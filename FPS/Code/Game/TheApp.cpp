@@ -34,9 +34,7 @@ void TheApp::Startup()
 	{
 		g_theRenderer = new RenderContext();
 
-	g_theRenderer->Startup();
-	//g_theCamera->SetOrthoView(Vec2(0.f, 0.f), Vec2(WORLD_SIZE_X, WORLD_SIZE_Y));
-	g_theRenderer->ClearScreen(BLACK);
+		g_theRenderer->Startup( g_theWindow );
 	}
 
 	if ( g_theGame == nullptr )
@@ -63,7 +61,7 @@ void TheApp::BeginFrame()
 	// all engine things that must begin at the beginning of each frame and not the game
 	g_theInput->BeginFrame();
 	g_theRenderer->BeginFrame();
-	g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
+	//g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
 
 }
 
@@ -80,12 +78,12 @@ void TheApp::Update( float deltaSeconds )
 
 void TheApp::Render() const
 {
-		g_theRenderer->ClearScreen( BLACK );
-		g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
-		g_theGame->Render();
-		g_theRenderer->EndCamera( g_theGame->m_worldCamera );
-
-		g_theGame->RenderUI();
+// 		g_theRenderer->ClearScreen( BLACK );
+// 		g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
+// 		g_theGame->Render();
+// 		g_theRenderer->EndCamera( g_theGame->m_worldCamera );
+// 
+// 		g_theGame->RenderUI();
 	
 	
 }

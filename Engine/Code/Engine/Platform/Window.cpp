@@ -152,8 +152,12 @@ bool Window::Open( std::string const& title , float clientAspect , float maxClie
 		( HINSTANCE ) ::GetModuleHandle( NULL ),
 		NULL );
 
+	m_ClientWidth  = clientRect.right  - clientRect.left;
+	m_clientHeight = clientRect.bottom - clientRect.top;
+
 	if ( hwnd == nullptr )
 	{
+		// GetLastError();
 		return false;
 	}
 
@@ -199,6 +203,16 @@ void Window::BeginFrame()
 		TranslateMessage( &queuedMessage );
 		DispatchMessage( &queuedMessage ); // This tells Windows to call our "WindowsMessageHandlingProcedure" (a.k.a. "WinProc") function
 	}
+}
+
+int Window::GetClientWidth()
+{
+	return m_ClientWidth;
+}
+
+int Window::GetClientHeight()
+{
+	return m_clientHeight;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

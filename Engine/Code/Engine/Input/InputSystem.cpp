@@ -155,7 +155,7 @@ void InputSystem::UpdateMouse()
 // 	AABB2 clientBounds = AABB2( clientRect.left , clientRect.top , clientRect.right , clientRect.bottom );
 // 	m_mouseNormalizedPosition = clientBounds.GetUVForPoint( clientMousePosition );
 // 	m_mouseNormalizedPosition.y = 1.f - m_mouseNormalizedPosition.y;
-	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
+//	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

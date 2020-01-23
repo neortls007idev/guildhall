@@ -9,6 +9,7 @@
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Renderer/Texture.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
+#include "Engine/Platform/Window.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				THIRD PARTY LIBRARIES
@@ -18,22 +19,84 @@
 #include "ThirdParty/stb/stb_image.h"
 #pragma warning( pop )
 
+#if !defined(WIN32_LEAN_AND_MEAN)
+	 #define WIN32_LEAN_AND_MEAN
+#endif
+
+#define RENDER_DEBUG
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+#define INITGUID
+#include <d3d11.h>  // d3d11 specific objects
+#include <dxgi.h>   // shared library used across multiple dx graphical interfaces
+#include <dxgidebug.h>  // debug utility (mostly used for reporting and analytics)
+
+#pragma comment( lib, "d3d11.lib" )         // needed a01
+#pragma comment( lib, "dxgi.lib" )          // needed a01
+#pragma comment( lib, "d3dcompiler.lib" )   // needed when we get to shaders
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 BitmapFont* g_bitmapFont = nullptr;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::Startup()
+void RenderContext::Startup( Window* window )
 {
-	if ( g_bitmapFont == nullptr )
-	{
-		g_bitmapFont = GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
-	}
-// 	glEnable( GL_BLEND );
-// 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-// 	glLoadIdentity();
-	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
+	// ID3D11Device
+	// ID3D11DeviceContext
+
+	IDXGISwapChain* swapchain;
+
+	UINT flags = D3D11_CREATE_DEVICE_SINGLETHREADED;
+#if defined(RENDER_DEBUG)
+	flags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
+	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
+	memset( &swapChainDesc , 0 , sizeof( swapChainDesc ) );
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_BACK_BUFFER;
+
+	swapChainDesc.BufferCount = 2;
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD; // on swap, the old buffer is discarded
+	swapChainDesc.Flags = 0; // additional flags - see docs.  Used in special cases like for video buffers
+
+	// how swap chain is to be used
+	HWND hwnd = ( HWND ) window->m_hwnd;
+	swapChainDesc.OutputWindow = hwnd; // HWND for the window to be used
+	swapChainDesc.SampleDesc.Count = 1; // how many samples per pixel (1 so no MSAA)
+										 // note, if we're doing MSAA, we'll do it on a secondary target
+
+	// describe the buffer
+	swapChainDesc.Windowed = TRUE;                                    // windowed/full-screen mode
+	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;     // use 32-bit color RGBA8 color
+	swapChainDesc.BufferDesc.Width = window->GetClientWidth();
+	swapChainDesc.BufferDesc.Height = window->GetClientHeight(); 
+	// save data as member variable when window is created.
+
+	// create
+	HRESULT result = D3D11CreateDeviceAndSwapChain( nullptr ,
+		D3D_DRIVER_TYPE_HARDWARE ,
+		nullptr ,
+		flags ,// Controls the type of device we make
+		nullptr ,
+		0 ,
+		D3D11_SDK_VERSION ,
+		&swapChainDesc ,
+		&swapchain ,
+		&m_device ,
+		nullptr ,
+		&m_context );
+
+	// Instance - singleton
+	// Device - create resources like textures buffers etc.
+	// Context - issue commands
+
+	//~ swapchain
+	GUARANTEE_OR_DIE( SUCCEEDED( result ) , "FAILED TO CREATE RESOURCES" );
+// 	if ( g_bitmapFont == nullptr )
+// 	{
+// 		g_bitmapFont = GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
+// 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

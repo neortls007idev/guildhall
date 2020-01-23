@@ -14,10 +14,12 @@ public:
 
 	void BeginFrame(); // process window messages
 
+	int GetClientWidth();
+	int GetClientHeight();
+
 	void* m_hwnd = nullptr;
 
-
-
 private:
-
+	int m_clientHeight = 0;
+	int m_ClientWidth  = 0;
 };

@@ -13,6 +13,9 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 class BitmapFont;
+class Window;
+struct ID3D11Device;
+struct ID3D11DeviceContext;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -29,7 +32,7 @@ class RenderContext
 
 public:	
 	
-	void Startup();
+	void Startup( Window* window );
 	void BeginFrame();
 	void EndFrame();
 	void Shutdown();
@@ -78,12 +81,15 @@ private:
 	BitmapFont* CreateBitMapFontFromFile( std::string bitmapFontFilePath );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+public:
+	ID3D11Device*		 m_device;
+	ID3D11DeviceContext* m_context; // Immediate context
 
 private:
 
 	std::map<std::string , Texture*>	m_LoadedTextures;	 // LOOKUP TABLE OF FILEPATH & TEXTUREID
 	std::map<std::string , BitmapFont*> m_LoadedBitMapFonts; // LOOKUP TABLE OF FILEPATH & BITMAPFONTID
-	
+
 };
 
 
