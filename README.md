@@ -1,7 +1,8 @@
 MP2 And SD2 Checklist
 ------
 
-##MP2 Checklist
+## MP2 Checklist
+
 Checklist for all MP2 assignments
 
 ------
@@ -31,7 +32,8 @@ Use the branch name `mp2/turnin/a01` for grading, and you have the checklist cop
 - [ ] Once assignment is done and everything compiles (and there were changes), merge `mp2/turnin/a01` back in to `master`
 ------
 
-##SD2 Checklist
+## SD2 Checklist
+
 Checklist for all SD2 assignments
 ------
 
