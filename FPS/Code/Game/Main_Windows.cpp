@@ -44,7 +44,6 @@ int WINAPI WinMain( _In_ HINSTANCE applicationInstanceHandle, _In_opt_ HINSTANCE
 	while( !g_theApp->IsQuitting() )			
 	{
 		g_theApp -> RunFrame();					
-	/*	SwapBuffers( g_displayDeviceContext );*/
 	}
 
 	g_theApp -> Shutdown();
