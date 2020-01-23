@@ -1,12 +1,12 @@
 MP2 And SD2 Checklist
 ======
 
-#MP2 Checklist
+##MP2 Checklist
 
 Checklist for all MP2 assignments
 ------
 
-## A01 Checklist
+### A01 Checklist
 
 Use the branch name `mp2/turnin/a01` for grading, and you have the checklist copied to your `Root` folder in a file named `mp2.a01.md`
 
@@ -31,14 +31,14 @@ Use the branch name `mp2/turnin/a01` for grading, and you have the checklist cop
 - [ ] Once assignment is done and everything compiles (and there were changes), merge `mp2/turnin/a01` back in to `master`
 ------
 
-#SD2 Checklist
+##SD2 Checklist
 
 Checklist for all SD2 assignments
 ------
 
-## A01 Checklist
+### A01 Checklist
 
-### Required Tasks
+#### Required Tasks
 **Required Tasks** are tasks that the course relies on being complete, and will most likely be built upon on later assignments.  All required tasks must be attempted before a bonus task will be graded.
 
 - [ ] *10pts*: `Window` class created in Engine to spec, with Protogame being updated;
@@ -66,7 +66,7 @@ Checklist for all SD2 assignments
    - Also check that you are indeed making a debug context
 5. Grade extras if applicable
 
-### Bonus Tasks
+#### Bonus Tasks
 **Bonus Tasks** are tasks that are related to the main assignment, but are not required for finishing the course, hopefully to allow for some personalization of your own engine.
 
 No required tasks will build off bonus tasks, but future bonus tasks may (and they will clearly label which ones they require).
