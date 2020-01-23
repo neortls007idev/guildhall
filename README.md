@@ -1,9 +1,9 @@
 MP2 And SD2 Checklist
-======
+------
 
 ##MP2 Checklist
-
 Checklist for all MP2 assignments
+
 ------
 
 ### A01 Checklist
@@ -32,7 +32,6 @@ Use the branch name `mp2/turnin/a01` for grading, and you have the checklist cop
 ------
 
 ##SD2 Checklist
-
 Checklist for all SD2 assignments
 ------
 
