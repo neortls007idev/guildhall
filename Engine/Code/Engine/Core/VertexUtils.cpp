@@ -1,5 +1,6 @@
 #include "Engine/Core/VertexUtils.hpp "
 #include "Engine/Math/MathUtils.hpp"
+#include "ErrorWarningAssert.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -79,6 +80,37 @@ void AppendVertsForAABB2( std::vector<Vertex_PCU>& vertexArray , const AABB2& bo
 	{
 		vertexArray.push_back( boxVerts[ index ] );
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void AppendVertsForPolygon( std::vector<Vertex_PCU>& vertexArray , const Vec2* points , const unsigned int count , const Rgba8& tint )
+{
+	const Vertex_PCU tempVert1 = Vertex_PCU( Vec3( points->x , points->y , 0.f ) , tint , Vec2::ZERO );
+	
+	for ( unsigned int pointIndex = 2; pointIndex < count; pointIndex++  )
+	{
+		vertexArray.push_back( tempVert1 );
+		points = points++;
+		const Vertex_PCU tempVert2 = Vertex_PCU( Vec3( points->x , points->y , 0.f ) , tint , Vec2::ZERO );
+		vertexArray.push_back( tempVert2 );
+		points = points++;
+		const Vertex_PCU tempVert3 = Vertex_PCU( Vec3( points->x , points->y , 0.f ) , tint , Vec2::ZERO );
+		vertexArray.push_back( tempVert3 );
+		points = points--;
+		//points = points--;
+		//points = points + 3;
+	}
+
+	for ( int x = 0; x < vertexArray.size(); x++ )
+	{
+		DebuggerPrintf( "vertexArray[%d] => X = %f , Y = %f\n" , x , vertexArray[ x ].m_position.x , vertexArray[ x ].m_position.y );
+		if ( x%3 == 2)
+		{
+			DebuggerPrintf( "\n" );
+		}
+	}
+	int x;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
