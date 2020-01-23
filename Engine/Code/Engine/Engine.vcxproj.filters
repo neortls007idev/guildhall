@@ -32,6 +32,9 @@
     <Filter Include="Math\RNG &amp; Noise">
       <UniqueIdentifier>{3fbc4248-dff3-4d36-a6aa-c8ccf9017eb6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{0be3e79f-9125-4a7a-b052-d9f48a7a32d1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Rgba8.cpp">
@@ -165,6 +168,9 @@
     </ClCompile>
     <ClCompile Include="Math\SmoothNoise.cpp">
       <Filter>Math\RNG &amp; Noise</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Window.cpp">
+      <Filter>Platform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -332,6 +338,9 @@
     </ClInclude>
     <ClInclude Include="Math\SmoothNoise.hpp">
       <Filter>Math\RNG &amp; Noise</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Window.hpp">
+      <Filter>Platform</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

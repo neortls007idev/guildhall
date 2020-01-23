@@ -197,6 +197,7 @@
     <ClCompile Include="Math\Vec2.cpp" />
     <ClCompile Include="Math\Vec3.cpp" />
     <ClCompile Include="Math\Vec4.cpp" />
+    <ClCompile Include="Platform\Window.cpp" />
     <ClCompile Include="Primitives\AABB2.cpp" />
     <ClCompile Include="Primitives\Capsule2D.cpp" />
     <ClCompile Include="Primitives\Disc2D.cpp" />
@@ -254,6 +255,7 @@
     <ClInclude Include="Math\Vec2.hpp" />
     <ClInclude Include="Math\Vec3.hpp" />
     <ClInclude Include="Math\Vec4.hpp" />
+    <ClInclude Include="Platform\Window.hpp" />
     <ClInclude Include="Primitives\AABB2.hpp" />
     <ClInclude Include="Primitives\Capsule2D.hpp" />
     <ClInclude Include="Primitives\Disc2D.hpp" />
