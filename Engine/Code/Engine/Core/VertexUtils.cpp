@@ -83,3 +83,22 @@ void AppendVertsForAABB2( std::vector<Vertex_PCU>& vertexArray , const AABB2& bo
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void AppendVertsForPolygon( std::vector<Vertex_PCU>& vertexArray , const Vec2* points , const unsigned int count , const Rgba8& tint )
+{
+	const Vertex_PCU tempVert1 = Vertex_PCU( Vec3( points->x , points->y , 0.f ) , tint , Vec2::ZERO );
+
+	for ( unsigned int pointIndex = 2; pointIndex < count; pointIndex++ )
+	{
+		vertexArray.push_back( tempVert1 );
+		points = points++;
+		const Vertex_PCU tempVert2 = Vertex_PCU( Vec3( points->x , points->y , 0.f ) , tint , Vec2::ZERO );
+		vertexArray.push_back( tempVert2 );
+		points = points++;
+		const Vertex_PCU tempVert3 = Vertex_PCU( Vec3( points->x , points->y , 0.f ) , tint , Vec2::ZERO );
+		vertexArray.push_back( tempVert3 );
+		points = points--;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
