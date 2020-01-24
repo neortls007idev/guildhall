@@ -24,6 +24,7 @@
 #endif
 
 #define RENDER_DEBUG
+#define DX_SAFE_RELEASE( ptr ) if ( nullptr != ptr ) ( ptr->Release(); ptr = nullptr; )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 #define INITGUID
@@ -97,6 +98,7 @@ void RenderContext::Startup( Window* window )
 // 	{
 // 		g_bitmapFont = GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
 // 	}
+	swapchain->Release();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -117,7 +119,11 @@ void RenderContext::EndFrame()
 
 void RenderContext::Shutdown()
 {
-	
+	if ( nullptr != m_device )
+	{
+		m_device->Release();
+		m_context->Release();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
