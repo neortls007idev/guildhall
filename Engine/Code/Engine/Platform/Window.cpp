@@ -44,7 +44,7 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 	{
 		unsigned char asKey = ( unsigned char ) wParam;
 		//UNUSED( asKey );
-		input = window->GetInputSytem();
+		//input = window->GetInputSytem();
 		input->HandleKeyDown( asKey );
 		break;
 	}
@@ -53,7 +53,7 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 	case WM_KEYUP:
 	{
 		unsigned char asKey = ( unsigned char ) wParam;
-		input = window->GetInputSytem();
+		//input = window->GetInputSytem();
 		input->HandleKeyUp( asKey );
 		//UNUSED( asKey );
 		break;

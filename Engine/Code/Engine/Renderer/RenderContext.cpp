@@ -10,6 +10,7 @@
 #include "Engine/Renderer/Texture.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Platform/Window.hpp"
+#include "Engine/Renderer/SwapChain.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				THIRD PARTY LIBRARIES
@@ -19,21 +20,14 @@
 #include "ThirdParty/stb/stb_image.h"
 #pragma warning( pop )
 
-#if !defined(WIN32_LEAN_AND_MEAN)
-	 #define WIN32_LEAN_AND_MEAN
-#endif
-
 #include <shobjidl.h>
 #include <shobjidl_core.h>
 
-#define RENDER_DEBUG
-#define DX_SAFE_RELEASE( ptr ) if ( nullptr != ptr ) ( ptr->Release(); ptr = nullptr; )
-
 //--------------------------------------------------------------------------------------------------------------------------------------------
-#define INITGUID
-#include <d3d11.h>  // d3d11 specific objects
-#include <dxgi.h>   // shared library used across multiple dx graphical interfaces
-#include <dxgidebug.h>  // debug utility (mostly used for reporting and analytics)
+//				D3D11 specific includes and Macros
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+#include "Engine/Renderer/D3D11Common.hpp"
 
 #pragma comment( lib, "d3d11.lib" )         // needed a01
 #pragma comment( lib, "dxgi.lib" )          // needed a01
@@ -49,7 +43,7 @@ void RenderContext::Startup( Window* window )
 	// ID3D11Device
 	// ID3D11DeviceContext
 
-	IDXGISwapChain* swapchain;
+	IDXGISwapChain* swapchain = nullptr;  // Create Swap Chain
 
 	UINT flags = D3D11_CREATE_DEVICE_SINGLETHREADED;
 #if defined(RENDER_DEBUG)
@@ -61,7 +55,7 @@ void RenderContext::Startup( Window* window )
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_BACK_BUFFER;
 
 	swapChainDesc.BufferCount = 2;
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD; // on swap, the old buffer is discarded
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // on swap, the old buffer is discarded
 	swapChainDesc.Flags = 0; // additional flags - see docs.  Used in special cases like for video buffers
 
 	// how swap chain is to be used
@@ -103,7 +97,7 @@ void RenderContext::Startup( Window* window )
 // 	{
 // 		g_bitmapFont = GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
 // 	}
-	swapchain->Release();
+	m_swapChain = new SwapChain( this , swapchain );
 }
 
 
@@ -119,18 +113,18 @@ void RenderContext::BeginFrame()
 
 void RenderContext::EndFrame()
 {
-	//SwapBuffers( g_displayDeviceContext );
+	m_swapChain->Present();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void RenderContext::Shutdown()
 {
-	if ( nullptr != m_device )
-	{
-		m_device->Release();
-		m_context->Release();
-	}
+	delete m_swapChain;
+	m_swapChain = nullptr;
+
+	DX_SAFE_RELEASE( m_context );
+	DX_SAFE_RELEASE( m_device );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

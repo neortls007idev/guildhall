@@ -14,6 +14,7 @@
 
 class BitmapFont;
 class Window;
+class SwapChain;
 struct ID3D11Device;
 struct ID3D11DeviceContext;
 
@@ -82,8 +83,9 @@ private:
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 public:
-	ID3D11Device*		 m_device  = nullptr ;
-	ID3D11DeviceContext* m_context = nullptr ; // Immediate context
+	ID3D11Device*		 m_device	 = nullptr ;
+	ID3D11DeviceContext* m_context   = nullptr ; // Immediate context
+	SwapChain*			 m_swapChain = nullptr;
 
 private:
 

@@ -23,7 +23,6 @@ Game::Game()
 	
 }
 
-
 void Game::Update( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
@@ -52,10 +51,6 @@ void Game::AddScreenShakeIntensity( float deltaShakeIntensity )
 	//clamp it!
 }
 
-
-
-
-
 void Game::GarbageCollection()
 {
 
@@ -67,7 +62,6 @@ void Game::GarbageDeletion()
 {
 
 }
-
 
 void Game::Die()
 {

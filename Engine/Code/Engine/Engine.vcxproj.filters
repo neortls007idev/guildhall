@@ -172,6 +172,9 @@
     <ClCompile Include="Platform\Window.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\SwapChain.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -341,6 +344,12 @@
     </ClInclude>
     <ClInclude Include="Platform\Window.hpp">
       <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\SwapChain.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\D3D11Common.hpp">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
