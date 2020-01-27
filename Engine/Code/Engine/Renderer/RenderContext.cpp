@@ -23,6 +23,9 @@
 	 #define WIN32_LEAN_AND_MEAN
 #endif
 
+#include <shobjidl.h>
+#include <shobjidl_core.h>
+
 #define RENDER_DEBUG
 #define DX_SAFE_RELEASE( ptr ) if ( nullptr != ptr ) ( ptr->Release(); ptr = nullptr; )
 
@@ -88,6 +91,8 @@ void RenderContext::Startup( Window* window )
 		nullptr ,
 		&m_context );
 
+	//HRESULT SetProgressState( HWND hwnd ,TBPFLAG TBPF_NORMAL );
+
 	// Instance - singleton
 	// Device - create resources like textures buffers etc.
 	// Context - issue commands
@@ -100,6 +105,8 @@ void RenderContext::Startup( Window* window )
 // 	}
 	swapchain->Release();
 }
+
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

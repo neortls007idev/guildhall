@@ -2,14 +2,10 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include "Game/TheApp.hpp"
+
 #include "Engine/Input/InputSystem.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-
-extern TheApp* g_theApp;
-extern InputSystem* g_theInput;
-
 
 static TCHAR const* WND_CLASS_NAME = TEXT( "Simple Window Class" );
 
@@ -21,13 +17,25 @@ static TCHAR const* WND_CLASS_NAME = TEXT( "Simple Window Class" );
 
 static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UINT wmMessageCode , WPARAM wParam , LPARAM lParam )
 {
-	/*
+	Window* window = ( Window* ) ::GetWindowLongPtr( windowHandle , GWLP_USERDATA );
+	InputSystem* input = nullptr;
+
+	if ( window )
+	{
+		input = window->GetInputSytem();
+	}
+
 	switch ( wmMessageCode )
 	{
+	case WM_CREATE: {
+		window = ( Window* ) lParam;
+		::SetWindowLongPtr( windowHandle , GWLP_USERDATA , ( LONG_PTR ) window );
+	} break;
 		// App close requested via "X" button, or right-click "Close Window" on task bar, or "Close" from system menu, or Alt-F4
 	case WM_CLOSE:
 	{
-		g_theApp->HandleQuitRequested();
+		//Window->HandleQuitRequested();
+		//g_theApp->HandleQuitRequested();
 		return 0; // "Consumes" this message (tells Windows "okay, we handled it")
 	}
 
@@ -36,7 +44,8 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 	{
 		unsigned char asKey = ( unsigned char ) wParam;
 		//UNUSED( asKey );
-		g_theInput->HandleKeyDown( asKey );
+		input = window->GetInputSytem();
+		input->HandleKeyDown( asKey );
 		break;
 	}
 
@@ -44,12 +53,13 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 	case WM_KEYUP:
 	{
 		unsigned char asKey = ( unsigned char ) wParam;
-		g_theInput->HandleKeyUp( asKey );
+		input = window->GetInputSytem();
+		input->HandleKeyUp( asKey );
 		//UNUSED( asKey );
 		break;
 	}
 	}
-	*/
+	
 	// Send back to Windows any unhandled/unconsumed messages we want other apps to see (e.g. play/pause in music apps, etc.)
 	return DefWindowProc( windowHandle , wmMessageCode , wParam , lParam );
 }
@@ -98,7 +108,7 @@ Window::~Window()
 bool Window::Open( std::string const& title , float clientAspect , float maxClientFractionOfDesktop )
 {
 	// #SD1ToDo: Add support for fullscreen mode (requires different window style flags than windowed mode)
-	const DWORD windowStyleFlags = WS_CAPTION | WS_BORDER | WS_THICKFRAME | WS_SYSMENU | WS_OVERLAPPED;
+	const DWORD windowStyleFlags = WS_CAPTION | WS_SYSMENU | WS_OVERLAPPED /*| WS_BORDER | WS_THICKFRAME */;
 	const DWORD windowStyleExFlags = WS_EX_APPWINDOW;
 
 	// Get desktop rect, dimensions, aspect
@@ -150,10 +160,22 @@ bool Window::Open( std::string const& title , float clientAspect , float maxClie
 		NULL ,
 		NULL ,
 		( HINSTANCE ) ::GetModuleHandle( NULL ),
-		NULL );
+		this );
+
+	/* TODO :- Taskbar progress 
+			HRESULT result = */
+		//HRESULT SetProgressState( HWND hwnd , TBPFLAG TBPF_NORMAL);
+
+// 	HRESULT SetProgressValue(
+// 		HWND      hwnd ,
+// 		ULONGLONG 50 ,
+// 		ULONGLONG 100
+// 	);
 
 	m_ClientWidth  = clientRect.right  - clientRect.left;
 	m_clientHeight = clientRect.bottom - clientRect.top;
+
+	::SetWindowLongPtr( hwnd , GWLP_USERDATA , ( LONG_PTR ) this );
 
 	if ( hwnd == nullptr )
 	{
@@ -185,6 +207,13 @@ void Window::Close()
 
 	::DestroyWindow( hwnd );
 	m_hwnd = nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Window::SetInputSystem( InputSystem* InputSystem )
+{
+	m_inputSystem = InputSystem;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

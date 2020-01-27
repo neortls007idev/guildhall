@@ -6,6 +6,7 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Time/Time.hpp"
+#include "Engine/Platform/Window.hpp"
 
 RenderContext* g_theRenderer = nullptr;
 TheApp* g_theApp = nullptr;
@@ -29,6 +30,7 @@ void TheApp::Startup()
  	if ( g_theInput == nullptr )
  	{
 		g_theInput = new InputSystem();
+		g_theWindow->SetInputSystem( g_theInput );
  	}
 	if ( g_theRenderer == nullptr )
 	{
@@ -60,6 +62,7 @@ void TheApp::BeginFrame()
 {
 	// all engine things that must begin at the beginning of each frame and not the game
 	g_theInput->BeginFrame();
+	g_theWindow->BeginFrame();
 	g_theRenderer->BeginFrame();
 	//g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
 
