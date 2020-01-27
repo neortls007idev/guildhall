@@ -19,12 +19,12 @@ class Camera
 public:
 	Camera() {};
 	~Camera() {};
-	void SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
-	Vec2 GetOrthoBottomLeft() const;
-	Vec2 GetOrthoTopRight() const;
-	void Translate2D( const Vec2 cameraTranslate );
-	void SetClearMode( unsigned int clearFlags , Rgba8 color , float depth = 0.f , unsigned int stencil = 0 );
-
+	void  SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
+	Vec2  GetOrthoBottomLeft() const;
+	Vec2  GetOrthoTopRight() const;
+	void  Translate2D( const Vec2 cameraTranslate );
+	void  SetClearMode( unsigned int clearFlags , Rgba8 color , float depth = 0.f , unsigned int stencil = 0 );
+	Rgba8 GetClearColor() const																						{ return m_clearColor; }
 
 private:
 

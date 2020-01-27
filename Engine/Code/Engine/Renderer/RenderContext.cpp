@@ -8,6 +8,7 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Renderer/Texture.hpp"
+#include "Engine/Renderer/TextureView.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Renderer/SwapChain.hpp"
@@ -35,6 +36,17 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 BitmapFont* g_bitmapFont = nullptr;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+RenderContext::~RenderContext()
+{
+	delete m_swapChain;
+	m_swapChain = nullptr;
+
+	DX_SAFE_RELEASE( m_context );
+	DX_SAFE_RELEASE( m_device );
+}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -129,22 +141,31 @@ void RenderContext::Shutdown()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::ClearScreen( const Rgba8& ClearColor )
+
+void RenderContext::ClearScreen( const Rgba8& clearColor )
 {
-	UNUSED( ClearColor );
-// 	glClear( GL_COLOR_BUFFER_BIT ); 
-// 	glClearColor( ClearColor.r * ( 1.f / 255.f ) , ClearColor.g * ( 1.f / 255.f ) , ClearColor.b * ( 1.f / 255.f ) , ClearColor.a * ( 1.f / 255.f ) );
-	GUARANTEE_OR_DIE( false , "replace with D3D11 implementation" );
+	float clearFloats[ 4 ];
+	float scaleToFloat = 1 / 255.f;
+
+	clearFloats[ 0 ] = ( float ) clearColor.r * scaleToFloat;
+	clearFloats[ 1 ] = ( float ) clearColor.g * scaleToFloat;
+	clearFloats[ 2 ] = ( float ) clearColor.b * scaleToFloat;
+	clearFloats[ 3 ] = ( float ) clearColor.a * scaleToFloat;
+
+	// can be put under clear Texture function
+
+	Texture* backbuffer = m_swapChain->GetBackBuffer();
+	TextureView* backbuffer_rtv = backbuffer->GetRenderTargetView();
+
+	ID3D11RenderTargetView* rtv = backbuffer_rtv->GetRTVHandle();
+	m_context->ClearRenderTargetView( rtv , clearFloats );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void RenderContext::BeginCamera( const Camera& camera )
 {
-	UNUSED( camera );
-// 	glLoadIdentity();
-// 	glOrtho(camera.GetOrthoBottomLeft().x, camera.GetOrthoTopRight().x, camera.GetOrthoBottomLeft().y, camera.GetOrthoTopRight().y, 0.f, 1.f);
-	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
+	ClearScreen( camera.GetClearColor() );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

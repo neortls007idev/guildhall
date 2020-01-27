@@ -81,9 +81,9 @@ void TheApp::Update( float deltaSeconds )
 
 void TheApp::Render() const
 {
-// 		g_theRenderer->ClearScreen( BLACK );
+// 		g_theRenderer->ClearScreen( RED );
 // 		g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
-// 		g_theGame->Render();
+ 		g_theGame->Render();
 // 		g_theRenderer->EndCamera( g_theGame->m_worldCamera );
 // 
 // 		g_theGame->RenderUI();

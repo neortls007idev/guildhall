@@ -32,14 +32,15 @@ class RenderContext
 {
 
 public:	
+	RenderContext() {};
+	~RenderContext();
 	
 	void Startup( Window* window );
 	void BeginFrame();
 	void EndFrame();
 	void Shutdown();
-
-	
-	void ClearScreen( const Rgba8& ClearColor );
+		
+	void ClearScreen( const Rgba8& clearColor );
 	void BeginCamera( const Camera& camera );
 	void EndCamera( const Camera& camera);
 
