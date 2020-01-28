@@ -20,13 +20,18 @@ Game::Game()
 {
 	m_worldCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y ) );
 	m_uiCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
-	
+	m_color = GREEN;
 }
 
 void Game::Update( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
-	m_worldCamera.SetClearMode( CLEAR_COLOR_BIT , GREEN );
+	m_color.a++;
+	float temp = m_color.a *( 1 / 255.f );
+	m_color.a = ( uchar ) ( SmoothStep3( temp ) * 255 );
+// 	m_color = m_color.RollRandomColor( m_RNG );
+// 	m_RNG.manuallyIncrementPosition();
+	m_worldCamera.SetClearMode( CLEAR_COLOR_BIT , m_color );
 }
 
 void Game::Render() const

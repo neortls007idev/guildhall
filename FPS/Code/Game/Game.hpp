@@ -1,11 +1,12 @@
 #pragma once
-#include "Game/GameCommon.hpp"
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
-#include "World.hpp"
+#include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Primitives/AABB2.hpp"
 #include "Engine/Renderer/Texture.hpp"
 #include "Game/Player.hpp"
+#include "Game/World.hpp"
+#include "Game/GameCommon.hpp"
 
 class Game
 {
@@ -47,5 +48,6 @@ public:
 	Texture* m_tankTurretTexture = nullptr;
 	Camera m_worldCamera;
 	Camera m_uiCamera;
-
+	RandomNumberGenerator m_RNG;
+	Rgba8 m_color;
 };

@@ -8,6 +8,8 @@
 #include "Engine/Time/Time.hpp"
 #include "Engine/Platform/Window.hpp"
 
+#include "Engine/Renderer/D3D11Common.hpp"
+
 RenderContext* g_theRenderer = nullptr;
 TheApp* g_theApp = nullptr;
 InputSystem* g_theInput = nullptr;
@@ -119,6 +121,13 @@ bool TheApp::HandleQuitRequested()
 
 void TheApp::UpdateFromKeyboard()
 {
+	if ( g_theInput != nullptr && g_theInput->WasKeyJustPressed( 'C' ) /*&& g_theInput->WasKeyJustPressed( 'T' )*/ )
+	{
+		
+		bool r = ::SetWindowTextA( ( HWND ) g_theWindow->m_hwnd , "new title"/* L"Changed Window Text at Runtime"*/ );
+		
+	}
+
 	if ( g_theInput->GetButtonState( 'T' ).IsPressed() ) { m_isSloMo = true; }
 	else { m_isSloMo = false; }
 	if ( g_theInput->GetButtonState( 'Y' ).IsPressed() ) { m_isSpeedMo = true; }
