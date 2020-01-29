@@ -274,7 +274,7 @@ void Game::UpdateFromKeyBoard()
 		m_color.a = 100;
 	}
 
-	if ( g_theInput->WasKeyJustPressed( 'C' ) )
+	if ( g_theInput->WasMiddleMouseButtonJustReleased() )
 	{
 		m_hasCursorChangedToOBB = !m_hasCursorChangedToOBB;
 	}

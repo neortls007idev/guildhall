@@ -24,6 +24,28 @@ public:
 	bool  WasKeyJustPressed( unsigned char keyCode ) const;
 	bool  HandleKeyDown( unsigned char keyCode );
 	bool  HandleKeyUp( unsigned char keyCode );
+
+	bool WasLeftMouseButtonJustPressed() const;
+	bool WasLeftMouseButtonJustReleased() const;
+	bool  IsLeftMouseButtonHeldDown() const;
+
+	bool HandleLeftMouseButtonPressed();
+	bool HandleLeftMouseButtonReleased();
+
+	bool WasRightMouseButtonJustPressed() const;
+	bool WasRightMouseButtonJustReleased() const;
+	bool  IsRightMouseButtonHeldDown() const;
+
+	bool HandleRightMouseButtonPressed();
+	bool HandleRightMouseButtonReleased();
+
+	bool WasMiddleMouseButtonJustPressed() const;
+	bool WasMiddleMouseButtonJustReleased() const;
+	bool  IsMiddleMouseButtonHeldDown() const;
+
+	bool HandleMiddleMouseButtonPressed();
+	bool HandleMiddleMouseButtonReleased();
+
 	const KeyButtonState& GetButtonState( unsigned char keyCode ) const;
 
 	const XboxController& GetXboxController( int controllerID );
@@ -36,6 +58,11 @@ public:
 private:
 
 	KeyButtonState m_keyStates[ MAX_KEYS ];
+
+	KeyButtonState m_leftMouseButton;
+	KeyButtonState m_rightMouseButton;
+	KeyButtonState m_middleMouseButton;
+
 	XboxController m_controllers[ MAX_XBOX_CONTROLLERS ] =
 	{
 		XboxController( 0 ),

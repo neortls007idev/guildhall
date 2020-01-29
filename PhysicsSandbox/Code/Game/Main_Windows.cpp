@@ -45,7 +45,6 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 		case WM_KEYDOWN:
 		{
 			unsigned char asKey = (unsigned char)wParam;
-			//UNUSED( asKey );
 			g_theInput->HandleKeyDown( asKey );
 			break;
 		}
@@ -55,7 +54,42 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 		{
 			unsigned char asKey = (unsigned char)wParam;
 			g_theInput->HandleKeyUp( asKey );
-			//UNUSED( asKey );
+			break;
+		}
+
+		case WM_LBUTTONDOWN :
+		{
+			g_theInput->HandleLeftMouseButtonPressed();
+			break;
+		}
+
+		case WM_LBUTTONUP :
+		{
+			g_theInput->HandleLeftMouseButtonReleased();
+			break;
+		}
+
+		case WM_RBUTTONDOWN :
+		{
+			g_theInput->HandleRightMouseButtonPressed();
+			break;
+		}
+
+		case WM_RBUTTONUP :
+		{
+			g_theInput->HandleRightMouseButtonReleased();
+			break;
+		}
+
+		case WM_MBUTTONDOWN :
+		{
+			g_theInput->HandleMiddleMouseButtonPressed();
+			break;
+		}
+
+		case WM_MBUTTONUP :
+		{
+			g_theInput->HandleMiddleMouseButtonReleased();
 			break;
 		}
 	}
