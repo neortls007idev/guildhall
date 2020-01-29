@@ -25,12 +25,8 @@ Game::Game()
 
 void Game::Update( float deltaSeconds )
 {
-	UNUSED( deltaSeconds );
-	m_color.a++;
-	float temp = m_color.a *( 1 / 255.f );
-	m_color.a = ( uchar ) ( SmoothStep3( temp ) * 255 );
-// 	m_color = m_color.RollRandomColor( m_RNG );
-// 	m_RNG.manuallyIncrementPosition();
+	//UNUSED( deltaSeconds );
+	m_color.g++;
 	m_worldCamera.SetClearMode( CLEAR_COLOR_BIT , m_color );
 }
 

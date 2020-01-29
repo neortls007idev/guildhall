@@ -32,6 +32,8 @@ void Camera::Translate2D(const Vec2 cameraTranslate)
 	topRightCoordinate   = topRightCoordinate + cameraTranslate;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Camera::SetClearMode( unsigned int clearFlags , Rgba8 color , float depth /*= 0.f */ , unsigned int stencil /*= 0 */ )
 {
 	m_clearMode = clearFlags;

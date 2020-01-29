@@ -22,10 +22,14 @@ public:
 	int GetClientWidth();
 	int GetClientHeight();
 
+	bool IsQuitting() const { return m_isQuitting; }
+	bool HandleQuitRequested();
+
 	void* m_hwnd = nullptr;
 
 private:
 	int			 m_clientHeight = 0;
 	int			 m_ClientWidth  = 0;
-	InputSystem* m_inputSystem = nullptr;
+	InputSystem* m_inputSystem  = nullptr;
+	bool		 m_isQuitting   = false;
 };

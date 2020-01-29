@@ -2,7 +2,6 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-
 #include "Engine/Input/InputSystem.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -35,8 +34,7 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 		// App close requested via "X" button, or right-click "Close Window" on task bar, or "Close" from system menu, or Alt-F4
 	case WM_CLOSE:
 	{
-		//Window->HandleQuitRequested();
-		//g_theApp->HandleQuitRequested();
+		window->HandleQuitRequested();
 		return 0; // "Consumes" this message (tells Windows "okay, we handled it")
 	}
 
@@ -163,9 +161,8 @@ bool Window::Open( std::string const& title , float clientAspect , float maxClie
 		( HINSTANCE ) ::GetModuleHandle( NULL ),
 		this );
 
-	/* TODO :- Taskbar progress 
-			HRESULT result = */
-		//HRESULT SetProgressState( HWND hwnd , TBPFLAG TBPF_NORMAL);
+	// TODO :- Taskbar progress 
+		//	HRESULT result = HRESULT SetProgressState( HWND hwnd , TBPFLAG TBPF_NORMAL);
 
 // 	HRESULT SetProgressValue(
 // 		HWND      hwnd ,
@@ -190,6 +187,17 @@ bool Window::Open( std::string const& title , float clientAspect , float maxClie
 
 	HCURSOR cursor = LoadCursor( NULL , IDC_ARROW );
 	SetCursor( cursor );
+
+// TODO:- Ask Forseth  this makes the entire window transparent based on alpha 
+// 	SetWindowLong( hwnd , GWL_EXSTYLE , WS_EX_LAYERED );
+// 	SetLayeredWindowAttributes( hwnd , RGB( 0 , 0 , 0 ) , 128 , LWA_ALPHA );
+
+// 	HICON hIcon1 = LoadIcon( ::GetModuleHandle( NULL ) ,  );
+// 		//DrawIcon(  , 10 , 20 , hIcon1 );
+// 		SetClassLongA( hwnd ,          // window handle 
+// 			-14 ,              // changes icon 
+// 			( LONG ) LoadIcon( ::GetModuleHandle( NULL ) , IDI_QUESTION )
+// 		);
 
 	m_hwnd = ( void* ) hwnd;
 	
@@ -235,14 +243,26 @@ void Window::BeginFrame()
 	}
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 int Window::GetClientWidth()
 {
 	return m_ClientWidth;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 int Window::GetClientHeight()
 {
 	return m_clientHeight;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Window::HandleQuitRequested()
+{
+	m_isQuitting = true;
+	return m_isQuitting;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

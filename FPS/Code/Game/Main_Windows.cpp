@@ -41,7 +41,7 @@ int WINAPI WinMain( _In_ HINSTANCE applicationInstanceHandle, _In_opt_ HINSTANCE
 
 	g_theApp -> Startup();
 		
-	while( !g_theApp->IsQuitting() )			
+	while( !g_theWindow->IsQuitting() )			
 	{
 		g_theApp -> RunFrame();					
 	}

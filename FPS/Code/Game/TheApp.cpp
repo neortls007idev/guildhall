@@ -112,20 +112,13 @@ void TheApp::Shutdown()
 	g_theInput = nullptr;
 }
 
-
-bool TheApp::HandleQuitRequested()
-{
-	m_isQuitting = true;
-	return m_isQuitting;
-}
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::UpdateFromKeyboard()
 {
 	if ( g_theInput != nullptr && g_theInput->WasKeyJustPressed( 'C' ) /*&& g_theInput->WasKeyJustPressed( 'T' )*/ )
 	{
-		
-		bool r = ::SetWindowTextA( ( HWND ) g_theWindow->m_hwnd , "new title"/* L"Changed Window Text at Runtime"*/ );
-		
+		::SetWindowTextA( ( HWND ) g_theWindow->m_hwnd , "new title"/* L"Changed Window Text at Runtime"*/ );
 	}
 
 	if ( g_theInput->GetButtonState( 'T' ).IsPressed() ) { m_isSloMo = true; }
@@ -135,7 +128,8 @@ void TheApp::UpdateFromKeyboard()
 
 	if ( g_theInput->GetButtonState( 'P' ).WasJustPressed() ) { m_isPaused = !m_isPaused; }
 
-	if ( g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() ) { HandleQuitRequested(); }
+	if ( g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() ) { g_theWindow->HandleQuitRequested(); }
+
 	if ( g_theInput->GetButtonState( KEY_F4 ).WasJustPressed() )
 	{
 		m_debugCamera = !m_debugCamera;

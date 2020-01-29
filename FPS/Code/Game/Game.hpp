@@ -48,6 +48,6 @@ public:
 	Texture* m_tankTurretTexture = nullptr;
 	Camera m_worldCamera;
 	Camera m_uiCamera;
-	RandomNumberGenerator m_RNG;
+	//RandomNumberGenerator m_RNG;
 	Rgba8 m_color;
 };
