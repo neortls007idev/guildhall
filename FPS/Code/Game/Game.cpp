@@ -25,7 +25,7 @@ Game::Game()
 
 void Game::Update( float deltaSeconds )
 {
-	//UNUSED( deltaSeconds );
+	UNUSED( deltaSeconds );
 	m_color.g++;
 	m_worldCamera.SetClearMode( CLEAR_COLOR_BIT , m_color );
 }
