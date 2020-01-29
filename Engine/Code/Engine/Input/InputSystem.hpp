@@ -24,6 +24,7 @@ public:
 	bool  WasKeyJustPressed( unsigned char keyCode ) const;
 	bool  HandleKeyDown( unsigned char keyCode );
 	bool  HandleKeyUp( unsigned char keyCode );
+	const KeyButtonState& GetButtonState( unsigned char keyCode ) const;
 
 	bool WasLeftMouseButtonJustPressed() const;
 	bool WasLeftMouseButtonJustReleased() const;
@@ -46,15 +47,14 @@ public:
 	bool HandleMiddleMouseButtonPressed();
 	bool HandleMiddleMouseButtonReleased();
 
-	const KeyButtonState& GetButtonState( unsigned char keyCode ) const;
-
-	const XboxController& GetXboxController( int controllerID );
-
 	IntVec2 GetMouseRawDesktopPosition() const;
 	Vec2    GetMouseNormalizedClientPosition() const;
 
 	void UpdateMouse();
+	void UpdateMouseWheel();
 
+	const XboxController& GetXboxController( int controllerID );
+	   
 private:
 
 	KeyButtonState m_keyStates[ MAX_KEYS ];

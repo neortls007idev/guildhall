@@ -92,6 +92,12 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 			g_theInput->HandleMiddleMouseButtonReleased();
 			break;
 		}
+
+		case WM_MOUSEWHEEL :
+		{
+			g_theInput->UpdateMouseWheel();
+			break;
+		}
 	}
 
 	// Send back to Windows any unhandled/unconsumed messages we want other apps to see (e.g. play/pause in music apps, etc.)
