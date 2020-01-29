@@ -29,6 +29,7 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 #include "Engine/Renderer/D3D11Common.hpp"
+#include "Shader.hpp"
 
 #pragma comment( lib, "d3d11.lib" )         // needed a01
 #pragma comment( lib, "dxgi.lib" )          // needed a01
@@ -110,6 +111,8 @@ void RenderContext::Startup( Window* window )
 // 		g_bitmapFont = GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
 // 	}
 	m_swapChain = new SwapChain( this , swapchain );
+	m_currentShader = new Shader();
+	m_currentShader->CreateFromFile( this , "Data/Shaders/Triangle.hlsl" );
 }
 
 
@@ -296,6 +299,13 @@ void RenderContext::BindTexture( const Texture* texture )
 // 		glDisable( GL_TEXTURE_2D );
 // 	}
 	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::Draw( int numVertexes , int vertexOffset )
+{
+	m_context->Draw( numVertexes , vertexOffset );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
