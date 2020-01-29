@@ -51,7 +51,8 @@ public:
 	Vec2    GetMouseNormalizedClientPosition() const;
 
 	void UpdateMouse();
-	void UpdateMouseWheel();
+	void UpdateMouseWheel( int deltaWheel );
+	int GetMouseWheelValue() const			{ return m_mouseWheel; }
 
 	const XboxController& GetXboxController( int controllerID );
 	   
@@ -62,6 +63,9 @@ private:
 	KeyButtonState m_leftMouseButton;
 	KeyButtonState m_rightMouseButton;
 	KeyButtonState m_middleMouseButton;
+	int			   m_mouseWheel				 = 0;
+	Vec2		   m_mouseNormalizedPosition = Vec2::ZERO;
+
 
 	XboxController m_controllers[ MAX_XBOX_CONTROLLERS ] =
 	{
@@ -71,7 +75,6 @@ private:
 		XboxController( 3 ),
 	};
 
-	Vec2 m_mouseNormalizedPosition = Vec2::ZERO;
 
 };
 

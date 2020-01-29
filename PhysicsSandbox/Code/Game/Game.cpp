@@ -122,6 +122,8 @@ void Game::RandomizePolygon( Vec2 mins , Vec2 maxs , unsigned int count , Random
 	m_polygon.push_back( Vec2( 100 , 100 ) );
 	m_polygon.push_back( Vec2( 100 , 10 ) );
 	
+	UNUSED( rng );
+	UNUSED( count );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -238,7 +240,7 @@ void Game::Render() const
 
 	g_theRenderer->DrawLine( m_lineSegment2D.m_start, m_lineSegment2D.m_end , m_color , 5.f );
 
-	g_theRenderer->DrawPolygon( &m_polygon[ 0 ] , m_polygon.size() , WHITE );
+	g_theRenderer->DrawPolygon( &m_polygon[ 0 ] , ( unsigned int ) m_polygon.size() , WHITE );
 
 	DrawMouseCurrentPosition( m_worldCamera );
 }
@@ -274,7 +276,7 @@ void Game::UpdateFromKeyBoard()
 		m_color.a = 100;
 	}
 
-	if ( g_theInput->WasMiddleMouseButtonJustReleased() )
+	if ( g_theInput->GetMouseWheelValue() > 1 )
 	{
 		m_hasCursorChangedToOBB = !m_hasCursorChangedToOBB;
 	}

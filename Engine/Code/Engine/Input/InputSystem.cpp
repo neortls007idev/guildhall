@@ -5,6 +5,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>					// #include this (massive, platform-specific) header in very few places
+#include "../Core/ErrorWarningAssert.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -54,6 +55,8 @@ void InputSystem::EndFrame()
 	m_leftMouseButton.m_wasPressedLastFrame   = m_leftMouseButton.m_isPressed;
 	m_rightMouseButton.m_wasPressedLastFrame  = m_rightMouseButton.m_isPressed;
 	m_middleMouseButton.m_wasPressedLastFrame = m_middleMouseButton.m_isPressed;
+
+	m_mouseWheel = ( int ) 0;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -254,9 +257,11 @@ void InputSystem::UpdateMouse()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void InputSystem::UpdateMouseWheel()
+void InputSystem::UpdateMouseWheel( int deltaWheel )
 {
-
+	DebuggerPrintf( "Current wheel Value preincrement = %d\n " , m_mouseWheel );
+	m_mouseWheel += deltaWheel;
+	DebuggerPrintf( "Current wheel Value postincrement = %d\n " , m_mouseWheel );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

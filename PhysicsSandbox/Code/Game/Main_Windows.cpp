@@ -21,7 +21,7 @@ bool g_isQuitting = false;							// ...becomes App::m_isQuitting
 HWND g_hWnd = nullptr;								// ...becomes WindowContext::m_windowHandle
 HDC g_displayDeviceContext = nullptr;				// ...becomes WindowContext::m_displayContext
 HGLRC g_openGLRenderingContext = nullptr;			// ...becomes RenderContext::m_apiRenderingContext
-const char* APP_NAME = " MP1 A8: Visual Unit Tests ";	// ...becomes ??? (Change this per project!)
+const char* APP_NAME = " MP2 A2: Physics Sandbox ";	// ...becomes ??? (Change this per project!)
 
 
 //-----------------------------------------------------------------------------------------------
@@ -95,7 +95,16 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 
 		case WM_MOUSEWHEEL :
 		{
-			g_theInput->UpdateMouseWheel();
+// 			if ( GET_WHEEL_DELTA_WPARAM( wParam ) > 0 )
+// 			{
+// 				g_theInput->UpdateMouseWheel( 10 );
+// 			}
+// 			if ( GET_WHEEL_DELTA_WPARAM( wParam ) < 0 )
+// 			{
+// 				g_theInput->UpdateMouseWheel( -10 );
+// 			}
+
+			g_theInput->UpdateMouseWheel( GET_WHEEL_DELTA_WPARAM( wParam ) );
 			break;
 		}
 	}
