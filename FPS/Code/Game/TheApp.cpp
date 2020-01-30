@@ -19,7 +19,7 @@ Game* g_theGame = nullptr;
 
 TheApp::TheApp()
 {
-
+	
 }
 
 TheApp::~TheApp()
@@ -119,6 +119,20 @@ void TheApp::UpdateFromKeyboard()
 	if ( g_theInput != nullptr && g_theInput->WasKeyJustPressed( 'C' ) /*&& g_theInput->WasKeyJustPressed( 'T' )*/ )
 	{
 		::SetWindowTextA( ( HWND ) g_theWindow->m_hwnd , "new title"/* L"Changed Window Text at Runtime"*/ );
+	}
+
+	if ( g_theInput != nullptr && g_theInput->WasKeyJustPressed( 'I' ) )
+	{
+		// TODO :- 
+		/*
+		HICON m_hIcon = static_cast< HICON >( ::LoadImage( NULL ,
+			MAKEINTRESOURCE( IDI_ERROR ) ,
+			IMAGE_ICON ,
+			0 , 0 ,
+			LR_DEFAULTCOLOR | LR_SHARED | LR_DEFAULTSIZE ) );
+
+		SetClassLong( ( HWND ) g_theWindow->m_hwnd , -34 , ( LONG ) m_hIcon );
+		*/
 	}
 
 	if ( g_theInput->GetButtonState( 'T' ).IsPressed() ) { m_isSloMo = true; }

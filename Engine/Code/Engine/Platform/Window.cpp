@@ -2,12 +2,17 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <Shobjidl.h>
+
 #include "Engine/Input/InputSystem.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-
-
-static TCHAR const* WND_CLASS_NAME = TEXT( "Simple Window Class" );
+//		STATIC AND GLOBAL VARIABLES
+//--------------------------------------------------------------------------------------------------------------------------------------------
+static TCHAR const*		WND_CLASS_NAME = TEXT( "Simple Window Class" );
+	   ITaskbarList3*	pTaskbar	   = NULL;
+	   UINT				m_taskbarButtonCreatedMessageId;
 
 //-----------------------------------------------------------------------------------------------
 // Handles Windows (Win32) messages/events; i.e. the OS is trying to tell us something happened.
@@ -20,6 +25,12 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 	Window* window = ( Window* ) ::GetWindowLongPtr( windowHandle , GWLP_USERDATA );
 	InputSystem* input = nullptr;
 
+	if ( wmMessageCode == m_taskbarButtonCreatedMessageId )
+	{
+		HRESULT result = CoCreateInstance( CLSID_TaskbarList , NULL , CLSCTX_INPROC_SERVER , IID_ITaskbarList3 , reinterpret_cast< LPVOID* >( &pTaskbar ) );
+		UNUSED( result );
+	}
+	
 	if ( window )
 	{
 		input = window->GetInputSytem();
@@ -67,17 +78,28 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 
 static void RegisterWindowClass() 
 {
+	HICON hIcon1 = static_cast< HICON >( ::LoadImage( NULL ,
+		IDI_WARNING ,
+		IMAGE_ICON ,
+		0 , 0 ,
+		LR_DEFAULTCOLOR | LR_SHARED | LR_DEFAULTSIZE ) );
+
 	// Define a window style/class
+
 	WNDCLASSEX windowClassDescription;
 	memset( &windowClassDescription , 0 , sizeof( windowClassDescription ) );
 	windowClassDescription.cbSize = sizeof( windowClassDescription );
 	windowClassDescription.style = CS_OWNDC; // Redraw on move, request own Display Context
 	windowClassDescription.lpfnWndProc = static_cast< WNDPROC >( WindowsMessageHandlingProcedure ); // Register our Windows message-handling function
 	windowClassDescription.hInstance = ::GetModuleHandle( NULL );
-	windowClassDescription.hIcon = NULL;
+	windowClassDescription.hIcon = hIcon1;
 	windowClassDescription.hCursor = NULL;
 	windowClassDescription.lpszClassName = TEXT( "Simple Window Class" );
 	::RegisterClassEx( &windowClassDescription );
+
+	m_taskbarButtonCreatedMessageId = RegisterWindowMessage( L"TaskbarButtonCreated" );
+	ChangeWindowMessageFilterEx( GetActiveWindow() , m_taskbarButtonCreatedMessageId , MSGFLT_ALLOW , NULL );
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -92,6 +114,7 @@ static void UnRegisterWindowClass()
 
 Window::Window()
 {
+	::CoInitialize( NULL );
 	RegisterWindowClass();
 }
 
@@ -161,15 +184,6 @@ bool Window::Open( std::string const& title , float clientAspect , float maxClie
 		( HINSTANCE ) ::GetModuleHandle( NULL ),
 		this );
 
-	// TODO :- Taskbar progress 
-		//	HRESULT result = HRESULT SetProgressState( HWND hwnd , TBPFLAG TBPF_NORMAL);
-
-// 	HRESULT SetProgressValue(
-// 		HWND      hwnd ,
-// 		ULONGLONG 50 ,
-// 		ULONGLONG 100
-// 	);
-
 	m_ClientWidth  = clientRect.right  - clientRect.left;
 	m_clientHeight = clientRect.bottom - clientRect.top;
 
@@ -188,18 +202,26 @@ bool Window::Open( std::string const& title , float clientAspect , float maxClie
 	HCURSOR cursor = LoadCursor( NULL , IDC_ARROW );
 	SetCursor( cursor );
 
-// TODO:- Ask Forseth  this makes the entire window transparent based on alpha 
-// 	SetWindowLong( hwnd , GWL_EXSTYLE , WS_EX_LAYERED );
-// 	SetLayeredWindowAttributes( hwnd , RGB( 0 , 0 , 0 ) , 128 , LWA_ALPHA );
-
-// 	HICON hIcon1 = LoadIcon( ::GetModuleHandle( NULL ) ,  );
-// 		//DrawIcon(  , 10 , 20 , hIcon1 );
-// 		SetClassLongA( hwnd ,          // window handle 
-// 			-14 ,              // changes icon 
-// 			( LONG ) LoadIcon( ::GetModuleHandle( NULL ) , IDI_QUESTION )
-// 		);
-
 	m_hwnd = ( void* ) hwnd;
+
+// 	SetWindowLong( hwnd , GWL_EXSTYLE , WS_EX_LAYERED );						----> Change Window Creation style to make a Layered Window
+// 	SetLayeredWindowAttributes( hwnd , RGB( 0 , 0 , 0 ) , 128 , LWA_ALPHA );	----> Change Attributes of Layered Window
+
+// 	HICON hIcon1 = static_cast< HICON >( ::LoadImage( NULL ,	----> Load an Icon to Memory using a .ico image file
+// 		MAKEINTRESOURCE( IDI_WARNING ) ,
+// 		IMAGE_ICON ,
+// 		0 , 0 ,
+// 		LR_DEFAULTCOLOR | LR_SHARED | LR_DEFAULTSIZE ) );
+// LoadIcon( ::GetModuleHandle( NULL ) , IDI_QUESTION );		----> Deprecated Version to Load an Icon LoadImage is more Preferred
+//	HDC hdc = GetDC( hwnd );									----> Get the current Devie Context using the windows handle
+// 	DrawIcon( hdc , 0 , 0 , hIcon1 );							----> Draw Icon in the current Context at the given coords from TopLeft
+// // 		SetClassLongA( hwnd ,								----> window handle 
+// // 			-14 ,											----> changes icon 
+// // 			( LONG ) LoadIcon( ::GetModuleHandle( NULL ) , IDI_QUESTION )
+// // 		);
+// 	SetWindowLongPtr( hwnd , -14 , ( LONG_PTR ) hIcon1 );
+// 	SendMessage( hwnd , WM_SETICON , ICON_BIG , NULL );
+// 	SetClassLong( hwnd , -14 , LPARAM( hIcon1 ) );
 	
 	return true;
 }
@@ -232,6 +254,16 @@ void Window::BeginFrame()
 	MSG queuedMessage;
 	for ( ;; )
 	{
+		if ( pTaskbar )
+		{
+			// Set Progress bar status in the taskbar
+			pTaskbar->SetProgressState( ( HWND ) m_hwnd , TBPF_INDETERMINATE );
+			// 	HRESULT SetProgressValue(
+			// 		HWND      hwnd ,
+			// 		ULONGLONG 50 ,
+			// 		ULONGLONG 100
+			// 	);
+		}
 		const BOOL wasMessagePresent = PeekMessage( &queuedMessage , NULL , 0 , 0 , PM_REMOVE );
 		if ( !wasMessagePresent )
 		{
@@ -261,6 +293,8 @@ int Window::GetClientHeight()
 
 bool Window::HandleQuitRequested()
 {
+	pTaskbar->Release();
+	::CoUninitialize();
 	m_isQuitting = true;
 	return m_isQuitting;
 }

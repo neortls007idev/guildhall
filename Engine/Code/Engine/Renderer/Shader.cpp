@@ -26,8 +26,9 @@ void* FileReadToNewBuffer( std::string const& filename, size_t *out_size )
 	if ( nullptr != buffer )
 	{
 		fseek( filePath , 0 , SEEK_SET );
-		long bytesRead = fread( buffer , 1 , fileSize , filePath );
+		size_t bytesRead = fread( buffer , 1 , fileSize , filePath );
 		//buffer bytesRead = NULL;
+		UNUSED( bytesRead );
 	}
 	
 	if ( out_size != nullptr )
@@ -62,6 +63,8 @@ bool Shader::CreateFromFile( RenderContext* ctx , std::string const& filename )
 	{
 		return false;
 	}
+
+	delete[] source;
 
 	return true;
 }

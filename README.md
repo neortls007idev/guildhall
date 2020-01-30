@@ -82,8 +82,8 @@ Note, most bonus tasks are twice the work for half the points of a required task
 - [ ] (X01.01 : 05pts) Fullscreen Support.  See notes, the default D3D11 support for this will not count.
 - [ ] (X01.10 : 02pts) Window alignment options
 - [x] (X01.11 : 01pts) Allow change of window title at runtime **( Press C key to test )**
-- [ ] (X01.12 : 02pts) Set a custom window icon
+- [x] (X01.12 : 02pts) Set a custom window icon
 - [ ] (X01.13 : 02pts) Allow change of window icon at runtime
-- [ ] (X01.14 : 02pts) Show window loading progress in task bar.
+- [-] (X01.14 : 02pts) Show window loading progress in task bar.**( Set To INDETERMINANT AND cycles constantly at the moment because we don't really have heavy load times at the moment )**
 
 ------
