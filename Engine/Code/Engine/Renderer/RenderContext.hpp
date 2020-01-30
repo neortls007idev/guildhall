@@ -18,6 +18,8 @@ class SwapChain;
 struct ID3D11Device;
 struct ID3D11DeviceContext;
 
+class Shader;
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 enum class BlendMode
@@ -57,7 +59,7 @@ public:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // DRAW FUNCTIONS
 //--------------------------------------------------------------------------------------------------------------------------------------------
-
+	void Draw( int numVertexes , int vertexOffset = 0 );
 	void DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes );
 	void DrawVertexArray( const std::vector<Vertex_PCU>& vertexArray );
 
@@ -87,6 +89,7 @@ public:
 	ID3D11Device*		 m_device	 = nullptr ;
 	ID3D11DeviceContext* m_context   = nullptr ; // Immediate context
 	SwapChain*			 m_swapChain = nullptr;
+	Shader* m_currentShader = nullptr;
 
 private:
 

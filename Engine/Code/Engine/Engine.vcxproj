@@ -203,6 +203,7 @@
     <ClCompile Include="Primitives\Disc2D.cpp" />
     <ClCompile Include="Primitives\LineSegment2D.cpp" />
     <ClCompile Include="Primitives\OBB2.cpp" />
+    <ClCompile Include="Renderer\Shader.cpp" />
     <ClCompile Include="Renderer\SpriteAnimSet.cpp" />
     <ClCompile Include="Renderer\BitmapFont.cpp" />
     <ClCompile Include="Renderer\Camera.cpp" />
@@ -267,6 +268,7 @@
     <ClInclude Include="Renderer\Camera.hpp" />
     <ClInclude Include="Renderer\D3D11Common.hpp" />
     <ClInclude Include="Renderer\RenderContext.hpp" />
+    <ClInclude Include="Renderer\Shader.hpp" />
     <ClInclude Include="Renderer\SpriteAnimation.hpp" />
     <ClInclude Include="Renderer\SpriteAnimeSet.hpp" />
     <ClInclude Include="Renderer\SpriteDefinition.hpp" />

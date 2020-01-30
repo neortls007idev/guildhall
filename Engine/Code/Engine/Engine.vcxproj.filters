@@ -35,6 +35,9 @@
     <Filter Include="Platform">
       <UniqueIdentifier>{0be3e79f-9125-4a7a-b052-d9f48a7a32d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Renderer\Shaders">
+      <UniqueIdentifier>{bd527724-b331-42fa-8bca-7a74f56c86de}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Rgba8.cpp">
@@ -177,6 +180,9 @@
     </ClCompile>
     <ClCompile Include="Renderer\TextureView.cpp">
       <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Shader.cpp">
+      <Filter>Renderer\Shaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -356,6 +362,9 @@
     </ClInclude>
     <ClInclude Include="Renderer\TextureView.hpp">
       <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Shader.hpp">
+      <Filter>Renderer\Shaders</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -4,6 +4,7 @@
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Game/Game.hpp"
 
+
 class TheApp
 {
 
@@ -24,7 +25,7 @@ public:
 private :
 	bool m_isSloMo = false;
 	bool m_isSpeedMo = false;
-
+	
 public:
 	bool m_isPaused = false;
 	bool m_debugCamera = false;

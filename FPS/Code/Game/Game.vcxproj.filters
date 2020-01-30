@@ -11,6 +11,12 @@
     <Filter Include="Gameplay\Entities">
       <UniqueIdentifier>{3329ea6d-c86e-48d3-8692-1cbaaabb7222}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data">
+      <UniqueIdentifier>{a912b540-ab14-40cf-a033-7b990fd31a2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Shaders">
+      <UniqueIdentifier>{057eeab1-e14a-4765-9763-8877c79401d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entity.cpp">
@@ -69,5 +75,10 @@
     <ClInclude Include="EngineBuildPreferences.hpp">
       <Filter>Framework</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\Run\Data\Shaders\Triangle.hlsl">
+      <Filter>Data\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

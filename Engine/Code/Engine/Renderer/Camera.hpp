@@ -3,7 +3,7 @@
 #include "Engine/Core/Rgba8.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-// TODO :- #define BIT_FLAG(b) ( 1 << b )
+// TODO :- 
 
 enum eCameraClearBitFlag : unsigned int
 {
