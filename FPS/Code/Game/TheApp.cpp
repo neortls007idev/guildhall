@@ -10,6 +10,8 @@
 
 #include "Engine/Renderer/D3D11Common.hpp"
 
+#include <winuser.h>
+
 RenderContext* g_theRenderer = nullptr;
 TheApp* g_theApp = nullptr;
 InputSystem* g_theInput = nullptr;
@@ -125,6 +127,13 @@ void TheApp::UpdateFromKeyboard()
 	{
 		// TODO :- 
 		/*
+
+		attempting to directly change the window class structure icon parameter
+
+		LPWNDCLASSEX currentWindow;
+		WNDCLASSEX windowClassDescription;
+		::GetClassInfo(NULL, windowClassDescription , currentWindow );
+
 		HICON m_hIcon = static_cast< HICON >( ::LoadImage( NULL ,
 			MAKEINTRESOURCE( IDI_ERROR ) ,
 			IMAGE_ICON ,
