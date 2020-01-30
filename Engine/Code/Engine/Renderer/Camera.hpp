@@ -25,6 +25,7 @@ public:
 	void  Translate2D( const Vec2 cameraTranslate );
 	void  SetClearMode( unsigned int clearFlags , Rgba8 color , float depth = 0.f , unsigned int stencil = 0 );
 	Rgba8 GetClearColor() const																						{ return m_clearColor; }
+	unsigned int GetClearMode() const																				{ return m_clearMode; }
 
 private:
 
