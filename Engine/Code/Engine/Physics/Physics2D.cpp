@@ -35,6 +35,12 @@ Rigidbody2D* Physics2D::CreateRigidbody()
 
 void Physics2D::DestroyRigidbody( Rigidbody2D* rigidbody )
 {
+	Collider2D* collider = rigidbody->GetCollider();
+	if (collider)
+	{
+		rigidbody->SetCollider( nullptr );
+		collider->Destroy();
+	}
 	rigidbody->Destroy();
 }
 

@@ -18,7 +18,8 @@ public:
 	void Destroy();								// helper for destroying myself (uses owner to mark self for destruction)
 	
 	void TakeCollider( Collider2D* collider );	// takes ownership of a collider (destroying my current one if present)
-	
+	Collider2D* GetCollider() const			{ return m_collider; }
+	void SetCollider( Collider2D* collider );
 	void SetPosition( Vec2 position );
 
 public:
@@ -26,6 +27,7 @@ public:
 	Collider2D* m_collider;
 
 	Vec2		m_worldPosition;				// where in the world is this rigidbody
+	bool		m_isGarbage = false;
 
 private:
 	~Rigidbody2D();								// destroys the collider
