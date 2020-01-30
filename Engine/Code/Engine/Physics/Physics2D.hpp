@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Math/Vec2.hpp"
+#include <vector>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -18,7 +19,7 @@ public:
 
 	// factory style create/destroy
 	Rigidbody2D* CreateRigidbody();
-	void DestroyRigidbody( Rigidbody2D* rb );
+	void DestroyRigidbody( Rigidbody2D* rigidbody );
 
 	DiscCollider2D* CreateDiscCollider( Vec2 localPosition , float radius );
 	void DestroyCollider( Collider2D* collider );
@@ -26,7 +27,9 @@ public:
 public:
 	// add members you may need to store these
 	// storage for all rigid bodies
+	std::vector<Rigidbody2D*>	m_rigidBodied2D;
 	// storage for all colliders
+	std::vector<Collider2D*>	m_colliders2D;
 	// ...
 };
 

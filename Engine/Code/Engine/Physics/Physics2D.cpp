@@ -1,5 +1,7 @@
 #include "Engine/Physics/Physics2D.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Physics/Rigidbody2D.hpp"
+#include "Engine/Physics/Collider2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -31,9 +33,9 @@ Rigidbody2D* Physics2D::CreateRigidbody()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Physics2D::DestroyRigidbody( Rigidbody2D* rb )
+void Physics2D::DestroyRigidbody( Rigidbody2D* rigidbody )
 {
-	UNUSED( rb );
+	rigidbody->Destroy();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -49,7 +51,7 @@ DiscCollider2D* Physics2D::CreateDiscCollider( Vec2 localPosition , float radius
 
 void Physics2D::DestroyCollider( Collider2D* collider )
 {
-	UNUSED( collider );
+	collider->~Collider2D();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

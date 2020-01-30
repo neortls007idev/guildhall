@@ -23,6 +23,8 @@ class Collider2D
 	friend class Physics2D;
 
 public: 
+	Collider2D( Physics2D* system , Rigidbody2D* rigidbody , COLLIDER2D_TYPE colliderType = COLLIDER2D_DISC );
+
 	virtual void UpdateWorldShape() = 0;
 
 	virtual Vec2 GetClosestPoint( Vec2 pos ) const = 0;
@@ -37,7 +39,7 @@ protected:
 public: 
 
 public:
-	COLLIDER2D_TYPE		m_type;						// keep track of the type - will help with collision later
+	COLLIDER2D_TYPE		m_colliderType;				// keep track of the type - will help with collision later
 	Physics2D*			m_system;                   // system who created or destr
 	Rigidbody2D*		m_rigidbody = nullptr;		// owning rigidbody, used for calculating world shape
 };
