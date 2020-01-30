@@ -197,6 +197,10 @@
     <ClCompile Include="Math\Vec2.cpp" />
     <ClCompile Include="Math\Vec3.cpp" />
     <ClCompile Include="Math\Vec4.cpp" />
+    <ClCompile Include="Physics\Collider2D.cpp" />
+    <ClCompile Include="Physics\DiscCollider2D.cpp" />
+    <ClCompile Include="Physics\Physics2D.cpp" />
+    <ClCompile Include="Physics\Rigidbody2D.cpp" />
     <ClCompile Include="Primitives\AABB2.cpp" />
     <ClCompile Include="Primitives\Capsule2D.cpp" />
     <ClCompile Include="Primitives\Disc2D.cpp" />
@@ -254,6 +258,10 @@
     <ClInclude Include="Math\Vec2.hpp" />
     <ClInclude Include="Math\Vec3.hpp" />
     <ClInclude Include="Math\Vec4.hpp" />
+    <ClInclude Include="Physics\Collider2D.hpp" />
+    <ClInclude Include="Physics\DiscCollider2D.hpp" />
+    <ClInclude Include="Physics\Physics2D.hpp" />
+    <ClInclude Include="Physics\Rigidbody2D.hpp" />
     <ClInclude Include="Primitives\AABB2.hpp" />
     <ClInclude Include="Primitives\Capsule2D.hpp" />
     <ClInclude Include="Primitives\Disc2D.hpp" />

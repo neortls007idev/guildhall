@@ -32,6 +32,9 @@
     <Filter Include="Math\RNG &amp; Noise">
       <UniqueIdentifier>{3fbc4248-dff3-4d36-a6aa-c8ccf9017eb6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Physics">
+      <UniqueIdentifier>{f29748e3-1432-455f-a59d-88acc662bc57}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Rgba8.cpp">
@@ -165,6 +168,18 @@
     </ClCompile>
     <ClCompile Include="Math\SmoothNoise.cpp">
       <Filter>Math\RNG &amp; Noise</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Collider2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\DiscCollider2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Physics2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Rigidbody2D.cpp">
+      <Filter>Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -332,6 +347,18 @@
     </ClInclude>
     <ClInclude Include="Math\SmoothNoise.hpp">
       <Filter>Math\RNG &amp; Noise</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Collider2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\DiscCollider2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Physics2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Rigidbody2D.hpp">
+      <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
