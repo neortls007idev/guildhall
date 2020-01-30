@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-
+#include <string.h>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -9,12 +9,13 @@ class RenderContext;
 struct ID3D11Resource;
 struct ID3D11VertexShader;
 struct ID3D11PixelShader;
+struct ID3D10Blob;
 
 struct ID3D11InputLayout;
 struct ID3D11RasterizerState;
 
 
-enum SHADER_STAGE
+enum SHADER_STAGE_TYPE
 {
 	SHADER_STAGE_VERTEX ,
 	SHADER_STAGE_FRAGMENT ,
@@ -28,18 +29,17 @@ public:
 	ShaderStage();
 	~ShaderStage();
 
-	bool LoadShaderFromSource( RenderContext* ctx ,
-		std::string const& filename , // For Debug Purpose
-		void const* source ,
-		size_t const sourceByteLen ,
-		SHADER_STAGE stage );
+	bool Compile( RenderContext* ctx , std::string const& filename , void const* source ,
+				  size_t const sourceByteLen , SHADER_STAGE_TYPE stageType );
 
-	inline bool IsValid() const { return m_handle != nullptr; }
+	inline bool IsValid() const { return nullptr != m_handle; }
 
 public:
 	// a stage could be any one of these types,
 	// so we use a enum to identify it, and a union to store it; 
-	SHADER_STAGE m_stage;
+	SHADER_STAGE_TYPE		m_stage;
+	ID3D10Blob*				m_byteCode = nullptr ;
+
 	union
 	{
 		ID3D11Resource*		m_handle;
@@ -53,22 +53,26 @@ public:
 class Shader
 {
 public:
+	Shader( RenderContext* context );
+	~Shader();
 	bool CreateFromFile( RenderContext* ctx , std::string const& filename );    // A02
-
 	// for hooking IA (input assembler) to the VS (vertex shader), 
 	// needs to vertex shader and vertex format to make the binding
 	//ID3D11InputLayout* GetOrCreateInputLayout( VertexBuffer* vbo );            // A02
 
 	ID3D11RasterizerState* GetRasterState();                                   // A02 (only creating a default one for now)
+	void CreateRasterSate();
 
 
 public:
-	ShaderStage m_vertex_shader;
-	ShaderStage m_pixel_shader;
+	ShaderStage				m_vertexStage;
+	ShaderStage				m_fragmentStage;
+	ID3D11RasterizerState*	m_rasterState = nullptr;
 
 	// A02 temp
-	ID3D11InputLayout* m_inputLayout = nullptr; // for now, we'll have 1, but in the future you could have one for each different vertex type you use with this; 
-	ID3D11RasterizerState* m_defaultRasterState = nullptr;
+	RenderContext*			m_owner;
+	ID3D11InputLayout*		m_inputLayout = nullptr; // for now, we'll have 1, but in the future you could have one for each different vertex type you use with this; 
+	ID3D11RasterizerState*	m_defaultRasterState = nullptr;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

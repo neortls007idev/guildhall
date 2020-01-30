@@ -111,7 +111,7 @@ void RenderContext::Startup( Window* window )
 // 		g_bitmapFont = GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
 // 	}
 	m_swapChain = new SwapChain( this , swapchain );
-	m_currentShader = new Shader();
+	m_currentShader = new Shader( this );
 	m_currentShader->CreateFromFile( this , "Data/Shaders/Triangle.hlsl" );
 }
 
@@ -137,6 +137,9 @@ void RenderContext::Shutdown()
 {
 	delete m_swapChain;
 	m_swapChain = nullptr;
+
+	delete m_currentShader;
+	m_currentShader = nullptr;
 
 	DX_SAFE_RELEASE( m_context );
 	DX_SAFE_RELEASE( m_device );
@@ -168,7 +171,22 @@ void RenderContext::ClearScreen( const Rgba8& clearColor )
 
 void RenderContext::BeginCamera( const Camera& camera )
 {
-	ClearScreen( camera.GetClearColor() );
+	if ( camera.GetClearMode() & CLEAR_COLOR_BIT )
+	{
+		ClearScreen( camera.GetClearColor() );
+	}
+	/*
+Texture* output = camera->GetColorTarget();
+if ( output == nullptr )
+{
+	output = m_swapChain->GetColorTarget();
+}
+
+if ( camera->ShouldClearClear() )
+{
+	ClearColorTarget( output , camera->GetClearColor() );
+}*/
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -305,6 +323,30 @@ void RenderContext::BindTexture( const Texture* texture )
 
 void RenderContext::Draw( int numVertexes , int vertexOffset )
 {
+	// TEMPORARY - this will be moved
+	//Set up the GPU for a draw
+	
+	Texture* Texture = m_swapChain->GetBackBuffer();
+	TextureView* view = Texture->GetRenderTargetView();
+	ID3D11RenderTargetView* rtv = view->GetRTVHandle();
+
+	IntVec2 output = Texture->GetDimensions();
+
+	D3D11_VIEWPORT viewport;
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.Width = output.x;
+	viewport.Height = output.y;
+	viewport.MinDepth = 0.0;
+	viewport.MaxDepth = 1.f;
+	
+	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
+	m_context->RSSetState( m_currentShader->m_rasterState );
+	m_context->RSSetViewports( 1 , &viewport );
+	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fragmnetShader , nullptr , 0 );
+	m_context->OMSetRenderTargets( 1 , &rtv , nullptr );
+
 	m_context->Draw( numVertexes , vertexOffset );
 }
 

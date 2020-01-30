@@ -20,7 +20,7 @@ Game::Game()
 {
 	m_worldCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y ) );
 	m_uiCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
-	m_color = GREEN;
+	m_color = BLACK;
 }
 
 void Game::Update( float deltaSeconds )
@@ -33,6 +33,7 @@ void Game::Update( float deltaSeconds )
 void Game::Render() const
 {
 	g_theRenderer->BeginCamera( m_worldCamera );
+	g_theRenderer->Draw( 3 , 0 );
 	g_theRenderer->EndCamera( m_worldCamera );
 }
 
