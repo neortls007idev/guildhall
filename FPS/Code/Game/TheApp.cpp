@@ -134,14 +134,15 @@ void TheApp::UpdateFromKeyboard()
 		WNDCLASSEX windowClassDescription;
 		::GetClassInfo(NULL, windowClassDescription , currentWindow );
 
-		HICON m_hIcon = static_cast< HICON >( ::LoadImage( NULL ,
+		*/
+		HICON m_hIcon = reinterpret_cast< HICON >( ::LoadImage( NULL ,
 			MAKEINTRESOURCE( IDI_ERROR ) ,
 			IMAGE_ICON ,
 			0 , 0 ,
 			LR_DEFAULTCOLOR | LR_SHARED | LR_DEFAULTSIZE ) );
 
-		SetClassLong( ( HWND ) g_theWindow->m_hwnd , -34 , ( LONG ) m_hIcon );
-		*/
+		//SetWindowLong( ( HWND ) g_theWindow->m_hwnd , GCL_HICON , ( LONG ) m_hIcon );
+		//SendMessage( ( HWND ) g_theWindow->m_hwnd , )
 	}
 
 	if ( g_theInput->GetButtonState( 'T' ).IsPressed() ) { m_isSloMo = true; }
