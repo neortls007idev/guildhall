@@ -71,6 +71,13 @@ float Camera::GetAspectRatio() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Camera::CorrectAspectRaio( float clientAspectRatio )
+{
+	m_outputSize.x = m_outputSize.y * clientAspectRatio;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Vec2 Camera::GetOrthoMin() const
 {
 	return ( m_position - ( m_outputSize / 2.f ) );

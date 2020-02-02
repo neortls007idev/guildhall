@@ -25,14 +25,14 @@ Rigidbody2D::Rigidbody2D( Physics2D* system, Vec2 worldPosition ) :
 
 void Rigidbody2D::Destroy()
 {
-	m_collider->Destroy();
+	m_isGarbage = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Rigidbody2D::TakeCollider( Collider2D* collider )
 {
-	if ( nullptr != m_collider )
+	if ( nullptr != m_collider && collider != m_collider )
 	{
 		m_collider->Destroy();
 	}

@@ -16,16 +16,17 @@ public:
 // 	Vec2 GetOrthoTopRight() const;
 // 	void Translate2D( const Vec2 cameraTranslate );
 	
-	void SetOutputSize( Vec2 size );
-	void SetPosition( Vec3 position );
-
-	Vec2 GetOutputSize() const;
-	Vec2 GetPosition() const;
-
-	void SetProjectionOrthographic( float height , float nearZ = -1.0f , float farZ = 1.0f );
-	Vec2 GetClientToWorldPosition( Vec2 clientPos ) const;
+	void  SetOutputSize( Vec2 size );
+	void  SetPosition( Vec3 position );
+		  
+	Vec2  GetOutputSize() const;
+	Vec2  GetPosition() const;
+		  
+	void  SetProjectionOrthographic( float height , float nearZ = -1.0f , float farZ = 1.0f );
+	Vec2  GetClientToWorldPosition( Vec2 clientPos ) const;
 
 	float GetAspectRatio() const;
+	void  CorrectAspectRaio( float clientAspectRatio );
 
 private:
 	Vec2 GetOrthoMin() const;

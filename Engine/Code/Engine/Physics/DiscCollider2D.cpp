@@ -7,10 +7,10 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-DiscCollider2D::DiscCollider2D( Physics2D* system , Rigidbody2D* rigidbody , COLLIDER2D_TYPE colliderType ,
-	Vec2 localPosition , float radius ) :	Collider2D( system , rigidbody , COLLIDER2D_DISC ),
-											m_localPosition( localPosition ) ,
-											m_radius( radius )
+DiscCollider2D::DiscCollider2D( Physics2D* system , Rigidbody2D* rigidbody ,Vec2 localPosition , float radius ) :
+																									Collider2D( system , rigidbody , COLLIDER2D_DISC ),
+																									m_localPosition( localPosition ) ,
+																									m_radius( radius )
 {
 	m_worldPosition = m_rigidbody->m_worldPosition + m_localPosition;
 }
@@ -64,7 +64,8 @@ bool DiscCollider2D::Intersects( Collider2D const* other ) const
 void DiscCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor )
 {
 	ctx->DrawDisc( m_worldPosition , m_radius , fillColor );
-	ctx->DrawRing( m_worldPosition , m_radius , borderColor , 0.2f * m_radius );
+	ctx->DrawRing( m_worldPosition , m_radius - ( 0.05f * m_radius ) , borderColor , 0.1f * m_radius );
+	// Reducing half the thickness on the border radius so that the drawing itself does not feel buggy.
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

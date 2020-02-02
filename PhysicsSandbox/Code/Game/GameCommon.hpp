@@ -17,9 +17,12 @@ extern Game* g_theGame;
 constexpr float CLIENT_ASPECT											=  16.f / 8.f; // We are requesting a 2:1 aspect (square) window area
 constexpr float MAX_CAMERA_MOVE_VELOCITY_X								=  70.f;
 constexpr float MAX_CAMERA_MOVE_VELOCITY_Y								=  70.f;
-constexpr float MAX_CAMERA_ZOOM_VELOCITY_X								=  5000.f;
-constexpr float MAX_CAMERA_ZOOM_VELOCITY_Y								=  5000.f;
+constexpr float MAX_CAMERA_ZOOM_VELOCITY_X								=  15000.f;
+constexpr float MAX_CAMERA_ZOOM_VELOCITY_Y								=  15000.f;
 constexpr float MIN_CAMERA_SHAKE										= -10.0f;
 constexpr float MAX_CAMERA_SHAKE										=  10.0f;
+
+constexpr float MIN_COLLIDER_RADIUS = 50.f;
+constexpr float MAX_COLLIDER_RADIUS = 200.f;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

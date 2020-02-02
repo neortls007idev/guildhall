@@ -13,7 +13,7 @@ class Rigidbody2D;
 class DiscCollider2D : public Collider2D
 {
 public: 
-	DiscCollider2D( Physics2D* system , Rigidbody2D* rigidbody , COLLIDER2D_TYPE colliderType, Vec2 localPosition , float radius = 1.f );
+	DiscCollider2D( Physics2D* system , Rigidbody2D* rigidbody , Vec2 localPosition , float radius = 1.f );
 	virtual ~DiscCollider2D() override;
 
 	virtual void Destroy() override;

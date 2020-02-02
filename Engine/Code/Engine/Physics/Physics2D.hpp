@@ -13,12 +13,15 @@ class Collider2D;
 class Physics2D
 {
 public:
+	Physics2D();
+	~Physics2D();
+
 	void BeginFrame();
 	void Update( float deltaSeconds );
 	void EndFrame();    // cleanup destroyed objects
 
 	// factory style create/destroy
-	Rigidbody2D* CreateRigidbody();
+	Rigidbody2D* CreateRigidbody( Vec2 position , Vec2 coliderPositionRelativeToRigidBody , float ColliderRadius );
 	void DestroyRigidbody( Rigidbody2D* rigidbody );
 
 	DiscCollider2D* CreateDiscCollider( Vec2 localPosition , float radius );
