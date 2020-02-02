@@ -60,6 +60,7 @@ public:
 	void DrawRing(const Vec2& center, float radius, const Rgba8& color, float thickness);
 	void DrawAABB2( const AABB2& box, const Rgba8& tint);
 	void DrawDisc( const Disc2D& disc, const Rgba8& tint); 
+	void DrawDisc( const Vec2& center, const float& radius , const Rgba8& tint );
 	void DrawOBB2( const OBB2& box , const Rgba8& tint );
 	void DrawCapsule2D( const Vec2& capsuleMidStart , const Vec2& capsuleMidEnd , const float capsuleRadius, const Rgba8& tint );
  	void DrawDiscFraction(const Disc2D& disc, const float drawFraction, const Rgba8& tint, const float orientationDegrees );

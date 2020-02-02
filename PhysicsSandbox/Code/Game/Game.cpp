@@ -31,24 +31,14 @@ STATIC RandomNumberGenerator Game::m_rng;
 
 Game::Game()
 {
-	m_worldCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 1600.f , 800.f ) );
+	//m_worldCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 1600.f , 800.f ) );
+	m_worldCamera.SetOutputSize( Vec2( 1600.f , 800.f ) );
+	//m_worldCamera.SetProjectionOrthographic( 800.f );
+	m_worldCamera.SetPosition( Vec3( 800.f , 400.f , 0.f ) );
+	//m_worldCamera.SetPosition( Vec3( 0.f , 0.f , 0.f ) );
+	Vec2 cameraBottomLeft = m_worldCamera.GetPosition() - ( m_worldCamera.GetOutputSize() / 2.f );
+	Vec2 cameraTopRight = m_worldCamera.GetPosition() + ( m_worldCamera.GetOutputSize() / 2.f );
 	
-	Vec2 cameraBottomLeft = m_worldCamera.GetOrthoBottomLeft();
-	Vec2 cameraTopRight = m_worldCamera.GetOrthoTopRight();
-	
-	m_rng.manuallyIncrementPosition();
-	RandomizeAABB2(		  cameraBottomLeft , cameraTopRight , m_rng );
-	m_rng.manuallyIncrementPosition();
-	RandomizeOBB2(		  cameraBottomLeft , cameraTopRight , m_rng );
-	m_rng.manuallyIncrementPosition();
-	RandomizeLineSegment( cameraBottomLeft , cameraTopRight , m_rng );
-	m_rng.manuallyIncrementPosition();
-	RandomizeCapsule(	  cameraBottomLeft , cameraTopRight , m_rng );
-	m_rng.manuallyIncrementPosition();
-	RandomizeDisc(		  cameraBottomLeft , cameraTopRight , m_rng );
-	m_rng.manuallyIncrementPosition();
-	RandomizePolygon( cameraBottomLeft , cameraTopRight , m_rng.RollRandomIntInRange( 3 , 13 ) , m_rng );
-
 	m_color.RollRandomColor( m_rng );
 	m_color.a = 100;
 
@@ -57,99 +47,11 @@ Game::Game()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Game::RandomizeAABB2( Vec2 mins, Vec2 maxs , RandomNumberGenerator rng )
-{
-	m_aabb2D = AABB2( rng.RollRandomFloatInRange( mins.x , maxs.x ) , rng.RollRandomFloatInRange( mins.y , maxs.y ) ,
-		rng.RollRandomFloatInRange( mins.x , maxs.x ) , rng.RollRandomFloatInRange( mins.y , maxs.y ) );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Game::RandomizeOBB2( Vec2 mins , Vec2 maxs , RandomNumberGenerator rng )
-{
-	m_Obb2D = OBB2( Vec2( rng.RollRandomFloatInRange( mins.x , maxs.x ) , rng.RollRandomFloatInRange( mins.y , maxs.y ) ) ,
-		Vec2( rng.RollRandomFloatInRange( mins.x , maxs.x ) , rng.RollRandomFloatInRange( mins.y , maxs.y ) ) ,
-		rng.RollRandomFloatInRange( 0.f , 360.f ) );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Game::RandomizeLineSegment( Vec2 mins , Vec2 maxs , RandomNumberGenerator rng )
-{
-	m_lineSegment2D = LineSegment2D( rng.RollRandomFloatInRange( mins.x , maxs.x ) , rng.RollRandomFloatInRange( mins.y , maxs.y ) ,
-		rng.RollRandomFloatInRange( mins.x , maxs.x ) , rng.RollRandomFloatInRange( mins.y , maxs.y ) );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Game::RandomizeCapsule( Vec2 mins , Vec2 maxs, RandomNumberGenerator rng )
-{
-	m_capsule2D = Capsule2D( rng.RollRandomFloatInRange( mins.x , maxs.x ) , rng.RollRandomFloatInRange( mins.y , maxs.y ) ,
-		rng.RollRandomFloatInRange( mins.x , maxs.x ) , rng.RollRandomFloatInRange( mins.y , maxs.y ) ,
-		rng.RollRandomFloatInRange( 20.f , 50.f ) );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Game::RandomizeDisc( Vec2 cameraBottomLeft , Vec2 cameraTopRight , RandomNumberGenerator rng )
-{
-	m_disc2D = Disc2D( Vec2( rng.RollRandomFloatInRange( cameraBottomLeft.x , cameraTopRight.x ) , rng.RollRandomFloatInRange( cameraBottomLeft.y , cameraTopRight.y ) ),
-		rng.RollRandomFloatInRange( 20.f , 50.f ) );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Game::RandomizePolygon( Vec2 mins , Vec2 maxs , unsigned int count , RandomNumberGenerator rng )
-{
-	m_polygon.clear();
-
-// 	for ( unsigned int pointIndex = 0; pointIndex < 4/*count*/ ; pointIndex++ )
-// 	{
-// 		//rng.manuallyIncrementPosition();
-// 		Vec2 tempPoint( rng.RollRandomFloatInRange( mins.x , maxs.x ) , rng.RollRandomFloatInRange( mins.y , maxs.y ) );
-// 		m_polygon.push_back( tempPoint );
-// 	}
-
-	m_polygon.push_back( Vec2( 10 , 10 ) );
-	m_polygon.push_back( Vec2( 10 , 100 ) );
-	m_polygon.push_back( Vec2( 50 , 150 ) );
-
-	m_polygon.push_back( Vec2( 10 , 10 ) );
-	m_polygon.push_back( Vec2( 50 , 150 ) );
-	m_polygon.push_back( Vec2( 100 , 100 ) );
-
-	m_polygon.push_back( Vec2( 10 , 10 ) );
-	m_polygon.push_back( Vec2( 100 , 100 ) );
-	m_polygon.push_back( Vec2( 100 , 10 ) );
-	
-	UNUSED( rng );
-	UNUSED( count );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Game::RandomizeShapes( Vec2 mins , Vec2 maxs , RandomNumberGenerator* rng )
-{
-	rng->manuallyIncrementPosition();
-	RandomizeAABB2(		  mins , maxs , *rng );
-	rng->manuallyIncrementPosition();
-	RandomizeOBB2(		  mins , maxs , *rng );
-	rng->manuallyIncrementPosition();
-	RandomizeLineSegment( mins , maxs , *rng );
-	rng->manuallyIncrementPosition();
-	RandomizeCapsule(	  mins , maxs , *rng );
-	rng->manuallyIncrementPosition();
-	RandomizeDisc(		  mins , maxs , *rng );
-	rng->manuallyIncrementPosition();
-	RandomizePolygon( mins , maxs , rng->RollRandomIntInRange( 3 , 15 ) , *rng );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 void Game::Update( float deltaSeconds )
 {
-	Vec2 cameraBottomLeft = m_worldCamera.GetOrthoBottomLeft();
-	Vec2 cameraTopRight	  = m_worldCamera.GetOrthoTopRight();
+	m_worldCamera.SetPosition( Vec3( 800.f , -400.f , 0.f ) );
+	Vec2 cameraBottomLeft = m_worldCamera.GetPosition() - ( m_worldCamera.GetOutputSize() / 2.f );
+	Vec2 cameraTopRight = m_worldCamera.GetPosition() + ( m_worldCamera.GetOutputSize() / 2.f );
 	UpdateFromKeyBoard();
 	m_mousePosition = g_theInput->GetMouseNormalizedClientPosition() * ( cameraTopRight - cameraBottomLeft );
 
@@ -160,6 +62,7 @@ void Game::Update( float deltaSeconds )
 
 void Game::Render() const
 {
+	g_theRenderer->BeginCamera( m_worldCamera );
 	g_theRenderer->BindTexture( nullptr );
 
 	Vec2 nearestPointOnAABB2D		  = GetNearestPointOnAABB2D( m_mousePosition , m_aabb2D );
@@ -240,8 +143,6 @@ void Game::Render() const
 
 	g_theRenderer->DrawLine( m_lineSegment2D.m_start, m_lineSegment2D.m_end , m_color , 5.f );
 
-	g_theRenderer->DrawPolygon( &m_polygon[ 0 ] , ( unsigned int ) m_polygon.size() , WHITE );
-
 	DrawMouseCurrentPosition( m_worldCamera );
 }
 
@@ -249,7 +150,6 @@ void Game::Render() const
 
 void Game::UpdateCamera()
 {
-
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -271,7 +171,7 @@ void Game::UpdateFromKeyBoard()
 	{
 		Vec2 cameraBottomLeft = m_worldCamera.GetOrthoBottomLeft();
 		Vec2 cameraTopRight = m_worldCamera.GetOrthoTopRight();
-		RandomizeShapes( cameraBottomLeft , cameraTopRight , &m_rng );
+
 		m_color.RollRandomColor( m_rng );
 		m_color.a = 100;
 	}
@@ -281,6 +181,5 @@ void Game::UpdateFromKeyBoard()
 		m_hasCursorChangedToOBB = !m_hasCursorChangedToOBB;
 	}
 }
-
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

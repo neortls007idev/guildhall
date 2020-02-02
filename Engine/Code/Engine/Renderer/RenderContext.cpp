@@ -80,7 +80,9 @@ void RenderContext::ClearScreen( const Rgba8& ClearColor )
 void RenderContext::BeginCamera( const Camera& camera )
 {
 	glLoadIdentity();
-	glOrtho(camera.GetOrthoBottomLeft().x, camera.GetOrthoTopRight().x, camera.GetOrthoBottomLeft().y, camera.GetOrthoTopRight().y, 0.f, 1.f);
+	Vec2 cameraBottomLeft	= camera.GetPosition() - ( camera.GetOutputSize() / 2.f );
+	Vec2 cameraTopRight		= camera.GetPosition() + ( camera.GetOutputSize() / 2.f );
+	glOrtho( cameraBottomLeft.x , cameraTopRight.x , cameraBottomLeft.y , cameraTopRight.y , 0.f , 1.f );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -346,6 +348,52 @@ void RenderContext::DrawDisc( const Disc2D& disc , const Rgba8& tint )
 
 	// MOVE  THIS LINE OF CODE INTO A SEPARATE FUNCTION LATER
 	TransformVertexArray2D( NUMBER_OF_DISC_VERTS , discVerts , 1 , 0.f , disc.m_center );
+	DrawVertexArray( NUMBER_OF_DISC_VERTS , discVerts );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::DrawDisc( const Vec2& center , const float& radius , const Rgba8& tint )
+{
+	constexpr int  NUMBER_OF_DISC_VERTS = 120;
+	Vertex_PCU discVerts[ NUMBER_OF_DISC_VERTS ];
+	const Vec2 UVCoordsAtCenter = Vec2( 0.5f , 0.5f );
+	const float UVRadius = 0.5f;
+
+	float angleInDegreesBetweenDiscTriangles = 0.f;
+
+	discVerts[ 0 ] = Vertex_PCU( ( Vec3( 0.f , 0.f , 0.f ) ) , tint , Vec2( 0.5f , 0.5f ) );
+	discVerts[ 1 ] = Vertex_PCU( ( Vec3( radius , 0.f , 0.f ) ) , tint , Vec2( 1.f , 0.5f ) );
+	angleInDegreesBetweenDiscTriangles = ( 360.f * 3.f ) / static_cast< float >( NUMBER_OF_DISC_VERTS );
+
+	//-----------------------------------------------------------------------------------------------------------------
+	float costheta = CosDegrees( angleInDegreesBetweenDiscTriangles );
+	float intialXVertex = radius * costheta;
+
+	float sintheha = SinDegrees( angleInDegreesBetweenDiscTriangles );
+	float initialYVertex = radius * sintheha;
+
+	discVerts[ 2 ] = Vertex_PCU( ( Vec3( intialXVertex , initialYVertex , 0.f ) ) , tint , Vec2( UVRadius + UVRadius * costheta , UVRadius + UVRadius * sintheha ) );
+
+	//-----------------------------------------------------------------------------------------------------------------
+	int discVertIndex = 3;
+	for ( discVertIndex = 3; discVertIndex < NUMBER_OF_DISC_VERTS; discVertIndex += 3 )
+	{
+		angleInDegreesBetweenDiscTriangles = angleInDegreesBetweenDiscTriangles + ( ( 360.f * 3.f ) / ( NUMBER_OF_DISC_VERTS ) );
+		discVerts[ discVertIndex ] = discVerts[ discVertIndex - 3 ];
+		discVerts[ discVertIndex + 1 ] = discVerts[ discVertIndex - 1 ];
+
+		discVerts[ discVertIndex + 2 ].m_position = Vec3( radius * CosDegrees( angleInDegreesBetweenDiscTriangles ) ,
+			radius * SinDegrees( angleInDegreesBetweenDiscTriangles ) , 0.f );
+		discVerts[ discVertIndex + 2 ].m_color = tint;
+		discVerts[ discVertIndex + 2 ].m_uvTexCoords = Vec2( UVRadius + UVRadius * CosDegrees( angleInDegreesBetweenDiscTriangles ) ,
+			UVRadius + UVRadius * SinDegrees( angleInDegreesBetweenDiscTriangles ) );
+	}
+	discVerts[ NUMBER_OF_DISC_VERTS - 1 ] = discVerts[ 1 ];
+
+
+	// MOVE  THIS LINE OF CODE INTO A SEPARATE FUNCTION LATER
+	TransformVertexArray2D( NUMBER_OF_DISC_VERTS , discVerts , 1 , 0.f , center );
 	DrawVertexArray( NUMBER_OF_DISC_VERTS , discVerts );
 }
 

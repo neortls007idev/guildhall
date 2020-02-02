@@ -27,14 +27,6 @@ public:
 	void Render() const;
 	void UpdateCamera();
 		
-	void RandomizeAABB2( Vec2 mins , Vec2 maxs , RandomNumberGenerator rng );
-	void RandomizeOBB2( Vec2 mins , Vec2 maxs , RandomNumberGenerator rng );
-	void RandomizeLineSegment( Vec2 mins , Vec2 maxs , RandomNumberGenerator rng );
-	void RandomizeCapsule( Vec2 mins , Vec2 maxs , RandomNumberGenerator rng );
-	void RandomizeDisc( Vec2 mins , Vec2 maxs , RandomNumberGenerator rng );
-	void RandomizePolygon( Vec2 mins , Vec2 maxs , unsigned int count , RandomNumberGenerator rng );
-	void RandomizeShapes( Vec2 mins , Vec2 maxs , RandomNumberGenerator* rng );
-
 	void DrawMouseCurrentPosition( const Camera& camera ) const;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -59,14 +51,14 @@ public:
 
 	static RandomNumberGenerator m_rng;
 		   Camera				 m_worldCamera;
-		   AABB2				 m_aabb2D				= AABB2::ZERO_TO_ONE;
+		   AABB2				 m_aabb2D				= AABB2( -800.f , -400.f , 0.f , 0.f );
 		   OBB2					 m_Obb2D				= OBB2( m_aabb2D , 0.f );
 		   Rgba8				 m_color				= Rgba8( 0 , 0 , 0 , 0 );
 		   LineSegment2D		 m_lineSegment2D		= LineSegment2D::UNITLINESEGMENT;
 		   Capsule2D			 m_capsule2D			= Capsule2D::UNITCAPSULE;
-		   Disc2D				 m_disc2D				= Disc2D::UNITDISC;
+		   Disc2D				 m_disc2D				= Disc2D( Vec2( 800.f , -400.f ) , 50.f );
 		   Vec2					 m_mousePosition		= Vec2::ZERO;
-		   std::vector<Vec2>	 m_polygon;
+		   
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

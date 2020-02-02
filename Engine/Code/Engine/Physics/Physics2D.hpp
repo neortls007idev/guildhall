@@ -14,7 +14,7 @@ class Physics2D
 {
 public:
 	void BeginFrame();
-	void Update();
+	void Update( float deltaSeconds );
 	void EndFrame();    // cleanup destroyed objects
 
 	// factory style create/destroy

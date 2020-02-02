@@ -6,12 +6,16 @@
 #include "GameCommon.hpp"
 #include "Game/TheApp.hpp"
 #include "Engine/Input/InputSystem.hpp"
+#include "Engine/Math/Vec2.hpp"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 extern TheApp* g_theApp;
 extern InputSystem* g_theInput;
+Vec2 g_windowDimensions = Vec2::ZERO; // TODO: - after merging remove this and use member functions of the window class.
 
 
 //-----------------------------------------------------------------------------------------------
@@ -167,9 +171,12 @@ void CreateOSWindow( void* applicationInstanceHandle, float clientAspect )
 	clientRect.top = (int)clientMarginY;
 	clientRect.bottom = clientRect.top + (int)clientHeight;
 
+
+	g_windowDimensions = Vec2( clientRect.right - clientRect.left , clientRect.bottom - clientRect.top );
 	// Calculate the outer dimensions of the physical window, including frame et. al.
 	RECT windowRect = clientRect;
 	AdjustWindowRectEx( &windowRect, windowStyleFlags, FALSE, windowStyleExFlags );
+	
 
 	WCHAR windowTitle[1024];
 	MultiByteToWideChar( GetACP(), 0, APP_NAME, -1, windowTitle, sizeof( windowTitle ) / sizeof( windowTitle[0] ) );

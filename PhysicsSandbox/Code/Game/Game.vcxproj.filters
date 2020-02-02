@@ -13,9 +13,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Entity.cpp">
-      <Filter>Gameplay\Entities</Filter>
-    </ClCompile>
     <ClCompile Include="GameCommon.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
@@ -28,11 +25,11 @@
     <ClCompile Include="Game.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
+    <ClCompile Include="Gameobject.cpp">
+      <Filter>Gameplay\Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Entity.hpp">
-      <Filter>Gameplay\Entities</Filter>
-    </ClInclude>
     <ClInclude Include="GameCommon.hpp">
       <Filter>Framework</Filter>
     </ClInclude>
@@ -44,6 +41,9 @@
     </ClInclude>
     <ClInclude Include="EngineBuildPreferences.hpp">
       <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Gameobject.hpp">
+      <Filter>Gameplay\Entities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

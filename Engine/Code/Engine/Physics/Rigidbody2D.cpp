@@ -4,14 +4,38 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Rigidbody2D::Rigidbody2D( Physics2D* system , Vec2 worldPosition , Collider2D* collider ) :
+																		m_system( system ) ,
+																		m_worldPosition( worldPosition ),
+																		m_collider( collider )
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Rigidbody2D::Rigidbody2D( Physics2D* system, Vec2 worldPosition ) :
+																		m_system( system ),
+																		m_worldPosition( worldPosition )
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Rigidbody2D::Destroy()
 {
+	m_collider->Destroy();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Rigidbody2D::TakeCollider( Collider2D* collider )
 {
+	if ( nullptr != m_collider )
+	{
+		m_collider->Destroy();
+	}
 	m_collider = collider;
 }
 

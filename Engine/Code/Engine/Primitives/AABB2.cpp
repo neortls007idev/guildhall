@@ -12,19 +12,19 @@ AABB2 AABB2::ZERO_TO_ONE = AABB2( Vec2::ZERO , Vec2::ONE );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-AABB2::AABB2( const AABB2& copyFrom ): m_mins(copyFrom.m_mins), m_maxs(copyFrom.m_maxs)
+AABB2::AABB2( const AABB2& copyFrom ) : m_mins( copyFrom.m_mins ) , m_maxs( copyFrom.m_maxs )
 {
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-AABB2::AABB2( const Vec2& mins , const Vec2& maxs ): m_mins(mins), m_maxs(maxs)
+AABB2::AABB2( const Vec2& mins , const Vec2& maxs ) : m_mins( mins ) , m_maxs( maxs )
 {
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-AABB2::AABB2( float minX , float minY , float maxX , float maxY ): m_mins(Vec2(minX,minY)), m_maxs(Vec2(maxX,maxY))
+AABB2::AABB2( float minX , float minY , float maxX , float maxY ) : m_mins( Vec2( minX , minY ) ) , m_maxs( Vec2( maxX , maxY ) )
 {
 }
 

@@ -12,9 +12,9 @@ void Physics2D::BeginFrame()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Physics2D::Update()
+void Physics2D::Update( float deltaSeconds )
 {
-
+	UNUSED( deltaSeconds );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -28,6 +28,11 @@ void Physics2D::EndFrame()
 
 Rigidbody2D* Physics2D::CreateRigidbody()
 {
+
+	//Rigidbody2D* rigidBody = new Rigidbody2D( this ,  );
+	//m_rigidBodied2D.push_back( rigidBody );
+	
+	//Collider2D* collider = new Collider2D( );
 	return nullptr;
 }
 

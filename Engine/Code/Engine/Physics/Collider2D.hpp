@@ -26,7 +26,7 @@ public:
 	Collider2D( Physics2D* system , Rigidbody2D* rigidbody , COLLIDER2D_TYPE colliderType = COLLIDER2D_DISC );
 
 	virtual void UpdateWorldShape() = 0;
-	void Destroy();
+	virtual void Destroy() = 0;
 
 	virtual Vec2 GetClosestPoint( Vec2 pos ) const = 0;
 	virtual bool Contains( Vec2 pos ) const = 0;

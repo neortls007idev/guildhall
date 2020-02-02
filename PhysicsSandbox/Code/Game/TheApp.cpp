@@ -13,34 +13,23 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Math/IntRange.hpp"
 #include "Engine/Math/FloatRange.hpp"
+#include "Engine/Physics/Physics2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			GLOBAL VARIABLES
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-InputSystem*				g_theInput			= nullptr;
-RenderContext*				g_theRenderer		= nullptr;
+InputSystem*					g_theInput			= nullptr;
+RenderContext*					g_theRenderer		= nullptr;
+AudioSystem*					g_theAudioSystem	= nullptr;
+TheApp*							g_theApp			= nullptr;
+Game*							g_theGame			= nullptr;
+DevConsole*						g_theDevConsole		= nullptr;
+Physics2D*						g_thePhysicsSystem	= nullptr;
+extern BitmapFont*				g_bitmapFont;
+extern NamedStrings				g_gameConfigBlackboard;
 /*BitmapFont* g_bitmapFont = nullptr;*/
-AudioSystem*				  g_theAudioSystem	= nullptr;
-TheApp*						  g_theApp			= nullptr;
-Game*						  g_theGame			= nullptr;
-DevConsole*					  g_theDevConsole   = nullptr;
-extern BitmapFont*			  g_bitmapFont;
-extern NamedStrings		      g_gameConfigBlackboard;
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
-bool SunRise( EventArgs& abc )
-{
-	UNUSED( abc );
-	DebuggerPrintf( "Sunrise has been called.\n" );
-	g_theDevConsole->PrintString( WHITE , "Sunrise has been called." );
-	return true;
-}
-
-void SunSet()
-{
-	DebuggerPrintf( "Sunset has been called.\n" );
-}
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 TheApp::TheApp()
@@ -84,8 +73,13 @@ void TheApp::Startup()
 
 	if ( g_theAudioSystem == nullptr )
 	{
-		//g_theAudioSystem = new AudioSystem();
-		//g_theAudioSystem->Startup();
+		g_theAudioSystem = new AudioSystem();
+		g_theAudioSystem->Startup();
+	}
+
+	if ( g_thePhysicsSystem == nullptr )
+	{
+		g_thePhysicsSystem = new Physics2D();
 	}
 
 	if ( g_theGame == nullptr )
@@ -100,12 +94,6 @@ void TheApp::Startup()
 
 	g_theDevConsole->Startup();
 
-	g_theDevConsole->PrintString( RED , "HELLO" );
-	g_theDevConsole->PrintString( GREEN , "BYE" );
-	g_theDevConsole->PrintString( MAGENTA , "THIS IS A GREAT TEXT" );
-
-	g_theEventSystem->SubscribeToEvent( "sunrise" ,  SunRise );
-	g_theEventSystem->FireEvent( "sunrise" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -119,6 +107,7 @@ void TheApp::RunFrame()
 	
 	BeginFrame();                        // all engine system and not game systems
 	Update( ( float ) deltaSeconds );	
+	g_thePhysicsSystem->Update( ( float ) deltaSeconds );
 	Render();
 	EndFrame();
 }
@@ -130,9 +119,10 @@ void TheApp::BeginFrame()
 	// all engine things that must begin at the beginning of each frame and not the game
 	g_theInput->BeginFrame();
 	g_theRenderer->BeginFrame();
-	g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
+	//g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
 	g_theDevConsole->BeginFrame();
-	//g_theAudioSystem->BeginFrame();
+	g_theAudioSystem->BeginFrame();
+	g_thePhysicsSystem->BeginFrame();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -143,10 +133,10 @@ void TheApp::Update( float deltaSeconds )
 
 		if ( m_isPaused ) { deltaSeconds = 0; }
 		else if ( m_isSloMo == true ) { deltaSeconds /= 10.f; }
+
 		if ( m_isSpeedMo ) { deltaSeconds = deltaSeconds * 4.0f; }
 		
 		g_theGame->Update( deltaSeconds );
-		g_theInput->EndFrame();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -154,19 +144,13 @@ void TheApp::Update( float deltaSeconds )
 void TheApp::Render() const
 {
 		g_theRenderer->ClearScreen( BLACK );
-		g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
 		g_theGame->Render();
-
-		g_theGame->m_worldCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 1600.f , 800.f ) );
 
 		if ( g_theDevConsole->IsOpen() )
 		{
 			g_theDevConsole->Render( *g_theRenderer , g_theGame->m_worldCamera , 20.f );
 		}
 
-		g_theRenderer->EndCamera( g_theGame->m_worldCamera );
-
-		g_theGame->Render();	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -175,7 +159,8 @@ void TheApp::EndFrame()
 {
 	// all engine things that must end at the end of the frame and not the game
 	//SwapBuffers( m_displayDeviceContext );
-	//g_theAudioSystem->EndFrame();
+	g_thePhysicsSystem->EndFrame();
+	g_theAudioSystem->EndFrame();
 	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
