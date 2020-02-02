@@ -166,26 +166,34 @@ void Game::DrawMouseCurrentPosition( const Camera& camera ) const
 
 GameObject* Game::PickGameobject( Vec2 mousePos )
 {
+	bool isMouseOverAnygameobject = false;
 	for ( size_t gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
 	{
 		DiscCollider2D* collider = ( DiscCollider2D* ) m_gameObjects[ gameObjectIndex ]->m_rigidbody->m_collider;
 		if ( collider && collider->Contains( mousePos ) )
 		{
 			m_isMouseOnGameObject[ gameObjectIndex ] = true;
+			isMouseOverAnygameobject = true;
 		}
 	}
-	
-	size_t gameObjectIndex = m_isMouseOnGameObject.size();
 
-	for ( --gameObjectIndex ; gameObjectIndex > 0; --gameObjectIndex )
+	if ( !isMouseOverAnygameobject )
 	{
-		if ( m_isMouseOnGameObject[ gameObjectIndex ] )
-		{
-			return m_gameObjects[ gameObjectIndex ];
-		}
+		return nullptr;
 	}
+	else
+	{
+		size_t gameObjectIndex = m_isMouseOnGameObject.size();
 
-	return nullptr;
+		for ( --gameObjectIndex; gameObjectIndex >= 0; --gameObjectIndex )
+		{
+			if ( m_isMouseOnGameObject[ gameObjectIndex ] )
+			{
+				return m_gameObjects[ gameObjectIndex ];
+			}
+		}
+		return nullptr;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -252,6 +260,10 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 		{
 			m_selectedGameObject = nullptr;
 			clickCounter = true;
+			for ( size_t gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
+			{
+				m_isMouseOnGameObject[ gameObjectIndex ] = false;
+			}
 		}
 	}
 }
