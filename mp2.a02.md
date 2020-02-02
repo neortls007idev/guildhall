@@ -1,13 +1,13 @@
 ## MP2 : A02 Checklist
 
-- [-] *05pts*: Insantiate a physic system into the game.
+- [x] *05pts*: Insantiate a physic system into the game.
 - [ ] *10pts*: Be able to create game objects with a collider based on button press,
     - [ ] `1` should create random radius disc centered at cursor
-- [ ] *10pts*: Camera changes implemented
-- [ ] *05pts*: Can move around using `WASD` or equivalent (if different, make note in readme)
-- [ ] *10pts*: Can zoom in and out using mouse-wheel.
-    - [ ] Make sure this is clamped at a max and min "zoom" so zoom can't go negative.
-- [ ] *05pts*: Pressing 'O' (capitol letter 'Oh') should reset camera position and zoom to default (ie, move to origin)
+- [-] *10pts*: Camera changes implemented
+- [x] *05pts*: Can move around using `WASD` or equivalent
+- [x] *10pts*: Can zoom in and out using mouse-wheel.
+    - [x] Make sure this is clamped at a max and min "zoom" so zoom can't go negative.
+- [x] *05pts*: Pressing 'O' (capitol letter 'Oh') should reset camera position and zoom to default (ie, move to origin)
 - [ ] *05pts*: Be sure to render the objects in your scene, by default...
     - [ ] Render with a blue border
     - [ ] Render with 50% alpha white interior

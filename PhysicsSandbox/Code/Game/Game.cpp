@@ -195,6 +195,8 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	if ( g_theInput->GetMouseWheelValue() < 0 )
 	{
 		Vec2 currentCameraOutputSize = m_worldCamera.GetOutputSize() + ( Vec2( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y ) * deltaSeconds );
+		currentCameraOutputSize.x = Clamp( currentCameraOutputSize.x , 200.f , 20000.f );
+		currentCameraOutputSize.y = Clamp( currentCameraOutputSize.y , 200.f , 20000.f );
 		m_worldCamera.SetOutputSize( currentCameraOutputSize );
 		m_worldCamera.SetProjectionOrthographic( currentCameraOutputSize.y );
 	}
@@ -202,6 +204,8 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	if ( g_theInput->GetMouseWheelValue() > 0 )
 	{
 		Vec2 currentCameraOutputSize = m_worldCamera.GetOutputSize() - ( Vec2( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y ) * deltaSeconds );
+		currentCameraOutputSize.x = Clamp( currentCameraOutputSize.x , 200.f , 20000.f );
+		currentCameraOutputSize.y = Clamp( currentCameraOutputSize.y , 200.f , 20000.f );
 		m_worldCamera.SetOutputSize( currentCameraOutputSize );
 		m_worldCamera.SetProjectionOrthographic( currentCameraOutputSize.y );
 	}
