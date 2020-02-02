@@ -18,7 +18,8 @@ public:
 	Rigidbody2D( Physics2D* system , Vec2 worldPosition , Collider2D* collider );
 	Rigidbody2D( Physics2D* system , Vec2 worldPosition );
 	void Destroy();																	// helper for destroying myself (uses owner to mark self for destruction)
-	
+	void Update( float deltaSeconds );
+
 	void TakeCollider( Collider2D* collider );										// takes ownership of a collider (destroying my current one if present)
 	Collider2D* GetCollider() const						{ return m_collider; }
 	void SetCollider( Collider2D* collider );

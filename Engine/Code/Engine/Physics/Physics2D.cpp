@@ -27,7 +27,15 @@ void Physics2D::BeginFrame()
 
 void Physics2D::Update( float deltaSeconds )
 {
-	UNUSED( deltaSeconds );
+	for ( size_t rigidBodyIndex = 0; rigidBodyIndex < m_rigidBodied2D.size(); ++rigidBodyIndex )
+	{
+		m_rigidBodied2D[ rigidBodyIndex ]->Update( deltaSeconds );
+	}
+
+	for ( size_t colliderIndex = 0; colliderIndex < m_colliders2D.size(); ++colliderIndex )
+	{
+		m_colliders2D[ colliderIndex ]->UpdateWorldShape();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -60,7 +68,7 @@ Rigidbody2D* Physics2D::CreateRigidbody( Vec2 rigidBodyPosition , Vec2 coliderPo
 	
 	Rigidbody2D* rigidBody = new Rigidbody2D( this , rigidBodyPosition );
 	DiscCollider2D* collider = new DiscCollider2D( this , rigidBody , coliderPositionRelativeToRigidBody , ColliderRadius );
-	
+	rigidBody->TakeCollider( collider );
 	m_rigidBodied2D.push_back( rigidBody );
 	m_colliders2D.push_back( collider );
 	

@@ -226,6 +226,15 @@ void TheApp::UpdateFromKeyboard()
 			
 		}
 	}
+	if ( g_theInput->GetButtonState( KEY_F8 ).WasJustPressed() )
+	{
+		delete g_theGame;
+		g_theGame = nullptr;
+		delete g_thePhysicsSystem;
+		g_thePhysicsSystem = new Physics2D();
+		g_theGame = new Game();
+		
+	}
 	
 	if ( g_theInput->GetButtonState( KEY_TILDE ).WasJustPressed() )
 	{

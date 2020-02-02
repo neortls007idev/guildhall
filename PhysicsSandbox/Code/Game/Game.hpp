@@ -30,9 +30,10 @@ public:
 	void Render() const;
 
 	void UpdateCamera();
+	void UpdateGameObjectPosition();
 		
 	void DrawMouseCurrentPosition( const Camera& camera ) const;
-
+	GameObject* PickGameobject( Vec2 mousePos );
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 private:
@@ -60,8 +61,10 @@ public:
 		   Rgba8					m_overlapColor				= Rgba8( 255 , 0 , 0 , 127 );
 		   Rgba8					m_selectedObjectColor		= Rgba8( 0 , 110 , 0 , 255 );
 		   Disc2D					m_disc2D					= Disc2D( Vec2( 800.f , -400.f ) , 50.f );
+		   
 		   Vec2						m_mousePosition				= Vec2::ZERO;
-		
+		   GameObject*				m_selectedGameObject = nullptr;
+
 		   Vec3						m_cameraDefaultPosition		= Vec3::ZERO;
 		   Vec3						m_cameraCurrentPosition		= Vec3::ZERO;
 		   Vec3						m_cameraMoveVelocity		= Vec3( MAX_CAMERA_MOVE_VELOCITY_X , MAX_CAMERA_MOVE_VELOCITY_Y , 0.f );
@@ -72,6 +75,7 @@ public:
 		   float					m_currentColliderRadius;
 
 		   std::vector<GameObject*>	m_gameObjects;
+		   std::vector<bool>		m_isMouseOnGameObject;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

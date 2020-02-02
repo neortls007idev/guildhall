@@ -30,6 +30,13 @@ void Rigidbody2D::Destroy()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Rigidbody2D::Update( float deltaSeconds )
+{
+	UNUSED( deltaSeconds );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Rigidbody2D::TakeCollider( Collider2D* collider )
 {
 	if ( nullptr != m_collider && collider != m_collider )

@@ -7,7 +7,7 @@ MP2 And SD2 Checklist
 
 ### A02 Checklist
 
-- [x] *05pts*: Insantiate a physic system into the game.
+- [x] *05pts*: Instantiate a physic system into the game.
 - [x] *10pts*: Be able to create game objects with a collider based on button press,
     - [x] `1` should create random radius disc;
     - [x] centered at cursor
@@ -19,10 +19,10 @@ MP2 And SD2 Checklist
 - [x] *05pts*: Be sure to render the objects in your scene, by default...
     - [x] Render with a blue border
     - [x] Render with 50% alpha white interior
-- [-] *10pts* If mouse is inside the object, render the border yellow.
-- [ ] *15pts* Be able to drag them around
+- [x] *10pts* If mouse is inside the object, render the border yellow.
+- [-] *15pts* Be able to drag them around
     - [ ] If the mouse is dragging the object, render the border dark green.
-- [-] *10pts* If the object is touching another object, render the entire interior at 50% alpha red instead of white.
+- [x] *10pts* If the object is touching another object, render the entire interior at 50% alpha red instead of white.
     - [x] Disc-vs-Disc collision should be same as MP1
 - [ ] *10pts* If dragging, and `delete` or `backspace` is pressed, destroy object.
 - [x] *05pts* Press `Escape` to quit.
@@ -35,6 +35,8 @@ MP2 And SD2 Checklist
 - 'O' (capitol letter 'Oh') to reset camera Position to origin. ( this does not rest the camera output Size ).
 - Right Mouse Button To spawn New GameObjects.
 - Scroll Mouse Wheel Up and Down Movement for Zooming in and out.
+- Left Click to select the object
+
 
 
 Makes sure you mouse position is correct for your current view - converting the client position (offset from top-left of window) to a world location.
