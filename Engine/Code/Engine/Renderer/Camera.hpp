@@ -11,10 +11,10 @@ public:
 	Camera() {};
 	~Camera() {};
 	// TODO :-  write new constructors;
-	void SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
-	Vec2 GetOrthoBottomLeft() const;
-	Vec2 GetOrthoTopRight() const;
-	void Translate2D( const Vec2 cameraTranslate );
+// 	void SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
+// 	Vec2 GetOrthoBottomLeft() const;
+// 	Vec2 GetOrthoTopRight() const;
+// 	void Translate2D( const Vec2 cameraTranslate );
 	
 	void SetOutputSize( Vec2 size );
 	void SetPosition( Vec3 position );
@@ -23,7 +23,7 @@ public:
 	Vec2 GetPosition() const;
 
 	void SetProjectionOrthographic( float height , float nearZ = -1.0f , float farZ = 1.0f );
-	Vec2 ClientToWorldPosition( Vec2 clientPos );
+	Vec2 GetClientToWorldPosition( Vec2 clientPos ) const;
 
 	float GetAspectRatio() const;
 
@@ -31,8 +31,6 @@ private:
 	Vec2 GetOrthoMin() const;
 	Vec2 GetOrthoMax() const;
 
-	Vec2 bottomLeftCoordinate	= Vec2( -1.f , -1.f );
-	Vec2 topRightCoordinate		= Vec2::ONE;
 	Vec2 m_outputSize;
 	Vec2 m_position				= Vec2::ZERO;
 

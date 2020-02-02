@@ -7,35 +7,6 @@
 
 extern Vec2 g_windowDimensions;
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Camera::SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight ) 
-{
-	bottomLeftCoordinate = bottomLeft;
-	topRightCoordinate   = topRight;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-Vec2 Camera::GetOrthoBottomLeft() const
-{
-	return bottomLeftCoordinate;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-Vec2 Camera::GetOrthoTopRight() const
-{
-	return topRightCoordinate;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Camera::Translate2D(const Vec2 cameraTranslate)
-{
-	bottomLeftCoordinate = bottomLeftCoordinate + cameraTranslate;
-	topRightCoordinate   = topRightCoordinate + cameraTranslate;
-}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -77,7 +48,7 @@ void Camera::SetProjectionOrthographic( float height , float nearZ , float farZ 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Vec2 Camera::ClientToWorldPosition( Vec2 clientPos )
+Vec2 Camera::GetClientToWorldPosition( Vec2 clientPos ) const
 {
 	Vec2 worldPos;
 // 	Vec2 outputDimensions = GetOrthoMax()-GetOrthoMin();

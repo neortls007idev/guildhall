@@ -34,7 +34,7 @@ Game::Game()
 	//m_worldCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 1600.f , 800.f ) );
 	m_worldCamera.SetOutputSize( Vec2( 1600.f , 800.f ) );
 	//m_worldCamera.SetProjectionOrthographic( 800.f );
-	m_worldCamera.SetPosition( Vec3( 800.f , 400.f , 0.f ) );
+	m_worldCamera.SetPosition( m_cameraDefaultPosition );
 	//m_worldCamera.SetPosition( Vec3( 0.f , 0.f , 0.f ) );
 	Vec2 cameraBottomLeft = m_worldCamera.GetPosition() - ( m_worldCamera.GetOutputSize() / 2.f );
 	Vec2 cameraTopRight = m_worldCamera.GetPosition() + ( m_worldCamera.GetOutputSize() / 2.f );
@@ -49,12 +49,11 @@ Game::Game()
 
 void Game::Update( float deltaSeconds )
 {
-	m_worldCamera.SetPosition( Vec3( 800.f , -400.f , 0.f ) );
 	Vec2 cameraBottomLeft = m_worldCamera.GetPosition() - ( m_worldCamera.GetOutputSize() / 2.f );
 	Vec2 cameraTopRight = m_worldCamera.GetPosition() + ( m_worldCamera.GetOutputSize() / 2.f );
-	UpdateFromKeyBoard();
+	UpdateFromKeyBoard( deltaSeconds );
 	m_mousePosition = g_theInput->GetMouseNormalizedClientPosition() * ( cameraTopRight - cameraBottomLeft );
-
+	UpdateCamera();
 	UNUSED( deltaSeconds );
 }
 
@@ -150,6 +149,7 @@ void Game::Render() const
 
 void Game::UpdateCamera()
 {
+	m_worldCamera.SetPosition( m_cameraCurrentPosition );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -157,28 +157,53 @@ void Game::UpdateCamera()
 void Game::DrawMouseCurrentPosition( const Camera& camera ) const
 {
 	Vec2 mouseNormalizedPos = g_theInput->GetMouseNormalizedClientPosition();
-	AABB2 orthoBounds = AABB2( camera.GetOrthoBottomLeft() , camera.GetOrthoTopRight() );
-	Vec2 mouseDrawPos = orthoBounds.GetPointForUV( mouseNormalizedPos );
+//	AABB2 orthoBounds = AABB2( camera.GetOrthoBottomLeft() , camera.GetOrthoTopRight() );
+//Vec2 mouseDrawPos = orthoBounds.GetPointForUV( mouseNormalizedPos );
+	Vec2 mouseCurrentClientPosition = camera.GetClientToWorldPosition( mouseNormalizedPos );
 	//g_theRenderer->DrawRing( mouseDrawPos , 2.f , RED , 2.f );
-	g_theRenderer->DrawDisc( Disc2D( mouseDrawPos , 2.5f ) , RED );
+	g_theRenderer->DrawDisc( Disc2D( mouseCurrentClientPosition , 2.5f ) , RED );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Game::UpdateFromKeyBoard()
+void Game::UpdateFromKeyBoard( float deltaSeconds )
 {
-	if ( g_theInput->WasKeyJustPressed( KEY_F8 ) )
+	if ( g_theInput->WasKeyJustPressed( 'O' ) )
 	{
-		Vec2 cameraBottomLeft = m_worldCamera.GetOrthoBottomLeft();
-		Vec2 cameraTopRight = m_worldCamera.GetOrthoTopRight();
-
-		m_color.RollRandomColor( m_rng );
-		m_color.a = 100;
+		m_cameraCurrentPosition = m_cameraDefaultPosition;
+	}
+	
+	if ( g_theInput->IsKeyHeldDown( 'D' ) )
+	{
+		m_cameraCurrentPosition += ( Vec3( m_cameraMoveVelocity.x , 0.f , 0.f ) * deltaSeconds );
+	}
+	
+	if ( g_theInput->IsKeyHeldDown( 'A' ) )
+	{
+		m_cameraCurrentPosition -= ( Vec3( m_cameraMoveVelocity.x , 0.f , 0.f ) * deltaSeconds );
 	}
 
-	if ( g_theInput->GetMouseWheelValue() > 1 )
+	if ( g_theInput->IsKeyHeldDown( 'S' ) )
 	{
-		m_hasCursorChangedToOBB = !m_hasCursorChangedToOBB;
+		m_cameraCurrentPosition -= ( Vec3( 0.f , m_cameraMoveVelocity.y , 0.f ) * deltaSeconds );
+	}
+
+	if ( g_theInput->IsKeyHeldDown( 'W' ) )
+	{
+		m_cameraCurrentPosition += ( Vec3( 0.f , m_cameraMoveVelocity.y , 0.f ) * deltaSeconds );
+	}
+	if ( g_theInput->GetMouseWheelValue() < 0 )
+	{
+		Vec2 currentCameraOutputSize = m_worldCamera.GetOutputSize() + ( Vec2( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y ) * deltaSeconds );
+		m_worldCamera.SetOutputSize( currentCameraOutputSize );
+		m_worldCamera.SetProjectionOrthographic( currentCameraOutputSize.y );
+	}
+
+	if ( g_theInput->GetMouseWheelValue() > 0 )
+	{
+		Vec2 currentCameraOutputSize = m_worldCamera.GetOutputSize() - ( Vec2( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y ) * deltaSeconds );
+		m_worldCamera.SetOutputSize( currentCameraOutputSize );
+		m_worldCamera.SetProjectionOrthographic( currentCameraOutputSize.y );
 	}
 }
 

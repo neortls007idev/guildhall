@@ -41,7 +41,7 @@ void DiscCollider2D::UpdateWorldShape()
 Vec2 DiscCollider2D::GetClosestPoint( Vec2 pos ) const
 {
 	Vec2 nearestPoint = GetNearestPointOnDisc2D( pos , m_worldPosition , m_radius );
-	nearestPoint;
+	return nearestPoint;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

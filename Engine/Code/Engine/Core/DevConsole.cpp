@@ -57,12 +57,14 @@ void DevConsole::PrintString( const Rgba8& textColor , const std::string& devCon
 
 void DevConsole::Render( RenderContext& renderer , const Camera& camera , float lineHeight ) const
 {
-	AABB2 consoleArea = AABB2( camera.GetOrthoBottomLeft() , camera.GetOrthoTopRight() );
+	Vec2 cameraBottomLeft	= camera.GetPosition() - ( camera.GetOutputSize() / 2.f );
+	Vec2 cameraTopRight		= camera.GetPosition() + ( camera.GetOutputSize() / 2.f );
+	AABB2 consoleArea		= AABB2( cameraBottomLeft , cameraTopRight );
 	float offsetBetweenLines = 1.f;
 
-	float dimensionOfConsole = camera.GetOrthoTopRight().y - camera.GetOrthoBottomLeft().y;
+	float dimensionOfConsole = cameraTopRight.y - cameraBottomLeft.y;
 	int numberOfLinesToDisplay = RoundDownToInt( dimensionOfConsole / ( lineHeight + offsetBetweenLines) );
-	Vec2 startMins = camera.GetOrthoBottomLeft();
+	Vec2 startMins = cameraBottomLeft;
 	int myStringIndex = ( int ) m_consoleText.size() - 1;
 	Vec2 alignment = ALIGN_BOTTOM_LEFT;
 	float alignmentDeltaChange = 0.f;
