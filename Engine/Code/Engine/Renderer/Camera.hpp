@@ -24,6 +24,7 @@ public:
 		  
 	void  SetProjectionOrthographic( float height , float nearZ = -1.0f , float farZ = 1.0f );
 	Vec2  GetClientToWorldPosition( Vec2 clientPos ) const;
+	Vec2  GetWorldNormalizedToClientPosition( Vec2 worldPos ) const;
 
 	float GetAspectRatio() const;
 	void  CorrectAspectRaio( float clientAspectRatio );

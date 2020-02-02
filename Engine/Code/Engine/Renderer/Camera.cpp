@@ -56,10 +56,28 @@ Vec2 Camera::GetClientToWorldPosition( Vec2 clientPos ) const
 //  	pixelpos.x = RangeMapFloat( 0.f , m_outputSize.x , 0.f , m_outputSize.x , worldPos.x );
 //  	pixelpos.y = RangeMapFloat( 0.f , m_outputSize.y , 0.f , m_outputSize.y , worldPos.y );
 
+	Vec2 cameraBottomLeft = GetOrthoMin();
+	Vec2 cameraTopRight = GetOrthoMax();
+
 	Vec2 outputDimensions = m_outputSize;
-	worldPos.x = RangeMapFloat( 0.f , 1.f , outputDimensions.x , outputDimensions.x , clientPos.x );
-	worldPos.y = RangeMapFloat( 0.f , 1.f , outputDimensions.y , outputDimensions.y , clientPos.y );
+	worldPos.x = RangeMapFloat( 0.f , 1.f , cameraBottomLeft.x , cameraTopRight.x , clientPos.x );
+	worldPos.y = RangeMapFloat( 0.f , 1.f , cameraBottomLeft.y , cameraTopRight.y , clientPos.y );
 	return worldPos;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec2 Camera::GetWorldNormalizedToClientPosition( Vec2 worldPos ) const
+{
+	Vec2 clientPos;
+
+	Vec2 cameraBottomLeft	= GetOrthoMin();
+	Vec2 cameraTopRight		= GetOrthoMax();
+
+	Vec2 outputDimensions = m_outputSize;
+	clientPos.x = RangeMapFloat( 0.f,1.f, cameraBottomLeft.x , cameraTopRight.x , worldPos.x );
+	clientPos.y = RangeMapFloat( 0.f,1.f, cameraBottomLeft.y , cameraTopRight.y , worldPos.y );
+	return clientPos;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

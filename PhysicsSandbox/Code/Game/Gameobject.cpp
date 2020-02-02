@@ -4,26 +4,12 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-GameObject::GameObject( Physics2D* system ) : 
-												m_physiscsSystem( system )
+GameObject::GameObject( Physics2D* system , Vec2 rigidBodyPosition , Vec2 coliderPositionRelativeToRigidBody , float ColliderRadius ) :
+																													m_physiscsSystem( system )
 {
-// 	if ( !m_rigidbody )
-// 	{
-// 		m_rigidbody = new Rigidbody2D(m_physiscsSystem,)
-// 	}
+	m_rigidbody = m_physiscsSystem->CreateRigidbody( rigidBodyPosition , coliderPositionRelativeToRigidBody , ColliderRadius );
 }
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-GameObject::GameObject( Physics2D* system , Rigidbody2D* rigidbody ) :
-																		m_physiscsSystem( system ) ,
-																		m_rigidbody( rigidbody )
-{
-	if ( !m_rigidbody )
-	{
-		//m_rigidbody = new Rigidbody2D(m_physiscsSystem,)
-	}
-}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -31,7 +17,6 @@ GameObject::~GameObject()
 {
 	// delete m_rigidbody; // this should be an error if setup right
 	m_rigidbody->Destroy(); // destroys through the system;  
-	m_rigidbody = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

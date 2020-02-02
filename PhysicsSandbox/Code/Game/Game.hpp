@@ -15,6 +15,8 @@
 #include <vector>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+class GameObject;
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 class Game
 {
@@ -22,9 +24,11 @@ class Game
 public:
 
 	Game();
+	void InitialGameObjectsSpawner();
 
 	void Update( float deltaSeconds );
 	void Render() const;
+
 	void UpdateCamera();
 		
 	void DrawMouseCurrentPosition( const Camera& camera ) const;
@@ -51,18 +55,23 @@ public:
 
 	static RandomNumberGenerator	m_rng;
 		   Camera					m_worldCamera;
-		   AABB2					m_aabb2D				= AABB2( -800.f , -400.f , 0.f , 0.f );
-		   Rgba8					m_fillColor				= WHITE;
-		   Disc2D					m_disc2D				= Disc2D( Vec2( 800.f , -400.f ) , 50.f );
-		   Vec2						m_mousePosition			= Vec2::ZERO;
+		   AABB2					m_aabb2D					= AABB2( -800.f , -400.f , 0.f , 0.f );
+		   Rgba8					m_fillColor					= Rgba8( 255 , 255 , 255 , 127 );
+		   Rgba8					m_overlapColor				= Rgba8( 255 , 0 , 0 , 127 );
+		   Rgba8					m_selectedObjectColor		= Rgba8( 0 , 110 , 0 , 255 );
+		   Disc2D					m_disc2D					= Disc2D( Vec2( 800.f , -400.f ) , 50.f );
+		   Vec2						m_mousePosition				= Vec2::ZERO;
 		
-		   Vec3						m_cameraDefaultPosition = Vec3::ZERO;
-		   Vec3						m_cameraCurrentPosition = Vec3::ZERO;
-		   Vec3						m_cameraMoveVelocity	= Vec3( MAX_CAMERA_MOVE_VELOCITY_X , MAX_CAMERA_MOVE_VELOCITY_Y , 0.f );
-		   
-		   float					m_minColliderRadius		= MIN_COLLIDER_RADIUS;
-		   float					m_maxColliderRadius		= MAX_COLLIDER_RADIUS;
+		   Vec3						m_cameraDefaultPosition		= Vec3::ZERO;
+		   Vec3						m_cameraCurrentPosition		= Vec3::ZERO;
+		   Vec3						m_cameraMoveVelocity		= Vec3( MAX_CAMERA_MOVE_VELOCITY_X , MAX_CAMERA_MOVE_VELOCITY_Y , 0.f );
+		   Vec2						m_currentCameraOutputSize	= Vec2( 1600.f , 800.f );
+
+		   float					m_minColliderRadius			= MIN_COLLIDER_RADIUS;
+		   float					m_maxColliderRadius			= MAX_COLLIDER_RADIUS;
 		   float					m_currentColliderRadius;
+
+		   std::vector<GameObject*>	m_gameObjects;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
