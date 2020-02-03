@@ -120,12 +120,11 @@ void Game::UpdateGameObjectPosition()
 
 void Game::UpdateGameObjects()
 {
-	for ( size_t colliderIndex = 0; colliderIndex < g_thePhysicsSystem->m_colliders2D.size(); colliderIndex++ )
+	for ( size_t colliderIndex = 0; colliderIndex < m_gameObjects.size(); colliderIndex++ )
 	{
-		DiscCollider2D* collider = ( DiscCollider2D* ) g_thePhysicsSystem->m_colliders2D[ colliderIndex ];
+		Collider2D* collider = m_gameObjects[ colliderIndex ]->m_rigidbody->GetCollider();
 
-		bool isMouseInside = IsPointOnDisc2D( m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() ) ,
-			collider->m_worldPosition , collider->m_radius );
+		bool isMouseInside = collider->Contains( m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() ) );
 
 		bool isSelectedGameObject = m_gameObjects[ colliderIndex ]->m_isSelected;
 
@@ -143,34 +142,33 @@ void Game::UpdateGameObjects()
 			m_gameObjects[ colliderIndex ]->m_borderColor = BLUE;
 		}
 	}
+	
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//				COLLISION UPDATE
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-	for ( size_t index = 0; index < m_gameObjects.size(); index++ )
+	for ( int firstColliderIndex = 0; firstColliderIndex < m_gameObjects.size(); firstColliderIndex++ )
 	{
-		for ( size_t secondColliderIndex = 0; secondColliderIndex < g_thePhysicsSystem->m_colliders2D.size(); secondColliderIndex++ )
+		if ( m_gameObjects[ firstColliderIndex ] == nullptr )
 		{
-			DiscCollider2D* secondCollider = ( DiscCollider2D* ) g_thePhysicsSystem->m_colliders2D[ secondColliderIndex ];
-
-			if ( secondCollider == firstCollider )
+			continue;
+		}
+		for ( int secondColliderIndex = 0; secondColliderIndex < m_gameObjects.size(); secondColliderIndex++ )
+		{
+			if ( m_gameObjects[ secondColliderIndex ] == nullptr )
 			{
 				continue;
 			}
-			else
+			if ( m_gameObjects[ firstColliderIndex ] != m_gameObjects[ secondColliderIndex ] )
 			{
-				if ( firstCollider->Intersects( secondCollider ) )
+				if ( m_gameObjects[ firstColliderIndex ]->m_rigidbody->m_collider->Intersects( m_gameObjects[ secondColliderIndex ]->m_rigidbody->m_collider ) )
 				{
-					//m_gameObjects[ firstColliderIndex ]->m_fillColor = m_overlapColor;
-					m_gameObjects[ firstColliderIndex ]->m_isColliding = true;
-				}
-
-			}
-			{
-				if ( m_gameObjects[ index ]->m_isColliding )
-				{
-					m_gameObjects[ index ]->m_fillColor = m_overlapColor;
+					m_gameObjects[ firstColliderIndex ]->m_fillColor = m_overlapColor;
+					break;
 				}
 				else
 				{
-					m_gameObjects[ index ]->m_fillColor = m_fillColor;
+					m_gameObjects[ firstColliderIndex ]->m_fillColor = m_fillColor;
 				}
 			}
 		}
@@ -288,7 +286,10 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 		}
 		else
 		{
-			m_selectedGameObject->m_isSelected = false;
+			if ( m_selectedGameObject != nullptr )
+			{
+				m_selectedGameObject->m_isSelected = false;
+			}
 			m_selectedGameObject = nullptr;
 			clickCounter = true;
 			for ( size_t gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )

@@ -4,7 +4,7 @@
 **( NOTE :- Controls Listed at the Bottom after the Checklist )**
 ------
 
-- [x] *05pts*: Insantiate a physic system into the game.
+- [x] *05pts*: Instantiate a physic system into the game.
 - [x] *10pts*: Be able to create game objects with a collider based on button press,
     - [x] `1` should create random radius disc;
     - [x] centered at cursor
@@ -17,8 +17,8 @@
     - [x] Render with a blue border
     - [x] Render with 50% alpha white interior
 - [x] *10pts* If mouse is inside the object, render the border yellow.
-- [-] *15pts* Be able to drag them around
-    - [ ] If the mouse is dragging the object, render the border dark green.
+- [x] *15pts* Be able to drag them around
+    - [x] If the mouse is dragging the object, render the border dark green.
 - [x] *10pts* If the object is touching another object, render the entire interior at 50% alpha red instead of white.
     - [x] Disc-vs-Disc collision should be same as MP1
 - [ ] *10pts* If dragging, and `delete` or `backspace` is pressed, destroy object.
