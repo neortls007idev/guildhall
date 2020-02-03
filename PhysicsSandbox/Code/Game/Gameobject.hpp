@@ -12,7 +12,7 @@ class GameObject
 {
 public:
 	GameObject( Physics2D* system , Vec2 rigidBodyPosition , Vec2 coliderPositionRelativeToRigidBody , float ColliderRadius );
-//	GameObject( Physics2D* system , Rigidbody2D* rigidbody );
+
 	~GameObject();
 
 public:

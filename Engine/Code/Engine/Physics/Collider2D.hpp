@@ -33,6 +33,7 @@ public:
 	virtual bool Intersects( Collider2D const* other ) const = 0;
 
 	virtual void DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor ) = 0;
+	virtual Vec2 GetPosition() const = 0;
 
 protected:
 	virtual ~Collider2D(); // private - make sure this is virtual so correct deconstructor gets called

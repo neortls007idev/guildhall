@@ -24,7 +24,7 @@ MP2 And SD2 Checklist
     - [x] If the mouse is dragging the object, render the border dark green.
 - [x] *10pts* If the object is touching another object, render the entire interior at 50% alpha red instead of white.
     - [x] Disc-vs-Disc collision should be same as MP1
-- [ ] *10pts* If dragging, and `delete` or `backspace` is pressed, destroy object.
+- [x] *10pts* If dragging, and `delete` or `backspace` is pressed, destroy object.
 - [x] *05pts* Press `Escape` to quit.
 - [x] Add `mp2.a02.md` readme to root folder
 ------

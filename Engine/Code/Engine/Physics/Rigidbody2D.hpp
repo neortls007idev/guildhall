@@ -24,6 +24,7 @@ public:
 	Collider2D* GetCollider() const						{ return m_collider; }
 	void SetCollider( Collider2D* collider );
 	void SetPosition( Vec2 position );
+	Vec2 GetPosition() const							{ return m_worldPosition; }
 
 public:
 	Physics2D*	m_system			= nullptr;										// which scene created/owns this object

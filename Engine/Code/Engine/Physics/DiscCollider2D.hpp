@@ -25,6 +25,7 @@ public:
 	virtual bool Intersects( Collider2D const* other ) const override;
 
 	virtual void DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor ) override;
+	virtual Vec2 GetPosition() const override																				{ return m_worldPosition;  }
 
 public:
 	Vec2	m_localPosition; // my local offset from my parent

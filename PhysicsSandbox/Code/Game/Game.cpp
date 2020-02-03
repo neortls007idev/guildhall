@@ -120,8 +120,14 @@ void Game::UpdateGameObjectPosition()
 	}
 	else
 	{
-		Vec2 newWorldPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
-		m_selectedGameObject->m_rigidbody->SetPosition( newWorldPosition );
+		Vec2 colliderPos		= m_selectedGameObject->m_rigidbody->GetPosition();
+		Vec2 newWorldPosition	= m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+		if ( !m_isDragOffsetSet )
+		{
+			m_rigidBodyMouseOffset	=  newWorldPosition - colliderPos;
+			m_isDragOffsetSet = true;
+		}
+		m_selectedGameObject->m_rigidbody->SetPosition( newWorldPosition - m_rigidBodyMouseOffset );		
 	}
 }
 
@@ -309,6 +315,8 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 			if ( m_selectedGameObject != nullptr )
 			{
 				m_selectedGameObject->m_isSelected = false;
+				m_rigidBodyMouseOffset = Vec2::ZERO;
+				m_isDragOffsetSet = false;
 			}
 			m_selectedGameObject = nullptr;
 			clickCounter = true;

@@ -64,7 +64,9 @@ public:
 		   Disc2D					m_disc2D					= Disc2D( Vec2( 800.f , -400.f ) , 50.f );
 		   
 		   Vec2						m_mousePosition				= Vec2::ZERO;
-		   GameObject*				m_selectedGameObject = nullptr;
+		   Vec2						m_rigidBodyMouseOffset		= Vec2::ZERO;
+		   GameObject*				m_selectedGameObject		= nullptr;
+		   bool						m_isDragOffsetSet = false;
 
 		   Vec3						m_cameraDefaultPosition		= Vec3::ZERO;
 		   Vec3						m_cameraCurrentPosition		= Vec3::ZERO;
