@@ -17,6 +17,7 @@ GameObject::~GameObject()
 {
 	// delete m_rigidbody; // this should be an error if setup right
 	m_rigidbody->Destroy(); // destroys through the system;  
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

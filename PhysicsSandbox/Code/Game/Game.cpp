@@ -65,12 +65,12 @@ void Game::InitialGameObjectsSpawner()
 
 void Game::Update( float deltaSeconds )
 {
-	UpdateFromKeyBoard( deltaSeconds );
 	m_mousePosition = m_worldCamera.GetClientToWorldPosition( m_mousePosition );
 	m_mousePosition = m_worldCamera.GetWorldNormalizedToClientPosition( m_mousePosition );
 	UpdateCamera();
 	UpdateGameObjectPosition();
 	UpdateGameObjects();
+	UpdateFromKeyBoard( deltaSeconds );
 	g_thePhysicsSystem->Update( deltaSeconds );
 	//UNUSED( deltaSeconds );
 }
@@ -82,10 +82,19 @@ void Game::Render() const
 	g_theRenderer->BeginCamera( m_worldCamera );
 	g_theRenderer->BindTexture( nullptr );
 
-	for ( size_t index = 0; index < g_thePhysicsSystem->m_colliders2D.size(); index++ )
+	for ( unsigned int index = 0; index < ( unsigned int ) m_gameObjects.size(); index++ )
 	{
-		DiscCollider2D* Collider = ( DiscCollider2D* ) g_thePhysicsSystem->m_colliders2D[ index ];
-		Collider->DebugRender( g_theRenderer , m_gameObjects[index]->m_borderColor , m_gameObjects[index]->m_fillColor );
+		if ( m_gameObjects[index] == nullptr )
+		{
+			continue;
+		}
+
+		Collider2D* Collider = m_gameObjects[ index ]->m_rigidbody->GetCollider();
+		
+		if ( Collider )
+		{
+			Collider->DebugRender( g_theRenderer , m_gameObjects[index]->m_borderColor , m_gameObjects[index]->m_fillColor );
+		}
 	}
 
 	DrawMouseCurrentPosition( m_worldCamera );
@@ -122,6 +131,11 @@ void Game::UpdateGameObjects()
 {
 	for ( size_t colliderIndex = 0; colliderIndex < m_gameObjects.size(); colliderIndex++ )
 	{
+		if ( m_gameObjects[ colliderIndex ] == nullptr )
+		{
+			continue;
+		}
+		
 		Collider2D* collider = m_gameObjects[ colliderIndex ]->m_rigidbody->GetCollider();
 
 		bool isMouseInside = collider->Contains( m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() ) );
@@ -192,7 +206,13 @@ GameObject* Game::PickGameobject( Vec2 mousePos )
 	bool isMouseOverAnygameobject = false;
 	for ( size_t gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
 	{
-		DiscCollider2D* collider = ( DiscCollider2D* ) m_gameObjects[ gameObjectIndex ]->m_rigidbody->m_collider;
+		if ( !m_gameObjects[gameObjectIndex] )
+		{
+			continue;
+		}
+
+		Collider2D* collider = m_gameObjects[ gameObjectIndex ]->m_rigidbody->m_collider;
+		
 		if ( collider && collider->Contains( mousePos ) )
 		{
 			m_isMouseOnGameObject[ gameObjectIndex ] = true;
@@ -295,6 +315,27 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 			for ( size_t gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
 			{
 				m_isMouseOnGameObject[ gameObjectIndex ] = false;
+			}
+		}
+	}
+
+	if ( g_theInput->WasKeyJustPressed( KEY_BACKSPACE ) || g_theInput->WasKeyJustPressed( KEY_DELETE ) )
+	{
+		if ( m_selectedGameObject )
+		{
+			for ( size_t index = 0; index < m_gameObjects.size(); index++ )
+			{
+				if ( !m_gameObjects[index] )
+				{
+					continue;
+				}
+				
+				if ( m_gameObjects[index] == m_selectedGameObject )
+				{
+					delete m_gameObjects[ index ];
+					m_gameObjects[ index ] = nullptr;
+					m_selectedGameObject = nullptr;
+				}
 			}
 		}
 	}

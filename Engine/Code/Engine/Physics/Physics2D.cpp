@@ -44,6 +44,11 @@ void Physics2D::EndFrame()
 {
 	for ( size_t rigidBodyIndex = 0; rigidBodyIndex < m_rigidBodied2D.size(); rigidBodyIndex++ )
 	{
+		if ( !m_rigidBodied2D[ rigidBodyIndex ] )
+		{
+			continue;
+		}
+
 		if ( m_rigidBodied2D[ rigidBodyIndex ]->m_isGarbage )
 		{
 			delete m_rigidBodied2D[ rigidBodyIndex ];
