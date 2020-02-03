@@ -99,15 +99,6 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 
 		case WM_MOUSEWHEEL :
 		{
-// 			if ( GET_WHEEL_DELTA_WPARAM( wParam ) > 0 )
-// 			{
-// 				g_theInput->UpdateMouseWheel( 10 );
-// 			}
-// 			if ( GET_WHEEL_DELTA_WPARAM( wParam ) < 0 )
-// 			{
-// 				g_theInput->UpdateMouseWheel( -10 );
-// 			}
-
 			g_theInput->UpdateMouseWheel( GET_WHEEL_DELTA_WPARAM( wParam ) );
 			break;
 		}

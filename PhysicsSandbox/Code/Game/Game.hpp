@@ -31,6 +31,7 @@ public:
 
 	void UpdateCamera();
 	void UpdateGameObjectPosition();
+	void UpdateGameObjects();
 		
 	void DrawMouseCurrentPosition( const Camera& camera ) const;
 	GameObject* PickGameobject( Vec2 mousePos );
