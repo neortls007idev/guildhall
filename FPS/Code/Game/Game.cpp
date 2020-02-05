@@ -33,8 +33,8 @@ void Game::Update( float deltaSeconds )
 void Game::Render() const
 {
 	g_theRenderer->BeginCamera( m_worldCamera );
-	g_theRenderer->Draw( 3 , 0 );
-	g_theRenderer->DrawAABB2( AABB2( -0.5f , -0.5f , 0.5f , 0.5f ) , GREEN );
+	//g_theRenderer->Draw( 3 , 0 );
+	g_theRenderer->DrawAABB2( AABB2( -0.5f , -0.5f , 0.5f , 0.5f ) , WHITE );
 	g_theRenderer->EndCamera( m_worldCamera );
 }
 

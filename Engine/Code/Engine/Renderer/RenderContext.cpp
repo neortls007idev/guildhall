@@ -113,7 +113,7 @@ void RenderContext::Startup( Window* window )
 // 	}
 	m_swapChain = new SwapChain( this , swapchain );
 	m_defaultShader = new Shader( this );
-	m_defaultShader->CreateFromFile( this , "Data/Shaders/Triangle.hlsl" );
+	m_defaultShader->CreateFromFile( this , "Data/Shaders/default.hlsl" );
 
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
 }
@@ -344,12 +344,17 @@ void RenderContext::Draw( int numVertexes , int vertexOffset )
 	viewport.MinDepth = 0.0;
 	viewport.MaxDepth = 1.f;
 	
+
 	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
 	m_context->RSSetState( m_currentShader->m_rasterState );
 	m_context->RSSetViewports( 1 , &viewport );
-	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fragmnetShader , nullptr , 0 );
+	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fragmentShader , nullptr , 0 );
 	m_context->OMSetRenderTargets( 1 , &rtv , nullptr );
+
+	 // So at this, I need to describe the vertex format to the shader
+	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout(/* VertexPCU :: LAYOUT */ );
+	m_context->IASetInputLayout( inputLayout );
 
 	m_context->Draw( numVertexes , vertexOffset );
 }
@@ -384,12 +389,15 @@ void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes
 	size_t  bufferTotalByteSize	= numVertexes * sizeof( Vertex_PCU );
 	size_t	elementSize			= sizeof( Vertex_PCU );
 	m_immediateVBO->Update( vertexes , bufferTotalByteSize , elementSize );
-// 	
-// 	// Bind the Shader
-// 	BindVertexInput( m_immediateVBO );
-// 	// Index Buffers - to be covered later
 
-// Draw
+
+	// Bind the Shader
+
+ 	BindVertexinput( m_immediateVBO );
+
+	// Index Buffers - to be covered later
+
+	// Draw
 	Draw( numVertexes , 0 );
 
 }

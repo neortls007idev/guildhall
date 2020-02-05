@@ -148,7 +148,7 @@ bool ShaderStage::Compile( RenderContext* ctx , std::string const& filename , vo
 
 			case SHADER_STAGE_FRAGMENT:
 			{
-				result = device->CreatePixelShader( byteCodePtr , byteCodeSize , nullptr , &m_fragmnetShader );
+				result = device->CreatePixelShader( byteCodePtr , byteCodeSize , nullptr , &m_fragmentShader );
 				GUARANTEE_OR_DIE( SUCCEEDED( result ) , "FAILED TO LINK VERTEX SHADER STAGE" );
 			} break;
 
@@ -176,6 +176,20 @@ bool ShaderStage::Compile( RenderContext* ctx , std::string const& filename , vo
 	// byte 
 	return IsValid();
 
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void const* ShaderStage::GetByteCode() const
+{
+	return m_byteCode->GetBufferPointer();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+size_t ShaderStage::GetByteCodeLength() const
+{
+	return m_byteCode->GetBufferSize();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -213,6 +227,7 @@ bool Shader::CreateFromFile( RenderContext* ctx , std::string const& filename )
 Shader::~Shader()
 {
 	DX_SAFE_RELEASE( m_rasterState );
+	DX_SAFE_RELEASE( m_inputLayout );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -234,6 +249,52 @@ void Shader::CreateRasterSate()
 
 	ID3D11Device* device = m_owner->m_device;
 	device->CreateRasterizerState( &desc , &m_rasterState );
+}
+
+ID3D11InputLayout* Shader::GetOrCreateInputLayout(/* buffer_attribute_t const* attribs */ )
+{
+	D3D11_INPUT_ELEMENT_DESC vertexDescription[ 3 ];
+	if ( m_inputLayout != nullptr )
+	{
+		return m_inputLayout;
+	}
+
+	// Position
+	vertexDescription[ 0 ].SemanticName			= "POSITION";
+	vertexDescription[ 0 ].SemanticIndex		= 0;													// Array element
+	vertexDescription[ 0 ].Format				= DXGI_FORMAT_R32G32B32_FLOAT;							// 3 32-bit floats
+	vertexDescription[ 0 ].InputSlot			= 0;													// interlaced or parallel IA format
+	vertexDescription[ 0 ].AlignedByteOffset	= offsetof( Vertex_PCU , m_position );
+	vertexDescription[ 0 ].InputSlotClass		= D3D11_INPUT_PER_VERTEX_DATA;							// Vertex data = drawing a tree, Instance data = drawing a million tree
+	vertexDescription[ 0 ].InstanceDataStepRate = 0;
+
+	// Color
+	vertexDescription[ 1 ].SemanticName			= "COLOR";
+	vertexDescription[ 1 ].SemanticIndex		= 0;													// Array element
+	vertexDescription[ 1 ].Format				= DXGI_FORMAT_R8G8B8A8_UNORM;							// 4 1 byte channel. unsigned normal Value
+	vertexDescription[ 1 ].InputSlot			= 0;													// interlaced or parallel IA format
+	vertexDescription[ 1 ].AlignedByteOffset	= offsetof( Vertex_PCU , m_color );
+	vertexDescription[ 1 ].InputSlotClass		= D3D11_INPUT_PER_VERTEX_DATA;							// Vertex data = drawing a tree, Instance data = drawing a million tree
+	vertexDescription[ 1 ].InstanceDataStepRate = 0;
+	
+	// UVS
+	vertexDescription[ 2 ].SemanticName			= "TEXCOORD";
+	vertexDescription[ 2 ].SemanticIndex		= 0;													// Array element
+	vertexDescription[ 2 ].Format				= DXGI_FORMAT_R32G32_FLOAT;								// 4 1 byte channel. unsigned normal Value
+	vertexDescription[ 2 ].InputSlot			= 0;													// interlaced or parallel IA format
+	vertexDescription[ 2 ].AlignedByteOffset	= offsetof( Vertex_PCU , m_uvTexCoords );
+	vertexDescription[ 2 ].InputSlotClass		= D3D11_INPUT_PER_VERTEX_DATA;							// Vertex data = drawing a tree, Instance data = drawing a million tree
+	vertexDescription[ 2 ].InstanceDataStepRate	= 0;
+
+
+	ID3D11Device* device = m_owner->m_device;
+	device->CreateInputLayout(
+		vertexDescription , 3 ,
+		m_vertexStage.GetByteCode() , m_vertexStage.GetByteCodeLength() ,
+		&m_inputLayout );
+																			// describe the Vertex PCU
+
+	return m_inputLayout;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -34,6 +34,10 @@ public:
 
 	inline bool IsValid() const { return nullptr != m_handle; }
 
+	void const* GetByteCode() const;
+	size_t GetByteCodeLength() const;
+
+
 public:
 	// a stage could be any one of these types,
 	// so we use a enum to identify it, and a union to store it; 
@@ -44,7 +48,7 @@ public:
 	{
 		ID3D11Resource*		m_handle;
 		ID3D11VertexShader* m_vertexShader;
-		ID3D11PixelShader*	m_fragmnetShader;
+		ID3D11PixelShader*	m_fragmentShader;
 	};
 };
 
@@ -62,6 +66,8 @@ public:
 
 	ID3D11RasterizerState* GetRasterState();                                   // A02 (only creating a default one for now)
 	void CreateRasterSate();
+
+	ID3D11InputLayout* GetOrCreateInputLayout(/* buffer_attribute_t const* attribs */);
 
 
 public:
