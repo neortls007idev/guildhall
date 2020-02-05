@@ -24,9 +24,8 @@ typedef unsigned char	uchar;
 
 #define UNUSED(x) (void)(x);
 #define STATIC // DO NOTHING JUST A PLACEHOLDER STATIC KEYWORD TO IDENTIFY STATIC TYPES IN CPPS
-#define BIT_FLAG_SHIFT_LEFT(b) ( 1 << b )
-#define BIT_FLAG_SHIFT_RIGHT(b) ( 0xFFFF >> b )
-#define BREAKPOINT int myBreakpoint; \ UNUSED(myBreakPoint);
+#define BIT_FLAG( b ) ( 1 << ( b ) )
+#define BREAKPOINT( x ) int myBreakpoint ## x; \ UNUSED( myBreakPoint ## x );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

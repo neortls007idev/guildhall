@@ -19,6 +19,7 @@ struct ID3D11Device;
 struct ID3D11DeviceContext;
 
 class Shader;
+class VertexBuffer;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -73,7 +74,8 @@ public:
  	void DrawRegularPolygon(); // TO DO
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-
+	void BindShader( Shader* shader );
+	void BindVertexinput( VertexBuffer* vbo );
 
 private:
 
@@ -86,10 +88,13 @@ private:
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 public:
-	ID3D11Device*		 m_device	 = nullptr ;
-	ID3D11DeviceContext* m_context   = nullptr ; // Immediate context
-	SwapChain*			 m_swapChain = nullptr;
-	Shader* m_currentShader = nullptr;
+	ID3D11Device*		 m_device			= nullptr ;
+	ID3D11DeviceContext* m_context			= nullptr ; // Immediate context
+	SwapChain*			 m_swapChain		= nullptr;
+
+	Shader*				 m_defaultShader	= nullptr;
+	Shader*				 m_currentShader	= nullptr;
+	VertexBuffer*		 m_immediateVBO		= nullptr;
 
 private:
 

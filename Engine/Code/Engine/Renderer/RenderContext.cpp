@@ -12,6 +12,7 @@
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Renderer/SwapChain.hpp"
+#include "Engine/Renderer/VertexBuffer.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				THIRD PARTY LIBRARIES
@@ -111,11 +112,11 @@ void RenderContext::Startup( Window* window )
 // 		g_bitmapFont = GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
 // 	}
 	m_swapChain = new SwapChain( this , swapchain );
-	m_currentShader = new Shader( this );
-	m_currentShader->CreateFromFile( this , "Data/Shaders/Triangle.hlsl" );
+	m_defaultShader = new Shader( this );
+	m_defaultShader->CreateFromFile( this , "Data/Shaders/Triangle.hlsl" );
+
+	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
 }
-
-
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -135,11 +136,14 @@ void RenderContext::EndFrame()
 
 void RenderContext::Shutdown()
 {
+	delete m_immediateVBO;
+	m_immediateVBO = nullptr;
+
 	delete m_swapChain;
 	m_swapChain = nullptr;
 
-	delete m_currentShader;
-	m_currentShader = nullptr;
+	delete m_defaultShader;
+	m_defaultShader = nullptr;
 
 	DX_SAFE_RELEASE( m_context );
 	DX_SAFE_RELEASE( m_device );
@@ -186,7 +190,7 @@ if ( camera->ShouldClearClear() )
 {
 	ClearColorTarget( output , camera->GetClearColor() );
 }*/
-
+	BindShader( nullptr );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -335,8 +339,8 @@ void RenderContext::Draw( int numVertexes , int vertexOffset )
 	D3D11_VIEWPORT viewport;
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
-	viewport.Width = output.x;
-	viewport.Height = output.y;
+	viewport.Width = ( float ) output.x;
+	viewport.Height = ( float ) output.y;
 	viewport.MinDepth = 0.0;
 	viewport.MaxDepth = 1.f;
 	
@@ -370,20 +374,24 @@ BitmapFont* RenderContext::GetOrCreateBitmapFontFromFile( std::string bitmapFont
 
 void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes )
 {
-	UNUSED( numVertexes );
-	UNUSED( vertexes );
-// 	glBegin( GL_TRIANGLES );
-// 	{
-// 		for ( int vertIndex = 0; vertIndex < numVertexes; vertIndex++)
-// 		{
-// 			const Vertex_PCU& vert = vertexes[ vertIndex ];
-// 			glTexCoord2f( vert.m_uvTexCoords.x , vert.m_uvTexCoords.y );
-// 			glColor4ub( vert.m_color.r , vert.m_color.g , vert.m_color.b , vert.m_color.a );
-// 			glVertex3f( vert.m_position.x , vert.m_position.y , vert.m_position.z );
-// 		}
-// 	}
-// 	glEnd();
-	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
+
+	// Update a vertex buffer
+	// RenderBUffer* m_immediateVBO // VBO - vertex buffer object - a buffer of memomry on the GPU.
+	// void* cpuBuffer = ( void* ) vertexes;
+	// stride - the number of bytes we need to move in an array or buffer of a memory
+
+
+	size_t  bufferTotalByteSize	= numVertexes * sizeof( Vertex_PCU );
+	size_t	elementSize			= sizeof( Vertex_PCU );
+	m_immediateVBO->Update( vertexes , bufferTotalByteSize , elementSize );
+// 	
+// 	// Bind the Shader
+// 	BindVertexInput( m_immediateVBO );
+// 	// Index Buffers - to be covered later
+
+// Draw
+	Draw( numVertexes , 0 );
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -622,6 +630,27 @@ void RenderContext::DrawDiscFraction(const Disc2D& disc, const float drawFractio
 	// MOVE  THIS LINE OF CODE INTO A SEPARATE FUNCTION LATER
 	TransformVertexArray2D( NUMBER_OF_VERTS_IN_DISC_FRACTION , discVerts , 1 , OrientationDegrees , disc.m_center );
 	DrawVertexArray( NUMBER_OF_VERTS_IN_DISC_FRACTION , discVerts );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::BindShader( Shader* shader )
+{
+	m_currentShader = shader;
+	if ( m_currentShader == nullptr )
+	{
+		m_currentShader = m_defaultShader;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::BindVertexinput( VertexBuffer* vbo )
+{
+	ID3D11Buffer* vboHandle = vbo->m_handle;
+	UINT stride = ( UINT ) sizeof( Vertex_PCU );	//	how far from one vertex to next
+	UINT offset = 0;								//  how far into buffer we start
+	m_context->IASetVertexBuffers( 0 , 1 , &vboHandle , &stride , &offset );
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------

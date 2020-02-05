@@ -203,6 +203,7 @@
     <ClCompile Include="Primitives\Disc2D.cpp" />
     <ClCompile Include="Primitives\LineSegment2D.cpp" />
     <ClCompile Include="Primitives\OBB2.cpp" />
+    <ClCompile Include="Renderer\RenderBuffer.cpp" />
     <ClCompile Include="Renderer\Shader.cpp" />
     <ClCompile Include="Renderer\SpriteAnimSet.cpp" />
     <ClCompile Include="Renderer\BitmapFont.cpp" />
@@ -214,6 +215,7 @@
     <ClCompile Include="Renderer\SwapChain.cpp" />
     <ClCompile Include="Renderer\Texture.cpp" />
     <ClCompile Include="Renderer\TextureView.cpp" />
+    <ClCompile Include="Renderer\VertexBuffer.cpp" />
     <ClCompile Include="Time\Time.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -267,6 +269,7 @@
     <ClInclude Include="Renderer\BitmapFont.hpp" />
     <ClInclude Include="Renderer\Camera.hpp" />
     <ClInclude Include="Renderer\D3D11Common.hpp" />
+    <ClInclude Include="Renderer\RenderBuffer.hpp" />
     <ClInclude Include="Renderer\RenderContext.hpp" />
     <ClInclude Include="Renderer\Shader.hpp" />
     <ClInclude Include="Renderer\SpriteAnimation.hpp" />
@@ -276,6 +279,7 @@
     <ClInclude Include="Renderer\SwapChain.hpp" />
     <ClInclude Include="Renderer\Texture.hpp" />
     <ClInclude Include="Renderer\TextureView.hpp" />
+    <ClInclude Include="Renderer\VertexBuffer.hpp" />
     <ClInclude Include="Time\Time.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

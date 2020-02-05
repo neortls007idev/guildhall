@@ -38,6 +38,9 @@
     <Filter Include="Renderer\Shaders">
       <UniqueIdentifier>{bd527724-b331-42fa-8bca-7a74f56c86de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Renderer\Buffers">
+      <UniqueIdentifier>{a7ac4d5c-3218-4045-894d-2451b0e083f5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Rgba8.cpp">
@@ -183,6 +186,12 @@
     </ClCompile>
     <ClCompile Include="Renderer\Shader.cpp">
       <Filter>Renderer\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\RenderBuffer.cpp">
+      <Filter>Renderer\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\VertexBuffer.cpp">
+      <Filter>Renderer\Buffers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -365,6 +374,12 @@
     </ClInclude>
     <ClInclude Include="Renderer\Shader.hpp">
       <Filter>Renderer\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\RenderBuffer.hpp">
+      <Filter>Renderer\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\VertexBuffer.hpp">
+      <Filter>Renderer\Buffers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

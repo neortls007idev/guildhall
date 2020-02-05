@@ -134,13 +134,13 @@ void TheApp::UpdateFromKeyboard()
 		WNDCLASSEX windowClassDescription;
 		::GetClassInfo(NULL, windowClassDescription , currentWindow );
 
-		*/
+		
 		HICON m_hIcon = reinterpret_cast< HICON >( ::LoadImage( NULL ,
 			MAKEINTRESOURCE( IDI_ERROR ) ,
 			IMAGE_ICON ,
 			0 , 0 ,
 			LR_DEFAULTCOLOR | LR_SHARED | LR_DEFAULTSIZE ) );
-
+		*/
 		//SetWindowLong( ( HWND ) g_theWindow->m_hwnd , GCL_HICON , ( LONG ) m_hIcon );
 		//SendMessage( ( HWND ) g_theWindow->m_hwnd , )
 	}
