@@ -6,7 +6,7 @@
 
 - [x] *05pts*: Instantiate a physic system into the game.
 - [x] *10pts*: Be able to create game objects with a collider based on button press,
-    - [x] `1` should create random radius disc;
+    - [x] `Right Mouse Button` should create random radius disc;
     - [x] centered at cursor
 - [x] *10pts*: Camera changes implemented
 - [x] *05pts*: Can move around using `WASD` or equivalent
@@ -32,7 +32,8 @@
 - 'O' (capitol letter 'Oh') to reset camera Position to origin. ( this does not rest the camera output Size ).
 - Right Mouse Button To spawn New GameObjects.
 - Scroll Mouse Wheel Up and Down Movement for Zooming in and out.
-- Left Click to select the object
+- Left Click to select the object and click again to Deselect the object.
+- Select an object and hit `delete` or `backspace` key to delete the currently selected object.
 
 
 Makes sure you mouse position is correct for your current view - converting the client position (offset from top-left of window) to a world location.
