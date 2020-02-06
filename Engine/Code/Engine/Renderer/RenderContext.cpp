@@ -14,6 +14,7 @@
 #include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Renderer/VertexBuffer.hpp"
 
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				THIRD PARTY LIBRARIES
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -24,6 +25,9 @@
 
 #include <shobjidl.h>
 #include <shobjidl_core.h>
+
+#include <d3d11sdklayers.h>
+#include <dxgidebug.h>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				D3D11 specific includes and Macros
@@ -56,6 +60,9 @@ void RenderContext::Startup( Window* window )
 {
 	// ID3D11Device
 	// ID3D11DeviceContext
+#if defined(RENDER_DEBUG)
+	CreateDebugModule();
+#endif
 
 	IDXGISwapChain* swapchain = nullptr;  // Create Swap Chain
 
@@ -112,7 +119,7 @@ void RenderContext::Startup( Window* window )
 // 		g_bitmapFont = GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
 // 	}
 	m_swapChain = new SwapChain( this , swapchain );
-	m_defaultShader = new Shader( this );
+	//m_defaultShader = new Shader( this );
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/default.hlsl" );
 
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
@@ -139,6 +146,9 @@ void RenderContext::Shutdown()
 	delete m_immediateVBO;
 	m_immediateVBO = nullptr;
 
+	m_lastBoundVBO = nullptr;
+	m_currentCamera = nullptr;
+
 	delete m_swapChain;
 	m_swapChain = nullptr;
 
@@ -147,6 +157,9 @@ void RenderContext::Shutdown()
 
 	DX_SAFE_RELEASE( m_context );
 	DX_SAFE_RELEASE( m_device );
+
+	ReportLiveObjects();    // do our leak reporting just before shutdown to give us a better detailed list; 
+	DestroyDebugModule();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -175,6 +188,12 @@ void RenderContext::ClearScreen( const Rgba8& clearColor )
 
 void RenderContext::BeginCamera( const Camera& camera )
 {
+	m_currentCamera = &camera;
+
+#if defined(RENDER_DEBUG)
+	m_context->ClearState(); 
+#endif
+
 	if ( camera.GetClearMode() & CLEAR_COLOR_BIT )
 	{
 		ClearScreen( camera.GetClearColor() );
@@ -186,15 +205,17 @@ if ( camera->ShouldClearClear() )
 	ClearColorTarget( output , camera->GetClearColor() );
 }*/
 
+	//camera.SetColorTarget( nullptr );					// m_context->SetFrameColorTarget();
+														// m_camera->SetColorTarget
+
 // TEMPORARY - this will be moved
 //Set up the GPU for a draw
-	if ( camera.GetColorTarget()  == nullptr ) 
+	
+	m_textureTarget = camera.GetColorTarget();
+	
+	if ( m_textureTarget  == nullptr ) 
 	{
 		m_textureTarget = m_swapChain->GetBackBuffer();
-	}
-	else
-	{
-		m_textureTarget = camera.GetColorTarget();
 	}
 
 	IntVec2 output = m_textureTarget->GetDimensions();
@@ -208,14 +229,16 @@ if ( camera->ShouldClearClear() )
 	viewport.MaxDepth = 1.f;
 
 	m_context->RSSetViewports( 1 , &viewport );
-
+	ClearScreen( camera.GetClearColor() );
 	BindShader( "" );
+	m_lastBoundVBO = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void RenderContext::EndCamera( const Camera& camera )
 {
+	m_currentCamera = nullptr;
 	UNUSED(camera);
 }
 
@@ -238,6 +261,57 @@ void RenderContext::SetBlendMode( BlendMode blendMode )
 // 	}
 	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
 }// state of openGL need to change every time like texture.
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::CreateDebugModule()
+{
+	// load the dll
+ 	m_debugModule = ::LoadLibraryA( "Dxgidebug.dll" );
+ 	if ( m_debugModule == nullptr )
+ 	{
+ 		DebuggerPrintf( "gfx" , "Failed to find dxgidebug.dll.  No debug features enabled." );
+ 	}
+ 	else
+ 	{
+ 		// find a function in the loaded dll
+ 		typedef HRESULT( WINAPI* GetDebugModuleCB )( REFIID , void** );
+		HMODULE temp = ( HMODULE ) m_debugModule;
+		GetDebugModuleCB cb = ( GetDebugModuleCB ) ::GetProcAddress( temp , "DXGIGetDebugInterface" );
+ 
+ 		// create our debug object
+ 		HRESULT hr = cb( __uuidof( IDXGIDebug ) , ( void** ) &m_debug );
+ 		ASSERT_OR_DIE( SUCCEEDED( hr ), "" );
+ 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::DestroyDebugModule()
+{
+	{
+		if ( nullptr != m_debug )
+		{
+			DX_SAFE_RELEASE( m_debug );   // release our debug object
+			FreeLibrary( ( HMODULE ) m_debugModule ); // unload the dll
+
+			m_debug = nullptr;
+			m_debugModule = ( HMODULE )nullptr;
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::ReportLiveObjects()
+{
+	{
+		if ( nullptr != m_debug )
+		{
+			m_debug->ReportLiveObjects( DXGI_DEBUG_ALL , DXGI_DEBUG_RLO_DETAIL );
+		}
+	}
+}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -369,15 +443,16 @@ void RenderContext::Draw( int numVertexes , int vertexOffset )
 {
 	TextureView* view = m_textureTarget->GetRenderTargetView();
 	ID3D11RenderTargetView* rtv = view->GetRTVHandle();
-	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+	
 	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
 	m_context->RSSetState( m_currentShader->m_rasterState );
-
 	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fragmentShader , nullptr , 0 );
+
 	m_context->OMSetRenderTargets( 1 , &rtv , nullptr );
 
 	// So at this, I need to describe the vertex format to the shader
 	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
+	// do similar to last bound VBO
 	m_context->IASetInputLayout( inputLayout );
 	m_context->Draw( numVertexes , vertexOffset );
 }
@@ -665,8 +740,20 @@ void RenderContext::DrawDiscFraction(const Disc2D& disc, const float drawFractio
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+bool RenderContext::IsDrawing() const
+{
+	if ( m_currentCamera )
+	{
+		return true;
+	}
+	return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 bool RenderContext::BindShader( Shader* shader )
 {
+	ASSERT_OR_DIE( IsDrawing(),"No active Camera" );					// -> IsDrawing() -> Do I have a camera?
 	m_currentShader = shader;
 	if ( m_currentShader == nullptr )
 	{
@@ -677,7 +764,7 @@ bool RenderContext::BindShader( Shader* shader )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::BindShader( char const* shaderFileName )
+void RenderContext::BindShader( std::string shaderFileName )
 {
 	Shader* temp = nullptr;
 	if ( shaderFileName == "" )
@@ -685,7 +772,7 @@ void RenderContext::BindShader( char const* shaderFileName )
 		BindShader( temp );
 		return;
 	}
-	temp = GetOrCreateShader( shaderFileName );
+	temp = GetOrCreateShader( shaderFileName.c_str() );
 	BindShader( temp );
 }
 
@@ -696,7 +783,13 @@ void RenderContext::BindVertexInput( VertexBuffer* vbo )
 	ID3D11Buffer* vboHandle = vbo->m_handle;
 	UINT stride = ( UINT ) sizeof( Vertex_PCU );	//	how far from one vertex to next
 	UINT offset = 0;								//  how far into buffer we start
-	m_context->IASetVertexBuffers( 0 , 1 , &vboHandle , &stride , &offset );
+	
+	if (m_lastBoundVBO != vboHandle )
+	{
+		m_context->IASetVertexBuffers( 0 , 1 , &vboHandle , &stride , &offset );
+		m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+		m_lastBoundVBO = vboHandle;
+	}
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------

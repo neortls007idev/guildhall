@@ -83,6 +83,8 @@ ShaderStage::~ShaderStage()
 {
 	DX_SAFE_RELEASE( m_byteCode );
 	DX_SAFE_RELEASE( m_handle );
+	DX_SAFE_RELEASE( m_vertexShader );
+	DX_SAFE_RELEASE( m_fragmentShader );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -256,6 +258,7 @@ bool Shader::CreateFromFile( RenderContext* ctx , std::string const& filename )
 Shader::~Shader()
 {
 	DX_SAFE_RELEASE( m_rasterState );
+	DX_SAFE_RELEASE( m_defaultRasterState );
 	DX_SAFE_RELEASE( m_inputLayout );
 }
 
