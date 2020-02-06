@@ -291,7 +291,11 @@ ID3D11InputLayout* Shader::GetOrCreateInputLayout( buffer_attribute_t const* att
 		return m_inputLayout;
 	}
 
-	ConvertBufferAttributeToID3DX11Attribute( vertexDescription , attribs );
+	if ( m_lastBufferAttribute != attribs )
+	{
+		ConvertBufferAttributeToID3DX11Attribute( vertexDescription , attribs );
+		m_lastBufferAttribute = attribs;
+	}
 
  	//Position
  		//vertexDescription[ 0 ].SemanticName			= "POSITION";

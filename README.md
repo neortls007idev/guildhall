@@ -28,7 +28,7 @@ Checklist for all SD2 assignments
 - [x] *10pts*: Implement `VertexBuffer` specialization of `RenderBuffer` for handling vertex data
     - [x] Add `buffer_attribute_t` description of your `VertexPCT`
 - [x] *05pts*: Implement `RenderContext::BindVertexBuffer( VertexBuffer* vbo )`
-    - [ ] Keep track of currently bound vertex buffer and don't rebind if no change is made.
+    - [x] Keep track of currently bound vertex buffer and don't rebind if no change is made.
 - [x] *15pts*: Implement `RenderContext::DrawVertexArray`
     - [x] `RenderContext` should own a vertex buffer (`RenderBuffer* m_immediateVBO`) to use for `DrawVertexArray`
     - [x] Copy vertices to immediate vbo.
