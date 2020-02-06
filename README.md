@@ -33,11 +33,11 @@ MP2 And SD2 Checklist
 
 - WASD for Camera Movement.
 - 'O' (capitol letter 'Oh') to reset camera Position to origin. ( this does not rest the camera output Size ).
-- Right Mouse Button To spawn New GameObjects.
+- Right Mouse Button To spawn New Game Objects.
 - Scroll Mouse Wheel Up and Down Movement for Zooming in and out.
 - Left Click to select the object and click again to Deselect the object.
 - Select an object and hit `delete` or `backspace` key to delete the currently selected object.
-
+- F8 key to delete and reset the game.
 
 
 Makes sure you mouse position is correct for your current view - converting the client position (offset from top-left of window) to a world location.
