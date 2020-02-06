@@ -119,7 +119,7 @@ void RenderContext::Startup( Window* window )
 // 		g_bitmapFont = GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
 // 	}
 	m_swapChain = new SwapChain( this , swapchain );
-	m_defaultShader = new Shader( this );
+	//m_defaultShader = new Shader( this );
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/default.hlsl" );
 
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
@@ -145,6 +145,9 @@ void RenderContext::Shutdown()
 {
 	delete m_immediateVBO;
 	m_immediateVBO = nullptr;
+
+	m_lastBoundVBO = nullptr;
+	m_currentCamera = nullptr;
 
 	delete m_swapChain;
 	m_swapChain = nullptr;
@@ -235,6 +238,7 @@ if ( camera->ShouldClearClear() )
 
 void RenderContext::EndCamera( const Camera& camera )
 {
+	m_currentCamera = nullptr;
 	UNUSED(camera);
 }
 
