@@ -17,6 +17,8 @@ class Window;
 class SwapChain;
 struct ID3D11Device;
 struct ID3D11DeviceContext;
+struct IDXGIDebug;
+struct ID3D11Buffer;
 
 class Shader;
 class VertexBuffer;
@@ -49,6 +51,10 @@ public:
 
 	void SetBlendMode( BlendMode blendMode );
 
+	void CreateDebugModule();
+	void DestroyDebugModule();
+	void ReportLiveObjects();
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // TEXTURE FUNCTIONS
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -75,8 +81,9 @@ public:
  	void DrawRegularPolygon(); // TO DO
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+	bool IsDrawing() const;
 	bool BindShader( Shader* shader );
-	void BindShader( char const* shaderFileName );
+	void BindShader( std::string shaderFileName );
 	void BindVertexInput( VertexBuffer* vbo );
 
 private:
@@ -93,10 +100,16 @@ public:
 	ID3D11Device*		 m_device			= nullptr ;
 	ID3D11DeviceContext* m_context			= nullptr ; // Immediate context
 	SwapChain*			 m_swapChain		= nullptr;
+	const Camera*		 m_currentCamera	= nullptr;
+
+	void*				 m_debugModule		= nullptr;
+	IDXGIDebug*			 m_debug			= nullptr;
+
 
 	Shader*				 m_defaultShader	= nullptr;
 	Shader*				 m_currentShader	= nullptr;
 	VertexBuffer*		 m_immediateVBO		= nullptr;
+	ID3D11Buffer*		 m_lastBoundVBO		= nullptr;
 	Texture*			 m_textureTarget	= nullptr;
 
 private:
