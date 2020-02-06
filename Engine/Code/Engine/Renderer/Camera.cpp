@@ -1,6 +1,7 @@
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Renderer/Texture.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -41,6 +42,13 @@ void Camera::SetClearMode( unsigned int clearFlags , Rgba8 color , float depth /
 
 	UNUSED( depth );
 	UNUSED( stencil );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Camera::SetColorTarget( Texture* texture )
+{
+	m_colorTarget = texture;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

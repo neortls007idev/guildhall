@@ -7,7 +7,6 @@ struct ID3D11Buffer;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-
 enum eRenderBufferUsageBit : uint
 {
 	VERTEX_BUFFER_BIT	= BIT_FLAG(0),	// A02 - Vertex Buffer(VBO)
@@ -17,7 +16,11 @@ enum eRenderBufferUsageBit : uint
 	// there are more - unless for thesis or DFS
 };
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 typedef uint eRenderBufferUsage;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 // The how we are going to access it
 enum eRenderMemoryHint : uint
@@ -28,6 +31,8 @@ enum eRenderMemoryHint : uint
 	MEMORY_HINT_STAGING,	// Cpu read/ write, and can copy from cpu-gpu
 };
 // RenderBuffer ( MEMORY_HINT_GPU )
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 // A GPU Allocator ( like malloc on the GPU, new byte[count] ) 
 class RenderBuffer

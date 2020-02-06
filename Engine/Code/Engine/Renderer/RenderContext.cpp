@@ -113,7 +113,7 @@ void RenderContext::Startup( Window* window )
 // 	}
 	m_swapChain = new SwapChain( this , swapchain );
 	m_defaultShader = new Shader( this );
-	m_defaultShader->CreateFromFile( this , "Data/Shaders/default.hlsl" );
+	m_defaultShader = GetOrCreateShader( "Data/Shaders/default.hlsl" );
 
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
 }
@@ -180,17 +180,36 @@ void RenderContext::BeginCamera( const Camera& camera )
 		ClearScreen( camera.GetClearColor() );
 	}
 	/*
-Texture* output = camera->GetColorTarget();
-if ( output == nullptr )
-{
-	output = m_swapChain->GetColorTarget();
-}
 
 if ( camera->ShouldClearClear() )
 {
 	ClearColorTarget( output , camera->GetClearColor() );
 }*/
-	BindShader( nullptr );
+
+// TEMPORARY - this will be moved
+//Set up the GPU for a draw
+	if ( camera.GetColorTarget()  == nullptr ) 
+	{
+		m_textureTarget = m_swapChain->GetBackBuffer();
+	}
+	else
+	{
+		m_textureTarget = camera.GetColorTarget();
+	}
+
+	IntVec2 output = m_textureTarget->GetDimensions();
+
+	D3D11_VIEWPORT viewport;
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.Width = ( float ) output.x;
+	viewport.Height = ( float ) output.y;
+	viewport.MinDepth = 0.0;
+	viewport.MaxDepth = 1.f;
+
+	m_context->RSSetViewports( 1 , &viewport );
+
+	BindShader( "" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -219,6 +238,27 @@ void RenderContext::SetBlendMode( BlendMode blendMode )
 // 	}
 	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
 }// state of openGL need to change every time like texture.
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Shader* RenderContext::GetOrCreateShader( char const* filename )
+{
+	Shader* Temp = m_LoadedShaders[ filename ];
+	if (Temp == nullptr)
+	{
+		Temp = CreateShaderFromFile( filename );
+	}
+	
+	return Temp;
+}
+
+Shader* RenderContext::CreateShaderFromFile( char const* shaderFilePath )
+{
+	Shader* temp = new Shader(this);
+	temp->CreateFromFile( this , shaderFilePath );
+	m_LoadedShaders[ shaderFilePath ] = temp;
+	return temp;
+}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -327,35 +367,18 @@ void RenderContext::BindTexture( const Texture* texture )
 
 void RenderContext::Draw( int numVertexes , int vertexOffset )
 {
-	// TEMPORARY - this will be moved
-	//Set up the GPU for a draw
-	
-	Texture* Texture = m_swapChain->GetBackBuffer();
-	TextureView* view = Texture->GetRenderTargetView();
+	TextureView* view = m_textureTarget->GetRenderTargetView();
 	ID3D11RenderTargetView* rtv = view->GetRTVHandle();
-
-	IntVec2 output = Texture->GetDimensions();
-
-	D3D11_VIEWPORT viewport;
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.Width = ( float ) output.x;
-	viewport.Height = ( float ) output.y;
-	viewport.MinDepth = 0.0;
-	viewport.MaxDepth = 1.f;
-	
-
 	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
 	m_context->RSSetState( m_currentShader->m_rasterState );
-	m_context->RSSetViewports( 1 , &viewport );
+
 	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fragmentShader , nullptr , 0 );
 	m_context->OMSetRenderTargets( 1 , &rtv , nullptr );
 
-	 // So at this, I need to describe the vertex format to the shader
-	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout(/* VertexPCU :: LAYOUT */ );
+	// So at this, I need to describe the vertex format to the shader
+	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
 	m_context->IASetInputLayout( inputLayout );
-
 	m_context->Draw( numVertexes , vertexOffset );
 }
 
@@ -393,7 +416,7 @@ void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes
 
 	// Bind the Shader
 
- 	BindVertexinput( m_immediateVBO );
+ 	BindVertexInput( m_immediateVBO );
 
 	// Index Buffers - to be covered later
 
@@ -642,18 +665,33 @@ void RenderContext::DrawDiscFraction(const Disc2D& disc, const float drawFractio
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::BindShader( Shader* shader )
+bool RenderContext::BindShader( Shader* shader )
 {
 	m_currentShader = shader;
 	if ( m_currentShader == nullptr )
 	{
 		m_currentShader = m_defaultShader;
 	}
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::BindVertexinput( VertexBuffer* vbo )
+void RenderContext::BindShader( char const* shaderFileName )
+{
+	Shader* temp = nullptr;
+	if ( shaderFileName == "" )
+	{
+		BindShader( temp );
+		return;
+	}
+	temp = GetOrCreateShader( shaderFileName );
+	BindShader( temp );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::BindVertexInput( VertexBuffer* vbo )
 {
 	ID3D11Buffer* vboHandle = vbo->m_handle;
 	UINT stride = ( UINT ) sizeof( Vertex_PCU );	//	how far from one vertex to next

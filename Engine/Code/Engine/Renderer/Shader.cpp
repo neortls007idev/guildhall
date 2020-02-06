@@ -6,6 +6,35 @@
 
 #include <stdio.h>
 #include "Engine/Core/ErrorWarningAssert.hpp"
+//#include "Engine/Core/EngineCommon.hpp"
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void ConvertBufferAttributeToID3DX11Attribute( D3D11_INPUT_ELEMENT_DESC* d3d11VertxDescription, buffer_attribute_t const* attribute )
+{
+	for ( int index = 0; attribute[ index ].type != BUFFER_FORMAT_INVALID; index++ )
+	{
+		d3d11VertxDescription[ index ].SemanticName			= attribute[ index ].name.c_str();
+		d3d11VertxDescription[ index ].SemanticIndex		= 0;													// Array element
+		switch ( attribute[index].type )
+		{
+			case BUFFER_FORMAT_INVALID			: ERROR_AND_DIE( "INVALID FORMAT" );
+												  break;
+			case BUFFER_FORMAT_VEC2				: d3d11VertxDescription[ index ].Format = DXGI_FORMAT_R32G32_FLOAT;
+												  break;
+			case BUFFER_FORMAT_VEC3				: d3d11VertxDescription[ index ].Format = DXGI_FORMAT_R32G32B32_FLOAT; 
+												  break;
+			case BUFFER_FORMAT_R8G8B8A8_UNORM	: d3d11VertxDescription[ index ].Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+												  break;
+		default:
+			break;
+		}
+		d3d11VertxDescription[ index ].InputSlot			= 0;													// interlaced or parallel IA format
+		d3d11VertxDescription[ index ].AlignedByteOffset	= attribute[ index ].offset;
+		d3d11VertxDescription[ index ].InputSlotClass		= D3D11_INPUT_PER_VERTEX_DATA;							// Vertex data = drawing a tree, Instance data = drawing a million tree
+		d3d11VertxDescription[ index ].InstanceDataStepRate = 0;
+	}
+}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -251,7 +280,7 @@ void Shader::CreateRasterSate()
 	device->CreateRasterizerState( &desc , &m_rasterState );
 }
 
-ID3D11InputLayout* Shader::GetOrCreateInputLayout(/* buffer_attribute_t const* attribs */ )
+ID3D11InputLayout* Shader::GetOrCreateInputLayout( buffer_attribute_t const* attribs )
 {
 	D3D11_INPUT_ELEMENT_DESC vertexDescription[ 3 ];
 	if ( m_inputLayout != nullptr )
@@ -259,32 +288,34 @@ ID3D11InputLayout* Shader::GetOrCreateInputLayout(/* buffer_attribute_t const* a
 		return m_inputLayout;
 	}
 
-	// Position
-	vertexDescription[ 0 ].SemanticName			= "POSITION";
-	vertexDescription[ 0 ].SemanticIndex		= 0;													// Array element
-	vertexDescription[ 0 ].Format				= DXGI_FORMAT_R32G32B32_FLOAT;							// 3 32-bit floats
-	vertexDescription[ 0 ].InputSlot			= 0;													// interlaced or parallel IA format
-	vertexDescription[ 0 ].AlignedByteOffset	= offsetof( Vertex_PCU , m_position );
-	vertexDescription[ 0 ].InputSlotClass		= D3D11_INPUT_PER_VERTEX_DATA;							// Vertex data = drawing a tree, Instance data = drawing a million tree
-	vertexDescription[ 0 ].InstanceDataStepRate = 0;
+	ConvertBufferAttributeToID3DX11Attribute( vertexDescription , attribs );
 
-	// Color
-	vertexDescription[ 1 ].SemanticName			= "COLOR";
-	vertexDescription[ 1 ].SemanticIndex		= 0;													// Array element
-	vertexDescription[ 1 ].Format				= DXGI_FORMAT_R8G8B8A8_UNORM;							// 4 1 byte channel. unsigned normal Value
-	vertexDescription[ 1 ].InputSlot			= 0;													// interlaced or parallel IA format
-	vertexDescription[ 1 ].AlignedByteOffset	= offsetof( Vertex_PCU , m_color );
-	vertexDescription[ 1 ].InputSlotClass		= D3D11_INPUT_PER_VERTEX_DATA;							// Vertex data = drawing a tree, Instance data = drawing a million tree
-	vertexDescription[ 1 ].InstanceDataStepRate = 0;
-	
-	// UVS
-	vertexDescription[ 2 ].SemanticName			= "TEXCOORD";
-	vertexDescription[ 2 ].SemanticIndex		= 0;													// Array element
-	vertexDescription[ 2 ].Format				= DXGI_FORMAT_R32G32_FLOAT;								// 4 1 byte channel. unsigned normal Value
-	vertexDescription[ 2 ].InputSlot			= 0;													// interlaced or parallel IA format
-	vertexDescription[ 2 ].AlignedByteOffset	= offsetof( Vertex_PCU , m_uvTexCoords );
-	vertexDescription[ 2 ].InputSlotClass		= D3D11_INPUT_PER_VERTEX_DATA;							// Vertex data = drawing a tree, Instance data = drawing a million tree
-	vertexDescription[ 2 ].InstanceDataStepRate	= 0;
+ 	//Position
+ 		//vertexDescription[ 0 ].SemanticName			= "POSITION";
+ 		//vertexDescription[ 0 ].SemanticIndex		= 0;													// Array element
+ 		//vertexDescription[ 0 ].Format				= DXGI_FORMAT_R32G32B32_FLOAT;							// 3 32-bit floats
+ 		//vertexDescription[ 0 ].InputSlot			= 0;													// interlaced or parallel IA format
+ 		//vertexDescription[ 0 ].AlignedByteOffset	= offsetof( Vertex_PCU , m_position );
+ 		//vertexDescription[ 0 ].InputSlotClass		= D3D11_INPUT_PER_VERTEX_DATA;							// Vertex data = drawing a tree, Instance data = drawing a million tree
+ 		//vertexDescription[ 0 ].InstanceDataStepRate = 0;
+ 	
+ 		//// Color
+ 		//vertexDescription[ 1 ].SemanticName			= "COLOR";
+ 		//vertexDescription[ 1 ].SemanticIndex		= 0;													// Array element
+ 		//vertexDescription[ 1 ].Format				= DXGI_FORMAT_R8G8B8A8_UNORM;							// 4 1 byte channel. unsigned normal Value
+ 		//vertexDescription[ 1 ].InputSlot			= 0;													// interlaced or parallel IA format
+ 		//vertexDescription[ 1 ].AlignedByteOffset	= offsetof( Vertex_PCU , m_color );
+ 		//vertexDescription[ 1 ].InputSlotClass		= D3D11_INPUT_PER_VERTEX_DATA;							// Vertex data = drawing a tree, Instance data = drawing a million tree
+ 		//vertexDescription[ 1 ].InstanceDataStepRate = 0;
+ 		//
+ 		//// UVS
+ 		//vertexDescription[ 2 ].SemanticName			= "TEXCOORD";
+ 		//vertexDescription[ 2 ].SemanticIndex		= 0;													// Array element
+ 		//vertexDescription[ 2 ].Format				= DXGI_FORMAT_R32G32_FLOAT;								// 4 1 byte channel. unsigned normal Value
+ 		//vertexDescription[ 2 ].InputSlot			= 0;													// interlaced or parallel IA format
+ 		//vertexDescription[ 2 ].AlignedByteOffset	= offsetof( Vertex_PCU , m_uvTexCoords );
+ 		//vertexDescription[ 2 ].InputSlotClass		= D3D11_INPUT_PER_VERTEX_DATA;							// Vertex data = drawing a tree, Instance data = drawing a million tree
+ 		//vertexDescription[ 2 ].InstanceDataStepRate	= 0;
 
 
 	ID3D11Device* device = m_owner->m_device;

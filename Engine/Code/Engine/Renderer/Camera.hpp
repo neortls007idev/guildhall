@@ -2,6 +2,8 @@
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Core/Rgba8.hpp"
 
+class Texture;
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // TODO :- 
 
@@ -27,6 +29,9 @@ public:
 	Rgba8 GetClearColor() const																						{ return m_clearColor; }
 	unsigned int  GetClearMode() const																				{ return m_clearMode; }
 
+	void	 SetColorTarget( Texture* texture );
+	Texture* GetColorTarget() const																					{ return m_colorTarget; }
+
 private:
 
 	Vec2 bottomLeftCoordinate = Vec2( -1.f , -1.f );
@@ -34,6 +39,7 @@ private:
 
 	unsigned int m_clearMode  = 0;
 	Rgba8		 m_clearColor = BLACK;
+	Texture*	 m_colorTarget = nullptr;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

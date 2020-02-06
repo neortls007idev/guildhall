@@ -13,7 +13,9 @@ struct ID3D10Blob;
 
 struct ID3D11InputLayout;
 struct ID3D11RasterizerState;
+struct buffer_attribute_t;
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 enum SHADER_STAGE_TYPE
 {
@@ -67,9 +69,8 @@ public:
 	ID3D11RasterizerState* GetRasterState();                                   // A02 (only creating a default one for now)
 	void CreateRasterSate();
 
-	ID3D11InputLayout* GetOrCreateInputLayout(/* buffer_attribute_t const* attribs */);
-
-
+	ID3D11InputLayout* GetOrCreateInputLayout( buffer_attribute_t const* attribs );
+	   
 public:
 	ShaderStage				m_vertexStage;
 	ShaderStage				m_fragmentStage;

@@ -53,9 +53,10 @@ public:
 // TEXTURE FUNCTIONS
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+	Shader*		GetOrCreateShader( char const* shaderFilename );
 	Texture*	GetOrCreateTextureFromFile( const char* imageFilePath );
 	BitmapFont* GetOrCreateBitmapFontFromFile( std::string bitmapFontFilePath );
-	void BindTexture( const Texture* texture );
+	void		BindTexture( const Texture* texture );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // DRAW FUNCTIONS
@@ -74,15 +75,16 @@ public:
  	void DrawRegularPolygon(); // TO DO
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-	void BindShader( Shader* shader );
-	void BindVertexinput( VertexBuffer* vbo );
+	bool BindShader( Shader* shader );
+	void BindShader( char const* shaderFileName );
+	void BindVertexInput( VertexBuffer* vbo );
 
 private:
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // TEXTURE FUNCTIONS ( TO BE ACCESSED BY THE RENDERER ONLY )
 //--------------------------------------------------------------------------------------------------------------------------------------------
-	
+	Shader*		CreateShaderFromFile( char const* shaderFillePath );
 	Texture*	CreateTextureFromFile( const char* imageFilePath );
 	BitmapFont* CreateBitMapFontFromFile( std::string bitmapFontFilePath );
 
@@ -95,12 +97,13 @@ public:
 	Shader*				 m_defaultShader	= nullptr;
 	Shader*				 m_currentShader	= nullptr;
 	VertexBuffer*		 m_immediateVBO		= nullptr;
+	Texture*			 m_textureTarget	= nullptr;
 
 private:
 
 	std::map<std::string , Texture*>	m_LoadedTextures;	 // LOOKUP TABLE OF FILEPATH & TEXTUREID
 	std::map<std::string , BitmapFont*> m_LoadedBitMapFonts; // LOOKUP TABLE OF FILEPATH & BITMAPFONTID
-
+	std::map<std::string , Shader*>		m_LoadedShaders;	 // LOOKUP TABLE OF FILEPATH & Shaders
 };
 
 
