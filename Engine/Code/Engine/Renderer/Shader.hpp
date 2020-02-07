@@ -72,14 +72,15 @@ public:
 	ID3D11InputLayout* GetOrCreateInputLayout( buffer_attribute_t const* attribs );
 	   
 public:
-	ShaderStage				m_vertexStage;
-	ShaderStage				m_fragmentStage;
-	ID3D11RasterizerState*	m_rasterState = nullptr;
+	ShaderStage					m_vertexStage;
+	ShaderStage					m_fragmentStage;
+	ID3D11RasterizerState*		m_rasterState = nullptr;
+	buffer_attribute_t const*	m_lastBufferAttribute = nullptr;
 
 	// A02 temp
-	RenderContext*			m_owner;
-	ID3D11InputLayout*		m_inputLayout = nullptr; // for now, we'll have 1, but in the future you could have one for each different vertex type you use with this; 
-	ID3D11RasterizerState*	m_defaultRasterState = nullptr;
+	RenderContext*				m_owner;
+	ID3D11InputLayout*			m_inputLayout = nullptr; // for now, we'll have 1, but in the future you could have one for each different vertex type you use with this; 
+	ID3D11RasterizerState*		m_defaultRasterState = nullptr;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
