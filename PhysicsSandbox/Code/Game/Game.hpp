@@ -66,7 +66,8 @@ public:
 		   Vec2						m_mousePosition				= Vec2::ZERO;
 		   Vec2						m_rigidBodyMouseOffset		= Vec2::ZERO;
 		   GameObject*				m_selectedGameObject		= nullptr;
-		   bool						m_isDragOffsetSet = false;
+		   bool						m_isDragOffsetSet			= false;
+		   bool						m_isGameObjectSelected		= false;
 
 		   Vec3						m_cameraDefaultPosition		= Vec3::ZERO;
 		   Vec3						m_cameraCurrentPosition		= Vec3::ZERO;

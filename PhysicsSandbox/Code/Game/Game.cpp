@@ -214,6 +214,7 @@ GameObject* Game::PickGameobject( Vec2 mousePos )
 	{
 		if ( !m_gameObjects[gameObjectIndex] )
 		{
+			m_isMouseOnGameObject[ gameObjectIndex ] = false;
 			continue;
 		}
 
@@ -296,18 +297,19 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 		m_isMouseOnGameObject.push_back( false );
 	}
 
+	//static bool isGameObjectSelected = false;
+	
 	if ( g_theInput->WasLeftMouseButtonJustPressed() )
 	{
-		static bool clickCounter = true;
-		if ( clickCounter)
+		if ( !m_isGameObjectSelected)
 		{
 			Vec2 PickObjectPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
 			m_selectedGameObject = PickGameobject( PickObjectPosition );
-			clickCounter = false;
 			if ( m_selectedGameObject )
 			{
 				m_selectedGameObject->m_borderColor = Rgba8( 0 , 127 , 0 , 255 );
 				m_selectedGameObject->m_isSelected	= true;
+				m_isGameObjectSelected = true;
 			}
 		}
 		else
@@ -317,9 +319,9 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 				m_selectedGameObject->m_isSelected = false;
 				m_rigidBodyMouseOffset = Vec2::ZERO;
 				m_isDragOffsetSet = false;
+				m_isGameObjectSelected = false;
 			}
 			m_selectedGameObject = nullptr;
-			clickCounter = true;
 			for ( size_t gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
 			{
 				m_isMouseOnGameObject[ gameObjectIndex ] = false;
@@ -343,6 +345,7 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 					delete m_gameObjects[ index ];
 					m_gameObjects[ index ] = nullptr;
 					m_selectedGameObject = nullptr;
+					m_isGameObjectSelected = false;
 				}
 			}
 		}
