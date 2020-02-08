@@ -129,7 +129,10 @@ void TheApp::BeginFrame()
 
 void TheApp::Update( float deltaSeconds )
 {
+		
 		UpdateFromKeyboard();
+
+		g_theDevConsole->Update( deltaSeconds );
 
 		if ( m_isPaused ) { deltaSeconds = 0; }
 		else if ( m_isSloMo == true ) { deltaSeconds /= 10.f; }
