@@ -10,7 +10,11 @@
 
 #include "Engine/Renderer/D3D11Common.hpp"
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 #include <winuser.h>
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 RenderContext* g_theRenderer = nullptr;
 TheApp* g_theApp = nullptr;
@@ -19,15 +23,21 @@ Game* g_theGame = nullptr;
 
 //Rgba8 Clrscr = Rgba8( 0 , 0 , 0 , 255 );
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 TheApp::TheApp()
 {
 	
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 TheApp::~TheApp()
 {
 
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::Startup()
 {
@@ -49,6 +59,8 @@ void TheApp::Startup()
 	}
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void TheApp::RunFrame()
 {
 	static double timeLastFrameStarted = GetCurrentTimeSeconds();
@@ -62,6 +74,8 @@ void TheApp::RunFrame()
 	EndFrame();
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void TheApp::BeginFrame()
 {
 	// all engine things that must begin at the beginning of each frame and not the game
@@ -72,16 +86,22 @@ void TheApp::BeginFrame()
 
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void TheApp::Update( float deltaSeconds )
 {
 		UpdateFromKeyboard();
+		
 		if ( m_isPaused ) { deltaSeconds = 0; }
 		else if ( m_isSloMo == true ) { deltaSeconds /= 10.f; }
 		if ( m_isSpeedMo ) { deltaSeconds = deltaSeconds * 4.0f; }
+		
 		g_theGame->Update( deltaSeconds );
 		g_theInput->EndFrame();
 
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::Render() const
 {
@@ -91,9 +111,10 @@ void TheApp::Render() const
 // 		g_theRenderer->EndCamera( g_theGame->m_worldCamera );
 // 
 // 		g_theGame->RenderUI();
-	
-	
+
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::EndFrame()
 {
@@ -102,6 +123,8 @@ void TheApp::EndFrame()
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::Shutdown()
 {
@@ -120,7 +143,7 @@ void TheApp::UpdateFromKeyboard()
 {
 	if ( g_theInput != nullptr && g_theInput->WasKeyJustPressed( 'C' ) /*&& g_theInput->WasKeyJustPressed( 'T' )*/ )
 	{
-		::SetWindowTextA( ( HWND ) g_theWindow->m_hwnd , "new title"/* L"Changed Window Text at Runtime"*/ );
+		g_theWindow->SetTitle( "Function Works" );
 	}
 
 	if ( g_theInput != nullptr && g_theInput->WasKeyJustPressed( 'I' ) )
@@ -134,24 +157,36 @@ void TheApp::UpdateFromKeyboard()
 		WNDCLASSEX windowClassDescription;
 		::GetClassInfo(NULL, windowClassDescription , currentWindow );
 
-		
-		HICON m_hIcon = reinterpret_cast< HICON >( ::LoadImage( NULL ,
+		*/
+		const HICON m_hIcon = reinterpret_cast< HICON >( ::LoadImage( NULL ,
 			MAKEINTRESOURCE( IDI_ERROR ) ,
 			IMAGE_ICON ,
 			0 , 0 ,
 			LR_DEFAULTCOLOR | LR_SHARED | LR_DEFAULTSIZE ) );
-		*/
+		
 		//SetWindowLong( ( HWND ) g_theWindow->m_hwnd , GCL_HICON , ( LONG ) m_hIcon );
 		//SendMessage( ( HWND ) g_theWindow->m_hwnd , )
+		g_theWindow->SetNewIcon( ( void* ) m_hIcon );
 	}
 
-	if ( g_theInput->GetButtonState( 'T' ).IsPressed() ) { m_isSloMo = true; }
-	else { m_isSloMo = false; }
-	if ( g_theInput->GetButtonState( 'Y' ).IsPressed() ) { m_isSpeedMo = true; }
-	else { m_isSpeedMo = false; }
+	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasKeyJustPressed( 'B' ) )
+	{
+		g_theWindow->DisplaySettings( BORDERLESS );
+	}
+	
+	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasKeyJustPressed( 'R' ) )
+	{
+		g_theWindow->DisplaySettings( REGULAR );
+	}
 
+	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasKeyJustPressed( 'F' ) )
+	{
+		g_theWindow->DisplaySettings( FULLSCREEN );
+	}
+	
 	if ( g_theInput->GetButtonState( 'P' ).WasJustPressed() ) { m_isPaused = !m_isPaused; }
 
+	
 	if ( g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() ) { g_theWindow->HandleQuitRequested(); }
 
 	if ( g_theInput->GetButtonState( KEY_F4 ).WasJustPressed() )

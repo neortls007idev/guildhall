@@ -24,4 +24,5 @@ const unsigned char KEY_F11						= 0x80;
 const unsigned char KEY_F12						= 0x81;
 const unsigned char KEY_ENTER					= 0x0D;
 const unsigned char KEY_TILDE					= 0xC0;
+const unsigned char KEY_SHIFT					= 0x10;
 //--------------------------------------------------------------------------------------------------------------------------------------------

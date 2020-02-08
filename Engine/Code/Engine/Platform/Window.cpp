@@ -130,7 +130,10 @@ Window::~Window()
 bool Window::Open( std::string const& title , float clientAspect , float maxClientFractionOfDesktop )
 {
 	// #SD1ToDo: Add support for fullscreen mode (requires different window style flags than windowed mode)
-	const DWORD windowStyleFlags = WS_CAPTION | WS_SYSMENU | WS_OVERLAPPED /*| WS_BORDER | WS_THICKFRAME */;
+
+	//ConvertDisplaySettings( FULLSCREEN );
+
+	const DWORD windowStyleFlags = /*m_windowStyleFlags;*/ WS_CAPTION | WS_SYSMENU | WS_OVERLAPPED| WS_BORDER | WS_THICKFRAME;
 	const DWORD windowStyleExFlags = WS_EX_APPWINDOW;
 
 	// Get desktop rect, dimensions, aspect
@@ -297,6 +300,42 @@ bool Window::HandleQuitRequested()
 	::CoUninitialize();
 	m_isQuitting = true;
 	return m_isQuitting;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Window::SetTitle( std::string const& title )
+{
+	::SetWindowTextA( ( HWND ) m_hwnd , title.c_str()/* L"Changed Window Text at Runtime"*/ );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Window::SetNewIcon( void* const& icon )
+{
+	SendMessage( ( HWND ) m_hwnd , WM_SETICON , ICON_BIG , reinterpret_cast< LPARAM >( icon ) );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Window::DisplaySettings( eDisplaySettings settings )
+{
+	switch ( settings )
+	{
+	case BORDERLESS:	SetWindowLong( ( HWND ) m_hwnd , GWL_STYLE , WS_POPUP );
+						ShowWindow( ( HWND ) m_hwnd , SW_SHOWDEFAULT );
+						break;
+	case REGULAR:		SetWindowLong( ( HWND ) m_hwnd , GWL_STYLE , WS_CAPTION | WS_SYSMENU | WS_OVERLAPPED | WS_BORDER | WS_THICKFRAME );
+						ShowWindow( ( HWND ) m_hwnd , SW_SHOWNORMAL );
+						break;
+	case FULLSCREEN:	SetWindowLong( ( HWND ) m_hwnd , GWL_STYLE , WS_POPUP | WS_VISIBLE );
+						ShowWindow( ( HWND ) m_hwnd , SW_SHOWMAXIMIZED );
+						//RECT fullrect = { 0 };
+						//SetRect( &fullrect , 0 , 0 , GetSystemMetrics( SM_CXSCREEN ) , GetSystemMetrics( SM_CYSCREEN ) );
+						break;
+	default:
+		break;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

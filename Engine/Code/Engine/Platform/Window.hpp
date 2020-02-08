@@ -1,7 +1,21 @@
 #pragma once
 #include <string>
+#include "Engine/Core/EngineCommon.hpp"
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 class InputSystem;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum eDisplaySettings : uint
+{
+	BORDERLESS,
+	REGULAR,
+	FULLSCREEN
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 class Window
 {
@@ -25,11 +39,18 @@ public:
 	bool IsQuitting() const { return m_isQuitting; }
 	bool HandleQuitRequested();
 
+	void SetTitle( std::string const& title );
+	void SetNewIcon( void* const& icon );
+	void DisplaySettings( eDisplaySettings settings );
+
+
+public:
 	void* m_hwnd = nullptr;
 
 private:
-	int			 m_clientHeight = 0;
-	int			 m_ClientWidth  = 0;
-	InputSystem* m_inputSystem  = nullptr;
-	bool		 m_isQuitting   = false;
+	int					m_clientHeight		= 0;
+	int					m_ClientWidth		= 0;
+	InputSystem*		m_inputSystem		= nullptr;
+	bool				m_isQuitting		= false;
+	eDisplaySettings	m_windowStyleFlags	= REGULAR;
 };
