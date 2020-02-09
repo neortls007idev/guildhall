@@ -10,6 +10,7 @@
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
 #include "Game/Game.hpp"
+#include "Engine/Time/Time.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +27,8 @@ Game::Game()
 void Game::Update( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
-	m_color.g++;
+	//m_color.g++;
+	m_color.g = ( uchar ) RangeMapFloat( -1.f , 1.f , 0 , 255 , SinDegrees( 100.f * ( float ) GetCurrentTimeSeconds() ) );
 	m_worldCamera.SetClearMode( CLEAR_COLOR_BIT , m_color );
 }
 

@@ -6,9 +6,10 @@
 #include "Engine/Primitives/AABB2.hpp"
 #include "Engine/Primitives/OBB2.hpp"
 #include "Engine/Primitives/Disc2D.hpp"
-#include <vector>
-#include <map>
-#include <string>
+ #include <vector>
+ #include <map>
+ #include <string>
+#include "Engine/Core/EngineCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

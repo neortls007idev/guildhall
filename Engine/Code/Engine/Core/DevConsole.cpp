@@ -2,7 +2,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Math/MathUtils.hpp"
-
+#include "Engine/Renderer/RenderContext.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
