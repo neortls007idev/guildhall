@@ -10,6 +10,15 @@ class Collider2D;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+enum eSimulationMode
+{
+	SIMULATIONMODE_STATIC,
+	SIMULATIONMODE_KINEMATIC,
+	SIMULATIONMODE_DYNAMIC
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 class Rigidbody2D
 {
 	friend class Physics2D;
@@ -17,22 +26,33 @@ class Rigidbody2D
 public:
 	Rigidbody2D( Physics2D* system , Vec2 worldPosition , Collider2D* collider );
 	Rigidbody2D( Physics2D* system , Vec2 worldPosition );
-	void Destroy();																	// helper for destroying myself (uses owner to mark self for destruction)
-	void Update( float deltaSeconds );
+	void			Destroy();																	// helper for destroying myself (uses owner to mark self for destruction)
+	void			Update( float deltaSeconds );
 
-	void TakeCollider( Collider2D* collider );										// takes ownership of a collider (destroying my current one if present)
-	Collider2D* GetCollider() const						{ return m_collider; }
-	void SetCollider( Collider2D* collider );
-	void SetPosition( Vec2 position );
-	Vec2 GetPosition() const							{ return m_worldPosition; }
+	void			TakeCollider( Collider2D* collider );										// takes ownership of a collider (destroying my current one if present)
+	Collider2D*		GetCollider() const								{ return m_collider; }
+	Vec2			GetPosition() const								{ return m_worldPosition; }
+	Vec2			GetVelocity() const								{ return m_velocity; }
+	eSimulationMode GetSimulationMode() const						{ return m_simulationMode; }
+	float			GetMass() const									{ return m_mass; }
+
+	void			SetCollider( Collider2D* collider );
+	void			SetPosition( Vec2 position );
+	void			SetVeloity( Vec2 velocity );
+	void			ReverseVelocity();
+	void			SetSimulationMode( eSimulationMode simulationMode );
+	void			SetMass( float newMass );
+
 
 public:
-	Physics2D*	m_system			= nullptr;										// which scene created/owns this object
-	Collider2D* m_collider			= nullptr;
-
-	Vec2		m_worldPosition;													// where in the world is this rigidbody
-	bool		m_isGarbage			= false;
+	Physics2D*			m_system			= nullptr;											// which scene created/owns this object
+	bool				m_isGarbage			= false;
+	Collider2D*			m_collider			= nullptr;
+	Vec2				m_worldPosition;														// where in the world is this rigidbody
+	Vec2				m_velocity			= Vec2( 100.f , 0.f );
+	float				m_mass;
+	eSimulationMode		m_simulationMode	= SIMULATIONMODE_DYNAMIC;
 
 private:
-	~Rigidbody2D();																	// destroys the collider
+	~Rigidbody2D();																				// destroys the collider
 };

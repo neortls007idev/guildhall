@@ -39,6 +39,8 @@ Game::Game()
 	m_worldCamera.SetOutputSize( m_currentCameraOutputSize );
 	m_worldCamera.SetPosition( m_cameraDefaultPosition );
 		
+	g_thePhysicsSystem->m_sceneCamera = &m_worldCamera;
+
 	m_mousePosition = g_theInput->GetMouseNormalizedClientPosition();
 	m_mousePosition = m_worldCamera.GetClientToWorldPosition( m_mousePosition );
 

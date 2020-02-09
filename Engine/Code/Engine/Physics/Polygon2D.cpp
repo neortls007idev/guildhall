@@ -149,7 +149,9 @@ Polygon2D Polygon2D::MakeConvexFromPointCloud( Vec2 const* points , uint pointCo
 		for ( uint index = 0; index < pointCount; index++ )
 		{
 			if ( CheckOrientation( points[ point ] , points[ index ] , points[ nextPoint ] ) == 2 )
-			nextPoint = index;
+			{
+				nextPoint = index;
+			}
 		}
 
 		tempPolygon.m_points.push_back( points[ nextPoint ] ); // Add q to result as a next point of p

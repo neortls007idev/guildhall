@@ -29,9 +29,9 @@ public:
 	float GetAspectRatio() const;
 	void  CorrectAspectRaio( float clientAspectRatio );
 
-private:
 	Vec2 GetOrthoMin() const;
 	Vec2 GetOrthoMax() const;
+private:
 
 	Vec2 m_outputSize;
 	Vec2 m_position				= Vec2::ZERO;

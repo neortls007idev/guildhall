@@ -7,6 +7,7 @@
 class DiscCollider2D;
 class Rigidbody2D;
 class Collider2D;
+class Camera;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -33,13 +34,19 @@ public:
 	DiscCollider2D* CreateDiscCollider( Vec2 localPosition , float radius );
 	void DestroyCollider( Collider2D* collider );
 
+	void ChangeSceneGravity( Vec2 newGravity );
+	Vec2 GetSceneGravity() const																							{ return m_sceneGravity; }
+	void GravityBounce( Camera* sceneCamera, Rigidbody2D* rigidBody );
+	void ScreenWrapAround( Camera* sceneCamera , Rigidbody2D* rigidBody );
+
 public:
-	// add members you may need to store these
+	Vec2 m_sceneGravity = Vec2( 0.f , -200.f );
 	// storage for all rigid bodies
-	std::vector<Rigidbody2D*>	m_rigidBodied2D;
+	std::vector<Rigidbody2D*>	m_rigidBodies2D;
 	// storage for all colliders
 	std::vector<Collider2D*>	m_colliders2D;
-	// ...
+	Camera*						m_sceneCamera = nullptr;
+	
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
