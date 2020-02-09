@@ -521,6 +521,11 @@ void RenderContext::DrawDiscFraction(const Disc2D& disc, const float drawFractio
 
 void RenderContext::DrawPolygon( const Vec2* points , unsigned int count , const Rgba8& tint )
 {
+	if ( count < 3 )
+	{
+		return;
+	}
+
 	std::vector<Vertex_PCU> polygonVerts;
 
 	AppendVertsForPolygon( polygonVerts , points , count , tint );

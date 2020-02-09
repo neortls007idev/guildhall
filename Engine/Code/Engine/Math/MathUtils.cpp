@@ -991,3 +991,43 @@ float SmoothStep3( float t )
 {
 	return ( ( t * t ) * ( 3 - ( 2 * t ) ) );
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const Vec2* GetLeftMostPointFromPointCloud( Vec2 const* points , uint pointCount )
+{
+	int indexOfLeftMostPoint = 0;
+
+	for ( uint index = 1; index < pointCount; index++ )
+	{
+		if ( points[ index ].x < points[ indexOfLeftMostPoint ].x )
+			indexOfLeftMostPoint = index;
+	}
+
+	return &points[ indexOfLeftMostPoint ];
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const uint GetIndexOfLeftMostPointFromPointCloud( Vec2 const* points , uint pointCount )
+{
+	uint indexOfLeftMostPoint = 0;
+	
+	for ( uint index = 1; index < pointCount; index++ )
+	{
+		if ( points[ index ].x < points[ indexOfLeftMostPoint ].x )
+			indexOfLeftMostPoint = index;
+	}
+
+	return indexOfLeftMostPoint;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const Vec2* GetBottomMostPointFromPointCloud( Vec2 const* points , uint pointCount )
+{
+	// TODO:- Implement function 
+	return &Vec2::ZERO;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

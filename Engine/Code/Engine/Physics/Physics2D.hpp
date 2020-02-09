@@ -18,6 +18,12 @@ public:
 
 	void BeginFrame();
 	void Update( float deltaSeconds );
+	
+	void AdvanceSimulation( float deltaSeconds );
+	void ApplyEffectors( float deltaSeconds );
+	void MoveRigidbodies( float deltaSeconds );
+	void CleanupDestroyedObjects();
+
 	void EndFrame();    // cleanup destroyed objects
 
 	// factory style create/destroy

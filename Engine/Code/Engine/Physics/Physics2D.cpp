@@ -3,6 +3,7 @@
 #include "Engine/Physics/Rigidbody2D.hpp"
 #include "Engine/Physics/Collider2D.hpp"
 #include "Engine/Physics/DiscCollider2D.hpp"
+#include "Engine/Math/MathUtils.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -27,6 +28,8 @@ void Physics2D::BeginFrame()
 
 void Physics2D::Update( float deltaSeconds )
 {
+	AdvanceSimulation( deltaSeconds );
+
 	for ( size_t rigidBodyIndex = 0; rigidBodyIndex < m_rigidBodied2D.size(); ++rigidBodyIndex )
 	{
 		m_rigidBodied2D[ rigidBodyIndex ]->Update( deltaSeconds );
@@ -36,6 +39,38 @@ void Physics2D::Update( float deltaSeconds )
 	{
 		m_colliders2D[ colliderIndex ]->UpdateWorldShape();
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Physics2D::AdvanceSimulation( float deltaSeconds )
+{
+	ApplyEffectors( deltaSeconds );
+	MoveRigidbodies( deltaSeconds );
+	// DetectCollisions(); - A04	// determine all pairs of intersecting colliders
+	// CollisionResponse(); - A04	// resolve all collisions, firing appropraite events
+	CleanupDestroyedObjects();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Physics2D::ApplyEffectors( float deltaSeconds )
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Physics2D::MoveRigidbodies( float deltaSeconds )
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Physics2D::CleanupDestroyedObjects()
+{
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -13,9 +13,11 @@
 #include "Engine/Primitives/Disc2D.hpp"
 #include "Game/GameCommon.hpp"
 #include <vector>
+#include "Engine/Physics/Polygon2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 class GameObject;
+class Polygon2D;
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 class Game
@@ -28,10 +30,13 @@ public:
 
 	void Update( float deltaSeconds );
 	void Render() const;
+	void DebugRender() const;
 
 	void UpdateCamera();
 	void UpdateGameObjectPosition();
 	void UpdateGameObjects();
+
+	void RandomizePointCloud( RandomNumberGenerator m_rng );
 		
 	void DrawMouseCurrentPosition( const Camera& camera ) const;
 	GameObject* PickGameobject( Vec2 mousePos );
@@ -77,9 +82,11 @@ public:
 		   float					m_minColliderRadius			= MIN_COLLIDER_RADIUS;
 		   float					m_maxColliderRadius			= MAX_COLLIDER_RADIUS;
 		   float					m_currentColliderRadius;
+		   Polygon2D				testPolygon;
 
 		   std::vector<GameObject*>	m_gameObjects;
 		   std::vector<bool>		m_isMouseOnGameObject;
+		   std::vector<Vec2>		m_pointCloud;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

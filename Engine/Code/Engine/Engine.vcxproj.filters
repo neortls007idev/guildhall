@@ -184,6 +184,15 @@
     <ClCompile Include="Core\DevConsole.cpp">
       <Filter>Core\Devconsole</Filter>
     </ClCompile>
+    <ClCompile Include="Physics\Polygon2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Plane.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\MatUtils.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -362,6 +371,15 @@
     </ClInclude>
     <ClInclude Include="Core\DevConsole.hpp">
       <Filter>Core\Devconsole</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Polygon2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Plane.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\MatUtils.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

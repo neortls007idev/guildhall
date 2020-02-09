@@ -17,6 +17,7 @@
 #include "Game/TheApp.hpp"
 #include "Game/Game.hpp"
 #include "Game/Gameobject.hpp"
+//#include "Engine/Physics/Polygon2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // GLOBAL VARIABLES
@@ -42,6 +43,11 @@ Game::Game()
 	m_mousePosition = m_worldCamera.GetClientToWorldPosition( m_mousePosition );
 
 	InitialGameObjectsSpawner();
+	RandomizePointCloud( m_rng );
+	//testPolygon = new Polygon2D();
+	testPolygon = ( Polygon2D::MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() ) );
+	//testPolygon->MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
+	int x = 5;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -98,6 +104,20 @@ void Game::Render() const
 	}
 
 	DrawMouseCurrentPosition( m_worldCamera );
+
+	DebugRender();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::DebugRender() const
+{
+	g_theRenderer->DrawPolygon( &testPolygon.m_points[ 0 ] , testPolygon.m_points.size() , WHITE );
+
+	for ( size_t index = 0; index < m_pointCloud.size(); index++ )
+	{
+		g_theRenderer->DrawDisc( Disc2D( m_pointCloud[ index ] , 3.f ) , RED );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -195,6 +215,18 @@ void Game::UpdateGameObjects()
 	}
 }
 	
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::RandomizePointCloud( RandomNumberGenerator m_rng )
+{
+	uint count = m_rng.RollRandomIntLessThan( 50 );
+
+	for ( size_t index = 0; index < count; index++ )
+	{
+		Vec2 temp = Vec2( m_rng.RollRandomFloatLessThan( 800.f ) , m_rng.RollRandomFloatLessThan( 800.f ) );
+		m_pointCloud.push_back( temp );
+	}
+}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
