@@ -32,27 +32,89 @@ void Polygon2D::UpdateWorldShape()
 
 void Polygon2D::Destroy()
 {
-
+	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Vec2 Polygon2D::GetClosestPoint( Vec2 pos ) const
 {
-	return Vec2::ZERO;
+	if ( Contains( pos ) )
+	{
+		return pos;
+	}
+	else
+	{
+		std::vector<Vec2> nearestPointOnEdge;
+		size_t totalPoints = m_points.size();
+		
+		for ( size_t index = 0; index < totalPoints; index++ )
+		{
+			nearestPointOnEdge.push_back( GetNearestPointOnLineSegment2D( pos , m_points[ index % totalPoints ] , m_points[ ( index + 1 ) % totalPoints ] ) );
+		}
+
+		Vec2 nearestPoint = nearestPointOnEdge[0];
+
+		for ( size_t index = 1; index < nearestPointOnEdge.size(); index++ )
+		{
+			float lengthOfNearestPoint = ( pos - nearestPoint ).GetLengthSquared();
+			float lengthOfNearestPointOnEdge = ( pos - nearestPointOnEdge[ index ] ).GetLengthSquared();
+
+			if ( lengthOfNearestPoint > lengthOfNearestPointOnEdge )
+			{
+				nearestPoint = nearestPointOnEdge[ index ];
+			}
+		}
+		return nearestPoint;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 bool Polygon2D::Contains( Vec2 pos ) const
 {
-	return false;
+	if ( 3 > m_points.size() )
+	{
+		return false;
+	}
+	else
+	{
+		Vec2 edge = Vec2::ZERO;
+		Vec2 edgeNormal;
+		Vec2 pointRelativePos;
+		size_t index = 1;
+
+		for ( ; index < m_points.size(); index++ )
+		{
+			edge = m_points[ index ] - m_points[ index - 1 ];
+			edgeNormal = edge.GetRotated90Degrees().GetNormalized();
+			//edgeNormal.Normalize();
+			pointRelativePos = pos - m_points[ index - 1 ];
+
+			if ( DotProduct2D( edgeNormal , pointRelativePos ) <= 0 )
+			{
+				return false;
+			}
+		}
+
+		edge = m_points[ 0 ] - m_points[ index - 1 ];
+		edgeNormal = edge.GetRotated90Degrees().GetNormalized();
+		//edgeNormal.Normalize();
+		pointRelativePos = pos - m_points[ 0 ];
+		if ( DotProduct2D( edgeNormal , pointRelativePos ) <= 0 )
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 bool Polygon2D::Intersects( Collider2D const* other ) const
 {
+	
+
 	return false;
 }
 
@@ -60,7 +122,16 @@ bool Polygon2D::Intersects( Collider2D const* other ) const
 
 void Polygon2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor )
 {
+	ctx->DrawPolygon( &m_points[ 0 ] , ( unsigned int ) m_points.size() , fillColor );
+	
+	size_t totalPoints = m_points.size();
 
+	for ( size_t index = 0; index < totalPoints; index++ )
+	{
+		size_t startPoint	= index % totalPoints;
+		size_t endPoint		= ( index + 1 ) % totalPoints;
+		ctx->DrawLine( m_points[ startPoint ] , m_points[ endPoint ] , borderColor , 5.f );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -90,6 +161,34 @@ bool Polygon2D::IsConvex() const
 	{
 		return false;
 	}
+	else
+	{
+		Vec2 edge	= m_points[ 1 ] - m_points[ 0 ];;
+		Vec2 edgeNormal = edge.GetRotated90Degrees().GetNormalized();
+		Vec2 nextEdge;
+		size_t index = 2;
+
+		for ( ; index < m_points.size(); index++ )
+		{
+			nextEdge = m_points[ index ] - m_points[ index - 1 ];
+			if ( DotProduct2D( edgeNormal , nextEdge ) < 0 )
+			{
+				return false;
+			}
+			edge = m_points[ index ] - m_points[ index - 1 ];
+			edgeNormal = edge.GetRotated90Degrees().GetNormalized();
+		}
+
+		edge = m_points[ index - 1 ] - m_points[ 0 ];
+		nextEdge = m_points[ 0 ] - m_points[ 1 ];
+		edgeNormal = edge.GetRotated90Degrees().GetNormalized();
+		
+		if ( DotProduct2D( nextEdge , edgeNormal ) < 0 )
+		{
+			return false;
+		}
+
+	}
 
 	return true;
 }
@@ -98,7 +197,8 @@ bool Polygon2D::IsConvex() const
 
 float Polygon2D::GetDistance( Vec2 point ) const
 {
-	return 0.f;
+	Vec2 nearestPoint = GetClosestPoint( point );
+	return ( nearestPoint - point ).GetLength();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

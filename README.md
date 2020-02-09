@@ -13,8 +13,8 @@ I may mark tasks as **CHALLENGE** if I believe them to be more difficult relativ
     - [ ] *05pts*: Can construct from counter-clockwise list of points
         - [ ] `GUARANTEE_OR_DIE` points represent a convex polygon
     - [x] **CHALLENGE** - Can construct from a point cloud (gift wrapping algorithm)
-    - [ ] *05pts*: Implement `Contains`
-    - [ ] *05pts*: Implement `GetClosestPoint`
+    - [x] *05pts*: Implement `Contains`
+    - [x] *05pts*: Implement `GetClosestPoint`
     - [ ] *05pts*: Implement `Intersects`, but only vs disc, return `false` if intersecting with another polygon for now.
         - [ ] Be sure disc now checks against both discs and polygons using `GetType`
     - [x] *05pts*: Can render it - should work as before.

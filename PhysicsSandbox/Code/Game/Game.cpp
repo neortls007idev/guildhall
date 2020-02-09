@@ -49,6 +49,7 @@ Game::Game()
 	//testPolygon = new Polygon2D();
 	testPolygon = ( Polygon2D::MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() ) );
 	//testPolygon->MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
+	bool result = testPolygon.IsConvex();
 	int x = 5;
 }
 
@@ -108,6 +109,21 @@ void Game::Render() const
 	DrawMouseCurrentPosition( m_worldCamera );
 
 	DebugRender();
+	
+	Vec2 newWorldPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+// 	bool polyIsPointInside = testPolygon.Contains( newWorldPosition );
+// 
+// 	if ( polyIsPointInside )
+// 	{
+// 		g_theRenderer->DrawDisc( Disc2D( newWorldPosition , 5.f ) , GREEN );
+// 	}
+// 	else
+// 	{
+// 		g_theRenderer->DrawDisc( Disc2D( newWorldPosition , 5.f ) , PURPLE );
+// 	}
+
+	Vec2 nearestPoint = testPolygon.GetClosestPoint( newWorldPosition );
+	g_theRenderer->DrawDisc( Disc2D( nearestPoint , 5.f ) , PURPLE );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -120,6 +136,7 @@ void Game::DebugRender() const
 	{
 		g_theRenderer->DrawDisc( Disc2D( m_pointCloud[ index ] , 3.f ) , RED );
 	}
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -221,7 +238,7 @@ void Game::UpdateGameObjects()
 
 void Game::RandomizePointCloud( RandomNumberGenerator m_rng )
 {
-	uint count = m_rng.RollRandomIntLessThan( 50 );
+	uint count = m_rng.RollRandomIntInRange( 2 , 50 );
 
 	for ( size_t index = 0; index < count; index++ )
 	{
