@@ -3,6 +3,8 @@
 #include "Engine/Core/Rgba8.hpp"
 
 class Texture;
+class RenderBuffer;
+class RenderContext;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // TODO :- 
@@ -16,11 +18,19 @@ enum eCameraClearBitFlag : unsigned int
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+struct CameraDataT
+{
+	float orthoMin[ 2 ];
+	float orthoMax[ 2 ];
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 class Camera
 {
 public:
 	Camera() {};
-	~Camera() {};
+	~Camera();
 	void  SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
 	Vec2  GetOrthoBottomLeft() const;
 	Vec2  GetOrthoTopRight() const;
@@ -29,17 +39,21 @@ public:
 	Rgba8 GetClearColor() const																						{ return m_clearColor; }
 	unsigned int  GetClearMode() const																				{ return m_clearMode; }
 
-	void	 SetColorTarget( Texture* texture );
-	Texture* GetColorTarget() const																					{ return m_colorTarget; }
+	void			 SetColorTarget( Texture* texture );
+	RenderBuffer*	 UpdateUBO( RenderContext* ctx );
+	Texture*		 GetColorTarget() const																					{ return m_colorTarget; }
+
+public:
+	RenderBuffer*	m_cameraUBO		= nullptr;
 
 private:
 
 	Vec2 bottomLeftCoordinate = Vec2( -1.f , -1.f );
 	Vec2 topRightCoordinate   = Vec2::ONE;
 
-	unsigned int m_clearMode  = 0;
-	Rgba8		 m_clearColor = BLACK;
-	Texture*	 m_colorTarget = nullptr;
+	unsigned int	m_clearMode		= 0;
+	Rgba8			m_clearColor	= BLACK;
+	Texture*		m_colorTarget	= nullptr;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

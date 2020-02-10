@@ -13,7 +13,8 @@
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Renderer/VertexBuffer.hpp"
-
+#include "Engine/Time/Time.hpp"
+#include "Engine/Renderer/RenderBuffer.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				THIRD PARTY LIBRARIES
@@ -123,6 +124,7 @@ void RenderContext::Startup( Window* window )
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/default.hlsl" );
 
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
+	m_frameUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -130,6 +132,15 @@ void RenderContext::Startup( Window* window )
 void RenderContext::BeginFrame()
 {
 
+}
+
+void RenderContext::UpdateFrameTime( float deltaSeconds )
+{
+	FrameDataT frameData;
+	frameData.m_systemTime = ( float ) GetCurrentTimeSeconds();
+	frameData.m_systemDeltaTime = deltaSeconds;
+
+	m_frameUBO->Update( &frameData , sizeof( frameData ) , sizeof( frameData ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -146,6 +157,9 @@ void RenderContext::Shutdown()
 	delete m_immediateVBO;
 	m_immediateVBO = nullptr;
 
+	delete m_frameUBO;
+	m_frameUBO = nullptr;
+	
 	m_lastBoundVBO = nullptr;
 	m_currentCamera = nullptr;
 
@@ -188,7 +202,7 @@ void RenderContext::ClearScreen( const Rgba8& clearColor )
 
 void RenderContext::BeginCamera( const Camera& camera )
 {
-	m_currentCamera = &camera;
+	m_currentCamera = const_cast< Camera* >( &camera );
 
 #if defined(RENDER_DEBUG)
 	m_context->ClearState(); 
@@ -232,6 +246,9 @@ if ( camera->ShouldClearClear() )
 	ClearScreen( camera.GetClearColor() );
 	BindShader( "" );
 	m_lastBoundVBO = nullptr;
+	BindUniformBuffer( UBO_FRAME_SLOT , m_frameUBO );
+	//m_currentCamera->UpdateUBO( this );
+	BindUniformBuffer( UBO_CAMERA_SLOT , m_currentCamera->UpdateUBO( this ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -790,6 +807,17 @@ void RenderContext::BindVertexInput( VertexBuffer* vbo )
 		m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 		m_lastBoundVBO = vboHandle;
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::BindUniformBuffer( unsigned int slot , RenderBuffer* ubo )
+{
+	
+	ID3D11Buffer* uboHandle = ubo->m_handle; /*ubo->GetHandle();*/
+
+	m_context->VSSetConstantBuffers( slot , 1 , &uboHandle );
+	m_context->PSSetConstantBuffers( slot , 1 , &uboHandle );
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------

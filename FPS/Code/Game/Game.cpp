@@ -19,7 +19,7 @@ extern TheApp* g_theApp;
 
 Game::Game()
 {
-	m_worldCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y ) );
+	m_worldCamera.SetOrthoView( Vec2( -WORLD_CAMERA_SIZE_X , -WORLD_CAMERA_SIZE_Y ) , Vec2( WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y ) );
 	m_uiCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
 	m_color = BLACK;
 }
@@ -36,7 +36,7 @@ void Game::Render() const
 {
 	g_theRenderer->BeginCamera( m_worldCamera );
 	//g_theRenderer->Draw( 3 , 0 );
-	g_theRenderer->DrawAABB2( AABB2( -0.5f , -0.5f , 0.5f , 0.5f ) , WHITE );
+	g_theRenderer->DrawAABB2( AABB2( -1.f , -1.f , 1.f , 1.f ) , WHITE );
 	g_theRenderer->EndCamera( m_worldCamera );
 }
 

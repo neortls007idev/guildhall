@@ -23,6 +23,31 @@ struct vs_input_t
    float2 uv            : TEXCOORD; 
 }; 
 
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+
+float RangeMap( float val , float inMin , float inMax , float outMin , float outMax )
+{
+	float domain = inMax - inMin;
+	float range = outMax - outMin;
+	return ( ( val - inMin ) / domain ) * range + outMin;
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+// constant built into the shader
+static float SHIFT = 5.0f;
+// 
+
+cbuffer time_constants : register( b0 ) // index 0 is now time
+{
+	float SYSTEM_TIME_SECONDS;
+	float SYSTEM_TIME_DELTA_SECONDS;
+}
+
+cbuffer camera_constants : register( b1 ) // index 1 is now camera
+{
+	float2 orthoMin;
+	float2 orthoMax;
+}
 
 //--------------------------------------------------------------------------------------
 // Programmable Shader Stages
@@ -48,6 +73,23 @@ v2f_t VertexFunction( vs_input_t input )
    v2f.color = input.color; 
    v2f.uv = input.uv; 
     
+   float4 worldPos = float4( input.position , 1 );
+   worldPos.x += cos( SYSTEM_TIME_SECONDS );
+   worldPos.y += sin( SYSTEM_TIME_SECONDS );
+
+   float4 clipPos = worldPos; // might have a w( usually 1 for now )
+
+   //float clipPos;
+   clipPos.x = RangeMap( worldPos.x , orthoMin.x , orthoMax.x , -1.0f , 1.0f );
+   clipPos.y = RangeMap( worldPos.y , orthoMin.y , orthoMax.y , -1.0f , 1.0f );
+   clipPos.z = 0.f;
+   clipPos.w = 1.f;
+
+   // SYSTEM_TIME_SECONDS = 4.0f // ERROR SINCE ITS A CONSTANT BUFFER
+   //v2f.position.x += cos( SYSTEM_TIME_SECONDS );
+   //v2f.position.y += sin( SYSTEM_TIME_SECONDS );
+
+   v2f.position = clipPos;
    return v2f;
 }
 
@@ -58,12 +100,17 @@ v2f_t VertexFunction( vs_input_t input )
 // is being drawn to the first bound color target.
 float4 FragmentFunction( v2f_t input ) : SV_Target0
 {
-   // we'll outoupt our UV coordinates as color here
-   // to make sure they're being passed correctly.
-   // Very common rendering debugging method is to 
-   // use color to portray information; 
-   float4 uvAsColor = float4( input.uv, 0.0f, 1.0f ); 
-   float4 finalColor = uvAsColor * input.color; 
+	// we'll outoupt our UV coordinates as color here
+	// to make sure they're being passed correctly.
+	// Very common rendering debugging method is to 
+	// use color to portray information; 
 
-   return finalColor; 
+	//	float4 uvAsColor = float4( input.uv, 0.0f, 1.0f ); 
+	//	float4 finalColor = uvAsColor * input.color; 
+
+	 float r = 0.5f * ( sin( input.uv.x * 40.0f + SYSTEM_TIME_SECONDS * 10.f ) + 1.0f );
+	float  b = 0.5f * ( cos( input.uv.y * 40.0f + SYSTEM_TIME_SECONDS * 10.f ) + 1.0f );
+return float4( r , 0 , b , 1 );
+
+//   return finalColor; 
 }

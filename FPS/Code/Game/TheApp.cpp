@@ -90,6 +90,8 @@ void TheApp::BeginFrame()
 
 void TheApp::Update( float deltaSeconds )
 {
+		g_theRenderer->UpdateFrameTime( deltaSeconds );
+
 		UpdateFromKeyboard();
 		
 		if ( m_isPaused ) { deltaSeconds = 0; }

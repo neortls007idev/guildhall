@@ -23,6 +23,7 @@ struct ID3D11Buffer;
 
 class Shader;
 class VertexBuffer;
+class RenderBuffer;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -30,6 +31,22 @@ enum class BlendMode
 {
 	ALPHA ,
 	ADDITIVE ,
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum eBufferSlot
+{
+	UBO_FRAME_SLOT	= 0,
+	UBO_CAMERA_SLOT = 1,
+};
+
+struct FrameDataT
+{
+	float m_systemTime;
+	float m_systemDeltaTime;
+
+	float m_padding[ 2 ];
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -43,6 +60,7 @@ public:
 	
 	void Startup( Window* window );
 	void BeginFrame();
+	void UpdateFrameTime( float deltaSeconds );
 	void EndFrame();
 	void Shutdown();
 		
@@ -86,6 +104,7 @@ public:
 	bool BindShader( Shader* shader );
 	void BindShader( std::string shaderFileName );
 	void BindVertexInput( VertexBuffer* vbo );
+	void BindUniformBuffer( unsigned int slot , RenderBuffer* ubo ); // ubo - uniform buffer object
 
 private:
 
@@ -101,7 +120,7 @@ public:
 	ID3D11Device*		 m_device			= nullptr ;
 	ID3D11DeviceContext* m_context			= nullptr ; // Immediate context
 	SwapChain*			 m_swapChain		= nullptr;
-	const Camera*		 m_currentCamera	= nullptr;
+	Camera*				 m_currentCamera	= nullptr;
 
 	void*				 m_debugModule		= nullptr;
 	IDXGIDebug*			 m_debug			= nullptr;
@@ -113,11 +132,12 @@ public:
 	ID3D11Buffer*		 m_lastBoundVBO		= nullptr;
 	Texture*			 m_textureTarget	= nullptr;
 
+	RenderBuffer*		 m_frameUBO			= nullptr;
+
 private:
 
 	std::map<std::string , Texture*>	m_LoadedTextures;	 // LOOKUP TABLE OF FILEPATH & TEXTUREID
 	std::map<std::string , BitmapFont*> m_LoadedBitMapFonts; // LOOKUP TABLE OF FILEPATH & BITMAPFONTID
 	std::map<std::string , Shader*>		m_LoadedShaders;	 // LOOKUP TABLE OF FILEPATH & Shaders
 };
-
 
