@@ -5,7 +5,6 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Core/SimpleTriangleFont.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
@@ -13,6 +12,7 @@
 #include "Engine/Physics/Collider2D.hpp"
 #include "Engine/Physics/DiscCollider2D.hpp"
 #include "Engine/Physics/Rigidbody2D.hpp"
+#include "Engine/Renderer/BitmapFont.hpp"
 
 #include "Game/TheApp.hpp"
 #include "Game/Game.hpp"
@@ -27,6 +27,7 @@ extern RenderContext*	g_theRenderer;
 extern AudioSystem*		g_theAudioSystem;
 extern Physics2D*		g_thePhysicsSystem;
 extern TheApp*			g_theApp;
+extern BitmapFont*		g_bitmapFont;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -38,7 +39,10 @@ Game::Game()
 {	
 	m_worldCamera.SetOutputSize( m_currentCameraOutputSize );
 	m_worldCamera.SetPosition( m_cameraDefaultPosition );
-		
+	
+	m_UICamera.SetOutputSize( m_currentCameraOutputSize );
+	m_UICamera.SetPosition( m_cameraDefaultPosition );
+
 	g_thePhysicsSystem->m_sceneCamera = &m_worldCamera;
 
 	m_mousePosition = g_theInput->GetMouseNormalizedClientPosition();
@@ -77,9 +81,9 @@ void Game::Update( float deltaSeconds )
 	m_mousePosition = m_worldCamera.GetClientToWorldPosition( m_mousePosition );
 	m_mousePosition = m_worldCamera.GetWorldNormalizedToClientPosition( m_mousePosition );
 	UpdateCamera();
-	UpdateGameObjectPosition();
+	UpdateGameObject( deltaSeconds );
 	UpdateGameObjects();
-	UpdateFromKeyBoard( deltaSeconds );
+	UpdateFromUserInput( deltaSeconds );
 	g_thePhysicsSystem->Update( deltaSeconds );
 	//UNUSED( deltaSeconds );
 }
@@ -124,6 +128,42 @@ void Game::Render() const
 
 	//Vec2 nearestPoint = testPolygon.GetClosestPoint( newWorldPosition );
 	//g_theRenderer->DrawDisc( Disc2D( nearestPoint , 5.f ) , PURPLE );
+	RenderUI();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::RenderUI() const
+{
+	g_theRenderer->BeginCamera( m_UICamera );
+	RenderGravityUI();
+	g_theRenderer->EndCamera( m_UICamera );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::RenderGravityUI() const
+{
+	AABB2 uiArea = AABB2( m_UICamera.GetOrthoMin() , m_UICamera.GetOrthoMax() );
+
+	uiArea = uiArea.GetBoxAtTop( 0.9f , 0.f ).GetBoxAtRight( 0.5f , 0.f );
+	/*uiArea.CarveBoxOffRight( 0.5f , 0.f );*/
+	
+	std::vector<Vertex_PCU> uiVerts;
+
+	std::string currGravityX = "Current Gravity Along X= ";
+	currGravityX += std::to_string( g_thePhysicsSystem->GetSceneGravity().x );
+	
+	std::string currGravityY = "Current Gravity Along Y= ";
+	currGravityY += std::to_string( g_thePhysicsSystem->GetSceneGravity().y );
+
+	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea , uiArea.GetDimensions().y * 0.2f , currGravityX , RED , 1.f , ALIGN_TOP_RIGHT );
+	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea , uiArea.GetDimensions().y * 0.2f , currGravityY , RED, 1.f , ALIGN_CENTERED_RIGHT  );
+	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea , uiArea.GetDimensions().y * 0.2f , "Press + or - key to change Gravity" , RED , 1.f , ALIGN_BOTTOM_RIGHT );
+	
+	g_theRenderer->BindTexture( g_bitmapFont->GetTexture() );
+	g_theRenderer->DrawVertexArray( uiVerts );
+	g_theRenderer->BindTexture( nullptr );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -147,27 +187,81 @@ void Game::UpdateCamera()
 	m_worldCamera.SetOutputSize( m_currentCameraOutputSize );
 	m_worldCamera.CorrectAspectRaio( CLIENT_ASPECT );
 	m_worldCamera.SetProjectionOrthographic( m_currentCameraOutputSize.y );
+
+	m_UICamera.SetPosition( m_cameraCurrentPosition );
+	m_UICamera.SetOutputSize( m_currentCameraOutputSize );
+	m_UICamera.CorrectAspectRaio( CLIENT_ASPECT );
+	m_UICamera.SetProjectionOrthographic( m_currentCameraOutputSize.y );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Game::UpdateGameObjectPosition()
+void Game::UpdateGameObject( float deltaSeconds )
 {
+	static Vec2 originalPosition;
 	if ( !m_selectedGameObject )
 	{
 		return;
 	}
 	else
 	{
+		UpdateSimulationType( &m_simMode );
 		Vec2 colliderPos		= m_selectedGameObject->m_rigidbody->GetPosition();
 		Vec2 newWorldPosition	= m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+
 		if ( !m_isDragOffsetSet )
 		{
 			m_rigidBodyMouseOffset	=  newWorldPosition - colliderPos;
 			m_isDragOffsetSet = true;
+			originalPosition = newWorldPosition;
 		}
 		m_selectedGameObject->m_rigidbody->SetPosition( newWorldPosition - m_rigidBodyMouseOffset );		
 	}
+}
+
+void Game::UpdateSimulationType( eSimulationMode* simMode )
+{
+	if ( g_theInput->WasKeyJustPressed( '1' ) ) 
+	{ 
+		m_selectedGameObject->m_rigidbody->SetSimulationMode( SIMULATIONMODE_STATIC ); 
+		*simMode = SIMULATIONMODE_STATIC;
+	}
+	else if ( g_theInput->WasKeyJustPressed( '2' ) ) 
+	{
+		m_selectedGameObject->m_rigidbody->SetSimulationMode( SIMULATIONMODE_KINEMATIC ); 
+		*simMode = SIMULATIONMODE_KINEMATIC;
+	}
+	else if ( g_theInput->WasKeyJustPressed( '3' ) ) 
+	{ 
+		m_selectedGameObject->m_rigidbody->SetSimulationMode( SIMULATIONMODE_DYNAMIC ); 
+		*simMode = SIMULATIONMODE_DYNAMIC;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateGravity()
+{
+	if ( g_theInput->WasKeyJustPressed( KEY_PLUS ) )
+	{
+		Vec2 currentGravity = g_thePhysicsSystem->GetSceneGravity();
+		currentGravity -= Vec2( 0.f , DELTA_GRAVITY_CHANGE_ALONGY );
+		g_thePhysicsSystem->ChangeSceneGravity( currentGravity );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( KEY_MINUS ) )
+	{
+		Vec2 currentGravity = g_thePhysicsSystem->GetSceneGravity();
+		currentGravity += Vec2( 0.f , DELTA_GRAVITY_CHANGE_ALONGY );
+		g_thePhysicsSystem->ChangeSceneGravity( currentGravity );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec2 Game::GetMouseDragVelocity() const
+{
+	return Vec2::ZERO;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -299,8 +393,10 @@ GameObject* Game::PickGameobject( Vec2 mousePos )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Game::UpdateFromKeyBoard( float deltaSeconds )
+void Game::UpdateFromUserInput( float deltaSeconds )
 {
+	UpdateGravity();
+	
 	if ( g_theInput->WasKeyJustPressed( 'O' ) )
 	{
 		m_cameraCurrentPosition = m_cameraDefaultPosition;
@@ -351,22 +447,34 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	//static bool isGameObjectSelected = false;
 	
 	if ( g_theInput->WasLeftMouseButtonJustPressed() )
-	{
+	{		
+		static float dragTime = 0.f;
+		static Vec2 dragStartPos;
+		dragTime += deltaSeconds;
+
 		if ( !m_isGameObjectSelected)
 		{
 			Vec2 PickObjectPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
 			m_selectedGameObject = PickGameobject( PickObjectPosition );
 			if ( m_selectedGameObject )
 			{
+				dragTime = 0.f;
+				dragStartPos = PickObjectPosition;
+				m_simMode = m_selectedGameObject->m_rigidbody->GetSimulationMode();
 				m_selectedGameObject->m_borderColor = Rgba8( 0 , 127 , 0 , 255 );
 				m_selectedGameObject->m_isSelected	= true;
 				m_isGameObjectSelected = true;
+				m_selectedGameObject->m_rigidbody->SetSimulationMode( SIMULATIONMODE_KINEMATIC );
 			}
 		}
 		else
 		{
 			if ( m_selectedGameObject != nullptr )
 			{
+				Vec2 dragEndPos = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+				Vec2 newVelocity = ( dragEndPos - dragStartPos ) / ( dragTime * 100.f );
+				m_selectedGameObject->m_rigidbody->SetVeloity( newVelocity );
+				m_selectedGameObject->m_rigidbody->SetSimulationMode( m_simMode );
 				m_selectedGameObject->m_isSelected = false;
 				m_rigidBodyMouseOffset = Vec2::ZERO;
 				m_isDragOffsetSet = false;

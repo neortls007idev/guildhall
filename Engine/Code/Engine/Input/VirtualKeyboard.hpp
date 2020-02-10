@@ -26,4 +26,6 @@ const unsigned char KEY_ENTER					= 0x0D;
 const unsigned char KEY_TILDE					= 0xC0;
 const unsigned char KEY_BACKSPACE				= 0x08;
 const unsigned char KEY_DELETE					= 0x2E;
+const unsigned char KEY_PLUS					= 0xBB;
+const unsigned char KEY_MINUS					= 0xBD;
 //--------------------------------------------------------------------------------------------------------------------------------------------

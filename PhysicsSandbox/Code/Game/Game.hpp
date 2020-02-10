@@ -14,6 +14,7 @@
 #include "Game/GameCommon.hpp"
 #include <vector>
 #include "Engine/Primitives/Polygon2D.hpp"
+#include "Engine/Physics/Rigidbody2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 class GameObject;
@@ -30,10 +31,15 @@ public:
 
 	void Update( float deltaSeconds );
 	void Render() const;
+	void RenderUI() const;
+	void RenderGravityUI() const;
 	void DebugRender() const;
 
 	void UpdateCamera();
-	void UpdateGameObjectPosition();
+	void UpdateGameObject( float deltaSeconds );
+	void UpdateSimulationType( eSimulationMode* simMode );
+	void UpdateGravity();
+	Vec2 GetMouseDragVelocity() const;
 	void UpdateGameObjects();
 
 	void RandomizePointCloud( RandomNumberGenerator m_rng );
@@ -44,7 +50,7 @@ public:
 
 private:
 
-	void UpdateFromKeyBoard( float deltaSeconds );
+	void UpdateFromUserInput( float deltaSeconds );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -56,12 +62,14 @@ private:
 	float m_tilesInViewVertically = 9.0f;
 	Vec2 m_CameraCenter = Vec2( m_tilesInViewHorizontally / 2 , m_tilesInViewVertically / 2 );
 	bool m_hasCursorChangedToOBB = false;
+	eSimulationMode m_simMode = SIMULATIONMODE_STATIC;
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 public:
 
 	static RandomNumberGenerator	m_rng;
 		   Camera					m_worldCamera;
+		   Camera					m_UICamera;
 		   AABB2					m_aabb2D					= AABB2( -800.f , -400.f , 0.f , 0.f );
 		   Rgba8					m_fillColor					= Rgba8( 255 , 255 , 255 , 127 );
 		   Rgba8					m_overlapColor				= Rgba8( 255 , 0 , 0 , 127 );

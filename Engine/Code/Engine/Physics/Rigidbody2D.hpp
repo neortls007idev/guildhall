@@ -49,7 +49,7 @@ public:
 	bool				m_isGarbage			= false;
 	Collider2D*			m_collider			= nullptr;
 	Vec2				m_worldPosition;														// where in the world is this rigidbody
-	Vec2				m_velocity			= Vec2( 100.f , 0.f );
+	Vec2				m_velocity			= Vec2( 0.f , 0.f );
 	float				m_mass;
 	eSimulationMode		m_simulationMode	= SIMULATIONMODE_DYNAMIC;
 

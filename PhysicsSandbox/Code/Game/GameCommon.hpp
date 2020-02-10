@@ -28,4 +28,6 @@ constexpr float	MAX_COLLIDER_RADIUS										=  200.f;
 constexpr int	MIN_INITIAL_GAME_OBJECTS								=  5;
 constexpr int	MAX_INITIAL_GAME_OBJECTS								=  10;
 
+constexpr float	DELTA_GRAVITY_CHANGE_ALONGY								= 10.f;
+
 //--------------------------------------------------------------------------------------------------------------------------------------------

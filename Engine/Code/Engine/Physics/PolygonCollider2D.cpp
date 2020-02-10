@@ -1,11 +1,13 @@
 #include "Engine/Physics/PolygonCollider2D.hpp"
 #include "Engine/Primitives/Polygon2D.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Physics/DiscCollider2D.hpp"
+#include "Engine/Physics/Rigidbody2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 PolygonCollider2D::PolygonCollider2D( Physics2D* system , Rigidbody2D* rigidbody , Vec2 localPosition ) :
-																							Collider2D( system , rigidbody , COLLIDER2D_DISC )
+																							Collider2D( system , rigidbody , COLLIDER2D_CONVEXGON )
 {
 
 }
@@ -14,7 +16,7 @@ PolygonCollider2D::PolygonCollider2D( Physics2D* system , Rigidbody2D* rigidbody
 
 void PolygonCollider2D::UpdateWorldShape()
 {
-
+	m_worldPosition = m_rigidbody->m_worldPosition + m_localPosition;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -102,7 +104,26 @@ bool PolygonCollider2D::Contains( Vec2 pos ) const
 
 bool PolygonCollider2D::Intersects( Collider2D const* other ) const
 {
-	
+	if ( other->m_colliderType == COLLIDER2D_CONVEXGON )
+	{
+		return false;
+	}
+	else
+	{
+		if ( other->m_colliderType == COLLIDER2D_DISC )
+		{
+			DiscCollider2D const* collider = ( DiscCollider2D* ) other;
+
+			Vec2 closetPoint = GetClosestPoint( collider->GetPosition() );
+
+			float distanceSqaured = ( collider->GetPosition() - closetPoint ).GetLengthSquared();
+			float radiusSquared = collider->m_radius * collider->m_radius;
+			if ( distanceSqaured < radiusSquared )
+			{
+				return true;
+			}
+		}
+	}
 
 	return false;
 }
@@ -121,13 +142,6 @@ void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderCol
 		size_t endPoint		= ( index + 1 ) % totalPoints;
 		ctx->DrawLine( m_polygon->m_points[ startPoint ] , m_polygon->m_points[ endPoint ] , borderColor , 5.f );
 	}
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-Vec2 PolygonCollider2D::GetPosition() const
-{
-	return Vec2::ZERO;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

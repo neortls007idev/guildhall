@@ -189,11 +189,41 @@ void Physics2D::ChangeSceneGravity( Vec2 newGravity )
 
 void Physics2D::GravityBounce( Camera* sceneCamera , Rigidbody2D* rigidBody )
 {
-	Vec2 gravityPlane = sceneCamera->GetOrthoMin();
+	Vec2 gravityPlane( sceneCamera->GetOrthoMax().x - sceneCamera->GetOrthoMin().x , sceneCamera->GetOrthoMin().y );
 
-	if ( rigidBody->GetPosition().y <= gravityPlane.y )
+	Collider2D* collider = nullptr;
+
+	if ( rigidBody!= nullptr )
 	{
-		rigidBody->ReverseVelocity();
+		collider = rigidBody->GetCollider();
+	}
+	else
+	{
+		return;
+	}
+
+	if ( collider != nullptr )
+	{
+		switch ( collider->GetType() )
+		{
+		case COLLIDER2D_DISC :
+									{	
+										DiscCollider2D* colliderAsDisc = ( DiscCollider2D* ) collider;
+
+										if ( rigidBody->GetPosition().y - colliderAsDisc->m_radius <= gravityPlane.y )
+										{
+											rigidBody->ReverseVelocity();
+										}
+									}break;
+
+		case COLLIDER2D_CONVEXGON :
+									if ( collider->GetClosestPoint( gravityPlane ).y <= gravityPlane.y )
+									{
+										rigidBody->ReverseVelocity();
+									}break;
+		default:
+			break;
+		}
 	}
 }
 
@@ -205,14 +235,24 @@ void Physics2D::ScreenWrapAround( Camera* sceneCamera , Rigidbody2D* rigidBody )
 	float ScreenMaxX = sceneCamera->GetOrthoMax().x;
 	Vec2  rbCurrentPos = rigidBody->GetPosition();
 
-	if ( rigidBody->GetPosition().x < ScreenMinX )
+	Collider2D* collider = rigidBody->GetCollider();
+
+	if ( collider->GetType() == COLLIDER2D_DISC )
 	{
-		rigidBody->SetPosition( Vec2( rbCurrentPos.x + ScreenMaxX , rbCurrentPos.y ) );
-	}
-	else if ( rigidBody->GetPosition().x > ScreenMaxX )
+		DiscCollider2D* discCollider = ( DiscCollider2D* ) collider;
+		if ( ( rigidBody->GetPosition().x - discCollider->m_radius ) < ScreenMinX )
+		{
+			rigidBody->SetPosition( Vec2( ScreenMaxX - discCollider->m_radius , rbCurrentPos.y ) );
+		}
+		else if ( (rigidBody->GetPosition().x + discCollider->m_radius) > ScreenMaxX )
+		{
+			rigidBody->SetPosition( Vec2( ScreenMinX + discCollider->m_radius , rbCurrentPos.y ) );
+		}
+	} 
+	else if ( collider->GetType() == COLLIDER2D_CONVEXGON )
 	{
-		rigidBody->SetPosition( Vec2( ScreenMinX , rbCurrentPos.y ) );
 	}
+	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

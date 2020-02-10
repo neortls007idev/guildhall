@@ -2,6 +2,7 @@
 
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Core/Rgba8.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -14,7 +15,7 @@ class Rigidbody2D;
 enum COLLIDER2D_TYPE
 {
 	COLLIDER2D_DISC ,
-	Collider2D_CONVEXGON,
+	COLLIDER2D_CONVEXGON,
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -23,7 +24,7 @@ class Collider2D
 {
 	friend class Physics2D;
 
-public: 
+public:
 	Collider2D( Physics2D* system , Rigidbody2D* rigidbody , COLLIDER2D_TYPE colliderType = COLLIDER2D_DISC );
 
 	virtual void UpdateWorldShape() = 0;
@@ -35,6 +36,8 @@ public:
 
 	virtual void DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor ) = 0;
 	virtual Vec2 GetPosition() const = 0;
+
+	uint GetType() const																								{ return m_colliderType; }
 
 protected:
 	virtual ~Collider2D(); // private - make sure this is virtual so correct deconstructor gets called

@@ -10,13 +10,13 @@ MP2 And SD2 Checklist
 I may mark tasks as **CHALLENGE** if I believe them to be more difficult relative to the rest of the assignment.  This is just to hint to you that you may want to save those tasks for the end if you have time, or skip altogether if not.  
 
 - [ ] *25pts*: Add a `PolygonCollider2D`
-    - [ ] *05pts*: Can construct from counter-clockwise list of points
+    - [x] *05pts*: Can construct from counter-clockwise list of points
         - [ ] `GUARANTEE_OR_DIE` points represent a convex polygon
     - [x] **CHALLENGE** - Can construct from a point cloud (gift wrapping algorithm)
     - [x] *05pts*: Implement `Contains`
     - [x] *05pts*: Implement `GetClosestPoint`
-    - [ ] *05pts*: Implement `Intersects`, but only vs disc, return `false` if intersecting with another polygon for now.
-        - [ ] Be sure disc now checks against both discs and polygons using `GetType`
+    - [x] *05pts*: Implement `Intersects`, but only vs disc, return `false` if intersecting with another polygon for now.
+        - [x] Be sure disc now checks against both discs and polygons using `GetType`
     - [x] *05pts*: Can render it - should work as before.
 - [ ] *25pts*: Can construct `GameObject` with a `PolygonCollider`
     - [ ] Press `2` to enter a polygon draw mode, place first point where cursor is when `2` was pressed
@@ -45,11 +45,11 @@ I may mark tasks as **CHALLENGE** if I believe them to be more difficult relativ
     - [x] `STATIC` objects do not apply forces or simulate.
     - [x] `KINEMATIC` objects do not apply forces, but will simulate.  
     - [x] `DYNAMIC` objects apply forces and simulate
-    - [ ] While selected, `1`, `2`, and `3` should switch the object to `STATIC`, `KINEMATIC`, or `DYNAMIC` respectively
+    - [x] While selected, `1`, `2`, and `3` should switch the object to `STATIC`, `KINEMATIC`, or `DYNAMIC` respectively *KINEMATIC DOESNT WORK*
 - [x] *05pts*: `Physics2D::SetSceneGravity` implemented
     - [x] Applies a flat acceleration force to every dynamic rigidbody in the scene beginning of frame.
-    - [ ] Use `+` and `-` keys to adjust gravity amount
-    - [ ] Current gravity should be visible on the screen (hotkey hint here is nice)
+    - [x] Use `+` and `-` keys to adjust gravity amount
+    - [x] Current gravity should be visible on the screen (hotkey hint here is nice)
 - [ ] *05pts*: Objects that fully fall off the sides of the screen should appear on the opposite side, maintaining velocity
 - [x] *05pts*: Implement `Rigidbody2D::GetVelocity`
     - [x] Objects that falling off the bottom of the screen, reverse its velocity along Y (bounce it)
