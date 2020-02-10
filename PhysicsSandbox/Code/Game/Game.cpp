@@ -122,8 +122,8 @@ void Game::Render() const
 // 		g_theRenderer->DrawDisc( Disc2D( newWorldPosition , 5.f ) , PURPLE );
 // 	}
 
-	Vec2 nearestPoint = testPolygon.GetClosestPoint( newWorldPosition );
-	g_theRenderer->DrawDisc( Disc2D( nearestPoint , 5.f ) , PURPLE );
+	//Vec2 nearestPoint = testPolygon.GetClosestPoint( newWorldPosition );
+	//g_theRenderer->DrawDisc( Disc2D( nearestPoint , 5.f ) , PURPLE );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

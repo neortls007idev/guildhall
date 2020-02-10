@@ -13,7 +13,7 @@
 #include "Engine/Primitives/Disc2D.hpp"
 #include "Game/GameCommon.hpp"
 #include <vector>
-#include "Engine/Physics/Polygon2D.hpp"
+#include "Engine/Primitives/Polygon2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 class GameObject;
