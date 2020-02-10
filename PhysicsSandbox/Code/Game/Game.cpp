@@ -134,6 +134,7 @@ void Game::Render() const
 	//Vec2 nearestPoint = testPolygon.GetClosestPoint( newWorldPosition );
 	//g_theRenderer->DrawDisc( Disc2D( nearestPoint , 5.f ) , PURPLE );
 	RenderDrawMode();
+	g_theRenderer->DrawX( m_mousePosition , MAGENTA , 1.0f , 5.f );
 	RenderUI();
 }
 
@@ -300,6 +301,7 @@ void Game::PolygonDrawMode()
 		temp = Polygon2D::MakeFromLineLoop( points , m_drawModePoints.size() );
 		GameObject* polyGameobject = new GameObject( g_thePhysicsSystem , temp.GetCenter() , Vec2::ZERO , temp );
 		m_gameObjects.push_back( polyGameobject );
+		m_isMouseOnGameObject.push_back( false );
 		m_isDrawModeActive = false;
 		m_drawModePoints.clear();
 	}

@@ -261,10 +261,24 @@ void Physics2D::ScreenWrapAround( Camera* sceneCamera , Rigidbody2D* rigidBody )
 	else if ( collider->GetType() == COLLIDER2D_CONVEXGON )
 	{
 		PolygonCollider2D* polyCollider = ( PolygonCollider2D* ) collider;
+		Vec2 leftMostPoint	= *GetLeftMostPointFromPointCloud( &polyCollider->m_polygon.m_points[ 0 ] , ( int ) polyCollider->m_polygon.m_points.size() );
+		Vec2 rightMostPoint = *GetRightMostPointFromPointCloud( &polyCollider->m_polygon.m_points[ 0 ] , ( int ) polyCollider->m_polygon.m_points.size() );
+		float widthOfPolygon = ( rightMostPoint - leftMostPoint ).x;
 
-// 		if ( )
-// 		{
-// 		}
+		if ( rigidBody->GetVelocity().x < 0 )
+		{
+			if ( leftMostPoint.x < ScreenMinX )
+			{
+				rigidBody->SetPosition( Vec2( ScreenMaxX - widthOfPolygon , rbCurrentPos.y ) );
+			}
+		}
+		if ( rigidBody->GetVelocity().x > 0 )
+		{
+			if ( rightMostPoint.x > ScreenMaxX )
+			{
+				rigidBody->SetPosition( Vec2( ScreenMinX + widthOfPolygon , rbCurrentPos.y ) );
+			}
+		}
 	}
 }
 

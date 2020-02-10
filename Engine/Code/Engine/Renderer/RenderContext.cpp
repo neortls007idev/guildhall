@@ -242,7 +242,7 @@ void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU>& vertexArray 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext:: DrawLine(const Vec2& start, const Vec2& end, const Rgba8& color, float thickness)
+void RenderContext:: DrawLine(const Vec2& start, const Vec2& end, const Rgba8& color, float thickness , float scale , float orientationDegrees , Vec2 translate )
 {
 	Vec2 displacement = end - start;
 	Vec2 forward = displacement.GetNormalized();
@@ -259,14 +259,14 @@ void RenderContext:: DrawLine(const Vec2& start, const Vec2& end, const Rgba8& c
 	Vec3 startLeftVec3( startLeft.x , startLeft.y , 0.f );
 	Vec3 startRightVec3( startRight.x , startRight.y , 0.f );
 
-	const Vertex_PCU lineVerts[6] = { Vertex_PCU(startRightVec3, color, Vec2(0.f, 0.f)),
+	Vertex_PCU lineVerts[6] = { Vertex_PCU(startRightVec3, color, Vec2(0.f, 0.f)),
 								Vertex_PCU(endRightVec3  , color, Vec2(0.f, 0.f)),
 								Vertex_PCU(endLeftVec3   , color, Vec2(0.f, 0.f)),
 								Vertex_PCU(endLeftVec3   , color, Vec2(0.f, 0.f)),
 								Vertex_PCU(startLeftVec3 , color, Vec2(0.f, 0.f)),
 								Vertex_PCU(startRightVec3, color, Vec2(0.f, 0.f)) };
 
-
+	TransformVertexArray2D( 6 , lineVerts , scale , orientationDegrees , translate );
 	DrawVertexArray(6, lineVerts);
 }
 
@@ -531,6 +531,14 @@ void RenderContext::DrawPolygon( const Vec2* points , unsigned int count , const
 	AppendVertsForPolygon( polygonVerts , points , count , tint );
 
 	DrawVertexArray( ( int ) polygonVerts.size() , &polygonVerts[ 0 ] );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::DrawX( Vec2 position , const Rgba8& color , float scale , float thickness )
+{
+	DrawLine( Vec2(  -100.f , -100.f ) , Vec2(  100.f ,  100.f ) , color , thickness , scale );
+	DrawLine( Vec2( -100.f , -100.f ) , Vec2( 100.f , 100.f ) , color , thickness , scale , 90.f );
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------
