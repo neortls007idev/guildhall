@@ -2,17 +2,18 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Physics/Collider2D.hpp"
+#include "Engine/Primitives/Polygon2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-class Polygon2D;
+//class Polygon2D;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 class PolygonCollider2D : public Collider2D
 {
 public:
-	PolygonCollider2D( Physics2D* system , Rigidbody2D* rigidbody , Vec2 localPosition );
+	PolygonCollider2D( Physics2D* system , Rigidbody2D* rigidbody , Vec2 localPosition , Polygon2D convexgon );
 	~PolygonCollider2D() {};
 
 	virtual void UpdateWorldShape() override;
@@ -30,7 +31,7 @@ public:
 public:
 	Vec2		m_localPosition; // my local offset from my parent
 	Vec2		m_worldPosition; // calculated from local position and owning rigidbody if present
-	Polygon2D*	m_polygon;
+	Polygon2D	m_polygon;
 	
 private:
 };

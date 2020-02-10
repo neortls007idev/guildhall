@@ -1,5 +1,6 @@
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Core/Rgba8.hpp"
+#include "Engine/Primitives/Polygon2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -12,7 +13,7 @@ class GameObject
 {
 public:
 	GameObject( Physics2D* system , Vec2 rigidBodyPosition , Vec2 coliderPositionRelativeToRigidBody , float ColliderRadius );
-
+	GameObject( Physics2D* system , Vec2 rigidBodyPosition , Vec2 coliderPositionRelativeToRigidBody , Polygon2D convexgon );
 	~GameObject();
 
 public:

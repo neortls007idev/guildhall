@@ -1026,8 +1026,60 @@ const uint GetIndexOfLeftMostPointFromPointCloud( Vec2 const* points , uint poin
 
 const Vec2* GetBottomMostPointFromPointCloud( Vec2 const* points , uint pointCount )
 {
-	// TODO:- Implement function 
-	return &Vec2::ZERO;
+	int indexOfBottomMostPoint = 0;
+
+	for ( uint index = 1; index < pointCount; index++ )
+	{
+		if ( points[ index ].y < points[ indexOfBottomMostPoint ].y )
+			indexOfBottomMostPoint = index;
+	}
+
+	return &points[ indexOfBottomMostPoint ];
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const uint GetIndexOfBottomMostPointFromPointCloud( Vec2 const* points , uint pointCount )
+{
+	uint indexOfBottomMostPoint = 0;
+
+	for ( uint index = 1; index < pointCount; index++ )
+	{
+		if ( points[ index ].y < points[ indexOfBottomMostPoint ].y )
+			indexOfBottomMostPoint = index;
+	}
+
+	return indexOfBottomMostPoint;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const Vec2* GetRightMostPointFromPointCloud( Vec2 const* points , uint pointCount )
+{
+	int indexOfRightMostPoint = 0;
+
+	for ( uint index = 1; index < pointCount; index++ )
+	{
+		if ( points[ index ].x > points[ indexOfRightMostPoint ].x )
+			indexOfRightMostPoint = index;
+	}
+
+	return &points[ indexOfRightMostPoint ];
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const uint GetIndexOfRightMostPointFromPointCloud( Vec2 const* points , uint pointCount )
+{
+	uint indexOfRightMostPoint = 0;
+
+	for ( uint index = 1; index < pointCount; index++ )
+	{
+		if ( points[ index ].x > points[ indexOfRightMostPoint ].x )
+			indexOfRightMostPoint = index;
+	}
+
+	return indexOfRightMostPoint;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -30,19 +30,25 @@ public:
 	void InitialGameObjectsSpawner();
 
 	void Update( float deltaSeconds );
+	
 	void Render() const;
 	void RenderUI() const;
 	void RenderGravityUI() const;
+	void RenderDrawMode() const;
 	void DebugRender() const;
+	
+	void DrawConvexgonMode();
+	void PolygonDrawMode();
+	bool IsPolygonPotentiallyConvex( Vec2 latestPoint );
 
 	void UpdateCamera();
 	void UpdateGameObject( float deltaSeconds );
+	void UpdateGameObjects();
 	void UpdateSimulationType( eSimulationMode* simMode );
 	void UpdateGravity();
 	Vec2 GetMouseDragVelocity() const;
-	void UpdateGameObjects();
 
-	void RandomizePointCloud( RandomNumberGenerator m_rng );
+	void RandomizePointCloud( RandomNumberGenerator rng );
 		
 	void DrawMouseCurrentPosition( const Camera& camera ) const;
 	GameObject* PickGameobject( Vec2 mousePos );
@@ -95,6 +101,11 @@ public:
 		   std::vector<GameObject*>	m_gameObjects;
 		   std::vector<bool>		m_isMouseOnGameObject;
 		   std::vector<Vec2>		m_pointCloud;
+
+		   std::vector<Vec2>		m_drawModePoints;
+		   bool						m_isDrawModeActive = false;
+		   Vec2						m_invalidPoint;
+		   bool						m_isLastPointInvalid = false;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

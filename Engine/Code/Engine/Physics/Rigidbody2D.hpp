@@ -35,6 +35,7 @@ public:
 	Vec2			GetVelocity() const								{ return m_velocity; }
 	eSimulationMode GetSimulationMode() const						{ return m_simulationMode; }
 	float			GetMass() const									{ return m_mass; }
+	bool			IsSimulationActive() const						{ return m_isSimulationActive; }
 
 	void			SetCollider( Collider2D* collider );
 	void			SetPosition( Vec2 position );
@@ -42,17 +43,18 @@ public:
 	void			ReverseVelocity();
 	void			SetSimulationMode( eSimulationMode simulationMode );
 	void			SetMass( float newMass );
-
+	void			ChangeIsSimulationActive( bool newSimulationStatus );
 
 public:
-	Physics2D*			m_system			= nullptr;											// which scene created/owns this object
-	bool				m_isGarbage			= false;
-	Collider2D*			m_collider			= nullptr;
-	Vec2				m_worldPosition;														// where in the world is this rigidbody
-	Vec2				m_velocity			= Vec2( 0.f , 0.f );
+	Physics2D*			m_system				= nullptr;											// which scene created/owns this object
+	bool				m_isGarbage				= false;
+	Collider2D*			m_collider				= nullptr;
+	Vec2				m_worldPosition;															// where in the world is this rigidbody
+	Vec2				m_velocity				= Vec2( 0.f , 0.f );
 	float				m_mass;
-	eSimulationMode		m_simulationMode	= SIMULATIONMODE_DYNAMIC;
+	eSimulationMode		m_simulationMode		= SIMULATIONMODE_DYNAMIC;
+	bool				m_isSimulationActive	= true;
 
 private:
-	~Rigidbody2D();																				// destroys the collider
+	~Rigidbody2D();																					// destroys the collider
 };

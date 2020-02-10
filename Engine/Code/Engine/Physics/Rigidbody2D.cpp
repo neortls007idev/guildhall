@@ -90,6 +90,13 @@ void Rigidbody2D::SetMass( float newMass )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Rigidbody2D::ChangeIsSimulationActive( bool newSimulationStatus )
+{
+	m_isSimulationActive = newSimulationStatus;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Rigidbody2D::~Rigidbody2D()
 {
 }

@@ -1,6 +1,8 @@
 #pragma once
 #include "Engine/Math/Vec2.hpp"
 #include <vector>
+#include "Engine/Physics/PolygonCollider2D.hpp"
+#include "Engine/Primitives/Polygon2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -28,7 +30,8 @@ public:
 	void EndFrame();    // cleanup destroyed objects
 
 	// factory style create/destroy
-	Rigidbody2D* CreateRigidbody( Vec2 position , Vec2 coliderPositionRelativeToRigidBody , float ColliderRadius );
+	Rigidbody2D* CreateRigidbody( Vec2 rigidBodyPosition , Vec2 coliderPositionRelativeToRigidBody , float ColliderRadius );
+	Rigidbody2D* CreateRigidbody( Vec2 rigidBodyPosition , Vec2 coliderPositionRelativeToRigidBody , Polygon2D convexgon );
 	void DestroyRigidbody( Rigidbody2D* rigidbody );
 
 	DiscCollider2D* CreateDiscCollider( Vec2 localPosition , float radius );

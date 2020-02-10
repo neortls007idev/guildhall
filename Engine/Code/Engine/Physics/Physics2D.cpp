@@ -57,7 +57,7 @@ void Physics2D::ApplyEffectors( float deltaSeconds )
 {
 	for ( size_t index = 0; index < m_rigidBodies2D.size(); index++ )
 	{
-		if ( !m_rigidBodies2D[index] )
+		if ( !m_rigidBodies2D[index] || !m_rigidBodies2D[index]->m_isSimulationActive )
 		{
 			continue;
 		}
@@ -82,11 +82,6 @@ void Physics2D::ApplyEffectors( float deltaSeconds )
 		GravityBounce( m_sceneCamera , m_rigidBodies2D[ index ] );
 		ScreenWrapAround( m_sceneCamera , m_rigidBodies2D[ index ] );
 		m_rigidBodies2D[ index ]->SetPosition( m_rigidBodies2D[ index ]->GetPosition() + ( m_rigidBodies2D[ index ]->GetVelocity() * deltaSeconds ) );
-		
-		if ( index == 1 )
-		{
-			int x = 9;
-		}
 	}
 }
 
@@ -94,7 +89,7 @@ void Physics2D::ApplyEffectors( float deltaSeconds )
 
 void Physics2D::MoveRigidbodies( float deltaSeconds )
 {
-
+	UNUSED( deltaSeconds );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -136,13 +131,23 @@ void Physics2D::EndFrame()
 
 Rigidbody2D* Physics2D::CreateRigidbody( Vec2 rigidBodyPosition , Vec2 coliderPositionRelativeToRigidBody , float ColliderRadius )
 {
-	
 	Rigidbody2D* rigidBody = new Rigidbody2D( this , rigidBodyPosition );
 	DiscCollider2D* collider = new DiscCollider2D( this , rigidBody , coliderPositionRelativeToRigidBody , ColliderRadius );
 	rigidBody->TakeCollider( collider );
 	m_rigidBodies2D.push_back( rigidBody );
 	m_colliders2D.push_back( collider );
 	
+	return rigidBody;
+}
+
+Rigidbody2D* Physics2D::CreateRigidbody( Vec2 rigidBodyPosition , Vec2 coliderPositionRelativeToRigidBody , Polygon2D convexgon )
+{
+	Rigidbody2D* rigidBody = new Rigidbody2D( this , rigidBodyPosition );
+	PolygonCollider2D* collider = new PolygonCollider2D( this , rigidBody , coliderPositionRelativeToRigidBody , convexgon );
+	rigidBody->TakeCollider( collider );
+	m_rigidBodies2D.push_back( rigidBody );
+	m_colliders2D.push_back( collider );
+
 	return rigidBody;
 }
 
@@ -217,9 +222,13 @@ void Physics2D::GravityBounce( Camera* sceneCamera , Rigidbody2D* rigidBody )
 									}break;
 
 		case COLLIDER2D_CONVEXGON :
-									if ( collider->GetClosestPoint( gravityPlane ).y <= gravityPlane.y )
 									{
-										rigidBody->ReverseVelocity();
+										PolygonCollider2D* polyCollider = ( PolygonCollider2D* ) collider;
+										Vec2 lowestPoint = *GetBottomMostPointFromPointCloud( &polyCollider->m_polygon.m_points[ 0 ] , ( int ) polyCollider->m_polygon.m_points.size() );
+										if ( lowestPoint.y <= gravityPlane.y )
+										{
+											rigidBody->ReverseVelocity();
+										}
 									}break;
 		default:
 			break;
@@ -251,8 +260,12 @@ void Physics2D::ScreenWrapAround( Camera* sceneCamera , Rigidbody2D* rigidBody )
 	} 
 	else if ( collider->GetType() == COLLIDER2D_CONVEXGON )
 	{
+		PolygonCollider2D* polyCollider = ( PolygonCollider2D* ) collider;
+
+// 		if ( )
+// 		{
+// 		}
 	}
-	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

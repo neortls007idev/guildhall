@@ -6,17 +6,26 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-PolygonCollider2D::PolygonCollider2D( Physics2D* system , Rigidbody2D* rigidbody , Vec2 localPosition ) :
+PolygonCollider2D::PolygonCollider2D( Physics2D* system , Rigidbody2D* rigidbody , Vec2 localPosition, Polygon2D convexgon ) :
 																							Collider2D( system , rigidbody , COLLIDER2D_CONVEXGON )
 {
-
+	m_polygon = convexgon;
+	m_worldPosition = m_rigidbody->m_worldPosition + m_localPosition;
+	m_polygon.m_localPos = m_worldPosition;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void PolygonCollider2D::UpdateWorldShape()
 {
+	m_localPosition = m_rigidbody->m_worldPosition - m_polygon.GetCenter();
 	m_worldPosition = m_rigidbody->m_worldPosition + m_localPosition;
+
+// 	for ( size_t index = 0; index < m_polygon.m_points.size(); index++ )
+// 	{
+// 		m_polygon.m_points[ index ] = m_polygon.m_points[ index ] + m_localPosition;
+// 	}
+	m_polygon.SetPosition( m_worldPosition );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -37,11 +46,11 @@ Vec2 PolygonCollider2D::GetClosestPoint( Vec2 pos ) const
 	else
 	{
 		std::vector<Vec2> nearestPointOnEdge;
-		size_t totalPoints = m_polygon->m_points.size();
+		size_t totalPoints = m_polygon.m_points.size();
 		
 		for ( size_t index = 0; index < totalPoints; index++ )
 		{
-			nearestPointOnEdge.push_back( GetNearestPointOnLineSegment2D( pos , m_polygon->m_points[ index % totalPoints ] , m_polygon->m_points[ ( index + 1 ) % totalPoints ] ) );
+			nearestPointOnEdge.push_back( GetNearestPointOnLineSegment2D( pos , m_polygon.m_points[ index % totalPoints ] , m_polygon.m_points[ ( index + 1 ) % totalPoints ] ) );
 		}
 
 		Vec2 nearestPoint = nearestPointOnEdge[0];
@@ -64,7 +73,7 @@ Vec2 PolygonCollider2D::GetClosestPoint( Vec2 pos ) const
 
 bool PolygonCollider2D::Contains( Vec2 pos ) const
 {
-	if ( 3 > m_polygon->m_points.size() )
+	if ( 3 > m_polygon.m_points.size() )
 	{
 		return false;
 	}
@@ -75,12 +84,12 @@ bool PolygonCollider2D::Contains( Vec2 pos ) const
 		Vec2 pointRelativePos;
 		size_t index = 1;
 
-		for ( ; index < m_polygon->m_points.size(); index++ )
+		for ( ; index < m_polygon.m_points.size(); index++ )
 		{
-			edge = m_polygon->m_points[ index ] - m_polygon->m_points[ index - 1 ];
+			edge = m_polygon.m_points[ index ] - m_polygon.m_points[ index - 1 ];
 			edgeNormal = edge.GetRotated90Degrees().GetNormalized();
 			//edgeNormal.Normalize();
-			pointRelativePos = pos - m_polygon->m_points[ index - 1 ];
+			pointRelativePos = pos - m_polygon.m_points[ index - 1 ];
 
 			if ( DotProduct2D( edgeNormal , pointRelativePos ) <= 0 )
 			{
@@ -88,10 +97,10 @@ bool PolygonCollider2D::Contains( Vec2 pos ) const
 			}
 		}
 
-		edge = m_polygon->m_points[ 0 ] - m_polygon->m_points[ index - 1 ];
+		edge = m_polygon.m_points[ 0 ] - m_polygon.m_points[ index - 1 ];
 		edgeNormal = edge.GetRotated90Degrees().GetNormalized();
 		//edgeNormal.Normalize();
-		pointRelativePos = pos - m_polygon->m_points[ 0 ];
+		pointRelativePos = pos - m_polygon.m_points[ 0 ];
 		if ( DotProduct2D( edgeNormal , pointRelativePos ) <= 0 )
 		{
 			return false;
@@ -116,12 +125,7 @@ bool PolygonCollider2D::Intersects( Collider2D const* other ) const
 
 			Vec2 closetPoint = GetClosestPoint( collider->GetPosition() );
 
-			float distanceSqaured = ( collider->GetPosition() - closetPoint ).GetLengthSquared();
-			float radiusSquared = collider->m_radius * collider->m_radius;
-			if ( distanceSqaured < radiusSquared )
-			{
-				return true;
-			}
+			return IsPointOnDisc2D( Disc2D( collider->GetPosition() , collider->m_radius ) , closetPoint );
 		}
 	}
 
@@ -132,15 +136,15 @@ bool PolygonCollider2D::Intersects( Collider2D const* other ) const
 
 void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor )
 {
-	ctx->DrawPolygon( &m_polygon->m_points[ 0 ] , ( unsigned int ) m_polygon->m_points.size() , fillColor );
+	ctx->DrawPolygon( &m_polygon.m_points[ 0 ] , ( unsigned int ) m_polygon.m_points.size() , fillColor );
 	
-	size_t totalPoints = m_polygon->m_points.size();
+	size_t totalPoints = m_polygon.m_points.size();
 
 	for ( size_t index = 0; index < totalPoints; index++ )
 	{
 		size_t startPoint	= index % totalPoints;
 		size_t endPoint		= ( index + 1 ) % totalPoints;
-		ctx->DrawLine( m_polygon->m_points[ startPoint ] , m_polygon->m_points[ endPoint ] , borderColor , 5.f );
+		ctx->DrawLine( m_polygon.m_points[ startPoint ] , m_polygon.m_points[ endPoint ] , borderColor , 5.f );
 	}
 }
 

@@ -133,5 +133,8 @@ float SmoothStep3( float t );
 const Vec2* GetLeftMostPointFromPointCloud( Vec2 const* points , uint pointCount );
 const uint	GetIndexOfLeftMostPointFromPointCloud( Vec2 const* points , uint pointCount );
 const Vec2* GetBottomMostPointFromPointCloud( Vec2 const* points , uint pointCount );
+const uint	GetIndexOfBottomMostPointFromPointCloud( Vec2 const* points , uint pointCount );
+const Vec2* GetRightMostPointFromPointCloud( Vec2 const* points , uint pointCount );
+const uint	GetIndexOfRightMostPointFromPointCloud( Vec2 const* points , uint pointCount );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------x

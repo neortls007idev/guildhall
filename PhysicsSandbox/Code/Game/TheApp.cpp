@@ -219,7 +219,7 @@ void TheApp::UpdateFromKeyboard()
 	if ( g_theInput->GetButtonState( 'P' ).WasJustPressed() ) 
 	{ m_isPaused = !m_isPaused; }
 
-	if ( g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() ) { HandleQuitRequested(); }
+	if ( g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() && !g_theGame->m_isDrawModeActive ) { HandleQuitRequested(); }
 	
 	if ( g_theInput->GetButtonState( KEY_F4 ).WasJustPressed() )
 	{

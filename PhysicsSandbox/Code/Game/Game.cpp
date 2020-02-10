@@ -48,13 +48,11 @@ Game::Game()
 	m_mousePosition = g_theInput->GetMouseNormalizedClientPosition();
 	m_mousePosition = m_worldCamera.GetClientToWorldPosition( m_mousePosition );
 
-	InitialGameObjectsSpawner();
 	RandomizePointCloud( m_rng );
 	//testPolygon = new Polygon2D();
 	testPolygon = ( Polygon2D::MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() ) );
 	//testPolygon->MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
-	bool result = testPolygon.IsConvex();
-	int x = 5;
+	InitialGameObjectsSpawner();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -72,6 +70,9 @@ void Game::InitialGameObjectsSpawner()
 		m_gameObjects.push_back( temp );
 		m_isMouseOnGameObject.push_back( false );
 	}
+	GameObject* temp = new GameObject( g_thePhysicsSystem , testPolygon.GetCenter() , Vec2::ZERO , testPolygon );
+	m_gameObjects.push_back( temp );
+	m_isMouseOnGameObject.push_back( false );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -83,7 +84,11 @@ void Game::Update( float deltaSeconds )
 	UpdateCamera();
 	UpdateGameObject( deltaSeconds );
 	UpdateGameObjects();
-	UpdateFromUserInput( deltaSeconds );
+	if ( !m_isDrawModeActive )
+	{
+		UpdateFromUserInput( deltaSeconds );
+	}
+	DrawConvexgonMode();
 	g_thePhysicsSystem->Update( deltaSeconds );
 	//UNUSED( deltaSeconds );
 }
@@ -112,7 +117,7 @@ void Game::Render() const
 
 	DrawMouseCurrentPosition( m_worldCamera );
 
-	DebugRender();
+	//DebugRender();
 	
 	Vec2 newWorldPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
 // 	bool polyIsPointInside = testPolygon.Contains( newWorldPosition );
@@ -128,6 +133,7 @@ void Game::Render() const
 
 	//Vec2 nearestPoint = testPolygon.GetClosestPoint( newWorldPosition );
 	//g_theRenderer->DrawDisc( Disc2D( nearestPoint , 5.f ) , PURPLE );
+	RenderDrawMode();
 	RenderUI();
 }
 
@@ -168,15 +174,147 @@ void Game::RenderGravityUI() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Game::RenderDrawMode() const
+{
+	if ( !m_isDrawModeActive )
+	{
+		return;
+	}
+
+	for ( size_t index = 0 ; index < m_drawModePoints.size() ; index++ )
+	{
+		g_theRenderer->DrawDisc( Disc2D( m_drawModePoints[ index ] , 2.f ) , CYAN );
+	}
+
+	if ( m_drawModePoints.size() > 1 )
+	{
+		for ( size_t index = 0; index < m_drawModePoints.size() - 1; index++ )
+		{
+			g_theRenderer->DrawLine( m_drawModePoints[ index ] , m_drawModePoints[ index + 1 ] , BLUE , 3.f );
+		}
+	}
+
+	if ( m_isLastPointInvalid )
+	{
+		size_t totalPoints = m_drawModePoints.size();
+		g_theRenderer->DrawLine( m_drawModePoints[ totalPoints - 1 ] , m_invalidPoint , RED , 3.f );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Game::DebugRender() const
 {
-	g_theRenderer->DrawPolygon( &testPolygon.m_points[ 0 ] , testPolygon.m_points.size() , WHITE );
+	g_theRenderer->DrawPolygon( &testPolygon.m_points[ 0 ] , ( unsigned int ) testPolygon.m_points.size() , WHITE );
 
 	for ( size_t index = 0; index < m_pointCloud.size(); index++ )
 	{
 		g_theRenderer->DrawDisc( Disc2D( m_pointCloud[ index ] , 3.f ) , RED );
 	}
 
+}
+
+void Game::DrawConvexgonMode()
+{
+	if ( g_theInput->WasKeyJustPressed( '2' ) )
+	{
+		m_isDrawModeActive = true;
+
+		Vec2 point = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+		m_drawModePoints.clear();
+		m_isLastPointInvalid = false;
+		m_drawModePoints.push_back( point );	
+	}
+
+	PolygonDrawMode();
+	
+	if ( g_theInput->WasKeyJustPressed( KEY_ESC ) )
+	{
+		m_isDrawModeActive = false;
+		m_drawModePoints.clear();
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::PolygonDrawMode()
+{
+	if ( !m_isDrawModeActive )
+	{
+		return;
+	}
+
+	m_isDrawModeActive = true;
+	
+	if ( g_theInput->WasLeftMouseButtonJustPressed() )
+	{
+		if ( m_drawModePoints.size() == 1 )
+		{
+			m_drawModePoints.push_back( m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() ) );
+			return;
+		}
+
+		Vec2 point = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+		if ( IsPolygonPotentiallyConvex( point ) )
+		{
+			m_drawModePoints.push_back( point );
+			m_isLastPointInvalid = false;
+		}
+		else
+		{
+			m_invalidPoint = point;
+			m_isLastPointInvalid = true;
+		}
+	}
+
+	if ( g_theInput->WasKeyJustPressed( KEY_BACKSPACE ) )
+	{
+		if ( m_isLastPointInvalid )
+		{
+			m_isLastPointInvalid = false;
+		}
+		else
+		{
+			m_drawModePoints.pop_back();
+		}
+	}
+
+	if ( g_theInput->WasRightMouseButtonJustPressed() )
+	{
+		if ( m_drawModePoints.size() < 3 || m_isLastPointInvalid )
+		{
+			m_drawModePoints.clear();
+			m_isLastPointInvalid = false;
+			m_isDrawModeActive = false;
+			return;
+		}
+
+		Vec2* points = new Vec2[ m_drawModePoints.size() ];
+
+		for ( size_t index = 0; index < m_drawModePoints.size(); index++ )
+		{
+			points[ index ] = m_drawModePoints[ index ];
+		}
+
+		Polygon2D temp;
+		temp = Polygon2D::MakeFromLineLoop( points , m_drawModePoints.size() );
+		GameObject* polyGameobject = new GameObject( g_thePhysicsSystem , temp.GetCenter() , Vec2::ZERO , temp );
+		m_gameObjects.push_back( polyGameobject );
+		m_isDrawModeActive = false;
+		m_drawModePoints.clear();
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Game::IsPolygonPotentiallyConvex( Vec2 latestPoint )
+{
+	Polygon2D convexgon;
+	convexgon.m_points = m_drawModePoints;
+
+	convexgon.m_points.push_back( latestPoint );
+
+	return convexgon.IsConvex();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -198,7 +336,10 @@ void Game::UpdateCamera()
 
 void Game::UpdateGameObject( float deltaSeconds )
 {
+	UNUSED( deltaSeconds );
+
 	static Vec2 originalPosition;
+	
 	if ( !m_selectedGameObject )
 	{
 		return;
@@ -317,6 +458,7 @@ void Game::UpdateGameObjects()
 				if ( m_gameObjects[ firstColliderIndex ]->m_rigidbody->m_collider->Intersects( m_gameObjects[ secondColliderIndex ]->m_rigidbody->m_collider ) )
 				{
 					m_gameObjects[ firstColliderIndex ]->m_fillColor = m_overlapColor;
+					m_gameObjects[ secondColliderIndex ]->m_fillColor = m_overlapColor;
 					break;
 				}
 				else
@@ -330,13 +472,13 @@ void Game::UpdateGameObjects()
 	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Game::RandomizePointCloud( RandomNumberGenerator m_rng )
+void Game::RandomizePointCloud( RandomNumberGenerator rng )
 {
-	uint count = m_rng.RollRandomIntInRange( 2 , 50 );
+	uint count = rng.RollRandomIntInRange( 2 , 50 );
 
 	for ( size_t index = 0; index < count; index++ )
 	{
-		Vec2 temp = Vec2( m_rng.RollRandomFloatLessThan( 800.f ) , m_rng.RollRandomFloatLessThan( 800.f ) );
+		Vec2 temp = Vec2( rng.RollRandomFloatLessThan( 800.f ) , rng.RollRandomFloatLessThan( 800.f ) );
 		m_pointCloud.push_back( temp );
 	}
 }

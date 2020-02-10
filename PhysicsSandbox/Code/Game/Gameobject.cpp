@@ -11,6 +11,12 @@ GameObject::GameObject( Physics2D* system , Vec2 rigidBodyPosition , Vec2 colide
 }
 
 
+GameObject::GameObject( Physics2D* system , Vec2 rigidBodyPosition , Vec2 coliderPositionRelativeToRigidBody , Polygon2D convexgon ) :
+																														m_physiscsSystem( system )
+{
+	m_rigidbody = m_physiscsSystem->CreateRigidbody( rigidBodyPosition , coliderPositionRelativeToRigidBody , convexgon );
+}
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 GameObject::~GameObject()
