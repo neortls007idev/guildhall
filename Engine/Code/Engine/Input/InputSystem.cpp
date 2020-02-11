@@ -259,9 +259,7 @@ void InputSystem::UpdateMouse()
 
 void InputSystem::UpdateMouseWheel( int deltaWheel )
 {
-	DebuggerPrintf( "Current wheel Value preincrement = %d\n " , m_mouseWheel );
 	m_mouseWheel += deltaWheel;
-	DebuggerPrintf( "Current wheel Value postincrement = %d\n " , m_mouseWheel );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

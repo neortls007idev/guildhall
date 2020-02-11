@@ -35,10 +35,12 @@ public:
 	void RenderUI() const;
 	void RenderGravityUI() const;
 	void RenderDrawMode() const;
+	void RenderDrawFromPointCloudMode() const;
 	void DebugRender() const;
 	
 	void DrawConvexgonMode();
 	void PolygonDrawMode();
+	void PolygonDrawPointCloudMode();
 	bool IsPolygonPotentiallyConvex( Vec2 latestPoint );
 
 	void UpdateCamera();

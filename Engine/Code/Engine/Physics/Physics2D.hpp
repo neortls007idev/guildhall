@@ -23,8 +23,8 @@ public:
 	void Update( float deltaSeconds );
 	
 	void AdvanceSimulation( float deltaSeconds );
-	void ApplyEffectors( float deltaSeconds );
-	void MoveRigidbodies( float deltaSeconds );
+	void ApplyEffectors( Rigidbody2D* rigidbody , float deltaSeconds );
+	void MoveRigidbodies( Rigidbody2D* rigidbody , float deltaSeconds );
 	void CleanupDestroyedObjects();
 
 	void EndFrame();    // cleanup destroyed objects
@@ -43,7 +43,7 @@ public:
 	void ScreenWrapAround( Camera* sceneCamera , Rigidbody2D* rigidBody );
 
 public:
-	Vec2 m_sceneGravity = Vec2( 0.f , -200.f );
+	Vec2 m_sceneGravity = Vec2( 0.f , -9.8f );
 	// storage for all rigid bodies
 	std::vector<Rigidbody2D*>	m_rigidBodies2D;
 	// storage for all colliders

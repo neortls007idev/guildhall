@@ -20,9 +20,9 @@ I may mark tasks as **CHALLENGE** if I believe them to be more difficult relativ
     - [x] *05pts*: Can render it - should work as before.
 - [x] *25pts*: Can construct `GameObject` with a `PolygonCollider`
     - [x] Press `2` to enter a polygon draw mode, place first point where cursor is when `2` was pressed
-    - [x] Draw a line from last point added to cursor
-        - [x] Line drawn `RED` if not a valid point to add (ie, would maintain convexity)
-        - [x] Line drawn `BLUE` if it is a valid point.
+    - [] Draw a line from last point added to cursor
+        - [] Line drawn `RED` if not a valid point to add (ie, would maintain convexity)
+        - [] Line drawn `BLUE` if it is a valid point.
     - [x] When pressing `Left Mouse Button`, add a point if it is a legal (will maintain convex polygon)
     - [x] When pressing `Right Mouse Button`, end, closing off the loop.
     - [x] Pressing `Escape` while in this mode should cancel the creation.
@@ -30,11 +30,11 @@ I may mark tasks as **CHALLENGE** if I believe them to be more difficult relativ
         - [x] Pick 'center', or position of rigidbody by either
             - Average of all points
             - Center of box that encapsulates all points
-            - **CHALLENGE**: Center of mass, assuming uniform density **NOT ATTEMPTED**
+            - **CHALLENGE**: Center of mass, assuming uniform density
     - [x] *If you did the giftwrapping algorithm, you can just add points and construct a polygon that would work for them*
 - [x] *05pts*: `Rigidbody2D` can `Enable` or `Disable` itself, taking it out of the simulation, but still rendering
-    - [-] Objects being dragged should set themselves to disabled, and re-enable when unselected.*(need to implement this)*
-- [ ] *05pts*: When drawing, draw the location of the `Rigidbody` as an `X`, red if disabled, blue if enabled.
+    - [x] Objects being dragged should set themselves to disabled, and re-enable when unselected.
+- [x] *05pts*: When drawing, draw the location of the `Rigidbody` as an `X`, red if disabled, blue if enabled.
 - [x] *10pts*: `Physics2D::Update` loop implemented
     - [x] Apply all global forces
     - [x] Simulate all rigidbodies

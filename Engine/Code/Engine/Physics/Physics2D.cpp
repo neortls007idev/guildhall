@@ -44,52 +44,51 @@ void Physics2D::Update( float deltaSeconds )
 
 void Physics2D::AdvanceSimulation( float deltaSeconds )
 {
-	ApplyEffectors( deltaSeconds );
-	MoveRigidbodies( deltaSeconds );
-	// DetectCollisions(); - A04	// determine all pairs of intersecting colliders
-	// CollisionResponse(); - A04	// resolve all collisions, firing appropraite events
-	CleanupDestroyedObjects();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Physics2D::ApplyEffectors( float deltaSeconds )
-{
 	for ( size_t index = 0; index < m_rigidBodies2D.size(); index++ )
 	{
 		if ( !m_rigidBodies2D[index] || !m_rigidBodies2D[index]->m_isSimulationActive )
 		{
 			continue;
 		}
-
-		eSimulationMode simulationMode = m_rigidBodies2D[ index ]->GetSimulationMode();
-		Vec2 currentVelocity = m_rigidBodies2D[ index ]->GetVelocity();
-		
-		switch ( simulationMode )
-		{
-			case SIMULATIONMODE_STATIC:		m_rigidBodies2D[ index ]->SetVeloity( Vec2::ZERO );
-											break;
-
-			case SIMULATIONMODE_KINEMATIC:	/*m_rigidBodied2D[ index ]->SetVeloity( currentVelocity );*/
-											break;
-
-			case SIMULATIONMODE_DYNAMIC:	m_rigidBodies2D[ index ]->SetVeloity( currentVelocity + ( m_sceneGravity * deltaSeconds ) );
-											break;
-
-			default:
-				break;
-		}
-		GravityBounce( m_sceneCamera , m_rigidBodies2D[ index ] );
-		ScreenWrapAround( m_sceneCamera , m_rigidBodies2D[ index ] );
-		m_rigidBodies2D[ index ]->SetPosition( m_rigidBodies2D[ index ]->GetPosition() + ( m_rigidBodies2D[ index ]->GetVelocity() * deltaSeconds ) );
+	ApplyEffectors( m_rigidBodies2D[index] , deltaSeconds );
+	MoveRigidbodies( m_rigidBodies2D[ index ] , deltaSeconds );
+	// DetectCollisions(); - A04	// determine all pairs of intersecting colliders
+	// CollisionResponse(); - A04	// resolve all collisions, firing appropraite events
+	CleanupDestroyedObjects();
 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Physics2D::MoveRigidbodies( float deltaSeconds )
+void Physics2D::ApplyEffectors( Rigidbody2D* rigidbody , float deltaSeconds )
 {
-	UNUSED( deltaSeconds );
+
+		eSimulationMode simulationMode = rigidbody->GetSimulationMode();
+		Vec2 currentVelocity = rigidbody->GetVelocity();
+		
+		switch ( simulationMode )
+		{
+			case SIMULATIONMODE_STATIC:		rigidbody->SetVeloity( Vec2::ZERO );
+											break;
+
+			case SIMULATIONMODE_KINEMATIC:	/*m_rigidBodied2D[ index ]->SetVeloity( currentVelocity );*/
+											break;
+
+			case SIMULATIONMODE_DYNAMIC:	rigidbody->SetVeloity( currentVelocity + ( m_sceneGravity * deltaSeconds ) );
+											break;
+
+			default:
+				break;
+		}
+	GravityBounce( m_sceneCamera    , rigidbody );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Physics2D::MoveRigidbodies( Rigidbody2D* rigidbody , float deltaSeconds )
+{
+	rigidbody->SetPosition( rigidbody->GetPosition() + ( rigidbody->GetVelocity() * deltaSeconds ) );
+	ScreenWrapAround( m_sceneCamera , rigidbody );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -249,13 +248,13 @@ void Physics2D::ScreenWrapAround( Camera* sceneCamera , Rigidbody2D* rigidBody )
 	if ( collider->GetType() == COLLIDER2D_DISC )
 	{
 		DiscCollider2D* discCollider = ( DiscCollider2D* ) collider;
-		if ( ( rigidBody->GetPosition().x - discCollider->m_radius ) < ScreenMinX )
+		if ( ( rigidBody->GetPosition().x + discCollider->m_radius ) < ScreenMinX )
 		{
-			rigidBody->SetPosition( Vec2( ScreenMaxX - discCollider->m_radius , rbCurrentPos.y ) );
+			rigidBody->SetPosition( Vec2( ScreenMaxX + discCollider->m_radius , rbCurrentPos.y ) );
 		}
-		else if ( (rigidBody->GetPosition().x + discCollider->m_radius) > ScreenMaxX )
+		else if ( (rigidBody->GetPosition().x - discCollider->m_radius) > ScreenMaxX )
 		{
-			rigidBody->SetPosition( Vec2( ScreenMinX + discCollider->m_radius , rbCurrentPos.y ) );
+			rigidBody->SetPosition( Vec2( ScreenMinX - discCollider->m_radius , rbCurrentPos.y ) );
 		}
 	} 
 	else if ( collider->GetType() == COLLIDER2D_CONVEXGON )
@@ -267,16 +266,16 @@ void Physics2D::ScreenWrapAround( Camera* sceneCamera , Rigidbody2D* rigidBody )
 
 		if ( rigidBody->GetVelocity().x < 0 )
 		{
-			if ( leftMostPoint.x < ScreenMinX )
+			if ( rightMostPoint.x < ScreenMinX )
 			{
-				rigidBody->SetPosition( Vec2( ScreenMaxX - widthOfPolygon , rbCurrentPos.y ) );
+				rigidBody->SetPosition( Vec2( ScreenMaxX - ( widthOfPolygon * 0.5f ) , rbCurrentPos.y ) );
 			}
 		}
 		if ( rigidBody->GetVelocity().x > 0 )
 		{
-			if ( rightMostPoint.x > ScreenMaxX )
+			if ( leftMostPoint.x > ScreenMaxX )
 			{
-				rigidBody->SetPosition( Vec2( ScreenMinX + widthOfPolygon , rbCurrentPos.y ) );
+				rigidBody->SetPosition( Vec2( ScreenMinX + ( widthOfPolygon * 0.5f ) , rbCurrentPos.y ) );
 			}
 		}
 	}

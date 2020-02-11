@@ -146,6 +146,23 @@ void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderCol
 		size_t endPoint		= ( index + 1 ) % totalPoints;
 		ctx->DrawLine( m_polygon.m_points[ startPoint ] , m_polygon.m_points[ endPoint ] , borderColor , 5.f );
 	}
+
+	float m_width = GetRightMostPointFromPointCloud( &m_polygon.m_points[ 0 ] , ( uint ) m_polygon.m_points.size() )->x -
+		GetLeftMostPointFromPointCloud( &m_polygon.m_points[ 0 ] , ( uint ) m_polygon.m_points.size() )->x;
+
+	Vec2 line1 = Vec2::MakeFromPolarDegrees(  45.f , 0.1f * m_width );
+	Vec2 line2 = Vec2::MakeFromPolarDegrees( -45.f , 0.1f * m_width );
+
+	if ( m_rigidbody->m_isSimulationActive )
+	{
+		ctx->DrawLine( m_worldPosition - line1 , m_worldPosition + line1 , BLUE , 0.01f * m_width );
+		ctx->DrawLine( m_worldPosition - line2 , m_worldPosition + line2 , BLUE , 0.01f * m_width );
+	}
+	else
+	{
+		ctx->DrawLine( m_worldPosition - line1 , m_worldPosition + line1 , RED , 0.01f * m_width );
+		ctx->DrawLine( m_worldPosition - line2 , m_worldPosition + line2 , RED , 0.01f * m_width );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

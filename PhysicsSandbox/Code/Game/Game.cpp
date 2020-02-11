@@ -84,10 +84,7 @@ void Game::Update( float deltaSeconds )
 	UpdateCamera();
 	UpdateGameObject( deltaSeconds );
 	UpdateGameObjects();
-	if ( !m_isDrawModeActive )
-	{
-		UpdateFromUserInput( deltaSeconds );
-	}
+	UpdateFromUserInput( deltaSeconds );
 	DrawConvexgonMode();
 	g_thePhysicsSystem->Update( deltaSeconds );
 	//UNUSED( deltaSeconds );
@@ -133,8 +130,8 @@ void Game::Render() const
 
 	//Vec2 nearestPoint = testPolygon.GetClosestPoint( newWorldPosition );
 	//g_theRenderer->DrawDisc( Disc2D( nearestPoint , 5.f ) , PURPLE );
-	RenderDrawMode();
-	g_theRenderer->DrawX( m_mousePosition , MAGENTA , 1.0f , 5.f );
+	//RenderDrawMode();
+	RenderDrawFromPointCloudMode();
 	RenderUI();
 }
 
@@ -204,6 +201,25 @@ void Game::RenderDrawMode() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Game::RenderDrawFromPointCloudMode() const
+{
+	if ( !m_isDrawModeActive )
+	{
+		return;
+	}
+
+	for ( size_t index = 0; index < m_drawModePoints.size(); index++ )
+	{
+		g_theRenderer->DrawDisc( Disc2D( m_drawModePoints[ index ] , 2.f ) , CYAN );
+	}
+
+	Polygon2D temp;
+	temp = Polygon2D::MakeConvexFromPointCloud( &m_drawModePoints[ 0 ] , ( uint ) m_drawModePoints.size() );
+	g_theRenderer->DrawPolygon( &temp.m_points[ 0 ] , ( unsigned int ) temp.m_points.size() , Rgba8( 255 , 255 , 255 , 127 ) );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Game::DebugRender() const
 {
 	g_theRenderer->DrawPolygon( &testPolygon.m_points[ 0 ] , ( unsigned int ) testPolygon.m_points.size() , WHITE );
@@ -217,7 +233,7 @@ void Game::DebugRender() const
 
 void Game::DrawConvexgonMode()
 {
-	if ( g_theInput->WasKeyJustPressed( '2' ) )
+	if ( g_theInput->WasKeyJustPressed( '2' ) && m_selectedGameObject == nullptr )
 	{
 		m_isDrawModeActive = true;
 
@@ -227,7 +243,8 @@ void Game::DrawConvexgonMode()
 		m_drawModePoints.push_back( point );	
 	}
 
-	PolygonDrawMode();
+	//PolygonDrawMode();
+	PolygonDrawPointCloudMode();
 	
 	if ( g_theInput->WasKeyJustPressed( KEY_ESC ) )
 	{
@@ -298,7 +315,55 @@ void Game::PolygonDrawMode()
 		}
 
 		Polygon2D temp;
-		temp = Polygon2D::MakeFromLineLoop( points , m_drawModePoints.size() );
+		temp = Polygon2D::MakeFromLineLoop( points , ( uint ) m_drawModePoints.size() );
+		GameObject* polyGameobject = new GameObject( g_thePhysicsSystem , temp.GetCenter() , Vec2::ZERO , temp );
+		m_gameObjects.push_back( polyGameobject );
+		m_isMouseOnGameObject.push_back( false );
+		m_isDrawModeActive = false;
+		m_drawModePoints.clear();
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::PolygonDrawPointCloudMode()
+{
+	if ( !m_isDrawModeActive )
+	{
+		return;
+	}
+
+	m_isDrawModeActive = true;
+
+	if ( g_theInput->WasLeftMouseButtonJustPressed() )
+	{
+		Vec2 point = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+		m_drawModePoints.push_back( point );
+	}
+	
+	if ( g_theInput->WasKeyJustPressed( KEY_BACKSPACE ) )
+	{
+		m_drawModePoints.pop_back();
+	}
+
+	if ( g_theInput->WasRightMouseButtonJustPressed() )
+	{
+		if ( m_drawModePoints.size() < 3 || m_isLastPointInvalid )
+		{
+			m_drawModePoints.clear();
+			m_isDrawModeActive = false;
+			return;
+		}
+
+		Vec2* points = new Vec2[ m_drawModePoints.size() ];
+
+		for ( size_t index = 0; index < m_drawModePoints.size(); index++ )
+		{
+			points[ index ] = m_drawModePoints[ index ];
+		}
+
+		Polygon2D temp;
+		temp = Polygon2D::MakeConvexFromPointCloud( &points[ 0 ] , ( uint ) m_drawModePoints.size() );
 		GameObject* polyGameobject = new GameObject( g_thePhysicsSystem , temp.GetCenter() , Vec2::ZERO , temp );
 		m_gameObjects.push_back( polyGameobject );
 		m_isMouseOnGameObject.push_back( false );
@@ -539,7 +604,11 @@ GameObject* Game::PickGameobject( Vec2 mousePos )
 
 void Game::UpdateFromUserInput( float deltaSeconds )
 {
-	UpdateGravity();
+
+	if ( !m_isDrawModeActive )
+	{
+		UpdateGravity();
+	}
 	
 	if ( g_theInput->WasKeyJustPressed( 'O' ) )
 	{
@@ -579,6 +648,8 @@ void Game::UpdateFromUserInput( float deltaSeconds )
 		m_currentCameraOutputSize.y = Clamp( m_currentCameraOutputSize.y , 200.f , 20000.f );
 	}
 
+	if ( !m_isDrawModeActive )
+	{
 	if ( g_theInput->WasRightMouseButtonJustPressed() )
 	{
 		m_currentColliderRadius = m_rng.RollRandomFloatInRange( m_minColliderRadius , m_maxColliderRadius );
@@ -589,66 +660,68 @@ void Game::UpdateFromUserInput( float deltaSeconds )
 	}
 
 	//static bool isGameObjectSelected = false;
-	
-	if ( g_theInput->WasLeftMouseButtonJustPressed() )
-	{		
-		static float dragTime = 0.f;
-		static Vec2 dragStartPos;
-		dragTime += deltaSeconds;
-
-		if ( !m_isGameObjectSelected)
+		if ( g_theInput->WasLeftMouseButtonJustPressed() )
 		{
-			Vec2 PickObjectPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
-			m_selectedGameObject = PickGameobject( PickObjectPosition );
+			static float dragTime = 0.f;
+			static Vec2 dragStartPos;
+			dragTime += deltaSeconds;
+
+			if ( !m_isGameObjectSelected )
+			{
+				Vec2 PickObjectPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+				m_selectedGameObject = PickGameobject( PickObjectPosition );
+				if ( m_selectedGameObject )
+				{
+					dragTime = 0.f;
+					dragStartPos = PickObjectPosition;
+					//m_simMode = m_selectedGameObject->m_rigidbody->GetSimulationMode();
+					m_selectedGameObject->m_rigidbody->ChangeIsSimulationActive( false );
+					m_selectedGameObject->m_borderColor = Rgba8( 0 , 127 , 0 , 255 );
+					m_selectedGameObject->m_isSelected = true;
+					m_isGameObjectSelected = true;
+					//m_selectedGameObject->m_rigidbody->SetSimulationMode( SIMULATIONMODE_KINEMATIC );
+				}
+			}
+			else
+			{
+				if ( m_selectedGameObject != nullptr )
+				{
+					Vec2 dragEndPos = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+					Vec2 newVelocity = ( dragEndPos - dragStartPos ) / ( dragTime * 100.f );
+					m_selectedGameObject->m_rigidbody->SetVeloity( newVelocity );
+					m_selectedGameObject->m_rigidbody->ChangeIsSimulationActive( true );
+					//m_selectedGameObject->m_rigidbody->SetSimulationMode( m_simMode );
+					m_selectedGameObject->m_isSelected = false;
+					m_rigidBodyMouseOffset = Vec2::ZERO;
+					m_isDragOffsetSet = false;
+					m_isGameObjectSelected = false;
+				}
+				m_selectedGameObject = nullptr;
+				for ( size_t gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
+				{
+					m_isMouseOnGameObject[ gameObjectIndex ] = false;
+				}
+			}
+		}
+
+		if ( g_theInput->WasKeyJustPressed( KEY_BACKSPACE ) || g_theInput->WasKeyJustPressed( KEY_DELETE ) )
+		{
 			if ( m_selectedGameObject )
 			{
-				dragTime = 0.f;
-				dragStartPos = PickObjectPosition;
-				m_simMode = m_selectedGameObject->m_rigidbody->GetSimulationMode();
-				m_selectedGameObject->m_borderColor = Rgba8( 0 , 127 , 0 , 255 );
-				m_selectedGameObject->m_isSelected	= true;
-				m_isGameObjectSelected = true;
-				m_selectedGameObject->m_rigidbody->SetSimulationMode( SIMULATIONMODE_KINEMATIC );
-			}
-		}
-		else
-		{
-			if ( m_selectedGameObject != nullptr )
-			{
-				Vec2 dragEndPos = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
-				Vec2 newVelocity = ( dragEndPos - dragStartPos ) / ( dragTime * 100.f );
-				m_selectedGameObject->m_rigidbody->SetVeloity( newVelocity );
-				m_selectedGameObject->m_rigidbody->SetSimulationMode( m_simMode );
-				m_selectedGameObject->m_isSelected = false;
-				m_rigidBodyMouseOffset = Vec2::ZERO;
-				m_isDragOffsetSet = false;
-				m_isGameObjectSelected = false;
-			}
-			m_selectedGameObject = nullptr;
-			for ( size_t gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
-			{
-				m_isMouseOnGameObject[ gameObjectIndex ] = false;
-			}
-		}
-	}
+				for ( size_t index = 0; index < m_gameObjects.size(); index++ )
+				{
+					if ( !m_gameObjects[ index ] )
+					{
+						continue;
+					}
 
-	if ( g_theInput->WasKeyJustPressed( KEY_BACKSPACE ) || g_theInput->WasKeyJustPressed( KEY_DELETE ) )
-	{
-		if ( m_selectedGameObject )
-		{
-			for ( size_t index = 0; index < m_gameObjects.size(); index++ )
-			{
-				if ( !m_gameObjects[index] )
-				{
-					continue;
-				}
-				
-				if ( m_gameObjects[index] == m_selectedGameObject )
-				{
-					delete m_gameObjects[ index ];
-					m_gameObjects[ index ] = nullptr;
-					m_selectedGameObject = nullptr;
-					m_isGameObjectSelected = false;
+					if ( m_gameObjects[ index ] == m_selectedGameObject )
+					{
+						delete m_gameObjects[ index ];
+						m_gameObjects[ index ] = nullptr;
+						m_selectedGameObject = nullptr;
+						m_isGameObjectSelected = false;
+					}
 				}
 			}
 		}
