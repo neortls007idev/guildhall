@@ -30,6 +30,8 @@ public:
 	bool IsOpen() const;
 
 	void ChangeOverlayColor( Rgba8 newOverlayColor );
+	void Update();
+	void ProcessInput();
 
 protected:
 

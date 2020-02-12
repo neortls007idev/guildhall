@@ -1,6 +1,8 @@
 #pragma once
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Core/Rgba8.hpp"
+#include "Engine/Math/Matrix4x4.hpp"
+#include "Engine/Math/Vec3.hpp"
 
 class Texture;
 class RenderBuffer;
@@ -20,8 +22,8 @@ enum eCameraClearBitFlag : unsigned int
 
 struct CameraDataT
 {
-	float orthoMin[ 2 ];
-	float orthoMax[ 2 ];
+	Mat44 cameraToClipTransform;
+	Mat44 view;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -31,6 +33,9 @@ class Camera
 public:
 	Camera() {};
 	~Camera();
+
+	void  SetPostion( const Vec3& position );
+	void  Translate( const Vec3& translation );
 	void  SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
 	Vec2  GetOrthoBottomLeft() const;
 	Vec2  GetOrthoTopRight() const;
@@ -54,6 +59,9 @@ private:
 	unsigned int	m_clearMode		= 0;
 	Rgba8			m_clearColor	= BLACK;
 	Texture*		m_colorTarget	= nullptr;
+	Mat44			m_projection;
+	Mat44			m_view;
+	Vec3			m_position;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

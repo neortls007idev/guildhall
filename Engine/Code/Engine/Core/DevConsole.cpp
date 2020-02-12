@@ -3,10 +3,12 @@
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Input/InputSystem.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 extern BitmapFont* g_bitmapFont;
+extern InputSystem* g_theInput;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -131,6 +133,20 @@ bool DevConsole::IsOpen() const
 void DevConsole::ChangeOverlayColor( Rgba8 newOverlayColor )
 {
 	m_OverlayColor = newOverlayColor;
+}
+
+void DevConsole::Update()
+{
+	ProcessInput();
+}
+
+void DevConsole::ProcessInput()
+{
+	wchar_t character;
+	while ( g_theInput->PopCharacter( &character ) )
+	{
+		//AddCharacterToInput( character );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

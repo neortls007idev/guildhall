@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Input/XboxController.hpp"
+#include <queue>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -32,6 +33,12 @@ public:
 	Vec2    GetMouseNormalizedClientPosition() const;
 
 	void UpdateMouse();
+
+	void PushCharacter( wchar_t character );
+	bool PopCharacter( wchar_t* outCharacter );
+
+public:
+	std::queue<wchar_t> m_characters;
 
 private:
 

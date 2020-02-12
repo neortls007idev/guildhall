@@ -13,7 +13,7 @@
 static TCHAR const*		WND_CLASS_NAME = TEXT( "Simple Window Class" );
 	   ITaskbarList3*	pTaskbar	   = NULL;
 	   UINT				m_taskbarButtonCreatedMessageId;
-
+extern InputSystem* g_theInput;
 //-----------------------------------------------------------------------------------------------
 // Handles Windows (Win32) messages/events; i.e. the OS is trying to tell us something happened.
 // This function is called by Windows whenever we ask it for notifications
@@ -49,6 +49,13 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 		return 0; // "Consumes" this message (tells Windows "okay, we handled it")
 	}
 
+	case WM_CHAR:
+	{
+		wchar_t character = ( wchar_t ) wParam;
+// 		g_theDevConsole->OnKeyPress( character );
+// 		g_theInputSystem->PushCharacter( character );
+		break;
+	}
 	// Raw physical keyboard "key-was-just-depressed" event (case-insensitive, not translated)
 	case WM_KEYDOWN:
 	{

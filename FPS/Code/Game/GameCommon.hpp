@@ -14,7 +14,7 @@ extern Window* g_theWindow;
 constexpr float CLIENT_ASPECT											= 16.f/9.f; // We are requesting a 2:1 aspect (square) window area
 
 constexpr float WORLD_SIZE_X											= 20.f;
-constexpr float WORLD_SIZE_Y											= 30.f;
+constexpr float WORLD_SIZE_Y											= 12.f;
 constexpr float WORLD_CAMERA_SIZE_X										= /*16.f;*/ WORLD_SIZE_Y*CLIENT_ASPECT;
 constexpr float WORLD_CAMERA_SIZE_Y										= /*9.f;*/WORLD_SIZE_Y;
 constexpr float UI_SIZE_X												= 1600.f;

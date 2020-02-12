@@ -47,6 +47,8 @@ void InputSystem::EndFrame()
 	{
 		m_keyStates[ keycode ].m_wasPressedLastFrame = m_keyStates[ keycode ].m_isPressed;
 	}
+
+	//m_characters.clear();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -156,6 +158,25 @@ void InputSystem::UpdateMouse()
 // 	m_mouseNormalizedPosition = clientBounds.GetUVForPoint( clientMousePosition );
 // 	m_mouseNormalizedPosition.y = 1.f - m_mouseNormalizedPosition.y;
 //	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
+}
+
+void InputSystem::PushCharacter( wchar_t character )
+{
+	m_characters.push( character );
+}
+
+bool InputSystem::PopCharacter( wchar_t* outCharacter )
+{
+	if ( !m_characters.empty() )
+	{
+		*outCharacter = m_characters.front();
+		m_characters.pop();
+		return true;
+	}
+	else 
+	{
+		return false;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

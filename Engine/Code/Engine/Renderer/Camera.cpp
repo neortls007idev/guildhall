@@ -18,10 +18,26 @@ Camera::~Camera()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Camera::SetPostion( const Vec3& position )
+{
+	m_position = position;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Camera::Translate( const Vec3& translation )
+{
+	m_position += translation;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Camera::SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight ) 
 {
 	bottomLeftCoordinate = bottomLeft;
 	topRightCoordinate   = topRight;
+	//m_projection	= Mat44::CreateOrthoGraphicProjeciton( Vec3( -1.0f , -1.0f , 0.0f ) , Vec3( 1.0f , 1.0f , 1.0f ) );
+	m_projection	= Mat44::CreateOrthoGraphicProjeciton( Vec3( bottomLeft, 0.0f ) , Vec3( topRight , 1.0f ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -77,10 +93,18 @@ RenderBuffer* Camera::UpdateUBO( RenderContext* ctx )
 
 	CameraDataT cameraData;
 
-	cameraData.orthoMin[ 0 ] = bottomLeftCoordinate.x;
-	cameraData.orthoMin[ 1 ] = bottomLeftCoordinate.y;
-	cameraData.orthoMax[ 0 ] = topRightCoordinate.x;
-	cameraData.orthoMax[ 1 ] = topRightCoordinate.y;
+// 	cameraData.orthoMin[ 0 ] = bottomLeftCoordinate.x;
+// 	cameraData.orthoMin[ 1 ] = bottomLeftCoordinate.y;
+// 	cameraData.orthoMax[ 0 ] = topRightCoordinate.x;
+// 	cameraData.orthoMax[ 1 ] = topRightCoordinate.y;
+
+	cameraData.cameraToClipTransform = m_projection;
+	Mat44 CameraModel = Mat44::CreateTranslation3D( m_position );
+	// CameraToWorld Space Transform
+	// View -> worldToCamera
+	// Mat44 View  = Invert(cameraModel);
+	
+	cameraData.view = Mat44::CreateTranslation3D( -m_position );
 
 	m_cameraUBO->Update( &cameraData , sizeof( cameraData ) , sizeof( cameraData ) );
 	

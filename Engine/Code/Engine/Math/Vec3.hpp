@@ -1,4 +1,5 @@
 #pragma once
+#include "Engine/Math/Vec2.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -21,6 +22,7 @@ public:
 	~Vec3() {}															// DESTRUCTOR ( DOES NOTHING )
 	Vec3() {}															// DEFAULT CONSTRUCOTR ( DOES NOTHING )
 	Vec3( const Vec3& copyFrom );										// COPY CONSTRUCTOR ( FROM ANOTHER VEC3 )
+	Vec3( const Vec2& copyFrom , float z );										// COPY CONSTRUCTOR ( FROM ANOTHER VEC3 )
 	explicit Vec3( float initialX, float initialY, float initialz );	// EXPLICIT CONSTRUCTOR ( FROM FLOATING TYPE X, Y, Z )
 	
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -7,6 +7,7 @@
 #include "Game/Player.hpp"
 #include "Game/World.hpp"
 #include "Game/GameCommon.hpp"
+#include "Engine/Math/Vec3.hpp"
 
 class Game
 {
@@ -50,4 +51,5 @@ public:
 	Camera m_uiCamera;
 	//RandomNumberGenerator m_RNG;
 	Rgba8 m_color;
+	Vec3	m_cameraPosition;
 };

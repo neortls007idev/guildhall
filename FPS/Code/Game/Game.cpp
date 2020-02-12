@@ -30,13 +30,35 @@ void Game::Update( float deltaSeconds )
 	//m_color.g++;
 	m_color.g = ( uchar ) RangeMapFloat( -1.f , 1.f , 0 , 255 , SinDegrees( 100.f * ( float ) GetCurrentTimeSeconds() ) );
 	m_worldCamera.SetClearMode( CLEAR_COLOR_BIT , m_color );
+
+	Vec3 movement = Vec3( Vec2::ZERO , 0.f );
+	if ( g_theInput->IsKeyHeldDown( 'A' ) )
+	{
+		movement.x -= 1.f;
+	}
+	if ( g_theInput->IsKeyHeldDown( 'D' ) )
+	{
+		movement.x += 1.f;
+	}
+	if ( g_theInput->IsKeyHeldDown( 'W' ) )
+	{
+		movement.y += 1.f;
+	}
+	if ( g_theInput->IsKeyHeldDown( 'S' ) )
+	{
+		movement.y -= 1.f;
+	}
+
+	float speed = 4.0f;
+	m_cameraPosition += movement * speed * deltaSeconds;
+	m_worldCamera.SetPostion( m_cameraPosition );
 }
 
 void Game::Render() const
 {
 	g_theRenderer->BeginCamera( m_worldCamera );
 	//g_theRenderer->Draw( 3 , 0 );
-	g_theRenderer->DrawAABB2( AABB2( -1.f , -1.f , 1.f , 1.f ) , WHITE );
+	g_theRenderer->DrawAABB2( AABB2( -10.f , -10.f , 10.f , 10.f ) , WHITE );
 	g_theRenderer->EndCamera( m_worldCamera );
 }
 
