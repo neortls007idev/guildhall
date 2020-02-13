@@ -168,7 +168,6 @@ Polygon2D Polygon2D::MakeConvexFromPointCloud( Vec2 const* points , uint pointCo
 		point = nextPoint; // Set p as q for next iteration
 
 	} while ( point != start );
-
 	return tempPolygon;
 }
 

@@ -265,24 +265,18 @@ void Physics2D::ScreenWrapAround( Camera* sceneCamera , Rigidbody2D* rigidBody )
 		PolygonCollider2D* polyCollider = ( PolygonCollider2D* ) collider;
 		Vec2 leftMostPoint	= *GetLeftMostPointFromPointCloud( &polyCollider->m_polygon.m_points[ 0 ] , ( int ) polyCollider->m_polygon.m_points.size() );
 		Vec2 rightMostPoint = *GetRightMostPointFromPointCloud( &polyCollider->m_polygon.m_points[ 0 ] , ( int ) polyCollider->m_polygon.m_points.size() );
-		float widthOfPolygon = ( rightMostPoint - leftMostPoint ).x;
 
-// 		if ( rigidBody->GetVelocity().x < 0 )
-// 		{
-			if ( rightMostPoint.x < ScreenMinX )
-			{
-				Vec2 offset =  /*rigidBody->m_worldPosition*/ polyCollider->m_worldPosition - leftMostPoint ;
-				rigidBody->SetPosition( Vec2( ScreenMaxX + ( offset.x /*widthOfPolygon * 0.5f */ ) , rbCurrentPos.y ) );
-			}
-// 		}
-// 		if ( rigidBody->GetVelocity().x > 0 )
-// 		{
-			if ( leftMostPoint.x > ScreenMaxX )
-			{
-				Vec2 offset = rightMostPoint - polyCollider->m_worldPosition;
-				rigidBody->SetPosition( Vec2( ScreenMinX - ( offset.x /*widthOfPolygon * 0.5f*/ ) , rbCurrentPos.y ) );
-			}
-		//}
+		if ( rightMostPoint.x < ScreenMinX )
+		{
+			Vec2 offset =  /*rigidBody->m_worldPosition*/ polyCollider->m_worldPosition - leftMostPoint ;
+			rigidBody->SetPosition( Vec2( ScreenMaxX + ( offset.x /*widthOfPolygon * 0.5f */ ) , rbCurrentPos.y ) );
+		}
+
+		if ( leftMostPoint.x > ScreenMaxX )
+		{
+			Vec2 offset = rightMostPoint - polyCollider->m_worldPosition;
+			rigidBody->SetPosition( Vec2( ScreenMinX - ( offset.x /*widthOfPolygon * 0.5f*/ ) , rbCurrentPos.y ) );
+		}
 	}
 }
 

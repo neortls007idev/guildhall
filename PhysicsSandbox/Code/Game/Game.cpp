@@ -50,7 +50,8 @@ Game::Game()
 
 	RandomizePointCloud( m_rng );
 	//testPolygon = new Polygon2D();
-	testPolygon = ( Polygon2D::MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() ) );
+	testPolygon =  Polygon2D::MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
+	//testPolygon.SetCenter();
 	//testPolygon->MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
 	InitialGameObjectsSpawner();
 }
@@ -98,7 +99,6 @@ void Game::Update( float deltaSeconds )
 	UpdateFromUserInput( deltaSeconds );
 	DrawConvexgonMode();
 	g_thePhysicsSystem->Update( deltaSeconds );
-	//UNUSED( deltaSeconds );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -124,24 +124,9 @@ void Game::Render() const
 	}
 
 	DrawMouseCurrentPosition( m_worldCamera );
-
-	//DebugRender();
 	
-	Vec2 newWorldPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
-// 	bool polyIsPointInside = testPolygon.Contains( newWorldPosition );
-// 
-// 	if ( polyIsPointInside )
-// 	{
-// 		g_theRenderer->DrawDisc( Disc2D( newWorldPosition , 5.f ) , GREEN );
-// 	}
-// 	else
-// 	{
-// 		g_theRenderer->DrawDisc( Disc2D( newWorldPosition , 5.f ) , PURPLE );
-// 	}
+	//Vec2 newWorldPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
 
-	//Vec2 nearestPoint = testPolygon.GetClosestPoint( newWorldPosition );
-	//g_theRenderer->DrawDisc( Disc2D( nearestPoint , 5.f ) , PURPLE );
-	//RenderDrawMode();
 	RenderDrawFromPointCloudMode();
 	RenderUI();
 }
@@ -244,6 +229,8 @@ void Game::DebugRender() const
 	}
 
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Game::DrawConvexgonMode()
 {
@@ -547,16 +534,9 @@ void Game::UpdateGameObjects()
 			{
 				if ( m_gameObjects[ firstColliderIndex ]->m_rigidbody->m_collider->Intersects( m_gameObjects[ secondColliderIndex ]->m_rigidbody->m_collider ) )
 				{
-					//m_gameObjects[ firstColliderIndex ]->m_fillColor = m_overlapColor;
-					//m_gameObjects[ secondColliderIndex ]->m_fillColor = m_overlapColor;
 					m_gameObjects[ firstColliderIndex ]-> m_isColliding = true;
 					m_gameObjects[ secondColliderIndex ]->m_isColliding = true;
-					//break;
 				}
-// 				else
-// 				{
-// 					m_gameObjects[ firstColliderIndex ]->m_fillColor = m_fillColor;
-// 				}
 			}
 		}
 	}
