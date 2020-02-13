@@ -85,10 +85,16 @@ void Polygon2D::GetEdge( int idx , Vec2* outStart , Vec2* outEnd )
 
 void Polygon2D::SetCenter()
 {
+	if ( m_points.size() == 0 )
+	{
+		return;
+	}
+
 	for ( size_t index = 0; index < m_points.size(); index++ )
 	{
 		m_center += m_points[ index ];
 	}
+
 	m_center *= ( 1.f / m_points.size() );
 }
 
@@ -168,6 +174,7 @@ Polygon2D Polygon2D::MakeConvexFromPointCloud( Vec2 const* points , uint pointCo
 		point = nextPoint; // Set p as q for next iteration
 
 	} while ( point != start );
+
 	return tempPolygon;
 }
 

@@ -10,7 +10,7 @@ PolygonCollider2D::PolygonCollider2D( Physics2D* system , Rigidbody2D* rigidbody
 																							Collider2D( system , rigidbody , COLLIDER2D_CONVEXGON )
 {
 	m_polygon = convexgon;
-	m_worldPosition = m_rigidbody->m_worldPosition + m_localPosition;
+	m_worldPosition = m_rigidbody->m_worldPosition + localPosition;
 	m_polygon.m_localPos = m_worldPosition;
 }
 

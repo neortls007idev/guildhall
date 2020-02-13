@@ -51,7 +51,12 @@ Game::Game()
 	RandomizePointCloud( m_rng );
 	//testPolygon = new Polygon2D();
 	testPolygon =  Polygon2D::MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
-	//testPolygon.SetCenter();
+	testPolygon.SetCenter();
+	
+	if ( isnan( testPolygon.m_center.x) || isnan(testPolygon.m_center.y) )
+	{
+		return;
+	}
 	//testPolygon->MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
 	InitialGameObjectsSpawner();
 }
@@ -368,6 +373,7 @@ void Game::PolygonDrawPointCloudMode()
 
 		Polygon2D temp;
 		temp = Polygon2D::MakeConvexFromPointCloud( &points[ 0 ] , ( uint ) m_drawModePoints.size() );
+		temp.SetCenter();
 		GameObject* polyGameobject = new GameObject( g_thePhysicsSystem , temp.GetCenter() , Vec2::ZERO , temp );
 		m_gameObjects.push_back( polyGameobject );
 		m_isMouseOnGameObject.push_back( false );
@@ -594,7 +600,7 @@ GameObject* Game::PickGameobject( Vec2 mousePos )
 		}
 	}
 
-	if ( !isMouseOverAnygameobject )
+	if ( !isMouseOverAnygameobject  || m_gameObjects.size() == 0 )
 	{
 		return nullptr;
 	}

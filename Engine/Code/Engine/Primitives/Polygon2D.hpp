@@ -38,6 +38,6 @@ public: // static constructors (feel free to just use a constructor - I just lik
 
 	std::vector<Vec2> m_points;
 	Vec2 m_localPos = Vec2::ZERO;
-private:
 	Vec2 m_center = Vec2::ZERO;
+private:
 };
