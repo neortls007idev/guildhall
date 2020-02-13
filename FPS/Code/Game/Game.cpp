@@ -58,8 +58,9 @@ void Game::Render() const
 {
 	g_theRenderer->BeginCamera( m_worldCamera );
 	//g_theRenderer->Draw( 3 , 0 );
-	Texture* tank = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/PlayerTankBase.png" );
-	g_theRenderer->BindTexture( tank );
+	//Texture* tank = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/PlayerTankBase.png" );
+	//g_theRenderer->BindTexture( tank );
+	//g_theRenderer->SetBlendMode( BlendMode::ADDITIVE );
 	g_theRenderer->DrawAABB2( AABB2( -10.f , -10.f , 10.f , 10.f ) , WHITE );
 	g_theRenderer->EndCamera( m_worldCamera );
 }

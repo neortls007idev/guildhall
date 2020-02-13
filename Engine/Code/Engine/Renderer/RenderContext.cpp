@@ -51,7 +51,9 @@ RenderContext::~RenderContext()
 {
 	delete m_swapChain;
 	m_swapChain = nullptr;
-
+	DX_SAFE_RELEASE( m_alphaBlendState );
+	DX_SAFE_RELEASE( m_additiveBlendState );
+	DX_SAFE_RELEASE( m_lastBoundVBO );
 	DX_SAFE_RELEASE( m_context );
 	DX_SAFE_RELEASE( m_device );
 }
