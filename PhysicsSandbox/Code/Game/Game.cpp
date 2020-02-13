@@ -81,6 +81,17 @@ void Game::Update( float deltaSeconds )
 {
 	m_mousePosition = m_worldCamera.GetClientToWorldPosition( m_mousePosition );
 	m_mousePosition = m_worldCamera.GetWorldNormalizedToClientPosition( m_mousePosition );
+
+	m_dragTime += deltaSeconds;
+	m_frameDelay++;
+
+	if ( m_frameDelay % 5 == 0 )
+	{
+		m_MouseDragFrames[ m_frameCount ] = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+		m_frameCount++;
+		m_frameCount %= 10;
+		m_frameDelay = 0;
+	}
 	UpdateCamera();
 	UpdateGameObject( deltaSeconds );
 	UpdateGameObjects();
@@ -214,8 +225,11 @@ void Game::RenderDrawFromPointCloudMode() const
 	}
 
 	Polygon2D temp;
-	temp = Polygon2D::MakeConvexFromPointCloud( &m_drawModePoints[ 0 ] , ( uint ) m_drawModePoints.size() );
-	g_theRenderer->DrawPolygon( &temp.m_points[ 0 ] , ( unsigned int ) temp.m_points.size() , Rgba8( 255 , 255 , 255 , 127 ) );
+	if ( m_drawModePoints.size() > 0 )
+	{
+		temp = Polygon2D::MakeConvexFromPointCloud( &m_drawModePoints[ 0 ] , ( uint ) m_drawModePoints.size() );
+		g_theRenderer->DrawPolygon( &temp.m_points[ 0 ] , ( unsigned int ) temp.m_points.size() , Rgba8( 255 , 255 , 255 , 127 ) );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -343,7 +357,10 @@ void Game::PolygonDrawPointCloudMode()
 	
 	if ( g_theInput->WasKeyJustPressed( KEY_BACKSPACE ) )
 	{
-		m_drawModePoints.pop_back();
+		if ( m_drawModePoints.size() > 0 )
+		{
+			m_drawModePoints.pop_back();
+		}
 	}
 
 	if ( g_theInput->WasRightMouseButtonJustPressed() )
@@ -469,7 +486,7 @@ void Game::UpdateGravity()
 
 Vec2 Game::GetMouseDragVelocity() const
 {
-	return Vec2::ZERO;
+	return m_MouseDragFrames[0] - m_MouseDragFrames[ m_frameCount ];
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -508,6 +525,12 @@ void Game::UpdateGameObjects()
 //				COLLISION UPDATE
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+	for ( size_t index = 0; index < m_gameObjects.size(); index++ )
+	{
+		m_gameObjects[ index ]->m_isColliding = false;
+		m_gameObjects[ index ]->m_fillColor = m_fillColor;
+	}
+
 	for ( int firstColliderIndex = 0; firstColliderIndex < m_gameObjects.size(); firstColliderIndex++ )
 	{
 		if ( m_gameObjects[ firstColliderIndex ] == nullptr )
@@ -524,15 +547,25 @@ void Game::UpdateGameObjects()
 			{
 				if ( m_gameObjects[ firstColliderIndex ]->m_rigidbody->m_collider->Intersects( m_gameObjects[ secondColliderIndex ]->m_rigidbody->m_collider ) )
 				{
-					m_gameObjects[ firstColliderIndex ]->m_fillColor = m_overlapColor;
-					m_gameObjects[ secondColliderIndex ]->m_fillColor = m_overlapColor;
-					break;
+					//m_gameObjects[ firstColliderIndex ]->m_fillColor = m_overlapColor;
+					//m_gameObjects[ secondColliderIndex ]->m_fillColor = m_overlapColor;
+					m_gameObjects[ firstColliderIndex ]-> m_isColliding = true;
+					m_gameObjects[ secondColliderIndex ]->m_isColliding = true;
+					//break;
 				}
-				else
-				{
-					m_gameObjects[ firstColliderIndex ]->m_fillColor = m_fillColor;
-				}
+// 				else
+// 				{
+// 					m_gameObjects[ firstColliderIndex ]->m_fillColor = m_fillColor;
+// 				}
 			}
+		}
+	}
+
+	for ( size_t index = 0; index < m_gameObjects.size(); index++ )
+	{
+		if ( m_gameObjects[ index ]->m_isColliding )
+		{
+			m_gameObjects[ index ]->m_fillColor = m_overlapColor;
 		}
 	}
 }
@@ -658,23 +691,20 @@ void Game::UpdateFromUserInput( float deltaSeconds )
 		m_gameObjects.push_back( temp );
 		m_isMouseOnGameObject.push_back( false );
 	}
-
-	//static bool isGameObjectSelected = false;
-		if ( g_theInput->WasLeftMouseButtonJustPressed() )
-		{
-			static float dragTime = 0.f;
-			static Vec2 dragStartPos;
-			dragTime += deltaSeconds;
-
-			if ( !m_isGameObjectSelected )
+		
+	if ( g_theInput->WasLeftMouseButtonJustPressed() )
+	{
+		if ( !m_isGameObjectSelected )
 			{
 				Vec2 PickObjectPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
 				m_selectedGameObject = PickGameobject( PickObjectPosition );
 				if ( m_selectedGameObject )
 				{
-					dragTime = 0.f;
-					dragStartPos = PickObjectPosition;
+					m_dragTime = 0.f;
+					m_frameCount = 0;
+					//dragStartPos = PickObjectPosition;
 					//m_simMode = m_selectedGameObject->m_rigidbody->GetSimulationMode();
+					m_MouseDragFrames[ m_frameCount ] = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
 					m_selectedGameObject->m_rigidbody->ChangeIsSimulationActive( false );
 					m_selectedGameObject->m_borderColor = Rgba8( 0 , 127 , 0 , 255 );
 					m_selectedGameObject->m_isSelected = true;
@@ -682,12 +712,12 @@ void Game::UpdateFromUserInput( float deltaSeconds )
 					//m_selectedGameObject->m_rigidbody->SetSimulationMode( SIMULATIONMODE_KINEMATIC );
 				}
 			}
-			else
+		else
 			{
 				if ( m_selectedGameObject != nullptr )
 				{
-					Vec2 dragEndPos = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
-					Vec2 newVelocity = ( dragEndPos - dragStartPos ) / ( dragTime * 100.f );
+					//Vec2 dragEndPos = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+					Vec2 newVelocity = GetMouseDragVelocity() / ( m_dragTime );
 					m_selectedGameObject->m_rigidbody->SetVeloity( newVelocity );
 					m_selectedGameObject->m_rigidbody->ChangeIsSimulationActive( true );
 					//m_selectedGameObject->m_rigidbody->SetSimulationMode( m_simMode );
@@ -702,9 +732,9 @@ void Game::UpdateFromUserInput( float deltaSeconds )
 					m_isMouseOnGameObject[ gameObjectIndex ] = false;
 				}
 			}
-		}
+	}
 
-		if ( g_theInput->WasKeyJustPressed( KEY_BACKSPACE ) || g_theInput->WasKeyJustPressed( KEY_DELETE ) )
+	if ( g_theInput->WasKeyJustPressed( KEY_BACKSPACE ) || g_theInput->WasKeyJustPressed( KEY_DELETE ) )
 		{
 			if ( m_selectedGameObject )
 			{

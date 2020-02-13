@@ -108,6 +108,11 @@ public:
 		   bool						m_isDrawModeActive = false;
 		   Vec2						m_invalidPoint;
 		   bool						m_isLastPointInvalid = false;
+
+		   Vec2						m_MouseDragFrames[ 10 ];
+		   float					m_dragTime = 0.f;
+		   int						m_frameCount = 0;
+		   int						m_frameDelay = 0;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

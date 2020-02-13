@@ -18,13 +18,9 @@ PolygonCollider2D::PolygonCollider2D( Physics2D* system , Rigidbody2D* rigidbody
 
 void PolygonCollider2D::UpdateWorldShape()
 {
+	m_polygon.SetNewCenter( m_rigidbody->m_worldPosition );
 	m_localPosition = m_rigidbody->m_worldPosition - m_polygon.GetCenter();
-	m_worldPosition = m_rigidbody->m_worldPosition + m_localPosition;
-
-// 	for ( size_t index = 0; index < m_polygon.m_points.size(); index++ )
-// 	{
-// 		m_polygon.m_points[ index ] = m_polygon.m_points[ index ] + m_localPosition;
-// 	}
+	m_worldPosition = m_rigidbody->m_worldPosition/* + m_localPosition*/;
 	m_polygon.SetPosition( m_worldPosition );
 }
 
@@ -99,8 +95,8 @@ bool PolygonCollider2D::Contains( Vec2 pos ) const
 
 		edge = m_polygon.m_points[ 0 ] - m_polygon.m_points[ index - 1 ];
 		edgeNormal = edge.GetRotated90Degrees().GetNormalized();
-		//edgeNormal.Normalize();
 		pointRelativePos = pos - m_polygon.m_points[ 0 ];
+		
 		if ( DotProduct2D( edgeNormal , pointRelativePos ) <= 0 )
 		{
 			return false;
@@ -125,7 +121,7 @@ bool PolygonCollider2D::Intersects( Collider2D const* other ) const
 
 			Vec2 closetPoint = GetClosestPoint( collider->GetPosition() );
 
-			return IsPointOnDisc2D( Disc2D( collider->GetPosition() , collider->m_radius ) , closetPoint );
+			return ( IsPointOnDisc2D( Disc2D( collider->GetPosition() , collider->m_radius ) , closetPoint ) || Contains( collider->GetPosition() ) );
 		}
 	}
 
