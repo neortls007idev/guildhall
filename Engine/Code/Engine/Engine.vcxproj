@@ -204,6 +204,7 @@
     <ClCompile Include="Primitives\LineSegment2D.cpp" />
     <ClCompile Include="Primitives\OBB2.cpp" />
     <ClCompile Include="Renderer\RenderBuffer.cpp" />
+    <ClCompile Include="Renderer\Sampler.cpp" />
     <ClCompile Include="Renderer\Shader.cpp" />
     <ClCompile Include="Renderer\SpriteAnimSet.cpp" />
     <ClCompile Include="Renderer\BitmapFont.cpp" />
@@ -271,6 +272,7 @@
     <ClInclude Include="Renderer\D3D11Common.hpp" />
     <ClInclude Include="Renderer\RenderBuffer.hpp" />
     <ClInclude Include="Renderer\RenderContext.hpp" />
+    <ClInclude Include="Renderer\Sampler.hpp" />
     <ClInclude Include="Renderer\Shader.hpp" />
     <ClInclude Include="Renderer\SpriteAnimation.hpp" />
     <ClInclude Include="Renderer\SpriteAnimeSet.hpp" />

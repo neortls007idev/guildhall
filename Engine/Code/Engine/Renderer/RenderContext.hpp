@@ -20,10 +20,13 @@ struct ID3D11Device;
 struct ID3D11DeviceContext;
 struct IDXGIDebug;
 struct ID3D11Buffer;
+struct ID3D11BlendState;
 
 class Shader;
 class VertexBuffer;
 class RenderBuffer;
+class Sampler;
+class Image;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -81,8 +84,8 @@ public:
 	Shader*		GetOrCreateShader( char const* shaderFilename );
 	Texture*	GetOrCreateTextureFromFile( const char* imageFilePath );
 	BitmapFont* GetOrCreateBitmapFontFromFile( std::string bitmapFontFilePath );
-	void		BindTexture( const Texture* texture );
-
+	void		BindTexture( const Texture* constTexture );
+	void		CreateBlendStates();
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // DRAW FUNCTIONS
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -100,11 +103,14 @@ public:
  	void DrawRegularPolygon(); // TO DO
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-	bool IsDrawing() const;
-	bool BindShader( Shader* shader );
-	void BindShader( std::string shaderFileName );
-	void BindVertexInput( VertexBuffer* vbo );
-	void BindUniformBuffer( unsigned int slot , RenderBuffer* ubo ); // ubo - uniform buffer object
+	bool		IsDrawing() const;
+	bool		BindShader( Shader* shader );
+	void		BindShader( std::string shaderFileName );
+	void		BindVertexInput( VertexBuffer* vbo );
+	void		BindUniformBuffer( unsigned int slot , RenderBuffer* ubo ); // ubo - uniform buffer object
+	void		BindSampler( const Sampler* sampler );
+	Texture*	CreateTextureFromColor( Rgba8 color );
+	Texture*	CreateFromImage( Image* image );
 
 private:
 
@@ -131,8 +137,13 @@ public:
 	VertexBuffer*		 m_immediateVBO		= nullptr;
 	ID3D11Buffer*		 m_lastBoundVBO		= nullptr;
 	Texture*			 m_textureTarget	= nullptr;
+	ID3D11BlendState*	 m_alphaBlendState = nullptr;
+	ID3D11BlendState*	 m_additiveBlendState = nullptr;
+
 
 	RenderBuffer*		 m_frameUBO			= nullptr;
+	Sampler*			 m_defaultSampler	= nullptr;
+	Texture*			 m_textureDefault	= nullptr;
 
 private:
 

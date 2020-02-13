@@ -30,8 +30,30 @@ Texture::Texture( RenderContext* renderContext , ID3D11Texture2D* handle ) :
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Texture::Texture( const char* filePath , RenderContext* renderContext , ID3D11Texture2D* handle ) : Texture( renderContext , handle )
+{
+	m_imageFilePath = filePath;
+// 	m_owner = renderContext;
+// 	m_handle = handle;
+// 
+// 	D3D11_TEXTURE2D_DESC desc;
+// 	m_handle->GetDesc( &desc );
+// 	m_dimensions.x = desc.Width;
+// 	m_dimensions.y = desc.Height;
+}
+// 
+// Texture::Texture( Rgba8 color , RenderContext* renderContext , ID3D11Texture2D* handle ) : Texture( renderContext , handle )
+// {
+// 	m_color = color;
+// }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Texture::~Texture()
 {
+	delete m_shaderResourceView;
+	m_shaderResourceView = nullptr;
+
 	delete m_renderTargetView;
 	m_renderTargetView = nullptr;
 
@@ -40,7 +62,7 @@ Texture::~Texture()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-TextureView* Texture::GetRenderTargetView()
+TextureView* Texture::GetOrCreateRenderTargetView()
 {
 	if ( m_renderTargetView)
 	{
@@ -58,6 +80,27 @@ TextureView* Texture::GetRenderTargetView()
 	}
 
 	return m_renderTargetView;
+}
+
+TextureView* Texture::GetOrCreateShaderResourceView()
+{
+	if ( m_shaderResourceView )
+	{
+		return m_shaderResourceView;
+	}
+
+	ID3D11Device* device = m_owner->m_device;
+	ID3D11ShaderResourceView* srv = nullptr;
+
+	device->CreateShaderResourceView( m_handle , nullptr , &srv );
+	
+	if ( srv )
+	{
+		m_shaderResourceView = new TextureView();
+		m_shaderResourceView->m_srv = srv;
+	}
+
+	return m_shaderResourceView;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

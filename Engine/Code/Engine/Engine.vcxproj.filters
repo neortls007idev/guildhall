@@ -193,6 +193,9 @@
     <ClCompile Include="Renderer\VertexBuffer.cpp">
       <Filter>Renderer\Buffers</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\Sampler.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -380,6 +383,9 @@
     </ClInclude>
     <ClInclude Include="Renderer\VertexBuffer.hpp">
       <Filter>Renderer\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Sampler.hpp">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

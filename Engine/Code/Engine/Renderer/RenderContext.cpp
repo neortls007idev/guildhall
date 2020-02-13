@@ -35,7 +35,8 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 #include "Engine/Renderer/D3D11Common.hpp"
-#include "Shader.hpp"
+#include "Engine/Renderer/Shader.hpp"
+#include "Engine/Renderer/Sampler.hpp"
 
 #pragma comment( lib, "d3d11.lib" )         // needed a01
 #pragma comment( lib, "dxgi.lib" )          // needed a01
@@ -125,6 +126,11 @@ void RenderContext::Startup( Window* window )
 
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
 	m_frameUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+
+	m_defaultSampler = new Sampler( this , SAMPLER_POINT );
+	m_textureDefault = CreateTextureFromColor( RED );
+
+	CreateBlendStates();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -154,6 +160,13 @@ void RenderContext::EndFrame()
 
 void RenderContext::Shutdown()
 {
+
+	delete m_textureDefault;
+	m_textureDefault = nullptr;
+
+	delete m_defaultSampler;
+	m_defaultSampler = nullptr;
+
 	delete m_immediateVBO;
 	m_immediateVBO = nullptr;
 
@@ -192,7 +205,7 @@ void RenderContext::ClearScreen( const Rgba8& clearColor )
 	// can be put under clear Texture function
 
 	Texture* backbuffer = m_swapChain->GetBackBuffer();
-	TextureView* backbuffer_rtv = backbuffer->GetRenderTargetView();
+	TextureView* backbuffer_rtv = backbuffer->GetOrCreateRenderTargetView();
 
 	ID3D11RenderTargetView* rtv = backbuffer_rtv->GetRTVHandle();
 	m_context->ClearRenderTargetView( rtv , clearFloats );
@@ -249,6 +262,10 @@ if ( camera->ShouldClearClear() )
 	BindUniformBuffer( UBO_FRAME_SLOT , m_frameUBO );
 	//m_currentCamera->UpdateUBO( this );
 	BindUniformBuffer( UBO_CAMERA_SLOT , m_currentCamera->UpdateUBO( this ) );
+
+	BindTexture( m_textureDefault );
+	BindSampler( m_defaultSampler );
+	SetBlendMode( BlendMode::ALPHA );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -263,21 +280,20 @@ void RenderContext::EndCamera( const Camera& camera )
 
 void RenderContext::SetBlendMode( BlendMode blendMode )
 {
-	UNUSED( blendMode );
-// 	if ( blendMode == BlendMode::ALPHA )
-// 	{
-// 		glBlendFunc( GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA );
-// 	}
-// 	else if ( blendMode == BlendMode::ADDITIVE )
-// 	{
-// 		glBlendFunc( GL_SRC_ALPHA , GL_ONE );
-// 	}
-// 	else
-// 	{
-// 		ERROR_AND_DIE( Stringf( "Unknown / unsupported blend mode #%i" , blendMode ) );
-// 	}
-	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
-}// state of openGL need to change every time like texture.
+	float const zeroes[] = { 0 , 0 , 0 , 0 };
+	
+	switch ( blendMode )
+	{
+	case BlendMode::ALPHA:
+					m_context->OMSetBlendState( m_alphaBlendState , zeroes , ~0U );
+					break;
+	case BlendMode::ADDITIVE:
+					m_context->OMSetBlendState( m_additiveBlendState , zeroes , ~0U );
+					break;
+	default:
+		break;
+	}
+}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -355,58 +371,49 @@ Shader* RenderContext::CreateShaderFromFile( char const* shaderFilePath )
 
 Texture* RenderContext::CreateTextureFromFile( const char* imageFilePath )
 {
-	UNUSED( imageFilePath );
-// 	const char* imageFilePath = "Data/Images/Test_StbiFlippedAndOpenGL.png";
-// 		unsigned int textureID = 0;
-// 		int imageTexelSizeX = 0; // This will be filled in for us to indicate image width
-// 		int imageTexelSizeY = 0; // This will be filled in for us to indicate image height
-// 		int numComponents = 0; // This will be filled in for us to indicate how many color components the image had (e.g. 3=RGB=24bit, 4=RGBA=32bit)
-// 		int numComponentsRequested = 0; // don't care; we support 3 (24-bit RGB) or 4 (32-bit RGBA)
-// 	
-// 		stbi_set_flip_vertically_on_load( 1 ); // We prefer uvTexCoords has origin (0,0) at BOTTOM LEFT
-// 		unsigned char* imageData = stbi_load( imageFilePath , &imageTexelSizeX , &imageTexelSizeY , &numComponents , numComponentsRequested );
-// 	
-// 		// Check if the load was successful
-// 		GUARANTEE_OR_DIE( imageData , Stringf( "Failed to load image \"%s\"" , imageFilePath ));
-// 		GUARANTEE_OR_DIE( numComponents >= 3 && numComponents <= 4 && imageTexelSizeX > 0 && imageTexelSizeY > 0 , Stringf( "ERROR loading image \"%s\" (Bpp=%i, size=%i,%i)" , imageFilePath , numComponents , imageTexelSizeX , imageTexelSizeY ) );
-// 		glEnable( GL_TEXTURE_2D );
-// 		glPixelStorei( GL_UNPACK_ALIGNMENT , 1 );
-// 		glGenTextures( 1 , ( GLuint* ) &textureID );
-// 		glBindTexture( GL_TEXTURE_2D , textureID );
-// 		glTexParameteri( GL_TEXTURE_2D , GL_TEXTURE_WRAP_S , GL_REPEAT ); // GL_Clamp or GL_REPEAT
-// 		glTexParameteri( GL_TEXTURE_2D , GL_TEXTURE_WRAP_T , GL_REPEAT );
-// 	
-// 		// THESE 2 LINES ARE COMPULSORY DO NOT REMOVE THEM.
-// 		// Set magnification (texel > pixel) and minification (texel < pixel) filters
-// 		glTexParameteri( GL_TEXTURE_2D , GL_TEXTURE_MAG_FILTER , GL_NEAREST ); // one of: GL_NEAREST, GL_LINEAR
-// 		glTexParameteri( GL_TEXTURE_2D , GL_TEXTURE_MIN_FILTER , GL_LINEAR ); // one of: GL_NEAREST, GL_LINEAR, GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_LINEAR
-// 	
-// 		GLenum bufferFormat = GL_RGBA; // the format our source pixel data is in; any of: GL_RGB, GL_RGBA, GL_LUMINANCE, GL_LUMINANCE_ALPHA, ...
-// 		if ( numComponents == 3 )
-// 		{
-// 			bufferFormat = GL_RGB;
-// 		}
-// 		GLenum internalFormat = bufferFormat;
-// 	
-// 		glTexImage2D(			// Upload this pixel data to our new OpenGL texture
-// 			GL_TEXTURE_2D ,		// Creating this as a 2d texture
-// 			0 ,					// Which mipmap level to use as the "root" (0 = the highest-quality, full-res image), if mipmaps are enabled
-// 			internalFormat ,		// Type of texel format we want OpenGL to use for this texture internally on the video card
-// 			imageTexelSizeX ,	// Texel-width of image; for maximum compatibility, use 2^N + 2^B, where N is some integer in the range [3,11], and B is the border thickness [0,1]
-// 			imageTexelSizeY ,	// Texel-height of image; for maximum compatibility, use 2^M + 2^B, where M is some integer in the range [3,11], and B is the border thickness [0,1]
-// 			0 ,					// Border size, in texels (must be 0 or 1, recommend 0)
-// 			bufferFormat ,		// Pixel format describing the composition of the pixel data in buffer
-// 			GL_UNSIGNED_BYTE ,	// Pixel color components are unsigned bytes (one byte per color channel/component)
-// 			imageData );		// Address of the actual pixel data bytes/buffer in system memory
-// 	
-// 		// Free the raw image texel data now that we've sent a copy of it down to the GPU to be stored in video memory
-// 		
-// 		stbi_image_free( imageData );
-// 		Texture* Temp = new Texture( imageFilePath , textureID , IntVec2 (imageTexelSizeX, imageTexelSizeY ) /* DIMENSION OF THE TEXURE */ );
-// 		m_LoadedTextures[ imageFilePath ] = Temp;
-// 		return Temp;
-	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
-	return nullptr;
+		//unsigned int textureID = 0;
+		int imageTexelSizeX = 0; // This will be filled in for us to indicate image width
+		int imageTexelSizeY = 0; // This will be filled in for us to indicate image height
+		int numComponents = 0; // This will be filled in for us to indicate how many color components the image had (e.g. 3=RGB=24bit, 4=RGBA=32bit)
+		int numComponentsRequested = 4; // don't care; we support 3 (24-bit RGB) or 4 (32-bit RGBA)
+	
+		stbi_set_flip_vertically_on_load( 1 ); // We prefer uvTexCoords has origin (0,0) at BOTTOM LEFT ,  0 for D3D11
+		unsigned char* imageData = stbi_load( imageFilePath , &imageTexelSizeX , &imageTexelSizeY , &numComponents , numComponentsRequested );
+	
+		// Check if the load was successful
+		GUARANTEE_OR_DIE( imageData , Stringf( "Failed to load image \"%s\"" , imageFilePath ));
+		GUARANTEE_OR_DIE( numComponents == 4 && imageTexelSizeX > 0 && imageTexelSizeY > 0 , Stringf( "ERROR loading image \"%s\" (Bpp=%i, size=%i,%i)" , imageFilePath , numComponents , imageTexelSizeX , imageTexelSizeY ) );
+			
+		// describe the texture
+		D3D11_TEXTURE2D_DESC desc;
+		desc.Width = imageTexelSizeX;
+		desc.Height = imageTexelSizeY;
+		desc.MipLevels = 1;
+		desc.ArraySize = 1;
+		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		desc.SampleDesc.Count = 1;							// Multi sampling Anti-Aliasing
+		desc.SampleDesc.Quality = 0;						// Multi sampling Anti-Aliasing
+		desc.Usage = D3D11_USAGE_IMMUTABLE;					//  if we do mip-chains, we change this to GPU/DEFAULT
+		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		desc.CPUAccessFlags = 0;							// does the CPU write to this? 0  = no
+		desc.MiscFlags = 0;									// extension features like cube maps
+		
+		D3D11_SUBRESOURCE_DATA initialData;
+		initialData.pSysMem = imageData;
+		initialData.SysMemPitch = imageTexelSizeX * 4;
+		initialData.SysMemSlicePitch = 0;					// for 3D texturing
+
+		// DirectX Creation
+		ID3D11Texture2D* texHandle = nullptr;
+		m_device->CreateTexture2D( &desc , &initialData , &texHandle );
+
+
+		stbi_image_free( imageData );
+		Texture* temp = new Texture( imageFilePath , this , texHandle );
+		m_LoadedTextures[ imageFilePath ] = temp;
+		//delete temp;
+		//temp = nullptr;
+		return m_LoadedTextures[ imageFilePath ];
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -425,40 +432,81 @@ BitmapFont* RenderContext::CreateBitMapFontFromFile( std::string bitmapFontFileP
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Texture* RenderContext::GetOrCreateTextureFromFile( const char* imageFilePath )
-{
-	UNUSED( imageFilePath );
-// 	Texture* Temp = m_LoadedTextures[ imageFilePath ];
-// 	if (Temp == nullptr)
-// 	{
-// 		Temp = CreateTextureFromFile( imageFilePath );
-// 	}
-// 	return Temp;
-	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
-	return nullptr;
+{	
+	Texture* Temp = m_LoadedTextures[ imageFilePath ];
+	
+	if (Temp == nullptr)
+	{
+		Temp = CreateTextureFromFile( imageFilePath );
+	}
+	
+	return Temp;
+	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::BindTexture( const Texture* texture )
+void RenderContext::BindTexture( const Texture* constTexture )
 {
-	UNUSED( texture );
-// 	if ( texture )
-// 	{
-// 		glEnable( GL_TEXTURE_2D );
-// 		glBindTexture( GL_TEXTURE_2D , texture->GetTextureID() );
-// 	}
-// 	else
-// 	{
-// 		glDisable( GL_TEXTURE_2D );
-// 	}
-	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
+	if ( nullptr == constTexture )
+	{
+		TextureView* shaderResourceView = m_textureDefault->GetOrCreateShaderResourceView();
+		ID3D11ShaderResourceView* shaderResourceViewHandle = shaderResourceView->GetSRVHandle();
+		m_context->PSSetShaderResources( 0 , 1 , &shaderResourceViewHandle );
+		return;
+	}
+
+	Texture* texture = const_cast< Texture* >( constTexture );
+	TextureView* shaderResourceView =  texture->GetOrCreateShaderResourceView();
+	ID3D11ShaderResourceView* shaderResourceViewHandle = shaderResourceView->GetSRVHandle();
+	m_context->PSSetShaderResources( 0 , 1 , &shaderResourceViewHandle );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::CreateBlendStates()
+{
+	D3D11_BLEND_DESC alphaDesc;
+
+	alphaDesc.AlphaToCoverageEnable = false;
+	alphaDesc.IndependentBlendEnable = false;
+	alphaDesc.RenderTarget[ 0 ].BlendEnable = true;
+	alphaDesc.RenderTarget[ 0 ].BlendOp = D3D11_BLEND_OP_ADD;
+	alphaDesc.RenderTarget[ 0 ].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	alphaDesc.RenderTarget[ 0 ].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+
+	alphaDesc.RenderTarget[ 0 ].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	alphaDesc.RenderTarget[ 0 ].SrcBlendAlpha = D3D11_BLEND_ONE;
+	alphaDesc.RenderTarget[ 0 ].DestBlendAlpha = D3D11_BLEND_ZERO;
+
+	// render all output
+	alphaDesc.RenderTarget[ 0 ].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	
+	m_device->CreateBlendState( &alphaDesc , &m_alphaBlendState );
+
+	D3D11_BLEND_DESC additiveDesc;
+
+	additiveDesc.AlphaToCoverageEnable = false;
+	additiveDesc.IndependentBlendEnable = false;
+	additiveDesc.RenderTarget[ 0 ].BlendEnable = true;
+	additiveDesc.RenderTarget[ 0 ].BlendOp = D3D11_BLEND_OP_ADD;
+	additiveDesc.RenderTarget[ 0 ].SrcBlend = D3D11_BLEND_ONE;
+	additiveDesc.RenderTarget[ 0 ].DestBlend = D3D11_BLEND_ONE;
+	
+	additiveDesc.RenderTarget[ 0 ].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	additiveDesc.RenderTarget[ 0 ].SrcBlendAlpha = D3D11_BLEND_ONE;
+	additiveDesc.RenderTarget[ 0 ].DestBlendAlpha = D3D11_BLEND_ZERO;
+
+	// render all output
+	additiveDesc.RenderTarget[ 0 ].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	m_device->CreateBlendState( &additiveDesc , &m_additiveBlendState );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void RenderContext::Draw( int numVertexes , int vertexOffset )
 {
-	TextureView* view = m_textureTarget->GetRenderTargetView();
+	TextureView* view = m_textureTarget->GetOrCreateRenderTargetView();
 	ID3D11RenderTargetView* rtv = view->GetRTVHandle();
 	
 	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
@@ -818,6 +866,64 @@ void RenderContext::BindUniformBuffer( unsigned int slot , RenderBuffer* ubo )
 
 	m_context->VSSetConstantBuffers( slot , 1 , &uboHandle );
 	m_context->PSSetConstantBuffers( slot , 1 , &uboHandle );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::BindSampler( const Sampler* sampler )
+{
+
+	if ( nullptr == sampler )
+	{
+		ID3D11SamplerState* samplerHandle = m_defaultSampler->GetHandle();
+		m_context->PSSetSamplers( 0 , 1 , &samplerHandle );
+		return;
+	}
+	ID3D11SamplerState* samplerHandle = sampler->GetHandle();
+	m_context->PSSetSamplers( 0 , 1 , &samplerHandle );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Texture* RenderContext::CreateTextureFromColor( Rgba8 color )
+{
+	// make a 1x1 texture of that color, and return it;
+	int imageTexelSizeX = 1; // This will be filled in for us to indicate image width
+	int imageTexelSizeY = 1; // This will be filled in for us to indicate image height
+	//int numComponents = 4; // This will be filled in for us to indicate how many color components the image had (e.g. 3=RGB=24bit, 4=RGBA=32bit)
+	//int numComponentsRequested = 4; // don't care; we support 3 (24-bit RGB) or 4 (32-bit RGBA)
+
+	unsigned char* imageData = &color.r;
+
+	// describe the texture
+	D3D11_TEXTURE2D_DESC desc;
+	desc.Width = imageTexelSizeX;
+	desc.Height = imageTexelSizeY;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.SampleDesc.Count = 1;							// Multi sampling Anti-Aliasing
+	desc.SampleDesc.Quality = 0;						// Multi sampling Anti-Aliasing
+	desc.Usage = D3D11_USAGE_IMMUTABLE;					//  if we do mip-chains, we change this to GPU/DEFAULT
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags = 0;							// does the CPU write to this? 0  = no
+	desc.MiscFlags = 0;									// extension features like cube maps
+
+	D3D11_SUBRESOURCE_DATA initialData;
+	initialData.pSysMem = imageData;
+	initialData.SysMemPitch = imageTexelSizeX * 4;
+	initialData.SysMemSlicePitch = 0;					// for 3D texturing
+
+	// DirectX Creation
+	ID3D11Texture2D* texHandle = nullptr;
+	m_device->CreateTexture2D( &desc , &initialData , &texHandle );
+
+// 	delete imageData;
+// 	imageData = nullptr;
+
+	Texture* temp = new Texture( this , texHandle );
+
+	return temp;
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------

@@ -52,6 +52,11 @@ cbuffer camera_constants : register( b1 ) // index 1 is now camera
 	float4x4 VIEW;
 }
 
+// Texture & Samplers are also a form of constants
+
+Texture2D <float4> tDiffuse : register( t0 );			// Color of surface
+SamplerState eSampler : register( s0 );					// Sampler are rules on hoe to sample
+
 //--------------------------------------------------------------------------------------
 // Programmable Shader Stages
 //--------------------------------------------------------------------------------------
@@ -114,9 +119,17 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	//	float4 uvAsColor = float4( input.uv, 0.0f, 1.0f ); 
 	//	float4 finalColor = uvAsColor * input.color; 
 
-		float r = 0.5f * ( sin( input.uv.x * 40.0f + SYSTEM_TIME_SECONDS * 10.f ) + 1.0f );
-		 float  b = 0.5f * ( cos( input.uv.y * 40.0f + SYSTEM_TIME_SECONDS * 10.f ) + 1.0f );
-return float4( r , 0 , b , 1 );
+	//return float4 ( input.uv , 0 , 1 );
+
+		//input.uv[1] = 0.5f * ( sin( input.uv.x * 40.0f + SYSTEM_TIME_SECONDS * 10.f ) );
+
+		float4 color = tDiffuse.Sample( eSampler, input.uv );
+		return color * input.color;
+		
+
+	// float r = 0.5f * ( sin( input.uv.x * 40.0f + SYSTEM_TIME_SECONDS * 10.f ) + 1.0f );
+	//	float  b = 0.5f * ( cos( input.uv.y * 40.0f + SYSTEM_TIME_SECONDS * 10.f ) + 1.0f );
+	//	return float4( r , 0 , b , 1 );
 
 //   return finalColor; 
 }
