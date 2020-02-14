@@ -22,15 +22,15 @@ I may mark tasks as **CHALLENGE** if I believe them to be more difficult relativ
     - [x] *05pts*: Can render it - should work as before.
 - [x] *25pts*: Can construct `GameObject` with a `PolygonCollider`
     - [x] Press `2` to enter a polygon draw mode, place first point where cursor is when `2` was pressed
-    - [] Draw a line from last point added to cursor
-        - [] Line drawn `RED` if not a valid point to add (ie, would maintain convexity)
-        - [] Line drawn `BLUE` if it is a valid point.
+    - [-] Draw a line from last point added to cursor 
+        - [-] Line drawn `RED` if not a valid point to add (ie, would maintain convexity)
+        - [-] Line drawn `BLUE` if it is a valid point.
     - [x] When pressing `Left Mouse Button`, add a point if it is a legal (will maintain convex polygon)
     - [x] When pressing `Right Mouse Button`, end, closing off the loop.
     - [x] Pressing `Escape` while in this mode should cancel the creation.
     - [x] Construct object with polygon as its collider, exiting creation mode
         - [x] Pick 'center', or position of rigidbody by either
-            - Average of all points
+            -[x] Average of all points
             - Center of box that encapsulates all points
             - **CHALLENGE**: Center of mass, assuming uniform density
     - [x] *If you did the giftwrapping algorithm, you can just add points and construct a polygon that would work for them*
@@ -82,7 +82,7 @@ I may mark tasks as **CHALLENGE** if I believe them to be more difficult relativ
 
 **Object Selection**
 -  While selected, `1`, `2`, and `3` should switch the object to `STATIC`, `KINEMATIC`, or `DYNAMIC` respectively.
-- *__NOTE__ :- Once you select an object you are essentially changing its velocity over the next 30 frames so when you change it to `KINEMATIC` make sure you drag around the cursor or it shall feel as if the object is now `STATIC` as velocity due to no cursor drag would be essentially ZERO.*
+- *__NOTE__ :- Once you select an object you are essentially changing its velocity over the last 30 frames till deselection, so when you change it to `KINEMATIC` make sure you drag around the cursor or it shall feel as if the object is now `STATIC` as velocity due to no cursor drag would be essentially ZERO.*
 - By default all objects are created in `DYNAMIC` mode.
 - Selected object is not influenced by physics simulations i.e. the gravity and movement but collisions will still be visible.
 - Select an object and drag around the cursor and deselect the object to throw it around ( might feel slow also recommended to use an actual mouse rather than the trackpad ).
