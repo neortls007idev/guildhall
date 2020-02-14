@@ -18,7 +18,8 @@ PolygonCollider2D::PolygonCollider2D( Physics2D* system , Rigidbody2D* rigidbody
 
 void PolygonCollider2D::UpdateWorldShape()
 {
-	m_polygon.SetNewCenter( m_rigidbody->m_worldPosition );
+	//m_polygon.SetNewCenter( m_rigidbody->m_worldPosition );
+	m_polygon.SetCenter();
 	m_localPosition = m_rigidbody->m_worldPosition - m_polygon.GetCenter();
 	m_worldPosition = m_rigidbody->m_worldPosition/* + m_localPosition*/;
 	m_polygon.SetPosition( m_worldPosition );

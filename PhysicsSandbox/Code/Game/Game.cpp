@@ -520,17 +520,21 @@ void Game::UpdateGameObjects()
 
 	for ( size_t index = 0; index < m_gameObjects.size(); index++ )
 	{
-		m_gameObjects[ index ]->m_isColliding = false;
-		m_gameObjects[ index ]->m_fillColor = m_fillColor;
+		if ( m_gameObjects[index] )
+		{
+			m_gameObjects[ index ]->m_isColliding = false;
+			m_gameObjects[ index ]->m_fillColor = m_fillColor;
+
+		}
 	}
 
-	for ( int firstColliderIndex = 0; firstColliderIndex < m_gameObjects.size(); firstColliderIndex++ )
+	for ( size_t firstColliderIndex = 0; firstColliderIndex < m_gameObjects.size(); firstColliderIndex++ )
 	{
 		if ( m_gameObjects[ firstColliderIndex ] == nullptr )
 		{
 			continue;
 		}
-		for ( int secondColliderIndex = 0; secondColliderIndex < m_gameObjects.size(); secondColliderIndex++ )
+		for ( size_t secondColliderIndex = 0; secondColliderIndex < m_gameObjects.size(); secondColliderIndex++ )
 		{
 			if ( m_gameObjects[ secondColliderIndex ] == nullptr )
 			{
@@ -549,7 +553,7 @@ void Game::UpdateGameObjects()
 
 	for ( size_t index = 0; index < m_gameObjects.size(); index++ )
 	{
-		if ( m_gameObjects[ index ]->m_isColliding )
+		if ( m_gameObjects[index] && m_gameObjects[ index ]->m_isColliding )
 		{
 			m_gameObjects[ index ]->m_fillColor = m_overlapColor;
 		}
