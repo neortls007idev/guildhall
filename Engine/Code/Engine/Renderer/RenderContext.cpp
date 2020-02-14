@@ -163,6 +163,12 @@ void RenderContext::EndFrame()
 void RenderContext::Shutdown()
 {
 
+	m_LoadedTextures.clear();
+	m_LoadedShaders.clear();
+
+	DX_SAFE_RELEASE( m_alphaBlendState );
+	DX_SAFE_RELEASE( m_additiveBlendState );
+
 	delete m_textureDefault;
 	m_textureDefault = nullptr;
 

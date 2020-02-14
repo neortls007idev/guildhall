@@ -13,8 +13,8 @@ TextureView::TextureView()
 TextureView::~TextureView()
 {
 	DX_SAFE_RELEASE( m_handle );
-	//DX_SAFE_RELEASE( m_rtv );
-	//DX_SAFE_RELEASE( m_srv );
+	DX_SAFE_RELEASE( m_rtv );
+	DX_SAFE_RELEASE( m_srv );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
