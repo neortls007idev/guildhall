@@ -264,6 +264,10 @@ if ( camera->ShouldClearClear() )
 	viewport.MaxDepth = 1.f;
 
 	m_context->RSSetViewports( 1 , &viewport );
+	
+	ID3D11RenderTargetView* rtv = m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
+	m_context->OMSetRenderTargets( 1 , &rtv , nullptr );
+
 	ClearScreen( camera.GetClearColor() );
 	BindShader( "" );
 	m_lastBoundVBO = nullptr;
@@ -513,15 +517,11 @@ void RenderContext::CreateBlendStates()
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void RenderContext::Draw( int numVertexes , int vertexOffset )
-{
-	TextureView* view = m_textureTarget->GetOrCreateRenderTargetView();
-	ID3D11RenderTargetView* rtv = view->GetRTVHandle();
-	
+{	
 	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
 	m_context->RSSetState( m_currentShader->m_rasterState );
 	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fragmentShader , nullptr , 0 );
 
-	m_context->OMSetRenderTargets( 1 , &rtv , nullptr );
 
 	// So at this, I need to describe the vertex format to the shader
 	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
