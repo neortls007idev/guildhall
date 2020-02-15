@@ -51,7 +51,7 @@ Game::Game()
 	RandomizePointCloud( m_rng );
 	//testPolygon = new Polygon2D();
 	testPolygon =  Polygon2D::MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
-	testPolygon.SetCenter();
+	//testPolygon.SetCenter();
 	
 	if ( isnan( testPolygon.m_center.x) || isnan(testPolygon.m_center.y) )
 	{
@@ -88,7 +88,6 @@ void Game::Update( float deltaSeconds )
 	m_mousePosition = m_worldCamera.GetClientToWorldPosition( m_mousePosition );
 	m_mousePosition = m_worldCamera.GetWorldNormalizedToClientPosition( m_mousePosition );
 
-	m_dragTime += deltaSeconds;
 	m_frameDelay++;
 
 	if ( m_frameDelay % 5 == 0 )
@@ -97,6 +96,7 @@ void Game::Update( float deltaSeconds )
 		m_frameCount++;
 		m_frameCount %= 10;
 		m_frameDelay = 0;
+		m_dragTime += deltaSeconds;
 	}
 	UpdateCamera();
 	UpdateGameObject( deltaSeconds );
@@ -130,8 +130,6 @@ void Game::Render() const
 
 	DrawMouseCurrentPosition( m_worldCamera );
 	
-	//Vec2 newWorldPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
-
 	RenderDrawFromPointCloudMode();
 	RenderUI();
 }

@@ -78,11 +78,10 @@ public:
 	static RandomNumberGenerator	m_rng;
 		   Camera					m_worldCamera;
 		   Camera					m_UICamera;
-		   AABB2					m_aabb2D					= AABB2( -800.f , -400.f , 0.f , 0.f );
+
 		   Rgba8					m_fillColor					= Rgba8( 255 , 255 , 255 , 127 );
 		   Rgba8					m_overlapColor				= Rgba8( 255 , 0 , 0 , 127 );
 		   Rgba8					m_selectedObjectColor		= Rgba8( 0 , 110 , 0 , 255 );
-		   Disc2D					m_disc2D					= Disc2D( Vec2( 800.f , -400.f ) , 50.f );
 		   
 		   Vec2						m_mousePosition				= Vec2::ZERO;
 		   Vec2						m_rigidBodyMouseOffset		= Vec2::ZERO;
