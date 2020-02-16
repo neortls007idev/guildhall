@@ -4,11 +4,14 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Input/InputSystem.hpp"
+#include "Engine/Core/StringUtils.hpp"
+#include "Engine/Platform/Window.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-extern BitmapFont* g_bitmapFont;
+extern BitmapFont*	g_bitmapFont;
 extern InputSystem* g_theInput;
+extern Window* g_theWindow;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -21,7 +24,29 @@ DevConsole::DevConsole()
 
 void DevConsole::Startup()
 {
+	g_theDevConsole->PrintString( CYAN , "DEVCONSOLE STARTED" );
 
+	InitializeCommands();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DevConsole::InitializeCommands()
+{
+	DevConsoleCommand help;
+	help.command = "help";
+	help.Description = "List All Commands";
+	m_consoleCommands.push_back( help );
+
+	DevConsoleCommand quit;
+	quit.command = "quit";
+	quit.Description = "Quits the Application";
+	m_consoleCommands.push_back( quit );
+
+	DevConsoleCommand close;
+	close.command = "close";
+	close.Description = "Closes the DevConsole";
+	m_consoleCommands.push_back( close );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -138,6 +163,75 @@ void DevConsole::OnKeyPress( char character )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void DevConsole::ProcessCommand()
+{
+	m_isCommandFound = false;
+	
+	for ( m_commandSearchIndex = 0; m_commandSearchIndex < m_consoleCommands.size(); m_commandSearchIndex++ )
+	{
+		if ( StringCompare( m_currentText , m_consoleCommands[ m_commandSearchIndex ].command ) )
+		{
+			m_isCommandFound = true;
+			break;
+		}
+		else
+		{
+			m_isCommandFound = false;
+		}
+	}
+
+	if ( !m_isCommandFound )
+	{
+		PrintString( RED , "Invalid Console Command :- Use \"help\" command  " );
+	}
+	else
+	{
+		ExecuteCommand();
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DevConsole::ExecuteCommand()
+{
+	if ( m_isCommandFound )
+	{
+		if ( m_commandSearchIndex == 0 )
+		{
+			ExecuteHelp();
+		}
+
+		if ( m_commandSearchIndex == 1 )
+		{
+			ExecuteQuit();
+		}
+
+		if ( m_commandSearchIndex == 2 )
+		{
+			Close();
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DevConsole::CreateCommand( DevConsoleCommand newCommand )
+{
+	m_consoleCommands.push_back( newCommand );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DevConsole::CreateCommand( std::string newCommand , std::string commandDescription )
+{
+	DevConsoleCommand newConsoleCommand;
+	newConsoleCommand.command = newCommand;
+	newConsoleCommand.Description = commandDescription;
+	m_consoleCommands.push_back( newConsoleCommand );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void DevConsole::SetIsOpen( bool isOpen )
 {
 	m_isConsoleOpen = isOpen;
@@ -187,8 +281,9 @@ void DevConsole::ProcessInput()
 
 	while ( g_theInput->PopCharacter( &character ) )
 	{
-		if ( character == 13 )
+		if ( character == 13 || character == 10 )
 		{
+			ProcessCommand();
 			m_currentText = "";
 			break;
 		}
@@ -221,6 +316,23 @@ void DevConsole::ResetConsole()
 	}
 	m_consoleText.clear();
 	m_currentText = "";
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DevConsole::ExecuteQuit()
+{
+	g_theWindow->HandleQuitRequested();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DevConsole::ExecuteHelp()
+{
+	for ( m_commandSearchIndex = 0; m_commandSearchIndex < m_consoleCommands.size(); m_commandSearchIndex++ )
+	{
+		PrintString( GREEN , m_consoleCommands[ m_commandSearchIndex ].command + " : " + m_consoleCommands[ m_commandSearchIndex ].Description );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -47,24 +47,26 @@ void TheApp::Startup()
 	{
 		g_theEventSystem = new EventSystem();
 	}
+	g_theEventSystem->Startup();
 
  	if ( g_theInput == nullptr )
  	{
 		g_theInput = new InputSystem();
 		g_theWindow->SetInputSystem( g_theInput );
  	}
+	g_theInput->Startup();
+	
 	if ( g_theRenderer == nullptr )
 	{
 		g_theRenderer = new RenderContext();
-
-		g_theRenderer->Startup( g_theWindow );
 	}
+	g_theRenderer->Startup( g_theWindow );
 
 	if ( g_theDevConsole == nullptr )
 	{
 		g_theDevConsole = new DevConsole();
-		g_theDevConsole->PrintString( CYAN , "DEVCONSOLE STARTED" );
 	}
+	g_theDevConsole->Startup();
 
 	if ( g_theGame == nullptr )
 	{
@@ -95,6 +97,7 @@ void TheApp::BeginFrame()
 	g_theInput->BeginFrame();
 	g_theWindow->BeginFrame();
 	g_theRenderer->BeginFrame();
+	g_theDevConsole->BeginFrame();
 	//g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
 
 }
@@ -114,7 +117,6 @@ void TheApp::Update( float deltaSeconds )
 		g_theGame->Update( deltaSeconds );
 		g_theDevConsole->Update();
 		g_theInput->EndFrame();
-
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -141,6 +143,7 @@ void TheApp::EndFrame()
 {
 	// all engine things that must end at the end of the frame and not the game
 	//SwapBuffers( m_displayDeviceContext );
+	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
 }
@@ -151,9 +154,13 @@ void TheApp::Shutdown()
 {
 	delete g_theGame;
 	g_theGame = nullptr;
+	g_theDevConsole->Shutdown();
+	delete g_theDevConsole;
+	g_theDevConsole = nullptr;
 	g_theRenderer->Shutdown();
 	delete g_theRenderer;
 	g_theRenderer = nullptr;
+	g_theInput->Shutdown();
 	delete g_theInput;
 	g_theInput = nullptr;
 }

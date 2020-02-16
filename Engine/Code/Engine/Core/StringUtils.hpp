@@ -11,4 +11,6 @@ const std::string Stringf( const int maxLength, const char* format, ... );
 
 Strings SplitStringAtGivenDelimiter( const std::string& originalString , const char delimiter = ',' );
 
-int StringCompare( const char* , std::string ); //TODO - CREATE ALL VERSIONS
+bool StringCompare( const char* firstString , std::string  secondString ); 
+bool StringCompare( std::string firstString , std::string  secondString ); 
+bool StringCompare( const char* firstString , const char* secondString );
