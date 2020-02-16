@@ -160,12 +160,12 @@ void InputSystem::UpdateMouse()
 //	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
 }
 
-void InputSystem::PushCharacter( wchar_t character )
+void InputSystem::PushCharacter( char character )
 {
 	m_characters.push( character );
 }
 
-bool InputSystem::PopCharacter( wchar_t* outCharacter )
+bool InputSystem::PopCharacter( char* outCharacter )
 {
 	if ( !m_characters.empty() )
 	{

@@ -60,6 +60,8 @@ void DevConsole::PrintString( const Rgba8& textColor , const std::string& devCon
 void DevConsole::Render( RenderContext& renderer , const Camera& camera , float lineHeight ) const
 {
 	AABB2 consoleArea = AABB2( camera.GetOrthoBottomLeft() , camera.GetOrthoTopRight() );
+	AABB2 typingArea = consoleArea.CarveBoxOffBottom( 0.1f , 0.f );
+	consoleArea = consoleArea.CarveBoxOffTop( 0.9f , 0.f );
 	float offsetBetweenLines = 1.f;
 
 	float dimensionOfConsole = camera.GetOrthoTopRight().y - camera.GetOrthoBottomLeft().y;
@@ -89,15 +91,66 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 
 		alignment.y = RangeMapFloat( 0.f , ( float ) numberOfLinesToDisplay , 0.f , 1.f , alignmentDeltaChange );
 	}
+	std::vector<Vertex_PCU> curretnTextVerts;
+	g_bitmapFont->AddVertsForTextInBox2D( curretnTextVerts , typingArea , lineHeight , m_currentText , WHITE , 1.f , ALIGN_CENTERED_LEFT );
 
 	renderer.BindTexture( g_bitmapFont->GetTexture() );
 	if ( consoleTextVerts.size() > 0)
 	{
 		renderer.DrawVertexArray( consoleTextVerts );
 	}
+
+	if ( curretnTextVerts.size() > 0 )
+	{
+		renderer.DrawVertexArray( curretnTextVerts );
+	}
+
 	renderer.BindTexture( nullptr );
+	//renderer.DrawAABB2( typingArea , Rgba8( 0 , 0 , 255 , 255 ) );
+	curretnTextVerts.clear();
 
 	//renderer.EndCamera( camera );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DevConsole::OnKeyPress( char character )
+{
+	ColoredLine newLineText;
+	newLineText.lineColor = WHITE;
+	newLineText.text = m_currentText;
+
+	if ( character == 13 )
+	{
+		m_consoleText.push_back( newLineText );
+	}
+
+// 	size_t currentCommandIndex = m_consoleText.size();
+// 	
+// 	ColoredLine newLineText;
+// 	newLineText.lineColor = WHITE;
+// 	
+// 	//m_consoleText.push_back( newLineText );
+// 
+// // 	if( character !=  13 )
+// // 	{
+// // 		newLineText.text += character;
+// // 	}
+// 	for ( size_t index = 0; index < g_theInput->m_characters.size(); index++ )
+// 	{
+// 		char currentChar = 0;
+// 		g_theInput->PopCharacter( &currentChar );
+// 
+// 		if ( currentChar != 13 && currentChar != 0 )
+// 		{
+// 			newLineText.text += currentChar;
+// 		}
+// 		else if ( currentChar == 13 )
+// 		{
+// 			m_consoleText.push_back( newLineText );
+// 			newLineText.text = "";
+// 		}
+// 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -111,6 +164,7 @@ void DevConsole::SetIsOpen( bool isOpen )
 
 void DevConsole::ToggleVisibility()
 {
+	ResetConsole();
 	m_isConsoleOpen = !m_isConsoleOpen;
 }
 
@@ -142,11 +196,37 @@ void DevConsole::Update()
 
 void DevConsole::ProcessInput()
 {
-	wchar_t character;
+	char character;
 	while ( g_theInput->PopCharacter( &character ) )
 	{
-		//AddCharacterToInput( character );
+		if ( character == 13 )
+		{
+			m_currentText = "";
+			break;
+		}
+		AddCharacterToInput( character );
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool DevConsole::AddCharacterToInput( char character )
+{
+	m_currentText += character;
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DevConsole::ResetConsole()
+{
+	while ( g_theInput->m_characters.size() > 0 )
+	{
+		g_theInput->m_characters.pop();
+	}
+	m_consoleText.clear();
+	m_currentText = "";
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

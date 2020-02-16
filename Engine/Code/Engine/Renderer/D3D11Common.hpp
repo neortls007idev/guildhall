@@ -18,7 +18,7 @@
 #include <dxgi.h>	    // shared library used across multiple dx graphical interfaces
 #include <dxgidebug.h>  // debug utility (mostly used for reporting and analytics)
 #include "RenderBuffer.hpp"
-#include "../Core/ErrorWarningAssert.hpp"
+#include "Engine/Core/ErrorWarningAssert.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

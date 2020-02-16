@@ -24,6 +24,8 @@
 #include "ThirdParty/stb/stb_image.h"
 #pragma warning( pop )
 
+#include <string>
+
 #include <shobjidl.h>
 #include <shobjidl_core.h>
 
@@ -47,8 +49,24 @@ BitmapFont* g_bitmapFont = nullptr;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void SetDebugName( ID3D11DeviceChild* child , const std::string* name )
+{
+	if ( child != nullptr && name != nullptr )
+		child->SetPrivateData( WKPDID_D3DDebugObjectName , ( UINT ) name->size() , name->c_str() );
+}
+
+
 RenderContext::~RenderContext()
 {
+	delete g_bitmapFont;
+	g_bitmapFont = nullptr;
+
+
+	
+	m_LoadedTextures.clear();
+	m_LoadedBitMapFonts.clear();
+	m_LoadedShaders.clear();
+
 	delete m_swapChain;
 	m_swapChain = nullptr;
 	DX_SAFE_RELEASE( m_alphaBlendState );
@@ -118,10 +136,6 @@ void RenderContext::Startup( Window* window )
 
 	//~ swapchain
 	GUARANTEE_OR_DIE( SUCCEEDED( result ) , "FAILED TO CREATE RESOURCES" );
-// 	if ( g_bitmapFont == nullptr )
-// 	{
-// 		g_bitmapFont = GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
-// 	}
 	m_swapChain = new SwapChain( this , swapchain );
 	//m_defaultShader = new Shader( this );
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/default.hlsl" );
@@ -130,9 +144,14 @@ void RenderContext::Startup( Window* window )
 	m_frameUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 
 	m_defaultSampler = new Sampler( this , SAMPLER_POINT );
-	m_textureDefault = CreateTextureFromColor( RED );
+	m_textureDefault = CreateTextureFromColor( WHITE );
 
 	CreateBlendStates();
+
+	if ( g_bitmapFont == nullptr )
+	{
+		g_bitmapFont = GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -163,8 +182,8 @@ void RenderContext::EndFrame()
 void RenderContext::Shutdown()
 {
 
-	m_LoadedTextures.clear();
-	m_LoadedShaders.clear();
+	delete g_bitmapFont;
+	g_bitmapFont = nullptr;
 
 	DX_SAFE_RELEASE( m_alphaBlendState );
 	DX_SAFE_RELEASE( m_additiveBlendState );
@@ -233,15 +252,6 @@ void RenderContext::BeginCamera( const Camera& camera )
 	{
 		ClearScreen( camera.GetClearColor() );
 	}
-	/*
-
-if ( camera->ShouldClearClear() )
-{
-	ClearColorTarget( output , camera->GetClearColor() );
-}*/
-
-	//camera.SetColorTarget( nullptr );					// m_context->SetFrameColorTarget();
-														// m_camera->SetColorTarget
 
 // TEMPORARY - this will be moved
 //Set up the GPU for a draw
@@ -334,15 +344,13 @@ void RenderContext::CreateDebugModule()
 
 void RenderContext::DestroyDebugModule()
 {
+	if ( nullptr != m_debug )
 	{
-		if ( nullptr != m_debug )
-		{
-			DX_SAFE_RELEASE( m_debug );   // release our debug object
-			FreeLibrary( ( HMODULE ) m_debugModule ); // unload the dll
+		DX_SAFE_RELEASE( m_debug );   // release our debug object
+		FreeLibrary( ( HMODULE ) m_debugModule ); // unload the dll
 
-			m_debug = nullptr;
-			m_debugModule = ( HMODULE )nullptr;
-		}
+		m_debug = nullptr;
+		m_debugModule = ( HMODULE )nullptr;
 	}
 }
 
@@ -350,11 +358,9 @@ void RenderContext::DestroyDebugModule()
 
 void RenderContext::ReportLiveObjects()
 {
+	if ( nullptr != m_debug )
 	{
-		if ( nullptr != m_debug )
-		{
-			m_debug->ReportLiveObjects( DXGI_DEBUG_ALL , DXGI_DEBUG_RLO_DETAIL );
-		}
+		m_debug->ReportLiveObjects( DXGI_DEBUG_ALL , DXGI_DEBUG_RLO_DETAIL );
 	}
 }
 
@@ -433,12 +439,10 @@ Texture* RenderContext::CreateTextureFromFile( const char* imageFilePath )
 BitmapFont* RenderContext::CreateBitMapFontFromFile( std::string bitmapFontFilePath )
 {
 	UNUSED( bitmapFontFilePath );
-// 	Texture* bitmapFontTexture = GetOrCreateTextureFromFile( bitmapFontFilePath.c_str() );
-// 	BitmapFont* newBitmapFont = new BitmapFont( "BitMapFont" , bitmapFontTexture );
-// 	m_LoadedBitMapFonts[ bitmapFontFilePath ] = newBitmapFont;
-// 	return newBitmapFont;
-	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
-	return nullptr;
+	Texture* bitmapFontTexture = GetOrCreateTextureFromFile( bitmapFontFilePath.c_str() );
+	BitmapFont* newBitmapFont = new BitmapFont( "BitMapFont" , bitmapFontTexture );
+	m_LoadedBitMapFonts[ bitmapFontFilePath ] = newBitmapFont;
+	return newBitmapFont;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -453,7 +457,6 @@ Texture* RenderContext::GetOrCreateTextureFromFile( const char* imageFilePath )
 	}
 	
 	return Temp;
-	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -534,15 +537,15 @@ void RenderContext::Draw( int numVertexes , int vertexOffset )
 
 BitmapFont* RenderContext::GetOrCreateBitmapFontFromFile( std::string bitmapFontFilePath )
 {
-	UNUSED( bitmapFontFilePath );
-	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
-	// 	bitmapFontFilePath.append( ".png" );
-// 	BitmapFont* Temp = m_LoadedBitMapFonts[ bitmapFontFilePath ];
-// 	if ( Temp == nullptr )
-// 	{
-// 		Temp = CreateBitMapFontFromFile( bitmapFontFilePath );
-// 	}
-// 	return Temp;
+ 	bitmapFontFilePath.append( ".png" );
+ 	BitmapFont* Temp = m_LoadedBitMapFonts[ bitmapFontFilePath ];
+ 	if ( Temp == nullptr )
+ 	{
+ 		Temp = CreateBitMapFontFromFile( bitmapFontFilePath );
+ 	}
+ 	return Temp;
+// 	UNUSED( bitmapFontFilePath );
+// 	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
 		
 }
 
@@ -577,7 +580,7 @@ void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes
 
 void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU>& vertexArray )
 {
-	DrawVertexArray( (int) vertexArray.size() , &vertexArray[ 0 ] );
+	DrawVertexArray( ( int ) vertexArray.size() , &vertexArray[ 0 ] );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -30,7 +30,7 @@ class Image;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-enum class BlendMode
+enum BlendMode
 {
 	ALPHA ,
 	ADDITIVE ,
@@ -45,6 +45,8 @@ enum eBufferSlot
 	UBO_FRAME_SLOT	= 0,
 	UBO_CAMERA_SLOT = 1,
 };
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 struct FrameDataT
 {
@@ -125,27 +127,28 @@ private:
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 public:
-	ID3D11Device*		 m_device			= nullptr ;
-	ID3D11DeviceContext* m_context			= nullptr ; // Immediate context
-	SwapChain*			 m_swapChain		= nullptr;
-	Camera*				 m_currentCamera	= nullptr;
+	ID3D11Device*		 m_device								= nullptr ;
+	ID3D11DeviceContext* m_context								= nullptr ; // Immediate context
+	SwapChain*			 m_swapChain							= nullptr;
+	Camera*				 m_currentCamera						= nullptr;
 
-	void*				 m_debugModule		= nullptr;
-	IDXGIDebug*			 m_debug			= nullptr;
-
-
-	Shader*				 m_defaultShader	= nullptr;
-	Shader*				 m_currentShader	= nullptr;
-	VertexBuffer*		 m_immediateVBO		= nullptr;
-	ID3D11Buffer*		 m_lastBoundVBO		= nullptr;
-	Texture*			 m_textureTarget	= nullptr;
-	ID3D11BlendState*	 m_alphaBlendState = nullptr;
-	ID3D11BlendState*	 m_additiveBlendState = nullptr;
+	void*				 m_debugModule							= nullptr;
+	IDXGIDebug*			 m_debug								= nullptr;
 
 
-	RenderBuffer*		 m_frameUBO			= nullptr;
-	Sampler*			 m_defaultSampler	= nullptr;
-	Texture*			 m_textureDefault	= nullptr;
+	Shader*				 m_defaultShader						= nullptr;
+	Shader*				 m_currentShader						= nullptr;
+	VertexBuffer*		 m_immediateVBO							= nullptr;
+	ID3D11Buffer*		 m_lastBoundVBO							= nullptr;
+	Texture*			 m_textureTarget						= nullptr;
+	//ID3D11BlendState*	 m_blendStates[ BlendMode::TOTAL ];
+	ID3D11BlendState*	 m_alphaBlendState						= nullptr;
+	ID3D11BlendState*	 m_additiveBlendState					= nullptr;
+
+
+	RenderBuffer*		 m_frameUBO								= nullptr;
+	Sampler*			 m_defaultSampler						= nullptr;
+	Texture*			 m_textureDefault						= nullptr;
 
 private:
 

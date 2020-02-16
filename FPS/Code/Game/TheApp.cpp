@@ -7,7 +7,7 @@
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Time/Time.hpp"
 #include "Engine/Platform/Window.hpp"
-
+#include "Engine/Core/EventSystem.hpp"
 #include "Engine/Renderer/D3D11Common.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -20,6 +20,8 @@ RenderContext* g_theRenderer = nullptr;
 TheApp* g_theApp = nullptr;
 InputSystem* g_theInput = nullptr;
 Game* g_theGame = nullptr;
+DevConsole* g_theDevConsole = nullptr;
+extern BitmapFont* g_bitmapFont;
 
 //Rgba8 Clrscr = Rgba8( 0 , 0 , 0 , 255 );
 
@@ -41,6 +43,11 @@ TheApp::~TheApp()
 
 void TheApp::Startup()
 {
+	if ( g_theEventSystem == nullptr )
+	{
+		g_theEventSystem = new EventSystem();
+	}
+
  	if ( g_theInput == nullptr )
  	{
 		g_theInput = new InputSystem();
@@ -51,6 +58,12 @@ void TheApp::Startup()
 		g_theRenderer = new RenderContext();
 
 		g_theRenderer->Startup( g_theWindow );
+	}
+
+	if ( g_theDevConsole == nullptr )
+	{
+		g_theDevConsole = new DevConsole();
+		g_theDevConsole->PrintString( CYAN , "DEVCONSOLE STARTED" );
 	}
 
 	if ( g_theGame == nullptr )
@@ -99,6 +112,7 @@ void TheApp::Update( float deltaSeconds )
 		if ( m_isSpeedMo ) { deltaSeconds = deltaSeconds * 4.0f; }
 		
 		g_theGame->Update( deltaSeconds );
+		g_theDevConsole->Update();
 		g_theInput->EndFrame();
 
 }
@@ -114,6 +128,11 @@ void TheApp::Render() const
 // 
 // 		g_theGame->RenderUI();
 
+		if ( g_theDevConsole->IsOpen() )
+		{
+			//g_theGame->m_worldCamera.SetOrthoView( Vec2( 5 , 5 ) , Vec2( 35 , 35 ) );
+			g_theDevConsole->Render( *g_theRenderer , g_theGame->m_worldCamera , 0.5f );
+		}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -150,24 +169,12 @@ void TheApp::UpdateFromKeyboard()
 
 	if ( g_theInput != nullptr && g_theInput->WasKeyJustPressed( 'I' ) )
 	{
-		// TODO :- 
-		/*
-
-		attempting to directly change the window class structure icon parameter
-
-		LPWNDCLASSEX currentWindow;
-		WNDCLASSEX windowClassDescription;
-		::GetClassInfo(NULL, windowClassDescription , currentWindow );
-
-		*/
 		const HICON m_hIcon = reinterpret_cast< HICON >( ::LoadImage( NULL ,
 			IDI_ERROR  ,
 			IMAGE_ICON ,
 			0 , 0 ,
 			LR_DEFAULTCOLOR | LR_SHARED | LR_DEFAULTSIZE ) );
 				
-		//SetWindowLong( ( HWND ) g_theWindow->m_hwnd , GCL_HICON , ( LONG ) m_hIcon );
-		//SendMessage( ( HWND ) g_theWindow->m_hwnd , )
 		g_theWindow->SetNewIcon( ( void* ) m_hIcon );
 	}
 
@@ -199,11 +206,17 @@ void TheApp::UpdateFromKeyboard()
 			g_theGame->m_worldCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y ) );
 		}
 	}
+	
 	if ( g_theInput->GetButtonState( KEY_F8 ).WasJustPressed() ) 
 	{
 		delete g_theGame;
 		g_theGame = nullptr;
 		g_theGame = new Game();
 	}
-		
+	
+	if ( g_theInput->WasKeyJustPressed( KEY_TILDE ) )
+	{
+		g_theDevConsole->ToggleVisibility();
+	}
+
 }

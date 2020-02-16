@@ -27,31 +27,31 @@ Game::Game()
 void Game::Update( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
-	//m_color.g++;
-	m_color.g = ( uchar ) RangeMapFloat( -1.f , 1.f , 0 , 255 , SinDegrees( 100.f * ( float ) GetCurrentTimeSeconds() ) );
-	m_worldCamera.SetClearMode( CLEAR_COLOR_BIT , m_color );
+// 	//m_color.g++;
+// 	m_color.g = ( uchar ) RangeMapFloat( -1.f , 1.f , 0 , 255 , SinDegrees( 100.f * ( float ) GetCurrentTimeSeconds() ) );
+// 	m_worldCamera.SetClearMode( CLEAR_COLOR_BIT , m_color );
+// 
+// 	Vec3 movement = Vec3( Vec2::ZERO , 0.f );
+// 	if ( g_theInput->IsKeyHeldDown( 'A' ) )
+// 	{
+// 		movement.x -= 1.f;
+// 	}
+// 	if ( g_theInput->IsKeyHeldDown( 'D' ) )
+// 	{
+// 		movement.x += 1.f;
+// 	}
+// 	if ( g_theInput->IsKeyHeldDown( 'W' ) )
+// 	{
+// 		movement.y += 1.f;
+// 	}
+// 	if ( g_theInput->IsKeyHeldDown( 'S' ) )
+// 	{
+// 		movement.y -= 1.f;
+// 	}
 
-	Vec3 movement = Vec3( Vec2::ZERO , 0.f );
-	if ( g_theInput->IsKeyHeldDown( 'A' ) )
-	{
-		movement.x -= 1.f;
-	}
-	if ( g_theInput->IsKeyHeldDown( 'D' ) )
-	{
-		movement.x += 1.f;
-	}
-	if ( g_theInput->IsKeyHeldDown( 'W' ) )
-	{
-		movement.y += 1.f;
-	}
-	if ( g_theInput->IsKeyHeldDown( 'S' ) )
-	{
-		movement.y -= 1.f;
-	}
-
-	float speed = 4.0f;
-	m_cameraPosition += movement * speed * deltaSeconds;
-	m_worldCamera.SetPostion( m_cameraPosition );
+// 	float speed = 4.0f;
+// 	m_cameraPosition += movement * speed * deltaSeconds;
+// 	m_worldCamera.SetPostion( m_cameraPosition );
 }
 
 void Game::Render() const
@@ -61,8 +61,8 @@ void Game::Render() const
 	//Texture* tank = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/PlayerTankBase.png" );
 	//g_theRenderer->BindTexture( tank );
 	//g_theRenderer->SetBlendMode( BlendMode::ADDITIVE );
-	g_theRenderer->DrawAABB2( AABB2( -10.f , -10.f , 10.f , 10.f ) , WHITE );
-	g_theRenderer->EndCamera( m_worldCamera );
+	//g_theRenderer->DrawAABB2( AABB2( -10.f , -10.f , 10.f , 10.f ) , WHITE );
+	//g_theRenderer->EndCamera( m_worldCamera );
 }
 
 void Game::RenderUI() const

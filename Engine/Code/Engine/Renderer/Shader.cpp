@@ -1,7 +1,7 @@
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/D3D11Common.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
-
+#include "Engine/Core/FileUtils.hpp"
 #include <d3dcompiler.h>
 
 #include <stdio.h>
@@ -34,40 +34,6 @@ void ConvertBufferAttributeToID3DX11Attribute( D3D11_INPUT_ELEMENT_DESC* d3d11Ve
 		d3d11VertxDescription[ index ].InputSlotClass		= D3D11_INPUT_PER_VERTEX_DATA;							// Vertex data = drawing a tree, Instance data = drawing a million tree
 		d3d11VertxDescription[ index ].InstanceDataStepRate = 0;
 	}
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void* FileReadToNewBuffer( std::string const& filename, size_t *out_size )
-{
-	FILE* filePath = nullptr;
-	fopen_s( &filePath, filename.c_str() , "r" );
-	if ( nullptr == filePath )
-	{
-		return nullptr;
-	}
-
-	// TODO :- ADD ASSERT OR DIE IF FILE DOES NOT EXIST
-
-	fseek( filePath , 0 , SEEK_END );
-	long fileSize = ftell( filePath );
-
-	uchar* buffer = new uchar[ fileSize + 1 ];
-	if ( nullptr != buffer )
-	{
-		fseek( filePath , 0 , SEEK_SET );
-		size_t bytesRead = fread( buffer , 1 , fileSize , filePath );
-		buffer[ bytesRead ] = NULL;
-		UNUSED( bytesRead );
-	}
-	
-	if ( out_size != nullptr )
-	{
-		*out_size = ( size_t ) fileSize;
-	}
-
-	fclose( filePath );
-	return buffer;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -297,41 +263,12 @@ ID3D11InputLayout* Shader::GetOrCreateInputLayout( buffer_attribute_t const* att
 		m_lastBufferAttribute = attribs;
 	}
 
- 	//Position
- 		//vertexDescription[ 0 ].SemanticName			= "POSITION";
- 		//vertexDescription[ 0 ].SemanticIndex		= 0;													// Array element
- 		//vertexDescription[ 0 ].Format				= DXGI_FORMAT_R32G32B32_FLOAT;							// 3 32-bit floats
- 		//vertexDescription[ 0 ].InputSlot			= 0;													// interlaced or parallel IA format
- 		//vertexDescription[ 0 ].AlignedByteOffset	= offsetof( Vertex_PCU , m_position );
- 		//vertexDescription[ 0 ].InputSlotClass		= D3D11_INPUT_PER_VERTEX_DATA;							// Vertex data = drawing a tree, Instance data = drawing a million tree
- 		//vertexDescription[ 0 ].InstanceDataStepRate = 0;
- 	
- 		//// Color
- 		//vertexDescription[ 1 ].SemanticName			= "COLOR";
- 		//vertexDescription[ 1 ].SemanticIndex		= 0;													// Array element
- 		//vertexDescription[ 1 ].Format				= DXGI_FORMAT_R8G8B8A8_UNORM;							// 4 1 byte channel. unsigned normal Value
- 		//vertexDescription[ 1 ].InputSlot			= 0;													// interlaced or parallel IA format
- 		//vertexDescription[ 1 ].AlignedByteOffset	= offsetof( Vertex_PCU , m_color );
- 		//vertexDescription[ 1 ].InputSlotClass		= D3D11_INPUT_PER_VERTEX_DATA;							// Vertex data = drawing a tree, Instance data = drawing a million tree
- 		//vertexDescription[ 1 ].InstanceDataStepRate = 0;
- 		//
- 		//// UVS
- 		//vertexDescription[ 2 ].SemanticName			= "TEXCOORD";
- 		//vertexDescription[ 2 ].SemanticIndex		= 0;													// Array element
- 		//vertexDescription[ 2 ].Format				= DXGI_FORMAT_R32G32_FLOAT;								// 4 1 byte channel. unsigned normal Value
- 		//vertexDescription[ 2 ].InputSlot			= 0;													// interlaced or parallel IA format
- 		//vertexDescription[ 2 ].AlignedByteOffset	= offsetof( Vertex_PCU , m_uvTexCoords );
- 		//vertexDescription[ 2 ].InputSlotClass		= D3D11_INPUT_PER_VERTEX_DATA;							// Vertex data = drawing a tree, Instance data = drawing a million tree
- 		//vertexDescription[ 2 ].InstanceDataStepRate	= 0;
-
-
 	ID3D11Device* device = m_owner->m_device;
 	device->CreateInputLayout(
 		vertexDescription , 3 ,
 		m_vertexStage.GetByteCode() , m_vertexStage.GetByteCodeLength() ,
 		&m_inputLayout );
 																			// describe the Vertex PCU
-
 	return m_inputLayout;
 }
 

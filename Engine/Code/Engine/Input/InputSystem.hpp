@@ -34,11 +34,11 @@ public:
 
 	void UpdateMouse();
 
-	void PushCharacter( wchar_t character );
-	bool PopCharacter( wchar_t* outCharacter );
+	void PushCharacter( char character );
+	bool PopCharacter( char* outCharacter );
 
 public:
-	std::queue<wchar_t> m_characters;
+	std::queue<char> m_characters;
 
 private:
 

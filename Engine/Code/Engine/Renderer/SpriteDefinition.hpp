@@ -17,6 +17,7 @@ public:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 	explicit SpriteDefinition( const SpriteSheet& spriteSheet , int spriteIndex , const Vec2& uvAtMins , const Vec2& uvAtMaxs );
+	~SpriteDefinition() {};
 	void				  GetUVs( Vec2& out_uvAtMins , Vec2& out_uvAtMaxs )const;
 	const	 SpriteSheet& GetSpriteSheet() const;
 	const	 Texture&	  GetTexture() const;
