@@ -263,6 +263,20 @@ void AABB2::FitWithinBounds( const AABB2& bounds )
 	
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void AABB2::AlignWithinAABB2( const AABB2& outerAABB2 , const Vec2& alignment )
+{	
+	Vec2 Dimesions = GetDimensions();
+	Vec2 cellMins = outerAABB2.m_mins + ( ( outerAABB2.m_maxs - outerAABB2.m_mins ) * alignment ) - ( Dimesions * alignment );
+	Vec2 cellMaxs = outerAABB2.m_maxs;/* outerAABB2.GetDimensions()*/
+	
+	m_mins = cellMins;
+	m_maxs = cellMins + Dimesions;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 AABB2 AABB2::CarveBoxOffRight( float fractionOfWidth , float additionalWidth )
 {
 	float width = m_maxs.x - m_mins.x;
@@ -271,6 +285,8 @@ AABB2 AABB2::CarveBoxOffRight( float fractionOfWidth , float additionalWidth )
 	m_maxs.x = carvedPiece.m_mins.x;
 	return carvedPiece;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 AABB2 AABB2::GetBoxAtRight( float fractionOfWidth , float additionalWidth )
 {
@@ -296,7 +312,7 @@ AABB2 AABB2::GetBoxAtLeft( float fractionOfWidth , float additionalWidth )
 {
 	float width = m_maxs.x - m_mins.x;
 	float carveWidth = ( fractionOfWidth * width ) + additionalWidth;
-	return AABB2( m_maxs.x , m_mins.y , m_maxs.x - carveWidth , m_maxs.y );
+	return AABB2( m_mins.x , m_mins.y , m_maxs.x - carveWidth , m_maxs.y );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

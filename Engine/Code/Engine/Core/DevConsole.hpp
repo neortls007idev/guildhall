@@ -36,6 +36,8 @@ public:
 	bool AddCharacterToInput( char character );
 	void ResetConsole();
 
+	int GetCurrentInputLength() const																				{ return ( int ) m_currentText.length(); }
+
 protected:
 
 	bool						  m_isConsoleOpen = false;

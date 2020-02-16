@@ -1,11 +1,16 @@
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Core/DevConsole.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>					// #include this (massive, platform-specific) header in very few places
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+extern	DevConsole* g_theDevConsole;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -162,6 +167,10 @@ void InputSystem::UpdateMouse()
 
 void InputSystem::PushCharacter( char character )
 {
+	if ( character == 8 && g_theDevConsole->GetCurrentInputLength() <= 0 )
+	{
+		return;
+	}
 	m_characters.push( character );
 }
 

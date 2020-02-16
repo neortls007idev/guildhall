@@ -60,9 +60,17 @@ void DevConsole::PrintString( const Rgba8& textColor , const std::string& devCon
 void DevConsole::Render( RenderContext& renderer , const Camera& camera , float lineHeight ) const
 {
 	AABB2 consoleArea = AABB2( camera.GetOrthoBottomLeft() , camera.GetOrthoTopRight() );
-	AABB2 typingArea = consoleArea.CarveBoxOffBottom( 0.1f , 0.f );
-	consoleArea = consoleArea.CarveBoxOffTop( 0.9f , 0.f );
-	float offsetBetweenLines = 1.f;
+	AABB2 typingArea = consoleArea.CarveBoxOffBottom( 0.075f , 0.f );
+	consoleArea = consoleArea.CarveBoxOffTop( 0.925f , 0.f );
+
+	Vec2 caratDimensions = typingArea.GetDimensions();
+	
+
+	AABB2 carat = typingArea.GetBoxAtLeft( 0.995f , 0.f );
+	carat.SetDimensions( carat.GetDimensions() * 0.7f );
+	carat.AlignWithinAABB2( typingArea , ALIGN_CENTERED_LEFT );
+
+	float offsetBetweenLines = 0.75f;
 
 	float dimensionOfConsole = camera.GetOrthoTopRight().y - camera.GetOrthoBottomLeft().y;
 	int numberOfLinesToDisplay = RoundDownToInt( dimensionOfConsole / ( lineHeight + offsetBetweenLines) );
@@ -74,6 +82,12 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	//renderer.BeginCamera( camera );
 	
 	renderer.DrawAABB2( consoleArea , m_OverlayColor );
+	renderer.DrawAABB2( typingArea , Rgba8( 0 , 0 , 255 , 100 ) );
+
+	float translateCaratX = m_currentText.length() * lineHeight;
+	carat.Translate( Vec2( translateCaratX , 0.f ) );
+	renderer.DrawAABB2( carat , Rgba8( 255 , 0 , 255 , 100 ) );
+	
 	std::vector<Vertex_PCU> consoleTextVerts;
 
 	for ( int index = 0; index < numberOfLinesToDisplay; index++ )
@@ -85,9 +99,8 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 
 		g_bitmapFont->AddVertsForTextInBox2D( consoleTextVerts , consoleArea , lineHeight , m_consoleText[ myStringIndex ].text , m_consoleText[ myStringIndex ].lineColor , 1.f , alignment );
 		myStringIndex--;
-				
-		//startMins.y += lineHeight;
-		alignmentDeltaChange += ( offsetBetweenLines /*+ 20.f */);
+
+		alignmentDeltaChange += ( offsetBetweenLines );
 
 		alignment.y = RangeMapFloat( 0.f , ( float ) numberOfLinesToDisplay , 0.f , 1.f , alignmentDeltaChange );
 	}
@@ -106,10 +119,7 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	}
 
 	renderer.BindTexture( nullptr );
-	//renderer.DrawAABB2( typingArea , Rgba8( 0 , 0 , 255 , 255 ) );
 	curretnTextVerts.clear();
-
-	//renderer.EndCamera( camera );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -124,33 +134,6 @@ void DevConsole::OnKeyPress( char character )
 	{
 		m_consoleText.push_back( newLineText );
 	}
-
-// 	size_t currentCommandIndex = m_consoleText.size();
-// 	
-// 	ColoredLine newLineText;
-// 	newLineText.lineColor = WHITE;
-// 	
-// 	//m_consoleText.push_back( newLineText );
-// 
-// // 	if( character !=  13 )
-// // 	{
-// // 		newLineText.text += character;
-// // 	}
-// 	for ( size_t index = 0; index < g_theInput->m_characters.size(); index++ )
-// 	{
-// 		char currentChar = 0;
-// 		g_theInput->PopCharacter( &currentChar );
-// 
-// 		if ( currentChar != 13 && currentChar != 0 )
-// 		{
-// 			newLineText.text += currentChar;
-// 		}
-// 		else if ( currentChar == 13 )
-// 		{
-// 			m_consoleText.push_back( newLineText );
-// 			newLineText.text = "";
-// 		}
-// 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -189,19 +172,30 @@ void DevConsole::ChangeOverlayColor( Rgba8 newOverlayColor )
 	m_OverlayColor = newOverlayColor;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void DevConsole::Update()
 {
 	ProcessInput();
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void DevConsole::ProcessInput()
 {
 	char character;
+
 	while ( g_theInput->PopCharacter( &character ) )
 	{
 		if ( character == 13 )
 		{
 			m_currentText = "";
+			break;
+		}
+
+		if ( character == 8 && m_currentText.size() > 0 )
+		{
+			m_currentText.pop_back();
 			break;
 		}
 		AddCharacterToInput( character );
