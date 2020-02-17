@@ -2,6 +2,8 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Core/EventSystem.hpp"
+#include <tuple>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -9,7 +11,7 @@ struct  DevConsoleCommand
 {
 	std::string command;
 	std::string Description;
-	//	TODO :- ("add EventSubscrition data here");
+	EventArgs commandArgs;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -24,7 +26,9 @@ struct ColoredLine
 
 class DevConsole
 {
+
 public:
+
 	DevConsole();
 	void Startup();
 
@@ -38,8 +42,6 @@ public:
 	
 	void Render( RenderContext& renderer , const Camera& camera , float lineHeight ) const;
 
-	float MoveCarrot( float lineHeight ) const;
-
 	void PrintString( const Rgba8& textColor = WHITE , const std::string& devConsolePrintString = "INVALID STRING" );
 
 	void ProcessInput();
@@ -51,6 +53,11 @@ public:
 	void ExecuteCommand();
 	void CreateCommand( DevConsoleCommand newCommand );
 	void CreateCommand( std::string newCommand , std::string commandDescription );
+	void CreateCommand( std::string newCommand , std::string commandDescription , EventArgs commandArgs );
+
+	bool ExecuteHelp( EventArgs& commandArgs );
+	bool ExecuteQuit( EventArgs& commandArgs );
+	bool Close( EventArgs& commandArgs );
 
 	void SetIsOpen( bool isOpen );
 	void ToggleVisibility();
@@ -62,8 +69,8 @@ public:
 	void HandleArrowKeys();
 
 private:
-	void ExecuteQuit();
 	void ExecuteHelp();
+	void ExecuteQuit();
 
 protected:
 
@@ -74,6 +81,7 @@ protected:
 	size_t							m_carrotOffset			= 0;
 	std::vector<ColoredLine>		m_consoleText;
 	std::vector<DevConsoleCommand>	m_consoleCommands;
+	//std::tuple<std::string, std::string , EventArgs> m_consoleCommandsTuple;
 	bool							m_isCommandFound		= false;
 	size_t							m_commandSearchIndex	= 0;
 

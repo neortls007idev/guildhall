@@ -19,9 +19,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Entity.cpp">
-      <Filter>Gameplay\Entities</Filter>
-    </ClCompile>
     <ClCompile Include="GameCommon.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
@@ -34,23 +31,8 @@
     <ClCompile Include="Game.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
-    <ClCompile Include="World.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="Map.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="Tile.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Gameplay\Entities</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Entity.hpp">
-      <Filter>Gameplay\Entities</Filter>
-    </ClInclude>
     <ClInclude Include="GameCommon.hpp">
       <Filter>Framework</Filter>
     </ClInclude>
@@ -59,18 +41,6 @@
     </ClInclude>
     <ClInclude Include="Game.hpp">
       <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="World.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="Map.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="Tile.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="Player.hpp">
-      <Filter>Gameplay\Entities</Filter>
     </ClInclude>
     <ClInclude Include="EngineBuildPreferences.hpp">
       <Filter>Framework</Filter>
@@ -81,6 +51,9 @@
       <Filter>Data\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="..\..\Run\Data\Shaders\default.hlsl">
+      <Filter>Data\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\InvertColor.hlsl">
       <Filter>Data\Shaders</Filter>
     </FxCompile>
   </ItemGroup>

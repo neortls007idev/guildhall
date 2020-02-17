@@ -30,7 +30,8 @@ TheApp::TheApp()
 
 TheApp::~TheApp()
 {
-
+	delete g_theGame;
+	g_theGame = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -133,7 +134,7 @@ void TheApp::Render() const
 		if ( g_theDevConsole->IsOpen() )
 		{
 			//g_theGame->m_worldCamera.SetOrthoView( Vec2( 5 , 5 ) , Vec2( 35 , 35 ) );
-			g_theDevConsole->Render( *g_theRenderer , g_theGame->m_worldCamera , 0.5f );
+			g_theDevConsole->Render( *g_theRenderer , g_theGame->m_gameCamera , 0.5f );
 		}
 }
 
@@ -204,7 +205,7 @@ void TheApp::UpdateFromKeyboard()
 		m_debugCamera = !m_debugCamera;
 		if (m_debugCamera)
 		{
-			g_theGame->m_worldCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y ) );
+			g_theGame->m_gameCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y ) );
 		}
 	}
 	

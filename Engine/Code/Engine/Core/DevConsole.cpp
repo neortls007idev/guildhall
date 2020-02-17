@@ -35,20 +35,10 @@ void DevConsole::Startup()
 
 void DevConsole::InitializeCommands()
 {
-	DevConsoleCommand help;
-	help.command = "help";
-	help.Description = "List All Commands";
-	m_consoleCommands.push_back( help );
-
-	DevConsoleCommand quit;
-	quit.command = "quit";
-	quit.Description = "Quits the Application";
-	m_consoleCommands.push_back( quit );
-
-	DevConsoleCommand close;
-	close.command = "close";
-	close.Description = "Closes the DevConsole";
-	m_consoleCommands.push_back( close );
+	CreateCommand( "help" , "List All Commands" );
+	//g_theEventSystem->SubscribeToEvent( "help" , ExecuteHelp );
+	CreateCommand( "quit" , "Quits the Application" );
+	CreateCommand( "close" , "Closes the Devconsole" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -151,12 +141,6 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	curretnTextVerts.clear();
 }
 
-float DevConsole::MoveCarrot( float lineHeight ) const
-{
-	float translateCaratX = m_currentText.length() * lineHeight;
-	return translateCaratX;
-}
-
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void DevConsole::OnKeyPress( char character )
@@ -242,6 +226,14 @@ void DevConsole::CreateCommand( std::string newCommand , std::string commandDesc
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void DevConsole::CreateCommand( std::string newCommand , std::string commandDescription , EventArgs commandArgs )
+{
+	__debugbreak();
+	// TODO
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void DevConsole::SetIsOpen( bool isOpen )
 {
 	m_isConsoleOpen = isOpen;
@@ -260,6 +252,15 @@ void DevConsole::ToggleVisibility()
 void DevConsole::Close()
 {
 	m_isConsoleOpen = false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool DevConsole::Close( EventArgs& commandArgs )
+{
+	UNUSED( commandArgs );
+	Close();
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -384,12 +385,30 @@ void DevConsole::ExecuteQuit()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+bool DevConsole::ExecuteQuit( EventArgs& commandArgs )
+{
+	UNUSED( commandArgs );
+	ExecuteQuit();
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void DevConsole::ExecuteHelp()
 {
 	for ( m_commandSearchIndex = 0; m_commandSearchIndex < m_consoleCommands.size(); m_commandSearchIndex++ )
 	{
 		PrintString( GREEN , m_consoleCommands[ m_commandSearchIndex ].command + " : " + m_consoleCommands[ m_commandSearchIndex ].Description );
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool DevConsole::ExecuteHelp( EventArgs& commandArgs )
+{
+	UNUSED( commandArgs );
+	ExecuteHelp();
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -3,11 +3,15 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Primitives/AABB2.hpp"
-#include "Engine/Renderer/Texture.hpp"
-#include "Game/Player.hpp"
-#include "Game/World.hpp"
 #include "Game/GameCommon.hpp"
 #include "Engine/Math/Vec3.hpp"
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+class Shader;
+class Texture;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 class Game
 {
@@ -15,6 +19,7 @@ class Game
 public:
 
 	Game();
+	~Game();
 	void Update( float deltaSeconds );
 	void Render() const;
 	void UpdateCamera();
@@ -34,22 +39,19 @@ private:
 
 private:
 
-	int m_controllerID = -1;
-	float m_screenShakeIntensity = 0.f;
-	World* m_world1 = nullptr;
-	bool m_isClipping = false;
-	float m_tilesInViewHorizontally = 16.0f;
-	float m_tilesInViewVertically = 9.0f;
-	Vec2 m_CameraCenter= Vec2( m_tilesInViewHorizontally / 2 , m_tilesInViewVertically / 2 );
-
+	int			m_controllerID			= -1;
+	float		m_screenShakeIntensity	= 0.f;
+	
 public:
+	
+	AABB2		m_normalImage;
+	AABB2		m_invertedColorImage;
+	Texture*	m_imageTex				= nullptr;
 
-	bool m_debugDraw = false;
-	Texture* m_tankBaseTexture = nullptr;
-	Texture* m_tankTurretTexture = nullptr;
-	Camera m_worldCamera;
-	Camera m_uiCamera;
-	//RandomNumberGenerator m_RNG;
-	Rgba8 m_color;
-	Vec3	m_cameraPosition;
+	Camera		m_gameCamera;
+	Camera		m_uiCamera;
+
+	Rgba8		m_color;
+	Vec3		m_cameraPosition;
+	Shader* 	m_invertColorShader;
 };
