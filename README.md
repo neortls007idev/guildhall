@@ -37,15 +37,15 @@ and remember you can submit extras from previous assignments.
                    You may use a custom key if you make a note in your assignment readme.
         - [x] Upon opening console, be sure the input is cleared.
     - [x] *02pts*: Pressing tilde again closes the console.
-    - [ ] *09pts* If console is open, Escape should...
-        - [ ] *03pts*: Clear input if there is any text currently there
-        - [ ] *03pts*: Close the console if console is open.
-        - [ ] *03pts*: Normal game behaviour otherwise (for example, for now it will quit your application)
+    - [x] *09pts* If console is open, Escape should...
+        - [x] *03pts*: Clear input if there is any text currently there
+        - [x] *03pts*: Close the console if console is open.
+        - [x] *03pts*: Normal game behaviour otherwise (for example, for now it will quit your application)
     - [x] *14pts*: User can type commands **only** while console is open.
         - [x] *02pts*: Typing should insert characters at the carot
-        - [ ] *02pts*: The carot blinks (every quarter to half second usually looks okay)
-        - [ ] *02pts*; Left & Right arrow keys should move carot forward and back along string
-        - [ ] *02pts*: Delete should delete the character after the carot
+        - [x] *02pts*: The carot blinks (every quarter to half second usually looks okay)
+        - [x] *02pts*; Left & Right arrow keys should move carot forward and back along string
+        - [x] *02pts*: Delete should delete the character after the carot
         - [x] *02pts*: Backspace should delete the character before the carot
         - [x] *02pts*: Pressing `Enter` submits the command
         - [x] *02pts* If it is an invalid command (it has not handler), print an error message

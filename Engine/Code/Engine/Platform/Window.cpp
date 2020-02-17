@@ -106,7 +106,6 @@ static void RegisterWindowClass()
 
 	m_taskbarButtonCreatedMessageId = RegisterWindowMessage( L"TaskbarButtonCreated" );
 	ChangeWindowMessageFilterEx( GetActiveWindow() , m_taskbarButtonCreatedMessageId , MSGFLT_ALLOW , NULL );
-
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -214,6 +213,8 @@ bool Window::Open( std::string const& title , float clientAspect , float maxClie
 
 	m_hwnd = ( void* ) hwnd;
 
+	CreateIcons();
+
 // 	SetWindowLong( hwnd , GWL_EXSTYLE , WS_EX_LAYERED );						----> Change Window Creation style to make a Layered Window
 // 	SetLayeredWindowAttributes( hwnd , RGB( 0 , 0 , 0 ) , 128 , LWA_ALPHA );	----> Change Attributes of Layered Window
 
@@ -303,8 +304,16 @@ int Window::GetClientHeight()
 
 bool Window::HandleQuitRequested()
 {
+	
+	if ( g_theDevConsole->IsOpen() )
+	{
+		g_theDevConsole->Close();
+		return false;
+	}
+
 	pTaskbar->Release();
 	::CoUninitialize();
+
 	m_isQuitting = true;
 	return m_isQuitting;
 }
@@ -321,6 +330,22 @@ void Window::SetTitle( std::string const& title )
 void Window::SetNewIcon( void* const& icon )
 {
 	SendMessage( ( HWND ) m_hwnd , WM_SETICON , ICON_BIG , reinterpret_cast< LPARAM >( icon ) );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Window::SetNewIcon( eIcon newIcon )
+{
+	SendMessage( ( HWND ) m_hwnd , WM_SETICON , ICON_BIG , reinterpret_cast< LPARAM >( m_icons[ newIcon ] ) );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Window::CreateIcons()
+{
+	m_icons[ eIcon::WARNING ] = reinterpret_cast< HICON >( ::LoadImage( NULL , IDI_WARNING , IMAGE_ICON , 0 , 0 , LR_DEFAULTCOLOR | LR_SHARED | LR_DEFAULTSIZE ) );
+	m_icons[ eIcon::ERROR_ICON ] = reinterpret_cast< HICON >( ::LoadImage( NULL , IDI_ERROR , IMAGE_ICON , 0 , 0 , LR_DEFAULTCOLOR | LR_SHARED | LR_DEFAULTSIZE ) );
+	m_icons[ eIcon::INFORMATION ] = reinterpret_cast< HICON >( ::LoadImage( NULL , IDI_INFORMATION , IMAGE_ICON , 0 , 0 , LR_DEFAULTCOLOR | LR_SHARED | LR_DEFAULTSIZE ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

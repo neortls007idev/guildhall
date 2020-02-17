@@ -12,18 +12,12 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-#include <winuser.h>
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 RenderContext* g_theRenderer = nullptr;
 TheApp* g_theApp = nullptr;
 InputSystem* g_theInput = nullptr;
 Game* g_theGame = nullptr;
 DevConsole* g_theDevConsole = nullptr;
 extern BitmapFont* g_bitmapFont;
-
-//Rgba8 Clrscr = Rgba8( 0 , 0 , 0 , 255 );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -115,7 +109,13 @@ void TheApp::Update( float deltaSeconds )
 		if ( m_isSpeedMo ) { deltaSeconds = deltaSeconds * 4.0f; }
 		
 		g_theGame->Update( deltaSeconds );
-		g_theDevConsole->Update();
+
+		if ( g_theDevConsole->IsOpen() )
+		{
+			g_theDevConsole->Update();
+		}
+
+		//g_theDevConsole->Update();
 		g_theInput->EndFrame();
 }
 
@@ -176,13 +176,7 @@ void TheApp::UpdateFromKeyboard()
 
 	if ( g_theInput != nullptr && g_theInput->WasKeyJustPressed( 'I' ) )
 	{
-		const HICON m_hIcon = reinterpret_cast< HICON >( ::LoadImage( NULL ,
-			IDI_ERROR  ,
-			IMAGE_ICON ,
-			0 , 0 ,
-			LR_DEFAULTCOLOR | LR_SHARED | LR_DEFAULTSIZE ) );
-				
-		g_theWindow->SetNewIcon( ( void* ) m_hIcon );
+		g_theWindow->SetNewIcon( eIcon::INFORMATION );
 	}
 
 	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasKeyJustPressed( 'B' ) )

@@ -6,6 +6,8 @@
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Platform/Window.hpp"
+#include "Engine/Time/Time.hpp"
+#include "../Input/VirtualKeyboard.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -109,9 +111,11 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	renderer.DrawAABB2( consoleArea , m_OverlayColor );
 	renderer.DrawAABB2( typingArea , Rgba8( 0 , 0 , 255 , 100 ) );
 
-	float translateCaratX = m_currentText.length() * lineHeight;
+	/*MoveCarrot( lineHeight );*/
+
+	float translateCaratX = ( m_currentText.length() - m_carrotOffset ) * lineHeight;
 	carat.Translate( Vec2( translateCaratX , 0.f ) );
-	renderer.DrawAABB2( carat , Rgba8( 255 , 0 , 255 , 100 ) );
+	renderer.DrawAABB2( carat , m_carrotColor );
 	
 	std::vector<Vertex_PCU> consoleTextVerts;
 
@@ -145,6 +149,12 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 
 	renderer.BindTexture( nullptr );
 	curretnTextVerts.clear();
+}
+
+float DevConsole::MoveCarrot( float lineHeight ) const
+{
+	float translateCaratX = m_currentText.length() * lineHeight;
+	return translateCaratX;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -278,19 +288,36 @@ void DevConsole::Update()
 void DevConsole::ProcessInput()
 {
 	char character;
+	m_carrotColor.a = ( uchar ) RangeMapFloat( -1.f , 1.f , 0 , 255 , SinDegrees( 127.f * ( float ) GetCurrentTimeSeconds() ) );
+	HandleArrowKeys();
+		
+	size_t curStringLength = m_currentText.length();
+
+	if ( g_theInput->WasKeyJustPressed( KEY_DELETE ) && ( curStringLength - m_carrotOffset ) < curStringLength )
+	{
+		m_currentText.erase( ( curStringLength - m_carrotOffset ) , 1 );
+		m_carrotColor.a = 255;
+		m_carrotOffset--;
+		return;
+	}
 
 	while ( g_theInput->PopCharacter( &character ) )
 	{
-		if ( character == 13 || character == 10 )
+		if ( character == EASCII_RETURNCARRIAGE || character == EASCII_NEWLINE )
 		{
 			ProcessCommand();
 			m_currentText = "";
+			m_carrotColor.a = 255;
+			m_carrotOffset = 0;
 			break;
 		}
 
-		if ( character == 8 && m_currentText.size() > 0 )
+		curStringLength = m_currentText.length();
+
+		if ( character == EASCII_BACKSPACE && ( curStringLength - m_carrotOffset ) > 0 )
 		{
-			m_currentText.pop_back();
+			m_currentText.erase( curStringLength - m_carrotOffset - 1 , 1 );
+			m_carrotColor.a = 255;
 			break;
 		}
 		AddCharacterToInput( character );
@@ -301,8 +328,14 @@ void DevConsole::ProcessInput()
 
 bool DevConsole::AddCharacterToInput( char character )
 {
-	m_currentText += character;
+	size_t curStringLength = m_currentText.length();
 
+	if ( character != 8 && character != 127 )
+	{
+		m_currentText.insert( curStringLength - m_carrotOffset , 1 , character );/* = character;*/
+		//m_currentText.insert()
+		m_carrotColor.a = 255;
+	}
 	return true;
 }
 
@@ -316,6 +349,30 @@ void DevConsole::ResetConsole()
 	}
 	m_consoleText.clear();
 	m_currentText = "";
+	m_carrotOffset = 0;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DevConsole::HandleArrowKeys()
+{
+	size_t curTextLength = m_currentText.length();
+
+	if ( curTextLength - m_carrotOffset > 0 )
+	{
+		if ( g_theInput->WasKeyJustPressed( KEY_LEFTARROW ) || g_theInput->IsKeyHeldDown( KEY_LEFTARROW ) )
+		{
+			m_carrotOffset += 1;
+		}
+	}
+	if ( curTextLength - m_carrotOffset < curTextLength )
+	{
+		if ( g_theInput->WasKeyJustPressed( KEY_RIGHTARROW ) || g_theInput->IsKeyHeldDown( KEY_RIGHTARROW ) )
+		{
+			m_carrotOffset -= 1;
+			//translateCaratX += lineHeight;
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -8,6 +8,16 @@ class InputSystem;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+enum eIcon : uint
+{
+	WARNING,
+	ERROR_ICON,
+ 	INFORMATION,
+	TOTAL_ICONS
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 enum eDisplaySettings : uint
 {
 	BORDERLESS,
@@ -41,6 +51,8 @@ public:
 
 	void SetTitle( std::string const& title );
 	void SetNewIcon( void* const& icon );
+	void SetNewIcon( eIcon newIcon );
+	void CreateIcons();
 	void DisplaySettings( eDisplaySettings settings );
 
 
@@ -53,4 +65,5 @@ private:
 	InputSystem*		m_inputSystem		= nullptr;
 	bool				m_isQuitting		= false;
 	eDisplaySettings	m_windowStyleFlags	= REGULAR;
+	void*				m_icons[ TOTAL_ICONS ];
 };

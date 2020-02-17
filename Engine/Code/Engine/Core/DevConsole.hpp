@@ -34,9 +34,18 @@ public:
 	void EndFrame();
 	void Shutdown();
 
-	void PrintString( const Rgba8& textColor = WHITE, const std::string& devConsolePrintString = "INVALID STRING");
+	void Update();
+	
 	void Render( RenderContext& renderer , const Camera& camera , float lineHeight ) const;
+
+	float MoveCarrot( float lineHeight ) const;
+
+	void PrintString( const Rgba8& textColor = WHITE , const std::string& devConsolePrintString = "INVALID STRING" );
+
+	void ProcessInput();
 	void OnKeyPress( char character );
+	bool AddCharacterToInput( char character );
+	int	 GetCurrentInputLength() const																				{ return ( int ) m_currentText.length(); }
 
 	void ProcessCommand();
 	void ExecuteCommand();
@@ -49,17 +58,20 @@ public:
 	bool IsOpen() const;
 
 	void ChangeOverlayColor( Rgba8 newOverlayColor );
-	void Update();
-	void ProcessInput();
-	bool AddCharacterToInput( char character );
 	void ResetConsole();
+	void HandleArrowKeys();
 
-	int GetCurrentInputLength() const																				{ return ( int ) m_currentText.length(); }
+private:
+	void ExecuteQuit();
+	void ExecuteHelp();
 
 protected:
 
 	bool							m_isConsoleOpen			= false;
 	Rgba8							m_OverlayColor			= Rgba8( 100 , 100 , 100 , 100 );
+	Rgba8							m_carrotColor			= Rgba8( 255 , 255 , 255 , 255 );
+	float							m_carrotPosX			= 0.f;
+	size_t							m_carrotOffset			= 0;
 	std::vector<ColoredLine>		m_consoleText;
 	std::vector<DevConsoleCommand>	m_consoleCommands;
 	bool							m_isCommandFound		= false;
@@ -67,6 +79,4 @@ protected:
 
 private:
 	std::string						m_currentText			= "";
-	void ExecuteQuit();
-	void ExecuteHelp();
 };
