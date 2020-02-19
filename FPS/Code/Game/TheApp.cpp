@@ -9,6 +9,7 @@
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Core/EventSystem.hpp"
 #include "Engine/Renderer/D3D11Common.hpp"
+#include <string>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -93,8 +94,6 @@ void TheApp::BeginFrame()
 	g_theWindow->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theDevConsole->BeginFrame();
-	//g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
-
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -147,6 +146,11 @@ void TheApp::EndFrame()
 	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
+
+	if ( g_theRenderer->HasAnyShaderChangedAtPath( L"\\Data\\Shaders\\" ) )
+	{
+		g_theRenderer->ReCompileShaders();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -170,6 +174,18 @@ void TheApp::Shutdown()
 
 void TheApp::UpdateFromKeyboard()
 {
+	if ( g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() ) { g_theWindow->HandleQuitRequested(); }
+
+	if ( g_theInput->WasKeyJustPressed( KEY_TILDE ) )
+	{
+		g_theDevConsole->ToggleVisibility();
+	}
+
+	if ( g_theDevConsole->IsOpen() )
+	{
+		return;
+	}
+
 	if ( g_theInput != nullptr && g_theInput->WasKeyJustPressed( 'C' ) /*&& g_theInput->WasKeyJustPressed( 'T' )*/ )
 	{
 		g_theWindow->SetTitle( "Function Works" );
@@ -198,8 +214,6 @@ void TheApp::UpdateFromKeyboard()
 	if ( g_theInput->GetButtonState( 'P' ).WasJustPressed() ) { m_isPaused = !m_isPaused; }
 
 	
-	if ( g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() ) { g_theWindow->HandleQuitRequested(); }
-
 	if ( g_theInput->GetButtonState( KEY_F4 ).WasJustPressed() )
 	{
 		m_debugCamera = !m_debugCamera;
@@ -216,9 +230,9 @@ void TheApp::UpdateFromKeyboard()
 		g_theGame = new Game();
 	}
 	
-	if ( g_theInput->WasKeyJustPressed( KEY_TILDE ) )
-	{
-		g_theDevConsole->ToggleVisibility();
+	if ( g_theInput->WasKeyJustPressed( 'R' ) )
+	{		
+		g_theRenderer->ReCompileShaders();
 	}
-
 }
+

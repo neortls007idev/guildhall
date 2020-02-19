@@ -170,6 +170,7 @@
     <ClCompile Include="..\ThirdParty\TinyXML2\tinyxml2.cpp" />
     <ClCompile Include="Audio\AudioSystem.cpp" />
     <ClCompile Include="Core\DevConsole.cpp" />
+    <ClCompile Include="Core\DirectoryWatcher.cpp" />
     <ClCompile Include="Core\EngineCommon.cpp" />
     <ClCompile Include="Core\ErrorWarningAssert.cpp" />
     <ClCompile Include="Core\EventSystem.cpp" />
@@ -233,6 +234,7 @@
     <ClInclude Include="..\ThirdParty\TinyXML2\tinyxml2.h" />
     <ClInclude Include="Audio\AudioSystem.hpp" />
     <ClInclude Include="Core\DevConsole.hpp" />
+    <ClInclude Include="Core\DirectoryWatcher.hpp" />
     <ClInclude Include="Core\EngineCommon.hpp" />
     <ClInclude Include="Core\ErrorWarningAssert.hpp" />
     <ClInclude Include="Core\EventSystem.hpp" />

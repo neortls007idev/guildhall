@@ -26,6 +26,7 @@ typedef unsigned char	uchar;
 #define STATIC // DO NOTHING JUST A PLACEHOLDER STATIC KEYWORD TO IDENTIFY STATIC TYPES IN CPPS
 #define BIT_FLAG( b ) ( 1 << ( b ) )
 #define BREAKPOINT( x ) int myBreakpoint ## x; \ UNUSED( myBreakPoint ## x );
+#define SAFE_RELEASE_POINTER( ptr ) if ( nullptr != ptr ) { delete ptr; ptr = nullptr; }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

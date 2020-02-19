@@ -48,6 +48,7 @@ public:
 	void OnKeyPress( char character );
 	bool AddCharacterToInput( char character );
 	int	 GetCurrentInputLength() const																				{ return ( int ) m_currentText.length(); }
+	void ResetCurrentInput();
 
 	void ProcessCommand();
 	void ExecuteCommand();

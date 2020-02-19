@@ -34,7 +34,7 @@ enum BlendMode
 {
 	ALPHA ,
 	ADDITIVE ,
-	NEGATIVE,
+	SOLID,
 	TOTAL
 };
 
@@ -110,6 +110,7 @@ public:
 	bool		IsDrawing() const;
 	bool		BindShader( Shader* shader );
 	void		BindShader( std::string shaderFileName );
+	bool		HasAnyShaderChangedAtPath( const wchar_t* relativePath );
 	void		BindVertexInput( VertexBuffer* vbo );
 	void		BindUniformBuffer( unsigned int slot , RenderBuffer* ubo ); // ubo - uniform buffer object
 	void		BindSampler( const Sampler* sampler );
@@ -142,14 +143,16 @@ public:
 	ID3D11Buffer*		 m_lastBoundVBO							= nullptr;
 	Texture*			 m_textureTarget						= nullptr;
 	//ID3D11BlendState*	 m_blendStates[ BlendMode::TOTAL ];
-	ID3D11BlendState*	 m_alphaBlendState						= nullptr;
-	ID3D11BlendState*	 m_additiveBlendState					= nullptr;
+// 	ID3D11BlendState*	 m_alphaBlendState						= nullptr;
+// 	ID3D11BlendState*	 m_additiveBlendState					= nullptr;
+	ID3D11BlendState*	 m_blendStates[BlendMode::TOTAL];
 
 
 	RenderBuffer*		 m_frameUBO								= nullptr;
 	Sampler*			 m_defaultSampler						= nullptr;
 	Texture*			 m_textureDefault						= nullptr;
 
+	void ReCompileShaders();
 private:
 
 	std::map<std::string , Texture*>	m_LoadedTextures;	 // LOOKUP TABLE OF FILEPATH & TEXTUREID

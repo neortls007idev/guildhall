@@ -83,6 +83,7 @@ void Game::Update( float deltaSeconds )
 // 	float speed = 4.0f;
 // 	m_cameraPosition += movement * speed * deltaSeconds;
 // 	m_worldCamera.SetPostion( m_cameraPosition );
+	m_invertColorShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/InvertColor.hlsl" );
 }
 
 void Game::Render() const
@@ -92,6 +93,8 @@ void Game::Render() const
 	g_theRenderer->BindShader( nullptr );
 	
 	g_theRenderer->BindTexture( m_imageTex );
+	g_theRenderer->SetBlendMode( BlendMode::SOLID );
+	
 	g_theRenderer->DrawAABB2( m_normalImage , WHITE );
 	g_theRenderer->BindShader( m_invertColorShader );
 	g_theRenderer->DrawAABB2( m_invertedColorImage , WHITE );

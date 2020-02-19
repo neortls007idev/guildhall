@@ -25,8 +25,8 @@ and remember you can submit extras from previous assignments.
     - [x] *03pts*: Default Samplers (Linear+Wrap, Point+Wrap)
     - [x] *03pts*: `RenderContext::GetOrCreateTexture` works again.
 - [x] *08pts*: Blend States supported by shader.
-    - [] *04pts*: Blend state is created/recreated and bound when shader is bound.
-    - [] *04pts*: Only recreate blend state if changed since last binding
+    - [x] *04pts*: Blend state is created/recreated and bound when shader is bound.
+    - [x] *04pts*: Only recreate blend state if changed since last binding
 - [x] *05pts*: Default Built-In Shader to use when `BindShader(nullptr)` is used
     - [x] `Renderer::SetBlendState` should affect this shader;
 - [x] *05pts*: Render two textured quads on screen
@@ -60,3 +60,4 @@ and remember you can submit extras from previous assignments.
 - [x] *X01.00 : 05pts*:  Borderless Window Support *Press `Shift + B` Key*
 - [x] *X01.01 : 05pts*:  Fullscreen Support.  See notes, the default D3D11 support for this will not count. *Press `Shift + F` Key*
 - [x] *X01.13 : 02pts*:  Allow change of window icon at runtime *Press `I` Key*
+- [x] *X02.10 : 02pts*:  Shader Reloading.  On key press (`R` suggested), reload all shaders in your shader database 

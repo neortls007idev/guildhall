@@ -62,6 +62,9 @@
     <Filter Include="Renderer\Pipeline\Shaders">
       <UniqueIdentifier>{bd527724-b331-42fa-8bca-7a74f56c86de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Experimental">
+      <UniqueIdentifier>{a29428e4-41a5-489e-8888-b412c27b8578}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Rgba8.cpp">
@@ -219,6 +222,9 @@
     </ClCompile>
     <ClCompile Include="Renderer\Sampler.cpp">
       <Filter>Renderer\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DirectoryWatcher.cpp">
+      <Filter>Core\Experimental</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -413,6 +419,9 @@
     </ClInclude>
     <ClInclude Include="Renderer\D3D11Common.hpp">
       <Filter>Renderer\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DirectoryWatcher.hpp">
+      <Filter>Core\Experimental</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

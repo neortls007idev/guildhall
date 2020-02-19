@@ -25,6 +25,7 @@
 #pragma warning( pop )
 
 #include <string>
+#include <corecrt_wstring.h>
 
 #include <shobjidl.h>
 #include <shobjidl_core.h>
@@ -69,8 +70,9 @@ RenderContext::~RenderContext()
 
 	delete m_swapChain;
 	m_swapChain = nullptr;
-	DX_SAFE_RELEASE( m_alphaBlendState );
-	DX_SAFE_RELEASE( m_additiveBlendState );
+	//DX_SAFE_RELEASE( m_alphaBlendState );
+	//DX_SAFE_RELEASE( m_additiveBlendState );
+
 	DX_SAFE_RELEASE( m_lastBoundVBO );
 	DX_SAFE_RELEASE( m_context );
 	DX_SAFE_RELEASE( m_device );
@@ -185,11 +187,29 @@ void RenderContext::Shutdown()
 	delete g_bitmapFont;
 	g_bitmapFont = nullptr;
 
-	DX_SAFE_RELEASE( m_alphaBlendState );
-	DX_SAFE_RELEASE( m_additiveBlendState );
+	//DX_SAFE_RELEASE( m_alphaBlendState );
+	//DX_SAFE_RELEASE( m_additiveBlendState );
+
+
+	for ( int index = 0; index < BlendMode::TOTAL; index++ )
+	{
+		DX_SAFE_RELEASE( m_blendStates[ index ] );
+	}
 
 	delete m_textureDefault;
 	m_textureDefault = nullptr;
+
+	delete m_defaultShader;
+	m_defaultShader = nullptr;
+
+// 	for ( auto& shaderIndex : m_LoadedShaders )
+// 	{
+// 		if ( shaderIndex.second != nullptr )
+// 		{
+// 			delete shaderIndex.second;
+// 			shaderIndex.second = nullptr;
+// 		}
+// 	}
 
 	delete m_defaultSampler;
 	m_defaultSampler = nullptr;
@@ -206,8 +226,6 @@ void RenderContext::Shutdown()
 	delete m_swapChain;
 	m_swapChain = nullptr;
 
-	delete m_defaultShader;
-	m_defaultShader = nullptr;
 
 	DX_SAFE_RELEASE( m_context );
 	DX_SAFE_RELEASE( m_device );
@@ -282,7 +300,7 @@ void RenderContext::BeginCamera( const Camera& camera )
 	BindShader( "" );
 	m_lastBoundVBO = nullptr;
 	BindUniformBuffer( UBO_FRAME_SLOT , m_frameUBO );
-	//m_currentCamera->UpdateUBO( this );
+	m_currentCamera->UpdateUBO( this );
 	BindUniformBuffer( UBO_CAMERA_SLOT , m_currentCamera->UpdateUBO( this ) );
 
 	BindTexture( m_textureDefault );
@@ -307,10 +325,13 @@ void RenderContext::SetBlendMode( BlendMode blendMode )
 	switch ( blendMode )
 	{
 	case BlendMode::ALPHA:
-					m_context->OMSetBlendState( m_alphaBlendState , zeroes , ~0U );
+					m_context->OMSetBlendState( m_blendStates[ BlendMode::ALPHA ] , zeroes , ~0U );
 					break;
 	case BlendMode::ADDITIVE:
-					m_context->OMSetBlendState( m_additiveBlendState , zeroes , ~0U );
+					m_context->OMSetBlendState( m_blendStates[ BlendMode::ADDITIVE ] , zeroes , ~0U );
+					break;
+	case BlendMode::SOLID:
+					m_context->OMSetBlendState( m_blendStates[ BlendMode::SOLID ] , zeroes , ~0U );
 					break;
 	default:
 		break;
@@ -369,6 +390,7 @@ void RenderContext::ReportLiveObjects()
 Shader* RenderContext::GetOrCreateShader( char const* filename )
 {
 	Shader* Temp = m_LoadedShaders[ filename ];
+
 	if (Temp == nullptr)
 	{
 		Temp = CreateShaderFromFile( filename );
@@ -376,6 +398,8 @@ Shader* RenderContext::GetOrCreateShader( char const* filename )
 	
 	return Temp;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 Shader* RenderContext::CreateShaderFromFile( char const* shaderFilePath )
 {
@@ -447,6 +471,35 @@ BitmapFont* RenderContext::CreateBitMapFontFromFile( std::string bitmapFontFileP
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void RenderContext::ReCompileShaders()
+{
+	size_t totalShadersCurrentlyLoaded = m_LoadedShaders.size();
+	std::vector<std::string> pathOfCurrentlyLoadedShaders;
+
+	for ( auto& shaderIndex : m_LoadedShaders )
+	{
+		pathOfCurrentlyLoadedShaders.push_back( shaderIndex.first );
+	}
+	
+	for ( auto& shaderIndex : m_LoadedShaders )
+	{
+ 			//delete shaderIndex.second;
+ 			//shaderIndex.second = nullptr;
+			shaderIndex.second->~Shader();
+	}
+
+	m_LoadedShaders.clear();
+
+	for ( size_t index = 0; index < totalShadersCurrentlyLoaded; index++ )
+	{
+		m_LoadedShaders[ pathOfCurrentlyLoadedShaders[ index ] ] = CreateShaderFromFile( pathOfCurrentlyLoadedShaders[ index ].c_str() );
+	}
+
+	m_defaultShader = GetOrCreateShader( "Data/Shaders/default.hlsl" );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Texture* RenderContext::GetOrCreateTextureFromFile( const char* imageFilePath )
 {	
 	Texture* Temp = m_LoadedTextures[ imageFilePath ];
@@ -497,7 +550,7 @@ void RenderContext::CreateBlendStates()
 	// render all output
 	alphaDesc.RenderTarget[ 0 ].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	
-	m_device->CreateBlendState( &alphaDesc , &m_alphaBlendState );
+	m_device->CreateBlendState( &alphaDesc , &m_blendStates[ BlendMode::ALPHA ] );
 
 	D3D11_BLEND_DESC additiveDesc;
 
@@ -514,7 +567,24 @@ void RenderContext::CreateBlendStates()
 
 	// render all output
 	additiveDesc.RenderTarget[ 0 ].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-	m_device->CreateBlendState( &additiveDesc , &m_additiveBlendState );
+	m_device->CreateBlendState( &additiveDesc , &m_blendStates[ BlendMode::ADDITIVE ] );
+
+	D3D11_BLEND_DESC opaqueDesc;
+
+	opaqueDesc.AlphaToCoverageEnable = false;
+	opaqueDesc.IndependentBlendEnable = false;
+	opaqueDesc.RenderTarget[ 0 ].BlendEnable = false;
+	opaqueDesc.RenderTarget[ 0 ].BlendOp = D3D11_BLEND_OP_ADD;
+	opaqueDesc.RenderTarget[ 0 ].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	opaqueDesc.RenderTarget[ 0 ].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+
+	opaqueDesc.RenderTarget[ 0 ].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	opaqueDesc.RenderTarget[ 0 ].SrcBlendAlpha = D3D11_BLEND_ONE;
+	opaqueDesc.RenderTarget[ 0 ].DestBlendAlpha = D3D11_BLEND_ZERO;
+
+	// render all output
+	opaqueDesc.RenderTarget[ 0 ].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	m_device->CreateBlendState( &additiveDesc , &m_blendStates[ BlendMode::SOLID ] );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -850,6 +920,34 @@ void RenderContext::BindShader( std::string shaderFileName )
 	}
 	temp = GetOrCreateShader( shaderFileName.c_str() );
 	BindShader( temp );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool RenderContext::HasAnyShaderChangedAtPath( const wchar_t* relativePath )
+{
+	TCHAR path[ MAX_PATH + 1 ] = L"";
+	
+	::GetCurrentDirectory( MAX_PATH , path );
+	wcscat_s( path , relativePath );
+	
+ 	HANDLE result = FindFirstChangeNotification( path , false , FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_ATTRIBUTES | FILE_NOTIFY_CHANGE_SIZE );
+
+	if ( result == INVALID_HANDLE_VALUE )
+	{
+		FindCloseChangeNotification( result );
+		return false;
+	}
+
+	if ( FindNextChangeNotification( result ) )
+	{
+		FindCloseChangeNotification( result );
+		return true;
+	}
+	
+	FindCloseChangeNotification( result );
+	return true;
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -84,7 +84,7 @@ static char const* GetShaderModelForStage( SHADER_STAGE_TYPE type )
 
 bool ShaderStage::Compile( RenderContext* ctx , std::string const& filename , void const* source , size_t const sourceByteLen , SHADER_STAGE_TYPE stageType )
 {
-	// HLSL - high level sahder language
+	// HLSL - high level shader language
 	// Compile - HLSL -  Byte Code
 	// Link ByteCode - Device Assembly ( what we need to get to ) - this is device specific
 

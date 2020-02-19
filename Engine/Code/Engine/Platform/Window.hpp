@@ -8,6 +8,17 @@ class InputSystem;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+enum eWindowProgressMode
+{
+	WND_PROGRESS_NONE ,
+	WND_PROGRESS_INDETERMINATE ,
+	WND_PROGRESS_VALUE ,
+	WND_PROGRESS_ERROR ,
+	WND_PROGRESS_PAUSED ,
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 enum eIcon : uint
 {
 	WARNING,
@@ -54,6 +65,7 @@ public:
 	void SetNewIcon( eIcon newIcon );
 	void CreateIcons();
 	void DisplaySettings( eDisplaySettings settings );
+	void SetProgress( eWindowProgressMode mode , float progress = 0.0f );
 
 
 public:

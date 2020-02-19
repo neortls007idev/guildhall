@@ -155,6 +155,12 @@ void DevConsole::OnKeyPress( char character )
 	}
 }
 
+void DevConsole::ResetCurrentInput()
+{
+	m_currentText.clear(); 
+	m_carrotOffset = 0;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void DevConsole::ProcessCommand()
@@ -228,8 +234,10 @@ void DevConsole::CreateCommand( std::string newCommand , std::string commandDesc
 
 void DevConsole::CreateCommand( std::string newCommand , std::string commandDescription , EventArgs commandArgs )
 {
-	__debugbreak();
-	// TODO
+	DevConsoleCommand newConsoleCommand;
+	newConsoleCommand.command = newCommand;
+	newConsoleCommand.Description = commandDescription;
+	newConsoleCommand.commandArgs = commandArgs;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -304,6 +312,11 @@ void DevConsole::ProcessInput()
 
 	while ( g_theInput->PopCharacter( &character ) )
 	{
+		if ( character == EASCII_ESCAPE )
+		{
+			return;
+		}
+
 		if ( character == EASCII_RETURNCARRIAGE || character == EASCII_NEWLINE )
 		{
 			ProcessCommand();
