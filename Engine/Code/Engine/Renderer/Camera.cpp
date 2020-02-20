@@ -4,6 +4,7 @@
 #include "Engine/Renderer/Texture.hpp"
 #include "Engine/Renderer/RenderBuffer.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Math/MatrixUtils.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +38,7 @@ void Camera::SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight )
 	bottomLeftCoordinate = bottomLeft;
 	topRightCoordinate   = topRight;
 	//m_projection	= Mat44::CreateOrthoGraphicProjeciton( Vec3( -1.0f , -1.0f , 0.0f ) , Vec3( 1.0f , 1.0f , 1.0f ) );
-	m_projection	= Mat44::CreateOrthoGraphicProjeciton( Vec3( bottomLeft, 0.0f ) , Vec3( topRight , 1.0f ) );
+	m_projection	= CreateOrthoGraphicProjeciton( Vec3( bottomLeft, 0.0f ) , Vec3( topRight , 1.0f ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
