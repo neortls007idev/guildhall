@@ -423,5 +423,8 @@
     <ClInclude Include="Core\DirectoryWatcher.hpp">
       <Filter>Core\Experimental</Filter>
     </ClInclude>
+    <ClInclude Include="Renderer\ErrorShaderCode.hpp">
+      <Filter>Renderer\Pipeline\Shaders</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

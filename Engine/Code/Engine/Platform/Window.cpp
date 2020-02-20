@@ -62,6 +62,10 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 		unsigned char asKey = ( unsigned char ) wParam;
 		//UNUSED( asKey );
 		//input = window->GetInputSytem();
+		if ( g_theDevConsole->IsOpen() )
+		{
+			g_theDevConsole->HandleInput( asKey );
+		}
 		input->HandleKeyDown( asKey );
 		break;
 	}
@@ -265,16 +269,16 @@ void Window::BeginFrame()
 	MSG queuedMessage;
 	for ( ;; )
 	{
-		if ( pTaskbar )
-		{
-			// Set Progress bar status in the taskbar
-			pTaskbar->SetProgressState( ( HWND ) m_hwnd , TBPF_INDETERMINATE );
-			// 	HRESULT SetProgressValue(
-			// 		HWND      hwnd ,
-			// 		ULONGLONG 50 ,
-			// 		ULONGLONG 100
-			// 	);
-		}
+// 		if ( pTaskbar )
+// 		{
+// 			// Set Progress bar status in the taskbar
+// 			pTaskbar->SetProgressState( ( HWND ) m_hwnd , TBPF_INDETERMINATE );
+// 			// 	HRESULT SetProgressValue(
+// 			// 		HWND      hwnd ,
+// 			// 		ULONGLONG 50 ,
+// 			// 		ULONGLONG 100
+// 			// 	);
+// 		}
 		const BOOL wasMessagePresent = PeekMessage( &queuedMessage , NULL , 0 , 0 , PM_REMOVE );
 		if ( !wasMessagePresent )
 		{
@@ -370,6 +374,35 @@ void Window::DisplaySettings( eDisplaySettings settings )
 						//RECT fullrect = { 0 };
 						//SetRect( &fullrect , 0 , 0 , GetSystemMetrics( SM_CXSCREEN ) , GetSystemMetrics( SM_CYSCREEN ) );
 						break;
+	default:
+		break;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Window::SetProgress( eWindowProgressMode mode , float progress /*= 0.0f */ )
+{
+	switch ( mode )
+	{
+	case WND_PROGRESS_NONE:
+									pTaskbar->SetProgressState( ( HWND ) m_hwnd , TBPF_NOPROGRESS );
+									break;
+	case WND_PROGRESS_INDETERMINATE:
+									pTaskbar->SetProgressState( ( HWND ) m_hwnd , TBPF_INDETERMINATE );
+									break;
+	case WND_PROGRESS_VALUE:
+									pTaskbar->SetProgressState( ( HWND ) m_hwnd , TBPF_NORMAL );
+									pTaskbar->SetProgressValue( ( HWND ) m_hwnd , ( ULONGLONG ) progress , 100 );
+									break;
+	case WND_PROGRESS_ERROR:
+									pTaskbar->SetProgressState( ( HWND ) m_hwnd , TBPF_ERROR );
+									pTaskbar->SetProgressValue( ( HWND ) m_hwnd , ( ULONGLONG ) progress , 100 );
+									break;
+	case WND_PROGRESS_PAUSED:
+									pTaskbar->SetProgressState( ( HWND ) m_hwnd , TBPF_PAUSED );
+									pTaskbar->SetProgressValue( ( HWND ) m_hwnd , ( ULONGLONG ) progress , 100 );
+									break;
 	default:
 		break;
 	}

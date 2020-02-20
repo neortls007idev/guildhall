@@ -96,8 +96,7 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	Vec2 alignment = ALIGN_BOTTOM_LEFT;
 	float alignmentDeltaChange = 0.f;
 	
-	//renderer.BeginCamera( camera );
-	
+	renderer.BeginCamera( camera );
 	renderer.DrawAABB2( consoleArea , m_OverlayColor );
 	renderer.DrawAABB2( typingArea , Rgba8( 0 , 0 , 255 , 100 ) );
 
@@ -298,7 +297,7 @@ void DevConsole::ProcessInput()
 {
 	char character;
 	m_carrotColor.a = ( uchar ) RangeMapFloat( -1.f , 1.f , 0 , 255 , SinDegrees( 127.f * ( float ) GetCurrentTimeSeconds() ) );
-	HandleArrowKeys();
+	//HandleArrowKeys();
 		
 	size_t curStringLength = m_currentText.length();
 
@@ -382,6 +381,29 @@ void DevConsole::HandleArrowKeys()
 	if ( curTextLength - m_carrotOffset < curTextLength )
 	{
 		if ( g_theInput->WasKeyJustPressed( KEY_RIGHTARROW ) || g_theInput->IsKeyHeldDown( KEY_RIGHTARROW ) )
+		{
+			m_carrotOffset -= 1;
+			//translateCaratX += lineHeight;
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DevConsole::HandleInput( unsigned char keycode )
+{
+	size_t curTextLength = m_currentText.length();
+
+	if ( curTextLength - m_carrotOffset > 0 )
+	{
+		if ( keycode == KEY_LEFTARROW  )
+		{
+			m_carrotOffset += 1;
+		}
+	}
+	if ( curTextLength - m_carrotOffset < curTextLength )
+	{
+		if ( keycode == KEY_RIGHTARROW )
 		{
 			m_carrotOffset -= 1;
 			//translateCaratX += lineHeight;

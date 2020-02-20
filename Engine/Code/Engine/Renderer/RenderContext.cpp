@@ -47,6 +47,7 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 BitmapFont* g_bitmapFont = nullptr;
+extern char const* g_errorShaderCode;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -139,8 +140,13 @@ void RenderContext::Startup( Window* window )
 	//~ swapchain
 	GUARANTEE_OR_DIE( SUCCEEDED( result ) , "FAILED TO CREATE RESOURCES" );
 	m_swapChain = new SwapChain( this , swapchain );
-	//m_defaultShader = new Shader( this );
+	
+	/*Shader::s_errorShader->CreateFromString( this , g_errorShaderCode );*/
+
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/default.hlsl" );
+
+	m_errorShader = new Shader( this );
+	m_errorShader->CreateFromString( this , g_errorShaderCode );
 
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
 	m_frameUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
@@ -187,9 +193,6 @@ void RenderContext::Shutdown()
 	delete g_bitmapFont;
 	g_bitmapFont = nullptr;
 
-	//DX_SAFE_RELEASE( m_alphaBlendState );
-	//DX_SAFE_RELEASE( m_additiveBlendState );
-
 
 	for ( int index = 0; index < BlendMode::TOTAL; index++ )
 	{
@@ -199,16 +202,25 @@ void RenderContext::Shutdown()
 	delete m_textureDefault;
 	m_textureDefault = nullptr;
 
-	delete m_defaultShader;
+	//delete m_defaultShader;
 	m_defaultShader = nullptr;
 
-// 	for ( auto& shaderIndex : m_LoadedShaders )
+ 	for ( auto& shaderIndex : m_LoadedShaders )
+ 	{
+ 		if ( shaderIndex.second != nullptr )
+ 		{
+ 			delete shaderIndex.second;
+ 			shaderIndex.second = nullptr;
+ 		}
+ 	}
+
+	delete m_errorShader;
+	m_errorShader = nullptr;
+
+// 	if ( Shader::s_errorShader )
 // 	{
-// 		if ( shaderIndex.second != nullptr )
-// 		{
-// 			delete shaderIndex.second;
-// 			shaderIndex.second = nullptr;
-// 		}
+// 		delete Shader::s_errorShader;
+// 		Shader::s_errorShader = nullptr;
 // 	}
 
 	delete m_defaultSampler;
@@ -483,9 +495,9 @@ void RenderContext::ReCompileShaders()
 	
 	for ( auto& shaderIndex : m_LoadedShaders )
 	{
- 			//delete shaderIndex.second;
- 			//shaderIndex.second = nullptr;
-			shaderIndex.second->~Shader();
+ 			delete shaderIndex.second;
+ 			shaderIndex.second = nullptr;
+			//shaderIndex.second->~Shader();
 	}
 
 	m_LoadedShaders.clear();

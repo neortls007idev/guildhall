@@ -25,7 +25,8 @@ public:
 private :
 	bool m_isSloMo = false;
 	bool m_isSpeedMo = false;
-	
+	static float m_taskbarProgress;
+
 public:
 	bool m_isPaused = false;
 	bool m_debugCamera = false;

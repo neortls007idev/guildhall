@@ -46,7 +46,7 @@ Game::Game()
 
 Game::~Game()
 {
-	delete m_invertColorShader;
+//	delete m_invertColorShader;
 	m_invertColorShader = nullptr;
 
 	delete m_imageTex;
@@ -90,10 +90,10 @@ void Game::Render() const
 {
 	g_theRenderer->BeginCamera( m_gameCamera );
 	
-	g_theRenderer->BindShader( nullptr );
+	g_theRenderer->BindShader( g_theRenderer->m_errorShader );
 	
 	g_theRenderer->BindTexture( m_imageTex );
-	g_theRenderer->SetBlendMode( BlendMode::SOLID );
+	//g_theRenderer->SetBlendMode( BlendMode::ALPHA );
 	
 	g_theRenderer->DrawAABB2( m_normalImage , WHITE );
 	g_theRenderer->BindShader( m_invertColorShader );

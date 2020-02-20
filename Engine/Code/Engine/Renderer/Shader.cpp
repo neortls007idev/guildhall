@@ -6,7 +6,12 @@
 
 #include <stdio.h>
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Renderer/ErrorShaderCode.hpp"
 //#include "Engine/Core/EngineCommon.hpp"
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+//STATIC Shader* Shader::s_errorShader;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -125,7 +130,10 @@ bool ShaderStage::Compile( RenderContext* ctx , std::string const& filename , vo
 			DebuggerPrintf( "Failed to compile [%s].  Compiler gave the following output;\n%s" ,
 				filename.c_str() ,
 				errorString );
-			DEBUGBREAK();
+			DX_SAFE_RELEASE( byteCode );
+			DX_SAFE_RELEASE( errors );
+			return false;
+			//DEBUGBREAK();
 		}
 	}
 		else
@@ -201,7 +209,12 @@ Shader::Shader( RenderContext* context ) :
 
 bool Shader::CreateFromFile( RenderContext* ctx , std::string const& filename )
 {
-	UNUSED( ctx );
+	//UNUSED( ctx );
+// 	if ( s_errorShader == nullptr )
+// 	{
+// 		s_errorShader->CreateFromString( ctx , g_errorShaderCode );
+// 	}
+
 	size_t fileSize = 0;
 	void* source = FileReadToNewBuffer( filename, &fileSize );
 	if ( nullptr == source )
@@ -214,9 +227,36 @@ bool Shader::CreateFromFile( RenderContext* ctx , std::string const& filename )
 
 	delete[] source;
 
+// 	if ( m_vertexStage.IsValid() && m_fragmentStage.IsValid() )
+// 	{
+// 		return true;
+// 	}
+// 	else
+// 	{
+// 		m_vertexStage   = s_errorShader->m_vertexStage;
+// 		m_fragmentStage = s_errorShader->m_fragmentStage;
+// 		return false;
+// 	}
+
 	return m_vertexStage.IsValid() && m_fragmentStage.IsValid();
-// 
-// 	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Shader::CreateFromString( RenderContext* ctx , std::string const& filename )
+{
+	UNUSED( ctx );
+	size_t fileSize = filename.length();
+	void* source = ( void* ) filename.c_str();
+	if ( nullptr == source )
+	{
+		return false;
+	}
+
+	m_vertexStage.Compile( m_owner , filename , source , fileSize , SHADER_STAGE_VERTEX );
+	m_fragmentStage.Compile( m_owner , filename , source , fileSize , SHADER_STAGE_FRAGMENT );
+
+	return m_vertexStage.IsValid() && m_fragmentStage.IsValid();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
