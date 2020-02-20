@@ -3,7 +3,7 @@
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Game/Game.hpp"
-
+#include "Engine/Platform/Window.hpp"
 
 class TheApp
 {
@@ -23,12 +23,13 @@ public:
 	void EndFrame();
 		
 private :
-	bool m_isSloMo = false;
-	bool m_isSpeedMo = false;
-	static float m_taskbarProgress;
+	bool				m_isSloMo				= false;
+	bool				m_isSpeedMo				= false;
+	float				m_taskbarProgress		= 0.f;
+	eWindowProgressMode m_taskbarProgressMode	= WND_PROGRESS_VALUE;
 
 public:
-	bool m_isPaused = false;
-	bool m_debugCamera = false;
+	bool				m_isPaused				= false;
+	bool				m_debugCamera			= false;
 };
 

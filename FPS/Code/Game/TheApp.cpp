@@ -18,7 +18,6 @@ InputSystem* g_theInput = nullptr;
 Game* g_theGame = nullptr;
 DevConsole* g_theDevConsole = nullptr;
 extern BitmapFont* g_bitmapFont;
-STATIC float TheApp::m_taskbarProgress;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -96,14 +95,14 @@ void TheApp::BeginFrame()
 	g_theRenderer->BeginFrame();
 	g_theDevConsole->BeginFrame();
 
-	if ( m_taskbarProgress < 100.f )
+	if ( m_taskbarProgress < 100.f  && m_taskbarProgressMode == WND_PROGRESS_VALUE )
 	{
 		m_taskbarProgress += 0.166f;
 		g_theWindow->SetProgress( WND_PROGRESS_VALUE , m_taskbarProgress );
 	}
 	else
 	{
-		g_theWindow->SetProgress( WND_PROGRESS_NONE , 0.f );
+		g_theWindow->SetProgress( m_taskbarProgressMode , m_taskbarProgress );
 		//m_taskbarProgress = 0.f;
 	}
 }
@@ -211,7 +210,33 @@ void TheApp::UpdateFromKeyboard()
 	{
 		g_theWindow->DisplaySettings( FULLSCREEN );
 	}
+
+	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasKeyJustPressed( 'T' ) )
+	{
+		m_taskbarProgress = 0.f;
+	}
 	
+	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasKeyJustPressed( 'P' ) )
+	{
+		m_taskbarProgressMode = WND_PROGRESS_PAUSED;
+	}
+
+	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasKeyJustPressed( 'R' ) )
+	{
+		m_taskbarProgressMode = WND_PROGRESS_VALUE;
+	}
+
+	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasKeyJustPressed( 'E' ) )
+	{
+		m_taskbarProgressMode = WND_PROGRESS_ERROR;
+	}
+
+	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasKeyJustPressed( 'O' ) )
+	{
+		m_taskbarProgress = 0.f;
+		m_taskbarProgressMode = WND_PROGRESS_NONE;
+	}
+
 	if ( g_theInput->GetButtonState( 'P' ).WasJustPressed() ) { m_isPaused = !m_isPaused; }
 
 	

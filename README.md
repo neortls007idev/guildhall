@@ -60,3 +60,10 @@ and remember you can submit extras from previous assignments.
 - [x] *X01.00 : 05pts*:  Borderless Window Support *Press `Shift + B` Key*
 - [x] *X01.01 : 05pts*:  Fullscreen Support.  See notes, the default D3D11 support for this will not count. *Press `Shift + F` Key*
 - [x] *X01.13 : 02pts*:  Allow change of window icon at runtime *Press `I` Key*
+- [x] *X01.14 : 02pts*:  Show window loading progress in task bar.
+    - Key binds for testing Taskbar progress  
+      *`Shift + T`* = reset the progress
+      *`Shift + P`* = Pause the progress
+      *`Shift + R`* = Resume/normal progress
+      *`Shift + E`* = Error progress mode
+      *`Shift + O`* = No progress/Progress Complete
