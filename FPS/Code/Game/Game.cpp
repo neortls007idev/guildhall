@@ -90,7 +90,7 @@ void Game::Render() const
 {
 	g_theRenderer->BeginCamera( m_gameCamera );
 	
-	g_theRenderer->BindShader( g_theRenderer->m_errorShader );
+	g_theRenderer->BindShader( nullptr );
 	
 	g_theRenderer->BindTexture( m_imageTex );
 	//g_theRenderer->SetBlendMode( BlendMode::ALPHA );

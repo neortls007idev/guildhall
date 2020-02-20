@@ -41,13 +41,14 @@ public:
 	Vec2  GetOrthoTopRight() const;
 	void  Translate2D( const Vec2 cameraTranslate );
 	void  SetClearMode( unsigned int clearFlags , Rgba8 color , float depth = 0.f , unsigned int stencil = 0 );
+	void  SetProjectionOrthographic( float x , float y , float z );
 	Rgba8 GetClearColor() const																						{ return m_clearColor; }
 	unsigned int  GetClearMode() const																				{ return m_clearMode; }
 
 	void			 SetColorTarget( Texture* texture );
 	RenderBuffer*	 UpdateUBO( RenderContext* ctx );
 	Texture*		 GetColorTarget() const																					{ return m_colorTarget; }
-
+	
 public:
 	RenderBuffer*	m_cameraUBO		= nullptr;
 

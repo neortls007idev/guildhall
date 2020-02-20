@@ -76,6 +76,10 @@ void Camera::SetClearMode( unsigned int clearFlags , Rgba8 color , float depth /
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Camera::SetColorTarget( Texture* texture )
 {
 	m_colorTarget = texture;
@@ -94,11 +98,6 @@ RenderBuffer* Camera::UpdateUBO( RenderContext* ctx )
 
 	CameraDataT cameraData;
 
-// 	cameraData.orthoMin[ 0 ] = bottomLeftCoordinate.x;
-// 	cameraData.orthoMin[ 1 ] = bottomLeftCoordinate.y;
-// 	cameraData.orthoMax[ 0 ] = topRightCoordinate.x;
-// 	cameraData.orthoMax[ 1 ] = topRightCoordinate.y;
-
 	cameraData.cameraToClipTransform = m_projection;
 	Mat44 CameraModel = Mat44::CreateTranslation3D( m_position );
 	// CameraToWorld Space Transform
@@ -106,7 +105,7 @@ RenderBuffer* Camera::UpdateUBO( RenderContext* ctx )
 	// Mat44 View  = Invert(cameraModel);
 	
 	cameraData.view = Mat44::CreateTranslation3D( -m_position );
-
+	
 	m_cameraUBO->Update( &cameraData , sizeof( cameraData ) , sizeof( cameraData ) );
 	
 	return m_cameraUBO;
