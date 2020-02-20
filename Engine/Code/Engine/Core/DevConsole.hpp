@@ -68,6 +68,7 @@ public:
 	void ChangeOverlayColor( Rgba8 newOverlayColor );
 	void ResetConsole();
 	void HandleArrowKeys();
+	void HandleInput( unsigned char keycode );
 
 private:
 	void ExecuteHelp();

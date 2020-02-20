@@ -61,17 +61,19 @@ class Shader
 public:
 	Shader( RenderContext* context );
 	~Shader();
-	bool CreateFromFile( RenderContext* ctx , std::string const& filename );    // A02
+	bool CreateFromFile( RenderContext* ctx , std::string const& filename );    
+	bool CreateFromString( RenderContext* ctx , std::string const& filename );   
 	// for hooking IA (input assembler) to the VS (vertex shader), 
 	// needs to vertex shader and vertex format to make the binding
-	//ID3D11InputLayout* GetOrCreateInputLayout( VertexBuffer* vbo );            // A02
+	//ID3D11InputLayout* GetOrCreateInputLayout( VertexBuffer* vbo );            
 
-	ID3D11RasterizerState* GetRasterState();                                   // A02 (only creating a default one for now)
+	ID3D11RasterizerState* GetRasterState();                                   
 	void CreateRasterSate();
 
 	ID3D11InputLayout* GetOrCreateInputLayout( buffer_attribute_t const* attribs );
 	   
 public:
+	//static Shader*				s_errorShader;
 	ShaderStage					m_vertexStage;
 	ShaderStage					m_fragmentStage;
 	ID3D11RasterizerState*		m_rasterState		  = nullptr;

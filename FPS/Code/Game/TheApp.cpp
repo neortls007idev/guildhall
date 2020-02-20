@@ -9,7 +9,6 @@
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Core/EventSystem.hpp"
 #include "Engine/Renderer/D3D11Common.hpp"
-#include <string>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -19,6 +18,7 @@ InputSystem* g_theInput = nullptr;
 Game* g_theGame = nullptr;
 DevConsole* g_theDevConsole = nullptr;
 extern BitmapFont* g_bitmapFont;
+STATIC float TheApp::m_taskbarProgress;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -89,11 +89,23 @@ void TheApp::RunFrame()
 
 void TheApp::BeginFrame()
 {
+
 	// all engine things that must begin at the beginning of each frame and not the game
 	g_theInput->BeginFrame();
 	g_theWindow->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theDevConsole->BeginFrame();
+
+	if ( m_taskbarProgress < 100.f )
+	{
+		m_taskbarProgress += 0.166f;
+		g_theWindow->SetProgress( WND_PROGRESS_VALUE , m_taskbarProgress );
+	}
+	else
+	{
+		g_theWindow->SetProgress( WND_PROGRESS_NONE , 0.f );
+		//m_taskbarProgress = 0.f;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -123,16 +135,10 @@ void TheApp::Update( float deltaSeconds )
 
 void TheApp::Render() const
 {
-// 		g_theRenderer->ClearScreen( RED );
-// 		g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
  		g_theGame->Render();
-// 		g_theRenderer->EndCamera( g_theGame->m_worldCamera );
-// 
-// 		g_theGame->RenderUI();
 
 		if ( g_theDevConsole->IsOpen() )
 		{
-			//g_theGame->m_worldCamera.SetOrthoView( Vec2( 5 , 5 ) , Vec2( 35 , 35 ) );
 			g_theDevConsole->Render( *g_theRenderer , g_theGame->m_gameCamera , 0.5f );
 		}
 }
@@ -142,16 +148,11 @@ void TheApp::Render() const
 void TheApp::EndFrame()
 {
 	// all engine things that must end at the end of the frame and not the game
-	//SwapBuffers( m_displayDeviceContext );
 	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
-
-	if ( g_theRenderer->HasAnyShaderChangedAtPath( L"\\Data\\Shaders\\" ) )
-	{
-		g_theRenderer->ReCompileShaders();
-	}
 }
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -228,11 +229,6 @@ void TheApp::UpdateFromKeyboard()
 		delete g_theGame;
 		g_theGame = nullptr;
 		g_theGame = new Game();
-	}
-	
-	if ( g_theInput->WasKeyJustPressed( 'R' ) )
-	{		
-		g_theRenderer->ReCompileShaders();
 	}
 }
 
