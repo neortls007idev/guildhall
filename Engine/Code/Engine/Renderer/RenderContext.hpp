@@ -137,7 +137,6 @@ public:
 	IDXGIDebug*			 m_debug								= nullptr;
 
 	Shader*				 m_defaultShader						= nullptr;
-	Shader*				 m_errorShader							= nullptr;
 	Shader*				 m_currentShader						= nullptr;
 	VertexBuffer*		 m_immediateVBO							= nullptr;
 	ID3D11Buffer*		 m_lastBoundVBO							= nullptr;

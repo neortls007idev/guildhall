@@ -30,6 +30,15 @@ typedef unsigned char	uchar;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+// 
+// #define COMMAND( name ) \
+// static void name##_impl( NamedStrings& args ); \				// static void some_method_impl( NamedStrings& args );
+// static EventRegistrar name##_register( #name , name##impl ); \  // static EventRegistrar some_method_register( "name" , name_impl )
+// static  void name##_impl( NamedStrings & args )			//
+
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 enum eBufferFormatType
 {
 	// add types as you need them - for now, we can get by with just this

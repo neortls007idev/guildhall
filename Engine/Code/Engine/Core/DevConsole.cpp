@@ -96,7 +96,6 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	Vec2 alignment = ALIGN_BOTTOM_LEFT;
 	float alignmentDeltaChange = 0.f;
 	
-	renderer.BeginCamera( camera );
 	renderer.DrawAABB2( consoleArea , m_OverlayColor );
 	renderer.DrawAABB2( typingArea , Rgba8( 0 , 0 , 255 , 100 ) );
 

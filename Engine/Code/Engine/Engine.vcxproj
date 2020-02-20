@@ -193,6 +193,7 @@
     <ClCompile Include="Math\IntVec2.cpp" />
     <ClCompile Include="Math\MathUtils.cpp" />
     <ClCompile Include="Math\Matrix4x4.cpp" />
+    <ClCompile Include="Math\MatrixUtils.cpp" />
     <ClCompile Include="Math\RandomNumberGenerator.cpp" />
     <ClCompile Include="Math\RawNoise.cpp" />
     <ClCompile Include="Math\SmoothNoise.cpp" />
@@ -259,6 +260,7 @@
     <ClInclude Include="Math\MathConstants.hpp" />
     <ClInclude Include="Math\MathUtils.hpp" />
     <ClInclude Include="Math\Matrix4x4.hpp" />
+    <ClInclude Include="Math\MatrixUtils.hpp" />
     <ClInclude Include="Math\RandomNumberGenerator.hpp" />
     <ClInclude Include="Math\RawNoise.hpp" />
     <ClInclude Include="Math\SmoothNoise.hpp" />

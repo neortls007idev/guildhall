@@ -227,18 +227,16 @@ bool Shader::CreateFromFile( RenderContext* ctx , std::string const& filename )
 
 	delete[] source;
 
-// 	if ( m_vertexStage.IsValid() && m_fragmentStage.IsValid() )
-// 	{
-// 		return true;
-// 	}
-// 	else
-// 	{
-// 		m_vertexStage   = s_errorShader->m_vertexStage;
-// 		m_fragmentStage = s_errorShader->m_fragmentStage;
-// 		return false;
-// 	}
-
-	return m_vertexStage.IsValid() && m_fragmentStage.IsValid();
+	if ( m_vertexStage.IsValid() && m_fragmentStage.IsValid() )
+	{
+		return true;
+	}
+	else
+	{
+		CreateFromString( ctx , g_errorShaderCode );
+		return false;
+	}
+	//return m_vertexStage.IsValid() && m_fragmentStage.IsValid();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

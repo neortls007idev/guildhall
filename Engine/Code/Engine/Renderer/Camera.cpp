@@ -4,6 +4,7 @@
 #include "Engine/Renderer/Texture.hpp"
 #include "Engine/Renderer/RenderBuffer.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Math/MatrixUtils.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +38,7 @@ void Camera::SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight )
 	bottomLeftCoordinate = bottomLeft;
 	topRightCoordinate   = topRight;
 	//m_projection	= Mat44::CreateOrthoGraphicProjeciton( Vec3( -1.0f , -1.0f , 0.0f ) , Vec3( 1.0f , 1.0f , 1.0f ) );
-	m_projection	= Mat44::CreateOrthoGraphicProjeciton( Vec3( bottomLeft, 0.0f ) , Vec3( topRight , 1.0f ) );
+	m_projection	= CreateOrthoGraphicProjeciton( Vec3( bottomLeft, 0.0f ) , Vec3( topRight , 1.0f ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -75,6 +76,10 @@ void Camera::SetClearMode( unsigned int clearFlags , Rgba8 color , float depth /
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Camera::SetColorTarget( Texture* texture )
 {
 	m_colorTarget = texture;
@@ -93,11 +98,6 @@ RenderBuffer* Camera::UpdateUBO( RenderContext* ctx )
 
 	CameraDataT cameraData;
 
-// 	cameraData.orthoMin[ 0 ] = bottomLeftCoordinate.x;
-// 	cameraData.orthoMin[ 1 ] = bottomLeftCoordinate.y;
-// 	cameraData.orthoMax[ 0 ] = topRightCoordinate.x;
-// 	cameraData.orthoMax[ 1 ] = topRightCoordinate.y;
-
 	cameraData.cameraToClipTransform = m_projection;
 	Mat44 CameraModel = Mat44::CreateTranslation3D( m_position );
 	// CameraToWorld Space Transform
@@ -105,7 +105,7 @@ RenderBuffer* Camera::UpdateUBO( RenderContext* ctx )
 	// Mat44 View  = Invert(cameraModel);
 	
 	cameraData.view = Mat44::CreateTranslation3D( -m_position );
-
+	
 	m_cameraUBO->Update( &cameraData , sizeof( cameraData ) , sizeof( cameraData ) );
 	
 	return m_cameraUBO;

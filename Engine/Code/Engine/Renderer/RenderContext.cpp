@@ -51,19 +51,20 @@ extern char const* g_errorShaderCode;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+// TODO :- move to D3D11 common
+
 void SetDebugName( ID3D11DeviceChild* child , const std::string* name )
 {
 	if ( child != nullptr && name != nullptr )
 		child->SetPrivateData( WKPDID_D3DDebugObjectName , ( UINT ) name->size() , name->c_str() );
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 RenderContext::~RenderContext()
 {
 	delete g_bitmapFont;
 	g_bitmapFont = nullptr;
-
-
 	
 	m_LoadedTextures.clear();
 	m_LoadedBitMapFonts.clear();
@@ -71,9 +72,7 @@ RenderContext::~RenderContext()
 
 	delete m_swapChain;
 	m_swapChain = nullptr;
-	//DX_SAFE_RELEASE( m_alphaBlendState );
-	//DX_SAFE_RELEASE( m_additiveBlendState );
-
+	
 	DX_SAFE_RELEASE( m_lastBoundVBO );
 	DX_SAFE_RELEASE( m_context );
 	DX_SAFE_RELEASE( m_device );
@@ -145,9 +144,6 @@ void RenderContext::Startup( Window* window )
 
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/default.hlsl" );
 
-	m_errorShader = new Shader( this );
-	m_errorShader->CreateFromString( this , g_errorShaderCode );
-
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
 	m_frameUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 
@@ -213,15 +209,6 @@ void RenderContext::Shutdown()
  			shaderIndex.second = nullptr;
  		}
  	}
-
-	delete m_errorShader;
-	m_errorShader = nullptr;
-
-// 	if ( Shader::s_errorShader )
-// 	{
-// 		delete Shader::s_errorShader;
-// 		Shader::s_errorShader = nullptr;
-// 	}
 
 	delete m_defaultSampler;
 	m_defaultSampler = nullptr;
