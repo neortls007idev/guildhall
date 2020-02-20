@@ -62,8 +62,8 @@ and remember you can submit extras from previous assignments.
 - [x] *X01.13 : 02pts*:  Allow change of window icon at runtime *Press `I` Key*
 - [x] *X01.14 : 02pts*:  Show window loading progress in task bar.
     - Key binds for testing Taskbar progress  
-      *`Shift + T`* = reset the progress
-      *`Shift + P`* = Pause the progress
-      *`Shift + R`* = Resume/normal progress
-      *`Shift + E`* = Error progress mode
-      *`Shift + O`* = No progress/Progress Complete
+      - *`Shift + T`* = reset the progress
+      - *`Shift + P`* = Pause the progress
+      - *`Shift + R`* = Resume/normal progress
+      - *`Shift + E`* = Error progress mode
+      - *`Shift + O`* = No progress/Progress Complete
