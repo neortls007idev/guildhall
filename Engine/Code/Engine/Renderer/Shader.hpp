@@ -34,7 +34,10 @@ public:
 	bool Compile( RenderContext* ctx , std::string const& filename , void const* source ,
 				  size_t const sourceByteLen , SHADER_STAGE_TYPE stageType );
 
+
 	inline bool IsValid() const { return nullptr != m_handle; }
+
+	void ReleaseShaderStageResources();
 
 	void const* GetByteCode() const;
 	size_t GetByteCodeLength() const;
@@ -68,7 +71,9 @@ public:
 	//ID3D11InputLayout* GetOrCreateInputLayout( VertexBuffer* vbo );            
 
 	ID3D11RasterizerState* GetRasterState();                                   
-	void CreateRasterSate();
+	void CreateRasterState();
+	void ReleaseShaderResources();
+	bool RecompileShader( std::string const& filename );
 
 	ID3D11InputLayout* GetOrCreateInputLayout( buffer_attribute_t const* attribs );
 	   

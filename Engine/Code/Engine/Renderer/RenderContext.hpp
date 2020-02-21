@@ -110,6 +110,7 @@ public:
 	bool		IsDrawing() const;
 	bool		BindShader( Shader* shader );
 	void		BindShader( std::string shaderFileName );
+	void		ReCompileAllShaders();
 	bool		HasAnyShaderChangedAtPath( const wchar_t* relativePath );
 	void		BindVertexInput( VertexBuffer* vbo );
 	void		BindUniformBuffer( unsigned int slot , RenderBuffer* ubo ); // ubo - uniform buffer object
@@ -148,7 +149,6 @@ public:
 	Sampler*			 m_defaultSampler						= nullptr;
 	Texture*			 m_textureDefault						= nullptr;
 
-	void ReCompileShaders();
 private:
 
 	std::map<std::string , Texture*>	m_LoadedTextures;	 // LOOKUP TABLE OF FILEPATH & TEXTUREID

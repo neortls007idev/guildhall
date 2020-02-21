@@ -67,4 +67,6 @@ and remember you can submit extras from previous assignments.
       - *`Shift + R`* = Resume/normal progress
       - *`Shift + E`* = Error progress mode
       - *`Shift + O`* = No progress/Progress Complete
+      - *`Shift + I`* = Indeterminant state  
 - [x] *X03.01 : 03pts*: Built-in error shader to use when a shader fails to compile.
+- [x] *X02.10 : 02pts*:  Shader Reloading. `On key press R`, reload all shaders in your shader database
