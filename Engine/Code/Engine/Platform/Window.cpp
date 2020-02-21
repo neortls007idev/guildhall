@@ -52,7 +52,7 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 	case WM_CHAR:
 	{
 		char character = ( char ) wParam;
-		g_theDevConsole->OnKeyPress( character );
+		//g_theDevConsole->OnKeyPress( character );
 		input->PushCharacter( character );
 		break;
 	}

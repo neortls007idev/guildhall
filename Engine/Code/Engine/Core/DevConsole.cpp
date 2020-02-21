@@ -344,8 +344,7 @@ bool DevConsole::AddCharacterToInput( char character )
 
 	if ( character != 8 && character != 127 )
 	{
-		m_currentText.insert( curStringLength - m_carrotOffset , 1 , character );/* = character;*/
-		//m_currentText.insert()
+		m_currentText.insert( curStringLength - m_carrotOffset , 1 , character );
 		m_carrotColor.a = 255;
 	}
 	return true;
