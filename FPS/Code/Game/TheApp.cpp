@@ -100,6 +100,11 @@ void TheApp::BeginFrame()
 		m_taskbarProgress += 0.166f;
 		g_theWindow->SetProgress( WND_PROGRESS_VALUE , m_taskbarProgress );
 	}
+	else if ( m_taskbarProgress >= 100.f && m_taskbarProgressMode == WND_PROGRESS_VALUE )
+	{
+		m_taskbarProgress = 0.f;
+		m_taskbarProgressMode = WND_PROGRESS_NONE;
+	}
 	else
 	{
 		g_theWindow->SetProgress( m_taskbarProgressMode , m_taskbarProgress );
@@ -150,6 +155,11 @@ void TheApp::EndFrame()
 	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
+
+	if ( g_theRenderer->HasAnyShaderChangedAtPath( L"\\Data\\Shaders\\" ) )
+	{
+		g_theRenderer->ReCompileAllShaders();
+	}
 }
 
 
@@ -221,6 +231,11 @@ void TheApp::UpdateFromKeyboard()
 		m_taskbarProgressMode = WND_PROGRESS_PAUSED;
 	}
 
+	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasKeyJustPressed( 'I' ) )
+	{
+		m_taskbarProgressMode = WND_PROGRESS_INDETERMINATE;
+	}
+
 	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasKeyJustPressed( 'R' ) )
 	{
 		m_taskbarProgressMode = WND_PROGRESS_VALUE;
@@ -254,6 +269,11 @@ void TheApp::UpdateFromKeyboard()
 		delete g_theGame;
 		g_theGame = nullptr;
 		g_theGame = new Game();
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'R' ) )
+	{
+		g_theRenderer->ReCompileAllShaders();
 	}
 }
 

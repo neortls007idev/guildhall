@@ -470,31 +470,12 @@ BitmapFont* RenderContext::CreateBitMapFontFromFile( std::string bitmapFontFileP
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::ReCompileShaders()
+void RenderContext::ReCompileAllShaders()
 {
-	size_t totalShadersCurrentlyLoaded = m_LoadedShaders.size();
-	std::vector<std::string> pathOfCurrentlyLoadedShaders;
-
 	for ( auto& shaderIndex : m_LoadedShaders )
 	{
-		pathOfCurrentlyLoadedShaders.push_back( shaderIndex.first );
+		shaderIndex.second->RecompileShader( shaderIndex.first );
 	}
-	
-	for ( auto& shaderIndex : m_LoadedShaders )
-	{
- 			delete shaderIndex.second;
- 			shaderIndex.second = nullptr;
-			//shaderIndex.second->~Shader();
-	}
-
-	m_LoadedShaders.clear();
-
-	for ( size_t index = 0; index < totalShadersCurrentlyLoaded; index++ )
-	{
-		m_LoadedShaders[ pathOfCurrentlyLoadedShaders[ index ] ] = CreateShaderFromFile( pathOfCurrentlyLoadedShaders[ index ].c_str() );
-	}
-
-	m_defaultShader = GetOrCreateShader( "Data/Shaders/default.hlsl" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -932,16 +913,37 @@ bool RenderContext::HasAnyShaderChangedAtPath( const wchar_t* relativePath )
 	
  	HANDLE result = FindFirstChangeNotification( path , false , FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_ATTRIBUTES | FILE_NOTIFY_CHANGE_SIZE );
 
+	const HANDLE* ptrResult = &result;
+
 	if ( result == INVALID_HANDLE_VALUE )
 	{
 		FindCloseChangeNotification( result );
 		return false;
 	}
 
-	if ( FindNextChangeNotification( result ) )
+	DWORD waitResult =	WaitForMultipleObjects( 1 , ptrResult , FALSE , 16);
+
+// 	if ( FindNextChangeNotification( result ) )
+// 	{
+// 		FindCloseChangeNotification( result );
+// 		return true;
+// 	}
+
+	if ( waitResult == WAIT_OBJECT_0 )
 	{
-		FindCloseChangeNotification( result );
-		return true;
+		ReCompileAllShaders();
+	}
+	else if ( waitResult == WAIT_ABANDONED_0 )
+	{
+		
+	}
+	else if ( waitResult == WAIT_FAILED )
+	{
+		
+	}
+	else if ( waitResult == WAIT_TIMEOUT )
+	{
+		
 	}
 	
 	FindCloseChangeNotification( result );

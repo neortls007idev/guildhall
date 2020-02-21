@@ -185,6 +185,16 @@ bool ShaderStage::Compile( RenderContext* ctx , std::string const& filename , vo
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void ShaderStage::ReleaseShaderStageResources()
+{
+	DX_SAFE_RELEASE( m_byteCode );
+	DX_SAFE_RELEASE( m_handle );
+	DX_SAFE_RELEASE( m_vertexShader );
+	DX_SAFE_RELEASE( m_fragmentShader );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void const* ShaderStage::GetByteCode() const
 {
 	return m_byteCode->GetBufferPointer();
@@ -202,19 +212,13 @@ size_t ShaderStage::GetByteCodeLength() const
 Shader::Shader( RenderContext* context ) :
 											m_owner( context )
 {
-	CreateRasterSate();
+	CreateRasterState();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 bool Shader::CreateFromFile( RenderContext* ctx , std::string const& filename )
 {
-	//UNUSED( ctx );
-// 	if ( s_errorShader == nullptr )
-// 	{
-// 		s_errorShader->CreateFromString( ctx , g_errorShaderCode );
-// 	}
-
 	size_t fileSize = 0;
 	void* source = FileReadToNewBuffer( filename, &fileSize );
 	if ( nullptr == source )
@@ -236,7 +240,6 @@ bool Shader::CreateFromFile( RenderContext* ctx , std::string const& filename )
 		CreateFromString( ctx , g_errorShaderCode );
 		return false;
 	}
-	//return m_vertexStage.IsValid() && m_fragmentStage.IsValid();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -268,7 +271,7 @@ Shader::~Shader()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Shader::CreateRasterSate()
+void Shader::CreateRasterState()
 {
 	D3D11_RASTERIZER_DESC desc;
 
@@ -286,6 +289,30 @@ void Shader::CreateRasterSate()
 	ID3D11Device* device = m_owner->m_device;
 	device->CreateRasterizerState( &desc , &m_rasterState );
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Shader::ReleaseShaderResources()
+{
+	DX_SAFE_RELEASE( m_rasterState );
+	DX_SAFE_RELEASE( m_defaultRasterState );
+	DX_SAFE_RELEASE( m_inputLayout );
+	m_lastBufferAttribute = nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Shader::RecompileShader( std::string const& filename )
+{
+	m_vertexStage.ReleaseShaderStageResources();
+	m_fragmentStage.ReleaseShaderStageResources();
+	ReleaseShaderResources();
+
+	CreateRasterState();
+	return CreateFromFile( m_owner , filename );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------              
 
 ID3D11InputLayout* Shader::GetOrCreateInputLayout( buffer_attribute_t const* attribs )
 {
