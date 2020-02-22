@@ -4,6 +4,8 @@
 #include <windows.h>
 #include <Shobjidl.h>
 
+#include "EngineCommon.hpp"
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void DirectoryWatcher::Startup()
@@ -22,7 +24,7 @@ void DirectoryWatcher::BeginFrame()
 
 void DirectoryWatcher::Update( float deltaSeconds )
 {
-
+	UNUSED( deltaSeconds );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

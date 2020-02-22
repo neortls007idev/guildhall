@@ -65,14 +65,14 @@ RenderContext::~RenderContext()
 {
 	delete g_bitmapFont;
 	g_bitmapFont = nullptr;
-	
+
 	m_LoadedTextures.clear();
 	m_LoadedBitMapFonts.clear();
 	m_LoadedShaders.clear();
 
 	delete m_swapChain;
 	m_swapChain = nullptr;
-	
+
 	DX_SAFE_RELEASE( m_lastBoundVBO );
 	DX_SAFE_RELEASE( m_context );
 	DX_SAFE_RELEASE( m_device );
@@ -113,7 +113,7 @@ void RenderContext::Startup( Window* window )
 	swapChainDesc.Windowed = TRUE;                                    // windowed/full-screen mode
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;     // use 32-bit color RGBA8 color
 	swapChainDesc.BufferDesc.Width = window->GetClientWidth();
-	swapChainDesc.BufferDesc.Height = window->GetClientHeight(); 
+	swapChainDesc.BufferDesc.Height = window->GetClientHeight();
 	// save data as member variable when window is created.
 
 	// create
@@ -139,7 +139,7 @@ void RenderContext::Startup( Window* window )
 	//~ swapchain
 	GUARANTEE_OR_DIE( SUCCEEDED( result ) , "FAILED TO CREATE RESOURCES" );
 	m_swapChain = new SwapChain( this , swapchain );
-	
+
 	/*Shader::s_errorShader->CreateFromString( this , g_errorShaderCode );*/
 
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/default.hlsl" );
@@ -218,7 +218,7 @@ void RenderContext::Shutdown()
 
 	delete m_frameUBO;
 	m_frameUBO = nullptr;
-	
+
 	m_lastBoundVBO = nullptr;
 	m_currentCamera = nullptr;
 
@@ -229,7 +229,7 @@ void RenderContext::Shutdown()
 	DX_SAFE_RELEASE( m_context );
 	DX_SAFE_RELEASE( m_device );
 
-	ReportLiveObjects();    // do our leak reporting just before shutdown to give us a better detailed list; 
+	ReportLiveObjects();    // do our leak reporting just before shutdown to give us a better detailed list;
 	DestroyDebugModule();
 }
 
@@ -262,7 +262,7 @@ void RenderContext::BeginCamera( const Camera& camera )
 	m_currentCamera = const_cast< Camera* >( &camera );
 
 #if defined(RENDER_DEBUG)
-	m_context->ClearState(); 
+	m_context->ClearState();
 #endif
 
 	if ( camera.GetClearMode() & CLEAR_COLOR_BIT )
@@ -272,10 +272,10 @@ void RenderContext::BeginCamera( const Camera& camera )
 
 // TEMPORARY - this will be moved
 //Set up the GPU for a draw
-	
+
 	m_textureTarget = camera.GetColorTarget();
-	
-	if ( m_textureTarget  == nullptr ) 
+
+	if ( m_textureTarget  == nullptr )
 	{
 		m_textureTarget = m_swapChain->GetBackBuffer();
 	}
@@ -291,7 +291,7 @@ void RenderContext::BeginCamera( const Camera& camera )
 	viewport.MaxDepth = 1.f;
 
 	m_context->RSSetViewports( 1 , &viewport );
-	
+
 	ID3D11RenderTargetView* rtv = m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
 	m_context->OMSetRenderTargets( 1 , &rtv , nullptr );
 
@@ -320,7 +320,7 @@ void RenderContext::EndCamera( const Camera& camera )
 void RenderContext::SetBlendMode( BlendMode blendMode )
 {
 	float const zeroes[] = { 0 , 0 , 0 , 0 };
-	
+
 	switch ( blendMode )
 	{
 	case BlendMode::ALPHA:
@@ -353,7 +353,7 @@ void RenderContext::CreateDebugModule()
  		typedef HRESULT( WINAPI* GetDebugModuleCB )( REFIID , void** );
 		HMODULE temp = ( HMODULE ) m_debugModule;
 		GetDebugModuleCB cb = ( GetDebugModuleCB ) ::GetProcAddress( temp , "DXGIGetDebugInterface" );
- 
+
  		// create our debug object
  		HRESULT hr = cb( __uuidof( IDXGIDebug ) , ( void** ) &m_debug );
  		ASSERT_OR_DIE( SUCCEEDED( hr ), "" );
@@ -394,7 +394,7 @@ Shader* RenderContext::GetOrCreateShader( char const* filename )
 	{
 		Temp = CreateShaderFromFile( filename );
 	}
-	
+
 	return Temp;
 }
 
@@ -417,14 +417,14 @@ Texture* RenderContext::CreateTextureFromFile( const char* imageFilePath )
 		int imageTexelSizeY = 0; // This will be filled in for us to indicate image height
 		int numComponents = 0; // This will be filled in for us to indicate how many color components the image had (e.g. 3=RGB=24bit, 4=RGBA=32bit)
 		int numComponentsRequested = 4; // don't care; we support 3 (24-bit RGB) or 4 (32-bit RGBA)
-	
+
 		stbi_set_flip_vertically_on_load( 1 ); // We prefer uvTexCoords has origin (0,0) at BOTTOM LEFT ,  0 for D3D11
 		unsigned char* imageData = stbi_load( imageFilePath , &imageTexelSizeX , &imageTexelSizeY , &numComponents , numComponentsRequested );
-	
+
 		// Check if the load was successful
 		GUARANTEE_OR_DIE( imageData , Stringf( "Failed to load image \"%s\"" , imageFilePath ));
 		GUARANTEE_OR_DIE( numComponents == 4 && imageTexelSizeX > 0 && imageTexelSizeY > 0 , Stringf( "ERROR loading image \"%s\" (Bpp=%i, size=%i,%i)" , imageFilePath , numComponents , imageTexelSizeX , imageTexelSizeY ) );
-			
+
 		// describe the texture
 		D3D11_TEXTURE2D_DESC desc;
 		desc.Width = imageTexelSizeX;
@@ -438,7 +438,7 @@ Texture* RenderContext::CreateTextureFromFile( const char* imageFilePath )
 		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		desc.CPUAccessFlags = 0;							// does the CPU write to this? 0  = no
 		desc.MiscFlags = 0;									// extension features like cube maps
-		
+
 		D3D11_SUBRESOURCE_DATA initialData;
 		initialData.pSysMem = imageData;
 		initialData.SysMemPitch = imageTexelSizeX * 4;
@@ -481,14 +481,14 @@ void RenderContext::ReCompileAllShaders()
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Texture* RenderContext::GetOrCreateTextureFromFile( const char* imageFilePath )
-{	
+{
 	Texture* Temp = m_LoadedTextures[ imageFilePath ];
-	
+
 	if (Temp == nullptr)
 	{
 		Temp = CreateTextureFromFile( imageFilePath );
 	}
-	
+
 	return Temp;
 }
 
@@ -529,7 +529,7 @@ void RenderContext::CreateBlendStates()
 
 	// render all output
 	alphaDesc.RenderTarget[ 0 ].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-	
+
 	m_device->CreateBlendState( &alphaDesc , &m_blendStates[ BlendMode::ALPHA ] );
 
 	D3D11_BLEND_DESC additiveDesc;
@@ -540,7 +540,7 @@ void RenderContext::CreateBlendStates()
 	additiveDesc.RenderTarget[ 0 ].BlendOp = D3D11_BLEND_OP_ADD;
 	additiveDesc.RenderTarget[ 0 ].SrcBlend = D3D11_BLEND_ONE;
 	additiveDesc.RenderTarget[ 0 ].DestBlend = D3D11_BLEND_ONE;
-	
+
 	additiveDesc.RenderTarget[ 0 ].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	additiveDesc.RenderTarget[ 0 ].SrcBlendAlpha = D3D11_BLEND_ONE;
 	additiveDesc.RenderTarget[ 0 ].DestBlendAlpha = D3D11_BLEND_ZERO;
@@ -570,7 +570,7 @@ void RenderContext::CreateBlendStates()
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void RenderContext::Draw( int numVertexes , int vertexOffset )
-{	
+{
 	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
 	m_context->RSSetState( m_currentShader->m_rasterState );
 	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fragmentShader , nullptr , 0 );
@@ -596,7 +596,7 @@ BitmapFont* RenderContext::GetOrCreateBitmapFontFromFile( std::string bitmapFont
  	return Temp;
 // 	UNUSED( bitmapFontFilePath );
 // 	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
-		
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -686,7 +686,7 @@ void RenderContext::DrawRing(const Vec2& center, float radius, const Rgba8& colo
 
 void RenderContext::DrawAABB2( const AABB2& box , const Rgba8& tint )
 {
-	const Vertex_PCU AABB2Verts[ 6 ] = { 
+	const Vertex_PCU AABB2Verts[ 6 ] = {
 								Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,0.f ) , tint, Vec2( 0.f, 0.f ) ),
 								Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,0.f ) , tint, Vec2( 1.f, 0.f ) ),
 								Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,0.f ) , tint, Vec2( 0.f, 1.f ) ),
@@ -694,7 +694,7 @@ void RenderContext::DrawAABB2( const AABB2& box , const Rgba8& tint )
 								Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,0.f ) , tint, Vec2( 1.f, 0.f ) ),
 								Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,0.f ) , tint, Vec2( 1.f, 1.f ) ),
 								Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,0.f ) , tint, Vec2( 0.f, 1.f ) ) };
-	
+
 	DrawVertexArray( 6 , AABB2Verts );
 }
 
@@ -757,7 +757,7 @@ void RenderContext::DrawOBB2( const OBB2& box , const Rgba8& tint )
 								Vertex_PCU( Vec3( newbox.m_mins.x,newbox.m_mins.y,0.f ) , tint, Vec2( 0.f, 0.f ) ),
 								Vertex_PCU( Vec3( newbox.m_maxs.x,newbox.m_mins.y,0.f ) , tint, Vec2( 1.f, 0.f ) ),
 								Vertex_PCU( Vec3( newbox.m_mins.x,newbox.m_maxs.y,0.f ) , tint, Vec2( 0.f, 1.f ) ),
-												  				  
+
 								Vertex_PCU( Vec3( newbox.m_maxs.x,newbox.m_mins.y,0.f ) , tint, Vec2( 1.f, 0.f ) ),
 								Vertex_PCU( Vec3( newbox.m_maxs.x,newbox.m_maxs.y,0.f ) , tint, Vec2( 1.f, 1.f ) ),
 								Vertex_PCU( Vec3( newbox.m_mins.x,newbox.m_maxs.y,0.f ) , tint, Vec2( 0.f, 1.f ) ) };
@@ -766,18 +766,18 @@ void RenderContext::DrawOBB2( const OBB2& box , const Rgba8& tint )
 	DrawVertexArray( 6 , OBB2Verts );
 
 // ALTERNATE WAY
-// 
+//
 // 	Vec2 cornerPoints[ 4 ];
 // 	box.GetCornerPositions( cornerPoints );
 // 	Vertex_PCU obbVertices[ 6 ];
 // 	obbVertices[ 0 ] = Vertex_PCU( Vec3( cornerPoints[ 0 ].x , cornerPoints[ 0 ].y , 0.f ) , Rgba8( 100 , 0 , 0 , 150 ) , Vec2( 0.f , 0.f ) );
 // 	obbVertices[ 1 ] = Vertex_PCU( Vec3( cornerPoints[ 1 ].x , cornerPoints[ 1 ].y , 0.f ) , Rgba8( 100 , 0 , 0 , 150 ) , Vec2( 0.f , 0.f ) );
 // 	obbVertices[ 2 ] = Vertex_PCU( Vec3( cornerPoints[ 2 ].x , cornerPoints[ 2 ].y , 0.f ) , Rgba8( 100 , 0 , 0 , 150 ) , Vec2( 0.f , 0.f ) );
-// 
+//
 // 	obbVertices[ 3 ] = Vertex_PCU( Vec3( cornerPoints[ 0 ].x , cornerPoints[ 0 ].y , 0.f ) , Rgba8( 100 , 0 , 0 , 150 ) , Vec2( 0.f , 0.f ) );
 // 	obbVertices[ 4 ] = Vertex_PCU( Vec3( cornerPoints[ 3 ].x , cornerPoints[ 3 ].y , 0.f ) , Rgba8( 100 , 0 , 0 , 150 ) , Vec2( 0.f , 0.f ) );
 // 	obbVertices[ 5 ] = Vertex_PCU( Vec3( cornerPoints[ 2 ].x , cornerPoints[ 2 ].y , 0.f ) , Rgba8( 100 , 0 , 0 , 150 ) , Vec2( 0.f , 0.f ) );
-// 
+//
 // 	DrawVertexArray( 6 , obbVertices );
 
 
@@ -907,10 +907,10 @@ void RenderContext::BindShader( std::string shaderFileName )
 bool RenderContext::HasAnyShaderChangedAtPath( const wchar_t* relativePath )
 {
 	TCHAR path[ MAX_PATH + 1 ] = L"";
-	
+
 	::GetCurrentDirectory( MAX_PATH , path );
 	wcscat_s( path , relativePath );
-	
+
  	HANDLE result = FindFirstChangeNotification( path , false , FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_ATTRIBUTES | FILE_NOTIFY_CHANGE_SIZE );
 
 	const HANDLE* ptrResult = &result;
@@ -939,7 +939,8 @@ bool RenderContext::HasAnyShaderChangedAtPath( const wchar_t* relativePath )
 	{
 		FindCloseChangeNotification( result );
 		return false;
-	}	
+	}
+	return false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -949,7 +950,7 @@ void RenderContext::BindVertexInput( VertexBuffer* vbo )
 	ID3D11Buffer* vboHandle = vbo->m_handle;
 	UINT stride = ( UINT ) sizeof( Vertex_PCU );	//	how far from one vertex to next
 	UINT offset = 0;								//  how far into buffer we start
-	
+
 	if (m_lastBoundVBO != vboHandle )
 	{
 		m_context->IASetVertexBuffers( 0 , 1 , &vboHandle , &stride , &offset );
@@ -962,7 +963,7 @@ void RenderContext::BindVertexInput( VertexBuffer* vbo )
 
 void RenderContext::BindUniformBuffer( unsigned int slot , RenderBuffer* ubo )
 {
-	
+
 	ID3D11Buffer* uboHandle = ubo->m_handle; /*ubo->GetHandle();*/
 
 	m_context->VSSetConstantBuffers( slot , 1 , &uboHandle );

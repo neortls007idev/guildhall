@@ -28,7 +28,7 @@ Game::Game()
 	m_imageTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/PlayerTankBase.png" );
 
 	m_normalImage = AABB2( -WORLD_CAMERA_SIZE_X , -WORLD_CAMERA_SIZE_Y , WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y );
-	
+
 	AABB2 boxCopy = m_normalImage;
 	m_invertedColorImage = boxCopy.CarveBoxOffRight( 0.5f , 0.f );
 	m_normalImage = m_normalImage.GetBoxAtLeft( 0.5f , 0.f );
@@ -61,7 +61,7 @@ void Game::Update( float deltaSeconds )
 // 	//m_color.g++;
 // 	m_color.g = ( uchar ) RangeMapFloat( -1.f , 1.f , 0 , 255 , SinDegrees( 100.f * ( float ) GetCurrentTimeSeconds() ) );
 // 	m_worldCamera.SetClearMode( CLEAR_COLOR_BIT , m_color );
-// 
+//
 // 	Vec3 movement = Vec3( Vec2::ZERO , 0.f );
 // 	if ( g_theInput->IsKeyHeldDown( 'A' ) )
 // 	{
@@ -89,16 +89,16 @@ void Game::Update( float deltaSeconds )
 void Game::Render() const
 {
 	g_theRenderer->BeginCamera( m_gameCamera );
-	
+
 	g_theRenderer->BindShader( nullptr );
-	
+
 	g_theRenderer->BindTexture( m_imageTex );
 	//g_theRenderer->SetBlendMode( BlendMode::ALPHA );
-	
+
 	g_theRenderer->DrawAABB2( m_normalImage , WHITE );
 	g_theRenderer->BindShader( m_invertColorShader );
 	g_theRenderer->DrawAABB2( m_invertedColorImage , WHITE );
-	
+
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindShader( nullptr );
 
@@ -112,7 +112,7 @@ void Game::RenderUI() const
 
 void Game::UpdateCamera()
 {
-	
+
 }
 
 void Game::AddScreenShakeIntensity( float deltaShakeIntensity )
