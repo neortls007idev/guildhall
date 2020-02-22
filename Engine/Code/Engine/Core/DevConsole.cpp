@@ -81,7 +81,7 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	consoleArea = consoleArea.CarveBoxOffTop( 0.925f , 0.f );
 
 	Vec2 caratDimensions = typingArea.GetDimensions();
-	
+
 
 	AABB2 carat = typingArea.GetBoxAtLeft( 0.995f , 0.f );
 	carat.SetDimensions( carat.GetDimensions() * 0.7f );
@@ -95,7 +95,7 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	int myStringIndex = ( int ) m_consoleText.size() - 1;
 	Vec2 alignment = ALIGN_BOTTOM_LEFT;
 	float alignmentDeltaChange = 0.f;
-	
+
 	renderer.DrawAABB2( consoleArea , m_OverlayColor );
 	renderer.DrawAABB2( typingArea , Rgba8( 0 , 0 , 255 , 100 ) );
 
@@ -104,7 +104,7 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	float translateCaratX = ( m_currentText.length() - m_carrotOffset ) * lineHeight;
 	carat.Translate( Vec2( translateCaratX , 0.f ) );
 	renderer.DrawAABB2( carat , m_carrotColor );
-	
+
 	std::vector<Vertex_PCU> consoleTextVerts;
 
 	for ( int index = 0; index < numberOfLinesToDisplay; index++ )
@@ -155,7 +155,7 @@ void DevConsole::OnKeyPress( char character )
 
 void DevConsole::ResetCurrentInput()
 {
-	m_currentText.clear(); 
+	m_currentText.clear();
 	m_carrotOffset = 0;
 }
 
@@ -164,7 +164,7 @@ void DevConsole::ResetCurrentInput()
 void DevConsole::ProcessCommand()
 {
 	m_isCommandFound = false;
-	
+
 	for ( m_commandSearchIndex = 0; m_commandSearchIndex < m_consoleCommands.size(); m_commandSearchIndex++ )
 	{
 		if ( StringCompare( m_currentText , m_consoleCommands[ m_commandSearchIndex ].command ) )
@@ -297,7 +297,7 @@ void DevConsole::ProcessInput()
 	char character;
 	m_carrotColor.a = ( uchar ) RangeMapFloat( -1.f , 1.f , 0 , 255 , SinDegrees( 127.f * ( float ) GetCurrentTimeSeconds() ) );
 	//HandleArrowKeys();
-		
+
 	size_t curStringLength = m_currentText.length();
 
 	if ( g_theInput->WasKeyJustPressed( KEY_DELETE ) && ( curStringLength - m_carrotOffset ) < curStringLength )
