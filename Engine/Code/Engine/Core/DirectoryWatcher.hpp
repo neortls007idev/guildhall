@@ -6,8 +6,12 @@ public:
 	DirectoryWatcher();
 	~DirectoryWatcher();
 
-	void Initialize();
-	void Terminate();
+	void Startup();
+	void BeginFrame();
+	void Update( float deltaSeconds );
+	void EndFrame();
+	void Shutdown();
+
 	//void AddDirectoryToWatchList( LPCTSTR directory , BOOL watchSubtree , DWORD notificationFilters , DWORD bufferSize = 16384 );
 
 private:

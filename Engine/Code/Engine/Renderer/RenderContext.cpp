@@ -921,7 +921,7 @@ bool RenderContext::HasAnyShaderChangedAtPath( const wchar_t* relativePath )
 		return false;
 	}
 
-	DWORD waitResult =	WaitForMultipleObjects( 1 , ptrResult , FALSE , 16);
+	DWORD waitResult = WaitForMultipleObjects( 1 , ptrResult , FALSE , 5 );
 
 // 	if ( FindNextChangeNotification( result ) )
 // 	{
@@ -932,23 +932,14 @@ bool RenderContext::HasAnyShaderChangedAtPath( const wchar_t* relativePath )
 	if ( waitResult == WAIT_OBJECT_0 )
 	{
 		ReCompileAllShaders();
+		FindCloseChangeNotification( result );
+		return true;
 	}
-	else if ( waitResult == WAIT_ABANDONED_0 )
+	else if ( waitResult ==  WAIT_ABANDONED_0 || waitResult == WAIT_FAILED ||  waitResult == WAIT_TIMEOUT )
 	{
-		
-	}
-	else if ( waitResult == WAIT_FAILED )
-	{
-		
-	}
-	else if ( waitResult == WAIT_TIMEOUT )
-	{
-		
-	}
-	
-	FindCloseChangeNotification( result );
-	return true;
-
+		FindCloseChangeNotification( result );
+		return false;
+	}	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
