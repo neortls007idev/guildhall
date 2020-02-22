@@ -60,6 +60,8 @@ public:
 	bool IsQuitting() const { return m_isQuitting; }
 	bool HandleQuitRequested();
 
+	bool ForceQuit();
+
 	void SetTitle( std::string const& title );
 	void SetNewIcon( void* const& icon );
 	void SetNewIcon( eIcon newIcon );

@@ -1,18 +1,11 @@
-#include "Engine/Input/VirtualKeyboard.hpp"
-#include "Engine/Math/MathUtils.hpp"
-#include "Engine/Core/VertexUtils.hpp"
-#include "Engine/Core/ErrorWarningAssert.hpp"
-#include "Engine/Core/StringUtils.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-#include "Engine/Math/RandomNumberGenerator.hpp"
+#include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
-#include "Engine/Renderer/Shader.hpp"
-#include "Engine/Renderer/Texture.hpp"
-#include "Engine/Time/Time.hpp"
+#include "Game/Game.hpp"
 
+#include "Engine/Math/MatrixUtils.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
-#include "Game/Game.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -40,6 +33,9 @@ Game::Game()
 	m_invertedColorImage.SetDimensions( m_invertedColorImage.GetDimensions() * 0.75f );
 	m_invertedColorImage.AlignWithinAABB2( boxCopy , ALIGN_CENTERED );
 
+// 	float testInv[] = { 4,0,0,0, 0,0,2,0, 0,1,2,0, 1,0,0,1 };
+// 	Mat44 testMat( testInv );
+// 	MatrixInvert( testMat );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -1,10 +1,8 @@
-#pragma once
-#include "Engine/Renderer/Camera.hpp"
-#include "Engine/Core/ErrorWarningAssert.hpp"
-#include "Engine/Math/RandomNumberGenerator.hpp"
-#include "Engine/Primitives/AABB2.hpp"
-#include "Game/GameCommon.hpp"
 #include "Engine/Math/Vec3.hpp"
+#include "Engine/Primitives/AABB2.hpp"
+#include "Engine/Renderer/Camera.hpp"
+#include "Game/GameCommon.hpp"
+#pragma once
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +23,7 @@ public:
 	void UpdateCamera();
 	void RenderUI() const;
 	void CheckCollision();
-	
+
 	void AddScreenShakeIntensity( float deltaShakeIntensity );
 
 	void GarbageCollection();
@@ -41,9 +39,9 @@ private:
 
 	int			m_controllerID			= -1;
 	float		m_screenShakeIntensity	= 0.f;
-	
+
 public:
-	
+
 	AABB2		m_normalImage;
 	AABB2		m_invertedColorImage;
 	Texture*	m_imageTex				= nullptr;

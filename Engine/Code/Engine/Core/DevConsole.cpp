@@ -7,7 +7,7 @@
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Time/Time.hpp"
-#include "../Input/VirtualKeyboard.hpp"
+#include "Engine/Input/VirtualKeyboard.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -17,16 +17,32 @@ extern Window* g_theWindow;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+STATIC bool DevConsole::m_isConsoleOpen;
+STATIC Rgba8 DevConsole::m_OverlayColor;
+STATIC Rgba8 DevConsole::m_carrotColor;
+STATIC float DevConsole::m_carrotPosX;
+STATIC size_t DevConsole::m_carrotOffset;
+STATIC std::vector<ColoredLine> DevConsole::m_consoleText;
+STATIC std::vector<DevConsoleCommand> DevConsole::m_consoleCommands;
+STATIC std::string DevConsole::m_currentText;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 DevConsole::DevConsole()
 {
-
+	m_isConsoleOpen = false;
+	m_OverlayColor = Rgba8( 100 , 100 , 100 , 100 );
+	m_carrotColor = Rgba8( 255 , 255 , 255 , 255 );
+	m_carrotPosX = 0.f;
+	m_carrotOffset = 0;
+	m_currentText = "";
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void DevConsole::Startup()
 {
-	g_theDevConsole->PrintString( CYAN , "DEVCONSOLE STARTED" );
+	PrintString( "DEVCONSOLE STARTED" , DEVCONSOLE_SYTEMLOG );
 
 	InitializeCommands();
 }
@@ -36,9 +52,13 @@ void DevConsole::Startup()
 void DevConsole::InitializeCommands()
 {
 	CreateCommand( "help" , "List All Commands" );
-	//g_theEventSystem->SubscribeToEvent( "help" , ExecuteHelp );
+	g_theEventSystem->SubscribeToEvent( "help" , DevConsole::ExecuteHelp );
+
 	CreateCommand( "quit" , "Quits the Application" );
+	g_theEventSystem->SubscribeToEvent( "quit" , DevConsole::ExecuteQuit );
+
 	CreateCommand( "close" , "Closes the Devconsole" );
+	g_theEventSystem->SubscribeToEvent( "close" , DevConsole::Close );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -64,11 +84,37 @@ void DevConsole::Shutdown()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void DevConsole::PrintString( const Rgba8& textColor , const std::string& devConsolePrintString )
+void DevConsole::PrintString( const Rgba8& textColor , const std::string& devConsolePrintString , eDevConsoleMessageType messageType )
 {
 	ColoredLine newLineText;
 	newLineText.lineColor = textColor;
 	newLineText.text = devConsolePrintString;
+	newLineText.messageType = messageType;
+	m_consoleText.push_back( newLineText );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DevConsole::PrintString( const std::string& devConsolePrintString /*= "INVALID STRING" */ , eDevConsoleMessageType messageType/*= USERINPUT */ )
+{
+	ColoredLine newLineText;
+	newLineText.text = devConsolePrintString;
+	newLineText.messageType = messageType;
+
+	switch (messageType)
+	{
+	case DEVCONSOLE_ERROR:			newLineText.lineColor = RED;
+									break;
+	case DEVCONSOLE_USERLOG:		newLineText.lineColor = PURPLE;
+									break;
+	case DEVCONSOLE_USERINPUT:		newLineText.lineColor = GREEN;
+									break;
+	case DEVCONSOLE_WARNING:		newLineText.lineColor = YELLOW;
+									break;
+	case DEVCONSOLE_SYTEMLOG:		newLineText.lineColor = CYAN;
+		break;
+	}
+
 	m_consoleText.push_back( newLineText );
 }
 
@@ -81,7 +127,7 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	consoleArea = consoleArea.CarveBoxOffTop( 0.925f , 0.f );
 
 	Vec2 caratDimensions = typingArea.GetDimensions();
-	
+
 
 	AABB2 carat = typingArea.GetBoxAtLeft( 0.995f , 0.f );
 	carat.SetDimensions( carat.GetDimensions() * 0.7f );
@@ -95,7 +141,7 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	int myStringIndex = ( int ) m_consoleText.size() - 1;
 	Vec2 alignment = ALIGN_BOTTOM_LEFT;
 	float alignmentDeltaChange = 0.f;
-	
+
 	renderer.DrawAABB2( consoleArea , m_OverlayColor );
 	renderer.DrawAABB2( typingArea , Rgba8( 0 , 0 , 255 , 100 ) );
 
@@ -104,7 +150,7 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	float translateCaratX = ( m_currentText.length() - m_carrotOffset ) * lineHeight;
 	carat.Translate( Vec2( translateCaratX , 0.f ) );
 	renderer.DrawAABB2( carat , m_carrotColor );
-	
+
 	std::vector<Vertex_PCU> consoleTextVerts;
 
 	for ( int index = 0; index < numberOfLinesToDisplay; index++ )
@@ -153,9 +199,11 @@ void DevConsole::OnKeyPress( char character )
 	}
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void DevConsole::ResetCurrentInput()
 {
-	m_currentText.clear(); 
+	m_currentText.clear();
 	m_carrotOffset = 0;
 }
 
@@ -163,51 +211,12 @@ void DevConsole::ResetCurrentInput()
 
 void DevConsole::ProcessCommand()
 {
-	m_isCommandFound = false;
-	
-	for ( m_commandSearchIndex = 0; m_commandSearchIndex < m_consoleCommands.size(); m_commandSearchIndex++ )
+	std::string currentCommand( m_currentText );
+	m_currentText = "";
+
+	if ( !g_theEventSystem->FireEvent( currentCommand ) )
 	{
-		if ( StringCompare( m_currentText , m_consoleCommands[ m_commandSearchIndex ].command ) )
-		{
-			m_isCommandFound = true;
-			break;
-		}
-		else
-		{
-			m_isCommandFound = false;
-		}
-	}
-
-	if ( !m_isCommandFound )
-	{
-		PrintString( RED , "Invalid Console Command :- Use \"help\" command  " );
-	}
-	else
-	{
-		ExecuteCommand();
-	}
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void DevConsole::ExecuteCommand()
-{
-	if ( m_isCommandFound )
-	{
-		if ( m_commandSearchIndex == 0 )
-		{
-			ExecuteHelp();
-		}
-
-		if ( m_commandSearchIndex == 1 )
-		{
-			ExecuteQuit();
-		}
-
-		if ( m_commandSearchIndex == 2 )
-		{
-			Close();
-		}
+		PrintString( RED , "Invalid Console Command :- Use \"help\" command  ", DEVCONSOLE_ERROR );
 	}
 }
 
@@ -249,7 +258,12 @@ void DevConsole::SetIsOpen( bool isOpen )
 
 void DevConsole::ToggleVisibility()
 {
-	ResetConsole();
+	//ResetConsole();
+	EventArgs temp;
+	ClearConsoleMessagesOfType( temp ,DEVCONSOLE_USERINPUT );
+	ClearConsoleMessagesOfType( temp ,DEVCONSOLE_USERLOG );
+	ClearConsoleMessagesOfType( temp ,DEVCONSOLE_USERLOG );
+
 	m_isConsoleOpen = !m_isConsoleOpen;
 }
 
@@ -265,7 +279,7 @@ void DevConsole::Close()
 bool DevConsole::Close( EventArgs& commandArgs )
 {
 	UNUSED( commandArgs );
-	Close();
+	m_isConsoleOpen = false;
 	return true;
 }
 
@@ -297,7 +311,7 @@ void DevConsole::ProcessInput()
 	char character;
 	m_carrotColor.a = ( uchar ) RangeMapFloat( -1.f , 1.f , 0 , 255 , SinDegrees( 127.f * ( float ) GetCurrentTimeSeconds() ) );
 	//HandleArrowKeys();
-		
+
 	size_t curStringLength = m_currentText.length();
 
 	if ( g_theInput->WasKeyJustPressed( KEY_DELETE ) && ( curStringLength - m_carrotOffset ) < curStringLength )
@@ -352,8 +366,9 @@ bool DevConsole::AddCharacterToInput( char character )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void DevConsole::ResetConsole()
+bool DevConsole::ResetConsole( EventArgs& commandArgs )
 {
+	UNUSED( commandArgs );
 	while ( g_theInput->m_characters.size() > 0 )
 	{
 		g_theInput->m_characters.pop();
@@ -361,29 +376,32 @@ void DevConsole::ResetConsole()
 	m_consoleText.clear();
 	m_currentText = "";
 	m_carrotOffset = 0;
+
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void DevConsole::HandleArrowKeys()
+bool DevConsole::ClearConsoleMessagesOfType( EventArgs& commandArgs , eDevConsoleMessageType messageType )
 {
-	size_t curTextLength = m_currentText.length();
+	UNUSED( commandArgs );
+	while ( g_theInput->m_characters.size() > 0 )
+	{
+		g_theInput->m_characters.pop();
+	}
 
-	if ( curTextLength - m_carrotOffset > 0 )
+	for ( auto index = m_consoleText.begin(); index < m_consoleText.end(); ++index )
 	{
-		if ( g_theInput->WasKeyJustPressed( KEY_LEFTARROW ) || g_theInput->IsKeyHeldDown( KEY_LEFTARROW ) )
+		if ( index->messageType == messageType )
 		{
-			m_carrotOffset += 1;
+			m_consoleText.erase( index-- );
 		}
 	}
-	if ( curTextLength - m_carrotOffset < curTextLength )
-	{
-		if ( g_theInput->WasKeyJustPressed( KEY_RIGHTARROW ) || g_theInput->IsKeyHeldDown( KEY_RIGHTARROW ) )
-		{
-			m_carrotOffset -= 1;
-			//translateCaratX += lineHeight;
-		}
-	}
+
+	m_currentText = "";
+	m_carrotOffset = 0;
+
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -404,16 +422,8 @@ void DevConsole::HandleInput( unsigned char keycode )
 		if ( keycode == KEY_RIGHTARROW )
 		{
 			m_carrotOffset -= 1;
-			//translateCaratX += lineHeight;
 		}
 	}
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void DevConsole::ExecuteQuit()
-{
-	g_theWindow->HandleQuitRequested();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -421,18 +431,8 @@ void DevConsole::ExecuteQuit()
 bool DevConsole::ExecuteQuit( EventArgs& commandArgs )
 {
 	UNUSED( commandArgs );
-	ExecuteQuit();
+	g_theWindow->ForceQuit();
 	return true;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void DevConsole::ExecuteHelp()
-{
-	for ( m_commandSearchIndex = 0; m_commandSearchIndex < m_consoleCommands.size(); m_commandSearchIndex++ )
-	{
-		PrintString( GREEN , m_consoleCommands[ m_commandSearchIndex ].command + " : " + m_consoleCommands[ m_commandSearchIndex ].Description );
-	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -440,7 +440,10 @@ void DevConsole::ExecuteHelp()
 bool DevConsole::ExecuteHelp( EventArgs& commandArgs )
 {
 	UNUSED( commandArgs );
-	ExecuteHelp();
+	for ( size_t commandSearchIndex = 0; commandSearchIndex < m_consoleCommands.size(); commandSearchIndex++ )
+	{
+		PrintString( GREEN , m_consoleCommands[ commandSearchIndex ].command + " : " + m_consoleCommands[ commandSearchIndex ].Description );
+	}
 	return true;
 }
 

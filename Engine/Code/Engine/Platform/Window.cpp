@@ -30,7 +30,7 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 		HRESULT result = CoCreateInstance( CLSID_TaskbarList , NULL , CLSCTX_INPROC_SERVER , IID_ITaskbarList3 , reinterpret_cast< LPVOID* >( &pTaskbar ) );
 		UNUSED( result );
 	}
-	
+
 	if ( window )
 	{
 		input = window->GetInputSytem();
@@ -60,8 +60,7 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 	case WM_KEYDOWN:
 	{
 		unsigned char asKey = ( unsigned char ) wParam;
-		//UNUSED( asKey );
-		//input = window->GetInputSytem();
+
 		if ( g_theDevConsole->IsOpen() )
 		{
 			g_theDevConsole->HandleInput( asKey );
@@ -74,20 +73,18 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 	case WM_KEYUP:
 	{
 		unsigned char asKey = ( unsigned char ) wParam;
-		//input = window->GetInputSytem();
 		input->HandleKeyUp( asKey );
-		//UNUSED( asKey );
 		break;
 	}
 	}
-	
+
 	// Send back to Windows any unhandled/unconsumed messages we want other apps to see (e.g. play/pause in music apps, etc.)
 	return DefWindowProc( windowHandle , wmMessageCode , wParam , lParam );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-static void RegisterWindowClass() 
+static void RegisterWindowClass()
 {
 	HICON hIcon1 = static_cast< HICON >( ::LoadImage( NULL ,
 		IDI_WARNING ,
@@ -117,7 +114,7 @@ static void RegisterWindowClass()
 static void UnRegisterWindowClass()
 {
 	::UnregisterClass( WND_CLASS_NAME , GetModuleHandle( NULL ) );
-	
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -230,14 +227,14 @@ bool Window::Open( std::string const& title , float clientAspect , float maxClie
 // LoadIcon( ::GetModuleHandle( NULL ) , IDI_QUESTION );		----> Deprecated Version to Load an Icon LoadImage is more Preferred
 //	HDC hdc = GetDC( hwnd );									----> Get the current Devie Context using the windows handle
 // 	DrawIcon( hdc , 0 , 0 , hIcon1 );							----> Draw Icon in the current Context at the given coords from TopLeft
-// // 		SetClassLongA( hwnd ,								----> window handle 
-// // 			-14 ,											----> changes icon 
+// // 		SetClassLongA( hwnd ,								----> window handle
+// // 			-14 ,											----> changes icon
 // // 			( LONG ) LoadIcon( ::GetModuleHandle( NULL ) , IDI_QUESTION )
 // // 		);
 // 	SetWindowLongPtr( hwnd , -14 , ( LONG_PTR ) hIcon1 );
 // 	SendMessage( hwnd , WM_SETICON , ICON_BIG , NULL );
 // 	SetClassLong( hwnd , -14 , LPARAM( hIcon1 ) );
-	
+
 	return true;
 }
 
@@ -269,16 +266,6 @@ void Window::BeginFrame()
 	MSG queuedMessage;
 	for ( ;; )
 	{
-// 		if ( pTaskbar )
-// 		{
-// 			// Set Progress bar status in the taskbar
-// 			pTaskbar->SetProgressState( ( HWND ) m_hwnd , TBPF_INDETERMINATE );
-// 			// 	HRESULT SetProgressValue(
-// 			// 		HWND      hwnd ,
-// 			// 		ULONGLONG 50 ,
-// 			// 		ULONGLONG 100
-// 			// 	);
-// 		}
 		const BOOL wasMessagePresent = PeekMessage( &queuedMessage , NULL , 0 , 0 , PM_REMOVE );
 		if ( !wasMessagePresent )
 		{
@@ -308,7 +295,7 @@ int Window::GetClientHeight()
 
 bool Window::HandleQuitRequested()
 {
-	
+
 	if ( g_theDevConsole->IsOpen() && g_theDevConsole->GetCurrentInputLength() > 0 )
 	{
 		g_theDevConsole->ResetCurrentInput();
@@ -323,6 +310,13 @@ bool Window::HandleQuitRequested()
 	pTaskbar->Release();
 	::CoUninitialize();
 
+	return ForceQuit();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Window::ForceQuit()
+{
 	m_isQuitting = true;
 	return m_isQuitting;
 }

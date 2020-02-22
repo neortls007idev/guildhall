@@ -229,6 +229,12 @@
     <ClCompile Include="Math\MatrixUtils.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="Math\Transform.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Primitives\GPUMesh.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -431,6 +437,12 @@
     </ClInclude>
     <ClInclude Include="Math\MatrixUtils.hpp">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Transform.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Primitives\GPUMesh.hpp">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

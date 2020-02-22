@@ -1,10 +1,8 @@
-#include "Engine/Core/DirectoryWatcher.hpp"
-
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <Shobjidl.h>
-
+#include "Engine/Core/DirectoryWatcher.hpp"
 #include "EngineCommon.hpp"
+#include <Shobjidl.h>
+#include <windows.h>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

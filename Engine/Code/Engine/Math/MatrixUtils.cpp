@@ -1,10 +1,10 @@
-#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/Matrix4x4.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // const Mat44 Mat44::CreateOrthoGraphicProjeciton( const Vec3& min , const Vec3& max )
 // {
-// 
+//
 // }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -37,6 +37,183 @@ const Mat44 CreateOrthoGraphicProjeciton( const Vec3& min , const Vec3& max )
 	};
 
 	return Mat44( mat );
+}
+
+const Mat44 MakePerpsectiveProjectionMatrixD3D( float fovDegrees , float aspectRatio , float nearZ , float farZ )
+{
+	float mat[16];
+
+	return Mat44( mat );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void MatrixTranspose( Mat44& mat )
+{
+	Mat44 copy = mat;
+
+	mat.Iy = copy.Jx;
+	mat.Jx = copy.Iy;
+
+	mat.Iz = copy.Kx;
+	mat.Kx = copy.Iz;
+
+	mat.Iw = copy.Tx;
+	mat.Tx = copy.Iw;
+
+	mat.Jz = copy.Ky;
+	mat.Ky = copy.Jz;
+
+	mat.Jw = copy.Ty;
+	mat.Ty = copy.Jw;
+
+	mat.Kw = copy.Tz;
+	mat.Tz = copy.Kw;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void MatrixInvertOrthoNormal( Mat44& mat )
+{
+	MatrixTranspose( mat );
+}
+
+void MatrixInvert( Mat44& mat )
+{
+	// TODO :- Might be incorrect test more.
+
+	float inverse[ 16 ];
+	float determinant;
+	float m[ 16 ];
+	uint index;
+
+	for ( index = 0; index < 16; ++index )
+	{
+		m[ index ] = *( &mat.Ix + index );
+	}
+
+	inverse[ 0 ] =	m[ 5 ]	* m[ 10 ] * m[ 15 ] -
+					m[ 5 ]	* m[ 11 ] * m[ 14 ] -
+					m[ 9 ]	* m[ 6 ]  * m[ 15 ] +
+					m[ 9 ]	* m[ 7 ]  * m[ 14 ] +
+					m[ 13 ] * m[ 6 ]  * m[ 11 ] -
+					m[ 13 ] * m[ 7 ]  * m[ 10 ];
+
+	inverse[ 4 ] = -m[ 4 ]  * m[ 10 ] * m[ 15 ] +
+					m[ 4 ]  * m[ 11 ] * m[ 14 ] +
+					m[ 8 ]  * m[ 6 ]  * m[ 15 ] -
+					m[ 8 ]  * m[ 7 ]  * m[ 14 ] -
+					m[ 12 ] * m[ 6 ]  * m[ 11 ] +
+					m[ 12 ] * m[ 7 ]  * m[ 10 ];
+
+	inverse[ 8 ] = m[ 4 ]  * m[ 9 ]  * m[ 15 ] -
+				   m[ 4 ]  * m[ 11 ] * m[ 13 ] -
+				   m[ 8 ]  * m[ 5 ]  * m[ 15 ] +
+				   m[ 8 ]  * m[ 7 ]  * m[ 13 ] +
+				   m[ 12 ] * m[ 5 ]  * m[ 11 ] -
+				   m[ 12 ] * m[ 7 ]  * m[ 9 ];
+
+	inverse[ 12 ] = -m[ 4 ]  * m[ 9 ]  * m[ 14 ] +
+					 m[ 4 ]  * m[ 10 ] * m[ 13 ] +
+					 m[ 8 ]  * m[ 5 ]  * m[ 14 ] -
+					 m[ 8 ]  * m[ 6 ]  * m[ 13 ] -
+					 m[ 12 ] * m[ 5 ]  * m[ 10 ] +
+					 m[ 12 ] * m[ 6 ]  * m[ 9 ];
+
+	inverse[ 1 ] = -m[ 1 ]  * m[ 10 ] * m[ 15 ] +
+					m[ 1 ]  * m[ 11 ] * m[ 14 ] +
+					m[ 9 ]  * m[ 2 ]  * m[ 15 ] -
+					m[ 9 ]  * m[ 3 ]  * m[ 14 ] -
+					m[ 13 ] * m[ 2 ]  * m[ 11 ] +
+					m[ 13 ] * m[ 3 ]  * m[ 10 ];
+
+	inverse[ 5 ] = m[ 0 ]  * m[ 10 ] * m[ 15 ] -
+				   m[ 0 ]  * m[ 11 ] * m[ 14 ] -
+				   m[ 8 ]  * m[ 2 ]  * m[ 15 ] +
+				   m[ 8 ]  * m[ 3 ]  * m[ 14 ] +
+				   m[ 12 ] * m[ 2 ]  * m[ 11 ] -
+				   m[ 12 ] * m[ 3 ]  * m[ 10 ];
+
+	inverse[ 9 ] = -m[ 0 ]  * m[ 9 ]  * m[ 15 ] +
+					m[ 0 ]  * m[ 11 ] * m[ 13 ] +
+					m[ 8 ]  * m[ 1 ]  * m[ 15 ] -
+					m[ 8 ]  * m[ 3 ]  * m[ 13 ] -
+					m[ 12 ] * m[ 1 ]  * m[ 11 ] +
+					m[ 12 ] * m[ 3 ]  * m[ 9 ];
+
+	inverse[ 13 ] = m[ 0 ]  * m[ 9 ]  * m[ 14 ] -
+					m[ 0 ]  * m[ 10 ] * m[ 13 ] -
+					m[ 8 ]  * m[ 1 ]  * m[ 14 ] +
+					m[ 8 ]  * m[ 2 ]  * m[ 13 ] +
+					m[ 12 ] * m[ 1 ]  * m[ 10 ] -
+					m[ 12 ] * m[ 2 ]  * m[ 9 ];
+
+	inverse[ 2 ] = m[ 1 ]  * m[ 6 ] * m[ 15 ] -
+				   m[ 1 ]  * m[ 7 ] * m[ 14 ] -
+				   m[ 5 ]  * m[ 2 ] * m[ 15 ] +
+				   m[ 5 ]  * m[ 3 ] * m[ 14 ] +
+				   m[ 13 ] * m[ 2 ] * m[ 7 ] -
+				   m[ 13 ] * m[ 3 ] * m[ 6 ];
+
+	inverse[ 6 ] = -m[ 0 ]  * m[ 6 ] * m[ 15 ] +
+					m[ 0 ]  * m[ 7 ] * m[ 14 ] +
+					m[ 4 ]  * m[ 2 ] * m[ 15 ] -
+					m[ 4 ]  * m[ 3 ] * m[ 14 ] -
+					m[ 12 ] * m[ 2 ] * m[ 7 ] +
+					m[ 12 ] * m[ 3 ] * m[ 6 ];
+
+	inverse[ 10 ] = m[ 0 ]  * m[ 5 ] * m[ 15 ] -
+					m[ 0 ]  * m[ 7 ] * m[ 13 ] -
+					m[ 4 ]  * m[ 1 ] * m[ 15 ] +
+					m[ 4 ]  * m[ 3 ] * m[ 13 ] +
+					m[ 12 ] * m[ 1 ] * m[ 7 ] -
+					m[ 12 ] * m[ 3 ] * m[ 5 ];
+
+	inverse[ 14 ] = -m[ 0 ]  * m[ 5 ] * m[ 14 ] +
+					 m[ 0 ]  * m[ 6 ] * m[ 13 ] +
+					 m[ 4 ]  * m[ 1 ] * m[ 14 ] -
+					 m[ 4 ]  * m[ 2 ] * m[ 13 ] -
+					 m[ 12 ] * m[ 1 ] * m[ 6 ] +
+					 m[ 12 ] * m[ 2 ] * m[ 5 ];
+
+	inverse[ 3 ] = -m[ 1 ] * m[ 6 ] * m[ 11 ] +
+					m[ 1 ] * m[ 7 ] * m[ 10 ] +
+					m[ 5 ] * m[ 2 ] * m[ 11 ] -
+					m[ 5 ] * m[ 3 ] * m[ 10 ] -
+					m[ 9 ] * m[ 2 ] * m[ 7 ] +
+					m[ 9 ] * m[ 3 ] * m[ 6 ];
+
+	inverse[ 7 ] = m[ 0 ] * m[ 6 ] * m[ 11 ] -
+				   m[ 0 ] * m[ 7 ] * m[ 10 ] -
+				   m[ 4 ] * m[ 2 ] * m[ 11 ] +
+				   m[ 4 ] * m[ 3 ] * m[ 10 ] +
+				   m[ 8 ] * m[ 2 ] * m[ 7 ] -
+				   m[ 8 ] * m[ 3 ] * m[ 6 ];
+
+	inverse[ 11 ] = -m[ 0 ] * m[ 5 ] * m[ 11 ] +
+					 m[ 0 ] * m[ 7 ] * m[ 9 ] +
+					 m[ 4 ] * m[ 1 ] * m[ 11 ] -
+					 m[ 4 ] * m[ 3 ] * m[ 9 ] -
+					 m[ 8 ] * m[ 1 ] * m[ 7 ] +
+					 m[ 8 ] * m[ 3 ] * m[ 5 ];
+
+	inverse[ 15 ] = m[ 0 ] * m[ 5 ] * m[ 10 ] -
+					m[ 0 ] * m[ 6 ] * m[ 9 ] -
+					m[ 4 ] * m[ 1 ] * m[ 10 ] +
+					m[ 4 ] * m[ 2 ] * m[ 9 ] +
+					m[ 8 ] * m[ 1 ] * m[ 6 ] -
+					m[ 8 ] * m[ 2 ] * m[ 5 ];
+
+	determinant = m[ 0 ] * inverse[ 0 ] + m[ 1 ] * inverse[ 4 ] + m[ 2 ] * inverse[ 8 ] + m[ 3 ] * inverse[ 12 ];
+	determinant = 1.0f / determinant;
+
+	Mat44 ret( inverse );
+	for ( index = 0; index < 16; index++ )
+	{
+		*( &ret.Ix + index ) = ( inverse[ index ] * determinant );
+	}
+
+	mat = ret;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
