@@ -7,25 +7,24 @@
 class Transform
 {
 public:
-	Transform();
-	~Transform();
-	void	SetScale();
+	Transform(){};
+	~Transform(){};
+
 	void	SetScale( float xScale , float yScale , float zScale );
-	void	SetRotation();
 	void	SetRotation( float pitch , float yaw , float roll );
-	void	SetTranslation();
-	void	SetTranslation( float xTranslation , float yTranslation , float zTranslation );
+	void	SetPosition( float xPosition , float yPosition , float zPosition );
+	void	SetPosition( Vec3 pos );
 	void	SetTransform( const Mat44 transform );
+	Mat44	ToMatrix() const;
 
-
-
-	Vec3	GetScale();
-	Vec3	GetRotation();
-	Vec3	GetTranslation();
-	Mat44	GetTransform() const																			{ return m_transform; }
+	inline Vec3	GetScale() const															{ return m_scale; }
+	inline Vec3	GetRotation() const															{ return m_rotationDegrees; }
+	inline Vec3	GetPostion() const															{ return m_position; }
 
 private:
-	Mat44 m_transform;
+	Vec3 m_position			= Vec3( 0.0f );
+	Vec3 m_rotationDegrees	= Vec3( 0.0f );
+	Vec3 m_scale			= Vec3( 1.0f );
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

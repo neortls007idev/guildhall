@@ -235,6 +235,9 @@
     <ClCompile Include="Primitives\GPUMesh.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\IndexBuffer.cpp">
+      <Filter>Renderer\Pipeline\Buffers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -443,6 +446,9 @@
     </ClInclude>
     <ClInclude Include="Primitives\GPUMesh.hpp">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\IndexBuffer.hpp">
+      <Filter>Renderer\Pipeline\Buffers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

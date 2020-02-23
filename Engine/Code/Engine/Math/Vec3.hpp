@@ -14,7 +14,7 @@ public: // NOTE: this is one of the few cases where we break both the "m_" namin
 	static Vec3 ONE;
 
 public:
-	
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // CONSTRUCTION/DESTRUCITON
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -24,12 +24,13 @@ public:
 	Vec3( const Vec3& copyFrom );										// COPY CONSTRUCTOR ( FROM ANOTHER VEC3 )
 	Vec3( const Vec2& copyFrom , float z );										// COPY CONSTRUCTOR ( FROM ANOTHER VEC3 )
 	explicit Vec3( float initialX, float initialY, float initialz );	// EXPLICIT CONSTRUCTOR ( FROM FLOATING TYPE X, Y, Z )
-	
+	explicit Vec3( float initialValues );
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // OPERATORS ( CONST )
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-	bool		operator==( const Vec3& compare ) const;		// vec3 == vec3 
+	bool		operator==( const Vec3& compare ) const;		// vec3 == vec3
 	bool		operator!=( const Vec3& compare ) const;		// vec3 != vec3
 	const Vec3	operator+( const Vec3& vecToAdd ) const;		// vec3 + vec3
 	const Vec3	operator-( const Vec3& vecToSubtract ) const;	// vec3 - vec3
@@ -73,9 +74,9 @@ public:
 	const Vec3  GetRotatedAboutZDegrees( float deltaDegrees ) const;
 	const Vec3	GetClamped( float maxLength ) const;
 	const Vec3	GetNormalized() const;
-	
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
-	
+
 	const Vec3 SetFromText( const char* text );
 
 };

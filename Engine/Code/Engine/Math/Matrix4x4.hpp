@@ -10,26 +10,26 @@ struct Vec4;
 struct Mat44
 {
 public:
-	
+
 	//enum { Ix , Iy , Iz , Iw ,		Jx , Jy , Jz , Jw ,			Kx , Ky , Kz , Kw ,			Tx , Ty , Tz , Tw };
-	
+
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
 	float Ix = 1.f;
 	float Iy = 0.f;
 	float Iz = 0.f;
 	float Iw = 0.f;
-	
+
 	float Jx = 0.f;
 	float Jy = 1.f;
 	float Jz = 0.f;
 	float Jw = 0.f;
-	
+
 	float Kx = 0.f;
 	float Ky = 0.f;
 	float Kz = 1.f;
 	float Kw = 0.f;
-	
+
 	float Tx = 0.f;
 	float Ty = 0.f;
 	float Tz = 0.f;
@@ -88,7 +88,7 @@ public:
 	void SetBasisVectors3D( const Vec3& iBasis3D , const Vec3& jBasis3D , const Vec3& kBasis3D );
 	void SetBasisVectors3D( const Vec3& iBasis3D , const Vec3& jBasis3D , const Vec3& kBasis3D , const Vec3& translation3D );
 	void SetBasisVectors4D( const Vec4& iBasis4D , const Vec4& jBasis4D , const Vec4& kBasis4D , const Vec4& translation4D );
-	
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //							TRANSFORMATION MUTATORS
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ public:
 //							STATIC METHODS
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-	
+
 	static const Mat44 CreateXRotationDegrees( float degreesAboutX );
 	static const Mat44 CreateYRotationDegrees( float degreesAboutY );
 	static const Mat44 CreateZRotationDegrees( float degreesAboutZ );
@@ -119,7 +119,9 @@ public:
 	static const Mat44 CreateNonUniformScale3D( const Vec3& scaleFactorXYZ );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-
+//						UTILITIES
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	Mat44 GetInverse();
 private:
 	const Mat44 operator*( const Mat44& rhs ) const = delete;
 

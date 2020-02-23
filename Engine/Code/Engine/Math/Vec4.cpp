@@ -54,6 +54,20 @@ const Vec4 Vec4::operator*( const Vec4& vecToMultiply ) const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+const Vec4 Vec4::operator*( const Mat44& lhs ) const
+{
+	Vec4 rowIntoColumn;
+
+	rowIntoColumn.x = lhs.Ix * x + lhs.Jx * y + lhs.Kx * z + lhs.Tx * w;
+	rowIntoColumn.y = lhs.Iy * x + lhs.Jy * y + lhs.Ky * z + lhs.Ty * w;
+	rowIntoColumn.z = lhs.Iz * x + lhs.Jz * y + lhs.Kz * z + lhs.Tz * w;
+	rowIntoColumn.w = lhs.Iw * x + lhs.Jw * y + lhs.Kw * z + lhs.Tw * w;
+
+	return rowIntoColumn;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 const Vec4 Vec4::operator/( float inverseScale ) const
 {
 	float scale = 1.f / inverseScale;

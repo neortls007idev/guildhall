@@ -14,45 +14,69 @@ This is the first assignment where you must supplement your assignment with some
 only cover 85 of the total 100 points.  Make a note of all extras you attempt in your assignment,
 and remember you can submit extras from previous assignments.
 
-- [x] *15pts*: Get a Working Orthographic Camera
-    - [x] *05pts*: Implement `MakeOrthographicProjectionMatrixD3D` in `Engine/Math/MatrixUtils.hpp`, `.cpp`.  
-    - [x] *05pts*: Camera now owns a `UniformBuffer` for their matrices
-    - [x] *05pts*: Camera updates and binds their uniform buffer in `BeginCamera`
-- [x] *18pts*: Get Working Textures
-    - [x] *04pts*: Be able to create a `Texture` from an Image/File
-    - [x] *04pts*: `TextureView` supports shader resource views (srv)
-    - [x] *04pts*: Make a `Sampler` class
-    - [x] *03pts*: Default Samplers (Linear+Wrap, Point+Wrap)
-    - [x] *03pts*: `RenderContext::GetOrCreateTexture` works again.
-    - [x] *08pts*: Blend States
-        - [x] *04pts*: Blend states created when renderer starts up.
-        - [x] *04pts*: `ADDITIVE`, `OPAQUE`, and `ALPHA` blend modes supported
-- [x] *05pts*: Default Built-In Shader to use when `BindShader(nullptr)` is used
-    - [x] `Renderer::SetBlendState` should affect this shader;
-- [x] *05pts*: Render two textured quads on screen
-    - [x] *04pts*: One using an invert color shader
-    - [x] *01pts*: One default
-- [x] *34pts*: Dev Console
-    - [x] *02pts*: User can open the dev console using the **tilde** key '\~'.  
-                   You may use a custom key if you make a note in your assignment readme.
-        - [x] Upon opening console, be sure the input is cleared.
-    - [x] *02pts*: Pressing tilde again closes the console.
-    - [x] *09pts* If console is open, Escape should...
-        - [x] *03pts*: Clear input if there is any text currently there
-        - [x] *03pts*: Close the console if console is open.
-        - [x] *03pts*: Normal game behavior otherwise (for example, for now it will quit your application)
-    - [x] *14pts*: User can type commands **only** while console is open.
-        - [x] *02pts*: Typing should insert characters at the carrot
-        - [x] *02pts*: The carrot blinks (every quarter to half second usually looks okay)
-        - [x] *02pts*; Left & Right arrow keys should move carrot forward and back along string
-        - [x] *02pts*: Delete should delete the character after the carrot
-        - [x] *02pts*: Backspace should delete the character before the carrot
-        - [x] *02pts*: Pressing `Enter` submits the command
-        - [x] *02pts* If it is an invalid command (it has not handler), print an error message
-    - [x] *02pts* Game input is ignored while dev console is open.
-    - [x] *03pts*: Support a `quit` command that quits the game.
-    - [x] *03pts*: Support a `help` command that lists all exposed commands
-
+- [x] `Camera::SetProjectionPerspective( float fovDegrees, float nearZClip, float farZClip )` implemented
+    - [ ] Set projection to `60 degrees`, and `-0.1` to `-100.0` for the clip planes.
+- [ ] Camera now has a `Transform`
+    - [ ] Create the `Transform` class
+    - [ ] `Transform::SetPosition` implemented
+    - [ ] `Transform::Translate` implemented
+    - [ ] `Transform::SetRotationFromPitchRollYawDegrees`
+        - [ ] When storing degrees, make sure they are stored in sane ranges...
+            - [ ] Roll & Yaw is `-180` to `180`
+            - [ ] Pitch is `-90` to `90`
+- [ ] Camera now calculates `view` matrix from their transform.
+    - [ ] `Transform::GetAsMatrix` implemented to calculate the camera's model matrix
+    - [ ] `MatrixInvertOrthoNormal` implemented to invert the camera's model into a view matrix
+        - [x] `MatrixIsOrthoNormal` check added
+        - [x] `MatrixTranspose` added
+- [ ] Draw a Quad at `(0, 0, -10)`, or 10 units in front of the origin (should be visible when you start)
+- [ ] Allow player to move the camera by change the camera transform position
+   - [ ] `W` & `S`: Forward & Back (movement is relative to where you're looking)
+   - [ ] `A` & `D`: Left and Right (movement is relative to where you're looking)
+   - [ ] `Space` & `C`: Up and Down Movement (movement is absolute (world up and world down)
+   - [ ] `Left-Shift`: Move faster while held.
+   - *Note:  If you want different controls, just make a note in your readme*
+- [ ] Allow player to turn the camera using the mouse.
+    - [ ] `InputSystem::HideSystemCursor` implemented
+    - [ ] `InputSystem::ClipSystemCursor` implemented
+    - [ ] `InputSystem::SetCursorMode` implemented
+        - [ ] `ABSOLUTE` mode is what you currently have
+        - [ ] `RELATIVE` move implemented
+            - [ ] Move mouse to the center of the screen, and store off the cursor position
+                - *Note:  Be sure to actually make the system call, not just assume where you moved it is where it went.  This can cause drifting.*
+            - [ ] Each frame, get the cursor position, and calculate frame delta.
+            - [ ] ...after which, reset to center of screen and reget the current position.
+    - [ ] Game should be set to `RELATIVE` mode
+        - [ ] `DevConsole` should unlock the mouse and set to `ABSOLUTE` mode
+    - [ ] Associate `X` movement with `yaw`
+    - [ ] Associate `Y` movement with `pitch`
+        - [ ] Do not allow pitch above `85` degrees or below `95` degrees - no going upside down... yet...
+        - *Note:  Up to you if you want inverted-y or not.*
+- [ ] Support `RenderContext::SetModelMatrix`
+    - [ ] Create a new uniform buffer for storing a model matrix (slot 2)
+    - [ ] `SetModelMatrix` should update this uniform buffer
+    - [ ] `BeginCamera` should `SetModelMatrix` to the `IDENTITY`, and be sure to bind the buffer.
+- [ ] Be able to draw a cube mesh at `(1, 0.5, -12.0)`
+    - [x] Create a `GPUMesh` class
+        - [ ] Implement `IndexBuffer`
+        - [ ] Be able to construct a mesh from a vertex and index array
+        - [ ] Add `RenderContext::BindIndexBuffer`
+        - [ ] Add `RenderContext::DrawIndexed`
+        - [ ] Add `RenderContext::DrawMesh`
+            - This should bind the vertex buffer, index buffer, and then `DrawIndexed`
+    - [ ] Game creates a `cube mesh` around the origin with 2 unit sides.
+    - [ ] Game has a `Transform` for the cube set at `(1, 0.5, -12.0f)`,
+    - [ ] Cube transform sets `yaw` rotation to current time each frame
+    - [ ] Game should `SetModelMatrix` to the cube transform matrix
+- [ ] Support a depth buffer
+    - [ ] `Texture::CreateDepthStencilBuffer` added
+    - [ ] `Camera::SetDepthStencilBuffer` added
+    - [ ] `RenderContext` now automatcially creates a depth buffer during init matching the swap chain's size
+    - [ ] `RenderContext::GetDefaultBackbuffer` implemented to return this
+    - [ ] `RenderContext::BeginCamera`, now binds the camera's back buffer as well.
+        - [ ] **IMPORANT:  Do not bind the default one automatically if the camera doesn't have one set.  There are reasons a camera may not want a depth buffer!**
+    - [ ] Camera's clear options should now store off the `depth` and `stencil` clear values.
+    - [ ] If camera has a depth buffer and says it should clear depth, also clear the depth buffer.
 ------
 
 ## Extras

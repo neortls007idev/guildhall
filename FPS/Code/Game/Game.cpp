@@ -6,6 +6,7 @@
 #include "Engine/Math/MatrixUtils.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
+#include "Engine/Math/Vec4.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

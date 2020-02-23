@@ -2,12 +2,6 @@
 #include "Engine/Core/EngineCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-// const Mat44 Mat44::CreateOrthoGraphicProjeciton( const Vec3& min , const Vec3& max )
-// {
-//
-// }
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
 
 const Mat44 CreateOrthoGraphicProjeciton( const Vec3& min , const Vec3& max )
 {
@@ -39,11 +33,21 @@ const Mat44 CreateOrthoGraphicProjeciton( const Vec3& min , const Vec3& max )
 	return Mat44( mat );
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 const Mat44 MakePerpsectiveProjectionMatrixD3D( float fovDegrees , float aspectRatio , float nearZ , float farZ )
 {
-	float mat[16];
+	float height = 1.0f / tanf( fovDegrees * .5f ); // how far away are we for the perspective point to be "one up" from our forward line.
+	float zrange = farZ - nearZ;
+	float q = 1.0f / zrange;
 
-	return Mat44( mat );
+	float proj[] = {
+					   height / aspectRatio,          0.f,			0.f,						0.f,
+										0.f,	   height,			0.f,						0.f,
+										0.f,          0.f,     farZ * q,		  -nearZ * farZ * q,
+										0.f,          0.f,			1.f,						0.f
+	};
+	return Mat44( proj );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -73,10 +77,18 @@ void MatrixTranspose( Mat44& mat )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void MatrixInvertOrthoNormal( Mat44& mat )
+Mat44 MatrixInvertOrthoNormal( Mat44& mat )
 {
-	MatrixTranspose( mat );
+	Mat44 inverse = mat;
+	inverse.SetTranslation3D( Vec3::ZERO );
+	MatrixTranspose( inverse );
+	Vec3 translation = mat.GetTranslation3D();
+	Vec3 inverseTranslation = inverse.TransformPosition3D( -translation );
+	inverse.SetTranslation3D( inverseTranslation );
+	return inverse;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void MatrixInvert( Mat44& mat )
 {
@@ -214,6 +226,26 @@ void MatrixInvert( Mat44& mat )
 	}
 
 	mat = ret;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool IsMatrixOrtonormal( Mat44& mat )
+{
+	Mat44 inverse = mat;
+	MatrixInvert( inverse );
+	Mat44 transpose = mat;
+	MatrixTranspose( transpose );
+
+	for ( int index = 0; index < 16; index++ )
+	{
+		if ( *( &inverse.Ix + index ) != *( &transpose.Ix + index ) )
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

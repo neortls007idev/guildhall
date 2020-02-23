@@ -13,7 +13,7 @@
 
 extern BitmapFont*	g_bitmapFont;
 extern InputSystem* g_theInput;
-extern Window* g_theWindow;
+extern Window*		g_theWindow;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -122,7 +122,7 @@ void DevConsole::PrintString( const std::string& devConsolePrintString /*= "INVA
 
 void DevConsole::Render( RenderContext& renderer , const Camera& camera , float lineHeight ) const
 {
-	AABB2 consoleArea = AABB2( camera.GetOrthoBottomLeft() , camera.GetOrthoTopRight() );
+	AABB2 consoleArea = AABB2( camera.GetOrthoMin().x , camera.GetOrthoMin().y , camera.GetOrthoMax().x , camera.GetOrthoMax().y );
 	AABB2 typingArea = consoleArea.CarveBoxOffBottom( 0.075f , 0.f );
 	consoleArea = consoleArea.CarveBoxOffTop( 0.925f , 0.f );
 
@@ -135,9 +135,9 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 
 	float offsetBetweenLines = 0.75f;
 
-	float dimensionOfConsole = camera.GetOrthoTopRight().y - camera.GetOrthoBottomLeft().y;
+	float dimensionOfConsole = camera.GetOrthoMax().y - camera.GetOrthoMin().y;
 	int numberOfLinesToDisplay = RoundDownToInt( dimensionOfConsole / ( lineHeight + offsetBetweenLines) );
-	Vec2 startMins = camera.GetOrthoBottomLeft();
+	Vec2 startMins = Vec2( camera.GetOrthoMin().x , camera.GetOrthoMin().y );
 	int myStringIndex = ( int ) m_consoleText.size() - 1;
 	Vec2 alignment = ALIGN_BOTTOM_LEFT;
 	float alignmentDeltaChange = 0.f;
