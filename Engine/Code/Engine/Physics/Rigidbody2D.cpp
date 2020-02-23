@@ -113,6 +113,13 @@ void Rigidbody2D::ChangeIsSimulationActive( bool newSimulationStatus )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Rigidbody2D::Move( Vec2 moveToPosition )
+{
+	m_worldPosition += moveToPosition;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Rigidbody2D::~Rigidbody2D()
 {
 }

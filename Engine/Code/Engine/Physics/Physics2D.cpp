@@ -170,24 +170,29 @@ void Physics2D::ResolvePolygonVsDiscCollisions(Collision2D& collision)
 		Rigidbody2D* meRigidBody = collision.m_me->GetRigidBody();
 		Rigidbody2D* themRigidBody = collision.m_them->GetRigidBody();
 
+		float myMass = meRigidBody->GetMass();
+		float theirMass = themRigidBody->GetMass();
+		float pushMe = theirMass / ( myMass + theirMass );
+		float pushThem = 1.0f - pushMe;
+
 		if ( meRigidBody && themRigidBody &&
 			meRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC &&
 			themRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC )
 		{
-			meRigidBody->SetPosition( meRigidBody->GetPosition() - ( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * 0.5f ) );
-			themRigidBody->SetPosition( themRigidBody->GetPosition() + ( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * 0.5f ) );
+			meRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * pushMe );
+			themRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * -pushThem );
 		}
 		else if ( meRigidBody && themRigidBody &&
 			meRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC &&
 			themRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC )
 		{
-			meRigidBody->SetPosition( meRigidBody->GetPosition() - ( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap ) );
+			meRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * pushMe );
 		}
 		else if ( meRigidBody && themRigidBody &&
 			meRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC &&
 			themRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC )
 		{
-			themRigidBody->SetPosition( themRigidBody->GetPosition() + ( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap ) );
+			themRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * -pushThem );
 		}
 	}
 }
@@ -201,24 +206,29 @@ void Physics2D::ResolveDiscVsDiscCollisions( Collision2D& collision )
 		Rigidbody2D* meRigidBody = collision.m_me->GetRigidBody();
 		Rigidbody2D* themRigidBody = collision.m_them->GetRigidBody();
 
+		float myMass = meRigidBody->GetMass();
+		float theirMass = themRigidBody->GetMass();
+		float pushMe = theirMass / ( myMass + theirMass );
+		float pushThem = 1.0f - pushMe;
+
 		if ( meRigidBody && themRigidBody &&
 			meRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC &&
 			themRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC )
 		{
-			meRigidBody->SetPosition( meRigidBody->GetPosition() + ( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * 0.5f ) );
-			themRigidBody->SetPosition( themRigidBody->GetPosition() - ( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * 0.5f ) );
+			meRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * pushMe );
+			themRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * -pushThem );
 		}
 		else if ( meRigidBody && themRigidBody &&
 			meRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC &&
 			themRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC )
 		{
-			meRigidBody->SetPosition( meRigidBody->GetPosition() + ( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap ) );
+			meRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * pushMe );
 		}
 		else if ( meRigidBody && themRigidBody &&
 			meRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC &&
 			themRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC )
 		{
-			themRigidBody->SetPosition( themRigidBody->GetPosition() - ( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap ) );
+			themRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * -pushThem );
 		}
 	}
 }
@@ -232,24 +242,29 @@ void Physics2D::ResolveDiscVsPolygonCollisions( Collision2D& collision )
 		Rigidbody2D* meRigidBody = collision.m_me->GetRigidBody();
 		Rigidbody2D* themRigidBody = collision.m_them->GetRigidBody();
 
+		float myMass = meRigidBody->GetMass();
+		float theirMass = themRigidBody->GetMass();
+		float pushMe = theirMass / ( myMass + theirMass );
+		float pushThem = 1.0f - pushMe;
+
 		if ( meRigidBody && themRigidBody &&
 			meRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC &&
 			themRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC )
 		{
-			meRigidBody->SetPosition( meRigidBody->GetPosition() - ( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * 0.5f ) );
-			themRigidBody->SetPosition( themRigidBody->GetPosition() + ( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * 0.5f ) );
+			meRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * pushMe );
+			themRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * -pushThem );
 		}
 		else if ( meRigidBody && themRigidBody &&
 			meRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC &&
 			themRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC )
 		{
-			meRigidBody->SetPosition( meRigidBody->GetPosition() - ( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap ) );
+			meRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * pushMe );
 		}
 		else if ( meRigidBody && themRigidBody &&
 			meRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC &&
 			themRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC )
 		{
-			themRigidBody->SetPosition( themRigidBody->GetPosition() + ( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap ) );
+			themRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * -pushThem );
 		}
 	}
 }

@@ -85,20 +85,21 @@ void Polygon2D::GetEdge( int idx , Vec2* outStart , Vec2* outEnd )
 
 void Polygon2D::SetCenter()
 {
-// 	if ( m_points.size() == 0 )
-// 	{
-// 		return;
-// 	}
-
-	DebuggerPrintf( "\n%d\n" , m_points.size() );
-	m_center = Vec2::ZERO;
-
-	for ( size_t index = 0; index < m_points.size(); index++ )
+	if ( m_points.size() == 0 )
 	{
-		m_center += m_points[ index ];
+		return;
 	}
 
-	m_center *= ( 1.f / m_points.size() );
+
+	m_center = Vec2::ZERO;
+
+	Vec2 leftMostPoint = *GetLeftMostPointFromPointCloud( &m_points[ 0 ] , ( int ) m_points.size() );
+	Vec2 rightMostPoint = *GetRightMostPointFromPointCloud( &m_points[ 0 ] , ( int ) m_points.size() );
+	Vec2 topMostPoint = *GetTopMostPointFromPointCloud( &m_points[ 0 ] , ( int ) m_points.size() );
+	Vec2 bottomMostPoint = *GetBottomMostPointFromPointCloud( &m_points[ 0 ] , ( int ) m_points.size() );
+	float centerX = ( rightMostPoint.x + leftMostPoint.x ) * 0.5f;
+	float centerY = ( topMostPoint.y + bottomMostPoint.y ) * 0.5f;
+	m_center = Vec2( centerX , centerY );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -125,20 +126,20 @@ void Polygon2D::SetPosition( Vec2 newPos )
 Polygon2D Polygon2D::MakeFromLineLoop( Vec2 const* points , uint pointCount )
 {
 	Polygon2D temp;
-	
+
 	for ( unsigned int index = 0; index < pointCount; index++ )
 	{
 		temp.m_points.push_back( points[ index ] );
 	}
-	
+
 	Vec2 center = Vec2( 0.f , 0.f );
-	
+
 	for ( int index = 0; index < temp.m_points.size(); index++ )
 	{
 		center += points[ index ];
 	}
 	temp.m_center = center / ( float ) temp.m_points.size();
-	
+
 	if ( temp.IsValid() )
 	{
 		return temp;
@@ -156,7 +157,7 @@ Polygon2D Polygon2D::MakeConvexFromPointCloud( Vec2 const* points , uint pointCo
 
 	const int start = GetIndexOfLeftMostPointFromPointCloud( points , pointCount );
 	int point = start , nextPoint;
-	
+
 	Polygon2D tempPolygon;
 
 	do

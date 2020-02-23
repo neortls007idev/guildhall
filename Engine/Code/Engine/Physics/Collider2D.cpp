@@ -37,10 +37,18 @@ bool DiscVPolygonCollisionCheck( Collider2D const* me , Collider2D const* them )
 	DiscCollider2D*		discColliderMe		= ( DiscCollider2D* ) me;
 	PolygonCollider2D*	polyColliderThem	= ( PolygonCollider2D* ) them;
 
-	Vec2 closetPoint = polyColliderThem->GetClosestPoint( discColliderMe->GetPosition() );
+	bool earlyOut = DoDiscsOverlap( discColliderMe->GetPosition() , discColliderMe->GetRadius() ,
+		polyColliderThem->m_boundingDisc.m_center , polyColliderThem->m_boundingDisc.m_radius );
 
-	return ( IsPointOnDisc2D( Disc2D( discColliderMe->GetPosition() , discColliderMe->GetRadius() ) , closetPoint ) ||
-				polyColliderThem->Contains( discColliderMe->GetPosition() ) );
+	if ( earlyOut )
+	{
+		Vec2 closetPoint = polyColliderThem->GetClosestPoint( discColliderMe->GetPosition() );
+
+		return ( IsPointOnDisc2D( Disc2D( discColliderMe->GetPosition() , discColliderMe->GetRadius() ) , closetPoint ) ||
+					polyColliderThem->Contains( discColliderMe->GetPosition() ) );
+	}
+
+	return false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -85,23 +93,25 @@ Manifold2D DiscVPolygonCollisionFold( Collider2D const* me , Collider2D const* t
 	DiscCollider2D*		discColliderMe		= ( DiscCollider2D* ) me;
 	PolygonCollider2D*	polyColliderThem	= ( PolygonCollider2D* ) them;
 
-	Vec2 closetPoint = polyColliderThem->GetClosestPoint( discColliderMe->GetPosition() );
 
-	collision.m_normal  = ( discColliderMe->GetPosition() - closetPoint ).GetNormalized();
-	collision.m_overlap = discColliderMe->GetRadius() - ( discColliderMe->GetPosition() - closetPoint ).GetLength();
+	bool earlyOut = DoDiscsOverlap( discColliderMe->GetPosition() , discColliderMe->GetRadius() ,
+				polyColliderThem->m_boundingDisc.m_center , polyColliderThem->m_boundingDisc.m_radius );
 
-	if ( polyColliderThem->Contains( discColliderMe->GetPosition() ) )
+	if ( earlyOut )
 	{
-		collision.m_normal = -collision.m_normal;
-		collision.m_overlap = discColliderMe->GetRadius() + ( discColliderMe->GetPosition() ).GetLength();
+		Vec2 closetPoint = polyColliderThem->GetClosestPoint( discColliderMe->GetPosition() );
+
+		collision.m_normal  = ( closetPoint - discColliderMe->GetPosition() ).GetNormalized();
+		collision.m_overlap = discColliderMe->GetRadius() - ( discColliderMe->GetPosition() - closetPoint ).GetLength();
+
+		if ( polyColliderThem->Contains( discColliderMe->GetPosition() ) )
+		{
+			collision.m_normal = -collision.m_normal;
+			collision.m_overlap = discColliderMe->GetRadius() + ( discColliderMe->GetPosition() ).GetLength();
+		}
+
+		collision.m_contactPoint = discColliderMe->GetPosition() + ( collision.m_normal * ( discColliderMe->GetRadius() - ( collision.m_overlap * 0.5f ) ) );
 	}
-
-// 	if ( collision.m_overlap <= 0 )
-// 	{
-// 		return collision;
-// 	}
-
-	collision.m_contactPoint = discColliderMe->GetPosition() + ( collision.m_normal * ( discColliderMe->GetRadius() - ( collision.m_overlap * 0.5f ) ) );
 
 	return collision;
 }
@@ -132,6 +142,8 @@ bool Collider2D::Intersects( Collider2D const* other ) const
 {
 	COLLIDER2D_TYPE myType = GetType();
 	COLLIDER2D_TYPE otherType = other->GetType();
+
+
 
 	if ( myType <= otherType )
 	{

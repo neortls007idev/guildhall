@@ -13,7 +13,7 @@ PolygonCollider2D::PolygonCollider2D( Physics2D* system , Rigidbody2D* rigidbody
 	m_polygon = convexgon;
 	m_worldPosition = m_rigidbody->m_worldPosition + localPosition;
 	m_polygon.m_localPos = m_worldPosition;
-	//CreateBoundingDisc();
+	CreateBoundingDisc();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ void PolygonCollider2D::UpdateWorldShape()
 {
 	m_worldPosition = m_rigidbody->m_worldPosition + m_localPosition;
 	m_polygon.SetPosition( m_worldPosition );
-	//m_boundingDisc.m_center = m_worldPosition;
+	m_boundingDisc.m_center = m_worldPosition;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -163,15 +163,15 @@ void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderCol
 	ctx->DrawRing( m_boundingDisc.m_center , m_boundingDisc.m_radius , WHITE , 5.f );
 	//ctx->DrawAABB2( m_boundingAABB , Rgba8( 0 , 0 , 255 , 127 ) );
 
-// 	Vec2 leftMostPoint		= *GetLeftMostPointFromPointCloud(	 &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
-// 	Vec2 rightMostPoint		= *GetRightMostPointFromPointCloud(  &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
-// 	Vec2 topMostPoint		= *GetTopMostPointFromPointCloud(	 &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
-// 	Vec2 bottomMostPoint	= *GetBottomMostPointFromPointCloud( &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
-// 
-// 	ctx->DrawDisc( rightMostPoint , 5.f , PURPLE );
-// 	ctx->DrawDisc( leftMostPoint , 5.f , PURPLE );
-// 	ctx->DrawDisc( bottomMostPoint , 5.f , PURPLE );
-// 	ctx->DrawDisc( topMostPoint , 5.f , PURPLE );
+	Vec2 leftMostPoint		= *GetLeftMostPointFromPointCloud(	 &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
+	Vec2 rightMostPoint		= *GetRightMostPointFromPointCloud(  &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
+	Vec2 topMostPoint		= *GetTopMostPointFromPointCloud(	 &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
+	Vec2 bottomMostPoint	= *GetBottomMostPointFromPointCloud( &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
+
+	ctx->DrawDisc( rightMostPoint , 5.f , PURPLE );
+	ctx->DrawDisc( leftMostPoint , 5.f , PURPLE );
+	ctx->DrawDisc( bottomMostPoint , 5.f , PURPLE );
+	ctx->DrawDisc( topMostPoint , 5.f , PURPLE );
 
 	//test.SetDimensions( Vec2( 100.f , 100.f ) );
 	//ctx->DrawAABB2( test , WHITE );
@@ -186,8 +186,6 @@ void PolygonCollider2D::CreateBoundingDisc()
 	Vec2 topMostPoint	 = *GetTopMostPointFromPointCloud( &m_polygon.m_points[ 0 ] , (int)m_polygon.m_points.size() );
 	Vec2 bottomMostPoint = *GetBottomMostPointFromPointCloud( &m_polygon.m_points[ 0 ] , (int)m_polygon.m_points.size() );
 
-	Vec2 midPoint = m_polygon.GetCenter();/*leftMostPoint + ( ( rightMostPoint - leftMostPoint ) * 0.5f );*/
-
 	float width = ( rightMostPoint.x - leftMostPoint.x );
 	float height = ( topMostPoint.y - bottomMostPoint.y );
 
@@ -195,11 +193,35 @@ void PolygonCollider2D::CreateBoundingDisc()
 	float centerY = ( topMostPoint.y + bottomMostPoint.y ) * 0.5f ;
 	Vec2  center  = Vec2( centerX , centerY );
 
+	float finalRadius = 0.f;
+	float finalRadiusSqaured = finalRadius * finalRadius;
+
+	if ( finalRadiusSqaured < (center - leftMostPoint).GetLengthSquared() )
+	{
+		finalRadiusSqaured = ( center - leftMostPoint ).GetLengthSquared();
+	}
+
+	if ( finalRadiusSqaured < ( center - rightMostPoint ).GetLengthSquared() )
+	{
+		finalRadiusSqaured = ( center - rightMostPoint ).GetLengthSquared();
+	}
+
+	if ( finalRadiusSqaured < ( center - topMostPoint ).GetLengthSquared() )
+	{
+		finalRadiusSqaured = ( center - topMostPoint ).GetLengthSquared();
+	}
+
+	if ( finalRadiusSqaured < ( center - bottomMostPoint ).GetLengthSquared() )
+	{
+		finalRadiusSqaured = ( center - bottomMostPoint ).GetLengthSquared();
+	}
+
+	finalRadius = sqrtf( finalRadiusSqaured );
 	m_boundingAABB.SetDimensions( Vec2( width , height ) );
 	m_boundingAABB.SetCenter( center );
 
 	m_boundingDisc.m_center = Vec2( centerX , centerY );
-	m_boundingDisc.m_radius = sqrtf( width * 0.5f * ( width * 0.5f ) + height * 0.5f * ( height * 0.5f ) );
+	m_boundingDisc.m_radius = /*finalRadius;*/sqrtf( ( width * width * 0.25f ) + ( height * height * 0.25f ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

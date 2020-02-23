@@ -10,14 +10,16 @@ MP2 And SD2 Checklist
 - [x] Stop coloring objects red that are intersecting (it becomes a strobe light in this assignment otherwise)
 - [x] Make sure your game creates polygons as `STATIC` by default, and discs create as `DYNAMIC` by default
 - [x] Add support for `disc Collider2D::GetWorldBounds` for existing colliders
-	- [x] **Easier Option**: Implement this using `AABB2` bounding boxes
-    - [] **Challenge Option**: Implement this using a bounding `Disc`
-    - [ ] Update this bounds whenever you update the world shape of the object.
+	- [ ] **Easier Option**: Implement this using `AABB2` bounding boxes
+    - [x] **Challenge Option**: Implement this using a bounding `Disc`
+    - [x] Update this bounds whenever you update the world shape of the object.
 - [x] Switch `Collider2D::Intersects` to be non-virtual, and instead use a matrix lookup
-    - [ ] Use a *mid-phase* check to early out of a collision by comparing the bounds first.
-    - [ ] If passes the bounds check, lookup and call the appropriate callback
+    - [x] Use a *mid-phase* check to early out of a collision by comparing the bounds first.
+					( Only done for discVsPolygon seemed pointless to do the check for disc vs disc).
+    - [x] If passes the bounds check, lookup and call the appropriate callback
 - [x] Add `Collider2D::GetManifold` that also uses a collision matrix or half matrix
-    - [ ] Again do an early out using the bounds.
+    - [x] Again do an early out using the bounds.
+			( Only done for discVsPolygon seemed pointless to do the check for disc vs disc).
     - [x] Implement a disc versus disc manifold
     - [x] Implement a disc versus polygon manifold
     - **Note: We are not doing polygon -vs- polygon yet**
@@ -38,10 +40,10 @@ MP2 And SD2 Checklist
     - [x] `ResolveCollision` to resolve a single collision
 - [x] `ResolveCollision` should...
     - [x] `CorrectObjects`, pushing them out of their respective objects
-        - [ ] Push should depend on the ratio of the masses
+        - [x] Push should depend on the ratio of the masses
         - [ ] Static and Kinematic objects assume infinite mass vs dynamic objects
-        - [ ] Kinematic vs Kinematic resolves based on masses
-        - [ ] Static objects never move, and should fully push the other object if it is not static.
+        - [x] Kinematic vs Kinematic resolves based on masses
+        - [x] Static objects never move, and should fully push the other object if it is not static.
         - [x] Two static objects do not correct at all.
     - [ ] Calculate **normal impulse** at point of collision.
     - [ ] `Rigidbody2D::ApplyImpulseAt` to both objects (`impulse` to A, `-impulse` to B)

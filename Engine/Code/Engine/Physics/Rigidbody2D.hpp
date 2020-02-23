@@ -47,6 +47,7 @@ public:
 	void			SetSimulationMode( eSimulationMode simulationMode );
 	void			SetMass( float newMass );
 	void			ChangeIsSimulationActive( bool newSimulationStatus );
+	void			Move( Vec2 moveToPosition );
 
 public:
 	Physics2D*			m_system				= nullptr;											// which scene created/owns this object
@@ -54,7 +55,7 @@ public:
 	Collider2D*			m_collider				= nullptr;
 	Vec2				m_worldPosition;															// where in the world is this rigidbody
 	Vec2				m_velocity				= Vec2( 0.f , 0.f );
-	float				m_mass;
+	float				m_mass					= 1.0f;
 	eSimulationMode		m_simulationMode		= SIMULATIONMODE_DYNAMIC;
 	bool				m_isSimulationActive	= true;
 
