@@ -2,6 +2,7 @@
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Physics/Manifold2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -13,7 +14,7 @@ class Rigidbody2D;
 
 enum COLLIDER2D_TYPE
 {
-	COLLIDER2D_DISC ,
+	COLLIDER2D_DISC,
 	COLLIDER2D_CONVEXGON,
 	NUM_COLLIDER_TYPES,
 };
@@ -33,11 +34,12 @@ public:
 	virtual Vec2			GetClosestPoint( Vec2 pos ) const = 0;
 	virtual bool			Contains( Vec2 pos ) const = 0;
 	bool					Intersects( Collider2D const* other ) const;
+	Manifold2D				GenrateManifold( Collider2D const* other );
 
 	virtual void			DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor ) = 0;
 	virtual Vec2			GetPosition() const = 0;
 
-	uint					GetType() const																{ return m_colliderType; }
+	COLLIDER2D_TYPE			GetType() const																{ return m_colliderType; }
 	Rigidbody2D*			GetRigidBody() const														{ return m_rigidbody; }
 
 protected:
@@ -50,7 +52,7 @@ public:
 	bool				m_isGarbage = false;
 
 private:
-	bool			  m_isColliding = false;
+	bool				m_isColliding = false;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -59,7 +61,11 @@ typedef bool ( *collisionCheckCB )( Collider2D const* , Collider2D const* );
 
 bool DiscVDiscCollisionCheck( Collider2D const* me , Collider2D const* them );
 bool DiscVPolygonCollisionCheck( Collider2D const* me , Collider2D const* them );
-bool PolygonVDiscCollisionCheck( Collider2D const* me , Collider2D const* them );
 bool PolygonVPolygonCollisionCheck( Collider2D const* me , Collider2D const* them );
 
+typedef Manifold2D ( *collisionManifoldCB )( Collider2D const* , Collider2D const* );
+
+Manifold2D DiscVDiscCollisionManiFold( Collider2D const* me , Collider2D const* them );
+Manifold2D DiscVPolygonCollisionFold( Collider2D const* me , Collider2D const* them );
+Manifold2D PolygonVPolygonCollisionFold( Collider2D const* me , Collider2D const* them );	// TODO: - Polygon V Polygon Manifold Generation
 //--------------------------------------------------------------------------------------------------------------------------------------------

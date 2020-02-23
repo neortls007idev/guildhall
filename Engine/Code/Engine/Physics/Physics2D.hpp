@@ -28,7 +28,7 @@ public:
 	void MoveRigidbodies( Rigidbody2D* rigidbody , float deltaSeconds );
 	void ResetCollisions();
 	void DetectCollisions();
-	void ResolveCollision( Collision2D collider );
+	void ResolveCollision( Collision2D collision );
 	void ResolveCollisions();
 	void CleanupDestroyedObjects();
 

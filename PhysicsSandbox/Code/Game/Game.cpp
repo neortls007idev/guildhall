@@ -3,14 +3,11 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
-#include "Engine/Core/StringUtils.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
-#include "Engine/Core/SimpleTriangleFont.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Physics/Physics2D.hpp"
 #include "Engine/Physics/Collider2D.hpp"
-#include "Engine/Physics/DiscCollider2D.hpp"
 #include "Engine/Physics/Rigidbody2D.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 
@@ -533,7 +530,6 @@ void Game::ResetCollisions()
 		{
 			m_gameObjects[ index ]->m_isColliding = false;
 			m_gameObjects[ index ]->m_fillColor = m_fillColor;
-
 		}
 	}
 }

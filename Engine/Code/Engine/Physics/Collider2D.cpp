@@ -7,8 +7,16 @@
 
 collisionCheckCB g_collisionChecks[ NUM_COLLIDER_TYPES * NUM_COLLIDER_TYPES ] = {
 	/*             disc,                         polygon, */
-	/*    disc */  DiscVDiscCollisionCheck,      PolygonVDiscCollisionCheck,
+	/*    disc */  DiscVDiscCollisionCheck,      nullptr,
 	/* polygon */  DiscVPolygonCollisionCheck,   PolygonVPolygonCollisionCheck
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+collisionManifoldCB g_collisionManifold[ NUM_COLLIDER_TYPES * NUM_COLLIDER_TYPES ] = {
+	/*             disc,                         polygon, */
+	/*    disc */  DiscVDiscCollisionManiFold,      nullptr,
+	/* polygon */  DiscVPolygonCollisionFold,   PolygonVPolygonCollisionFold
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -37,19 +45,75 @@ bool DiscVPolygonCollisionCheck( Collider2D const* me , Collider2D const* them )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-bool PolygonVDiscCollisionCheck( Collider2D const* me , Collider2D const* them )
-{
-	DiscVPolygonCollisionCheck( them , me );
-	return false;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 bool PolygonVPolygonCollisionCheck( Collider2D const* me , Collider2D const* them )
 {
 	UNUSED( me );
 	UNUSED( them );
 	return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Manifold2D DiscVDiscCollisionManiFold( Collider2D const* me , Collider2D const* them )
+{
+	Manifold2D collision;
+
+	DiscCollider2D* discColliderMe = ( DiscCollider2D* ) me;
+	DiscCollider2D* discColliderThem = ( DiscCollider2D* ) them;
+
+	Vec2 displacementBetweenCenters = Vec2( discColliderThem->GetPosition() - discColliderMe->GetPosition() );
+	float distanceBetweenCenters = displacementBetweenCenters.GetLength();
+
+	collision.m_overlap			= discColliderMe->GetRadius() + discColliderThem->GetRadius() - distanceBetweenCenters;
+	if ( collision.m_overlap <= 0 )
+	{
+		collision.m_overlap = 0.f;
+		return collision;
+	}
+	collision.m_normal			= ( discColliderMe->GetPosition() - discColliderThem->GetPosition()).GetNormalized();
+	collision.m_contactPoint = discColliderMe->GetPosition() + ( collision.m_normal * ( discColliderMe->GetRadius() - ( collision.m_overlap * 0.5f ) ) );
+
+	return collision;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Manifold2D DiscVPolygonCollisionFold( Collider2D const* me , Collider2D const* them )
+{
+	Manifold2D collision;
+
+	DiscCollider2D*		discColliderMe		= ( DiscCollider2D* ) me;
+	PolygonCollider2D*	polyColliderThem	= ( PolygonCollider2D* ) them;
+
+	Vec2 closetPoint = polyColliderThem->GetClosestPoint( discColliderMe->GetPosition() );
+
+	collision.m_normal  = ( discColliderMe->GetPosition() - closetPoint ).GetNormalized();
+	collision.m_overlap = discColliderMe->GetRadius() - ( discColliderMe->GetPosition() - closetPoint ).GetLength();
+
+	if ( polyColliderThem->Contains( discColliderMe->GetPosition() ) )
+	{
+		collision.m_normal = -collision.m_normal;
+		collision.m_overlap = discColliderMe->GetRadius() + ( discColliderMe->GetPosition() ).GetLength();
+	}
+
+	if ( collision.m_overlap <= 0 )
+	{
+		return collision;
+	}
+
+	collision.m_contactPoint = discColliderMe->GetPosition() + ( collision.m_normal * ( discColliderMe->GetRadius() - ( collision.m_overlap * 0.5f ) ) );
+
+	return collision;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Manifold2D PolygonVPolygonCollisionFold( Collider2D const* me , Collider2D const* them )
+{
+	UNUSED( me );
+	UNUSED( them );
+	Manifold2D collisionManifold;
+	return collisionManifold;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -66,8 +130,44 @@ Collider2D::Collider2D( Physics2D* system , Rigidbody2D* rigidbody , COLLIDER2D_
 
 bool Collider2D::Intersects( Collider2D const* other ) const
 {
-	collisionCheckCB collisionCheck = g_collisionChecks[ m_colliderType * other->GetType() ];
-	return collisionCheck( this , other );
+	COLLIDER2D_TYPE myType = GetType();
+	COLLIDER2D_TYPE otherType = other->GetType();
+
+	if ( myType <= otherType )
+	{
+		int idx = otherType * NUM_COLLIDER_TYPES + myType;
+		collisionCheckCB check = g_collisionChecks[ idx ];
+		return check( this , other );
+	}
+	else
+	{
+		// flip the types when looking into the index.
+		int idx = myType * NUM_COLLIDER_TYPES + otherType;
+		collisionCheckCB check = g_collisionChecks[ idx ];
+		return check( other , this );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Manifold2D Collider2D::GenrateManifold( Collider2D const* other )
+{
+	COLLIDER2D_TYPE myType = GetType();
+	COLLIDER2D_TYPE otherType = other->GetType();
+
+	if ( myType <= otherType )
+	{
+		int idx = otherType * NUM_COLLIDER_TYPES + myType;
+		collisionManifoldCB manifold = g_collisionManifold[ idx ];
+		return manifold( this , other );
+	}
+	else
+	{
+		// flip the types when looking into the index.
+		int idx = myType * NUM_COLLIDER_TYPES + otherType;
+		collisionManifoldCB manifold = g_collisionManifold[ idx ];
+		return manifold( other , this );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

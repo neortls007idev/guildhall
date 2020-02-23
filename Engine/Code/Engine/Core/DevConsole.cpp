@@ -84,12 +84,12 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	int myStringIndex = ( int ) m_consoleText.size() - 1;
 	Vec2 alignment = ALIGN_BOTTOM_LEFT;
 	float alignmentDeltaChange = 0.f;
-	
-//	AABB2 devConsolePhoenixAnimArea = consoleArea.GetBoxAtTop( 0.5f , 0.f ).GetBoxAtRight( 0.5f , 0.f );
-//	RenderPhoenixAnimation( renderer , camera , devConsolePhoenixAnimArea );
 
-//	AABB2 devConsoleCatAnimArea = consoleArea.GetBoxAtBottom( 0.5f , 0.f ).GetBoxAtRight( 0.5f , 0.f );
-//	RenderCatAnimation( renderer , camera , devConsoleCatAnimArea );
+	AABB2 devConsolePhoenixAnimArea = consoleArea.GetBoxAtTop( 0.5f , 0.f ).GetBoxAtRight( 0.5f , 0.f );
+	RenderPhoenixAnimation( renderer , camera , devConsolePhoenixAnimArea );
+
+	AABB2 devConsoleCatAnimArea = consoleArea.GetBoxAtBottom( 0.5f , 0.f ).GetBoxAtRight( 0.5f , 0.f );
+	RenderCatAnimation( renderer , camera , devConsoleCatAnimArea );
 
 	renderer.DrawAABB2( consoleArea , m_OverlayColor );
 	std::vector<Vertex_PCU> consoleTextVerts;
@@ -103,14 +103,14 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 
 		g_bitmapFont->AddVertsForTextInBox2D( consoleTextVerts , consoleArea , lineHeight , m_consoleText[ myStringIndex ].text , m_consoleText[ myStringIndex ].lineColor , 1.f , alignment );
 		myStringIndex--;
-				
+
 		//startMins.y += lineHeight;
 		alignmentDeltaChange += ( offsetBetweenLines /*+ 20.f */);
 
 		alignment.y = RangeMapFloat( 0.f , ( float ) numberOfLinesToDisplay , 0.f , 1.f , alignmentDeltaChange );
 	}
 
-	
+
 	renderer.BindTexture( g_bitmapFont->GetTexture() );
 	if ( consoleTextVerts.size() > 0)
 	{
@@ -133,7 +133,7 @@ void DevConsole::RenderPhoenixAnimation( RenderContext& renderer , const Camera&
 	Vec2 uvMins;
 	Vec2 uvMaxs;
 	devConsoleAnim.GetUVs( uvMins , uvMaxs );
-	
+
 	Vertex_PCU tempDevConsoleAnim[ 6 ];
 	for ( int index = 0; index < 6; index++ )
 	{
@@ -148,7 +148,7 @@ void DevConsole::RenderPhoenixAnimation( RenderContext& renderer , const Camera&
 	tempDevConsoleAnim[ 3 ].m_uvTexCoords = Vec2( uvMaxs.x , uvMins.y );
 	tempDevConsoleAnim[ 4 ].m_uvTexCoords = uvMaxs;
 	tempDevConsoleAnim[ 5 ].m_uvTexCoords = Vec2( uvMins.x , uvMaxs.y );
-	
+
 	Vec2 translateBy = animArea.GetCenter() + ( animArea.m_maxs - animArea.GetCenter() ) / 2.f;
 
 	TransformVertexArray2D( 6 , tempDevConsoleAnim , animArea.GetDimensions().y , 0.f , animArea.GetCenter() + ( animArea.m_maxs - animArea.GetCenter() ) / 2.f );
@@ -164,7 +164,7 @@ void DevConsole::RenderPhoenixAnimation( RenderContext& renderer , const Camera&
 void DevConsole::RenderCatAnimation( RenderContext& renderer , const Camera& camera , const AABB2& animArea ) const
 {
 	UNUSED( camera );
-	Texture* texture = renderer.GetOrCreateTextureFromFile( "Data/DevConsole/GamerCatHFlippedSpriteSheet1.png" );
+	Texture* texture = renderer.GetOrCreateTextureFromFile( "Data/DevConsole/GamerCatHFlippedSpriteSheet2.png" );
 	SpriteSheet* spriteSheet = new SpriteSheet( *texture , IntVec2( 3 , 11 ) );
 	SpriteAnimDefinition anim = SpriteAnimDefinition( *spriteSheet , 0 , 32 , m_catAnimationDuration , SpriteAnimPlaybackType::LOOP );
 	const SpriteDefinition& devConsoleAnim = anim.GetSpriteDefAtTime( m_currentCatAnimFrame );

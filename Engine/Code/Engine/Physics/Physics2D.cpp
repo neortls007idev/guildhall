@@ -130,8 +130,7 @@ void Physics2D::DetectCollisions()
 
 			if ( firstRigidBody && secondRigidBody )
 			{
-				g_theDevConsole->PrintString( RED , "Collider has no rigid body attached." );
-
+				//g_theDevConsole->PrintString( RED , "Collider has no rigid body attached." );
 				if ( firstRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC && secondRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC )
 				{
 					continue;
@@ -144,9 +143,10 @@ void Physics2D::DetectCollisions()
 				m_colliders2D[ secondColliderIndex ]->m_isColliding = true;
 
 				Collision2D newCollision;
-				newCollision.m_me	= m_colliders2D[ firstColliderIndex ];
-				newCollision.m_them = m_colliders2D[ secondColliderIndex ];
-				//newCollision.m_collisionManifold.
+ 				newCollision.m_me	= m_colliders2D[ firstColliderIndex ];
+ 				newCollision.m_them = m_colliders2D[ secondColliderIndex ];
+ 				newCollision.m_collisionManifold = m_colliders2D[ firstColliderIndex ]->GenrateManifold( m_colliders2D[ secondColliderIndex ] );
+				m_frameCollisions.push_back( newCollision );
 			}
 		}
 	}
@@ -154,9 +154,41 @@ void Physics2D::DetectCollisions()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Physics2D::ResolveCollision( Collision2D collider )
+void Physics2D::ResolveCollision( Collision2D collision )
 {
+	ResolveDiscVsDiscCollisions( collision );
 
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Physics2D::ResolveDiscVsDiscCollisions( Collision2D& collision )
+{
+	if ( collision.m_me->GetType() == COLLIDER2D_DISC && collision.m_them->GetType() == COLLIDER2D_DISC )
+	{
+		Rigidbody2D* meRigidBody = collision.m_me->GetRigidBody();
+		Rigidbody2D* themRigidBody = collision.m_them->GetRigidBody();
+
+		if ( meRigidBody && themRigidBody &&
+			meRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC &&
+			themRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC )
+		{
+			meRigidBody->SetPosition( meRigidBody->GetPosition() + ( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * 0.5f ) );
+			themRigidBody->SetPosition( themRigidBody->GetPosition() - ( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * 0.5f ) );
+		}
+		else if ( meRigidBody && themRigidBody &&
+			meRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC &&
+			themRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC )
+		{
+			meRigidBody->SetPosition( meRigidBody->GetPosition() + ( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap ) );
+		}
+		else if ( meRigidBody && themRigidBody &&
+			meRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC &&
+			themRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC )
+		{
+			themRigidBody->SetPosition( themRigidBody->GetPosition() - ( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap ) );
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -202,6 +234,7 @@ void Physics2D::EndFrame()
 			m_colliders2D[ colliderIndex ] = nullptr;
 		}
 	}
+	//ResetCollisions();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -216,6 +249,8 @@ Rigidbody2D* Physics2D::CreateRigidbody( Vec2 rigidBodyPosition , Vec2 coliderPo
 
 	return rigidBody;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 Rigidbody2D* Physics2D::CreateRigidbody( Vec2 rigidBodyPosition , Vec2 coliderPositionRelativeToRigidBody , Polygon2D convexgon )
 {

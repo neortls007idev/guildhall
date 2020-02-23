@@ -9,9 +9,18 @@ class Collider2D;
 
 struct Collision2D
 {
+public:
+	Collision2D();
+	Collision2D( const Collision2D& collision );
+	~Collision2D();
+
+private:
+
+public:
 	Collider2D* m_me;
 	Collider2D* m_them;
 	Manifold2D	m_collisionManifold;
+
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

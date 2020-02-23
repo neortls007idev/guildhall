@@ -228,7 +228,7 @@ void AABB2::StretchToIncludePoint( Vec2 point )
 	{
 		m_mins.y = point.y;
 	}
-	
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -260,8 +260,10 @@ void AABB2::FitWithinBounds( const AABB2& bounds )
 	{
 		Translate( Vec2( 0.f , bounds.m_mins.y - m_mins.y ) );
 	}
-	
+
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 AABB2 AABB2::CarveBoxOffRight( float fractionOfWidth , float additionalWidth )
 {
@@ -271,6 +273,8 @@ AABB2 AABB2::CarveBoxOffRight( float fractionOfWidth , float additionalWidth )
 	m_maxs.x = carvedPiece.m_mins.x;
 	return carvedPiece;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 AABB2 AABB2::GetBoxAtRight( float fractionOfWidth , float additionalWidth )
 {
@@ -369,7 +373,7 @@ void AABB2::GetCornerPositions( Vec2* out_FourPoints ) const
 {
 	//TODO :- get THE BELOW COMMENTS checked BY SQUIRREL
 	// 	outFourPoints = &Vec2( m_mins );
-	// 	
+	//
 	// The above lin generates warning "nonstandard extension used: class rvalue used as lvalue" ??
 
 	Vec2 point = m_mins;
