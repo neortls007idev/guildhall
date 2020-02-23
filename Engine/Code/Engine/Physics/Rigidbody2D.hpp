@@ -30,7 +30,10 @@ public:
 	void			Update( float deltaSeconds );
 
 	void			TakeCollider( Collider2D* collider );										// takes ownership of a collider (destroying my current one if present)
-	Collider2D*		GetCollider() const								{ return m_collider; }
+
+	void SetSimulationModeBasedOnCollider( Collider2D* collider );
+
+	Collider2D* GetCollider() const { return m_collider; }
 	Vec2			GetPosition() const								{ return m_worldPosition; }
 	Vec2			GetVelocity() const								{ return m_velocity; }
 	eSimulationMode GetSimulationMode() const						{ return m_simulationMode; }

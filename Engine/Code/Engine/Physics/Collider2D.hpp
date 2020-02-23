@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/EngineCommon.hpp"
@@ -16,6 +15,7 @@ enum COLLIDER2D_TYPE
 {
 	COLLIDER2D_DISC ,
 	COLLIDER2D_CONVEXGON,
+	NUM_COLLIDER_TYPES,
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -27,28 +27,39 @@ class Collider2D
 public:
 	Collider2D( Physics2D* system , Rigidbody2D* rigidbody , COLLIDER2D_TYPE colliderType = COLLIDER2D_DISC );
 
-	virtual void UpdateWorldShape() = 0;
-	virtual void Destroy() = 0;
+	virtual void			UpdateWorldShape() = 0;
+	virtual void			Destroy() = 0;
 
-	virtual Vec2 GetClosestPoint( Vec2 pos ) const = 0;
-	virtual bool Contains( Vec2 pos ) const = 0;
-	virtual bool Intersects( Collider2D const* other ) const = 0;
+	virtual Vec2			GetClosestPoint( Vec2 pos ) const = 0;
+	virtual bool			Contains( Vec2 pos ) const = 0;
+	bool					Intersects( Collider2D const* other ) const;
 
-	virtual void DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor ) = 0;
-	virtual Vec2 GetPosition() const = 0;
+	virtual void			DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor ) = 0;
+	virtual Vec2			GetPosition() const = 0;
 
-	uint GetType() const																								{ return m_colliderType; }
+	uint					GetType() const																{ return m_colliderType; }
+	Rigidbody2D*			GetRigidBody() const														{ return m_rigidbody; }
 
 protected:
 	virtual ~Collider2D(); // private - make sure this is virtual so correct deconstructor gets called
-
-public: 
 
 public:
 	COLLIDER2D_TYPE		m_colliderType;				// keep track of the type - will help with collision later
 	Physics2D*			m_system;                   // system who created or destr
 	Rigidbody2D*		m_rigidbody = nullptr;		// owning rigidbody, used for calculating world shape
 	bool				m_isGarbage = false;
+
+private:
+	bool			  m_isColliding = false;
 };
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+typedef bool ( *collisionCheckCB )( Collider2D const* , Collider2D const* );
+
+bool DiscVDiscCollisionCheck( Collider2D const* me , Collider2D const* them );
+bool DiscVPolygonCollisionCheck( Collider2D const* me , Collider2D const* them );
+bool PolygonVDiscCollisionCheck( Collider2D const* me , Collider2D const* them );
+bool PolygonVPolygonCollisionCheck( Collider2D const* me , Collider2D const* them );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

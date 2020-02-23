@@ -85,11 +85,11 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	Vec2 alignment = ALIGN_BOTTOM_LEFT;
 	float alignmentDeltaChange = 0.f;
 	
-	AABB2 devConsolePhoenixAnimArea = consoleArea.GetBoxAtTop( 0.5f , 0.f ).GetBoxAtRight( 0.5f , 0.f );
-	RenderPhoenixAnimation( renderer , camera , devConsolePhoenixAnimArea );
+//	AABB2 devConsolePhoenixAnimArea = consoleArea.GetBoxAtTop( 0.5f , 0.f ).GetBoxAtRight( 0.5f , 0.f );
+//	RenderPhoenixAnimation( renderer , camera , devConsolePhoenixAnimArea );
 
-	AABB2 devConsoleCatAnimArea = consoleArea.GetBoxAtBottom( 0.5f , 0.f ).GetBoxAtRight( 0.5f , 0.f );
-	RenderCatAnimation( renderer , camera , devConsoleCatAnimArea );
+//	AABB2 devConsoleCatAnimArea = consoleArea.GetBoxAtBottom( 0.5f , 0.f ).GetBoxAtRight( 0.5f , 0.f );
+//	RenderCatAnimation( renderer , camera , devConsoleCatAnimArea );
 
 	renderer.DrawAABB2( consoleArea , m_OverlayColor );
 	std::vector<Vertex_PCU> consoleTextVerts;

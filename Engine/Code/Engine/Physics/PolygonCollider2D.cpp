@@ -3,6 +3,7 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Physics/DiscCollider2D.hpp"
 #include "Engine/Physics/Rigidbody2D.hpp"
+#include <math.h>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -12,24 +13,23 @@ PolygonCollider2D::PolygonCollider2D( Physics2D* system , Rigidbody2D* rigidbody
 	m_polygon = convexgon;
 	m_worldPosition = m_rigidbody->m_worldPosition + localPosition;
 	m_polygon.m_localPos = m_worldPosition;
+	//CreateBoundingDisc();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void PolygonCollider2D::UpdateWorldShape()
 {
-	//m_polygon.SetNewCenter( m_rigidbody->m_worldPosition );
-	//m_polygon.SetCenter();
-	m_localPosition = m_rigidbody->m_worldPosition - m_polygon.GetCenter();
-	m_worldPosition = m_rigidbody->m_worldPosition/* + m_localPosition*/;
+	m_worldPosition = m_rigidbody->m_worldPosition + m_localPosition;
 	m_polygon.SetPosition( m_worldPosition );
+	//m_boundingDisc.m_center = m_worldPosition;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void PolygonCollider2D::Destroy()
 {
-	
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ Vec2 PolygonCollider2D::GetClosestPoint( Vec2 pos ) const
 	{
 		std::vector<Vec2> nearestPointOnEdge;
 		size_t totalPoints = m_polygon.m_points.size();
-		
+
 		for ( size_t index = 0; index < totalPoints; index++ )
 		{
 			nearestPointOnEdge.push_back( GetNearestPointOnLineSegment2D( pos , m_polygon.m_points[ index % totalPoints ] , m_polygon.m_points[ ( index + 1 ) % totalPoints ] ) );
@@ -97,7 +97,7 @@ bool PolygonCollider2D::Contains( Vec2 pos ) const
 		edge = m_polygon.m_points[ 0 ] - m_polygon.m_points[ index - 1 ];
 		edgeNormal = edge.GetRotated90Degrees().GetNormalized();
 		pointRelativePos = pos - m_polygon.m_points[ 0 ];
-		
+
 		if ( DotProduct2D( edgeNormal , pointRelativePos ) <= 0 )
 		{
 			return false;
@@ -108,33 +108,33 @@ bool PolygonCollider2D::Contains( Vec2 pos ) const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-bool PolygonCollider2D::Intersects( Collider2D const* other ) const
-{
-	if ( other->m_colliderType == COLLIDER2D_CONVEXGON )
-	{
-		return false;
-	}
-	else
-	{
-		if ( other->m_colliderType == COLLIDER2D_DISC )
-		{
-			DiscCollider2D const* collider = ( DiscCollider2D* ) other;
-
-			Vec2 closetPoint = GetClosestPoint( collider->GetPosition() );
-
-			return ( IsPointOnDisc2D( Disc2D( collider->GetPosition() , collider->m_radius ) , closetPoint ) || Contains( collider->GetPosition() ) );
-		}
-	}
-
-	return false;
-}
+// bool PolygonCollider2D::Intersects( Collider2D const* other ) const
+// {
+// 	if ( other->m_colliderType == COLLIDER2D_CONVEXGON )
+// 	{
+// 		return false;
+// 	}
+// 	else
+// 	{
+// 		if ( other->m_colliderType == COLLIDER2D_DISC )
+// 		{
+// 			DiscCollider2D const* collider = ( DiscCollider2D* ) other;
+//
+// 			Vec2 closetPoint = GetClosestPoint( collider->GetPosition() );
+//
+// 			return ( IsPointOnDisc2D( Disc2D( collider->GetPosition() , collider->m_radius ) , closetPoint ) || Contains( collider->GetPosition() ) );
+// 		}
+// 	}
+//
+// 	return false;
+// }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor )
 {
 	ctx->DrawPolygon( &m_polygon.m_points[ 0 ] , ( unsigned int ) m_polygon.m_points.size() , fillColor );
-	
+
 	size_t totalPoints = m_polygon.m_points.size();
 
 	for ( size_t index = 0; index < totalPoints; index++ )
@@ -160,6 +160,46 @@ void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderCol
 		ctx->DrawLine( m_worldPosition - line1 , m_worldPosition + line1 , RED , 0.01f * m_width );
 		ctx->DrawLine( m_worldPosition - line2 , m_worldPosition + line2 , RED , 0.01f * m_width );
 	}
+	ctx->DrawRing( m_boundingDisc.m_center , m_boundingDisc.m_radius , WHITE , 5.f );
+	//ctx->DrawAABB2( m_boundingAABB , Rgba8( 0 , 0 , 255 , 127 ) );
+
+// 	Vec2 leftMostPoint		= *GetLeftMostPointFromPointCloud(	 &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
+// 	Vec2 rightMostPoint		= *GetRightMostPointFromPointCloud(  &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
+// 	Vec2 topMostPoint		= *GetTopMostPointFromPointCloud(	 &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
+// 	Vec2 bottomMostPoint	= *GetBottomMostPointFromPointCloud( &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
+// 
+// 	ctx->DrawDisc( rightMostPoint , 5.f , PURPLE );
+// 	ctx->DrawDisc( leftMostPoint , 5.f , PURPLE );
+// 	ctx->DrawDisc( bottomMostPoint , 5.f , PURPLE );
+// 	ctx->DrawDisc( topMostPoint , 5.f , PURPLE );
+
+	//test.SetDimensions( Vec2( 100.f , 100.f ) );
+	//ctx->DrawAABB2( test , WHITE );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void PolygonCollider2D::CreateBoundingDisc()
+{
+	Vec2 leftMostPoint   = *GetLeftMostPointFromPointCloud( &m_polygon.m_points[ 0 ] , (int)m_polygon.m_points.size() );
+	Vec2 rightMostPoint  = *GetRightMostPointFromPointCloud( &m_polygon.m_points[ 0 ] , (int)m_polygon.m_points.size() );
+	Vec2 topMostPoint	 = *GetTopMostPointFromPointCloud( &m_polygon.m_points[ 0 ] , (int)m_polygon.m_points.size() );
+	Vec2 bottomMostPoint = *GetBottomMostPointFromPointCloud( &m_polygon.m_points[ 0 ] , (int)m_polygon.m_points.size() );
+
+	Vec2 midPoint = m_polygon.GetCenter();/*leftMostPoint + ( ( rightMostPoint - leftMostPoint ) * 0.5f );*/
+
+	float width = ( rightMostPoint.x - leftMostPoint.x );
+	float height = ( topMostPoint.y - bottomMostPoint.y );
+
+	float centerX = ( rightMostPoint.x + leftMostPoint.x ) * 0.5f ;
+	float centerY = ( topMostPoint.y + bottomMostPoint.y ) * 0.5f ;
+	Vec2  center  = Vec2( centerX , centerY );
+
+	m_boundingAABB.SetDimensions( Vec2( width , height ) );
+	m_boundingAABB.SetCenter( center );
+
+	m_boundingDisc.m_center = Vec2( centerX , centerY );
+	m_boundingDisc.m_radius = sqrtf( width * 0.5f * ( width * 0.5f ) + height * 0.5f * ( height * 0.5f ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

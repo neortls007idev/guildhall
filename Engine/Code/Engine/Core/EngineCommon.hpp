@@ -3,9 +3,6 @@
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EventSystem.hpp"
-
-#include <vector>
-#include <map>
 #include <string>
 //#pragma warning ( 2816:error);
 
@@ -41,7 +38,7 @@ enum eBufferFormatType
 struct buffer_attribute_t
 {
 	std::string name; 			// used to link to a D3D11 shader
-	// uint location; 			// used to link to a GL/Vulkan shader 
+	// uint location; 			// used to link to a GL/Vulkan shader
 	eBufferFormatType type;		// what data are we describing
 	uint offset; 				// where is it relative to the start of a vertex
 
@@ -53,8 +50,8 @@ struct buffer_attribute_t
 
 extern RandomNumberGenerator* g_RNG;
 extern NamedStrings		      g_gameConfigBlackboard; // declared in EngineCommon.hpp, defined in EngineCommon.cpp
-extern DevConsole* g_theDevConsole;
-extern EventSystem* g_theEventSystem;
+extern DevConsole*			  g_theDevConsole;
+extern EventSystem*			  g_theEventSystem;
 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

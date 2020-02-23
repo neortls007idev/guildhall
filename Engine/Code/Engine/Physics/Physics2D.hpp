@@ -1,8 +1,9 @@
 #pragma once
 #include "Engine/Math/Vec2.hpp"
-#include <vector>
+#include "Engine/Physics/Collision2D.hpp"
 #include "Engine/Physics/PolygonCollider2D.hpp"
 #include "Engine/Primitives/Polygon2D.hpp"
+#include <vector>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -21,10 +22,14 @@ public:
 
 	void BeginFrame();
 	void Update( float deltaSeconds );
-	
+
 	void AdvanceSimulation( float deltaSeconds );
 	void ApplyEffectors( Rigidbody2D* rigidbody , float deltaSeconds );
 	void MoveRigidbodies( Rigidbody2D* rigidbody , float deltaSeconds );
+	void ResetCollisions();
+	void DetectCollisions();
+	void ResolveCollision( Collision2D collider );
+	void ResolveCollisions();
 	void CleanupDestroyedObjects();
 
 	void EndFrame();    // cleanup destroyed objects
@@ -48,8 +53,9 @@ public:
 	std::vector<Rigidbody2D*>	m_rigidBodies2D;
 	// storage for all colliders
 	std::vector<Collider2D*>	m_colliders2D;
+	std::vector<Collision2D>	m_frameCollisions;
 	Camera*						m_sceneCamera = nullptr;
-	
+
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

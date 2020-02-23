@@ -136,5 +136,7 @@ const Vec2* GetBottomMostPointFromPointCloud( Vec2 const* points , uint pointCou
 const uint	GetIndexOfBottomMostPointFromPointCloud( Vec2 const* points , uint pointCount );
 const Vec2* GetRightMostPointFromPointCloud( Vec2 const* points , uint pointCount );
 const uint	GetIndexOfRightMostPointFromPointCloud( Vec2 const* points , uint pointCount );
+const Vec2* GetTopMostPointFromPointCloud( Vec2 const* points , uint pointCount );
+const uint	GetIndexOfTopMostPointFromPointCloud( Vec2 const* points , uint pointCount );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------x

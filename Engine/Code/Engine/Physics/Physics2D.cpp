@@ -4,6 +4,7 @@
 #include "Engine/Physics/Collider2D.hpp"
 #include "Engine/Physics/DiscCollider2D.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Core/DevConsole.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -52,8 +53,9 @@ void Physics2D::AdvanceSimulation( float deltaSeconds )
 		}
 	ApplyEffectors( m_rigidBodies2D[index] , deltaSeconds );
 	MoveRigidbodies( m_rigidBodies2D[ index ] , deltaSeconds );
-	// DetectCollisions(); - A04	// determine all pairs of intersecting colliders
-	// CollisionResponse(); - A04	// resolve all collisions, firing appropraite events
+	ResetCollisions();
+	DetectCollisions();
+	ResolveCollisions();
 	CleanupDestroyedObjects();
 	}
 }
@@ -65,10 +67,10 @@ void Physics2D::ApplyEffectors( Rigidbody2D* rigidbody , float deltaSeconds )
 
 		eSimulationMode simulationMode = rigidbody->GetSimulationMode();
 		Vec2 currentVelocity = rigidbody->GetVelocity();
-		
+
 		switch ( simulationMode )
 		{
-			case SIMULATIONMODE_STATIC:		
+			case SIMULATIONMODE_STATIC:
 											break;
 
 			case SIMULATIONMODE_KINEMATIC:	/*m_rigidBodied2D[ index ]->SetVeloity( currentVelocity );*/
@@ -91,6 +93,79 @@ void Physics2D::MoveRigidbodies( Rigidbody2D* rigidbody , float deltaSeconds )
 	{
 		rigidbody->SetPosition( rigidbody->GetPosition() + ( rigidbody->GetVelocity() * deltaSeconds ) );
 		ScreenWrapAround( m_sceneCamera , rigidbody );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Physics2D::ResetCollisions()
+{
+	for ( size_t index = 0; index < m_colliders2D.size(); index++ )
+	{
+		m_colliders2D[ index ]->m_isColliding = false;
+	}
+	m_frameCollisions.clear();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Physics2D::DetectCollisions()
+{
+	for ( size_t firstColliderIndex = 0; firstColliderIndex < m_colliders2D.size(); firstColliderIndex++ )
+	{
+		if ( !m_colliders2D[firstColliderIndex] )
+		{
+			continue;
+		}
+
+		for ( size_t secondColliderIndex = firstColliderIndex + 1; secondColliderIndex < m_colliders2D.size(); secondColliderIndex++ )
+		{
+			if ( !m_colliders2D[ secondColliderIndex ] )
+			{
+				continue;
+			}
+
+			Rigidbody2D* firstRigidBody = m_colliders2D[ firstColliderIndex ]->GetRigidBody();
+			Rigidbody2D* secondRigidBody = m_colliders2D[ secondColliderIndex ]->GetRigidBody();
+
+			if ( firstRigidBody && secondRigidBody )
+			{
+				g_theDevConsole->PrintString( RED , "Collider has no rigid body attached." );
+
+				if ( firstRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC && secondRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC )
+				{
+					continue;
+				}
+			}
+
+			if ( m_colliders2D[ firstColliderIndex ]->Intersects( m_colliders2D[ secondColliderIndex ] ) )
+			{
+				m_colliders2D[ firstColliderIndex ]->m_isColliding	= true;
+				m_colliders2D[ secondColliderIndex ]->m_isColliding = true;
+
+				Collision2D newCollision;
+				newCollision.m_me	= m_colliders2D[ firstColliderIndex ];
+				newCollision.m_them = m_colliders2D[ secondColliderIndex ];
+				//newCollision.m_collisionManifold.
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Physics2D::ResolveCollision( Collision2D collider )
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Physics2D::ResolveCollisions()
+{
+	for ( size_t index = 0; index < m_frameCollisions.size(); index++ )
+	{
+		ResolveCollision( m_frameCollisions[index] );
 	}
 }
 
@@ -138,7 +213,7 @@ Rigidbody2D* Physics2D::CreateRigidbody( Vec2 rigidBodyPosition , Vec2 coliderPo
 	rigidBody->TakeCollider( collider );
 	m_rigidBodies2D.push_back( rigidBody );
 	m_colliders2D.push_back( collider );
-	
+
 	return rigidBody;
 }
 
@@ -157,7 +232,7 @@ Rigidbody2D* Physics2D::CreateRigidbody( Vec2 rigidBodyPosition , Vec2 coliderPo
 
 void Physics2D::DestroyRigidbody( Rigidbody2D* rigidbody )
 {
-	
+
 	Collider2D* collider = rigidbody->GetCollider();
 
 	if ( !collider )
@@ -214,7 +289,7 @@ void Physics2D::GravityBounce( Camera* sceneCamera , Rigidbody2D* rigidBody )
 		switch ( collider->GetType() )
 		{
 		case COLLIDER2D_DISC :
-									{	
+									{
 										DiscCollider2D* colliderAsDisc = ( DiscCollider2D* ) collider;
 
 										if ( rigidBody->GetPosition().y - colliderAsDisc->m_radius <= gravityPlane.y )
@@ -259,7 +334,7 @@ void Physics2D::ScreenWrapAround( Camera* sceneCamera , Rigidbody2D* rigidBody )
 		{
 			rigidBody->SetPosition( Vec2( ScreenMinX - discCollider->m_radius , rbCurrentPos.y ) );
 		}
-	} 
+	}
 	else if ( collider->GetType() == COLLIDER2D_CONVEXGON )
 	{
 		PolygonCollider2D* polyCollider = ( PolygonCollider2D* ) collider;

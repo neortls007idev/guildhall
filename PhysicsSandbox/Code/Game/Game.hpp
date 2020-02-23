@@ -1,20 +1,11 @@
 #pragma once
-#include "Engine/Core/ErrorWarningAssert.hpp"
-#include "Engine/Renderer/Texture.hpp"
-#include "Engine/Renderer/Camera.hpp"
-#include "Engine/Renderer/SpriteSheet.hpp"
-#include "Engine/Renderer/SpriteDefinition.hpp"
-#include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
-#include "Engine/Primitives/AABB2.hpp"
-#include "Engine/Primitives/LineSegment2D.hpp"
+#include "Engine/Physics/Rigidbody2D.hpp"
 #include "Engine/Primitives/Capsule2D.hpp"
-#include "Engine/Primitives/OBB2.hpp"
-#include "Engine/Primitives/Disc2D.hpp"
+#include "Engine/Primitives/Polygon2D.hpp"
+#include "Engine/Renderer/Camera.hpp"
 #include "Game/GameCommon.hpp"
 #include <vector>
-#include "Engine/Primitives/Polygon2D.hpp"
-#include "Engine/Physics/Rigidbody2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 class GameObject;
@@ -30,14 +21,14 @@ public:
 	void InitialGameObjectsSpawner();
 
 	void Update( float deltaSeconds );
-	
+
 	void Render() const;
 	void RenderUI() const;
 	void RenderGravityUI() const;
 	void RenderDrawMode() const;
 	void RenderDrawFromPointCloudMode() const;
 	void DebugRender() const;
-	
+
 	void DrawConvexgonMode();
 	void PolygonDrawMode();
 	void PolygonDrawPointCloudMode();
@@ -46,12 +37,18 @@ public:
 	void UpdateCamera();
 	void UpdateGameObject( float deltaSeconds );
 	void UpdateGameObjects();
+
+	void IsMouseInsideGameObject();
+	void ResetCollisions();
+	void AreObjectsColliding();
+	void ChangeColorOnCollision();
+
 	void UpdateSimulationType( eSimulationMode* simMode );
 	void UpdateGravity();
 	Vec2 GetMouseDragVelocity() const;
 
 	void RandomizePointCloud( RandomNumberGenerator rng );
-		
+
 	void DrawMouseCurrentPosition( const Camera& camera ) const;
 	GameObject* PickGameobject( Vec2 mousePos );
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -82,7 +79,7 @@ public:
 		   Rgba8					m_fillColor					= Rgba8( 255 , 255 , 255 , 127 );
 		   Rgba8					m_overlapColor				= Rgba8( 255 , 0 , 0 , 127 );
 		   Rgba8					m_selectedObjectColor		= Rgba8( 0 , 110 , 0 , 255 );
-		   
+
 		   Vec2						m_mousePosition				= Vec2::ZERO;
 		   Vec2						m_rigidBodyMouseOffset		= Vec2::ZERO;
 		   GameObject*				m_selectedGameObject		= nullptr;

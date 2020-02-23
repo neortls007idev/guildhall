@@ -196,6 +196,12 @@
     <ClCompile Include="Physics\PolygonCollider2D.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
+    <ClCompile Include="Physics\Collision2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Manifold2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -385,6 +391,12 @@
       <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="Physics\PolygonCollider2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Collision2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Manifold2D.hpp">
       <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>

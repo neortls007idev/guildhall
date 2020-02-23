@@ -9,7 +9,7 @@ Rigidbody2D::Rigidbody2D( Physics2D* system , Vec2 worldPosition , Collider2D* c
 																		m_worldPosition( worldPosition ),
 																		m_collider( collider )
 {
-
+	SetSimulationModeBasedOnCollider( collider );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -44,6 +44,22 @@ void Rigidbody2D::TakeCollider( Collider2D* collider )
 		m_collider->Destroy();
 	}
 	m_collider = collider;
+
+	SetSimulationModeBasedOnCollider( collider );
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Rigidbody2D::SetSimulationModeBasedOnCollider( Collider2D* collider )
+{
+	switch ( collider->GetType() )
+	{
+	case COLLIDER2D_DISC:		SetSimulationMode( SIMULATIONMODE_DYNAMIC );
+		break;
+	case COLLIDER2D_CONVEXGON:	SetSimulationMode( SIMULATIONMODE_STATIC );
+		break;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

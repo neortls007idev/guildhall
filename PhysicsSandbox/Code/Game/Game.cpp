@@ -36,10 +36,10 @@ STATIC RandomNumberGenerator Game::m_rng;
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Game::Game()
-{	
+{
 	m_worldCamera.SetOutputSize( m_currentCameraOutputSize );
 	m_worldCamera.SetPosition( m_cameraDefaultPosition );
-	
+
 	m_UICamera.SetOutputSize( m_currentCameraOutputSize );
 	m_UICamera.SetPosition( m_cameraDefaultPosition );
 
@@ -52,7 +52,7 @@ Game::Game()
 	//testPolygon = new Polygon2D();
 	testPolygon =  Polygon2D::MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
 	//testPolygon.SetCenter();
-	
+
 	if ( isnan( testPolygon.m_center.x) || isnan(testPolygon.m_center.y) )
 	{
 		return;
@@ -121,7 +121,7 @@ void Game::Render() const
 		}
 
 		Collider2D* Collider = m_gameObjects[ index ]->m_rigidbody->GetCollider();
-		
+
 		if ( Collider )
 		{
 			Collider->DebugRender( g_theRenderer , m_gameObjects[index]->m_borderColor , m_gameObjects[index]->m_fillColor );
@@ -129,7 +129,7 @@ void Game::Render() const
 	}
 
 	DrawMouseCurrentPosition( m_worldCamera );
-	
+
 	RenderDrawFromPointCloudMode();
 	RenderUI();
 }
@@ -151,19 +151,19 @@ void Game::RenderGravityUI() const
 
 	uiArea = uiArea.GetBoxAtTop( 0.9f , 0.f ).GetBoxAtRight( 0.5f , 0.f );
 	/*uiArea.CarveBoxOffRight( 0.5f , 0.f );*/
-	
+
 	std::vector<Vertex_PCU> uiVerts;
 
 	std::string currGravityX = "Current Gravity Along X= ";
 	currGravityX += std::to_string( g_thePhysicsSystem->GetSceneGravity().x );
-	
+
 	std::string currGravityY = "Current Gravity Along Y= ";
 	currGravityY += std::to_string( g_thePhysicsSystem->GetSceneGravity().y );
 
 	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea , uiArea.GetDimensions().y * 0.2f , currGravityX , RED , 1.f , ALIGN_TOP_RIGHT );
 	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea , uiArea.GetDimensions().y * 0.2f , currGravityY , RED, 1.f , ALIGN_CENTERED_RIGHT  );
 	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea , uiArea.GetDimensions().y * 0.2f , "Press + or - key to change Gravity" , RED , 1.f , ALIGN_BOTTOM_RIGHT );
-	
+
 	g_theRenderer->BindTexture( g_bitmapFont->GetTexture() );
 	g_theRenderer->DrawVertexArray( uiVerts );
 	g_theRenderer->BindTexture( nullptr );
@@ -244,12 +244,12 @@ void Game::DrawConvexgonMode()
 		Vec2 point = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
 		m_drawModePoints.clear();
 		m_isLastPointInvalid = false;
-		m_drawModePoints.push_back( point );	
+		m_drawModePoints.push_back( point );
 	}
 
 	//PolygonDrawMode();
 	PolygonDrawPointCloudMode();
-	
+
 	if ( g_theInput->WasKeyJustPressed( KEY_ESC ) )
 	{
 		m_isDrawModeActive = false;
@@ -267,7 +267,7 @@ void Game::PolygonDrawMode()
 	}
 
 	m_isDrawModeActive = true;
-	
+
 	if ( g_theInput->WasLeftMouseButtonJustPressed() )
 	{
 		if ( m_drawModePoints.size() == 1 )
@@ -344,7 +344,7 @@ void Game::PolygonDrawPointCloudMode()
 		Vec2 point = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
 		m_drawModePoints.push_back( point );
 	}
-	
+
 	if ( g_theInput->WasKeyJustPressed( KEY_BACKSPACE ) )
 	{
 		if ( m_drawModePoints.size() > 0 )
@@ -414,7 +414,7 @@ void Game::UpdateGameObject( float deltaSeconds )
 	UNUSED( deltaSeconds );
 
 	static Vec2 originalPosition;
-	
+
 	if ( !m_selectedGameObject )
 	{
 		return;
@@ -431,25 +431,25 @@ void Game::UpdateGameObject( float deltaSeconds )
 			m_isDragOffsetSet = true;
 			originalPosition = newWorldPosition;
 		}
-		m_selectedGameObject->m_rigidbody->SetPosition( newWorldPosition - m_rigidBodyMouseOffset );		
+		m_selectedGameObject->m_rigidbody->SetPosition( newWorldPosition - m_rigidBodyMouseOffset );
 	}
 }
 
 void Game::UpdateSimulationType( eSimulationMode* simMode )
 {
-	if ( g_theInput->WasKeyJustPressed( '1' ) ) 
-	{ 
-		m_selectedGameObject->m_rigidbody->SetSimulationMode( SIMULATIONMODE_STATIC ); 
+	if ( g_theInput->WasKeyJustPressed( '1' ) )
+	{
+		m_selectedGameObject->m_rigidbody->SetSimulationMode( SIMULATIONMODE_STATIC );
 		*simMode = SIMULATIONMODE_STATIC;
 	}
-	else if ( g_theInput->WasKeyJustPressed( '2' ) ) 
+	else if ( g_theInput->WasKeyJustPressed( '2' ) )
 	{
-		m_selectedGameObject->m_rigidbody->SetSimulationMode( SIMULATIONMODE_KINEMATIC ); 
+		m_selectedGameObject->m_rigidbody->SetSimulationMode( SIMULATIONMODE_KINEMATIC );
 		*simMode = SIMULATIONMODE_KINEMATIC;
 	}
-	else if ( g_theInput->WasKeyJustPressed( '3' ) ) 
-	{ 
-		m_selectedGameObject->m_rigidbody->SetSimulationMode( SIMULATIONMODE_DYNAMIC ); 
+	else if ( g_theInput->WasKeyJustPressed( '3' ) )
+	{
+		m_selectedGameObject->m_rigidbody->SetSimulationMode( SIMULATIONMODE_DYNAMIC );
 		*simMode = SIMULATIONMODE_DYNAMIC;
 	}
 }
@@ -484,13 +484,23 @@ Vec2 Game::GetMouseDragVelocity() const
 
 void Game::UpdateGameObjects()
 {
+	IsMouseInsideGameObject();
+	ResetCollisions();
+	AreObjectsColliding();
+	ChangeColorOnCollision();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::IsMouseInsideGameObject()
+{
 	for ( size_t colliderIndex = 0; colliderIndex < m_gameObjects.size(); colliderIndex++ )
 	{
 		if ( m_gameObjects[ colliderIndex ] == nullptr )
 		{
 			continue;
 		}
-		
+
 		Collider2D* collider = m_gameObjects[ colliderIndex ]->m_rigidbody->GetCollider();
 
 		bool isMouseInside = collider->Contains( m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() ) );
@@ -511,28 +521,34 @@ void Game::UpdateGameObjects()
 			m_gameObjects[ colliderIndex ]->m_borderColor = BLUE;
 		}
 	}
-	
-//--------------------------------------------------------------------------------------------------------------------------------------------
-//				COLLISION UPDATE
+}
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Game::ResetCollisions()
+{
 	for ( size_t index = 0; index < m_gameObjects.size(); index++ )
 	{
-		if ( m_gameObjects[index] )
+		if ( m_gameObjects[ index ] )
 		{
 			m_gameObjects[ index ]->m_isColliding = false;
 			m_gameObjects[ index ]->m_fillColor = m_fillColor;
 
 		}
 	}
+}
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::AreObjectsColliding()
+{
 	for ( size_t firstColliderIndex = 0; firstColliderIndex < m_gameObjects.size(); firstColliderIndex++ )
 	{
 		if ( m_gameObjects[ firstColliderIndex ] == nullptr )
 		{
 			continue;
 		}
-		for ( size_t secondColliderIndex = 0; secondColliderIndex < m_gameObjects.size(); secondColliderIndex++ )
+		for ( size_t secondColliderIndex = firstColliderIndex + 1; secondColliderIndex < m_gameObjects.size(); secondColliderIndex++ )
 		{
 			if ( m_gameObjects[ secondColliderIndex ] == nullptr )
 			{
@@ -542,22 +558,27 @@ void Game::UpdateGameObjects()
 			{
 				if ( m_gameObjects[ firstColliderIndex ]->m_rigidbody->m_collider->Intersects( m_gameObjects[ secondColliderIndex ]->m_rigidbody->m_collider ) )
 				{
-					m_gameObjects[ firstColliderIndex ]-> m_isColliding = true;
+					m_gameObjects[ firstColliderIndex ]->m_isColliding = true;
 					m_gameObjects[ secondColliderIndex ]->m_isColliding = true;
 				}
 			}
 		}
 	}
+}
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::ChangeColorOnCollision()
+{
 	for ( size_t index = 0; index < m_gameObjects.size(); index++ )
 	{
-		if ( m_gameObjects[index] && m_gameObjects[ index ]->m_isColliding )
+		if ( m_gameObjects[ index ] && m_gameObjects[ index ]->m_isColliding )
 		{
 			m_gameObjects[ index ]->m_fillColor = m_overlapColor;
 		}
 	}
 }
-	
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Game::RandomizePointCloud( RandomNumberGenerator rng )
@@ -594,7 +615,7 @@ GameObject* Game::PickGameobject( Vec2 mousePos )
 		}
 
 		Collider2D* collider = m_gameObjects[ gameObjectIndex ]->m_rigidbody->m_collider;
-		
+
 		if ( collider && collider->Contains( mousePos ) )
 		{
 			m_isMouseOnGameObject[ gameObjectIndex ] = true;
@@ -630,17 +651,17 @@ void Game::UpdateFromUserInput( float deltaSeconds )
 	{
 		UpdateGravity();
 	}
-	
+
 	if ( g_theInput->WasKeyJustPressed( 'O' ) )
 	{
 		m_cameraCurrentPosition = m_cameraDefaultPosition;
 	}
-	
+
 	if ( g_theInput->IsKeyHeldDown( 'D' ) )
 	{
 		m_cameraCurrentPosition += ( Vec3( m_cameraMoveVelocity.x , 0.f , 0.f ) * deltaSeconds );
 	}
-	
+
 	if ( g_theInput->IsKeyHeldDown( 'A' ) )
 	{
 		m_cameraCurrentPosition -= ( Vec3( m_cameraMoveVelocity.x , 0.f , 0.f ) * deltaSeconds );
@@ -679,7 +700,7 @@ void Game::UpdateFromUserInput( float deltaSeconds )
 		m_gameObjects.push_back( temp );
 		m_isMouseOnGameObject.push_back( false );
 	}
-		
+
 	if ( g_theInput->WasLeftMouseButtonJustPressed() )
 	{
 		if ( !m_isGameObjectSelected )

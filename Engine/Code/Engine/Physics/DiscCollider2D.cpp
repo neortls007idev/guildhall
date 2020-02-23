@@ -20,7 +20,7 @@ DiscCollider2D::DiscCollider2D( Physics2D* system , Rigidbody2D* rigidbody ,Vec2
 
 DiscCollider2D::~DiscCollider2D()
 {
-	
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -54,20 +54,20 @@ bool DiscCollider2D::Contains( Vec2 pos ) const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-bool DiscCollider2D::Intersects( Collider2D const* other ) const
-{
-	if ( m_colliderType == COLLIDER2D_DISC )
-	{
-		DiscCollider2D* discCollider = ( DiscCollider2D* ) other;
-		return DoDiscsOverlap( m_worldPosition , m_radius , discCollider->m_worldPosition , discCollider->m_radius );
-	}
-	else if( m_colliderType == COLLIDER2D_CONVEXGON )
-	{
-		PolygonCollider2D* polygonCollider = ( PolygonCollider2D* ) other;
-		return polygonCollider->Intersects( this );
-	}
-	return false;
-}
+// bool DiscCollider2D::Intersects( Collider2D const* other ) const
+// {
+// 	if ( m_colliderType == COLLIDER2D_DISC )
+// 	{
+// 		DiscCollider2D* discCollider = ( DiscCollider2D* ) other;
+// 		return DoDiscsOverlap( m_worldPosition , m_radius , discCollider->m_worldPosition , discCollider->m_radius );
+// 	}
+// 	else if( m_colliderType == COLLIDER2D_CONVEXGON )
+// 	{
+// 		PolygonCollider2D* polygonCollider = ( PolygonCollider2D* ) other;
+// 		return polygonCollider->Intersects( this );
+// 	}
+// 	return false;
+// }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
