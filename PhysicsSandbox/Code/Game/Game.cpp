@@ -55,7 +55,7 @@ Game::Game()
 		return;
 	}
 	//testPolygon->MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
-	InitialGameObjectsSpawner();
+	//InitialGameObjectsSpawner();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

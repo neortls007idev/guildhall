@@ -96,10 +96,10 @@ Manifold2D DiscVPolygonCollisionFold( Collider2D const* me , Collider2D const* t
 		collision.m_overlap = discColliderMe->GetRadius() + ( discColliderMe->GetPosition() ).GetLength();
 	}
 
-	if ( collision.m_overlap <= 0 )
-	{
-		return collision;
-	}
+// 	if ( collision.m_overlap <= 0 )
+// 	{
+// 		return collision;
+// 	}
 
 	collision.m_contactPoint = discColliderMe->GetPosition() + ( collision.m_normal * ( discColliderMe->GetRadius() - ( collision.m_overlap * 0.5f ) ) );
 
