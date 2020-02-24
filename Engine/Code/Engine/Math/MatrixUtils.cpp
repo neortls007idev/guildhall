@@ -44,7 +44,7 @@ const Mat44 CreatePerpsectiveProjectionMatrixD3D( float fovDegrees , float aspec
 	float proj[] = {
 					   height / aspectRatio,          0.f,			0.f,						0.f,
 										0.f,	   height,			0.f,						0.f,
-										0.f,          0.f,     farZ * q,		  -nearZ * farZ * q,
+										0.f,          0.f,     -farZ * q,		  nearZ * farZ * q,
 										0.f,          0.f,			1.f,						0.f
 	};
 	return Mat44( proj );

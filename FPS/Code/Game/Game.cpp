@@ -15,12 +15,12 @@ extern TheApp* g_theApp;
 
 Game::Game()
 {
-	//m_gameCamera.SetOrthoView( Vec2( -WORLD_CAMERA_SIZE_X , -WORLD_CAMERA_SIZE_Y ) , Vec2( WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y ) );
+	m_gameCamera.SetOrthoView( Vec2( -WORLD_CAMERA_SIZE_X , -WORLD_CAMERA_SIZE_Y ) , Vec2( WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y ) );
 	m_uiCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
 	m_color = BLACK;
 	m_invertColorShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/InvertColor.hlsl" );
 	m_imageTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/PlayerTankBase.png" );
-	m_gameCamera.SetProjectionPerspective( 60.f , CLIENT_ASPECT , 1.0f , -1.f );
+	m_gameCamera.SetProjectionPerspective( 60.f , CLIENT_ASPECT , 10.0f , -10.f );
 	Vec3 orthoMin = m_gameCamera.GetOrthoMin();
 	Vec3 orthoMax = m_gameCamera.GetOrthoMax();
 	m_normalImage = AABB2( -WORLD_CAMERA_SIZE_X , -WORLD_CAMERA_SIZE_Y , WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y );
