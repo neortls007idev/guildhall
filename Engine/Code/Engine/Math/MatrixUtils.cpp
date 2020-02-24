@@ -1,5 +1,6 @@
 #include "Engine/Math/Matrix4x4.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "MathUtils.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -37,15 +38,15 @@ const Mat44 CreateOrthoGraphicProjeciton( const Vec3& min , const Vec3& max )
 
 const Mat44 CreatePerpsectiveProjectionMatrixD3D( float fovDegrees , float aspectRatio , float nearZ , float farZ )
 {
-	float height = 1.0f / tanf( fovDegrees * .5f ); // how far away are we for the perspective point to be "one up" from our forward line.
+	float height = 1.0f / TanDegrees( fovDegrees * .5f ); // how far away are we for the perspective point to be "one up" from our forward line.
 	float zrange = farZ - nearZ;
 	float q = 1.0f / zrange;
 
 	float proj[] = {
 					   height / aspectRatio,          0.f,			0.f,						0.f,
 										0.f,	   height,			0.f,						0.f,
-										0.f,          0.f,     -farZ * q,		  nearZ * farZ * q,
-										0.f,          0.f,			1.f,						0.f
+										0.f,          0.f,     -farZ * q,		 -1.f,
+										0.f,          0.f,	nearZ* farZ* q,						0.f
 	};
 	return Mat44( proj );
 }

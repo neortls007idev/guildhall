@@ -56,7 +56,6 @@ public:
 	Mat44			GetViewMatrix();
 	Mat44			GetProjectionMatrix() const																		{ return m_projection; }
 
-
 public:
 	RenderBuffer*	m_cameraUBO		= nullptr;
 

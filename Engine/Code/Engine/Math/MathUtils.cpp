@@ -44,6 +44,14 @@ float SinDegrees( float degrees )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+float TanDegrees( float degrees )
+{
+	float radians = ConvertDegreesToRadians( degrees );
+	return  tanf( radians );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 float Atan2Degrees( float y, float x )
 {
 	return( ConvertRadiansToDegrees(atan2f(y,x)));
@@ -190,17 +198,17 @@ bool DoDiscAndAABBOverlap( const Vec2& center , const float radius , const AABB2
 	displacementBetweenCenters.x = abs( center.x - box.GetCenter().x );
 	displacementBetweenCenters.y = abs( center.y - box.GetCenter().y );
 
-// FOR THE EDGES OF THE AABB2  
+// FOR THE EDGES OF THE AABB2
 
 	if ( displacementBetweenCenters.x > ( ( dimensionsOfAABB2D.x * 0.5f ) + radius ) ) { return false; }
 	if ( displacementBetweenCenters.y > ( ( dimensionsOfAABB2D.y * 0.5f ) + radius ) ) { return false; }
-	
+
 	if ( displacementBetweenCenters.x <= ( dimensionsOfAABB2D.x * 0.5f ) ) { return true; }
 	if ( displacementBetweenCenters.y <= ( dimensionsOfAABB2D.y * 0.5f ) ) { return true; }
 
 	float cornerDistanceSquared = ( displacementBetweenCenters.x - ( dimensionsOfAABB2D.x * 0.5f ) ) * ( displacementBetweenCenters.x - ( dimensionsOfAABB2D.x * 0.5f ) ) +
 								  ( displacementBetweenCenters.y - ( dimensionsOfAABB2D.y * 0.5f ) ) * ( displacementBetweenCenters.y - ( dimensionsOfAABB2D.y * 0.5f ) );
-	
+
 	return ( cornerDistanceSquared <= ( radius * radius ) );
 }
 
@@ -209,7 +217,7 @@ bool DoDiscAndAABBOverlap( const Vec2& center , const float radius , const AABB2
 bool DoOBBsOverlap( const OBB2& first , const OBB2& second )
 {
 	bool result = false;
-	
+
 	Vec2 firstOBBVerts[ 4 ];
 	Vec2 secondOBBVerts[ 4 ];
 
@@ -228,7 +236,7 @@ bool DoOBBsOverlap( const OBB2& first , const OBB2& second )
 		}
 
 		FloatRange SecondOBBProjectedRange = GetRangeOnProjectedAxis( 4 , secondOBBVerts , &first.m_center , axisToCheck );
-		
+
 		result = firstOBBProjectedRange.DoesOverlap( SecondOBBProjectedRange );
 
 		if ( !result )
@@ -251,7 +259,7 @@ bool DoOBBsOverlap( const OBB2& first , const OBB2& second )
 		FloatRange firstOBBProjectedRange = GetRangeOnProjectedAxis( 4 , firstOBBVerts , &second.m_center , axisToCheck );
 
 		result = SecondOBBProjectedRange.DoesOverlap( firstOBBProjectedRange );
-		
+
 		if ( !result )
 		{
 			return result;
@@ -309,7 +317,7 @@ bool IsPointInsideAABB2D( const Vec2& referencePoint , const AABB2& box )
 		rangeOnX.minimum = oldMaximum;
 		rangeOnX.maximum = oldMinimum;
 	}
-	
+
 	if ( rangeOnY.minimum > rangeOnY.maximum )
 	{
 		float oldMaximum = 0.f;
@@ -336,7 +344,7 @@ bool IsPointInsideAABB2D( const Vec2& referencePoint , const AABB2& box )
 		result = true;
 		return result;
 	}
-	 
+
 	return false;
 }
 
@@ -345,7 +353,7 @@ bool IsPointInsideAABB2D( const Vec2& referencePoint , const AABB2& box )
 bool IsPointInsideCapsule2D( const Vec2& referencePoint , const Vec2& capsuleMidStart , const Vec2& capsuleMidEnd , const float capsuleRadius )
 {
 	OBB2 box = OBB2( ( capsuleMidEnd - capsuleMidStart ) * 0.5f + capsuleMidStart , Vec2( ( capsuleMidEnd - capsuleMidStart ).GetLength() , capsuleRadius * 2.f ) , ( capsuleMidEnd - capsuleMidStart ).GetNormalized() );
-	
+
 	if ( IsPointOnDisc2D( Disc2D( capsuleMidStart , capsuleRadius ) , referencePoint ) )
 	{
 		return true;
@@ -422,7 +430,7 @@ const Vec2 TransformPosition2D( const Vec2& position , const Vec2& iBasis , cons
 	Vec2 coordsOnNewCoordinateSystem = Vec2::ZERO;
 	coordsOnNewCoordinateSystem.x = ( position.x * iBasis.x ) + ( position.y * jBasis.x ) + Translation.x;
 	coordsOnNewCoordinateSystem.y = ( position.x * iBasis.y ) + ( position.y * jBasis.y ) + Translation.y;
-	
+
 	return coordsOnNewCoordinateSystem;
 }
 
@@ -471,7 +479,7 @@ float RangeMapFloat(float inBegin, float inEnd, float outBegin, float outEnd, fl
 	float outRange		  = outEnd - outBegin;
 	float outDisplacement = fraction * outRange;
 	float outValue		  = outBegin + outDisplacement;
-	
+
 	return outValue;
 }
 
@@ -658,7 +666,7 @@ void PushMobileDiscOutOfFixedDisc( Vec2& MobileDiscCenter , const float& MobileD
 	Vec2 displacementBetweenCenters = Vec2( MobileDiscCenter - FixedDiscCenter );
 	float distanceBetweenCenters = displacementBetweenCenters.GetLength();
 	float displacementToMove = MobileDiscRadius + FixedDiscRadius - distanceBetweenCenters;
-	
+
 	if ( displacementToMove >= 0 )
 	{
 		displacementBetweenCenters = Vec2::MakeFromPolarDegrees( displacementBetweenCenters.GetAngleDegrees() , displacementToMove );
@@ -758,7 +766,7 @@ const Vec2 GetNearestPointOnDisc2D( const Disc2D& disc , const Vec2& point )
 	// might be wrong and may need correction;
 
 	Vec2 nearestPoint = ( disc.m_center + ( disc.m_radius * ( distanceBetweenCenterAndPoint / lenghtOfdistanceBetweenCenterAndPoint ) ) );
-	
+
 	return nearestPoint;
 }
 
@@ -861,8 +869,8 @@ const Vec2 GetNearestPointOnLineSegment2D( const Vec2& referencePoint , const Ve
 	Vec2 displacementFromStartToEnd = endPoint - startPoint; // AB
 
 	float magnitudeAB = displacementFromStartToEnd.GetLengthSquared();
-	float ABAPproduct = DotProduct2D( displacementFromStartToReference , displacementFromStartToEnd );         
-	float distance = ABAPproduct / magnitudeAB; //The normalized "distance" from start to closest point  
+	float ABAPproduct = DotProduct2D( displacementFromStartToReference , displacementFromStartToEnd );
+	float distance = ABAPproduct / magnitudeAB; //The normalized "distance" from start to closest point
 
 	if ( distance <= 0 )     //Check if projection is over the line
 	{
@@ -887,12 +895,12 @@ const Vec2 GetNearestPointOnCapsule2D( const Vec2& referencePoint , const Vec2& 
 	{
 		return referencePoint;
 	}
-	
+
 	Vec2 nearestPoint = Vec2::ZERO;
 	Vec2 displacementFromStartToPoint = referencePoint - capsuleMidStart;
 	Vec2 displacementFromStartToEnd = capsuleMidEnd - capsuleMidStart;
 	Vec2 displacementFromEndToPoint = referencePoint - capsuleMidEnd;
-	
+
 	if ( DotProduct2D(displacementFromStartToPoint,displacementFromStartToEnd) < 0 )
 	{
 		return GetNearestPointOnDisc2D( referencePoint , capsuleMidStart , capsuleRadius );
