@@ -202,6 +202,9 @@
     <ClCompile Include="Physics\Manifold2D.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
+    <ClCompile Include="Physics\PhysicsMaterial.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -397,6 +400,9 @@
       <Filter>Physics</Filter>
     </ClInclude>
     <ClInclude Include="Physics\Manifold2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\PhysicsMaterial.hpp">
       <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>

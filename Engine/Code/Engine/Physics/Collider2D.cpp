@@ -133,7 +133,7 @@ Collider2D::Collider2D( Physics2D* system , Rigidbody2D* rigidbody , COLLIDER2D_
 																						m_rigidbody( rigidbody ),
 																						m_colliderType( colliderType )
 {
-
+	m_physicsMaterial = new PhysicsMaterial();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -180,6 +180,16 @@ Manifold2D Collider2D::GenrateManifold( Collider2D const* other )
 		collisionManifoldCB manifold = g_collisionManifold[ idx ];
 		return manifold( other , this );
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+float Collider2D::GetBounceWith( Collider2D const* other ) const
+{
+	float meBounciness	  = m_physicsMaterial->GetBounciness();
+	float otherBounciness = other->GetPhysicsMaterial()->GetBounciness();
+
+	return ( otherBounciness * meBounciness );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -64,6 +64,14 @@ void Rigidbody2D::SetSimulationModeBasedOnCollider( Collider2D* collider )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Rigidbody2D::ApplyImpulse( Vec2 impulse , Vec2 point )
+{
+	UNUSED( point );
+	m_velocity += impulse / m_mass;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Rigidbody2D::SetCollider( Collider2D* collider )
 {
 	m_collider = collider;
@@ -78,14 +86,14 @@ void Rigidbody2D::SetPosition( Vec2 position )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Rigidbody2D::SetVeloity( Vec2 velocity )
+void Rigidbody2D::SetVelocity( Vec2 velocity )
 {
 	m_velocity = velocity;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Rigidbody2D::ReverseVelocity()
+void Rigidbody2D::ReverseVelocityY()
 {
 	m_velocity.y = -m_velocity.y;
 }

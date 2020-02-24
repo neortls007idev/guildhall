@@ -203,6 +203,7 @@
     <ClCompile Include="Physics\Manifold2D.cpp" />
     <ClCompile Include="Physics\DiscCollider2D.cpp" />
     <ClCompile Include="Physics\Physics2D.cpp" />
+    <ClCompile Include="Physics\PhysicsMaterial.cpp" />
     <ClCompile Include="Physics\PolygonCollider2D.cpp" />
     <ClCompile Include="Physics\Rigidbody2D.cpp" />
     <ClCompile Include="Primitives\AABB2.cpp" />
@@ -270,6 +271,7 @@
     <ClInclude Include="Physics\Manifold2D.hpp" />
     <ClInclude Include="Physics\DiscCollider2D.hpp" />
     <ClInclude Include="Physics\Physics2D.hpp" />
+    <ClInclude Include="Physics\PhysicsMaterial.hpp" />
     <ClInclude Include="Physics\PolygonCollider2D.hpp" />
     <ClInclude Include="Physics\Rigidbody2D.hpp" />
     <ClInclude Include="Primitives\AABB2.hpp" />

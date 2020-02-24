@@ -22,12 +22,12 @@ constexpr float MAX_CAMERA_ZOOM_VELOCITY_Y								=  15000.f;
 constexpr float MIN_CAMERA_SHAKE										= -10.0f;
 constexpr float MAX_CAMERA_SHAKE										=  10.0f;
 
-constexpr float	MIN_COLLIDER_RADIUS										=  20.f;
-constexpr float	MAX_COLLIDER_RADIUS										=  50.f;
+constexpr float	MIN_COLLIDER_RADIUS										=  50.f;
+constexpr float	MAX_COLLIDER_RADIUS										=  200.f;
 
 constexpr int	MIN_INITIAL_GAME_OBJECTS								=  5;
 constexpr int	MAX_INITIAL_GAME_OBJECTS								=  10;
 
 constexpr float	DELTA_GRAVITY_CHANGE_ALONGY								= 10.f;
-
+constexpr float DELTA_BOUNCINESS_CHANGE									= 10.f;
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -23,12 +23,12 @@ MP2 And SD2 Checklist
     - [x] Implement a disc versus disc manifold
     - [x] Implement a disc versus polygon manifold
     - **Note: We are not doing polygon -vs- polygon yet**
-- [ ] `Collider2D` gets a `PhysicsMaterial`
-    - [ ] `PhysicsMaterial` has a property for `restitution` (or `bounciness` if you prefer)
-    - [ ] `Collider2D::GetBounceWith(Collider2D const* other) const` implemented to compute restitution between two objects
+- [x] `Collider2D` gets a `PhysicsMaterial`
+    - [x] `PhysicsMaterial` has a property for `restitution` (or `bounciness` if you prefer)
+    - [x] `Collider2D::GetBounceWith(Collider2D const* other) const` implemented to compute restitution between two objects
         - There are multiple methods for computing the restitution.  Product, Min, Max, Spherical, Lookup, etc...   
-    - [ ] Allow user to adjust bounciness using `+` and `-` while the object is selected.
-    - [ ] Set the alpha for the fill color to the counciness of the object.
+    - [x] Allow user to adjust bounciness using `Shift + Mouse Wheel Movement` while the object is selected.
+    - [x] Set the alpha for the fill color to the bounciness of the object.
 - [x] Add a `Collision2D` object that contains..
     - Two pointers to the `Collider2D` objects involved in the collision (`me` and `them`)
     - A `manifold2` struct containing...
@@ -41,14 +41,14 @@ MP2 And SD2 Checklist
 - [x] `ResolveCollision` should...
     - [x] `CorrectObjects`, pushing them out of their respective objects
         - [x] Push should depend on the ratio of the masses
-        - [ ] Static and Kinematic objects assume infinite mass vs dynamic objects
+        - [-] Static and Kinematic objects assume infinite mass vs dynamic objects
         - [x] Kinematic vs Kinematic resolves based on masses
         - [x] Static objects never move, and should fully push the other object if it is not static.
         - [x] Two static objects do not correct at all.
-    - [ ] Calculate **normal impulse** at point of collision.
-    - [ ] `Rigidbody2D::ApplyImpulseAt` to both objects (`impulse` to A, `-impulse` to B)
-- [ ] `Rigidbody2D::ApplyImpulseAt( vec2 worldPos, vec2 impulse )` implemented
-    - [ ] Impulse uses force to apply an instant change in velocity
+    - [x] Calculate **normal impulse** at point of collision.
+    - [x] `Rigidbody2D::ApplyImpulseAt` to both objects (`impulse` to A, `-impulse` to B)
+- [x] `Rigidbody2D::ApplyImpulseAt( vec2 worldPos, vec2 impulse )` implemented
+    - [x] Impulse uses force to apply an instant change in velocity
         - `delta_velocity = impulse * inverse_mass`
     - [x] Ignore `worldPos` for now, it is there for when we apply rotational forces
 

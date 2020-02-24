@@ -485,6 +485,7 @@ void Game::UpdateGameObjects()
 	ResetCollisions();
 	AreObjectsColliding();
 	ChangeColorOnCollision();
+	ChangeAlphaByBounciness();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -577,6 +578,20 @@ void Game::ChangeColorOnCollision()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Game::ChangeAlphaByBounciness()
+{
+	for ( size_t index = 0; index < m_gameObjects.size(); index++ )
+	{
+		if ( m_gameObjects[ index ] )
+		{
+			float bounciness = m_gameObjects[ index ]->m_rigidbody->GetCollider()->GetPhysicsMaterial()->GetBounciness();
+			m_gameObjects[ index ]->m_fillColor.a = ( uchar ) RangeMapFloat( 0.f , 1.f , 0.f , 127.f , bounciness );
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Game::RandomizePointCloud( RandomNumberGenerator rng )
 {
 	uint count = rng.RollRandomIntInRange( 2 , 50 );
@@ -648,6 +663,95 @@ void Game::UpdateFromUserInput( float deltaSeconds )
 		UpdateGravity();
 	}
 
+	if ( !m_selectedGameObject )
+	{
+		UpdateCameraFromUserInput( deltaSeconds );
+	}
+
+	SelectGameObjectFormUserInput();
+	UpdateSelectedGameObjectBouncinessFromUserInput( deltaSeconds );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::SelectGameObjectFormUserInput()
+{
+	if ( !m_isDrawModeActive )
+	{
+		if ( g_theInput->WasRightMouseButtonJustPressed() && !m_selectedGameObject )
+		{
+			m_currentColliderRadius = m_rng.RollRandomFloatInRange( m_minColliderRadius , m_maxColliderRadius );
+			Vec2 spawnPos = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+			GameObject* temp = new GameObject( g_thePhysicsSystem , spawnPos , Vec2::ZERO , m_currentColliderRadius );
+			m_gameObjects.push_back( temp );
+			m_isMouseOnGameObject.push_back( false );
+		}
+
+		if ( g_theInput->WasLeftMouseButtonJustPressed() )
+		{
+			if ( !m_isGameObjectSelected )
+			{
+				Vec2 PickObjectPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+				m_selectedGameObject = PickGameobject( PickObjectPosition );
+				if ( m_selectedGameObject )
+				{
+					m_dragTime = 0.f;
+					m_frameCount = 0;
+					m_MouseDragFrames[ m_frameCount ] = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+					m_selectedGameObject->m_rigidbody->ChangeIsSimulationActive( false );
+					m_selectedGameObject->m_borderColor = Rgba8( 0 , 127 , 0 , 255 );
+					m_selectedGameObject->m_isSelected = true;
+					m_isGameObjectSelected = true;
+				}
+			}
+			else
+			{
+				if ( m_selectedGameObject != nullptr )
+				{
+					Vec2 newVelocity = GetMouseDragVelocity() / ( m_dragTime );
+					m_selectedGameObject->m_rigidbody->SetVelocity( newVelocity );
+					m_selectedGameObject->m_rigidbody->ChangeIsSimulationActive( true );
+					m_selectedGameObject->m_isSelected = false;
+					m_rigidBodyMouseOffset = Vec2::ZERO;
+					m_isDragOffsetSet = false;
+					m_isGameObjectSelected = false;
+				}
+				m_selectedGameObject = nullptr;
+				for ( size_t gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
+				{
+					m_isMouseOnGameObject[ gameObjectIndex ] = false;
+				}
+			}
+		}
+
+		if ( g_theInput->WasKeyJustPressed( KEY_BACKSPACE ) || g_theInput->WasKeyJustPressed( KEY_DELETE ) )
+		{
+			if ( m_selectedGameObject )
+			{
+				for ( size_t index = 0; index < m_gameObjects.size(); index++ )
+				{
+					if ( !m_gameObjects[ index ] )
+					{
+						continue;
+					}
+
+					if ( m_gameObjects[ index ] == m_selectedGameObject )
+					{
+						delete m_gameObjects[ index ];
+						m_gameObjects[ index ] = nullptr;
+						m_selectedGameObject = nullptr;
+						m_isGameObjectSelected = false;
+					}
+				}
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateCameraFromUserInput( float deltaSeconds )
+{
 	if ( g_theInput->WasKeyJustPressed( 'O' ) )
 	{
 		m_cameraCurrentPosition = m_cameraDefaultPosition;
@@ -672,6 +776,7 @@ void Game::UpdateFromUserInput( float deltaSeconds )
 	{
 		m_cameraCurrentPosition += ( Vec3( 0.f , m_cameraMoveVelocity.y , 0.f ) * deltaSeconds );
 	}
+
 	if ( g_theInput->GetMouseWheelValue() < 0 )
 	{
 		m_currentCameraOutputSize = m_worldCamera.GetOutputSize() + ( Vec2( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y ) * deltaSeconds );
@@ -685,81 +790,28 @@ void Game::UpdateFromUserInput( float deltaSeconds )
 		m_currentCameraOutputSize.x = Clamp( m_currentCameraOutputSize.x , 200.f , 20000.f );
 		m_currentCameraOutputSize.y = Clamp( m_currentCameraOutputSize.y , 200.f , 20000.f );
 	}
+}
 
-	if ( !m_isDrawModeActive )
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateSelectedGameObjectBouncinessFromUserInput( float deltaSeconds )
+{
+	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown(KEY_SHIFT) && g_theInput->GetMouseWheelValue() < 0 )
 	{
-	if ( g_theInput->WasRightMouseButtonJustPressed() )
-	{
-		m_currentColliderRadius = m_rng.RollRandomFloatInRange( m_minColliderRadius , m_maxColliderRadius );
-		Vec2 spawnPos = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
-		GameObject* temp = new GameObject( g_thePhysicsSystem , spawnPos , Vec2::ZERO , m_currentColliderRadius );
-		m_gameObjects.push_back( temp );
-		m_isMouseOnGameObject.push_back( false );
+		Collider2D* currentObjectCollider = m_selectedGameObject->m_rigidbody->GetCollider();
+		float bounciness = m_selectedGameObject->m_rigidbody->GetCollider()->GetPhysicsMaterial()->GetBounciness();
+		bounciness  += DELTA_BOUNCINESS_CHANGE * deltaSeconds;
+		bounciness = ClampZeroToOne( bounciness );
+		currentObjectCollider->GetPhysicsMaterial()->SetBounciness( bounciness );
 	}
 
-	if ( g_theInput->WasLeftMouseButtonJustPressed() )
+	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->GetMouseWheelValue() > 0 )
 	{
-		if ( !m_isGameObjectSelected )
-			{
-				Vec2 PickObjectPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
-				m_selectedGameObject = PickGameobject( PickObjectPosition );
-				if ( m_selectedGameObject )
-				{
-					m_dragTime = 0.f;
-					m_frameCount = 0;
-					//dragStartPos = PickObjectPosition;
-					//m_simMode = m_selectedGameObject->m_rigidbody->GetSimulationMode();
-					m_MouseDragFrames[ m_frameCount ] = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
-					m_selectedGameObject->m_rigidbody->ChangeIsSimulationActive( false );
-					m_selectedGameObject->m_borderColor = Rgba8( 0 , 127 , 0 , 255 );
-					m_selectedGameObject->m_isSelected = true;
-					m_isGameObjectSelected = true;
-					//m_selectedGameObject->m_rigidbody->SetSimulationMode( SIMULATIONMODE_KINEMATIC );
-				}
-			}
-		else
-			{
-				if ( m_selectedGameObject != nullptr )
-				{
-					//Vec2 dragEndPos = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
-					Vec2 newVelocity = GetMouseDragVelocity() / ( m_dragTime );
-					m_selectedGameObject->m_rigidbody->SetVeloity( newVelocity );
-					m_selectedGameObject->m_rigidbody->ChangeIsSimulationActive( true );
-					//m_selectedGameObject->m_rigidbody->SetSimulationMode( m_simMode );
-					m_selectedGameObject->m_isSelected = false;
-					m_rigidBodyMouseOffset = Vec2::ZERO;
-					m_isDragOffsetSet = false;
-					m_isGameObjectSelected = false;
-				}
-				m_selectedGameObject = nullptr;
-				for ( size_t gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
-				{
-					m_isMouseOnGameObject[ gameObjectIndex ] = false;
-				}
-			}
-	}
-
-	if ( g_theInput->WasKeyJustPressed( KEY_BACKSPACE ) || g_theInput->WasKeyJustPressed( KEY_DELETE ) )
-		{
-			if ( m_selectedGameObject )
-			{
-				for ( size_t index = 0; index < m_gameObjects.size(); index++ )
-				{
-					if ( !m_gameObjects[ index ] )
-					{
-						continue;
-					}
-
-					if ( m_gameObjects[ index ] == m_selectedGameObject )
-					{
-						delete m_gameObjects[ index ];
-						m_gameObjects[ index ] = nullptr;
-						m_selectedGameObject = nullptr;
-						m_isGameObjectSelected = false;
-					}
-				}
-			}
-		}
+		Collider2D* currentObjectCollider = m_selectedGameObject->m_rigidbody->GetCollider();
+		float bounciness = currentObjectCollider->GetPhysicsMaterial()->GetBounciness();
+		bounciness -= DELTA_BOUNCINESS_CHANGE * deltaSeconds;
+		bounciness = ClampZeroToOne( bounciness );
+		currentObjectCollider->GetPhysicsMaterial()->SetBounciness( bounciness );
 	}
 }
 

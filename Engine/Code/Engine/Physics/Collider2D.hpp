@@ -3,6 +3,7 @@
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Physics/Manifold2D.hpp"
+#include "Engine/Physics/PhysicsMaterial.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -35,21 +36,24 @@ public:
 	virtual bool			Contains( Vec2 pos ) const = 0;
 	bool					Intersects( Collider2D const* other ) const;
 	Manifold2D				GenrateManifold( Collider2D const* other );
+	float					GetBounceWith( Collider2D const* other ) const;
 
 	virtual void			DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor ) = 0;
 	virtual Vec2			GetPosition() const = 0;
 
 	COLLIDER2D_TYPE			GetType() const																{ return m_colliderType; }
 	Rigidbody2D*			GetRigidBody() const														{ return m_rigidbody; }
+	PhysicsMaterial*		GetPhysicsMaterial() const													{ return m_physicsMaterial; }
 
 protected:
 	virtual ~Collider2D(); // private - make sure this is virtual so correct deconstructor gets called
 
 public:
-	COLLIDER2D_TYPE		m_colliderType;				// keep track of the type - will help with collision later
-	Physics2D*			m_system;                   // system who created or destr
-	Rigidbody2D*		m_rigidbody = nullptr;		// owning rigidbody, used for calculating world shape
-	bool				m_isGarbage = false;
+	COLLIDER2D_TYPE		m_colliderType;							// keep track of the type - will help with collision later
+	Physics2D*			m_system;								// system who created or destr
+	Rigidbody2D*		m_rigidbody			= nullptr;			// owning rigidbody, used for calculating world shape
+	bool				m_isGarbage			= false;
+	PhysicsMaterial*	m_physicsMaterial;
 
 private:
 	bool				m_isColliding = false;

@@ -33,17 +33,17 @@ public:
 
 	void SetSimulationModeBasedOnCollider( Collider2D* collider );
 
-	Collider2D* GetCollider() const { return m_collider; }
+	Collider2D*		GetCollider() const								{ return m_collider; }
 	Vec2			GetPosition() const								{ return m_worldPosition; }
 	Vec2			GetVelocity() const								{ return m_velocity; }
 	eSimulationMode GetSimulationMode() const						{ return m_simulationMode; }
 	float			GetMass() const									{ return m_mass; }
 	bool			IsSimulationActive() const						{ return m_isSimulationActive; }
-
+	void			ApplyImpulse( Vec2 impulse , Vec2 point );
 	void			SetCollider( Collider2D* collider );
 	void			SetPosition( Vec2 position );
-	void			SetVeloity( Vec2 velocity );
-	void			ReverseVelocity();
+	void			SetVelocity( Vec2 velocity );
+	void			ReverseVelocityY();
 	void			SetSimulationMode( eSimulationMode simulationMode );
 	void			SetMass( float newMass );
 	void			ChangeIsSimulationActive( bool newSimulationStatus );

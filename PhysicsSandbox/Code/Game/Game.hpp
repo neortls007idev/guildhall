@@ -42,6 +42,7 @@ public:
 	void ResetCollisions();
 	void AreObjectsColliding();
 	void ChangeColorOnCollision();
+	void ChangeAlphaByBounciness();
 
 	void UpdateSimulationType( eSimulationMode* simMode );
 	void UpdateGravity();
@@ -56,6 +57,9 @@ public:
 private:
 
 	void UpdateFromUserInput( float deltaSeconds );
+	void SelectGameObjectFormUserInput();
+	void UpdateCameraFromUserInput( float deltaSeconds );
+	void UpdateSelectedGameObjectBouncinessFromUserInput( float deltaSeconds );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -76,8 +80,8 @@ public:
 		   Camera					m_worldCamera;
 		   Camera					m_UICamera;
 
-		   Rgba8					m_fillColor					= Rgba8( 255 , 255 , 255 , 127 );
-		   Rgba8					m_overlapColor				= Rgba8( 255 , 0 , 0 , 127 );
+		   Rgba8					m_fillColor					= Rgba8( 255 , 255 , 255 , 0 );
+		   Rgba8					m_overlapColor				= Rgba8( 255 , 0 , 0 , 255 );
 		   Rgba8					m_selectedObjectColor		= Rgba8( 0 , 110 , 0 , 255 );
 
 		   Vec2						m_mousePosition				= Vec2::ZERO;
