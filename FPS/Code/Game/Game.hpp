@@ -19,6 +19,8 @@ public:
 	Game();
 	~Game();
 	void Update( float deltaSeconds );
+
+
 	void Render() const;
 	void UpdateCamera();
 	void RenderUI() const;
@@ -32,8 +34,8 @@ public:
 
 private:
 
-	void UpdateFromKeyBoard();
-
+	void UpdateFromKeyBoard( float deltaSeconds );
+	void CameraPositionUpdateOnInput( float deltaSeconds );
 
 private:
 
@@ -50,6 +52,6 @@ public:
 	Camera		m_uiCamera;
 
 	Rgba8		m_color;
-	Vec3		m_cameraPosition;
+	Vec3		m_cameraPosition = Vec3::ZERO;
 	Shader* 	m_invertColorShader;
 };

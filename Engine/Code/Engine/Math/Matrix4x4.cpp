@@ -849,3 +849,23 @@ Mat44 Mat44::GetInverse()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+Mat44 Mat44::CreateFromScaleRotationTransformation( const Vec3& scale , const Vec3& eulerRotation , const Vec3& position )
+{
+	Mat44 transform;
+	Mat44 scaleMatrix	= CreateNonUniformScale3D( scale );
+	Mat44 tranformPitch = CreateXRotationDegrees( eulerRotation.x );
+	Mat44 tranformYaw	= CreateZRotationDegrees( eulerRotation.z );
+	Mat44 tranformRoll	= CreateYRotationDegrees( eulerRotation.y );
+	Mat44 translateBy = CreateTranslation3D( position );
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	transform.TransformBy( scaleMatrix );
+	transform.TransformBy( tranformPitch );
+	transform.TransformBy( tranformYaw );
+	transform.TransformBy( tranformRoll );
+	transform.TransformBy( translateBy );
+
+	return transform;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

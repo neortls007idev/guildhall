@@ -15,7 +15,7 @@ public:
 	void	SetPosition( float xPosition , float yPosition , float zPosition );
 	void	SetPosition( Vec3 pos );
 	void	SetTransform( const Mat44 transform );
-	Mat44	ToMatrix() const;
+	Mat44	GetAsMatrix() const;
 
 	inline Vec3	GetScale() const															{ return m_scale; }
 	inline Vec3	GetRotation() const															{ return m_rotationDegrees; }

@@ -35,7 +35,7 @@ const Mat44 CreateOrthoGraphicProjeciton( const Vec3& min , const Vec3& max )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-const Mat44 MakePerpsectiveProjectionMatrixD3D( float fovDegrees , float aspectRatio , float nearZ , float farZ )
+const Mat44 CreatePerpsectiveProjectionMatrixD3D( float fovDegrees , float aspectRatio , float nearZ , float farZ )
 {
 	float height = 1.0f / tanf( fovDegrees * .5f ); // how far away are we for the perspective point to be "one up" from our forward line.
 	float zrange = farZ - nearZ;

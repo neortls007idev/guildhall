@@ -37,21 +37,24 @@ public:
 
 	void  SetPostion( const Vec3& position );
 	void  Translate( const Vec3& translation );
+	void  SetPitchRollYawRotation( float pitch , float roll , float yaw );
+
 	void  SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
 	Vec3  GetOrthoMin() const;
 	Vec3  GetOrthoMax() const;
 	void  Translate2D( const Vec2 cameraTranslate );
 	void  SetClearMode( eCameraClearBitFlag clearFlags , Rgba8 color , float depth = 0.f , unsigned int stencil = 0 );
 	void  SetProjectionOrthographic( float x , float y , float z );
-	void  SetProjectionPerspective( float fov , float nearZ , float farZ );
+	void  SetProjectionPerspective( float fov , float aspectRatio , float nearZ , float farZ );
 	Rgba8 GetClearColor() const																						{ return m_clearColor; }
 	unsigned int  GetClearMode() const																				{ return m_clearMode; }
 
 	void			SetColorTarget( Texture* texture );
+	void			SetDepthStencilTarget( Texture* texture );
 	RenderBuffer*	UpdateUBO( RenderContext* ctx );
 	Texture*		GetColorTarget() const																			{ return m_colorTarget; }
-	Mat44			GetViewMatrix() const																			{ return m_view; };
-	Mat44			GetProjectionMatrix() const																		{ return m_projection; };
+	Mat44			GetViewMatrix();
+	Mat44			GetProjectionMatrix() const																		{ return m_projection; }
 
 
 public:

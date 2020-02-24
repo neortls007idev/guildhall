@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Engine/Renderer/IndexBuffer.hpp"
 #include "Engine/Renderer/VertexBuffer.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -8,8 +9,7 @@ class Mesh // A04
 {
 public:
 	void UpdateVertices( uint vcount , void const* vertexData , uint vertexStride , buffer_attribute_t const* layout );
-	void UpdateInidces( uint icount , uint const* indices );
-
+	void UpdateIndices( uint icount , uint const* indices );
 
 	// helper template
 	template <typename VERTEX_TYPE>
@@ -20,7 +20,7 @@ public:
 
 public:
 	VertexBuffer* m_vertices;
-	//IndexBuffer* m_indices;
+	IndexBuffer* m_indices;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

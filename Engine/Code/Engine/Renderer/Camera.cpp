@@ -34,6 +34,13 @@ void Camera::Translate( const Vec3& translation )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Camera::SetPitchRollYawRotation( float pitch , float roll , float yaw )
+{
+	m_transform.SetRotation( pitch , yaw , roll );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Camera::SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight )
 {
 	m_projection	= CreateOrthoGraphicProjeciton( Vec3( bottomLeft, 0.0f ) , Vec3( topRight , 1.0f ) );
@@ -91,14 +98,16 @@ void Camera::SetClearMode( eCameraClearBitFlag clearFlags , Rgba8 color , float 
 
 void Camera::SetProjectionOrthographic( float x , float y , float z )
 {
-
+	UNUSED( x );
+	UNUSED( y );
+	UNUSED( z );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Camera::SetProjectionPerspective( float fov , float nearZ , float farZ )
+void Camera::SetProjectionPerspective( float fov , float aspectRatio , float nearZ , float farZ )
 {
-
+	m_projection = CreatePerpsectiveProjectionMatrixD3D( fov , aspectRatio , nearZ , farZ );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -106,6 +115,13 @@ void Camera::SetProjectionPerspective( float fov , float nearZ , float farZ )
 void Camera::SetColorTarget( Texture* texture )
 {
 	m_colorTarget = texture;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Camera::SetDepthStencilTarget( Texture* texture )
+{
+	m_depthStencilTarget = texture;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -122,16 +138,29 @@ RenderBuffer* Camera::UpdateUBO( RenderContext* ctx )
 	CameraDataT cameraData;
 
 	cameraData.cameraToClipTransform = m_projection;
-	Mat44 CameraModel = Mat44::CreateTranslation3D( m_transform.GetPostion() );
+	Mat44 CameraModel = m_transform.GetAsMatrix();
 	// CameraToWorld Space Transform
 	// View -> worldToCamera
 	// Mat44 View  = Invert(cameraModel);
 
-	cameraData.view = Mat44::CreateTranslation3D( -m_transform.GetPostion() );
+	cameraData.view = GetViewMatrix()/*Mat44::CreateTranslation3D( -m_transform.GetPostion() )*/;
 
 	m_cameraUBO->Update( &cameraData , sizeof( cameraData ) , sizeof( cameraData ) );
 
 	return m_cameraUBO;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Mat44 Camera::GetViewMatrix()
+{
+	Vec3 m_position;
+	Vec3 m_eulerRotation;
+
+	Mat44 cameraModel = m_transform.GetAsMatrix();/*Mat44::CreateFromScaleRotationTransformation( Vec3( 1.f ) , m_transform.GetRotation() , m_transform.GetPostion() );*/
+
+	m_view = MatrixInvertOrthoNormal( cameraModel );
+	return m_view;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -15,18 +15,18 @@ only cover 85 of the total 100 points.  Make a note of all extras you attempt in
 and remember you can submit extras from previous assignments.
 
 - [x] `Camera::SetProjectionPerspective( float fovDegrees, float nearZClip, float farZClip )` implemented
-    - [ ] Set projection to `60 degrees`, and `-0.1` to `-100.0` for the clip planes.
-- [ ] Camera now has a `Transform`
-    - [ ] Create the `Transform` class
-    - [ ] `Transform::SetPosition` implemented
-    - [ ] `Transform::Translate` implemented
-    - [ ] `Transform::SetRotationFromPitchRollYawDegrees`
+    - [x] Set projection to `60 degrees`, and `-0.1` to `-100.0` for the clip planes.
+- [x] Camera now has a `Transform`
+    - [x] Create the `Transform` class
+    - [x] `Transform::SetPosition` implemented
+    - [x] `Transform::Translate` implemented
+    - [x] `Transform::SetRotationFromPitchRollYawDegrees`
         - [ ] When storing degrees, make sure they are stored in sane ranges...
             - [ ] Roll & Yaw is `-180` to `180`
             - [ ] Pitch is `-90` to `90`
-- [ ] Camera now calculates `view` matrix from their transform.
-    - [ ] `Transform::GetAsMatrix` implemented to calculate the camera's model matrix
-    - [ ] `MatrixInvertOrthoNormal` implemented to invert the camera's model into a view matrix
+- [x] Camera now calculates `view` matrix from their transform.
+    - [x] `Transform::GetAsMatrix` implemented to calculate the camera's model matrix
+    - [x] `MatrixInvertOrthoNormal` implemented to invert the camera's model into a view matrix
         - [x] `MatrixIsOrthoNormal` check added
         - [x] `MatrixTranspose` added
 - [ ] Draw a Quad at `(0, 0, -10)`, or 10 units in front of the origin (should be visible when you start)
