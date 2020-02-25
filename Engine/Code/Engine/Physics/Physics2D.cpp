@@ -156,157 +156,89 @@ void Physics2D::DetectCollisions()
 
 void Physics2D::ResolveCollision( Collision2D collision )
 {
-	ResolveDiscVsDiscCollisions( collision );
-	ResolveDiscVsPolygonCollisions(collision);
-	ResolvePolygonVsDiscCollisions(collision);
-}
+	float myMass = collision.m_me->GetRigidBody()->GetMass();
+	float theirMass = collision.m_them->GetRigidBody()->GetMass();
+	float pushMe = theirMass / ( myMass + theirMass );
+	float pushThem = 1.0f - pushMe;
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
+	float impulse = ( myMass * theirMass ) / ( myMass + theirMass ) * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) *
+		DotProduct2D( ( collision.m_them->GetRigidBody()->GetVelocity() - collision.m_me->GetRigidBody()->GetVelocity() ) , collision.m_collisionManifold.m_normal );
 
-void Physics2D::ResolveDiscVsDiscCollisions( Collision2D& collision )
-{
-	if ( collision.m_me->GetType() == COLLIDER2D_DISC && collision.m_them->GetType() == COLLIDER2D_DISC )
+	impulse = ( impulse < 0 ) ? 0 : impulse;
+
+	if ( collision.m_me->GetRigidBody()->m_collider->GetType() == COLLIDER2D_CONVEXGON )
 	{
-		Rigidbody2D* meRigidBody = collision.m_me->GetRigidBody();
-		Rigidbody2D* themRigidBody = collision.m_them->GetRigidBody();
+		collision.m_collisionManifold.m_normal *= -1;
+	}
 
-		float myMass = meRigidBody->GetMass();
-		float theirMass = themRigidBody->GetMass();
-		float pushMe = theirMass / ( myMass + theirMass );
-		float pushThem = 1.0f - pushMe;
+	// 8 ways to move the object;
 
-		float meImpulseAlongNormal = ( ( myMass * theirMass ) / ( myMass + theirMass ) ) * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) )
-												* DotProduct2D( ( themRigidBody->GetVelocity() - meRigidBody->GetVelocity() ) ,
-											collision.m_collisionManifold.m_normal );
+	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
+	{
+		collision.m_me->GetRigidBody()->Move( pushMe * collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * 0.5f );
+		collision.m_them->GetRigidBody()->Move( -pushThem * collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * 0.5f );
+	}
 
-		float themImpulseAlongNormal = ( ( myMass * theirMass ) / ( myMass + theirMass ) ) * ( 1 + collision.m_them->GetBounceWith( collision.m_me ) )
-												* DotProduct2D( ( themRigidBody->GetVelocity() - meRigidBody->GetVelocity() ) ,
-											collision.m_collisionManifold.m_normal );
+	if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC )
+	{
+		collision.m_me->GetRigidBody()->Move( pushMe * collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap );
+	}
 
-		if ( meRigidBody && themRigidBody &&
-			meRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC &&
-			themRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC )
+	if ( collision.CheckCollisionType() == STATIC_VS_KINEMATIC || collision.CheckCollisionType() == STATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC )
+	{
+		collision.m_them->GetRigidBody()->Move( -pushThem * collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap );
+	}
+
+	// 6 ways to apply impulse
+
+	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC   || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
+		 collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
+	{
+		collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
+		collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
+		return;
+	}
+
+	impulse = ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) *
+		DotProduct2D( ( collision.m_them->GetRigidBody()->GetVelocity() - collision.m_me->GetRigidBody()->GetVelocity() ) , collision.m_collisionManifold.m_normal );
+
+	impulse = ( impulse < 0 ) ? 0 : impulse;
+
+	if ( collision.CheckCollisionType() == STATIC_VS_KINEMATIC || collision.CheckCollisionType() == STATIC_VS_DYNAMIC )
+	{
+		if ( collision.m_me->GetType() == COLLIDER2D_CONVEXGON || collision.m_them->GetType() == COLLIDER2D_CONVEXGON )
 		{
-			meRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * pushMe );
-			themRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * -pushThem );
-
-			meRigidBody->ApplyImpulse( meImpulseAlongNormal * collision.m_collisionManifold.m_normal , collision.m_collisionManifold.m_contactPoint );
-			themRigidBody->ApplyImpulse( -themImpulseAlongNormal * collision.m_collisionManifold.m_normal , collision.m_collisionManifold.m_contactPoint );
+			if ( collision.m_me->GetType() == COLLIDER2D_CONVEXGON )
+			{
+				collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
+			}
+			else
+			{
+				collision.m_them->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
+			}
 		}
-		else if ( meRigidBody && themRigidBody &&
-			meRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC &&
-			themRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC )
+		else
 		{
-			meRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * pushMe );
-
-			meRigidBody->ApplyImpulse( meImpulseAlongNormal * collision.m_collisionManifold.m_normal , collision.m_collisionManifold.m_contactPoint );
-		}
-		else if ( meRigidBody && themRigidBody &&
-			meRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC &&
-			themRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC )
-		{
-			themRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * -pushThem );
-
-			themRigidBody->ApplyImpulse( -themImpulseAlongNormal * collision.m_collisionManifold.m_normal , collision.m_collisionManifold.m_contactPoint );
+			collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
 		}
 	}
-}
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Physics2D::ResolvePolygonVsDiscCollisions(Collision2D& collision)
-{
-	if ( collision.m_me->GetType() == COLLIDER2D_CONVEXGON && collision.m_them->GetType() == COLLIDER2D_DISC )
+	if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_STATIC )
 	{
-		Rigidbody2D* meRigidBody = collision.m_me->GetRigidBody();
-		Rigidbody2D* themRigidBody = collision.m_them->GetRigidBody();
-
-		float myMass = meRigidBody->GetMass();
-		float theirMass = themRigidBody->GetMass();
-		float pushMe = theirMass / ( myMass + theirMass );
-		float pushThem = 1.0f - pushMe;
-
-		float meImpulseAlongNormal = ( ( myMass * theirMass ) / ( myMass + theirMass ) ) * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) )
-												* DotProduct2D( ( themRigidBody->GetVelocity() - meRigidBody->GetVelocity() ) ,
-											collision.m_collisionManifold.m_normal );
-
-		float themImpulseAlongNormal = ( ( myMass * theirMass ) / ( myMass + theirMass ) ) * ( 1 + collision.m_them->GetBounceWith( collision.m_me ) )
-												  * DotProduct2D( ( themRigidBody->GetVelocity() - meRigidBody->GetVelocity() ) ,
-											  collision.m_collisionManifold.m_normal );
-
-		if ( meRigidBody && themRigidBody &&
-			meRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC &&
-			themRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC )
+		if ( collision.m_me->GetType() == COLLIDER2D_CONVEXGON || collision.m_them->GetType() == COLLIDER2D_CONVEXGON )
 		{
-			meRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * pushMe );
-			themRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * -pushThem );
-
-			meRigidBody->ApplyImpulse( meImpulseAlongNormal * collision.m_collisionManifold.m_normal , collision.m_collisionManifold.m_contactPoint );
-			themRigidBody->ApplyImpulse( -themImpulseAlongNormal * collision.m_collisionManifold.m_normal , collision.m_collisionManifold.m_contactPoint );
+			if ( collision.m_them->GetType() == COLLIDER2D_CONVEXGON )
+			{
+				collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
+			}
+			else
+			{
+				collision.m_me->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
+			}
 		}
-		else if ( meRigidBody && themRigidBody &&
-			meRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC &&
-			themRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC )
+		else
 		{
-			meRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * pushMe );
-
-			meRigidBody->ApplyImpulse( meImpulseAlongNormal * collision.m_collisionManifold.m_normal , collision.m_collisionManifold.m_contactPoint );
-		}
-		else if ( meRigidBody && themRigidBody &&
-			meRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC &&
-			themRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC )
-		{
-			themRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * -pushThem );
-
-			themRigidBody->ApplyImpulse( -themImpulseAlongNormal * collision.m_collisionManifold.m_normal , collision.m_collisionManifold.m_contactPoint );
-		}
-	}
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Physics2D::ResolveDiscVsPolygonCollisions( Collision2D& collision )
-{
-	if ( collision.m_me->GetType() == COLLIDER2D_DISC && collision.m_them->GetType() == COLLIDER2D_CONVEXGON )
-	{
-		Rigidbody2D* meRigidBody = collision.m_me->GetRigidBody();
-		Rigidbody2D* themRigidBody = collision.m_them->GetRigidBody();
-
-		float myMass = meRigidBody->GetMass();
-		float theirMass = themRigidBody->GetMass();
-		float pushMe = theirMass / ( myMass + theirMass );
-		float pushThem = 1.0f - pushMe;
-
-		float meImpulseAlongNormal = ( ( myMass * theirMass ) / ( myMass + theirMass ) ) * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) )
-			* DotProduct2D( ( themRigidBody->GetVelocity() - meRigidBody->GetVelocity() ) , collision.m_collisionManifold.m_normal );
-		float themImpulseAlongNormal = ( ( myMass * theirMass ) / ( myMass + theirMass ) ) * ( 1 + collision.m_them->GetBounceWith( collision.m_me ) )
-			* DotProduct2D( ( themRigidBody->GetVelocity() - meRigidBody->GetVelocity() ) , collision.m_collisionManifold.m_normal );
-
-		if ( meRigidBody && themRigidBody &&
-			meRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC &&
-			themRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC )
-		{
-			meRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * pushMe );
-			themRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * -pushThem );
-
-			meRigidBody->ApplyImpulse( meImpulseAlongNormal * collision.m_collisionManifold.m_normal , collision.m_collisionManifold.m_contactPoint );
-			themRigidBody->ApplyImpulse( -themImpulseAlongNormal * collision.m_collisionManifold.m_normal , collision.m_collisionManifold.m_contactPoint );
-		}
-		else if ( meRigidBody && themRigidBody &&
-			meRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC &&
-			themRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC )
-		{
-			meRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * pushMe );
-
-			meRigidBody->ApplyImpulse( meImpulseAlongNormal * collision.m_collisionManifold.m_normal , collision.m_collisionManifold.m_contactPoint );
-		}
-		else if ( meRigidBody && themRigidBody &&
-			meRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC &&
-			themRigidBody->GetSimulationMode() != SIMULATIONMODE_STATIC )
-		{
-			themRigidBody->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * -pushThem );
-
-			themRigidBody->ApplyImpulse( -themImpulseAlongNormal * collision.m_collisionManifold.m_normal , collision.m_collisionManifold.m_contactPoint );
+			collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
 		}
 	}
 }

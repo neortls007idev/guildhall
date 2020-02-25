@@ -101,7 +101,7 @@ Manifold2D DiscVPolygonCollisionFold( Collider2D const* me , Collider2D const* t
 	{
 		Vec2 closetPoint = polyColliderThem->GetClosestPoint( discColliderMe->GetPosition() );
 
-		collision.m_normal  = ( closetPoint - discColliderMe->GetPosition() ).GetNormalized();
+		collision.m_normal = ( discColliderMe->GetPosition() - closetPoint ).GetNormalized();
 		collision.m_overlap = discColliderMe->GetRadius() - ( discColliderMe->GetPosition() - closetPoint ).GetLength();
 
 		if ( polyColliderThem->Contains( discColliderMe->GetPosition() ) )

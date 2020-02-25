@@ -39,7 +39,7 @@ public:
 	eSimulationMode GetSimulationMode() const						{ return m_simulationMode; }
 	float			GetMass() const									{ return m_mass; }
 	bool			IsSimulationActive() const						{ return m_isSimulationActive; }
-	void			ApplyImpulse( Vec2 impulse , Vec2 point );
+	void			ApplyImpulse( Vec2 impulse , Vec2 point = Vec2::ZERO );
 	void			SetCollider( Collider2D* collider );
 	void			SetPosition( Vec2 position );
 	void			SetVelocity( Vec2 velocity );
