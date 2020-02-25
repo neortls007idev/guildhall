@@ -137,6 +137,11 @@ void Physics2D::DetectCollisions()
 				}
 			}
 
+			if ( !firstRigidBody->m_isSimulationActive || !secondRigidBody->m_isSimulationActive )
+			{
+				continue;
+			}
+
 			if ( m_colliders2D[ firstColliderIndex ]->Intersects( m_colliders2D[ secondColliderIndex ] ) )
 			{
 				m_colliders2D[ firstColliderIndex ]->m_isColliding	= true;
