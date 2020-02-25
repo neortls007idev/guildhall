@@ -16,6 +16,9 @@ public:
 	VertexBuffer* GetVertexBuffer() const																		{ return m_vertices; }
 	IndexBuffer*  GetIndexBuffer() const																		{ return m_indices; }
 
+	void AddVertices( uint vcount , void const* verts );
+	void AddIndices( uint icount , uint const* indices );
+
 	// helper template
 	template <typename VERTEX_TYPE>
 	void UpdateVertices( uint vcount , VERTEX_TYPE const* vertices )
