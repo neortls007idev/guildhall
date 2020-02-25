@@ -1,6 +1,7 @@
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Primitives/AABB2.hpp"
 #include "Engine/Renderer/Camera.hpp"
+#include "Engine/Math/Transform.hpp"
 #include "Game/GameCommon.hpp"
 #pragma once
 
@@ -8,6 +9,7 @@
 
 class Shader;
 class Texture;
+class GPUMesh;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -46,6 +48,8 @@ public:
 
 	AABB2		m_normalImage;
 	AABB2		m_invertedColorImage;
+	GPUMesh*	m_meshCube;
+	Transform	m_cubeTransform;
 	Texture*	m_imageTex				= nullptr;
 
 	Camera		m_gameCamera;

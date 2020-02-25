@@ -52,6 +52,10 @@ cbuffer camera_constants : register( b1 ) // index 1 is now camera
 	float4x4 VIEW;
 }
 
+cbuffer model_constants : register( b2 ) // index 2 is now model
+{
+	float4x4 MODEL;
+}
 // Texture & Samplers are also a form of constants
 
 Texture2D <float4> tDiffuse : register( t0 );			// Color of surface

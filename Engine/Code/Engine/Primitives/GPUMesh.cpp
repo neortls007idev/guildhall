@@ -2,14 +2,14 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Mesh::UpdateVertices( uint vcount , void const* vertexData , uint vertexStride , buffer_attribute_t const* layout )
+void GPUMesh::UpdateVertices( uint vcount , void const* vertexData , uint vertexStride , buffer_attribute_t const* layout )
 {
 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Mesh::UpdateIndices( uint icount , uint const* indices )
+void GPUMesh::UpdateIndices( uint icount , uint const* indices )
 {
 
 }

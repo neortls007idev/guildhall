@@ -49,6 +49,14 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 		return 0; // "Consumes" this message (tells Windows "okay, we handled it")
 	}
 
+	case WM_ACTIVATE:
+					g_theInput->HideSystemCursor();
+					g_theInput->ClipSystemCursor( MOUSE_IS_WINDOWLOCKED );
+					break;
+	case WA_INACTIVE:
+					g_theInput->ClipSystemCursor( MOUSE_IS_UNLOCKED );
+					g_theInput->ShowSystemCursor();
+					break;
 	case WM_CHAR:
 	{
 		char character = ( char ) wParam;

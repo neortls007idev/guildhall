@@ -5,13 +5,16 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-class Mesh // A04
+class GPUMesh // A04
 {
 public:
 	void UpdateVertices( uint vcount , void const* vertexData , uint vertexStride , buffer_attribute_t const* layout );
 	void UpdateIndices( uint icount , uint const* indices );
 
 	int GetIndexCount() const;
+	int GetVertexCount() const;
+	VertexBuffer* GetVertexBuffer() const																		{ return m_vertices; }
+	IndexBuffer*  GetIndexBuffer() const																		{ return m_indices; }
 
 	// helper template
 	template <typename VERTEX_TYPE>
@@ -26,8 +29,3 @@ public:
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-
-/* std::vector<Vertex_PCU> vertices;
-FillVertices( vertices );
-mesgh->UpdateVertices( vertices.size() , &vertices[ 0 ] );
-*/

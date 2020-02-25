@@ -1,3 +1,4 @@
+
 MP2 And SD2 Checklist
 ------
 
@@ -21,28 +22,28 @@ and remember you can submit extras from previous assignments.
     - [x] `Transform::SetPosition` implemented
     - [x] `Transform::Translate` implemented
     - [x] `Transform::SetRotationFromPitchRollYawDegrees`
-        - [ ] When storing degrees, make sure they are stored in sane ranges...
-            - [ ] Roll & Yaw is `-180` to `180`
-            - [ ] Pitch is `-90` to `90`
+        - [x] When storing degrees, make sure they are stored in sane ranges...
+            - [x] Roll & Yaw is `-180` to `180`
+            - [x] Pitch is `-90` to `90`
 - [x] Camera now calculates `view` matrix from their transform.
     - [x] `Transform::GetAsMatrix` implemented to calculate the camera's model matrix
     - [x] `MatrixInvertOrthoNormal` implemented to invert the camera's model into a view matrix
         - [x] `MatrixIsOrthoNormal` check added
         - [x] `MatrixTranspose` added
-- [ ] Draw a Quad at `(0, 0, -10)`, or 10 units in front of the origin (should be visible when you start)
-- [ ] Allow player to move the camera by change the camera transform position
-   - [ ] `W` & `S`: Forward & Back (movement is relative to where you're looking)
-   - [ ] `A` & `D`: Left and Right (movement is relative to where you're looking)
-   - [ ] `Space` & `C`: Up and Down Movement (movement is absolute (world up and world down)
-   - [ ] `Left-Shift`: Move faster while held.
+- [x] Draw a Quad at `(0, 0, -10)`, or 10 units in front of the origin (should be visible when you start)
+- [x] Allow player to move the camera by change the camera transform position
+   - [x] `W` & `S`: Forward & Back (movement is relative to where you're looking)
+   - [x] `A` & `D`: Left and Right (movement is relative to where you're looking)
+   - [x] `Q` & `E`: Up and Down Movement (movement is absolute (world up and world down)
+   - [x] `Left-Shift`: Move faster while held.
    - *Note:  If you want different controls, just make a note in your readme*
 - [ ] Allow player to turn the camera using the mouse.
-    - [ ] `InputSystem::HideSystemCursor` implemented
-    - [ ] `InputSystem::ClipSystemCursor` implemented
+    - [x] `InputSystem::HideSystemCursor` implemented
+    - [x] `InputSystem::ClipSystemCursor` implemented
     - [ ] `InputSystem::SetCursorMode` implemented
-        - [ ] `ABSOLUTE` mode is what you currently have
-        - [ ] `RELATIVE` move implemented
-            - [ ] Move mouse to the center of the screen, and store off the cursor position
+        - [x] `ABSOLUTE` mode is what you currently have
+        - [x] `RELATIVE` move implemented
+            - [x] Move mouse to the center of the screen, and store off the cursor position
                 - *Note:  Be sure to actually make the system call, not just assume where you moved it is where it went.  This can cause drifting.*
             - [ ] Each frame, get the cursor position, and calculate frame delta.
             - [ ] ...after which, reset to center of screen and reget the current position.
@@ -52,10 +53,10 @@ and remember you can submit extras from previous assignments.
     - [ ] Associate `Y` movement with `pitch`
         - [ ] Do not allow pitch above `85` degrees or below `95` degrees - no going upside down... yet...
         - *Note:  Up to you if you want inverted-y or not.*
-- [ ] Support `RenderContext::SetModelMatrix`
-    - [ ] Create a new uniform buffer for storing a model matrix (slot 2)
-    - [ ] `SetModelMatrix` should update this uniform buffer
-    - [ ] `BeginCamera` should `SetModelMatrix` to the `IDENTITY`, and be sure to bind the buffer.
+- [x] Support `RenderContext::SetModelMatrix`
+    - [x] Create a new uniform buffer for storing a model matrix (slot 2)
+    - [x] `SetModelMatrix` should update this uniform buffer
+    - [x] `BeginCamera` should `SetModelMatrix` to the `IDENTITY`, and be sure to bind the buffer.
 - [ ] Be able to draw a cube mesh at `(1, 0.5, -12.0)`
     - [x] Create a `GPUMesh` class
         - [ ] Implement `IndexBuffer`
@@ -65,8 +66,8 @@ and remember you can submit extras from previous assignments.
         - [ ] Add `RenderContext::DrawMesh`
             - This should bind the vertex buffer, index buffer, and then `DrawIndexed`
     - [ ] Game creates a `cube mesh` around the origin with 2 unit sides.
-    - [ ] Game has a `Transform` for the cube set at `(1, 0.5, -12.0f)`,
-    - [ ] Cube transform sets `yaw` rotation to current time each frame
+    - [x] Game has a `Transform` for the cube set at `(1, 0.5, -12.0f)`,
+    - [x] Cube transform sets `yaw` rotation to current time each frame
     - [ ] Game should `SetModelMatrix` to the cube transform matrix
 - [ ] Support a depth buffer
     - [ ] `Texture::CreateDepthStencilBuffer` added
@@ -80,17 +81,3 @@ and remember you can submit extras from previous assignments.
 ------
 
 ## Extras
-
-- [x] *X01.00 : 05pts*:  Borderless Window Support *Press `Shift + B` Key*
-- [x] *X01.01 : 05pts*:  Fullscreen Support.  See notes, the default D3D11 support for this will not count. *Press `Shift + F` Key*
-- [x] *X01.13 : 02pts*:  Allow change of window icon at runtime *Press `I` Key*
-- [x] *X01.14 : 02pts*:  Show window loading progress in task bar.
-    - Key binds for testing Taskbar progress  
-      - *`Shift + T`* = reset the progress
-      - *`Shift + P`* = Pause the progress
-      - *`Shift + R`* = Resume/normal progress
-      - *`Shift + E`* = Error progress mode
-      - *`Shift + O`* = No progress/Progress Complete
-      - *`Shift + I`* = Indeterminant state  
-- [x] *X03.01 : 03pts*: Built-in error shader to use when a shader fails to compile.
-- [x] *X02.10 : 02pts*:  Shader Reloading. `On key press R`, reload all shaders in your shader database

@@ -9,10 +9,12 @@
  #include <vector>
  #include <map>
  #include <string>
+//#include "Engine/Renderer/IndexBuffer.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+class GPUMesh;
 class BitmapFont;
 class Window;
 class SwapChain;
@@ -44,6 +46,7 @@ enum eBufferSlot
 {
 	UBO_FRAME_SLOT	= 0,
 	UBO_CAMERA_SLOT = 1,
+	UBO_MODEL_SLOT	= 2,
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -58,19 +61,27 @@ struct FrameDataT
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+struct ModelDataT
+{
+	Mat44 model;
+};
+
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 class RenderContext
 {
 
-public:	
+public:
 	RenderContext() {};
 	~RenderContext();
-	
+
 	void Startup( Window* window );
 	void BeginFrame();
 	void UpdateFrameTime( float deltaSeconds );
 	void EndFrame();
 	void Shutdown();
-		
+
 	void ClearScreen( const Rgba8& clearColor );
 	void BeginCamera( const Camera& camera );
 	void EndCamera( const Camera& camera);
@@ -96,11 +107,14 @@ public:
 	void Draw( int numVertexes , int vertexOffset = 0 );
 	void DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes );
 	void DrawVertexArray( const std::vector<Vertex_PCU>& vertexArray );
+	//void DrawIndexed( const IndexBuffer indexBuffer );
+	void DrawIndexedArray();
+	void DrawMesh( const GPUMesh* mesh );
 
 	void DrawLine(const Vec2& start, const Vec2& end, const Rgba8& color, float thickness);
 	void DrawRing(const Vec2& center, float radius, const Rgba8& color, float thickness);
 	void DrawAABB2( const AABB2& box, const Rgba8& tint);
-	void DrawDisc( const Disc2D& disc, const Rgba8& tint); 
+	void DrawDisc( const Disc2D& disc, const Rgba8& tint);
 	void DrawOBB2( const OBB2& box , const Rgba8& tint );
 	void DrawCapsule2D( const Vec2& capsuleMidStart , const Vec2& capsuleMidEnd , const float capsuleRadius, const Rgba8& tint );
  	void DrawDiscFraction(const Disc2D& disc, const float drawFraction, const Rgba8& tint, const float orientationDegrees );
@@ -114,6 +128,7 @@ public:
 	bool		HasAnyShaderChangedAtPath( const wchar_t* relativePath );
 	void		BindVertexInput( VertexBuffer* vbo );
 	void		BindUniformBuffer( unsigned int slot , RenderBuffer* ubo ); // ubo - uniform buffer object
+	void		SetModelMatrix( Mat44 modelmat );
 	void		BindSampler( const Sampler* sampler );
 	Texture*	CreateTextureFromColor( Rgba8 color );
 	Texture*	CreateFromImage( Image* image );
@@ -140,12 +155,14 @@ public:
 	Shader*				 m_defaultShader						= nullptr;
 	Shader*				 m_currentShader						= nullptr;
 	VertexBuffer*		 m_immediateVBO							= nullptr;
+	GPUMesh*			 m_immediateMesh						= nullptr;
 	ID3D11Buffer*		 m_lastBoundVBO							= nullptr;
 	Texture*			 m_textureTarget						= nullptr;
 
 	ID3D11BlendState*	 m_blendStates[BlendMode::TOTAL];
 
 	RenderBuffer*		 m_frameUBO								= nullptr;
+	RenderBuffer*		 m_modelMatrixUBO						= nullptr;
 	Sampler*			 m_defaultSampler						= nullptr;
 	Texture*			 m_textureDefault						= nullptr;
 

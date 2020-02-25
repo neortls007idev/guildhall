@@ -14,7 +14,7 @@
 #include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Renderer/VertexBuffer.hpp"
 #include "Engine/Time/Time.hpp"
-#include "Engine/Renderer/RenderBuffer.hpp"
+//#include "Engine/Renderer/RenderBuffer.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				THIRD PARTY LIBRARIES
@@ -40,6 +40,7 @@
 #include "Engine/Renderer/D3D11Common.hpp"
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/Sampler.hpp"
+#include "Engine/Primitives/GPUMesh.hpp"
 
 #pragma comment( lib, "d3d11.lib" )         // needed a01
 #pragma comment( lib, "dxgi.lib" )          // needed a01
@@ -146,6 +147,7 @@ void RenderContext::Startup( Window* window )
 
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
 	m_frameUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	m_modelMatrixUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 
 	m_defaultSampler = new Sampler( this , SAMPLER_POINT );
 	m_textureDefault = CreateTextureFromColor( WHITE );
@@ -215,6 +217,9 @@ void RenderContext::Shutdown()
 
 	delete m_immediateVBO;
 	m_immediateVBO = nullptr;
+
+	delete m_modelMatrixUBO;
+	m_modelMatrixUBO = nullptr;
 
 	delete m_frameUBO;
 	m_frameUBO = nullptr;
@@ -301,6 +306,8 @@ void RenderContext::BeginCamera( const Camera& camera )
 	BindUniformBuffer( UBO_FRAME_SLOT , m_frameUBO );
 	m_currentCamera->UpdateUBO( this );
 	BindUniformBuffer( UBO_CAMERA_SLOT , m_currentCamera->UpdateUBO( this ) );
+	SetModelMatrix( Mat44::IDENTITY );
+	BindUniformBuffer( UBO_MODEL_SLOT , m_modelMatrixUBO );
 
 	BindTexture( m_textureDefault );
 	BindSampler( m_defaultSampler );
@@ -665,6 +672,27 @@ void RenderContext:: DrawLine(const Vec2& start, const Vec2& end, const Rgba8& c
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void RenderContext::DrawMesh( const GPUMesh* mesh )
+{
+	/*
+	BindVertexBuffer( 0 , mesh->GetVertexBuffer() );
+	UpdateLayoutIfNeeded(); // based on currentVertex buffer & CurrentShader
+	bool hasIndices = mesh->GetIndexCount();
+
+	if ( hasIndices )
+	{
+		BindIndexBuffer( mesh->GetIndexBuffer() );
+		DrawIndexed( mesh->GetIndexCount() , 0 , 0 );
+	}
+	else
+	{
+		Draw( mesh->GetVertexCount() , 0 , 0 , 0 );
+
+	}*/
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void RenderContext::DrawRing(const Vec2& center, float radius, const Rgba8& color, float thickness)
 {
 	constexpr float degreePerSide = 360.f / 64.f;
@@ -968,6 +996,15 @@ void RenderContext::BindUniformBuffer( unsigned int slot , RenderBuffer* ubo )
 
 	m_context->VSSetConstantBuffers( slot , 1 , &uboHandle );
 	m_context->PSSetConstantBuffers( slot , 1 , &uboHandle );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::SetModelMatrix( Mat44 modelMat )
+{
+	ModelDataT modelData;
+	modelData.model = modelMat;
+	m_modelMatrixUBO->Update( &modelData , sizeof( modelData ) , sizeof( modelData ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
