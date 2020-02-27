@@ -82,10 +82,10 @@ v2f_t VertexFunction( vs_input_t input )
    v2f.color = input.color;
    v2f.uv = input.uv;
 
-   float4 worldPos = float4( input.position , 1 );
+   float4 localPos = float4( input.position , 1 );
 
-   float4 localPos	= mul( MODEL , worldPos );
-   float4 cameraPos = mul( VIEW , localPos );
+   float4 worldPos	= mul( MODEL , localPos );
+   float4 cameraPos = mul( VIEW , worldPos );
    float4 clipPos	= mul( CAMERA_TO_CLIP_TRANSFORM , cameraPos );
 
    v2f.position = clipPos;

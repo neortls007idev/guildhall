@@ -656,6 +656,13 @@ void RenderContext::DrawVertexArray( int numVertexes , VertexBuffer* vertices )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void RenderContext::DrawIndexed( uint indexCount , uint startIndex , uint indexStride )
+{
+	m_context->DrawIndexed( indexCount , startIndex , indexStride );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void RenderContext:: DrawLine(const Vec2& start, const Vec2& end, const Rgba8& color, float thickness)
 {
 	Vec2 displacement = end - start;
@@ -688,9 +695,9 @@ void RenderContext:: DrawLine(const Vec2& start, const Vec2& end, const Rgba8& c
 
 void RenderContext::DrawMesh( const GPUMesh* mesh )
 {
-	/*
-	BindVertexBuffer( 0 , mesh->GetVertexBuffer() );
-	UpdateLayoutIfNeeded(); // based on currentVertex buffer & CurrentShader
+	
+	BindVertexBuffer( mesh->GetVertexBuffer() );
+	/*UpdateLayoutIfNeeded(); // based on currentVertex buffer & CurrentShader
 	{
 		// buffer_attribute_t const* m_currentLayout;
 		// buffer_attribute_t const* m_prevoiuslyBoundLayout;
@@ -703,7 +710,7 @@ void RenderContext::DrawMesh( const GPUMesh* mesh )
 			m_previouslyBoundLayout = m_currentlLayout;
 			m_chaderHasChanged = false;
 		}
-	}
+	}*/
 	
 
 	bool hasIndices = mesh->GetIndexCount();
@@ -715,11 +722,8 @@ void RenderContext::DrawMesh( const GPUMesh* mesh )
 	}
 	else
 	{
-		Draw( mesh->GetVertexCount() , 0 , 0 , 0 );
-
-	}*/
-
-
+		Draw( mesh->GetVertexCount() , 0 );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1023,14 +1027,13 @@ void RenderContext::BindVertexBuffer( VertexBuffer* vbo )
 void RenderContext::BindIndexBuffer( IndexBuffer* ibo )
 {
 	ID3D11Buffer* iboHandle = ibo->m_handle;
-	UINT stride = ( UINT ) sizeof( Vertex_PCU );	//	how far from one vertex to next
 	UINT offset = 0;								//  how far into buffer we start
 
 	if ( m_lastBoundIBO != iboHandle )
 	{
-		//m_context->IASetIndexBuffer( 0 , 1 , &iboHandle , &stride , &offset );
+		m_context->IASetIndexBuffer( iboHandle , DXGI_FORMAT_R32_UINT , offset );
 		m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-		m_lastBoundIBO = iboHandle;
+		m_lastBoundIBO = ibo->m_handle;
 	}
 }
 

@@ -22,12 +22,8 @@ public:
 	void AddVertices( uint vcount , void const* verts );
 	void AddIndices( uint icount , uint const* indices );
 
-	void UpdateIndices( std::vector<uint> const& indices )
-	{
-		UpdateIndices( indices.size() , &indices[ 0 ] );
-	}
-
-	
+	void UpdateIndices( std::vector<uint> const& indices );
+		
 	// helper template
 	template <typename VERTEX_TYPE>
 	void UpdateVertices( uint vcount , VERTEX_TYPE const* vertices )

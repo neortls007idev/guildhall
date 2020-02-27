@@ -27,10 +27,25 @@ Game::Game()
 	m_cubeTransform.SetPosition( 1.f , 0.5f , -15.0f );
 
 	std::vector<Vertex_PCU> meshVerts;
-	AABB2 meshTest( -10 , -10 , 10 , 10 );
+	
+	Vertex_PCU AABB2Verts[ 4 ] = {
+						Vertex_PCU( Vec3( -5.f,-5.f,-10.f ) , WHITE, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( 5.f,-5.f,-10.f ) , WHITE, Vec2( 1.f, 0.f ) ),
 
-	AppendVertsForAABB2( meshVerts , meshTest , BLUE );
-	m_meshCube->UpdateVertices( meshVerts );
+						Vertex_PCU( Vec3( 5.f,5.f,-10.f ) , WHITE, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( -5.f,5.f,-10.f ) , WHITE, Vec2( 1.f, 0.f ) ),
+						};
+
+	uint Indices[ 6 ] = {
+	0,2,1,
+	2,1,0,
+	};
+
+	//AABB2 meshTest( -10 , -10 , 10 , 10 );
+
+	//AppendVertsForAABB2( meshVerts , meshTest , BLUE );
+	m_meshCube->UpdateVertices( 4 , &AABB2Verts[ 0 ] , 0 , Vertex_PCU::LAYOUT );
+	m_meshCube->UpdateIndices( 6 , Indices );
 
 
 	m_normalImage = AABB2( -WORLD_CAMERA_SIZE_X , -WORLD_CAMERA_SIZE_Y , WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y );
@@ -89,8 +104,8 @@ void Game::Render() const
 // 
 // 	g_theRenderer->DrawVertexArray( 6 , AABB2Verts );
 
-	g_theRenderer->DrawVertexArray( m_meshCube->GetVertexCount() , m_meshCube->GetVertexBuffer() );
-
+	//g_theRenderer->DrawVertexArray( m_meshCube->GetVertexCount() , m_meshCube->GetVertexBuffer() );
+	g_theRenderer->DrawMesh( m_meshCube );
 
 	g_theRenderer->BindTexture( m_imageTex );
 	g_theRenderer->DrawAABB2( m_normalImage , WHITE );

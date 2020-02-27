@@ -5,7 +5,7 @@
 
 void GPUMesh::UpdateVertices( uint vcount , void const* vertexData , uint vertexStride , buffer_attribute_t const* layout )
 {
-	m_vertices->Update( vertexData , /*sizeof( layout ) **/ vcount * vertexStride , /*sizeof( layout )*/vertexStride );
+	m_vertices->Update( vertexData , sizeof( layout ) * vcount /** vertexStride*/ , sizeof( layout )/*vertexStride*/ );
 	m_vertexCount = vcount;
 }
 
@@ -28,6 +28,13 @@ void GPUMesh::UpdateIndices( uint icount , uint const* indices )
 	m_indices->Update( icount , indices );
 
 	m_indexCount = icount;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void GPUMesh::UpdateIndices( std::vector<uint> const& indices )
+{
+		UpdateIndices( indices.size() , &indices[ 0 ] );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

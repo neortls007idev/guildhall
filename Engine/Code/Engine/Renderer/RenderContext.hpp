@@ -70,6 +70,8 @@ struct ModelDataT
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+typedef unsigned uint;
+
 class RenderContext
 {
 
@@ -109,7 +111,7 @@ public:
 	void DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes );
 	void DrawVertexArray( const std::vector<Vertex_PCU>& vertexArray );
 	//void DrawIndexed( const IndexBuffer indexBuffer );
-	void DrawIndexedArray();
+	void DrawIndexed( uint indexCount , uint startIndex, uint indexStride );
 	void DrawMesh( const GPUMesh* mesh );
 	void DrawVertexArray( int numVertexes , VertexBuffer* vertices );
 

@@ -20,6 +20,6 @@ public:
 // 	eRenderBufferUsage m_usage;
 // 	eRenderMemoryHint m_memHint;
 
-	size_t m_bufferByteSize;
-	size_t m_elementBysize;
+// 	size_t m_bufferByteSize;
+// 	size_t m_elementBysize;
 };
