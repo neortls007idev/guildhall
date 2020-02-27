@@ -2,88 +2,73 @@ MP2 And SD2 Checklist
 ------
 
 ## MP2 Checklist
+**( NOTE :- Controls Listed at the Bottom after the Checklist )**
+------
 
-Checklist for all MP2 assignments
+### A04 Checklist
+
+- [x] Stop coloring objects red that are intersecting (it becomes a strobe light in this assignment otherwise)
+- [x] Make sure your game creates polygons as `STATIC` by default, and discs create as `DYNAMIC` by default
+- [x] Add support for `disc Collider2D::GetWorldBounds` for existing colliders
+	- [ ] **Easier Option**: Implement this using `AABB2` bounding boxes
+    - [x] **Challenge Option**: Implement this using a bounding `Disc`
+    - [x] Update this bounds whenever you update the world shape of the object.
+- [x] Switch `Collider2D::Intersects` to be non-virtual, and instead use a matrix lookup
+    - [x] Use a *mid-phase* check to early out of a collision by comparing the bounds first.
+					( Only done for discVsPolygon, seemed pointless to do the check for disc vs disc).
+    - [x] If passes the bounds check, lookup and call the appropriate callback
+- [x] Add `Collider2D::GetManifold` that also uses a collision matrix or half matrix
+    - [x] Again do an early out using the bounds.
+			( Only done for discVsPolygon seemed pointless to do the check for disc vs disc).
+    - [x] Implement a disc versus disc manifold
+    - [x] Implement a disc versus polygon manifold
+    - **Note: We are not doing polygon -vs- polygon yet**
+- [x] `Collider2D` gets a `PhysicsMaterial`
+    - [x] `PhysicsMaterial` has a property for `restitution` (or `bounciness` if you prefer)
+    - [x] `Collider2D::GetBounceWith(Collider2D const* other) const` implemented to compute restitution between two objects
+        - There are multiple methods for computing the restitution.  Product, Min, Max, Spherical, Lookup, etc...   
+    - [x] Allow user to adjust bounciness using `Shift + Mouse Wheel Movement` while the object is selected.
+    - [x] Set the alpha for the fill color to the bounciness of the object.
+- [x] Add a `Collision2D` object that contains..
+    - Two pointers to the `Collider2D` objects involved in the collision (`me` and `them`)
+    - A `manifold2` struct containing...
+      - `normal` describing the normal at the impact point
+      - `penetration` How deeply interpenetrated are the two objects.
+- [x] `Physics2D` during a `SimulateStep` should now do the following
+    - [x] `DetectCollisions` to compute all collisions between all colliders.
+    - [x] `ResolveCollisions` to resolve all detected collisions
+    - [x] `ResolveCollision` to resolve a single collision
+- [x] `ResolveCollision` should...
+    - [x] `CorrectObjects`, pushing them out of their respective objects
+        - [x] Push should depend on the ratio of the masses
+        - [-] Static and Kinematic objects assume infinite mass vs dynamic objects
+        - [x] Kinematic vs Kinematic resolves based on masses
+        - [x] Static objects never move, and should fully push the other object if it is not static.
+        - [x] Two static objects do not correct at all.
+    - [x] Calculate **normal impulse** at point of collision.
+    - [x] `Rigidbody2D::ApplyImpulseAt` to both objects (`impulse` to A, `-impulse` to B)
+- [x] `Rigidbody2D::ApplyImpulseAt( vec2 worldPos, vec2 impulse )` implemented
+    - [x] Impulse uses force to apply an instant change in velocity
+        - `delta_velocity = impulse * inverse_mass`
+    - [x] Ignore `worldPos` for now, it is there for when we apply rotational forces
 
 ------
 
-### A01 Checklist
+### Control Scheme
 
-Use the branch name `mp2/turnin/a01` for grading, and you have the checklist copied to your `Root` folder in a file named `mp2.a01.md`
+- WASD for Camera Movement.
+- 'O' (capitol letter 'Oh') to reset camera Position to origin. ( this does not rest the camera output Size ).
+- Right Mouse Button To spawn New Game Objects.
+- Scroll Mouse Wheel Up and Down Movement for Zooming in and out.
+- Left Click to select the object and click again to Deselect the object.
+- Select an object and hit `delete` or `backspace` key to delete the currently selected object.
+- F8 key to delete and reset the game.
 
-- [x] [05pts] Create a GitHub account
-- [x] [05pts] Send me your Username
-- [x] [10pts] Create Private Repots
-    - [x] `Guildhall` repot
-    - [ ] `Engine` repot if using submodules
-- [x] [10pts] Make me a collaborator on all depots needed for class
-    - [x] `Guildhall` Repot
-    - [ ] `Engine` Repot if using Sbubmodules
-- [x] [20pts] Properly setup [./example.gitignore](`.gitignore`) for all repots
-    - [x] Not intermediate or temporary files should be pushed to the depot
-    - [x] Only the `exe` in the `Run` folder exists.
-- [x] [05pts] Make initial commit for all repots
-- [x] [05pts] Make initial push for all repots
-- [x] [10pts] Add a `mp2.a01.md` file to your `Root` folder...
-    - [x] This should contain a copy of this checklist with tasks you've attempted marked
-    - [x] Make sure this is pushed
-- [x] [30pts] Create your `mp2/turnin/a01` branch and make sure it is pushed to remote.
-- [x] Do a buddy build to make sure you can pull and build it yourself
-- [x] Once assignment is done and everything compiles (and there were changes), merge `mp2/turnin/a01` back in to `master`
 ------
 
-## SD2 Checklist
+### BUG
 
-Checklist for all SD2 assignments
-------
+- When disc spawn on top of disc or when disc drag inside polygon expected behavior is not observed.
 
-### A01 Checklist
-
-#### Required Tasks
-**Required Tasks** are tasks that the course relies on being complete, and will most likely be built upon on later assignments.  All required tasks must be attempted before a bonus task will be graded.
-
-- [ ] *10pts*: `Window` class created in Engine to spec, with Protogame being updated;
-- [ ] *20pts*: `RenderContext` changes
-      - [ ] All broken `RenderContext` methods a stripped with an assert to todo added to the body.
-      - [ ] `RenderContext` can be setup by giving it a window
-- [ ] *05pts* `Camera::SetClearMode` added
-- [ ] *05pts* `RenderContext::BeginCamera` should now clears depending on clear mode
-      - [ ] For  now, clear the default swapchain on `RenderContext`
-- [ ] *10pts* `SwapChain` implemented
-    - [ ] Default `SwapChain` is added to your `RenderContext`, created during setup
-    - [ ] Ability to get the backbuffer texture.
-- [ ] *10pts*: `Texture` class added/modified
-- [ ] *10pts*: `Texture::GetOrCreateView` will return a texture view;    
-- [ ] *10pts*: Game code should cycle clear color each frame to show everything working.
-- [ ] *20pts* Ability to create a debug context by pre defining `RENDER_DEBUG`
-    - [ ] All builds should define `RENDER_DEBUG` for now
-    - [ ] Be sure there are no leaked resources on shutdown (check `Output`)
-
-**How I will Grade**;  
-1. Pull, and compile your program in `Debug` and `Release`.
-2. Run it, and look for the cycling color.
-3. Quit (`Escape`) and look for leaks in output
-4. Check the code to make sure all window/context creation has been moved out of App
-   - Also check that you are indeed making a debug context
-5. Grade extras if applicable
-
-#### Bonus Tasks
-**Bonus Tasks** are tasks that are related to the main assignment, but are not required for finishing the course, hopefully to allow for some personalization of your own engine.
-
-No required tasks will build off bonus tasks, but future bonus tasks may (and they will clearly label which ones they require).
-
-These tasks *may be completed for any assignment in this semester*, but you must clearly state which extras you are turning in for which assignment.  You may resubmit an extra on multiple assignments to make up lost points.
-
-Example, say for the `DevConsole` assignment, you attempt the extra `auto-complete`, worth 8 points. While testing, I notice that it crashes if backspace is pressed midway through an autocompleted command, but otherwise works.  You are awarded say 5/8 for that extra.  You may then fix that bug, resubmit, and get the remaining 3/8 on a later assignment.  After that though no more points may be acquired from that extra.  
-
-Note, most bonus tasks are twice the work for half the points of a required task, and will not be graded at all if not all required tasks are attempted.  
-
-- [ ] (X01.00 : 05pts) Borderless Window Support
-- [ ] (X01.01 : 05pts) Fullscreen Support.  See notes, the default D3D11 support for this will not count.
-- [ ] (X01.10 : 02pts) Window alignment options
-- [ ] (X01.11 : 01pts) Allow change of window title at runtime
-- [ ] (X01.12 : 02pts) Set a custom window icon
-- [ ] (X01.13 : 02pts) Allow change of window icon at runtime
-- [ ] (X01.14 : 02pts) Show window loading progress in task bar.
-
+Makes sure you mouse position is correct for your current view - converting the client position (offset from top-left of window) to a world location.
 ------

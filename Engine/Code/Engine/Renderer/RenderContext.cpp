@@ -80,7 +80,9 @@ void RenderContext::ClearScreen( const Rgba8& ClearColor )
 void RenderContext::BeginCamera( const Camera& camera )
 {
 	glLoadIdentity();
-	glOrtho(camera.GetOrthoBottomLeft().x, camera.GetOrthoTopRight().x, camera.GetOrthoBottomLeft().y, camera.GetOrthoTopRight().y, 0.f, 1.f);
+	Vec2 cameraBottomLeft	= camera.GetPosition() - ( camera.GetOutputSize() / 2.f );
+	Vec2 cameraTopRight		= camera.GetPosition() + ( camera.GetOutputSize() / 2.f );
+	glOrtho( cameraBottomLeft.x , cameraTopRight.x , cameraBottomLeft.y , cameraTopRight.y , 0.f , 1.f );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -240,7 +242,7 @@ void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU>& vertexArray 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext:: DrawLine(const Vec2& start, const Vec2& end, const Rgba8& color, float thickness)
+void RenderContext:: DrawLine(const Vec2& start, const Vec2& end, const Rgba8& color, float thickness , float scale , float orientationDegrees , Vec2 translate )
 {
 	Vec2 displacement = end - start;
 	Vec2 forward = displacement.GetNormalized();
@@ -257,14 +259,14 @@ void RenderContext:: DrawLine(const Vec2& start, const Vec2& end, const Rgba8& c
 	Vec3 startLeftVec3( startLeft.x , startLeft.y , 0.f );
 	Vec3 startRightVec3( startRight.x , startRight.y , 0.f );
 
-	const Vertex_PCU lineVerts[6] = { Vertex_PCU(startRightVec3, color, Vec2(0.f, 0.f)),
+	Vertex_PCU lineVerts[6] = { Vertex_PCU(startRightVec3, color, Vec2(0.f, 0.f)),
 								Vertex_PCU(endRightVec3  , color, Vec2(0.f, 0.f)),
 								Vertex_PCU(endLeftVec3   , color, Vec2(0.f, 0.f)),
 								Vertex_PCU(endLeftVec3   , color, Vec2(0.f, 0.f)),
 								Vertex_PCU(startLeftVec3 , color, Vec2(0.f, 0.f)),
 								Vertex_PCU(startRightVec3, color, Vec2(0.f, 0.f)) };
 
-
+	TransformVertexArray2D( 6 , lineVerts , scale , orientationDegrees , translate );
 	DrawVertexArray(6, lineVerts);
 }
 
@@ -346,6 +348,52 @@ void RenderContext::DrawDisc( const Disc2D& disc , const Rgba8& tint )
 
 	// MOVE  THIS LINE OF CODE INTO A SEPARATE FUNCTION LATER
 	TransformVertexArray2D( NUMBER_OF_DISC_VERTS , discVerts , 1 , 0.f , disc.m_center );
+	DrawVertexArray( NUMBER_OF_DISC_VERTS , discVerts );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::DrawDisc( const Vec2& center , const float& radius , const Rgba8& tint )
+{
+	constexpr int  NUMBER_OF_DISC_VERTS = 120;
+	Vertex_PCU discVerts[ NUMBER_OF_DISC_VERTS ];
+	const Vec2 UVCoordsAtCenter = Vec2( 0.5f , 0.5f );
+	const float UVRadius = 0.5f;
+
+	float angleInDegreesBetweenDiscTriangles = 0.f;
+
+	discVerts[ 0 ] = Vertex_PCU( ( Vec3( 0.f , 0.f , 0.f ) ) , tint , Vec2( 0.5f , 0.5f ) );
+	discVerts[ 1 ] = Vertex_PCU( ( Vec3( radius , 0.f , 0.f ) ) , tint , Vec2( 1.f , 0.5f ) );
+	angleInDegreesBetweenDiscTriangles = ( 360.f * 3.f ) / static_cast< float >( NUMBER_OF_DISC_VERTS );
+
+	//-----------------------------------------------------------------------------------------------------------------
+	float costheta = CosDegrees( angleInDegreesBetweenDiscTriangles );
+	float intialXVertex = radius * costheta;
+
+	float sintheha = SinDegrees( angleInDegreesBetweenDiscTriangles );
+	float initialYVertex = radius * sintheha;
+
+	discVerts[ 2 ] = Vertex_PCU( ( Vec3( intialXVertex , initialYVertex , 0.f ) ) , tint , Vec2( UVRadius + UVRadius * costheta , UVRadius + UVRadius * sintheha ) );
+
+	//-----------------------------------------------------------------------------------------------------------------
+	int discVertIndex = 3;
+	for ( discVertIndex = 3; discVertIndex < NUMBER_OF_DISC_VERTS; discVertIndex += 3 )
+	{
+		angleInDegreesBetweenDiscTriangles = angleInDegreesBetweenDiscTriangles + ( ( 360.f * 3.f ) / ( NUMBER_OF_DISC_VERTS ) );
+		discVerts[ discVertIndex ] = discVerts[ discVertIndex - 3 ];
+		discVerts[ discVertIndex + 1 ] = discVerts[ discVertIndex - 1 ];
+
+		discVerts[ discVertIndex + 2 ].m_position = Vec3( radius * CosDegrees( angleInDegreesBetweenDiscTriangles ) ,
+			radius * SinDegrees( angleInDegreesBetweenDiscTriangles ) , 0.f );
+		discVerts[ discVertIndex + 2 ].m_color = tint;
+		discVerts[ discVertIndex + 2 ].m_uvTexCoords = Vec2( UVRadius + UVRadius * CosDegrees( angleInDegreesBetweenDiscTriangles ) ,
+			UVRadius + UVRadius * SinDegrees( angleInDegreesBetweenDiscTriangles ) );
+	}
+	discVerts[ NUMBER_OF_DISC_VERTS - 1 ] = discVerts[ 1 ];
+
+
+	// MOVE  THIS LINE OF CODE INTO A SEPARATE FUNCTION LATER
+	TransformVertexArray2D( NUMBER_OF_DISC_VERTS , discVerts , 1 , 0.f , center );
 	DrawVertexArray( NUMBER_OF_DISC_VERTS , discVerts );
 }
 
@@ -473,11 +521,24 @@ void RenderContext::DrawDiscFraction(const Disc2D& disc, const float drawFractio
 
 void RenderContext::DrawPolygon( const Vec2* points , unsigned int count , const Rgba8& tint )
 {
+	if ( count < 3 )
+	{
+		return;
+	}
+
 	std::vector<Vertex_PCU> polygonVerts;
 
 	AppendVertsForPolygon( polygonVerts , points , count , tint );
 
 	DrawVertexArray( ( int ) polygonVerts.size() , &polygonVerts[ 0 ] );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::DrawX( Vec2 position , const Rgba8& color , float scale , float thickness )
+{
+	DrawLine( Vec2(  -100.f , -100.f ) , Vec2(  100.f ,  100.f ) , color , thickness , scale );
+	DrawLine( Vec2( -100.f , -100.f ) , Vec2( 100.f , 100.f ) , color , thickness , scale , 90.f );
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------
