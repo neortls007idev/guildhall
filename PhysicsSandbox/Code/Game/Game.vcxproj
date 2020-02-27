@@ -20,33 +20,34 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{C75A1D18-5753-4C0C-BCD9-8D126DFEE1D6}</ProjectGuid>
+    <ProjectGuid>{58DEE0BF-891C-45CD-A597-C76EA227DEAA}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Engine</RootNamespace>
+    <RootNamespace>MathUnitTests</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>PhysicsSandbox</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -74,55 +75,67 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)_$(PlatformShortName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)_$(PlatformShortName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)_$(PlatformShortName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Temporary\$(ProjectName)_$(PlatformShortName)_$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)_$(PlatformShortName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-    <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalLibraryDirectories>
-    </Lib>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copying $(TargetFileName) to $(SolutionDir)Run...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-    <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalLibraryDirectories>
-    </Lib>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copying $(TargetFileName) to $(SolutionDir)Run...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -131,19 +144,23 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-    <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalLibraryDirectories>
-    </Lib>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copying $(TargetFileName) to $(SolutionDir)Run...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -152,144 +169,42 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-    <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalLibraryDirectories>
-    </Lib>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y /F /I "$(TargetPath)" "$(SolutionDir)Run"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copying $(TargetFileName) to $(SolutionDir)Run...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\ThirdParty\TinyXML2\tinyxml2.cpp" />
-    <ClCompile Include="Audio\AudioSystem.cpp" />
-    <ClCompile Include="Core\DevConsole.cpp" />
-    <ClCompile Include="Core\EngineCommon.cpp" />
-    <ClCompile Include="Core\ErrorWarningAssert.cpp" />
-    <ClCompile Include="Core\EventSystem.cpp" />
-    <ClCompile Include="Core\Image.cpp" />
-    <ClCompile Include="Core\NamedStrings.cpp" />
-    <ClCompile Include="Core\Rgba8.cpp" />
-    <ClCompile Include="Core\SimpleTriangleFont.cpp" />
-    <ClCompile Include="Core\StringUtils.cpp" />
-    <ClCompile Include="Core\Tags.cpp" />
-    <ClCompile Include="Core\VertexUtils.cpp" />
-    <ClCompile Include="Core\Vertex_PCU.cpp" />
-    <ClCompile Include="Core\XmlUtils.cpp" />
-    <ClCompile Include="Input\AnalogJoystick.cpp" />
-    <ClCompile Include="Input\InputSystem.cpp" />
-    <ClCompile Include="Input\KeyButtonState.cpp" />
-    <ClCompile Include="Input\XboxController.cpp" />
-    <ClCompile Include="Math\FloatRange.cpp" />
-    <ClCompile Include="Math\IntRange.cpp" />
-    <ClCompile Include="Math\IntVec2.cpp" />
-    <ClCompile Include="Math\MathUtils.cpp" />
-    <ClCompile Include="Math\Matrix4x4.cpp" />
-    <ClCompile Include="Math\MatUtils.cpp" />
-    <ClCompile Include="Math\RandomNumberGenerator.cpp" />
-    <ClCompile Include="Math\RawNoise.cpp" />
-    <ClCompile Include="Math\SmoothNoise.cpp" />
-    <ClCompile Include="Math\Vec2.cpp" />
-    <ClCompile Include="Math\Vec3.cpp" />
-    <ClCompile Include="Math\Vec4.cpp" />
-    <ClCompile Include="Physics\Collider2D.cpp" />
-    <ClCompile Include="Physics\Collision2D.cpp" />
-    <ClCompile Include="Physics\Manifold2D.cpp" />
-    <ClCompile Include="Physics\DiscCollider2D.cpp" />
-    <ClCompile Include="Physics\Physics2D.cpp" />
-    <ClCompile Include="Physics\PhysicsMaterial.cpp" />
-    <ClCompile Include="Physics\PolygonCollider2D.cpp" />
-    <ClCompile Include="Physics\Rigidbody2D.cpp" />
-    <ClCompile Include="Primitives\AABB2.cpp" />
-    <ClCompile Include="Primitives\Capsule2D.cpp" />
-    <ClCompile Include="Primitives\Disc2D.cpp" />
-    <ClCompile Include="Primitives\LineSegment2D.cpp" />
-    <ClCompile Include="Primitives\OBB2.cpp" />
-    <ClCompile Include="Primitives\Plane.cpp" />
-    <ClCompile Include="Primitives\Polygon2D.cpp" />
-    <ClCompile Include="Renderer\SpriteAnimSet.cpp" />
-    <ClCompile Include="Renderer\BitmapFont.cpp" />
-    <ClCompile Include="Renderer\Camera.cpp" />
-    <ClCompile Include="Renderer\RenderContext.cpp" />
-    <ClCompile Include="Renderer\SpriteAnimation.cpp" />
-    <ClCompile Include="Renderer\SpriteDefinition.cpp" />
-    <ClCompile Include="Renderer\SpriteSheet.cpp" />
-    <ClCompile Include="Renderer\Texture.cpp" />
-    <ClCompile Include="Time\Time.cpp" />
+    <ProjectReference Include="..\..\..\Engine\Code\Engine\Engine.vcxproj">
+      <Project>{c75a1d18-5753-4c0c-bcd9-8d126dfee1d6}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\ThirdParty\fmod\fmod.h" />
-    <ClInclude Include="..\ThirdParty\fmod\fmod.hpp" />
-    <ClInclude Include="..\ThirdParty\fmod\fmod_codec.h" />
-    <ClInclude Include="..\ThirdParty\fmod\fmod_common.h" />
-    <ClInclude Include="..\ThirdParty\fmod\fmod_dsp.h" />
-    <ClInclude Include="..\ThirdParty\fmod\fmod_dsp_effects.h" />
-    <ClInclude Include="..\ThirdParty\fmod\fmod_errors.h" />
-    <ClInclude Include="..\ThirdParty\fmod\fmod_output.h" />
-    <ClInclude Include="..\ThirdParty\stb\stb_image.h" />
-    <ClInclude Include="..\ThirdParty\TinyXML2\tinyxml2.h" />
-    <ClInclude Include="Audio\AudioSystem.hpp" />
-    <ClInclude Include="Core\DevConsole.hpp" />
-    <ClInclude Include="Core\EngineCommon.hpp" />
-    <ClInclude Include="Core\ErrorWarningAssert.hpp" />
-    <ClInclude Include="Core\EventSystem.hpp" />
-    <ClInclude Include="Core\Image.hpp" />
-    <ClInclude Include="Core\NamedStrings.hpp" />
-    <ClInclude Include="Core\Rgba8.hpp" />
-    <ClInclude Include="Core\SimpleTriangleFont.hpp" />
-    <ClInclude Include="Core\StringUtils.hpp" />
-    <ClInclude Include="Core\Tags.hpp" />
-    <ClInclude Include="Core\VertexUtils.hpp" />
-    <ClInclude Include="Core\Vertex_PCU.hpp" />
-    <ClInclude Include="Core\XmlUtils.hpp" />
-    <ClInclude Include="Input\AnalogJoystick.hpp" />
-    <ClInclude Include="Input\InputSystem.hpp" />
-    <ClInclude Include="Input\KeyButtonState.hpp" />
-    <ClInclude Include="Input\VirtualKeyboard.hpp" />
-    <ClInclude Include="Input\XboxController.hpp" />
-    <ClInclude Include="Math\FloatRange.hpp" />
-    <ClInclude Include="Math\IntRange.hpp" />
-    <ClInclude Include="Math\IntVec2.hpp" />
-    <ClInclude Include="Math\MathConstants.hpp" />
-    <ClInclude Include="Math\MathUtils.hpp" />
-    <ClInclude Include="Math\Matrix4x4.hpp" />
-    <ClInclude Include="Math\MatUtils.hpp" />
-    <ClInclude Include="Math\RandomNumberGenerator.hpp" />
-    <ClInclude Include="Math\RawNoise.hpp" />
-    <ClInclude Include="Math\SmoothNoise.hpp" />
-    <ClInclude Include="Math\Vec2.hpp" />
-    <ClInclude Include="Math\Vec3.hpp" />
-    <ClInclude Include="Math\Vec4.hpp" />
-    <ClInclude Include="Physics\Collider2D.hpp" />
-    <ClInclude Include="Physics\Collision2D.hpp" />
-    <ClInclude Include="Physics\Manifold2D.hpp" />
-    <ClInclude Include="Physics\DiscCollider2D.hpp" />
-    <ClInclude Include="Physics\Physics2D.hpp" />
-    <ClInclude Include="Physics\PhysicsMaterial.hpp" />
-    <ClInclude Include="Physics\PolygonCollider2D.hpp" />
-    <ClInclude Include="Physics\Rigidbody2D.hpp" />
-    <ClInclude Include="Primitives\AABB2.hpp" />
-    <ClInclude Include="Primitives\Capsule2D.hpp" />
-    <ClInclude Include="Primitives\Disc2D.hpp" />
-    <ClInclude Include="Primitives\LineSegment2D.hpp" />
-    <ClInclude Include="Primitives\OBB2.hpp" />
-    <ClInclude Include="Primitives\Plane.hpp" />
-    <ClInclude Include="Primitives\Polygon2D.hpp" />
-    <ClInclude Include="Renderer\BitmapFont.hpp" />
-    <ClInclude Include="Renderer\Camera.hpp" />
-    <ClInclude Include="Renderer\RenderContext.hpp" />
-    <ClInclude Include="Renderer\SpriteAnimation.hpp" />
-    <ClInclude Include="Renderer\SpriteAnimeSet.hpp" />
-    <ClInclude Include="Renderer\SpriteDefinition.hpp" />
-    <ClInclude Include="Renderer\SpriteSheet.hpp" />
-    <ClInclude Include="Renderer\Texture.hpp" />
-    <ClInclude Include="Time\Time.hpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameCommon.cpp" />
+    <ClCompile Include="Gameobject.cpp" />
+    <ClCompile Include="TheApp.cpp" />
+    <ClCompile Include="Main_Windows.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="EngineBuildPreferences.hpp" />
+    <ClInclude Include="Game.hpp" />
+    <ClInclude Include="Gameobject.hpp" />
+    <ClInclude Include="TheApp.hpp" />
+    <ClInclude Include="GameCommon.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

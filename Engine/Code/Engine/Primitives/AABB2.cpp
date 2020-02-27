@@ -12,19 +12,19 @@ AABB2 AABB2::ZERO_TO_ONE = AABB2( Vec2::ZERO , Vec2::ONE );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-AABB2::AABB2( const AABB2& copyFrom ): m_mins(copyFrom.m_mins), m_maxs(copyFrom.m_maxs)
+AABB2::AABB2( const AABB2& copyFrom ) : m_mins( copyFrom.m_mins ) , m_maxs( copyFrom.m_maxs )
 {
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-AABB2::AABB2( const Vec2& mins , const Vec2& maxs ): m_mins(mins), m_maxs(maxs)
+AABB2::AABB2( const Vec2& mins , const Vec2& maxs ) : m_mins( mins ) , m_maxs( maxs )
 {
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-AABB2::AABB2( float minX , float minY , float maxX , float maxY ): m_mins(Vec2(minX,minY)), m_maxs(Vec2(maxX,maxY))
+AABB2::AABB2( float minX , float minY , float maxX , float maxY ) : m_mins( Vec2( minX , minY ) ) , m_maxs( Vec2( maxX , maxY ) )
 {
 }
 
@@ -228,7 +228,7 @@ void AABB2::StretchToIncludePoint( Vec2 point )
 	{
 		m_mins.y = point.y;
 	}
-	
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -260,8 +260,10 @@ void AABB2::FitWithinBounds( const AABB2& bounds )
 	{
 		Translate( Vec2( 0.f , bounds.m_mins.y - m_mins.y ) );
 	}
-	
+
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 AABB2 AABB2::CarveBoxOffRight( float fractionOfWidth , float additionalWidth )
 {
@@ -271,6 +273,8 @@ AABB2 AABB2::CarveBoxOffRight( float fractionOfWidth , float additionalWidth )
 	m_maxs.x = carvedPiece.m_mins.x;
 	return carvedPiece;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 AABB2 AABB2::GetBoxAtRight( float fractionOfWidth , float additionalWidth )
 {
@@ -316,7 +320,7 @@ AABB2 AABB2::GetBoxAtTop( float fractionOfWidth , float additionalWidth )
 {
 	float height = m_maxs.y - m_mins.y;
 	float carveHeight = ( fractionOfWidth * height ) + additionalWidth;
-	return AABB2( m_maxs.x , m_mins.y , m_maxs.x , m_maxs.y - carveHeight );
+	return AABB2( m_mins.x , m_mins.y + carveHeight, m_maxs.x , m_maxs.y );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -336,7 +340,7 @@ AABB2 AABB2::GetBoxAtBottom( float fractionOfWidth , float additionalWidth )
 {
 	float height = m_maxs.y - m_mins.y;
 	float carveHeight = ( fractionOfWidth * height ) + additionalWidth;
-	return AABB2( m_maxs.x , m_mins.y - carveHeight , m_maxs.x , m_maxs.y );
+	return AABB2( m_maxs.x , m_mins.y , m_maxs.x , m_maxs.y - carveHeight );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -369,7 +373,7 @@ void AABB2::GetCornerPositions( Vec2* out_FourPoints ) const
 {
 	//TODO :- get THE BELOW COMMENTS checked BY SQUIRREL
 	// 	outFourPoints = &Vec2( m_mins );
-	// 	
+	//
 	// The above lin generates warning "nonstandard extension used: class rvalue used as lvalue" ??
 
 	Vec2 point = m_mins;
