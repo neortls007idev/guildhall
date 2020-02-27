@@ -45,9 +45,6 @@ cbuffer time_constants : register( b0 ) // index 0 is now time
 
 cbuffer camera_constants : register( b1 ) // index 1 is now camera
 {
-	// MVP - Model - View - Projection
-	// float2 orthoMin;
-	// float2 orthoMax;
 	float4x4 CAMERA_TO_CLIP_TRANSFORM; // PROJECTION MATRIX
 	float4x4 VIEW;
 }
@@ -86,23 +83,10 @@ v2f_t VertexFunction( vs_input_t input )
    v2f.uv = input.uv;
 
    float4 worldPos = float4( input.position , 1 );
- //  worldPos.x += cos( SYSTEM_TIME_SECONDS );
-  // worldPos.y += sin( SYSTEM_TIME_SECONDS );
 
-   //float4 clipPos = worldPos; // might have a w( usually 1 for now )
-   float4 cameraPos = mul( VIEW , worldPos );
-   float4 clipPos = mul( CAMERA_TO_CLIP_TRANSFORM , cameraPos );
-
-
-   //float clipPos;
-//   clipPos.x = RangeMap( worldPos.x , orthoMin.x , orthoMax.x , -1.0f , 1.0f );
-  // clipPos.y = RangeMap( worldPos.y , orthoMin.y , orthoMax.y , -1.0f , 1.0f );
-   //clipPos.z = 0.f;
-   //clipPos.w = 1.f;
-
-   // SYSTEM_TIME_SECONDS = 4.0f // ERROR SINCE ITS A CONSTANT BUFFER
-   //v2f.position.x += cos( SYSTEM_TIME_SECONDS );
-   //v2f.position.y += sin( SYSTEM_TIME_SECONDS );
+   float4 localPos	= mul( MODEL , worldPos );
+   float4 cameraPos = mul( VIEW , localPos );
+   float4 clipPos	= mul( CAMERA_TO_CLIP_TRANSFORM , cameraPos );
 
    v2f.position = clipPos;
    return v2f;
@@ -120,20 +104,6 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	// Very common rendering debugging method is to
 	// use color to portray information;
 
-	//	float4 uvAsColor = float4( input.uv, 0.0f, 1.0f );
-	//	float4 finalColor = uvAsColor * input.color;
-
-	//return float4 ( input.uv , 0 , 1 );
-
-		//input.uv[1] = 0.5f * ( sin( input.uv.x * 40.0f + SYSTEM_TIME_SECONDS * 10.f ) );
-
-		float4 color = tDiffuse.Sample( eSampler, input.uv );
-		return color * input.color;
-
-
-	// float r = 0.5f * ( sin( input.uv.x * 40.0f + SYSTEM_TIME_SECONDS * 10.f ) + 1.0f );
-	//	float  b = 0.5f * ( cos( input.uv.y * 40.0f + SYSTEM_TIME_SECONDS * 10.f ) + 1.0f );
-	//	return float4( r , 0 , b , 1 );
-
-//   return finalColor;
+	float4 color = tDiffuse.Sample( eSampler, input.uv );
+	return color * input.color;
 }

@@ -3,7 +3,7 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-IndexBuffer::IndexBuffer( RenderContext* owner , eRenderBufferUsage usage , eRenderMemoryHint memHint ) : RenderBuffer( owner , usage , memHint )
+IndexBuffer::IndexBuffer( RenderContext* owner , eRenderMemoryHint memHint ) : RenderBuffer( owner , INDEX_BUFFER_BIT , memHint )
 {
 
 }
@@ -19,7 +19,7 @@ IndexBuffer::~IndexBuffer()
 
 void IndexBuffer::Update( uint icount , uint const* indices )
 {
-
+	RenderBuffer::Update( indices , icount * sizeof( uint ) , sizeof( uint ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -13,10 +13,10 @@ void Transform::SetScale( float xScale , float yScale , float zScale )
 void Transform::SetRotation( float pitch , float yaw , float roll )
 {
 	float finalPitch = Clamp( pitch , -180.f , 180.f );
-	float finalYaw = Clamp( yaw , -180.f , 180.f );
-	float finalRoll = Clamp( roll , -90.f , 90.f );
+	float finalYaw	 = Clamp( yaw , -180.f , 180.f );
+	float finalRoll	 = Clamp( roll , -90.f , 90.f );
 
-	m_rotationDegrees = Vec3( finalPitch , finalRoll , finalYaw );
+	m_rotationDegrees = Vec3( finalPitch , finalYaw , finalRoll );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

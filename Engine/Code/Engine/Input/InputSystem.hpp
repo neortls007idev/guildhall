@@ -33,6 +33,7 @@ public:
 
 	void Startup();
 	void BeginFrame();
+	void Update( float deltaSeconds );
 	void EndFrame();
 	void Shutdown();
 
@@ -55,6 +56,7 @@ public:
 	void ClipSystemCursor( eMouseClipping mouseLockMode );
 	void SetCursorMode( eMouseMode mode );
 	void UpdateRelativeMode();
+	Vec2 GetRelativeMovement() const;
 
 	eMouseMode GetCursorMode() const														{ return m_mouseMode;  }
 

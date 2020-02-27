@@ -29,6 +29,7 @@ class VertexBuffer;
 class RenderBuffer;
 class Sampler;
 class Image;
+class IndexBuffer;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -126,7 +127,8 @@ public:
 	void		BindShader( std::string shaderFileName );
 	void		ReCompileAllShaders();
 	bool		HasAnyShaderChangedAtPath( const wchar_t* relativePath );
-	void		BindVertexInput( VertexBuffer* vbo );
+	void		BindVertexBuffer( VertexBuffer* vbo );
+	void		BindIndexBuffer( IndexBuffer* ibo );
 	void		BindUniformBuffer( unsigned int slot , RenderBuffer* ubo ); // ubo - uniform buffer object
 	void		SetModelMatrix( Mat44 modelmat );
 	void		BindSampler( const Sampler* sampler );
@@ -155,8 +157,10 @@ public:
 	Shader*				 m_defaultShader						= nullptr;
 	Shader*				 m_currentShader						= nullptr;
 	VertexBuffer*		 m_immediateVBO							= nullptr;
+	//IndexBuffer*		 m_immediateIBO							= nullptr;
 	GPUMesh*			 m_immediateMesh						= nullptr;
 	ID3D11Buffer*		 m_lastBoundVBO							= nullptr;
+	ID3D11Buffer*		 m_lastBoundIBO							= nullptr;
 	Texture*			 m_textureTarget						= nullptr;
 
 	ID3D11BlendState*	 m_blendStates[BlendMode::TOTAL];

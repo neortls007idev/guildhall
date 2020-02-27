@@ -57,5 +57,6 @@ public:
 
 	Rgba8		m_color;
 	Vec3		m_cameraPosition = Vec3::ZERO;
+	Vec3		m_cameraRotation = Vec3::ZERO;
 	Shader* 	m_invertColorShader;
 };

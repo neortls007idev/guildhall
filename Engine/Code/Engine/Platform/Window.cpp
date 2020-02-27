@@ -52,11 +52,11 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 	case WM_ACTIVATE:
 					g_theInput->HideSystemCursor();
 					g_theInput->ClipSystemCursor( MOUSE_IS_WINDOWLOCKED );
-					break;
+ 					break;
 	case WA_INACTIVE:
 					g_theInput->ClipSystemCursor( MOUSE_IS_UNLOCKED );
 					g_theInput->ShowSystemCursor();
-					break;
+ 					break;
 	case WM_CHAR:
 	{
 		char character = ( char ) wParam;
@@ -317,6 +317,9 @@ bool Window::HandleQuitRequested()
 
 	pTaskbar->Release();
 	::CoUninitialize();
+
+	g_theInput->ClipSystemCursor( MOUSE_IS_UNLOCKED );
+	g_theInput->ShowSystemCursor();
 
 	return ForceQuit();
 }

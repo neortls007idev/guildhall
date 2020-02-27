@@ -13,6 +13,7 @@
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Renderer/VertexBuffer.hpp"
+#include "Engine/Renderer/IndexBuffer.hpp"
 #include "Engine/Time/Time.hpp"
 //#include "Engine/Renderer/RenderBuffer.hpp"
 
@@ -74,6 +75,7 @@ RenderContext::~RenderContext()
 	delete m_swapChain;
 	m_swapChain = nullptr;
 
+	DX_SAFE_RELEASE( m_lastBoundIBO );
 	DX_SAFE_RELEASE( m_lastBoundVBO );
 	DX_SAFE_RELEASE( m_context );
 	DX_SAFE_RELEASE( m_device );
@@ -215,6 +217,8 @@ void RenderContext::Shutdown()
 	delete m_defaultSampler;
 	m_defaultSampler = nullptr;
 
+
+
 	delete m_immediateVBO;
 	m_immediateVBO = nullptr;
 
@@ -224,6 +228,7 @@ void RenderContext::Shutdown()
 	delete m_frameUBO;
 	m_frameUBO = nullptr;
 
+	m_lastBoundIBO = nullptr;
 	m_lastBoundVBO = nullptr;
 	m_currentCamera = nullptr;
 
@@ -306,8 +311,9 @@ void RenderContext::BeginCamera( const Camera& camera )
 	BindUniformBuffer( UBO_FRAME_SLOT , m_frameUBO );
 	m_currentCamera->UpdateUBO( this );
 	BindUniformBuffer( UBO_CAMERA_SLOT , m_currentCamera->UpdateUBO( this ) );
+
 	SetModelMatrix( Mat44::IDENTITY );
-	BindUniformBuffer( UBO_MODEL_SLOT , m_modelMatrixUBO );
+	//BindUniformBuffer( UBO_MODEL_SLOT , m_modelMatrixUBO );
 
 	BindTexture( m_textureDefault );
 	BindSampler( m_defaultSampler );
@@ -624,7 +630,7 @@ void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes
 
 	// Bind the Shader
 
- 	BindVertexInput( m_immediateVBO );
+ 	BindVertexBuffer( m_immediateVBO );
 
 	// Index Buffers - to be covered later
 
@@ -677,6 +683,21 @@ void RenderContext::DrawMesh( const GPUMesh* mesh )
 	/*
 	BindVertexBuffer( 0 , mesh->GetVertexBuffer() );
 	UpdateLayoutIfNeeded(); // based on currentVertex buffer & CurrentShader
+	{
+		// buffer_attribute_t const* m_currentLayout;
+		// buffer_attribute_t const* m_prevoiuslyBoundLayout;
+
+		if( m_currentlyBoundLayout != m_currentLayout = m_currentVBO -> GetLayout() )
+		|| ( m_hasShaderChanged )
+		{
+			ID3D11InputLayout* layout = m_currentShader->GetOrCreateInputLayout( m_currentLayout );
+			m_context->IASetInputLayput ( layout );
+			m_previouslyBoundLayout = m_currentlLayout;
+			m_chaderHasChanged = false;
+		}
+	}
+	
+
 	bool hasIndices = mesh->GetIndexCount();
 
 	if ( hasIndices )
@@ -973,7 +994,7 @@ bool RenderContext::HasAnyShaderChangedAtPath( const wchar_t* relativePath )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::BindVertexInput( VertexBuffer* vbo )
+void RenderContext::BindVertexBuffer( VertexBuffer* vbo )
 {
 	ID3D11Buffer* vboHandle = vbo->m_handle;
 	UINT stride = ( UINT ) sizeof( Vertex_PCU );	//	how far from one vertex to next
@@ -984,6 +1005,22 @@ void RenderContext::BindVertexInput( VertexBuffer* vbo )
 		m_context->IASetVertexBuffers( 0 , 1 , &vboHandle , &stride , &offset );
 		m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 		m_lastBoundVBO = vboHandle;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::BindIndexBuffer( IndexBuffer* ibo )
+{
+	ID3D11Buffer* iboHandle = ibo->m_handle;
+	UINT stride = ( UINT ) sizeof( Vertex_PCU );	//	how far from one vertex to next
+	UINT offset = 0;								//  how far into buffer we start
+
+	if ( m_lastBoundIBO != iboHandle )
+	{
+		//m_context->IASetIndexBuffer( 0 , 1 , &iboHandle , &stride , &offset );
+		m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+		m_lastBoundIBO = iboHandle;
 	}
 }
 
@@ -1005,6 +1042,7 @@ void RenderContext::SetModelMatrix( Mat44 modelMat )
 	ModelDataT modelData;
 	modelData.model = modelMat;
 	m_modelMatrixUBO->Update( &modelData , sizeof( modelData ) , sizeof( modelData ) );
+	BindUniformBuffer( UBO_MODEL_SLOT , m_modelMatrixUBO );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -50,6 +50,14 @@ void InputSystem::BeginFrame()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void InputSystem::Update( float deltaSeconds )
+{
+	UNUSED( deltaSeconds );
+	UpdateRelativeMode();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void InputSystem::EndFrame()
 {
 	for ( int keycode = 0 ; keycode < MAX_KEYS ; keycode++)
@@ -245,6 +253,13 @@ void InputSystem::UpdateRelativeMode()
 
 		// recenter
 		m_positionLastFrame = windowCenter;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec2 InputSystem::GetRelativeMovement() const
+{
+	return m_relativeMovement;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -23,7 +23,7 @@ extern BitmapFont* g_bitmapFont;
 
 TheApp::TheApp()
 {
-	
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ void TheApp::Startup()
 		g_theWindow->SetInputSystem( g_theInput );
  	}
 	g_theInput->Startup();
-	
+
 	if ( g_theRenderer == nullptr )
 	{
 		g_theRenderer = new RenderContext();
@@ -77,9 +77,9 @@ void TheApp::RunFrame()
 	double        timeThisFrameStarted = GetCurrentTimeSeconds();
 	double		  deltaSeconds		   = timeThisFrameStarted - timeLastFrameStarted;
 	timeLastFrameStarted			   = timeThisFrameStarted;
-	
+
 	BeginFrame();                        // all engine system and not game systems
-	Update( ( float ) deltaSeconds );	
+	Update( ( float ) deltaSeconds );
 	Render();
 	EndFrame();
 }
@@ -116,23 +116,24 @@ void TheApp::BeginFrame()
 
 void TheApp::Update( float deltaSeconds )
 {
-		g_theRenderer->UpdateFrameTime( deltaSeconds );
+	//g_theInput->Update( deltaSeconds );
+	g_theRenderer->UpdateFrameTime( deltaSeconds );
 
-		UpdateFromKeyboard();
-		
-		if ( m_isPaused ) { deltaSeconds = 0; }
-		else if ( m_isSloMo == true ) { deltaSeconds /= 10.f; }
-		if ( m_isSpeedMo ) { deltaSeconds = deltaSeconds * 4.0f; }
-		
-		g_theGame->Update( deltaSeconds );
+	UpdateFromKeyboard();
 
-		if ( g_theDevConsole->IsOpen() )
-		{
-			g_theDevConsole->Update();
-		}
+	if ( m_isPaused ) { deltaSeconds = 0; }
+	else if ( m_isSloMo == true ) { deltaSeconds /= 10.f; }
+	if ( m_isSpeedMo ) { deltaSeconds = deltaSeconds * 4.0f; }
 
-		//g_theDevConsole->Update();
-		g_theInput->EndFrame();
+	g_theGame->Update( deltaSeconds );
+
+	if ( g_theDevConsole->IsOpen() )
+	{
+		g_theDevConsole->Update();
+	}
+
+	//g_theDevConsole->Update();
+	g_theInput->EndFrame();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -210,7 +211,7 @@ void TheApp::UpdateFromKeyboard()
 	{
 		g_theWindow->DisplaySettings( BORDERLESS );
 	}
-	
+
 	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasKeyJustPressed( 'R' ) )
 	{
 		g_theWindow->DisplaySettings( REGULAR );
@@ -225,7 +226,7 @@ void TheApp::UpdateFromKeyboard()
 	{
 		m_taskbarProgress = 0.f;
 	}
-	
+
 	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasKeyJustPressed( 'P' ) )
 	{
 		m_taskbarProgressMode = WND_PROGRESS_PAUSED;
@@ -254,7 +255,7 @@ void TheApp::UpdateFromKeyboard()
 
 	if ( g_theInput->GetButtonState( 'P' ).WasJustPressed() ) { m_isPaused = !m_isPaused; }
 
-	
+
 	if ( g_theInput->GetButtonState( KEY_F4 ).WasJustPressed() )
 	{
 		m_debugCamera = !m_debugCamera;
@@ -263,8 +264,8 @@ void TheApp::UpdateFromKeyboard()
 			g_theGame->m_gameCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y ) );
 		}
 	}
-	
-	if ( g_theInput->GetButtonState( KEY_F8 ).WasJustPressed() ) 
+
+	if ( g_theInput->GetButtonState( KEY_F8 ).WasJustPressed() )
 	{
 		delete g_theGame;
 		g_theGame = nullptr;

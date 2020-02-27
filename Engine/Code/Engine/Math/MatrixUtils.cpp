@@ -93,8 +93,6 @@ Mat44 MatrixInvertOrthoNormal( Mat44& mat )
 
 void MatrixInvert( Mat44& mat )
 {
-	// TODO :- Might be incorrect test more.
-
 	float inverse[ 16 ];
 	float determinant;
 	float m[ 16 ];

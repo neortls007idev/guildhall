@@ -34,7 +34,7 @@ void Camera::Translate( const Vec3& translation )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Camera::SetPitchRollYawRotation( float pitch , float roll , float yaw )
+void Camera::SetPitchRollYawRotation( float pitch , float yaw , float roll )
 {
 	m_transform.SetRotation( pitch , yaw , roll );
 }
@@ -138,7 +138,7 @@ RenderBuffer* Camera::UpdateUBO( RenderContext* ctx )
 	CameraDataT cameraData;
 
 	cameraData.cameraToClipTransform = m_projection;
-	Mat44 CameraModel = m_transform.GetAsMatrix();
+
 	// CameraToWorld Space Transform
 	// View -> worldToCamera
 	// Mat44 View  = Invert(cameraModel);
@@ -154,13 +154,24 @@ RenderBuffer* Camera::UpdateUBO( RenderContext* ctx )
 
 Mat44 Camera::GetViewMatrix()
 {
-	Vec3 m_position;
-	Vec3 m_eulerRotation;
-
-	Mat44 cameraModel = m_transform.GetAsMatrix();/*Mat44::CreateFromScaleRotationTransformation( Vec3( 1.f ) , m_transform.GetRotation() , m_transform.GetPostion() );*/
+	Mat44 cameraModel = m_transform.GetAsMatrix();
 
 	m_view = MatrixInvertOrthoNormal( cameraModel );
 	return m_view;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec3 Camera::ClientToWorld( Vec2 client , float ndcZ )
+{
+	return Vec3::ZERO;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec3 Camera::WorldToClient( Vec3 worldPos )
+{
+	return m_view.TransformVector3D( worldPos );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

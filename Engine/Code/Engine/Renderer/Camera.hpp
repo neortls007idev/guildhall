@@ -37,13 +37,14 @@ public:
 
 	void  SetPostion( const Vec3& position );
 	void  Translate( const Vec3& translation );
-	void  SetPitchRollYawRotation( float pitch , float roll , float yaw );
+	void  SetPitchRollYawRotation( float pitch , float yaw , float roll );
 
 	void  SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
 	Vec3  GetOrthoMin() const;
 	Vec3  GetOrthoMax() const;
 	void  Translate2D( const Vec2 cameraTranslate );
 	void  SetClearMode( eCameraClearBitFlag clearFlags , Rgba8 color , float depth = 0.f , unsigned int stencil = 0 );
+
 	void  SetProjectionOrthographic( float x , float y , float z );
 	void  SetProjectionPerspective( float fov , float aspectRatio , float nearZ , float farZ );
 	Rgba8 GetClearColor() const																						{ return m_clearColor; }
@@ -55,6 +56,8 @@ public:
 	Texture*		GetColorTarget() const																			{ return m_colorTarget; }
 	Mat44			GetViewMatrix();
 	Mat44			GetProjectionMatrix() const																		{ return m_projection; }
+	Vec3			ClientToWorld( Vec2 client , float ndcZ );
+	Vec3			WorldToClient( Vec3 worldPos );
 
 public:
 	RenderBuffer*	m_cameraUBO		= nullptr;
