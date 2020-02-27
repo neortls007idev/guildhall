@@ -28,23 +28,45 @@ Game::Game()
 
 	std::vector<Vertex_PCU> meshVerts;
 	
-	Vertex_PCU AABB2Verts[ 4 ] = {
-						Vertex_PCU( Vec3( -5.f,-5.f,-10.f ) , WHITE, Vec2( 0.f, 0.f ) ),
-						Vertex_PCU( Vec3( 5.f,-5.f,-10.f ) , WHITE, Vec2( 1.f, 0.f ) ),
+	Vertex_PCU CubeVerts[ 12 ] = {
+		// FRONT FACE VERTS
+						Vertex_PCU( Vec3( -1.f,-1.f,1.f ) , WHITE, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( 1.f,-1.f,1.f ) , WHITE, Vec2( 1.f, 0.f ) ),
 
-						Vertex_PCU( Vec3( 5.f,5.f,-10.f ) , WHITE, Vec2( 1.f, 1.f ) ),
-						Vertex_PCU( Vec3( -5.f,5.f,-10.f ) , WHITE, Vec2( 1.f, 0.f ) ),
+						Vertex_PCU( Vec3( 1.f,1.f,1.f ) , WHITE, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( -1.f,1.f,1.f ) , WHITE, Vec2( 1.f, 0.f ) ),
+		// BACK FACE VERTS
+						Vertex_PCU( Vec3( -1.f,-1.f,-1.f ) , WHITE, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( 1.f,-1.f,-1.f ) , WHITE, Vec2( 1.f, 0.f ) ),
+
+						Vertex_PCU( Vec3( 1.f,1.f,-1.f ) , WHITE, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( -1.f,1.f,-1.f ) , WHITE, Vec2( 1.f, 0.f ) ),
+		// RIGHT FACE VERTS
+						Vertex_PCU( Vec3( -1.f,-1.f,1.f ) , WHITE, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( 1.f,-1.f,-1.f ) , WHITE, Vec2( 1.f, 0.f ) ),
+
+						Vertex_PCU( Vec3( 1.f,1.f,-1.f ) , WHITE, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( -1.f,1.f,1.f ) , WHITE, Vec2( 1.f, 0.f ) ),
+						
+
 						};
 
-	uint Indices[ 6 ] = {
-	0,2,1,
-	2,1,0,
-	};
+	uint Indices[ 18 ] = {
+		// FRONT FACE INDICES
+							0,1,2,
+							2,3,0,
+		// BACK FACE INDICES
+							4,5,6,
+							6,7,4,
+		// RIGHT FACE INDICES
+							8,9,10,
+							10,11,8,
+							};
 
 	//AABB2 meshTest( -10 , -10 , 10 , 10 );
 
 	//AppendVertsForAABB2( meshVerts , meshTest , BLUE );
-	m_meshCube->UpdateVertices( 4 , &AABB2Verts[ 0 ] , 0 , Vertex_PCU::LAYOUT );
+	m_meshCube->UpdateVertices( 4 , &CubeVerts[ 0 ] , sizeof( Vertex_PCU ) , Vertex_PCU::LAYOUT );
 	m_meshCube->UpdateIndices( 6 , Indices );
 
 
@@ -79,7 +101,7 @@ Game::~Game()
 
 void Game::Update( float deltaSeconds )
 {
-	m_cubeTransform.SetRotation( 0.f , ( float ) GetCurrentTimeSeconds() , 0.f );
+	//m_cubeTransform.SetRotation( 0.f , ( float ) GetCurrentTimeSeconds() , 0.f );
 	UpdateFromKeyBoard( deltaSeconds );
 }
 
@@ -258,9 +280,9 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	m_cameraPosition += movement * speed * deltaSeconds;
 	m_cameraRotation += /*Vec3( rotationPitch , 0.f , rotationYaw )*/ rotation * speed * deltaSeconds;;
 
-	//float finalPitch = Clamp( m_cameraRotation.x , -180.f , 180.f );
-	//float finalYaw	 = Clamp( m_cameraRotation.y, -180.f , 180.f );
-	//float finalRoll  = Clamp( m_cameraRotation.z, -90.f , 90.f );
+	float finalPitch = Clamp( m_cameraRotation.x , -180.f , 180.f );
+	float finalYaw	 = Clamp( m_cameraRotation.y, -180.f , 180.f );
+	float finalRoll  = Clamp( m_cameraRotation.z, -90.f , 90.f );
 
 	m_gameCamera.SetPostion( m_cameraPosition );
 	m_gameCamera.SetPitchRollYawRotation( m_cameraRotation.x , m_cameraRotation.z , m_cameraRotation.y );

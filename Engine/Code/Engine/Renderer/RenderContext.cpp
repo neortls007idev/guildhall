@@ -658,6 +658,15 @@ void RenderContext::DrawVertexArray( int numVertexes , VertexBuffer* vertices )
 
 void RenderContext::DrawIndexed( uint indexCount , uint startIndex , uint indexStride )
 {
+	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
+	m_context->RSSetState( m_currentShader->m_rasterState );
+	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fragmentShader , nullptr , 0 );
+
+	// So at this, I need to describe the vertex format to the shader
+	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
+	// do similar to last bound VBO
+	m_context->IASetInputLayout( inputLayout );
+
 	m_context->DrawIndexed( indexCount , startIndex , indexStride );
 }
 
@@ -697,21 +706,20 @@ void RenderContext::DrawMesh( const GPUMesh* mesh )
 {
 	
 	BindVertexBuffer( mesh->GetVertexBuffer() );
-	/*UpdateLayoutIfNeeded(); // based on currentVertex buffer & CurrentShader
-	{
-		// buffer_attribute_t const* m_currentLayout;
-		// buffer_attribute_t const* m_prevoiuslyBoundLayout;
-
-		if( m_currentlyBoundLayout != m_currentLayout = m_currentVBO -> GetLayout() )
-		|| ( m_hasShaderChanged )
-		{
-			ID3D11InputLayout* layout = m_currentShader->GetOrCreateInputLayout( m_currentLayout );
-			m_context->IASetInputLayput ( layout );
-			m_previouslyBoundLayout = m_currentlLayout;
-			m_chaderHasChanged = false;
-		}
-	}*/
-	
+// 	UpdateLayoutIfNeeded(); // based on currentVertex buffer & CurrentShader
+// 	{
+// 		 buffer_attribute_t const* m_currentLayout;
+// 		 buffer_attribute_t const* m_prevoiuslyBoundLayout;
+// 
+// 		if( m_currentlyBoundLayout != m_currentLayout = m_immediateVBO->GetLayout() )
+// 		|| ( m_hasShaderChanged )
+// 		{
+// 			ID3D11InputLayout* layout = m_currentShader->GetOrCreateInputLayout( m_currentLayout );
+// 			m_context->IASetInputLayput ( layout );
+// 			m_previouslyBoundLayout = m_currentlLayout;
+// 			m_chaderHasChanged = false;
+// 		}
+// 	}
 
 	bool hasIndices = mesh->GetIndexCount();
 
@@ -1032,8 +1040,12 @@ void RenderContext::BindIndexBuffer( IndexBuffer* ibo )
 	if ( m_lastBoundIBO != iboHandle )
 	{
 		m_context->IASetIndexBuffer( iboHandle , DXGI_FORMAT_R32_UINT , offset );
-		m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-		m_lastBoundIBO = ibo->m_handle;
+		//m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+		m_lastBoundIBO = iboHandle;
+	}
+	else
+	{
+		m_context->IASetIndexBuffer( m_lastBoundIBO , DXGI_FORMAT_R32_UINT , offset );
 	}
 }
 

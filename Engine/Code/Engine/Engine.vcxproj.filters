@@ -238,6 +238,9 @@
     <ClCompile Include="Renderer\IndexBuffer.cpp">
       <Filter>Renderer\Pipeline\Buffers</Filter>
     </ClCompile>
+    <ClCompile Include="Primitives\AABB3.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -449,6 +452,9 @@
     </ClInclude>
     <ClInclude Include="Renderer\IndexBuffer.hpp">
       <Filter>Renderer\Pipeline\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Primitives\AABB3.hpp">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

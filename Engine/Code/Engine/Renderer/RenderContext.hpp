@@ -112,8 +112,8 @@ public:
 	void DrawVertexArray( const std::vector<Vertex_PCU>& vertexArray );
 	//void DrawIndexed( const IndexBuffer indexBuffer );
 	void DrawIndexed( uint indexCount , uint startIndex, uint indexStride );
-	void DrawMesh( const GPUMesh* mesh );
 	void DrawVertexArray( int numVertexes , VertexBuffer* vertices );
+	void DrawMesh( const GPUMesh* mesh );
 
 	void DrawLine(const Vec2& start, const Vec2& end, const Rgba8& color, float thickness);
 	void DrawRing(const Vec2& center, float radius, const Rgba8& color, float thickness);
