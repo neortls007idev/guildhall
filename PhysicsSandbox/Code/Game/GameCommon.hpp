@@ -23,7 +23,7 @@ constexpr float MIN_CAMERA_SHAKE										= -10.0f;
 constexpr float MAX_CAMERA_SHAKE										=  10.0f;
 
 constexpr float	MIN_COLLIDER_RADIUS										=  50.f;
-constexpr float	MAX_COLLIDER_RADIUS										=  200.f;
+constexpr float	MAX_COLLIDER_RADIUS										=  150.f;
 
 constexpr int	MIN_INITIAL_GAME_OBJECTS								=  5;
 constexpr int	MAX_INITIAL_GAME_OBJECTS								=  10;

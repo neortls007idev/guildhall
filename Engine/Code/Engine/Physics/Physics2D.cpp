@@ -166,10 +166,11 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	float pushMe = theirMass / ( myMass + theirMass );
 	float pushThem = 1.0f - pushMe;
 
-	float impulse = ( myMass * theirMass ) / ( myMass + theirMass ) * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) *
-		DotProduct2D( ( collision.m_them->GetRigidBody()->GetVelocity() - collision.m_me->GetRigidBody()->GetVelocity() ) , collision.m_collisionManifold.m_normal );
 
-	impulse = ( impulse < 0 ) ? 0 : impulse;
+	if ( collision.m_me->GetRigidBody() == nullptr || collision.m_them->GetRigidBody() == nullptr )
+	{
+		return;
+	}
 
 	if ( collision.m_me->GetRigidBody()->m_collider->GetType() == COLLIDER2D_CONVEXGON )
 	{
@@ -194,7 +195,12 @@ void Physics2D::ResolveCollision( Collision2D collision )
 		collision.m_them->GetRigidBody()->Move( -pushThem * collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap );
 	}
 
-	// 6 ways to apply impulse
+	// 8 ways to apply impulse
+	
+	float impulse = ( myMass * theirMass ) / ( myMass + theirMass ) * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) *
+		DotProduct2D( ( collision.m_them->GetRigidBody()->GetVelocity() - collision.m_me->GetRigidBody()->GetVelocity() ) , collision.m_collisionManifold.m_normal );
+
+	impulse = ( impulse < 0 ) ? 0 : impulse;
 
 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC   || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
 		 collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
@@ -206,45 +212,17 @@ void Physics2D::ResolveCollision( Collision2D collision )
 
 	impulse = ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) *
 		DotProduct2D( ( collision.m_them->GetRigidBody()->GetVelocity() - collision.m_me->GetRigidBody()->GetVelocity() ) , collision.m_collisionManifold.m_normal );
-
+	
 	impulse = ( impulse < 0 ) ? 0 : impulse;
 
 	if ( collision.CheckCollisionType() == STATIC_VS_KINEMATIC || collision.CheckCollisionType() == STATIC_VS_DYNAMIC )
 	{
-		if ( collision.m_me->GetType() == COLLIDER2D_CONVEXGON || collision.m_them->GetType() == COLLIDER2D_CONVEXGON )
-		{
-			if ( collision.m_me->GetType() == COLLIDER2D_CONVEXGON )
-			{
-				collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
-			}
-			else
-			{
-				collision.m_them->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
-			}
-		}
-		else
-		{
-			collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
-		}
+		collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
 	}
 
 	if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_STATIC )
 	{
-		if ( collision.m_me->GetType() == COLLIDER2D_CONVEXGON || collision.m_them->GetType() == COLLIDER2D_CONVEXGON )
-		{
-			if ( collision.m_them->GetType() == COLLIDER2D_CONVEXGON )
-			{
-				collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
-			}
-			else
-			{
-				collision.m_me->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
-			}
-		}
-		else
-		{
-			collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
-		}
+		collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
 	}
 }
 

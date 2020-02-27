@@ -54,9 +54,10 @@ public:
 	Rigidbody2D*		m_rigidbody			= nullptr;			// owning rigidbody, used for calculating world shape
 	bool				m_isGarbage			= false;
 	PhysicsMaterial*	m_physicsMaterial;
+	bool				m_isDrawingCollisions	= false;
 
 private:
-	bool				m_isColliding = false;
+	bool				m_isColliding			= false;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

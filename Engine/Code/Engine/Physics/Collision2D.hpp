@@ -13,7 +13,7 @@ enum eCollisionType : uint
 /* STATIC		*/		STATIC_VS_STATIC,						STATIC_VS_KINEMATIC,					STATIC_VS_DYNAMIC,
 /* KINEMATIC	*/		KINEMATIC_VS_STATIC,					KINEMATIC_VS_KINEMATIC,					KINEMATIC_VS_DYNAMIC,
 /* DYNAMIC		*/		DYNAMIC_VS_STATIC,						DYNAMIC_VS_KINEMATIC,					DYNAMIC_VS_DYNAMIC ,
-/*SPECIAL CASES */		MISSING_RIGIDBODY,
+/*SPECIAL CASES */		MISSING_RIGIDBODY,						INVALID_COLLISION,
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

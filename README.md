@@ -15,7 +15,7 @@ MP2 And SD2 Checklist
     - [x] Update this bounds whenever you update the world shape of the object.
 - [x] Switch `Collider2D::Intersects` to be non-virtual, and instead use a matrix lookup
     - [x] Use a *mid-phase* check to early out of a collision by comparing the bounds first.
-					( Only done for discVsPolygon seemed pointless to do the check for disc vs disc).
+					( Only done for discVsPolygon, seemed pointless to do the check for disc vs disc).
     - [x] If passes the bounds check, lookup and call the appropriate callback
 - [x] Add `Collider2D::GetManifold` that also uses a collision matrix or half matrix
     - [x] Again do an early out using the bounds.
@@ -64,6 +64,11 @@ MP2 And SD2 Checklist
 - Select an object and hit `delete` or `backspace` key to delete the currently selected object.
 - F8 key to delete and reset the game.
 
+------
+
+### BUG
+
+- When disc spawn on top of disc or when disc drag inside polygon expected behavior is not observed.
 
 Makes sure you mouse position is correct for your current view - converting the client position (offset from top-left of window) to a world location.
 ------

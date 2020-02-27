@@ -47,6 +47,7 @@ eCollisionType Collision2D::CheckCollisionType() const
 	if ( meRigidBody->GetSimulationMode() == SIMULATIONMODE_DYNAMIC && themRigidBody->GetSimulationMode() == SIMULATIONMODE_KINEMATIC )		{ return DYNAMIC_VS_KINEMATIC; }
 	if ( meRigidBody->GetSimulationMode() == SIMULATIONMODE_DYNAMIC && themRigidBody->GetSimulationMode() == SIMULATIONMODE_DYNAMIC )		{ return DYNAMIC_VS_DYNAMIC; }
 
+	return INVALID_COLLISION;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

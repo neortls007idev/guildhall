@@ -47,15 +47,15 @@ Game::Game()
 
 	RandomizePointCloud( m_rng );
 	//testPolygon = new Polygon2D();
-	testPolygon =  Polygon2D::MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
+	//m_testPolygon =  Polygon2D::MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
 	//testPolygon.SetCenter();
 
-	if ( isnan( testPolygon.m_center.x) || isnan(testPolygon.m_center.y) )
+	if ( isnan( m_testPolygon.m_center.x) || isnan(m_testPolygon.m_center.y) )
 	{
 		return;
 	}
-	//testPolygon->MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
-	//InitialGameObjectsSpawner();
+	//m_testPolygon.MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
+	InitialGameObjectsSpawner();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -73,9 +73,9 @@ void Game::InitialGameObjectsSpawner()
 		m_gameObjects.push_back( temp );
 		m_isMouseOnGameObject.push_back( false );
 	}
-	GameObject* temp = new GameObject( g_thePhysicsSystem , testPolygon.GetCenter() , Vec2::ZERO , testPolygon );
-	m_gameObjects.push_back( temp );
-	m_isMouseOnGameObject.push_back( false );
+// 	GameObject* temp = new GameObject( g_thePhysicsSystem , m_testPolygon.GetCenter() , Vec2::ZERO , m_testPolygon );
+// 	m_gameObjects.push_back( temp );
+// 	m_isMouseOnGameObject.push_back( false );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -221,7 +221,7 @@ void Game::RenderDrawFromPointCloudMode() const
 
 void Game::DebugRender() const
 {
-	g_theRenderer->DrawPolygon( &testPolygon.m_points[ 0 ] , ( unsigned int ) testPolygon.m_points.size() , WHITE );
+	g_theRenderer->DrawPolygon( &m_testPolygon.m_points[ 0 ] , ( unsigned int ) m_testPolygon.m_points.size() , WHITE );
 
 	for ( size_t index = 0; index < m_pointCloud.size(); index++ )
 	{
@@ -484,7 +484,7 @@ void Game::UpdateGameObjects()
 	IsMouseInsideGameObject();
 	ResetCollisions();
 	AreObjectsColliding();
-	ChangeColorOnCollision();
+	//ChangeColorOnCollision();
 	ChangeAlphaByBounciness();
 }
 

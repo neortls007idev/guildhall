@@ -4,6 +4,10 @@
 #include "Engine/Physics/DiscCollider2D.hpp"
 #include "Engine/Physics/Rigidbody2D.hpp"
 #include <math.h>
+#include "Engine/Input/InputSystem.hpp"
+#include "Engine/Input/VirtualKeyboard.hpp"
+
+extern InputSystem* g_theInput;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -80,7 +84,6 @@ bool PolygonCollider2D::Contains( Vec2 pos ) const
 		Vec2 edgeNormal;
 		Vec2 pointRelativePos;
 		size_t index = 1;
-
 		for ( ; index < m_polygon.m_points.size(); index++ )
 		{
 			edge = m_polygon.m_points[ index ] - m_polygon.m_points[ index - 1 ];
@@ -103,6 +106,7 @@ bool PolygonCollider2D::Contains( Vec2 pos ) const
 			return false;
 		}
 	}
+
 	return true;
 }
 
@@ -160,21 +164,22 @@ void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderCol
 		ctx->DrawLine( m_worldPosition - line1 , m_worldPosition + line1 , RED , 0.01f * m_width );
 		ctx->DrawLine( m_worldPosition - line2 , m_worldPosition + line2 , RED , 0.01f * m_width );
 	}
-	ctx->DrawRing( m_boundingDisc.m_center , m_boundingDisc.m_radius , WHITE , 5.f );
-	//ctx->DrawAABB2( m_boundingAABB , Rgba8( 0 , 0 , 255 , 127 ) );
 
-	Vec2 leftMostPoint		= *GetLeftMostPointFromPointCloud(	 &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
-	Vec2 rightMostPoint		= *GetRightMostPointFromPointCloud(  &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
-	Vec2 topMostPoint		= *GetTopMostPointFromPointCloud(	 &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
-	Vec2 bottomMostPoint	= *GetBottomMostPointFromPointCloud( &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
+	if ( m_isDrawingCollisions )
+	{
+		ctx->DrawRing( m_boundingDisc.m_center , m_boundingDisc.m_radius , WHITE , 5.f );
+		
+		Vec2 leftMostPoint		= *GetLeftMostPointFromPointCloud(	 &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
+		Vec2 rightMostPoint		= *GetRightMostPointFromPointCloud(  &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
+		Vec2 topMostPoint		= *GetTopMostPointFromPointCloud(	 &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
+		Vec2 bottomMostPoint	= *GetBottomMostPointFromPointCloud( &m_polygon.m_points[ 0 ] , ( int ) m_polygon.m_points.size() );
 
-	ctx->DrawDisc( rightMostPoint , 5.f , PURPLE );
-	ctx->DrawDisc( leftMostPoint , 5.f , PURPLE );
-	ctx->DrawDisc( bottomMostPoint , 5.f , PURPLE );
-	ctx->DrawDisc( topMostPoint , 5.f , PURPLE );
+		ctx->DrawDisc( rightMostPoint , 5.f , PURPLE );
+		ctx->DrawDisc( leftMostPoint , 5.f , PURPLE );
+		ctx->DrawDisc( bottomMostPoint , 5.f , PURPLE );
+		ctx->DrawDisc( topMostPoint , 5.f , PURPLE );
+	}
 
-	//test.SetDimensions( Vec2( 100.f , 100.f ) );
-	//ctx->DrawAABB2( test , WHITE );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
