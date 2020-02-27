@@ -111,6 +111,7 @@ public:
 	//void DrawIndexed( const IndexBuffer indexBuffer );
 	void DrawIndexedArray();
 	void DrawMesh( const GPUMesh* mesh );
+	void DrawVertexArray( int numVertexes , VertexBuffer* vertices );
 
 	void DrawLine(const Vec2& start, const Vec2& end, const Rgba8& color, float thickness);
 	void DrawRing(const Vec2& center, float radius, const Rgba8& color, float thickness);

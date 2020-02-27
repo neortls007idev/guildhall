@@ -8,8 +8,10 @@
 class GPUMesh // A04
 {
 public:
-	GPUMesh( RenderContext* ctx );
+	GPUMesh( RenderContext* owner );
+	~GPUMesh();
 	void UpdateVertices( uint vcount , void const* vertexData , uint vertexStride , buffer_attribute_t const* layout );
+	void UpdateVertices( std::vector<Vertex_PCU> const& vertices );
 	void UpdateIndices( uint icount , uint const* indices );
 
 	int GetIndexCount() const;
@@ -25,12 +27,7 @@ public:
 		UpdateIndices( indices.size() , &indices[ 0 ] );
 	}
 
-// 	void UpdateVertices( std::vector<Vertex_PCU> const& vertices )
-// 	{
-// 		UpdateVertices( vertices.size() );
-// 
-// 	}
-
+	
 	// helper template
 	template <typename VERTEX_TYPE>
 	void UpdateVertices( uint vcount , VERTEX_TYPE const* vertices )
@@ -39,8 +36,10 @@ public:
 	}
 
 public:
-	VertexBuffer* m_vertices = nullptr;
-	IndexBuffer* m_indices = nullptr;
+	VertexBuffer*	m_vertices		= nullptr;
+	IndexBuffer*	m_indices		= nullptr;
+	uint			m_vertexCount	= 0;
+	uint			m_indexCount	= 0;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

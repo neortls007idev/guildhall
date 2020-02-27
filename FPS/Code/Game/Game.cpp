@@ -1,12 +1,11 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Input/VirtualKeyboard.hpp"
+#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Primitives/GPUMesh.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Time/Time.hpp"
-
 #include "Game/Game.hpp"
-
-#include "Engine/Math/MathUtils.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
 
@@ -24,7 +23,15 @@ Game::Game()
 	m_gameCamera.SetProjectionPerspective( 60.f , CLIENT_ASPECT , -.1f , -100.f );
 	m_gameCamera.SetPostion( Vec3( 0.f , 0.f , 0.f ) );
 
+	m_meshCube = new GPUMesh( g_theRenderer );
 	m_cubeTransform.SetPosition( 1.f , 0.5f , -15.0f );
+
+	std::vector<Vertex_PCU> meshVerts;
+	AABB2 meshTest( -10 , -10 , 10 , 10 );
+
+	AppendVertsForAABB2( meshVerts , meshTest , BLUE );
+	m_meshCube->UpdateVertices( meshVerts );
+
 
 	m_normalImage = AABB2( -WORLD_CAMERA_SIZE_X , -WORLD_CAMERA_SIZE_Y , WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y );
 	AABB2 boxCopy = m_normalImage;
@@ -48,6 +55,9 @@ Game::~Game()
 
 	delete m_imageTex;
 	m_imageTex = nullptr;
+
+	delete m_meshCube;
+	m_meshCube = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -68,16 +78,18 @@ void Game::Render() const
 	g_theRenderer->BindShader( nullptr );
 
 	//g_theRenderer->SetBlendMode( BlendMode::ALPHA );
-	const Vertex_PCU AABB2Verts[ 6 ] = {
-							Vertex_PCU( Vec3( -5.f,-5.f,-10.f ) , WHITE, Vec2( 0.f, 0.f ) ),
-							Vertex_PCU( Vec3( 5.f,-5.f,-10.f ) , WHITE, Vec2( 1.f, 0.f ) ),
-							Vertex_PCU( Vec3( 5.f,5.f,-10.f ) , WHITE, Vec2( 0.f, 1.f ) ),
+// 	const Vertex_PCU AABB2Verts[ 6 ] = {
+// 							Vertex_PCU( Vec3( -5.f,-5.f,-10.f ) , WHITE, Vec2( 0.f, 0.f ) ),
+// 							Vertex_PCU( Vec3( 5.f,-5.f,-10.f ) , WHITE, Vec2( 1.f, 0.f ) ),
+// 							Vertex_PCU( Vec3( 5.f,5.f,-10.f ) , WHITE, Vec2( 0.f, 1.f ) ),
+// 
+// 							Vertex_PCU( Vec3( 5.f,5.f,-10.f ) , WHITE, Vec2( 1.f, 0.f ) ),
+// 							Vertex_PCU( Vec3( -5.f,5.f,-10.f ) , WHITE, Vec2( 1.f, 1.f ) ),
+// 							Vertex_PCU( Vec3( -5.f,-5.f,-10.f ) , WHITE, Vec2( 0.f, 1.f ) ) };
+// 
+// 	g_theRenderer->DrawVertexArray( 6 , AABB2Verts );
 
-							Vertex_PCU( Vec3( 5.f,5.f,-10.f ) , WHITE, Vec2( 1.f, 0.f ) ),
-							Vertex_PCU( Vec3( -5.f,5.f,-10.f ) , WHITE, Vec2( 1.f, 1.f ) ),
-							Vertex_PCU( Vec3( -5.f,-5.f,-10.f ) , WHITE, Vec2( 0.f, 1.f ) ) };
-
-	g_theRenderer->DrawVertexArray( 6 , AABB2Verts );
+	g_theRenderer->DrawVertexArray( m_meshCube->GetVertexCount() , m_meshCube->GetVertexBuffer() );
 
 
 	g_theRenderer->BindTexture( m_imageTex );

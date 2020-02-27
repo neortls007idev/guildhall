@@ -1,10 +1,24 @@
 #include "Engine/Primitives/GPUMesh.hpp"
+#include "Engine/Renderer/D3D11Common.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void GPUMesh::UpdateVertices( uint vcount , void const* vertexData , uint vertexStride , buffer_attribute_t const* layout )
 {
-	m_vertices->Update( vertexData , sizeof( layout ) * vcount , sizeof( layout ) );
+	m_vertices->Update( vertexData , /*sizeof( layout ) **/ vcount * vertexStride , /*sizeof( layout )*/vertexStride );
+	m_vertexCount = vcount;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void GPUMesh::UpdateVertices( std::vector<Vertex_PCU> const& vertices )
+{
+	UpdateVertices( vertices.size() ,
+		&vertices[ 0 ] ,
+		sizeof( Vertex_PCU ) ,
+		Vertex_PCU::LAYOUT );
+
+	m_vertexCount = ( uint ) vertices.size();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -12,14 +26,41 @@ void GPUMesh::UpdateVertices( uint vcount , void const* vertexData , uint vertex
 void GPUMesh::UpdateIndices( uint icount , uint const* indices )
 {
 	m_indices->Update( icount , indices );
+
+	m_indexCount = icount;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-GPUMesh::GPUMesh( RenderContext* ctx )
+GPUMesh::GPUMesh( RenderContext* owner )
 {
-	m_vertices	= new VertexBuffer( ctx, MEMORY_HINT_DYNAMIC );
-	m_indices	= new IndexBuffer( ctx , MEMORY_HINT_DYNAMIC );
+	m_vertices	= new VertexBuffer( owner, MEMORY_HINT_DYNAMIC );
+	m_indices	= new IndexBuffer( owner , MEMORY_HINT_DYNAMIC );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+int GPUMesh::GetIndexCount() const
+{
+	return m_indexCount;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+int GPUMesh::GetVertexCount() const
+{
+	return m_vertexCount;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+GPUMesh::~GPUMesh()
+{
+	delete m_vertices;
+	m_vertices = nullptr;
+
+	delete m_indices;
+	m_indices = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -648,6 +648,14 @@ void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU>& vertexArray 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void RenderContext::DrawVertexArray( int numVertexes , VertexBuffer* vertices )
+{
+	BindVertexBuffer( vertices );
+	Draw( numVertexes , 0 );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void RenderContext:: DrawLine(const Vec2& start, const Vec2& end, const Rgba8& color, float thickness)
 {
 	Vec2 displacement = end - start;
@@ -710,6 +718,8 @@ void RenderContext::DrawMesh( const GPUMesh* mesh )
 		Draw( mesh->GetVertexCount() , 0 , 0 , 0 );
 
 	}*/
+
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

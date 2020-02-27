@@ -26,8 +26,7 @@ public:
 	void Render() const;
 	void UpdateCamera();
 	void RenderUI() const;
-	void CheckCollision();
-
+	
 	void AddScreenShakeIntensity( float deltaShakeIntensity );
 
 	void GarbageCollection();
