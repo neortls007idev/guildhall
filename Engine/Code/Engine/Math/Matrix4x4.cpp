@@ -3,6 +3,7 @@
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Math/Vec4.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -42,10 +43,10 @@ Mat44::Mat44( const Vec2& iBasis2D , const Vec2& jBasis2D , const Vec2& translat
 
 	Jx = jBasis2D.x;
 	Jy = jBasis2D.y;
-	
+
 	Tx = translation2D.x;
 	Ty = translation2D.y;
-	
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -55,15 +56,15 @@ Mat44::Mat44( const Vec3& iBasis3D , const Vec3& jBasis3D , const Vec3& kBasis3D
 	Ix = iBasis3D.x;
 	Iy = iBasis3D.y;
 	Iz = iBasis3D.z;
-	
+
 	Jx = jBasis3D.x;
 	Jy = jBasis3D.y;
 	Jz = jBasis3D.z;
-	
+
 	Kx = kBasis3D.x;
 	Ky = kBasis3D.y;
 	Kz = kBasis3D.z;
-	
+
 	Tx = translation3D.x;
 	Ty = translation3D.y;
 	Tz = translation3D.z;
@@ -102,17 +103,17 @@ Mat44::Mat44( float* sixteenValuesBasisMajor )
 	Iy = *( sixteenValuesBasisMajor + 1 );
 	Iz = *( sixteenValuesBasisMajor + 2 );
 	Iw = *( sixteenValuesBasisMajor + 3 );
-	
+
 	Jx = *( sixteenValuesBasisMajor + 4 );
 	Jy = *( sixteenValuesBasisMajor + 5 );
 	Jz = *( sixteenValuesBasisMajor + 6 );
 	Jw = *( sixteenValuesBasisMajor + 7 );
-		 						  
+
 	Kx = *( sixteenValuesBasisMajor + 8 );
 	Ky = *( sixteenValuesBasisMajor + 9 );
 	Kz = *( sixteenValuesBasisMajor + 10 );
 	Kw = *( sixteenValuesBasisMajor + 11 );
-		 						  
+
 	Tx = *( sixteenValuesBasisMajor + 12 );
 	Ty = *( sixteenValuesBasisMajor + 13 );
 	Tz = *( sixteenValuesBasisMajor + 14 );
@@ -145,10 +146,10 @@ const Vec3 Mat44::TransformVector3D( const Vec3& vectorQuantity ) const
 const Vec2 Mat44::TransformPosition2D( const Vec2& position ) const
 {
 	Vec2 copy = position;
-	
+
 	copy.x = ( position.x * Ix ) + ( position.y * Jx ) + ( Tx );
 	copy.y = ( position.x * Iy ) + ( position.y * Jy ) + ( Ty );
-	
+
 	return copy;
 }
 
@@ -157,7 +158,7 @@ const Vec2 Mat44::TransformPosition2D( const Vec2& position ) const
 const Vec3 Mat44::TransformPosition3D( const Vec3& position ) const
 {
 	Vec3 copy = position;
-	
+
 	copy.x = ( position.x * Ix ) + ( position.y * Jx ) + ( position.z * Kx ) + ( Tx );
 	copy.y = ( position.x * Iy ) + ( position.y * Jy ) + ( position.z * Ky ) + ( Ty );
 	copy.z = ( position.x * Iz ) + ( position.y * Jz ) + ( position.z * Kz ) + ( Tz );
@@ -170,7 +171,7 @@ const Vec3 Mat44::TransformPosition3D( const Vec3& position ) const
 const Vec4 Mat44::TransformHomogeneousPoint3D( const Vec4& homogeneousPoint ) const
 {
 	Vec4 copy = homogeneousPoint;
-	
+
 	copy.x = ( homogeneousPoint.x * Ix ) + ( homogeneousPoint.y * Jx ) + ( homogeneousPoint.z * Kx ) + ( homogeneousPoint.w * Tx );
 	copy.y = ( homogeneousPoint.x * Iy ) + ( homogeneousPoint.y * Jy ) + ( homogeneousPoint.z * Ky ) + ( homogeneousPoint.w * Ty );
 	copy.z = ( homogeneousPoint.x * Iz ) + ( homogeneousPoint.y * Jz ) + ( homogeneousPoint.z * Kz ) + ( homogeneousPoint.w * Tz );
@@ -350,7 +351,7 @@ void Mat44::SetBasisVectors4D( const Vec4& iBasis4D , const Vec4& jBasis4D , con
 	Jy = jBasis4D.y;
 	Jz = jBasis4D.z;
 	Jw = jBasis4D.w;
-			   
+
 	Kx = kBasis4D.x;
 	Ky = kBasis4D.y;
 	Kz = kBasis4D.z;
@@ -405,7 +406,7 @@ void Mat44::ScaleNonUniform2D(  Vec2 nonUniformScale2D  )
 	Iy *= nonUniformScale2D.x;
 	Iz *= nonUniformScale2D.x;
 	Iw *= nonUniformScale2D.x;
-						 
+
 	Jx *= nonUniformScale2D.y;
 	Jy *= nonUniformScale2D.y;
 	Jz *= nonUniformScale2D.y;
@@ -420,12 +421,12 @@ void Mat44::ScaleNonUniform3D( Vec3 nonUniformScale3D )
 	Iy *= nonUniformScale3D.x;
 	Iz *= nonUniformScale3D.x;
 	Iw *= nonUniformScale3D.x;
-		  
+
 	Jx *= nonUniformScale3D.y;
 	Jy *= nonUniformScale3D.y;
 	Jz *= nonUniformScale3D.y;
 	Jw *= nonUniformScale3D.y;
-		  
+
 	Kx *= nonUniformScale3D.z;
 	Ky *= nonUniformScale3D.z;
 	Kz *= nonUniformScale3D.z;
@@ -437,7 +438,7 @@ void Mat44::ScaleNonUniform3D( Vec3 nonUniformScale3D )
 void Mat44::RotateXDegrees( float degreesAboutX )
 {
 	Mat44 rotateAboutXDegrees = Mat44::CreateXRotationDegrees( degreesAboutX );
-	
+
 	float newJx =( Jx * rotateAboutXDegrees.Jy ) + ( Kx * rotateAboutXDegrees.Jz );
 	float newJw =( Jw * rotateAboutXDegrees.Jy ) + ( Kw * rotateAboutXDegrees.Jz );
 	float newJy =( Jy * rotateAboutXDegrees.Jy ) + ( Ky * rotateAboutXDegrees.Jz );
@@ -464,7 +465,7 @@ void Mat44::RotateXDegrees( float degreesAboutX )
 void Mat44::RotateYDegrees( float degreesAboutY )
 {
 	Mat44 rotateAboutYDegrees = Mat44::CreateYRotationDegrees( degreesAboutY );
-	
+
 	float newIx = ( Ix * rotateAboutYDegrees.Ix ) + ( Kx * rotateAboutYDegrees.Iz );
 	float newIy = ( Iy * rotateAboutYDegrees.Ix ) + ( Ky * rotateAboutYDegrees.Iz );
 	float newIz = ( Iz * rotateAboutYDegrees.Ix ) + ( Kz * rotateAboutYDegrees.Iz );
@@ -493,9 +494,9 @@ void Mat44::RotateZDegrees( float degreesAboutZ )
 	Mat44 rotateAboutZDegrees = Mat44::CreateZRotationDegrees( degreesAboutZ );
 
 	float newIx = ( Ix * rotateAboutZDegrees.Ix ) + ( Jx * rotateAboutZDegrees.Iy );
-	float newIy = ( Iy * rotateAboutZDegrees.Ix ) + ( Jy * rotateAboutZDegrees.Iy ); 
-	float newIz = ( Iz * rotateAboutZDegrees.Ix ) + ( Jz * rotateAboutZDegrees.Iy ); 
-	float newIw = ( Iw * rotateAboutZDegrees.Ix ) + ( Jw * rotateAboutZDegrees.Iy ); 
+	float newIy = ( Iy * rotateAboutZDegrees.Ix ) + ( Jy * rotateAboutZDegrees.Iy );
+	float newIz = ( Iz * rotateAboutZDegrees.Ix ) + ( Jz * rotateAboutZDegrees.Iy );
+	float newIw = ( Iw * rotateAboutZDegrees.Ix ) + ( Jw * rotateAboutZDegrees.Iy );
 
 	float newJx = ( Ix * rotateAboutZDegrees.Jx ) + ( Jx * rotateAboutZDegrees.Jy );
 	float newJy = ( Iy * rotateAboutZDegrees.Jx ) + ( Jy * rotateAboutZDegrees.Jy );
@@ -540,17 +541,17 @@ void Mat44::Translate3D( const Vec3& translation3D )
 void Mat44::TransformBy( const Mat44& arbitraryTransformationToAppend )
 {
 	const Mat44& matA = arbitraryTransformationToAppend;
-	
+
 	float newIx = ( Ix * matA.Ix ) + ( Jx * matA.Iy ) + ( Kx * matA.Iz ) + ( Tx * matA.Iw );
 	float newIy = ( Iy * matA.Ix ) + ( Jy * matA.Iy ) + ( Ky * matA.Iz ) + ( Ty * matA.Iw );
 	float newIz = ( Iz * matA.Ix ) + ( Jz * matA.Iy ) + ( Kz * matA.Iz ) + ( Tz * matA.Iw );
 	float newIw = ( Iw * matA.Ix ) + ( Jw * matA.Iy ) + ( Kw * matA.Iz ) + ( Tw * matA.Iw );
-	
+
 	float newJx = ( Ix * matA.Jx ) + ( Jx * matA.Jy ) + ( Kx * matA.Jz ) + ( Tx * matA.Jw );
 	float newJy = ( Iy * matA.Jx ) + ( Jy * matA.Jy ) + ( Ky * matA.Jz ) + ( Ty * matA.Jw );
 	float newJz = ( Iz * matA.Jx ) + ( Jz * matA.Jy ) + ( Kz * matA.Jz ) + ( Tz * matA.Jw );
 	float newJw = ( Iw * matA.Jx ) + ( Jw * matA.Jy ) + ( Kw * matA.Jz ) + ( Tw * matA.Jw );
-	
+
 	float newKx = ( Ix * matA.Kx ) + ( Jx * matA.Ky ) + ( Kx * matA.Kz ) + ( Tx * matA.Kw );
 	float newKy = ( Iy * matA.Kx ) + ( Jy * matA.Ky ) + ( Ky * matA.Kz ) + ( Ty * matA.Kw );
 	float newKz = ( Iz * matA.Kx ) + ( Jz * matA.Ky ) + ( Kz * matA.Kz ) + ( Tz * matA.Kw );
@@ -590,7 +591,7 @@ const Mat44 Mat44::CreateXRotationDegrees( float degreesAboutX )
 
 	rotateAboutX.Jy =  CosDegrees( degreesAboutX );
 	rotateAboutX.Jz =  SinDegrees( degreesAboutX );
-			   
+
 	rotateAboutX.Ky = -rotateAboutX.Jz;
 	rotateAboutX.Kz =  rotateAboutX.Jy;
 
@@ -605,7 +606,7 @@ const Mat44 Mat44::CreateYRotationDegrees( float degreesAboutY )
 
 	rotateAboutY.Ix =  CosDegrees( degreesAboutY );
 	rotateAboutY.Iz = -SinDegrees( degreesAboutY );
-			   
+
 	rotateAboutY.Kx = -rotateAboutY.Iz;
 	rotateAboutY.Kz =  rotateAboutY.Ix;
 
@@ -660,7 +661,7 @@ const Mat44 Mat44::CreateUniformScaleXY( float uniformScaleXY )
 	Mat44  uniformScale2D;
 
 	uniformScale2D.Ix = uniformScaleXY;
-	
+
 	uniformScale2D.Jy = uniformScaleXY;
 
 	return uniformScale2D;
@@ -675,7 +676,7 @@ const Mat44 Mat44::CreateNonUniformScaleXY( const Vec2& scaleFactorXY )
 	nonUniformScale2D.Ix = scaleFactorXY.x;
 
 	nonUniformScale2D.Jy = scaleFactorXY.y;
-	
+
 	return nonUniformScale2D;
 }
 
@@ -686,9 +687,9 @@ const Mat44 Mat44::CreateUniformScale3D( float uniformScale3D )
 	Mat44  mat44UniformScale3D;
 
 	mat44UniformScale3D.Ix = uniformScale3D;
-						   
+
 	mat44UniformScale3D.Jy = uniformScale3D;
-						   
+
 	mat44UniformScale3D.Kz = uniformScale3D;
 
 	return mat44UniformScale3D;
@@ -701,12 +702,170 @@ const Mat44 Mat44::CreateNonUniformScale3D( const Vec3& scaleFactorXYZ )
 	Mat44  nonUniformScale3D;
 
 	nonUniformScale3D.Ix = scaleFactorXYZ.x;
-	
+
 	nonUniformScale3D.Jy = scaleFactorXYZ.y;
-	
+
 	nonUniformScale3D.Kz = scaleFactorXYZ.z;
 
 	return nonUniformScale3D;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Mat44 Mat44::GetInverse()
+{
+	float inverse[ 16 ];
+	float determinant;
+	float m[ 16 ];
+	uint index;
+
+	for ( index = 0; index < 16; ++index )
+	{
+		m[ index ] = *( &Ix + index );
+	}
+
+	inverse[ 0 ] = m[ 5 ] * m[ 10 ] * m[ 15 ] -
+		m[ 5 ] * m[ 11 ] * m[ 14 ] -
+		m[ 9 ] * m[ 6 ] * m[ 15 ] +
+		m[ 9 ] * m[ 7 ] * m[ 14 ] +
+		m[ 13 ] * m[ 6 ] * m[ 11 ] -
+		m[ 13 ] * m[ 7 ] * m[ 10 ];
+
+	inverse[ 4 ] = -m[ 4 ] * m[ 10 ] * m[ 15 ] +
+		m[ 4 ] * m[ 11 ] * m[ 14 ] +
+		m[ 8 ] * m[ 6 ] * m[ 15 ] -
+		m[ 8 ] * m[ 7 ] * m[ 14 ] -
+		m[ 12 ] * m[ 6 ] * m[ 11 ] +
+		m[ 12 ] * m[ 7 ] * m[ 10 ];
+
+	inverse[ 8 ] = m[ 4 ] * m[ 9 ] * m[ 15 ] -
+		m[ 4 ] * m[ 11 ] * m[ 13 ] -
+		m[ 8 ] * m[ 5 ] * m[ 15 ] +
+		m[ 8 ] * m[ 7 ] * m[ 13 ] +
+		m[ 12 ] * m[ 5 ] * m[ 11 ] -
+		m[ 12 ] * m[ 7 ] * m[ 9 ];
+
+	inverse[ 12 ] = -m[ 4 ] * m[ 9 ] * m[ 14 ] +
+		m[ 4 ] * m[ 10 ] * m[ 13 ] +
+		m[ 8 ] * m[ 5 ] * m[ 14 ] -
+		m[ 8 ] * m[ 6 ] * m[ 13 ] -
+		m[ 12 ] * m[ 5 ] * m[ 10 ] +
+		m[ 12 ] * m[ 6 ] * m[ 9 ];
+
+	inverse[ 1 ] = -m[ 1 ] * m[ 10 ] * m[ 15 ] +
+		m[ 1 ] * m[ 11 ] * m[ 14 ] +
+		m[ 9 ] * m[ 2 ] * m[ 15 ] -
+		m[ 9 ] * m[ 3 ] * m[ 14 ] -
+		m[ 13 ] * m[ 2 ] * m[ 11 ] +
+		m[ 13 ] * m[ 3 ] * m[ 10 ];
+
+	inverse[ 5 ] = m[ 0 ] * m[ 10 ] * m[ 15 ] -
+		m[ 0 ] * m[ 11 ] * m[ 14 ] -
+		m[ 8 ] * m[ 2 ] * m[ 15 ] +
+		m[ 8 ] * m[ 3 ] * m[ 14 ] +
+		m[ 12 ] * m[ 2 ] * m[ 11 ] -
+		m[ 12 ] * m[ 3 ] * m[ 10 ];
+
+	inverse[ 9 ] = -m[ 0 ] * m[ 9 ] * m[ 15 ] +
+		m[ 0 ] * m[ 11 ] * m[ 13 ] +
+		m[ 8 ] * m[ 1 ] * m[ 15 ] -
+		m[ 8 ] * m[ 3 ] * m[ 13 ] -
+		m[ 12 ] * m[ 1 ] * m[ 11 ] +
+		m[ 12 ] * m[ 3 ] * m[ 9 ];
+
+	inverse[ 13 ] = m[ 0 ] * m[ 9 ] * m[ 14 ] -
+		m[ 0 ] * m[ 10 ] * m[ 13 ] -
+		m[ 8 ] * m[ 1 ] * m[ 14 ] +
+		m[ 8 ] * m[ 2 ] * m[ 13 ] +
+		m[ 12 ] * m[ 1 ] * m[ 10 ] -
+		m[ 12 ] * m[ 2 ] * m[ 9 ];
+
+	inverse[ 2 ] = m[ 1 ] * m[ 6 ] * m[ 15 ] -
+		m[ 1 ] * m[ 7 ] * m[ 14 ] -
+		m[ 5 ] * m[ 2 ] * m[ 15 ] +
+		m[ 5 ] * m[ 3 ] * m[ 14 ] +
+		m[ 13 ] * m[ 2 ] * m[ 7 ] -
+		m[ 13 ] * m[ 3 ] * m[ 6 ];
+
+	inverse[ 6 ] = -m[ 0 ] * m[ 6 ] * m[ 15 ] +
+		m[ 0 ] * m[ 7 ] * m[ 14 ] +
+		m[ 4 ] * m[ 2 ] * m[ 15 ] -
+		m[ 4 ] * m[ 3 ] * m[ 14 ] -
+		m[ 12 ] * m[ 2 ] * m[ 7 ] +
+		m[ 12 ] * m[ 3 ] * m[ 6 ];
+
+	inverse[ 10 ] = m[ 0 ] * m[ 5 ] * m[ 15 ] -
+		m[ 0 ] * m[ 7 ] * m[ 13 ] -
+		m[ 4 ] * m[ 1 ] * m[ 15 ] +
+		m[ 4 ] * m[ 3 ] * m[ 13 ] +
+		m[ 12 ] * m[ 1 ] * m[ 7 ] -
+		m[ 12 ] * m[ 3 ] * m[ 5 ];
+
+	inverse[ 14 ] = -m[ 0 ] * m[ 5 ] * m[ 14 ] +
+		m[ 0 ] * m[ 6 ] * m[ 13 ] +
+		m[ 4 ] * m[ 1 ] * m[ 14 ] -
+		m[ 4 ] * m[ 2 ] * m[ 13 ] -
+		m[ 12 ] * m[ 1 ] * m[ 6 ] +
+		m[ 12 ] * m[ 2 ] * m[ 5 ];
+
+	inverse[ 3 ] = -m[ 1 ] * m[ 6 ] * m[ 11 ] +
+		m[ 1 ] * m[ 7 ] * m[ 10 ] +
+		m[ 5 ] * m[ 2 ] * m[ 11 ] -
+		m[ 5 ] * m[ 3 ] * m[ 10 ] -
+		m[ 9 ] * m[ 2 ] * m[ 7 ] +
+		m[ 9 ] * m[ 3 ] * m[ 6 ];
+
+	inverse[ 7 ] = m[ 0 ] * m[ 6 ] * m[ 11 ] -
+		m[ 0 ] * m[ 7 ] * m[ 10 ] -
+		m[ 4 ] * m[ 2 ] * m[ 11 ] +
+		m[ 4 ] * m[ 3 ] * m[ 10 ] +
+		m[ 8 ] * m[ 2 ] * m[ 7 ] -
+		m[ 8 ] * m[ 3 ] * m[ 6 ];
+
+	inverse[ 11 ] = -m[ 0 ] * m[ 5 ] * m[ 11 ] +
+		m[ 0 ] * m[ 7 ] * m[ 9 ] +
+		m[ 4 ] * m[ 1 ] * m[ 11 ] -
+		m[ 4 ] * m[ 3 ] * m[ 9 ] -
+		m[ 8 ] * m[ 1 ] * m[ 7 ] +
+		m[ 8 ] * m[ 3 ] * m[ 5 ];
+
+	inverse[ 15 ] = m[ 0 ] * m[ 5 ] * m[ 10 ] -
+		m[ 0 ] * m[ 6 ] * m[ 9 ] -
+		m[ 4 ] * m[ 1 ] * m[ 10 ] +
+		m[ 4 ] * m[ 2 ] * m[ 9 ] +
+		m[ 8 ] * m[ 1 ] * m[ 6 ] -
+		m[ 8 ] * m[ 2 ] * m[ 5 ];
+
+	determinant = m[ 0 ] * inverse[ 0 ] + m[ 1 ] * inverse[ 4 ] + m[ 2 ] * inverse[ 8 ] + m[ 3 ] * inverse[ 12 ];
+	determinant = 1.0f / determinant;
+
+	Mat44 result( inverse );
+	for ( index = 0; index < 16; index++ )
+	{
+		*( &result.Ix + index ) = ( inverse[ index ] * determinant );
+	}
+
+	return result;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Mat44 Mat44::CreateFromScaleRotationTransformation( const Vec3& scale , const Vec3& eulerRotation , const Vec3& position )
+{
+	Mat44 transform;
+	Mat44 scaleMatrix	= CreateNonUniformScale3D( scale );
+	Mat44 translateBy	= CreateTranslation3D( position );
+	Mat44 tranformPitch = CreateXRotationDegrees( eulerRotation.x );
+	Mat44 tranformYaw	= CreateZRotationDegrees( eulerRotation.z );
+	Mat44 tranformRoll	= CreateYRotationDegrees( eulerRotation.y );
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	transform.TransformBy( translateBy );
+	transform.TransformBy( tranformPitch );
+	transform.TransformBy( tranformYaw );
+	transform.TransformBy( tranformRoll );
+	transform.TransformBy( scaleMatrix );
+
+	return transform;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

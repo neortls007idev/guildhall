@@ -32,7 +32,7 @@ public:
 
 	void SubscribeToEvent( const std::string& eventName , EventCallbackFunction eventToListen );
 	void UnSubscribeEvent( const std::string& eventName , EventCallbackFunction eventToUnscribe );
-	void FireEvent( const std::string& eventName );
+	bool FireEvent(const std::string& eventName);
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 

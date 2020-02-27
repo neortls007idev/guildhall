@@ -265,6 +265,18 @@ void AABB2::FitWithinBounds( const AABB2& bounds )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void AABB2::AlignWithinAABB2( const AABB2& outerAABB2 , const Vec2& alignment )
+{	
+	Vec2 Dimesions = GetDimensions();
+	Vec2 cellMins = outerAABB2.m_mins + ( ( outerAABB2.m_maxs - outerAABB2.m_mins ) * alignment ) - ( Dimesions * alignment );
+	Vec2 cellMaxs = outerAABB2.m_maxs;/* outerAABB2.GetDimensions()*/
+	
+	m_mins = cellMins;
+	m_maxs = cellMins + Dimesions;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 AABB2 AABB2::CarveBoxOffRight( float fractionOfWidth , float additionalWidth )
 {
 	float width = m_maxs.x - m_mins.x;
@@ -280,7 +292,7 @@ AABB2 AABB2::GetBoxAtRight( float fractionOfWidth , float additionalWidth )
 {
 	float width = m_maxs.x - m_mins.x;
 	float carveWidth = ( fractionOfWidth * width ) + additionalWidth;
-	return AABB2( m_maxs.x - carveWidth , m_mins.y , m_maxs.x , m_maxs.y );
+	return AABB2( m_mins.x - carveWidth , m_mins.y , m_maxs.x , m_maxs.y );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -289,7 +301,7 @@ AABB2 AABB2::CarveBoxOffLeft( float fractionOfWidth , float additionalWidth )
 {
 	float width = m_maxs.x - m_mins.x;
 	float carveWidth = ( fractionOfWidth * width ) + additionalWidth;
-	AABB2 carvedPiece( m_maxs.x , m_mins.y , m_maxs.x - carveWidth , m_maxs.y );
+	AABB2 carvedPiece( m_mins.x , m_mins.y , m_maxs.x - carveWidth , m_maxs.y );
 	m_maxs.x = carvedPiece.m_maxs.x;
 	return carvedPiece;
 }
@@ -300,18 +312,18 @@ AABB2 AABB2::GetBoxAtLeft( float fractionOfWidth , float additionalWidth )
 {
 	float width = m_maxs.x - m_mins.x;
 	float carveWidth = ( fractionOfWidth * width ) + additionalWidth;
-	return AABB2( m_maxs.x , m_mins.y , m_maxs.x - carveWidth , m_maxs.y );
+	return AABB2( m_mins.x , m_mins.y , m_maxs.x - carveWidth , m_maxs.y );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-AABB2 AABB2::CarveBoxOffTop( float fractionOfWidth , float additionalWidth )
+AABB2 AABB2::CarveBoxOffTop( float fractionOfHeight , float additionalHeight )
 {
-	float height = m_maxs.y - m_mins.y;
-	float carveHeight = ( fractionOfWidth * height ) + additionalWidth;
-	AABB2 carvedPiece( m_maxs.x , m_mins.y , m_maxs.x , m_maxs.y - carveHeight );
-	m_maxs.y = carvedPiece.m_maxs.y;
-	return carvedPiece;
+	Vec2 dimensions = GetDimensions();
+	Vec2 max = m_maxs;
+	Vec2 min = Vec2( m_mins.x , m_maxs.y - additionalHeight - ( fractionOfHeight * dimensions.y ) );
+	AABB2 newAAbb = AABB2( min , max );
+	return newAAbb;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -325,13 +337,13 @@ AABB2 AABB2::GetBoxAtTop( float fractionOfWidth , float additionalWidth )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-AABB2 AABB2::CarveBoxOffBottom( float fractionOfWidth , float additionalWidth )
+AABB2 AABB2::CarveBoxOffBottom( float fractionOfHeight , float additionalHeight )
 {
-	float height = m_maxs.y - m_mins.y;
-	float carveHeight = ( fractionOfWidth * height ) + additionalWidth;
-	AABB2 carvedPiece( m_maxs.x , m_mins.y - carveHeight , m_maxs.x , m_maxs.y );
-	m_mins.y = carvedPiece.m_mins.y;
-	return carvedPiece;
+	Vec2 dimensions = GetDimensions();
+	Vec2 min = m_mins;
+	Vec2 max = Vec2( m_maxs.x , m_mins.y + ( fractionOfHeight * dimensions.y ) + additionalHeight );
+	AABB2 newAAbb = AABB2( min , max );
+	return newAAbb;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -340,7 +352,7 @@ AABB2 AABB2::GetBoxAtBottom( float fractionOfWidth , float additionalWidth )
 {
 	float height = m_maxs.y - m_mins.y;
 	float carveHeight = ( fractionOfWidth * height ) + additionalWidth;
-	return AABB2( m_maxs.x , m_mins.y , m_maxs.x , m_maxs.y - carveHeight );
+	return AABB2( m_mins.x , m_mins.y , m_maxs.x , m_maxs.y - carveHeight );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

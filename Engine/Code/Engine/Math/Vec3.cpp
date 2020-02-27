@@ -20,7 +20,21 @@ Vec3::Vec3( const Vec3& copy ): x( copy.x ), y( copy.y ) , z( copy.z )
 
 Vec3::Vec3(  float initialX, float initialY, float initialz ) : x( initialX ), y( initialY ) , z( initialz )
 {
-	
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec3::Vec3( const Vec2& copyFrom , float z ) : x( copyFrom.x ) , y( copyFrom.y ) , z( z )
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec3::Vec3( float initialValues ) : x( initialValues ) , y( initialValues ) , z( initialValues )
+{
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -70,7 +84,7 @@ const Vec3 Vec3::operator/( float inverseScale ) const
 
 void Vec3::operator+=( const Vec3& vecToAdd )
 {
-	
+
 	x += vecToAdd.x;
 	y += vecToAdd.y;
 	z += vecToAdd.z;
@@ -92,7 +106,7 @@ void Vec3::operator*=( const float uniformScale )
 	x = x * uniformScale;
 	y = y * uniformScale;
 	z = z * uniformScale;
-	
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -125,7 +139,7 @@ const Vec3 operator*( float uniformScale, const Vec3& vecToScale )
 
 bool Vec3::operator==( const Vec3& compare ) const
 {
-	
+
 	if ( x == compare.x && y == compare.y && z == compare.z )
 	{
 		return true;
@@ -138,11 +152,11 @@ bool Vec3::operator==( const Vec3& compare ) const
 
 bool Vec3::operator!=( const Vec3& compare ) const
 {
-	
+
 	if ( x == compare.x && y == compare.y && z == compare.z )
 	{
 		return false;
-	}	
+	}
 
 	return true;
 }
@@ -199,10 +213,10 @@ const Vec3 Vec3::GetRotatedAboutZRadians( float deltaRadians ) const
 	float length = sqrt( (x * x) + (y * y) );
 	float currentAngleinRadians = GetAngleAboutZRadians();
 	float newAngleInRadians = currentAngleinRadians + deltaRadians;
-	
+
 	Copy.x = length * cos( newAngleInRadians );
 	Copy.y = length * sin( newAngleInRadians );
-	
+
 	return Copy;
 }
 
@@ -217,7 +231,7 @@ const Vec3 Vec3::GetRotatedAboutZDegrees( float deltaDegrees ) const
 
 	Copy.x = length * CosDegrees( newAngleInDegrees );
 	Copy.y = length * SinDegrees( newAngleInDegrees );
-	
+
 	return Copy;
 }
 
@@ -228,9 +242,9 @@ const Vec3 Vec3::GetClamped( float maxLength ) const
 	Vec3 Copy = *this;
 
 	float length = GetLength();
-	
+
 	if ( length > maxLength )
-	{ 
+	{
 		float scale = 1.f / maxLength;
 		Copy.x = Copy.x * scale;
 		Copy.y = Copy.y * scale;
@@ -244,7 +258,7 @@ const Vec3 Vec3::GetClamped( float maxLength ) const
 const Vec3 Vec3::GetNormalized() const
 {
 	Vec3 Copy = *this;
-		
+
 	float length = GetLength();
 	Copy = Copy * ( 1.f / length );
 

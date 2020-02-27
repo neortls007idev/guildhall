@@ -1,7 +1,7 @@
 #pragma once
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-// MICROSOFT KWYBOARD CONSTANT VLAUES FOR WINDOWS
+// MICROSOFT KEYBOARD CONSTANT VALUES FOR WINDOWS
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 const unsigned char KEY_UPARROW					= 0x26;
@@ -25,8 +25,19 @@ const unsigned char KEY_F12						= 0x81;
 const unsigned char KEY_ENTER					= 0x0D;
 const unsigned char KEY_TILDE					= 0xC0;
 const unsigned char KEY_BACKSPACE				= 0x08;
-const unsigned char KEY_DELETE					= 0x2E;
 const unsigned char KEY_PLUS					= 0xBB;
 const unsigned char KEY_MINUS					= 0xBD;
 const unsigned char KEY_SHIFT					= 0x10;
+const unsigned char KEY_DELETE					= 0x2E;
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
+// EASCII KEY VALUES;
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const unsigned char EASCII_NEWLINE					=	10;
+const unsigned char EASCII_RETURNCARRIAGE			=	13;
+const unsigned char EASCII_BACKSPACE				=	8;
+const unsigned char EASCII_HORIZONTALTAB			=	9;
+const unsigned char EASCII_ESCAPE					=	27;
+
+

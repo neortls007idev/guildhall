@@ -2,6 +2,8 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+struct Mat44;
+
 struct Vec4
 {
 public: // NOTE: this is one of the few cases where we break both the "m_" naming rule AND the avoid-public-members rule
@@ -26,7 +28,7 @@ public:
 // OPERATORS ( CONST )
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-	bool		operator==( const Vec4& compare ) const;		// vec3 == vec3 
+	bool		operator==( const Vec4& compare ) const;		// vec3 == vec3
 	bool		operator!=( const Vec4& compare ) const;		// vec3 != vec3
 	const Vec4	operator+(  const Vec4& vecToAdd ) const;		// vec3 + vec3
 	const Vec4	operator-(  const Vec4& vecToSubtract ) const;	// vec3 - vec3
@@ -34,6 +36,7 @@ public:
 	const Vec4	operator*( float uniformScale ) const;			// vec3 * float
 	const Vec4	operator*( const Vec4& vecToMultiply ) const;	// vec3 * vec3
 	const Vec4	operator/( float inverseScale ) const;			// vec3 / float
+	const Vec4  operator*( const Mat44& lhs ) const;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // OPERATORS ( SELF-MUTATING  / NON-CONST )
