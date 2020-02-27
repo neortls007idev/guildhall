@@ -74,6 +74,9 @@ public:
 	const Vec3  GetRotatedAboutZDegrees( float deltaDegrees ) const;
 	const Vec3	GetClamped( float maxLength ) const;
 	const Vec3	GetNormalized() const;
+	const Vec2	GetXYComponents() const { return Vec2( x , y ); }
+	const Vec2	GetYZComponents() const { return Vec2( y , z ); }
+	const Vec2	GetZXComponents() const { return Vec2( z , x ); }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

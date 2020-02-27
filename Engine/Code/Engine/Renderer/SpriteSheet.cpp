@@ -77,13 +77,11 @@ void SpriteSheet::GetSpriteUVs( Vec2& out_uvAtMins , Vec2& out_uvAtMaxs , int sp
 
 SpriteSheet::~SpriteSheet()
 {
-	for ( SpriteDefinition index : m_spriteDefs )
-	{
-		index.~SpriteDefinition();
-	}
-	m_spriteDefs.clear();
-
-	delete &m_texture;
+// 	for ( SpriteDefinition index : m_spriteDefs )
+// 	{
+// 		index.~SpriteDefinition();
+// 	}
+// 	//m_spriteDefs.clear();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

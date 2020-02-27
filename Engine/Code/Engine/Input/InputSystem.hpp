@@ -46,6 +46,10 @@ public:
 	const KeyButtonState& GetButtonState( unsigned char keyCode ) const;
 	const XboxController& GetXboxController( int controllerID );
 
+	bool WasLeftMouseButtonJustPressed() const;
+	bool WasLeftMouseButtonJustReleased() const;
+	bool  IsLeftMouseButtonHeldDown() const;
+
 	bool HandleLeftMouseButtonPressed();
 	bool HandleLeftMouseButtonReleased();
 

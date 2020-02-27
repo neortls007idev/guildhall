@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Renderer/IndexBuffer.hpp"
 #include "Engine/Renderer/VertexBuffer.hpp"
 

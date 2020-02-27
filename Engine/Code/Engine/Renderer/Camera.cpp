@@ -1,25 +1,23 @@
-#include "Engine/Math/Vec2.hpp"
-#include "Engine/Renderer/Camera.hpp"
-#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Math/MatrixUtils.hpp"
+#include "Engine/Math/Vec2.hpp"
+#include "Engine/Math/Vec4.hpp"
+#include "Engine/Renderer/Camera.hpp"
+#include "Engine/Renderer/RenderBuffer.hpp"
+#include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Renderer/Texture.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 extern Vec2 g_windowDimensions;
 
-#include "Engine/Core/EngineCommon.hpp"
-#include "Engine/Renderer/Texture.hpp"
-#include "Engine/Renderer/RenderBuffer.hpp"
-#include "Engine/Renderer/RenderContext.hpp"
-#include "Engine/Math/MatrixUtils.hpp"
-#include "Engine/Math/Vec4.hpp"
-
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Camera::SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight ) 
+//void Camera::SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight ) 
 void Camera::SetPosition( Vec3 position )
 {
-	m_position = Vec2( position.x , position.y );
+	m_transform.SetPosition( position );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -31,9 +29,9 @@ Vec2 Camera::GetOutputSize() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Vec2 Camera::GetPosition() const
+Vec3 Camera::GetPosition() const
 {
-	return m_position;
+	return m_transform.GetPostion();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -63,8 +61,8 @@ Vec2 Camera::GetClientToWorldPosition( Vec2 clientPos ) const
 //  	pixelpos.x = RangeMapFloat( 0.f , m_outputSize.x , 0.f , m_outputSize.x , worldPos.x );
 //  	pixelpos.y = RangeMapFloat( 0.f , m_outputSize.y , 0.f , m_outputSize.y , worldPos.y );
 
-	Vec2 cameraBottomLeft = GetOrthoMin();
-	Vec2 cameraTopRight = GetOrthoMax();
+	Vec3 cameraBottomLeft = GetOrthoMin();
+	Vec3 cameraTopRight = GetOrthoMax();
 
 	Vec2 outputDimensions = m_outputSize;
 	worldPos.x = RangeMapFloat( 0.f , 1.f , cameraBottomLeft.x , cameraTopRight.x , clientPos.x );
@@ -78,8 +76,8 @@ Vec2 Camera::GetWorldNormalizedToClientPosition( Vec2 worldPos ) const
 {
 	Vec2 clientPos;
 
-	Vec2 cameraBottomLeft	= GetOrthoMin();
-	Vec2 cameraTopRight		= GetOrthoMax();
+	Vec3 cameraBottomLeft	= GetOrthoMin();
+	Vec3 cameraTopRight		= GetOrthoMax();
 
 	Vec2 outputDimensions = m_outputSize;
 	clientPos.x = RangeMapFloat( 0.f,1.f, cameraBottomLeft.x , cameraTopRight.x , worldPos.x );
@@ -89,7 +87,8 @@ Vec2 Camera::GetWorldNormalizedToClientPosition( Vec2 worldPos ) const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-float Camera::GetAspectRatio() const
+//float Camera::GetAspectRatio() const
+
 Camera::~Camera()
 {
 	delete m_cameraUBO;
@@ -120,24 +119,30 @@ void Camera::SetPitchRollYawRotation( float pitch , float yaw , float roll )
 	m_transform.SetRotation( pitch , yaw , roll );
 }
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Camera::SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight )
+float Camera::GetAspectRatio() const
 {
-	bottomLeftCoordinate = bottomLeft;
-	topRightCoordinate   = topRight;
-	return m_outputSize.x / m_outputSize.y;
-	m_projection	= CreateOrthoGraphicProjeciton( Vec3( bottomLeft, 0.0f ) , Vec3( topRight , 1.0f ) );
+	return  ( GetOrthoMax().x - GetOrthoMin().x ) / ( GetOrthoMax().y - GetOrthoMin().y );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Vec2 Camera::GetOrthoBottomLeft() const
 void Camera::CorrectAspectRaio( float clientAspectRatio )
+{
+	// TODO - IMPLEMENT ME
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Camera::SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight )
+{
+	m_projection	= CreateOrthoGraphicProjeciton( Vec3( bottomLeft, 0.0f ) , Vec3( topRight , 1.0f ) );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+// TODO :- FIND ME - void Camera::CorrectAspectRaio( float clientAspectRatio )
+
 Vec3 Camera::GetOrthoMin() const
 {
-	return bottomLeftCoordinate;
-	m_outputSize.x = m_outputSize.y * clientAspectRatio;
 	Vec4 ndc( -1 , -1 , 0 , 1 );				// bottom left of renderable space
 	Mat44 projectionCopy = m_projection;
 	projectionCopy.TransformBy( m_view );
@@ -151,12 +156,8 @@ Vec3 Camera::GetOrthoMin() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Vec2 Camera::GetOrthoTopRight() const
-Vec2 Camera::GetOrthoMin() const
 Vec3 Camera::GetOrthoMax() const
 {
-	return topRightCoordinate;
-	return ( m_position - ( m_outputSize / 2.f ) );
 	Vec4 ndc( 1 , 1 , 0 , 1 );				// bottom left of renderable space
 	Mat44 projectionCopy = m_projection;
 	projectionCopy.TransformBy( m_view );
@@ -170,16 +171,6 @@ Vec3 Camera::GetOrthoMax() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Vec2 Camera::GetOrthoMax() const
-{
-	bottomLeftCoordinate = bottomLeftCoordinate + cameraTranslate;
-	topRightCoordinate   = topRightCoordinate + cameraTranslate;
-	return ( m_position + ( m_outputSize / 2.f ) );
-	// TODO :- IMPLEMENT DOES NOTHING FOR NOW
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 void Camera::SetClearMode( eCameraClearBitFlag clearFlags , Rgba8 color , float depth /*= 0.f */ , unsigned int stencil /*= 0 */ )
 {
 	m_clearMode = clearFlags;
@@ -187,15 +178,6 @@ void Camera::SetClearMode( eCameraClearBitFlag clearFlags , Rgba8 color , float 
 
 	UNUSED( depth );
 	UNUSED( stencil );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Camera::SetProjectionOrthographic( float x , float y , float z )
-{
-	UNUSED( x );
-	UNUSED( y );
-	UNUSED( z );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

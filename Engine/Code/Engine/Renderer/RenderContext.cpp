@@ -65,8 +65,8 @@ void SetDebugName( ID3D11DeviceChild* child , const std::string* name )
 
 RenderContext::~RenderContext()
 {
-	delete g_bitmapFont;
-	g_bitmapFont = nullptr;
+// 	delete g_bitmapFont;
+// 	g_bitmapFont = nullptr;
 
 	m_LoadedTextures.clear();
 	m_LoadedBitMapFonts.clear();
@@ -190,8 +190,8 @@ void RenderContext::EndFrame()
 void RenderContext::Shutdown()
 {
 
-	delete g_bitmapFont;
-	g_bitmapFont = nullptr;
+// 	delete g_bitmapFont;
+// 	g_bitmapFont = nullptr;
 
 
 	for ( int index = 0; index < BlendMode::TOTAL; index++ )
@@ -214,6 +214,25 @@ void RenderContext::Shutdown()
  		}
  	}
 
+
+	for ( auto& textureIndex : m_LoadedTextures )
+	{
+		if ( textureIndex.second != nullptr )
+		{
+			delete textureIndex.second;
+			textureIndex.second = nullptr;
+		}
+	}
+
+	for ( auto& bitmapFontIndex : m_LoadedBitMapFonts )
+	{
+		if ( bitmapFontIndex.second != nullptr )
+		{
+			delete bitmapFontIndex.second;
+			bitmapFontIndex.second = nullptr;
+		}
+	}
+	
 	delete m_defaultSampler;
 	m_defaultSampler = nullptr;
 
@@ -305,7 +324,7 @@ void RenderContext::BeginCamera( const Camera& camera )
 	ID3D11RenderTargetView* rtv = m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
 	m_context->OMSetRenderTargets( 1 , &rtv , nullptr );
 
-	ClearScreen( camera.GetClearColor() );
+	//ClearScreen( camera.GetClearColor() );
 	BindShader( "" );
 	m_lastBoundVBO = nullptr;
 	BindUniformBuffer( UBO_FRAME_SLOT , m_frameUBO );
@@ -672,7 +691,7 @@ void RenderContext::DrawIndexed( uint indexCount , uint startIndex , uint indexS
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext:: DrawLine(const Vec2& start, const Vec2& end, const Rgba8& color, float thickness)
+void RenderContext:: DrawLine(const Vec2& start, const Vec2& end, const Rgba8& color, float thickness, float scale , float orientationDegrees , Vec2 translate )
 {
 	Vec2 displacement = end - start;
 	Vec2 forward = displacement.GetNormalized();

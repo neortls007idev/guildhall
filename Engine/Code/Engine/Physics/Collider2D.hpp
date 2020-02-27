@@ -1,7 +1,6 @@
 #pragma once
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Core/Rgba8.hpp"
-#include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Physics/Manifold2D.hpp"
 #include "Engine/Physics/PhysicsMaterial.hpp"
 

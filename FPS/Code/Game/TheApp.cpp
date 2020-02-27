@@ -9,6 +9,7 @@
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Core/EventSystem.hpp"
 #include "Engine/Renderer/D3D11Common.hpp"
+#include "Engine/Core/DevConsole.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -129,10 +130,9 @@ void TheApp::Update( float deltaSeconds )
 
 	if ( g_theDevConsole->IsOpen() )
 	{
-		g_theDevConsole->Update();
+		g_theDevConsole->Update( deltaSeconds );
 	}
 
-	//g_theDevConsole->Update();
 	g_theInput->EndFrame();
 }
 

@@ -13,6 +13,10 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+extern BitmapFont*	g_bitmapFont;
+extern InputSystem* g_theInput;
+extern Window*		g_theWindow;
+
 STATIC bool DevConsole::m_isConsoleOpen;
 STATIC Rgba8 DevConsole::m_OverlayColor;
 STATIC Rgba8 DevConsole::m_carrotColor;
@@ -91,6 +95,7 @@ void DevConsole::Update( float deltaSeconds )
 	{
 		m_currentCatAnimFrame = 0.f;
 	}
+	ProcessInput();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -134,8 +139,8 @@ void DevConsole::PrintString( const std::string& devConsolePrintString /*= "INVA
 void DevConsole::Render( RenderContext& renderer , const Camera& camera , float lineHeight ) const
 {
 
-	float dimensionOfConsole = cameraTopRight.y - cameraBottomLeft.y;
 	float dimensionOfConsole = camera.GetOrthoMax().y - camera.GetOrthoMin().y;
+	float offsetBetweenLines = 1.f;
 	int numberOfLinesToDisplay = RoundDownToInt( dimensionOfConsole / ( lineHeight + offsetBetweenLines) );
 	int myStringIndex = ( int ) m_consoleText.size() - 1;
 	Vec2 alignment = ALIGN_BOTTOM_LEFT;
@@ -143,14 +148,14 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	
 	//renderer.BeginCamera( camera );
 	
-	renderer.DrawAABB2( consoleArea , m_OverlayColor );
-	renderer.DrawAABB2( typingArea , Rgba8( 0 , 0 , 255 , 100 ) );
+	//renderer.DrawAABB2( consoleArea , m_OverlayColor );
+	//renderer.DrawAABB2( typingArea , Rgba8( 0 , 0 , 255 , 100 ) );
 
 	/*MoveCarrot( lineHeight );*/
 
 	float translateCaratX = ( m_currentText.length() - m_carrotOffset ) * lineHeight;
-	carat.Translate( Vec2( translateCaratX , 0.f ) );
-	renderer.DrawAABB2( carat , m_carrotColor );
+	//carat.Translate( Vec2( translateCaratX , 0.f ) );
+	//renderer.DrawAABB2( carat , m_carrotColor );
 
 	std::vector<Vertex_PCU> consoleTextVerts;
 
@@ -161,7 +166,7 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 			break;
 		}
 
-		g_bitmapFont->AddVertsForTextInBox2D( consoleTextVerts , consoleArea , lineHeight , m_consoleText[ myStringIndex ].text , m_consoleText[ myStringIndex ].lineColor , 1.f , alignment );
+	//	g_bitmapFont->AddVertsForTextInBox2D( consoleTextVerts , consoleArea , lineHeight , m_consoleText[ myStringIndex ].text , m_consoleText[ myStringIndex ].lineColor , 1.f , alignment );
 		myStringIndex--;
 
 		alignmentDeltaChange += ( offsetBetweenLines );
@@ -169,7 +174,7 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 		alignment.y = RangeMapFloat( 0.f , ( float ) numberOfLinesToDisplay , 0.f , 1.f , alignmentDeltaChange );
 	}
 	std::vector<Vertex_PCU> curretnTextVerts;
-	g_bitmapFont->AddVertsForTextInBox2D( curretnTextVerts , typingArea , lineHeight , m_currentText , WHITE , 1.f , ALIGN_CENTERED_LEFT );
+//	g_bitmapFont->AddVertsForTextInBox2D( curretnTextVerts , typingArea , lineHeight , m_currentText , WHITE , 1.f , ALIGN_CENTERED_LEFT );
 
 
 	renderer.BindTexture( g_bitmapFont->GetTexture() );
@@ -374,13 +379,6 @@ bool DevConsole::IsOpen() const
 void DevConsole::ChangeOverlayColor( Rgba8 newOverlayColor )
 {
 	m_OverlayColor = newOverlayColor;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void DevConsole::Update()
-{
-	ProcessInput();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

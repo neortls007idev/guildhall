@@ -1,10 +1,12 @@
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Core/EventSystem.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Input/VirtualKeyboard.hpp"
 #include "Engine/Physics/Physics2D.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
+#include "Engine/Renderer/D3D11Common.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Time/Time.hpp"
 #include "Game/GameCommon.hpp"
@@ -23,7 +25,6 @@ DevConsole*						g_theDevConsole		= nullptr;
 Physics2D*						g_thePhysicsSystem	= nullptr;
 extern BitmapFont*				g_bitmapFont;
 extern NamedStrings				g_gameConfigBlackboard;
-/*BitmapFont* g_bitmapFont = nullptr;*/
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -36,7 +37,26 @@ TheApp::TheApp()
 
 TheApp::~TheApp()
 {
+	delete g_theGame;
+	g_theGame = nullptr;
 
+	delete g_theAudioSystem;
+	g_theAudioSystem = nullptr;
+
+	delete g_thePhysicsSystem;
+	g_thePhysicsSystem = nullptr;
+
+	delete g_theDevConsole;
+	g_theDevConsole = nullptr;
+
+	delete g_theRenderer;
+	g_theRenderer = nullptr;
+
+	delete g_theInput;
+	g_theInput = nullptr;
+
+	delete g_theEventSystem;
+	g_theEventSystem = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -46,50 +66,56 @@ void TheApp::Startup()
 	if ( g_theEventSystem == nullptr )
 	{
 		g_theEventSystem = new EventSystem();
-		g_theEventSystem->Startup();
 	}
- 	if ( g_theInput == nullptr )
- 	{
+	g_theEventSystem->Startup();
+
+	if ( g_theWindow == nullptr )
+	{
+		g_theWindow = new Window();
+	}
+	
+	if ( g_theInput == nullptr )
+	{
 		g_theInput = new InputSystem();
-		g_theInput->Startup();
- 	}
+		g_theWindow->SetInputSystem( g_theInput );
+	}
+	g_theInput->Startup();
 
 	if ( g_theRenderer == nullptr )
 	{
 		g_theRenderer = new RenderContext();
-		g_theRenderer->Startup();
-		g_theRenderer->ClearScreen(BLACK);
 	}
+	g_theRenderer->Startup( g_theWindow );
 
 	if ( g_bitmapFont == nullptr )
 	{
 		g_bitmapFont = g_theRenderer->GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
 	}
-
-	if ( g_theAudioSystem == nullptr )
+	
+	if ( g_theDevConsole == nullptr )
 	{
-		g_theAudioSystem = new AudioSystem();
-		g_theAudioSystem->Startup();
+		g_theDevConsole = new DevConsole();
 	}
+	g_theDevConsole->Startup();
 
 	if ( g_thePhysicsSystem == nullptr )
 	{
 		g_thePhysicsSystem = new Physics2D();
 	}
+	//g_thePhysicsSystem->Startup();
+	
+	if ( g_theAudioSystem == nullptr )
+	{
+		g_theAudioSystem = new AudioSystem();
+	}
+	g_theAudioSystem->Startup();
 
 	if ( g_theGame == nullptr )
 	{
 		g_theGame = new Game();
 	}
-
-	if ( g_theDevConsole == nullptr)
-	{
-		g_theDevConsole = new DevConsole();
-	}
-
-	g_theDevConsole->Startup();
-
 }
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -102,7 +128,6 @@ void TheApp::RunFrame()
 	
 	BeginFrame();                        // all engine system and not game systems
 	Update( ( float ) deltaSeconds );	
-	g_thePhysicsSystem->Update( ( float ) deltaSeconds );
 	Render();
 	EndFrame();
 }
@@ -112,41 +137,46 @@ void TheApp::RunFrame()
 void TheApp::BeginFrame()
 {
 	// all engine things that must begin at the beginning of each frame and not the game
+	g_theEventSystem->BeginFrame();
+	g_theWindow->BeginFrame();
 	g_theInput->BeginFrame();
 	g_theRenderer->BeginFrame();
-	//g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
 	g_theDevConsole->BeginFrame();
-	g_theAudioSystem->BeginFrame();
 	g_thePhysicsSystem->BeginFrame();
+	g_theAudioSystem->BeginFrame();
+	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::Update( float deltaSeconds )
-{
-		
-		UpdateFromKeyboard();
+{	
+	UpdateFromKeyboard();
 
+	g_thePhysicsSystem->Update( deltaSeconds );
+
+	if ( g_theDevConsole->IsOpen() )
+	{
 		g_theDevConsole->Update( deltaSeconds );
+	}
 
-		if ( m_isPaused ) { deltaSeconds = 0; }
-		else if ( m_isSloMo == true ) { deltaSeconds /= 10.f; }
+	if ( m_isPaused ) { deltaSeconds = 0; }
+	else if ( m_isSloMo == true ) { deltaSeconds /= 10.f; }
 
-		if ( m_isSpeedMo ) { deltaSeconds = deltaSeconds * 4.0f; }
-		
-		g_theGame->Update( deltaSeconds );
+	if ( m_isSpeedMo ) { deltaSeconds = deltaSeconds * 4.0f; }
+	
+	g_theGame->Update( deltaSeconds );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::Render() const
 {
-		g_theRenderer->ClearScreen( BLACK );
 		g_theGame->Render();
 
 		if ( g_theDevConsole->IsOpen() )
 		{
-			g_theDevConsole->Render( *g_theRenderer , g_theGame->m_worldCamera , 20.f );
+			g_theDevConsole->Render( *g_theRenderer , g_theGame->m_worldCamera , 10.f );
 		}
 
 }
@@ -157,54 +187,43 @@ void TheApp::EndFrame()
 {
 	// all engine things that must end at the end of the frame and not the game
 	//SwapBuffers( m_displayDeviceContext );
-	g_thePhysicsSystem->EndFrame();
 	g_theAudioSystem->EndFrame();
+	g_thePhysicsSystem->EndFrame();
 	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
+	// TODO :- Create this function g_theWindow->EndFrame();
+	g_theEventSystem->EndFrame();
 }
-
-// STATIC bool TheApp::CommandQuit( EventArgs& args )
-// {
-// 	UNUSED( args );
-// 	g_theApp->HandleQuitRequested();
-// 	return false;
-// }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::Shutdown()
 {
-	delete g_theGame;
-	g_theGame = nullptr;
-
-	//g_theAudioSystem->Shutdown();
-	delete g_theAudioSystem;
-	g_theAudioSystem = nullptr;
-
+	g_theAudioSystem->Shutdown();
+	// TODO :- write me g_thePhysicsSystem->Shutdown();
 	g_theDevConsole->Shutdown();
-	
 	g_theRenderer->Shutdown();
-	delete g_theRenderer;
-	g_theRenderer = nullptr;
-	
-	delete g_theInput;
-	g_theInput = nullptr;
-
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-bool TheApp::HandleQuitRequested()
-{
-	m_isQuitting = true;
-	return m_isQuitting;
+	g_theInput->Shutdown();
+	// TODO :- write me g_theWindow->Shutdown();
+	g_theEventSystem->Shutdown();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::UpdateFromKeyboard()
 {
+	if ( g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() ) { g_theWindow->HandleQuitRequested(); }
+
+	if ( g_theInput->WasKeyJustPressed( KEY_TILDE ) )
+	{
+		g_theDevConsole->ToggleVisibility();
+	}
+
+	if ( g_theDevConsole->IsOpen() )
+	{
+		return;
+	}
 	if ( g_theInput->GetButtonState( 'T' ).IsPressed() ) { m_isSloMo = true; }
 	else { m_isSloMo = false; }
 	
@@ -213,8 +232,6 @@ void TheApp::UpdateFromKeyboard()
 
 	if ( g_theInput->GetButtonState( 'P' ).WasJustPressed() ) 
 	{ m_isPaused = !m_isPaused; }
-
-	if ( g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() && !g_theGame->m_isDrawModeActive ) { HandleQuitRequested(); }
 	
 	if ( g_theInput->GetButtonState( KEY_F4 ).WasJustPressed() )
 	{

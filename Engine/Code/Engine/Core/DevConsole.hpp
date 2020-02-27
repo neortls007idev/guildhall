@@ -42,6 +42,7 @@ class DevConsole
 public:
 
 	DevConsole();
+	~DevConsole(){};
 	void Startup();
 
 	void InitializeCommands();
@@ -52,12 +53,12 @@ public:
 
 	void Update( float deltaSeconds );
 
-	void PrintString( const Rgba8& textColor = WHITE, const std::string& devConsolePrintString = "INVALID STRING");
 	void Render( RenderContext& renderer , const Camera& camera , float lineHeight ) const;
 	void RenderPhoenixAnimation( RenderContext& renderer , const Camera& camera , const AABB2& animArea ) const;
 	void RenderCatAnimation( RenderContext& renderer , const Camera& camera , const AABB2& animArea ) const;
 
 
+	//void PrintString( const Rgba8& textColor = WHITE, const std::string& devConsolePrintString = "INVALID STRING");
 	static void PrintString( const Rgba8& textColor = WHITE , const std::string& devConsolePrintString = "INVALID STRING" ,
 								eDevConsoleMessageType messageType= DEVCONSOLE_USERINPUT );
 
@@ -100,7 +101,7 @@ protected:
 
 private:
 	static std::string						m_currentText;
-	Vertex_PCU m_devConsoleAnimVerts[ 6 ] = {
+	Vertex_PCU m_devConsoleAnimVerts[ 6 ] = {};
 	Vec2 m_animUVMaxs;
 	Vec2 m_animUVMins;
 	float							m_catAnimationDuration		= 4.4f;

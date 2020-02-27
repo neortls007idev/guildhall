@@ -1,9 +1,10 @@
 #pragma once
-#include "Engine/Core/EngineCommon.hpp"
+
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Physics/Collider2D.hpp"
-#include "Engine/Primitives/Polygon2D.hpp"
+#include "Engine/Primitives/AABB2.hpp"
 #include "Engine/Primitives/Disc2D.hpp"
+#include "Engine/Primitives/Polygon2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

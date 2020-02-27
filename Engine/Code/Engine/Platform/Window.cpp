@@ -1,4 +1,5 @@
 #include "Engine/Platform/Window.hpp"
+#include "Engine/Core/DevConsole.hpp"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>

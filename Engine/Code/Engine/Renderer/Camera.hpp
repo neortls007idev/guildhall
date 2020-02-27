@@ -14,6 +14,7 @@ class RenderContext;
 
 enum eCameraClearBitFlag : unsigned int
 {
+	CLEAR_NONE		  = 0,
 	CLEAR_COLOR_BIT	  = ( 1 << 0 ),
 	CLEAR_DEPTH_BIT	  = ( 1 << 1 ),
 	CLEAR_STENCIL_BIT = ( 1 << 2 ),
@@ -36,16 +37,10 @@ public:
 	~Camera();
 	Vec2  GetWorldNormalizedToClientPosition( Vec2 worldPos ) const;
 	Vec2  GetClientToWorldPosition( Vec2 clientPos ) const;
-	void  SetProjectionOrthographic( float height , float nearZ = -1.0f , float farZ = 1.0f );
-	Vec2  GetPosition() const;
+	Vec3  GetPosition() const;
 	Vec2  GetOutputSize() const;
 	void  SetPosition( Vec3 position );
 	void  SetOutputSize( Vec2 size );
-// 	void Translate2D( const Vec2 cameraTranslate );
-// 	Vec2 GetOrthoTopRight() const;
-// 	Vec2 GetOrthoBottomLeft() const;
-// 	void SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
-	// TODO :-  write new constructors;
 
 	void  SetPostion( const Vec3& position );
 	void  Translate( const Vec3& translation );
@@ -59,7 +54,8 @@ public:
 	void  Translate2D( const Vec2 cameraTranslate );
 	void  SetClearMode( eCameraClearBitFlag clearFlags , Rgba8 color , float depth = 0.f , unsigned int stencil = 0 );
 
-	void  SetProjectionOrthographic( float x , float y , float z );
+	void  SetProjectionOrthographic( float height , float nearZ = 0.f , float farZ = 1.f );
+	//void  SetProjectionOrthographic( float height , float nearZ = -1.0f , float farZ = 1.0f );
 	void  SetProjectionPerspective( float fov , float aspectRatio , float nearZ , float farZ );
 	Rgba8 GetClearColor() const																						{ return m_clearColor; }
 	unsigned int  GetClearMode() const																				{ return m_clearMode; }
@@ -76,8 +72,6 @@ public:
 public:
 	RenderBuffer*	m_cameraUBO		= nullptr;
 
-	Vec2 GetOrthoMin() const;
-	Vec2 GetOrthoMax() const;
 private:
 
 	eCameraClearBitFlag	m_clearMode				= CLEAR_COLOR_BIT;

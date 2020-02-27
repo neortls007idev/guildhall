@@ -13,7 +13,7 @@ void GPUMesh::UpdateVertices( uint vcount , void const* vertexData , uint vertex
 
 void GPUMesh::UpdateVertices( std::vector<Vertex_PCU> const& vertices )
 {
-	UpdateVertices( vertices.size() ,
+	UpdateVertices( ( uint ) vertices.size() ,
 		&vertices[ 0 ] ,
 		sizeof( Vertex_PCU ) ,
 		Vertex_PCU::LAYOUT );
@@ -34,7 +34,7 @@ void GPUMesh::UpdateIndices( uint icount , uint const* indices )
 
 void GPUMesh::UpdateIndices( std::vector<uint> const& indices )
 {
-		UpdateIndices( indices.size() , &indices[ 0 ] );
+	UpdateIndices( ( uint ) indices.size() , &indices[ 0 ] );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
