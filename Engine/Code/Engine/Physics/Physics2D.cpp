@@ -51,13 +51,13 @@ void Physics2D::AdvanceSimulation( float deltaSeconds )
 		{
 			continue;
 		}
-	ApplyEffectors( m_rigidBodies2D[index] , deltaSeconds );
-	MoveRigidbodies( m_rigidBodies2D[ index ] , deltaSeconds );
+		ApplyEffectors( m_rigidBodies2D[index] , deltaSeconds );
+		MoveRigidbodies( m_rigidBodies2D[ index ] , deltaSeconds );
+	}
 	DetectCollisions();
 	ResolveCollisions();
 	ResetCollisions();
 	CleanupDestroyedObjects();
-	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
