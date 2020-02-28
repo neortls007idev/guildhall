@@ -186,49 +186,55 @@ void Physics2D::ResolveCollision( Collision2D collision )
 
 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
 	{
-		collision.m_me->GetRigidBody()->Move( pushMe * collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * 0.5f );
-		collision.m_them->GetRigidBody()->Move( -pushThem * collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * 0.5f );
-	}
-
-	if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC )
-	{
 		collision.m_me->GetRigidBody()->Move( pushMe * collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap );
+		collision.m_them->GetRigidBody()->Move( -pushThem * collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap );
 	}
 
-	if ( collision.CheckCollisionType() == STATIC_VS_KINEMATIC || collision.CheckCollisionType() == STATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC )
+	if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || 
+		 collision.CheckCollisionType() == DYNAMIC_VS_STATIC || 
+		 collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC )
 	{
-		collision.m_them->GetRigidBody()->Move( -pushThem * collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap );
+		collision.m_me->GetRigidBody()->Move(  collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap );
+	}
+
+	if ( collision.CheckCollisionType() == STATIC_VS_KINEMATIC || 
+		 collision.CheckCollisionType() == STATIC_VS_DYNAMIC || 
+		 collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC )
+	{
+		collision.m_them->GetRigidBody()->Move( -collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap );
 	}
 
 	// 8 ways to apply impulse
 	
-// 	float impulse = ( myMass * theirMass ) / ( myMass + theirMass ) * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) *
-// 		DotProduct2D( ( collision.m_them->GetRigidBody()->GetVelocity() - collision.m_me->GetRigidBody()->GetVelocity() ) , collision.m_collisionManifold.m_normal );
-// 
-// 	impulse = ( impulse < 0 ) ? 0 : impulse;
-// 
-// 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC   || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
-// 		 collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
-// 	{
-// 		collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
-// 		collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
-// 		return;
-// 	}
-// 
-// 	impulse = ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) *
-// 		DotProduct2D( ( collision.m_them->GetRigidBody()->GetVelocity() - collision.m_me->GetRigidBody()->GetVelocity() ) , collision.m_collisionManifold.m_normal );
-// 	
-// 	impulse = ( impulse < 0 ) ? 0 : impulse;
-// 
-// 	if ( collision.CheckCollisionType() == STATIC_VS_KINEMATIC || collision.CheckCollisionType() == STATIC_VS_DYNAMIC )
-// 	{
-// 		collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
-// 	}
-// 
-// 	if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_STATIC )
-// 	{
-// 		collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
-// 	}
+	float impulse = ( myMass * theirMass ) / ( myMass + theirMass ) * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) *
+		DotProduct2D( ( collision.m_them->GetRigidBody()->GetVelocity() - collision.m_me->GetRigidBody()->GetVelocity() ) ,
+					   collision.m_collisionManifold.m_normal );
+
+	impulse = ( impulse < 0 ) ? 0 : impulse;
+
+	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC   || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
+		 collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
+	{
+		collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
+		collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
+		return;
+	}
+
+	impulse = ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) *
+		DotProduct2D( ( collision.m_them->GetRigidBody()->GetVelocity() - collision.m_me->GetRigidBody()->GetVelocity() ) ,
+   					   collision.m_collisionManifold.m_normal );
+	
+	impulse = ( impulse < 0 ) ? 0 : impulse;
+
+	if ( collision.CheckCollisionType() == STATIC_VS_KINEMATIC || collision.CheckCollisionType() == STATIC_VS_DYNAMIC )
+	{
+		collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
+	}
+
+	if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_STATIC )
+	{
+		collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
