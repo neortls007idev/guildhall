@@ -53,9 +53,9 @@ void Physics2D::AdvanceSimulation( float deltaSeconds )
 		}
 	ApplyEffectors( m_rigidBodies2D[index] , deltaSeconds );
 	MoveRigidbodies( m_rigidBodies2D[ index ] , deltaSeconds );
-	ResetCollisions();
 	DetectCollisions();
 	ResolveCollisions();
+	ResetCollisions();
 	CleanupDestroyedObjects();
 	}
 }
@@ -70,7 +70,7 @@ void Physics2D::ApplyEffectors( Rigidbody2D* rigidbody , float deltaSeconds )
 
 		switch ( simulationMode )
 		{
-			case SIMULATIONMODE_STATIC:
+			case SIMULATIONMODE_STATIC:		
 											break;
 
 			case SIMULATIONMODE_KINEMATIC:	/*m_rigidBodied2D[ index ]->SetVeloity( currentVelocity );*/
@@ -93,6 +93,11 @@ void Physics2D::MoveRigidbodies( Rigidbody2D* rigidbody , float deltaSeconds )
 	{
 		rigidbody->SetPosition( rigidbody->GetPosition() + ( rigidbody->GetVelocity() * deltaSeconds ) );
 		ScreenWrapAround( m_sceneCamera , rigidbody );
+	}
+	
+	if ( rigidbody->GetSimulationMode() == SIMULATIONMODE_STATIC )
+	{
+		rigidbody->SetVelocity( Vec2::ZERO );
 	}
 }
 
@@ -197,33 +202,33 @@ void Physics2D::ResolveCollision( Collision2D collision )
 
 	// 8 ways to apply impulse
 	
-	float impulse = ( myMass * theirMass ) / ( myMass + theirMass ) * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) *
-		DotProduct2D( ( collision.m_them->GetRigidBody()->GetVelocity() - collision.m_me->GetRigidBody()->GetVelocity() ) , collision.m_collisionManifold.m_normal );
-
-	impulse = ( impulse < 0 ) ? 0 : impulse;
-
-	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC   || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
-		 collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
-	{
-		collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
-		collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
-		return;
-	}
-
-	impulse = ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) *
-		DotProduct2D( ( collision.m_them->GetRigidBody()->GetVelocity() - collision.m_me->GetRigidBody()->GetVelocity() ) , collision.m_collisionManifold.m_normal );
-	
-	impulse = ( impulse < 0 ) ? 0 : impulse;
-
-	if ( collision.CheckCollisionType() == STATIC_VS_KINEMATIC || collision.CheckCollisionType() == STATIC_VS_DYNAMIC )
-	{
-		collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
-	}
-
-	if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_STATIC )
-	{
-		collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
-	}
+// 	float impulse = ( myMass * theirMass ) / ( myMass + theirMass ) * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) *
+// 		DotProduct2D( ( collision.m_them->GetRigidBody()->GetVelocity() - collision.m_me->GetRigidBody()->GetVelocity() ) , collision.m_collisionManifold.m_normal );
+// 
+// 	impulse = ( impulse < 0 ) ? 0 : impulse;
+// 
+// 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC   || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
+// 		 collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
+// 	{
+// 		collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
+// 		collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
+// 		return;
+// 	}
+// 
+// 	impulse = ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) *
+// 		DotProduct2D( ( collision.m_them->GetRigidBody()->GetVelocity() - collision.m_me->GetRigidBody()->GetVelocity() ) , collision.m_collisionManifold.m_normal );
+// 	
+// 	impulse = ( impulse < 0 ) ? 0 : impulse;
+// 
+// 	if ( collision.CheckCollisionType() == STATIC_VS_KINEMATIC || collision.CheckCollisionType() == STATIC_VS_DYNAMIC )
+// 	{
+// 		collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
+// 	}
+// 
+// 	if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_STATIC )
+// 	{
+// 		collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
+// 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

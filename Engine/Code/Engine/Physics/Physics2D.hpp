@@ -26,6 +26,7 @@ public:
 	void AdvanceSimulation( float deltaSeconds );
 	void ApplyEffectors( Rigidbody2D* rigidbody , float deltaSeconds );
 	void MoveRigidbodies( Rigidbody2D* rigidbody , float deltaSeconds );
+	//void MoveRigidbody( Rigidbody2D* rigidbody , float deltaSeconds );
 	void ResetCollisions();
 	void DetectCollisions();
 
