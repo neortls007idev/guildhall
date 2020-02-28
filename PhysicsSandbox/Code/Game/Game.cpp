@@ -14,6 +14,7 @@
 #include "Game/TheApp.hpp"
 #include "Game/Game.hpp"
 #include "Game/Gameobject.hpp"
+#include "Engine/Physics/PolygonCollider2D.hpp"
 //#include "Engine/Physics/Polygon2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -55,7 +56,7 @@ Game::Game()
 		return;
 	}
 	//m_testPolygon.MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
-	InitialGameObjectsSpawner();
+	//InitialGameObjectsSpawner();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -128,6 +129,23 @@ void Game::Render() const
 	DrawMouseCurrentPosition( m_worldCamera );
 
 	RenderDrawFromPointCloudMode();
+
+	Vec2 point = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+	
+	for ( size_t index = 0 ; index < m_gameObjects.size() ; index ++ )
+	{
+			if ( m_gameObjects[index] )
+			{
+				if ( m_gameObjects[index]->m_rigidbody->GetCollider()->GetType() == COLLIDER2D_CONVEXGON )
+				{
+					PolygonCollider2D* currentPoly = ( PolygonCollider2D* ) m_gameObjects[ index ]->m_rigidbody->GetCollider();
+					Vec2 cp = currentPoly->GetClosestPoint( point );
+
+					g_theRenderer->DrawDisc( cp , 10.f , GREEN );
+				}
+			}
+	}
+
 	RenderUI();
 }
 
@@ -482,8 +500,8 @@ Vec2 Game::GetMouseDragVelocity() const
 void Game::UpdateGameObjects()
 {
 	IsMouseInsideGameObject();
-	ResetCollisions();
-	AreObjectsColliding();
+	//ResetCollisions();
+	//AreObjectsColliding();
 	//ChangeColorOnCollision();
 	ChangeAlphaByBounciness();
 }
