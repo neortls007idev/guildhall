@@ -36,17 +36,17 @@ Game::Game()
 						Vertex_PCU( Vec3( 1.f,1.f,1.f ) , WHITE, Vec2( 1.f, 1.f ) ),
 						Vertex_PCU( Vec3( -1.f,1.f,1.f ) , WHITE, Vec2( 1.f, 0.f ) ),
 		// BACK FACE VERTS
-						Vertex_PCU( Vec3( -1.f,-1.f,-1.f ) , WHITE, Vec2( 0.f, 0.f ) ),
-						Vertex_PCU( Vec3( 1.f,-1.f,-1.f ) , WHITE, Vec2( 1.f, 0.f ) ),
+						Vertex_PCU( Vec3( -1.f,-1.f,-1.f ) , GREEN, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( 1.f,-1.f,-1.f ) , GREEN, Vec2( 1.f, 0.f ) ),
 
-						Vertex_PCU( Vec3( 1.f,1.f,-1.f ) , WHITE, Vec2( 1.f, 1.f ) ),
-						Vertex_PCU( Vec3( -1.f,1.f,-1.f ) , WHITE, Vec2( 1.f, 0.f ) ),
+						Vertex_PCU( Vec3( 1.f,1.f,-1.f )  , GREEN, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( -1.f,1.f,-1.f ) , GREEN, Vec2( 1.f, 0.f ) ),
 		// RIGHT FACE VERTS
-						Vertex_PCU( Vec3( -1.f,-1.f,1.f ) , WHITE, Vec2( 0.f, 0.f ) ),
-						Vertex_PCU( Vec3( 1.f,-1.f,-1.f ) , WHITE, Vec2( 1.f, 0.f ) ),
+						Vertex_PCU( Vec3( -1.f,-1.f,1.f ) ,BLUE, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( 1.f,-1.f,-1.f ) ,BLUE, Vec2( 1.f, 0.f ) ),
 
-						Vertex_PCU( Vec3( 1.f,1.f,-1.f ) , WHITE, Vec2( 1.f, 1.f ) ),
-						Vertex_PCU( Vec3( -1.f,1.f,1.f ) , WHITE, Vec2( 1.f, 0.f ) ),
+						Vertex_PCU( Vec3( 1.f,1.f,-1.f ) , BLUE, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( -1.f,1.f,1.f ) ,BLUE, Vec2( 1.f, 0.f ) ),
 						
 
 						};
@@ -66,8 +66,8 @@ Game::Game()
 	//AABB2 meshTest( -10 , -10 , 10 , 10 );
 
 	//AppendVertsForAABB2( meshVerts , meshTest , BLUE );
-	m_meshCube->UpdateVertices( 4 , &CubeVerts[ 0 ] , sizeof( Vertex_PCU ) , Vertex_PCU::LAYOUT );
-	m_meshCube->UpdateIndices( 6 , Indices );
+	m_meshCube->UpdateVertices( 12 , &CubeVerts[ 0 ] , sizeof( Vertex_PCU ) , Vertex_PCU::LAYOUT );
+	m_meshCube->UpdateIndices( 18 , Indices );
 
 
 	m_normalImage = AABB2( -WORLD_CAMERA_SIZE_X , -WORLD_CAMERA_SIZE_Y , WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y );
@@ -87,11 +87,6 @@ Game::Game()
 
 Game::~Game()
 {
-//	delete m_invertColorShader;
-	m_invertColorShader = nullptr;
-
-	delete m_imageTex;
-	m_imageTex = nullptr;
 
 	delete m_meshCube;
 	m_meshCube = nullptr;
