@@ -38,6 +38,39 @@
     <Filter Include="Core\Devconsole">
       <UniqueIdentifier>{cf0c3c51-1c20-4171-b436-272996546e5b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{0be3e79f-9125-4a7a-b052-d9f48a7a32d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Utilities">
+      <UniqueIdentifier>{a87666d8-eec9-472b-a6bf-fe45b704d8b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Utilities\File">
+      <UniqueIdentifier>{782fd0d8-0aa8-4710-b3e5-35110803ad15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Utilities\String">
+      <UniqueIdentifier>{e63432ee-17fd-4044-bf76-4782b942a917}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Utilities\XML">
+      <UniqueIdentifier>{c9d1a282-294a-4809-8b66-da177c16295a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Utilities\Vertex">
+      <UniqueIdentifier>{9a4821b9-349c-4de6-9fde-10e6f5dcc0b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Debug">
+      <UniqueIdentifier>{22b8fa54-f986-48e8-b877-66bd94785c23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Pipeline">
+      <UniqueIdentifier>{1d60c64d-647d-4c50-a40b-b50639df74f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Pipeline\Buffers">
+      <UniqueIdentifier>{a7ac4d5c-3218-4045-894d-2451b0e083f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Pipeline\Shaders">
+      <UniqueIdentifier>{bd527724-b331-42fa-8bca-7a74f56c86de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Experimental">
+      <UniqueIdentifier>{a29428e4-41a5-489e-8888-b412c27b8578}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Rgba8.cpp">
@@ -51,15 +84,6 @@
     </ClCompile>
     <ClCompile Include="Renderer\RenderContext.cpp">
       <Filter>Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\ErrorWarningAssert.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\StringUtils.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\VertexUtils.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Input\KeyButtonState.cpp">
       <Filter>Input</Filter>
@@ -119,9 +143,6 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\EngineCommon.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\XmlUtils.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\EventSystem.cpp">
@@ -205,6 +226,63 @@
     <ClCompile Include="Physics\PhysicsMaterial.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
+    <ClCompile Include="Platform\Window.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\TextureView.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Shader.cpp">
+      <Filter>Renderer\Pipeline\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\RenderBuffer.cpp">
+      <Filter>Renderer\Pipeline\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\VertexBuffer.cpp">
+      <Filter>Renderer\Pipeline\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\FileUtils.cpp">
+      <Filter>Core\Utilities\File</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\StringUtils.cpp">
+      <Filter>Core\Utilities\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\XmlUtils.cpp">
+      <Filter>Core\Utilities\XML</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\VertexUtils.cpp">
+      <Filter>Core\Utilities\Vertex</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ErrorWarningAssert.cpp">
+      <Filter>Core\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\SwapChain.cpp">
+      <Filter>Renderer\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Sampler.cpp">
+      <Filter>Renderer\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DirectoryWatcher.cpp">
+      <Filter>Core\Experimental</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\MatrixUtils.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Transform.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Primitives\GPUMesh.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\IndexBuffer.cpp">
+      <Filter>Renderer\Pipeline\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Primitives\AABB3.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\D3D11Common.cpp">
+      <Filter>Renderer\Pipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -220,15 +298,6 @@
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Core\EngineCommon.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\ErrorWarningAssert.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\StringUtils.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\VertexUtils.hpp">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Input\KeyButtonState.hpp">
@@ -321,9 +390,6 @@
     <ClInclude Include="Core\NamedStrings.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Core\XmlUtils.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="Core\EventSystem.hpp">
       <Filter>Core</Filter>
     </ClInclude>
@@ -404,6 +470,66 @@
     </ClInclude>
     <ClInclude Include="Physics\PhysicsMaterial.hpp">
       <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Window.hpp">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\TextureView.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Shader.hpp">
+      <Filter>Renderer\Pipeline\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\RenderBuffer.hpp">
+      <Filter>Renderer\Pipeline\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\VertexBuffer.hpp">
+      <Filter>Renderer\Pipeline\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\FileUtils.hpp">
+      <Filter>Core\Utilities\File</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\StringUtils.hpp">
+      <Filter>Core\Utilities\String</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\XmlUtils.hpp">
+      <Filter>Core\Utilities\XML</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\VertexUtils.hpp">
+      <Filter>Core\Utilities\Vertex</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ErrorWarningAssert.hpp">
+      <Filter>Core\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\SwapChain.hpp">
+      <Filter>Renderer\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Sampler.hpp">
+      <Filter>Renderer\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\D3D11Common.hpp">
+      <Filter>Renderer\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DirectoryWatcher.hpp">
+      <Filter>Core\Experimental</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ErrorShaderCode.hpp">
+      <Filter>Renderer\Pipeline\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\MatrixUtils.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Transform.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Primitives\GPUMesh.hpp">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\IndexBuffer.hpp">
+      <Filter>Renderer\Pipeline\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Primitives\AABB3.hpp">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

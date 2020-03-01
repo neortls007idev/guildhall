@@ -18,6 +18,7 @@ class Game
 public:
 
 	Game();
+	~Game(){};
 	void InitialGameObjectsSpawner();
 
 	void Update( float deltaSeconds );

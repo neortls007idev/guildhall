@@ -85,8 +85,9 @@ void AppendVertsForAABB2( std::vector<Vertex_PCU>& vertexArray , const AABB2& bo
 
 void AppendVertsForPolygon( std::vector<Vertex_PCU>& vertexArray , const Vec2* points , const unsigned int count , const Rgba8& tint )
 {
-	const Vertex_PCU tempVert1 = Vertex_PCU( Vec3( points->x , points->y , 0.f ) , tint , Vec2::ZERO );
+	// TODO :- FIX ME
 
+	const Vertex_PCU tempVert1 = Vertex_PCU( Vec3( points->x , points->y , 0.f ) , tint , Vec2::ZERO );
 	for ( unsigned int pointIndex = 2; pointIndex < count; pointIndex++ )
 	{
 		vertexArray.push_back( tempVert1 );
@@ -97,6 +98,38 @@ void AppendVertsForPolygon( std::vector<Vertex_PCU>& vertexArray , const Vec2* p
 		const Vertex_PCU tempVert3 = Vertex_PCU( Vec3( points->x , points->y , 0.f ) , tint , Vec2::ZERO );
 		vertexArray.push_back( tempVert3 );
 		points = points--;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void AppendVertsForAABB3( std::vector<Vertex_PCU>& vertexArray , const AABB3& box , const Rgba8& tint )
+{
+	// TODO :- FIX ME
+	UNUSED( box );
+	UNUSED( tint );
+	UNUSED( vertexArray );
+	__debugbreak();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void AppendVertsForAABB3( std::vector<Vertex_PCU>& vertexArray , const AABB3& box , const Rgba8& tint , const Vec2& uvAtMins , const Vec2& uvAtMaxs )
+{
+	// TODO :- FIX ME
+
+	const Vertex_PCU boxVerts[ 6 ] = {
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y, 0.f ) , tint, uvAtMins ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y, 0.f ) , tint, Vec2( uvAtMaxs.x, uvAtMins.y ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y, 0.f ) , tint, Vec2( uvAtMins.x, uvAtMaxs.y ) ),
+
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,0.f ) , tint, Vec2( uvAtMaxs.x, uvAtMins.y ) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,0.f ) , tint, uvAtMaxs ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,0.f ) , tint, Vec2( uvAtMins.x, uvAtMaxs.y ) ) };
+
+	for ( int index = 0; index < 6; index++ )
+	{
+		vertexArray.push_back( boxVerts[ index ] );
 	}
 }
 

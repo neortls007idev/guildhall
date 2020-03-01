@@ -1,7 +1,8 @@
-#include "Engine/Math/Vec4.hpp"
-#include "Engine/Math/MathUtils.hpp"
-#include <cmath>
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Math/Matrix4x4.hpp"
+#include "Engine/Math/Vec4.hpp"
+#include <cmath>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -50,6 +51,20 @@ const Vec4 Vec4::operator*( float uniformScale ) const
 const Vec4 Vec4::operator*( const Vec4& vecToMultiply ) const
 {
 	return Vec4( x * vecToMultiply.x , y * vecToMultiply.y , z * vecToMultiply.z , w * vecToMultiply.w );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const Vec4 Vec4::operator*( const Mat44& lhs ) const
+{
+	Vec4 rowIntoColumn;
+
+	rowIntoColumn.x = lhs.Ix * x + lhs.Jx * y + lhs.Kx * z + lhs.Tx * w;
+	rowIntoColumn.y = lhs.Iy * x + lhs.Jy * y + lhs.Ky * z + lhs.Ty * w;
+	rowIntoColumn.z = lhs.Iz * x + lhs.Jz * y + lhs.Kz * z + lhs.Tz * w;
+	rowIntoColumn.w = lhs.Iw * x + lhs.Jw * y + lhs.Kw * z + lhs.Tw * w;
+
+	return rowIntoColumn;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

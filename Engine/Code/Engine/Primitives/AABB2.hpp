@@ -82,5 +82,6 @@ public:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 	void FitWithinBounds( const AABB2& bounds );
+	void AlignWithinAABB2( const AABB2& outerAABB2 , const Vec2& alignment );
 
 };

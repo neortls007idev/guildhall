@@ -309,5 +309,3 @@ void RecoverableWarning( const char* filePath, const char* functionName, int lin
 		}
 	}
 }
-
-

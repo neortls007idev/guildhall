@@ -64,8 +64,57 @@ Strings SplitStringAtGivenDelimiter( const std::string& originalString , const c
 	return splitStrings;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
+bool StringCompare( const char* firstString , std::string secondString )
+{
+	const char* secondStringPtr = secondString.c_str();
 
+	for ( size_t index = 0; ( index < secondString.length() ) || firstString[ index ]; index++ )
+	{
+		if ( firstString[ index ] != secondStringPtr[ index ] )
+		{
+			return false;
+		}
+	}
+	return true;
+}
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
+bool StringCompare( std::string firstString , std::string secondString )
+{
+	const char* firstStringPtr = firstString.c_str();
+	const char* secondStringPtr = secondString.c_str();
+
+	if ( firstString.length() != secondString.length() )
+	{
+		return false;
+	}
+
+	for ( size_t index = 0; ( index < firstString.length() ) || ( index < secondString.length() ); index++ )
+	{
+		if ( firstStringPtr[ index ] != secondStringPtr[ index ] )
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool StringCompare( const char* firstString , const char* secondString )
+{
+	for ( size_t index = 0; firstString[ index ] || secondString[ index ]; index++ )
+	{
+		if ( firstString[ index ] != secondString[ index ] )
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 

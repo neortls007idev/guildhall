@@ -1,74 +1,83 @@
+
 MP2 And SD2 Checklist
 ------
 
-## MP2 Checklist
-**( NOTE :- Controls Listed at the Bottom after the Checklist )**
+## SD2 Checklist
+
+Checklist for all SD2 assignments
 ------
 
-### A04 Checklist
+### A03 Checklist
 
-- [x] Stop coloring objects red that are intersecting (it becomes a strobe light in this assignment otherwise)
-- [x] Make sure your game creates polygons as `STATIC` by default, and discs create as `DYNAMIC` by default
-- [x] Add support for `disc Collider2D::GetWorldBounds` for existing colliders
-	- [ ] **Easier Option**: Implement this using `AABB2` bounding boxes
-    - [x] **Challenge Option**: Implement this using a bounding `Disc`
-    - [x] Update this bounds whenever you update the world shape of the object.
-- [x] Switch `Collider2D::Intersects` to be non-virtual, and instead use a matrix lookup
-    - [x] Use a *mid-phase* check to early out of a collision by comparing the bounds first.
-					( Only done for discVsPolygon, seemed pointless to do the check for disc vs disc).
-    - [x] If passes the bounds check, lookup and call the appropriate callback
-- [x] Add `Collider2D::GetManifold` that also uses a collision matrix or half matrix
-    - [x] Again do an early out using the bounds.
-			( Only done for discVsPolygon seemed pointless to do the check for disc vs disc).
-    - [x] Implement a disc versus disc manifold
-    - [x] Implement a disc versus polygon manifold
-    - **Note: We are not doing polygon -vs- polygon yet**
-- [x] `Collider2D` gets a `PhysicsMaterial`
-    - [x] `PhysicsMaterial` has a property for `restitution` (or `bounciness` if you prefer)
-    - [x] `Collider2D::GetBounceWith(Collider2D const* other) const` implemented to compute restitution between two objects
-        - There are multiple methods for computing the restitution.  Product, Min, Max, Spherical, Lookup, etc...   
-    - [x] Allow user to adjust bounciness using `Shift + Mouse Wheel Movement` while the object is selected.
-    - [x] Set the alpha for the fill color to the bounciness of the object.
-- [x] Add a `Collision2D` object that contains..
-    - Two pointers to the `Collider2D` objects involved in the collision (`me` and `them`)
-    - A `manifold2` struct containing...
-      - `normal` describing the normal at the impact point
-      - `penetration` How deeply interpenetrated are the two objects.
-- [x] `Physics2D` during a `SimulateStep` should now do the following
-    - [x] `DetectCollisions` to compute all collisions between all colliders.
-    - [x] `ResolveCollisions` to resolve all detected collisions
-    - [x] `ResolveCollision` to resolve a single collision
-- [x] `ResolveCollision` should...
-    - [x] `CorrectObjects`, pushing them out of their respective objects
-        - [x] Push should depend on the ratio of the masses
-        - [-] Static and Kinematic objects assume infinite mass vs dynamic objects
-        - [x] Kinematic vs Kinematic resolves based on masses
-        - [x] Static objects never move, and should fully push the other object if it is not static.
-        - [x] Two static objects do not correct at all.
-    - [x] Calculate **normal impulse** at point of collision.
-    - [x] `Rigidbody2D::ApplyImpulseAt` to both objects (`impulse` to A, `-impulse` to B)
-- [x] `Rigidbody2D::ApplyImpulseAt( vec2 worldPos, vec2 impulse )` implemented
-    - [x] Impulse uses force to apply an instant change in velocity
-        - `delta_velocity = impulse * inverse_mass`
-    - [x] Ignore `worldPos` for now, it is there for when we apply rotational forces
+### Core Task List [85%]
 
+This is the first assignment where you must supplement your assignment with some extras to get full credit.  Core tasks
+only cover 85 of the total 100 points.  Make a note of all extras you attempt in your assignment,
+and remember you can submit extras from previous assignments.
+
+- [x] `Camera::SetProjectionPerspective( float fovDegrees, float nearZClip, float farZClip )` implemented
+    - [x] Set projection to `60 degrees`, and `-0.1` to `-100.0` for the clip planes.
+- [x] Camera now has a `Transform`
+    - [x] Create the `Transform` class
+    - [x] `Transform::SetPosition` implemented
+    - [x] `Transform::Translate` implemented
+    - [x] `Transform::SetRotationFromPitchRollYawDegrees`
+        - [x] When storing degrees, make sure they are stored in sane ranges...
+            - [x] Roll & Yaw is `-180` to `180`
+            - [x] Pitch is `-90` to `90`
+- [x] Camera now calculates `view` matrix from their transform.
+    - [x] `Transform::GetAsMatrix` implemented to calculate the camera's model matrix
+    - [x] `MatrixInvertOrthoNormal` implemented to invert the camera's model into a view matrix
+        - [x] `MatrixIsOrthoNormal` check added
+        - [x] `MatrixTranspose` added
+- [x] Draw a Quad at `(0, 0, -10)`, or 10 units in front of the origin (should be visible when you start)
+- [x] Allow player to move the camera by change the camera transform position
+   - [x] `W` & `S`: Forward & Back (movement is relative to where you're looking)
+   - [x] `A` & `D`: Left and Right (movement is relative to where you're looking)
+   - [x] `Q` & `E`: Up and Down Movement (movement is absolute (world up and world down)
+   - [x] `Left-Shift`: Move faster while held.
+   - *Note:  If you want different controls, just make a note in your readme*
+- [ ] Allow player to turn the camera using the mouse.
+    - [x] `InputSystem::HideSystemCursor` implemented
+    - [x] `InputSystem::ClipSystemCursor` implemented
+    - [ ] `InputSystem::SetCursorMode` implemented
+        - [x] `ABSOLUTE` mode is what you currently have
+        - [x] `RELATIVE` move implemented
+            - [x] Move mouse to the center of the screen, and store off the cursor position
+                - *Note:  Be sure to actually make the system call, not just assume where you moved it is where it went.  This can cause drifting.*
+            - [ ] Each frame, get the cursor position, and calculate frame delta.
+            - [ ] ...after which, reset to center of screen and reget the current position.
+    - [ ] Game should be set to `RELATIVE` mode
+        - [ ] `DevConsole` should unlock the mouse and set to `ABSOLUTE` mode
+    - [ ] Associate `X` movement with `yaw`
+    - [ ] Associate `Y` movement with `pitch`
+        - [ ] Do not allow pitch above `85` degrees or below `95` degrees - no going upside down... yet...
+        - *Note:  Up to you if you want inverted-y or not.*
+- [x] Support `RenderContext::SetModelMatrix`
+    - [x] Create a new uniform buffer for storing a model matrix (slot 2)
+    - [x] `SetModelMatrix` should update this uniform buffer
+    - [x] `BeginCamera` should `SetModelMatrix` to the `IDENTITY`, and be sure to bind the buffer.
+- [ ] Be able to draw a cube mesh at `(1, 0.5, -12.0)`
+    - [x] Create a `GPUMesh` class
+        - [ ] Implement `IndexBuffer`
+        - [ ] Be able to construct a mesh from a vertex and index array
+        - [ ] Add `RenderContext::BindIndexBuffer`
+        - [ ] Add `RenderContext::DrawIndexed`
+        - [ ] Add `RenderContext::DrawMesh`
+            - This should bind the vertex buffer, index buffer, and then `DrawIndexed`
+    - [ ] Game creates a `cube mesh` around the origin with 2 unit sides.
+    - [x] Game has a `Transform` for the cube set at `(1, 0.5, -12.0f)`,
+    - [x] Cube transform sets `yaw` rotation to current time each frame
+    - [ ] Game should `SetModelMatrix` to the cube transform matrix
+- [ ] Support a depth buffer
+    - [ ] `Texture::CreateDepthStencilBuffer` added
+    - [ ] `Camera::SetDepthStencilBuffer` added
+    - [ ] `RenderContext` now automatcially creates a depth buffer during init matching the swap chain's size
+    - [ ] `RenderContext::GetDefaultBackbuffer` implemented to return this
+    - [ ] `RenderContext::BeginCamera`, now binds the camera's back buffer as well.
+        - [ ] **IMPORANT:  Do not bind the default one automatically if the camera doesn't have one set.  There are reasons a camera may not want a depth buffer!**
+    - [ ] Camera's clear options should now store off the `depth` and `stencil` clear values.
+    - [ ] If camera has a depth buffer and says it should clear depth, also clear the depth buffer.
 ------
 
-### Control Scheme
-
-- WASD for Camera Movement.
-- 'O' (capitol letter 'Oh') to reset camera Position to origin. ( this does not rest the camera output Size ).
-- Right Mouse Button To spawn New Game Objects.
-- Scroll Mouse Wheel Up and Down Movement for Zooming in and out.
-- Left Click to select the object and click again to Deselect the object.
-- Select an object and hit `delete` or `backspace` key to delete the currently selected object.
-- F8 key to delete and reset the game.
-
-------
-
-### BUG
-
-- When disc spawn on top of disc or when disc drag inside polygon expected behavior is not observed.
-
-Makes sure you mouse position is correct for your current view - converting the client position (offset from top-left of window) to a world location.
-------
+## Extras

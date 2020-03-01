@@ -1,10 +1,27 @@
 #pragma once
 #include "Engine/Input/XboxController.hpp"
+#include <queue>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 constexpr int MAX_XBOX_CONTROLLERS = 4;
 constexpr int MAX_KEYS = 256;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum eMouseClipping
+{
+	MOUSE_IS_WINDOWLOCKED,
+	MOUSE_IS_UNLOCKED,
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum eMouseMode
+{
+	ABSOLUTE_MODE,
+	RELATIVE_MODE,
+};
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -16,6 +33,7 @@ public:
 
 	void Startup();
 	void BeginFrame();
+	void Update( float deltaSeconds );
 	void EndFrame();
 	void Shutdown();
 
@@ -24,7 +42,9 @@ public:
 	bool  WasKeyJustPressed( unsigned char keyCode ) const;
 	bool  HandleKeyDown( unsigned char keyCode );
 	bool  HandleKeyUp( unsigned char keyCode );
+
 	const KeyButtonState& GetButtonState( unsigned char keyCode ) const;
+	const XboxController& GetXboxController( int controllerID );
 
 	bool WasLeftMouseButtonJustPressed() const;
 	bool WasLeftMouseButtonJustReleased() const;
@@ -54,9 +74,25 @@ public:
 	void UpdateMouseWheel( int deltaWheel );
 	int GetMouseWheelValue() const			{ return m_mouseWheel; }
 
-	const XboxController& GetXboxController( int controllerID );
-	   
+	void HideSystemCursor();
+	void ShowSystemCursor();
+	void ClipSystemCursor( eMouseClipping mouseLockMode );
+	void SetCursorMode( eMouseMode mode );
+	void UpdateRelativeMode();
+	Vec2 GetRelativeMovement() const;
+
+	eMouseMode GetCursorMode() const														{ return m_mouseMode;  }
+
+	void PushCharacter( char character );
+	bool PopCharacter( char* outCharacter );
+
+public:
+	std::queue<char> m_characters;
+
 private:
+	eMouseMode m_mouseMode		= ABSOLUTE_MODE;
+	Vec2 m_relativeMovement		= Vec2::ZERO;
+	Vec2 m_positionLastFrame	= Vec2::ZERO;
 
 	KeyButtonState m_keyStates[ MAX_KEYS ];
 

@@ -45,7 +45,7 @@ void EventSystem::SubscribeToEvent( const std::string& eventName , EventCallback
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void EventSystem::FireEvent( const std::string& eventName )
+bool EventSystem::FireEvent( const std::string& eventName )
 {
 	for ( int eventIndex = 0; eventIndex < ( int ) m_eventSubscriptions.size(); eventIndex++ )
 	{
@@ -54,8 +54,10 @@ void EventSystem::FireEvent( const std::string& eventName )
 		{
 			EventArgs defaultArguments;
 			subscription->m_callbackFunctionPtr( defaultArguments );
+			return true;
 		}
 	}
+	return false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

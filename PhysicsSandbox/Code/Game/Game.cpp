@@ -37,24 +37,19 @@ Game::Game()
 	m_worldCamera.SetOutputSize( m_currentCameraOutputSize );
 	m_worldCamera.SetPosition( m_cameraDefaultPosition );
 
+	//m_worldCamera.SetProjectionOrthographic( 800.f );
+	m_worldCamera.SetOrthoView( Vec2::ZERO , Vec2( 1600.f , 800.f ) );
+
 	m_UICamera.SetOutputSize( m_currentCameraOutputSize );
 	m_UICamera.SetPosition( m_cameraDefaultPosition );
-
+	m_UICamera.SetClearMode( CLEAR_NONE , WHITE , 0.f , 0 );
 	g_thePhysicsSystem->m_sceneCamera = &m_worldCamera;
 
 	m_mousePosition = g_theInput->GetMouseNormalizedClientPosition();
 	m_mousePosition = m_worldCamera.GetClientToWorldPosition( m_mousePosition );
 
 	RandomizePointCloud( m_rng );
-	//testPolygon = new Polygon2D();
-	//m_testPolygon =  Polygon2D::MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
-	//testPolygon.SetCenter();
 
-	if ( isnan( m_testPolygon.m_center.x) || isnan(m_testPolygon.m_center.y) )
-	{
-		return;
-	}
-	//m_testPolygon.MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
 	InitialGameObjectsSpawner();
 }
 
@@ -73,9 +68,6 @@ void Game::InitialGameObjectsSpawner()
 		m_gameObjects.push_back( temp );
 		m_isMouseOnGameObject.push_back( false );
 	}
-// 	GameObject* temp = new GameObject( g_thePhysicsSystem , m_testPolygon.GetCenter() , Vec2::ZERO , m_testPolygon );
-// 	m_gameObjects.push_back( temp );
-// 	m_isMouseOnGameObject.push_back( false );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -108,6 +100,8 @@ void Game::Update( float deltaSeconds )
 void Game::Render() const
 {
 	g_theRenderer->BeginCamera( m_worldCamera );
+	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
+	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( nullptr );
 
 	for ( unsigned int index = 0; index < ( unsigned int ) m_gameObjects.size(); index++ )
@@ -128,6 +122,7 @@ void Game::Render() const
 	DrawMouseCurrentPosition( m_worldCamera );
 
 	RenderDrawFromPointCloudMode();
+	g_theRenderer->EndCamera( m_worldCamera );
 	RenderUI();
 }
 
@@ -144,7 +139,7 @@ void Game::RenderUI() const
 
 void Game::RenderGravityUI() const
 {
-	AABB2 uiArea = AABB2( m_UICamera.GetOrthoMin() , m_UICamera.GetOrthoMax() );
+	AABB2 uiArea = AABB2( m_UICamera.GetOrthoMin().GetXYComponents() , m_UICamera.GetOrthoMax().GetXYComponents() );
 
 	uiArea = uiArea.GetBoxAtTop( 0.9f , 0.f ).GetBoxAtRight( 0.5f , 0.f );
 	/*uiArea.CarveBoxOffRight( 0.5f , 0.f );*/
@@ -274,6 +269,7 @@ void Game::PolygonDrawMode()
 		}
 
 		Vec2 point = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+		
 		if ( IsPolygonPotentiallyConvex( point ) )
 		{
 			m_drawModePoints.push_back( point );
