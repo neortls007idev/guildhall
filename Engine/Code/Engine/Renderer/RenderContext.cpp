@@ -53,32 +53,78 @@ extern char const* g_errorShaderCode;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-// TODO :- move to D3D11 common
-
-void SetDebugName( ID3D11DeviceChild* child , const std::string* name )
-{
-	if ( child != nullptr && name != nullptr )
-		child->SetPrivateData( WKPDID_D3DDebugObjectName , ( UINT ) name->size() , name->c_str() );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 RenderContext::~RenderContext()
 {
-// 	delete g_bitmapFont;
-// 	g_bitmapFont = nullptr;
 
-	m_LoadedTextures.clear();
-	m_LoadedBitMapFonts.clear();
-	m_LoadedShaders.clear();
+	// 	delete g_bitmapFont;
+	// 	g_bitmapFont = nullptr;
+
+	for ( int index = 0; index < BlendMode::TOTAL; index++ )
+	{
+		DX_SAFE_RELEASE( m_blendStates[ index ] );
+	}
+
+	delete m_textureDefault;
+	m_textureDefault = nullptr;
+
+	m_defaultShader = nullptr;
+
+	for ( auto& shaderIndex : m_LoadedShaders )
+	{
+		if ( shaderIndex.second != nullptr )
+		{
+			delete shaderIndex.second;
+			shaderIndex.second = nullptr;
+		}
+	}
+
+	for ( auto& textureIndex : m_LoadedTextures )
+	{
+		if ( textureIndex.second != nullptr )
+		{
+			delete textureIndex.second;
+			textureIndex.second = nullptr;
+		}
+	}
+
+	for ( auto& bitmapFontIndex : m_LoadedBitMapFonts )
+	{
+		if ( bitmapFontIndex.second != nullptr )
+		{
+			delete bitmapFontIndex.second;
+			bitmapFontIndex.second = nullptr;
+		}
+	}
+
+	delete m_defaultSampler;
+	m_defaultSampler = nullptr;
+
+	delete m_immediateVBO;
+	m_immediateVBO = nullptr;
+
+	delete m_modelMatrixUBO;
+	m_modelMatrixUBO = nullptr;
+
+	delete m_frameUBO;
+	m_frameUBO = nullptr;
+
+	m_currentCamera = nullptr;
+
+
+	// 	DX_SAFE_RELEASE( m_lastBoundIBO );
+	// 	DX_SAFE_RELEASE( m_lastBoundVBO );
+	m_lastBoundIBO = nullptr;
+	m_lastBoundVBO = nullptr;
 
 	delete m_swapChain;
 	m_swapChain = nullptr;
 
-	DX_SAFE_RELEASE( m_lastBoundIBO );
-	DX_SAFE_RELEASE( m_lastBoundVBO );
 	DX_SAFE_RELEASE( m_context );
 	DX_SAFE_RELEASE( m_device );
+
+	ReportLiveObjects();    // do our leak reporting just before shutdown to give us a better detailed list;
+	DestroyDebugModule();
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -143,6 +189,8 @@ void RenderContext::Startup( Window* window )
 	GUARANTEE_OR_DIE( SUCCEEDED( result ) , "FAILED TO CREATE RESOURCES" );
 	m_swapChain = new SwapChain( this , swapchain );
 
+	std::string debugName = "RenderContext Resource";
+	
 	/*Shader::s_errorShader->CreateFromString( this , g_errorShaderCode );*/
 
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/default.hlsl" );
@@ -190,76 +238,6 @@ void RenderContext::EndFrame()
 void RenderContext::Shutdown()
 {
 
-// 	delete g_bitmapFont;
-// 	g_bitmapFont = nullptr;
-
-
-	for ( int index = 0; index < BlendMode::TOTAL; index++ )
-	{
-		DX_SAFE_RELEASE( m_blendStates[ index ] );
-	}
-
-	delete m_textureDefault;
-	m_textureDefault = nullptr;
-
-	//delete m_defaultShader;
-	m_defaultShader = nullptr;
-
- 	for ( auto& shaderIndex : m_LoadedShaders )
- 	{
- 		if ( shaderIndex.second != nullptr )
- 		{
- 			delete shaderIndex.second;
- 			shaderIndex.second = nullptr;
- 		}
- 	}
-
-
-	for ( auto& textureIndex : m_LoadedTextures )
-	{
-		if ( textureIndex.second != nullptr )
-		{
-			delete textureIndex.second;
-			textureIndex.second = nullptr;
-		}
-	}
-
-	for ( auto& bitmapFontIndex : m_LoadedBitMapFonts )
-	{
-		if ( bitmapFontIndex.second != nullptr )
-		{
-			delete bitmapFontIndex.second;
-			bitmapFontIndex.second = nullptr;
-		}
-	}
-	
-	delete m_defaultSampler;
-	m_defaultSampler = nullptr;
-
-
-
-	delete m_immediateVBO;
-	m_immediateVBO = nullptr;
-
-	delete m_modelMatrixUBO;
-	m_modelMatrixUBO = nullptr;
-
-	delete m_frameUBO;
-	m_frameUBO = nullptr;
-
-	m_lastBoundIBO = nullptr;
-	m_lastBoundVBO = nullptr;
-	m_currentCamera = nullptr;
-
-	delete m_swapChain;
-	m_swapChain = nullptr;
-
-
-	DX_SAFE_RELEASE( m_context );
-	DX_SAFE_RELEASE( m_device );
-
-	ReportLiveObjects();    // do our leak reporting just before shutdown to give us a better detailed list;
-	DestroyDebugModule();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -412,7 +390,7 @@ void RenderContext::ReportLiveObjects()
 {
 	if ( nullptr != m_debug )
 	{
-		m_debug->ReportLiveObjects( DXGI_DEBUG_ALL , DXGI_DEBUG_RLO_DETAIL );
+		m_debug->ReportLiveObjects( DXGI_DEBUG_ALL , DXGI_DEBUG_RLO_ALL );
 	}
 }
 
@@ -486,6 +464,8 @@ Texture* RenderContext::CreateTextureFromFile( const char* imageFilePath )
 		m_LoadedTextures[ imageFilePath ] = temp;
 		//delete temp;
 		//temp = nullptr;
+		std::string filePath = imageFilePath;
+		SetDebugName( ( ID3D11DeviceChild* ) temp->GetHandle() , &filePath );
 		return m_LoadedTextures[ imageFilePath ];
 }
 

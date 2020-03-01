@@ -280,6 +280,9 @@
     <ClCompile Include="Primitives\AABB3.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\D3D11Common.cpp">
+      <Filter>Renderer\Pipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">

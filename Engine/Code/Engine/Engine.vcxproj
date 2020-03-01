@@ -220,6 +220,7 @@
     <ClCompile Include="Primitives\OBB2.cpp" />
     <ClCompile Include="Primitives\Plane.cpp" />
     <ClCompile Include="Primitives\Polygon2D.cpp" />
+    <ClCompile Include="Renderer\D3D11Common.cpp" />
     <ClCompile Include="Renderer\IndexBuffer.cpp" />
     <ClCompile Include="Renderer\RenderBuffer.cpp" />
     <ClCompile Include="Renderer\Sampler.cpp" />

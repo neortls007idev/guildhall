@@ -96,6 +96,9 @@ Camera::~Camera()
 
 	delete m_colorTarget;
 	m_colorTarget = nullptr;
+
+	delete m_depthStencilTarget;
+	m_depthStencilTarget = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -136,6 +139,7 @@ void Camera::CorrectAspectRaio( float clientAspectRatio )
 void Camera::SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight )
 {
 	m_projection	= CreateOrthoGraphicProjeciton( Vec3( bottomLeft, 0.0f ) , Vec3( topRight , 1.0f ) );
+	m_outputSize = ( GetOrthoMax() - GetOrthoMin() ).GetXYComponents();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

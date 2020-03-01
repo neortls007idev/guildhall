@@ -52,6 +52,10 @@ ShaderStage::ShaderStage()
 
 ShaderStage::~ShaderStage()
 {
+	SetDebugName( m_handle         , &m_user );
+	SetDebugName( m_vertexShader   , &m_user );
+	SetDebugName( m_fragmentShader , &m_user );
+
 	DX_SAFE_RELEASE( m_byteCode );
 	DX_SAFE_RELEASE( m_handle );
 	DX_SAFE_RELEASE( m_vertexShader );
@@ -92,7 +96,7 @@ bool ShaderStage::Compile( RenderContext* ctx , std::string const& filename , vo
 	// HLSL - high level shader language
 	// Compile - HLSL -  Byte Code
 	// Link ByteCode - Device Assembly ( what we need to get to ) - this is device specific
-
+	m_user = filename;
 	char const* entryPoint  = GetDefaultEntryPointForStage( stageType );
 	char const* shaderModel = GetShaderModelForStage( stageType );
 
@@ -165,6 +169,7 @@ bool ShaderStage::Compile( RenderContext* ctx , std::string const& filename , vo
 		DX_SAFE_RELEASE( errors );
 
 	// link the stage
+	SetDebugName( m_handle , &filename );
 
 	if ( stageType == SHADER_STAGE_VERTEX )
 	{
@@ -219,6 +224,8 @@ Shader::Shader( RenderContext* context ) :
 
 bool Shader::CreateFromFile( RenderContext* ctx , std::string const& filename )
 {
+	m_user = filename;
+	
 	size_t fileSize = 0;
 	void* source = FileReadToNewBuffer( filename, &fileSize );
 	if ( nullptr == source )
@@ -244,18 +251,20 @@ bool Shader::CreateFromFile( RenderContext* ctx , std::string const& filename )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-bool Shader::CreateFromString( RenderContext* ctx , std::string const& filename )
+bool Shader::CreateFromString( RenderContext* ctx , std::string const& stringName )
 {
 	UNUSED( ctx );
-	size_t fileSize = filename.length();
-	void* source = ( void* ) filename.c_str();
+	m_user = stringName;
+
+	size_t fileSize = stringName.length();
+	void* source = ( void* ) stringName.c_str();
 	if ( nullptr == source )
 	{
 		return false;
 	}
 
-	m_vertexStage.Compile( m_owner , filename , source , fileSize , SHADER_STAGE_VERTEX );
-	m_fragmentStage.Compile( m_owner , filename , source , fileSize , SHADER_STAGE_FRAGMENT );
+	m_vertexStage.Compile( m_owner , stringName , source , fileSize , SHADER_STAGE_VERTEX );
+	m_fragmentStage.Compile( m_owner , stringName , source , fileSize , SHADER_STAGE_FRAGMENT );
 
 	return m_vertexStage.IsValid() && m_fragmentStage.IsValid();
 }
@@ -333,7 +342,7 @@ ID3D11InputLayout* Shader::GetOrCreateInputLayout( buffer_attribute_t const* att
 		vertexDescription , 3 ,
 		m_vertexStage.GetByteCode() , m_vertexStage.GetByteCodeLength() ,
 		&m_inputLayout );
-																			// describe the Vertex PCU
+	SetDebugName( m_inputLayout , &m_user );																		// describe the Vertex PCU
 	return m_inputLayout;
 }
 

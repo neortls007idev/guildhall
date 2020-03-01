@@ -49,15 +49,7 @@ Game::Game()
 	m_mousePosition = m_worldCamera.GetClientToWorldPosition( m_mousePosition );
 
 	RandomizePointCloud( m_rng );
-	//testPolygon = new Polygon2D();
-	//m_testPolygon =  Polygon2D::MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
-	//testPolygon.SetCenter();
 
-	if ( isnan( m_testPolygon.m_center.x) || isnan(m_testPolygon.m_center.y) )
-	{
-		return;
-	}
-	//m_testPolygon.MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
 	InitialGameObjectsSpawner();
 }
 
@@ -76,9 +68,6 @@ void Game::InitialGameObjectsSpawner()
 		m_gameObjects.push_back( temp );
 		m_isMouseOnGameObject.push_back( false );
 	}
-// 	GameObject* temp = new GameObject( g_thePhysicsSystem , m_testPolygon.GetCenter() , Vec2::ZERO , m_testPolygon );
-// 	m_gameObjects.push_back( temp );
-// 	m_isMouseOnGameObject.push_back( false );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -280,6 +269,7 @@ void Game::PolygonDrawMode()
 		}
 
 		Vec2 point = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+		
 		if ( IsPolygonPotentiallyConvex( point ) )
 		{
 			m_drawModePoints.push_back( point );

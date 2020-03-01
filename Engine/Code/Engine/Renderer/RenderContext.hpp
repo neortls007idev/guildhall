@@ -146,7 +146,7 @@ private:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // TEXTURE FUNCTIONS ( TO BE ACCESSED BY THE RENDERER ONLY )
 //--------------------------------------------------------------------------------------------------------------------------------------------
-	Shader*		CreateShaderFromFile( char const* shaderFillePath );
+	Shader*		CreateShaderFromFile( char const* shaderFilePath );
 	Texture*	CreateTextureFromFile( const char* imageFilePath );
 	BitmapFont* CreateBitMapFontFromFile( std::string bitmapFontFilePath );
 

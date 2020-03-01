@@ -39,52 +39,93 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 
 	switch ( wmMessageCode )
 	{
-	case WM_CREATE: {
-		window = ( Window* ) lParam;
-		::SetWindowLongPtr( windowHandle , GWLP_USERDATA , ( LONG_PTR ) window );
-	} break;
-		// App close requested via "X" button, or right-click "Close Window" on task bar, or "Close" from system menu, or Alt-F4
-	case WM_CLOSE:
-	{
-		window->HandleQuitRequested();
-		return 0; // "Consumes" this message (tells Windows "okay, we handled it")
-	}
-
-	case WM_ACTIVATE:
-// 					g_theInput->HideSystemCursor();
-// 					g_theInput->ClipSystemCursor( MOUSE_IS_WINDOWLOCKED );
- 					break;
-	case WA_INACTIVE:
-// 					g_theInput->ClipSystemCursor( MOUSE_IS_UNLOCKED );
-// 					g_theInput->ShowSystemCursor();
- 					break;
-	case WM_CHAR:
-	{
-		char character = ( char ) wParam;
-		//g_theDevConsole->OnKeyPress( character );
-		input->PushCharacter( character );
-		break;
-	}
-	// Raw physical keyboard "key-was-just-depressed" event (case-insensitive, not translated)
-	case WM_KEYDOWN:
-	{
-		unsigned char asKey = ( unsigned char ) wParam;
-
-		if ( g_theDevConsole->IsOpen() )
+		case WM_CREATE: {
+			window = ( Window* ) lParam;
+			::SetWindowLongPtr( windowHandle , GWLP_USERDATA , ( LONG_PTR ) window );
+		} break;
+			// App close requested via "X" button, or right-click "Close Window" on task bar, or "Close" from system menu, or Alt-F4
+		case WM_CLOSE:
 		{
-			g_theDevConsole->HandleInput( asKey );
+			window->HandleQuitRequested();
+			return 0; // "Consumes" this message (tells Windows "okay, we handled it")
 		}
-		input->HandleKeyDown( asKey );
-		break;
-	}
 
-	// Raw physical keyboard "key-was-just-released" event (case-insensitive, not translated)
-	case WM_KEYUP:
-	{
-		unsigned char asKey = ( unsigned char ) wParam;
-		input->HandleKeyUp( asKey );
-		break;
-	}
+		case WM_ACTIVATE:
+// 						g_theInput->HideSystemCursor();
+// 						g_theInput->ClipSystemCursor( MOUSE_IS_WINDOWLOCKED );
+ 						break;
+		case WA_INACTIVE:
+// 						g_theInput->ClipSystemCursor( MOUSE_IS_UNLOCKED );
+// 						g_theInput->ShowSystemCursor();
+ 						break;
+		case WM_CHAR:
+		{
+			char character = ( char ) wParam;
+			//g_theDevConsole->OnKeyPress( character );
+			input->PushCharacter( character );
+			break;
+		}
+		// Raw physical keyboard "key-was-just-depressed" event (case-insensitive, not translated)
+		case WM_KEYDOWN:
+		{
+			unsigned char asKey = ( unsigned char ) wParam;
+
+			if ( g_theDevConsole->IsOpen() )
+			{
+				g_theDevConsole->HandleInput( asKey );
+			}
+			input->HandleKeyDown( asKey );
+			break;
+		}
+
+		// Raw physical keyboard "key-was-just-released" event (case-insensitive, not translated)
+		case WM_KEYUP:
+		{
+			unsigned char asKey = ( unsigned char ) wParam;
+			input->HandleKeyUp( asKey );
+			break;
+		}
+		case WM_LBUTTONDOWN:
+		{
+			g_theInput->HandleLeftMouseButtonPressed();
+			break;
+		}
+
+		case WM_LBUTTONUP:
+		{
+			g_theInput->HandleLeftMouseButtonReleased();
+			break;
+		}
+
+		case WM_RBUTTONDOWN:
+		{
+			g_theInput->HandleRightMouseButtonPressed();
+			break;
+		}
+
+		case WM_RBUTTONUP:
+		{
+			g_theInput->HandleRightMouseButtonReleased();
+			break;
+		}
+
+		case WM_MBUTTONDOWN:
+		{
+			g_theInput->HandleMiddleMouseButtonPressed();
+			break;
+		}
+
+		case WM_MBUTTONUP:
+		{
+			g_theInput->HandleMiddleMouseButtonReleased();
+			break;
+		}
+
+		case WM_MOUSEWHEEL:
+		{
+			g_theInput->UpdateMouseWheel( GET_WHEEL_DELTA_WPARAM( wParam ) );
+			break;
+		}
 	}
 
 	// Send back to Windows any unhandled/unconsumed messages we want other apps to see (e.g. play/pause in music apps, etc.)

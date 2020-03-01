@@ -28,7 +28,7 @@ Game::Game()
 
 	std::vector<Vertex_PCU> meshVerts;
 	
-	Vertex_PCU CubeVerts[ 12 ] = {
+	Vertex_PCU CubeVerts[ 20 ] = {
 		// FRONT FACE VERTS
 						Vertex_PCU( Vec3( -1.f,-1.f,1.f ) , WHITE, Vec2( 0.f, 0.f ) ),
 						Vertex_PCU( Vec3( 1.f,-1.f,1.f ) , WHITE, Vec2( 1.f, 0.f ) ),
@@ -42,16 +42,28 @@ Game::Game()
 						Vertex_PCU( Vec3( 1.f,1.f,-1.f )  , GREEN, Vec2( 1.f, 1.f ) ),
 						Vertex_PCU( Vec3( -1.f,1.f,-1.f ) , GREEN, Vec2( 1.f, 0.f ) ),
 		// RIGHT FACE VERTS
-						Vertex_PCU( Vec3( -1.f,-1.f,1.f ) ,BLUE, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( 1.f,-1.f,1.f ) ,BLUE, Vec2( 0.f, 0.f ) ),
 						Vertex_PCU( Vec3( 1.f,-1.f,-1.f ) ,BLUE, Vec2( 1.f, 0.f ) ),
 
 						Vertex_PCU( Vec3( 1.f,1.f,-1.f ) , BLUE, Vec2( 1.f, 1.f ) ),
-						Vertex_PCU( Vec3( -1.f,1.f,1.f ) ,BLUE, Vec2( 1.f, 0.f ) ),
-						
+						Vertex_PCU( Vec3( 1.f,1.f,1.f ) ,BLUE, Vec2( 1.f, 0.f ) ),
+		// LEFT FACE VERTS
+						Vertex_PCU( Vec3( -1.f,-1.f,1.f ) ,CYAN, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( -1.f,-1.f,-1.f ) ,CYAN, Vec2( 1.f, 0.f ) ),
+
+						Vertex_PCU( Vec3( -1.f,1.f,-1.f ) , CYAN, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( -1.f,1.f,1.f ) ,CYAN, Vec2( 1.f, 0.f ) ),
+		// TOP FACE VERTS
+						Vertex_PCU( Vec3( -1.f, 1.f, 1.f ) ,RED, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3(  1.f, 1.f, 1.f ) ,RED, Vec2( 1.f, 0.f ) ),
+
+						Vertex_PCU( Vec3(  1.f,1.f,-1.f ) , RED, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( -1.f,1.f, -1.f ) ,RED, Vec2( 1.f, 0.f ) ),
+		// BOTTOM FACE VERTS
 
 						};
 
-	uint Indices[ 18 ] = {
+	uint Indices[ 30 ] = {
 		// FRONT FACE INDICES
 							0,1,2,
 							2,3,0,
@@ -61,13 +73,19 @@ Game::Game()
 		// RIGHT FACE INDICES
 							8,9,10,
 							10,11,8,
+		// LEFT FACE INDICES
+							12,13,14,
+							14,15,12,
+		// TOP FACE INDICES
+							16,17,18,
+							18,19,16,
 							};
 
 	//AABB2 meshTest( -10 , -10 , 10 , 10 );
 
 	//AppendVertsForAABB2( meshVerts , meshTest , BLUE );
-	m_meshCube->UpdateVertices( 12 , &CubeVerts[ 0 ] , sizeof( Vertex_PCU ) , Vertex_PCU::LAYOUT );
-	m_meshCube->UpdateIndices( 18 , Indices );
+	m_meshCube->UpdateVertices( 20 , &CubeVerts[ 0 ] , sizeof( Vertex_PCU ) , Vertex_PCU::LAYOUT );
+	m_meshCube->UpdateIndices( 30 , Indices );
 
 
 	m_normalImage = AABB2( -WORLD_CAMERA_SIZE_X , -WORLD_CAMERA_SIZE_Y , WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y );
@@ -96,7 +114,7 @@ Game::~Game()
 
 void Game::Update( float deltaSeconds )
 {
-	//m_cubeTransform.SetRotation( 0.f , ( float ) GetCurrentTimeSeconds() , 0.f );
+	m_cubeTransform.SetRotation( 10.f * ( float ) GetCurrentTimeSeconds() , 0.f , 0.f );
 	UpdateFromKeyBoard( deltaSeconds );
 }
 
@@ -123,7 +141,7 @@ void Game::Render() const
 
 	//g_theRenderer->DrawVertexArray( m_meshCube->GetVertexCount() , m_meshCube->GetVertexBuffer() );
 	g_theRenderer->DrawMesh( m_meshCube );
-
+	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 	g_theRenderer->BindTexture( m_imageTex );
 	g_theRenderer->DrawAABB2( m_normalImage , WHITE );
 	g_theRenderer->BindShader( m_invertColorShader );

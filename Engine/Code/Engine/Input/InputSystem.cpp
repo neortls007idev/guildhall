@@ -8,7 +8,6 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>					// #include this (massive, platform-specific) header in very few places
-#include "../Core/ErrorWarningAssert.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -259,16 +258,16 @@ void InputSystem::UpdateMouse()
 {
 	//ShowCursor( FALSE );
 
-// 	POINT mousePosition;
-// 	GetCursorPos( &mousePosition );
-// 	ScreenToClient( g_hWnd , &mousePosition );
-// 	Vec2 clientMousePosition( ( float ) mousePosition.x , ( float ) mousePosition.y );
-//
-// 	RECT clientRect;
-// 	GetClientRect( g_hWnd , &clientRect );
-// 	AABB2 clientBounds = AABB2( clientRect.left , clientRect.top , clientRect.right , clientRect.bottom );
-// 	m_mouseNormalizedPosition = clientBounds.GetUVForPoint( clientMousePosition );
-// 	m_mouseNormalizedPosition.y = 1.f - m_mouseNormalizedPosition.y;
+	POINT mousePosition;
+	GetCursorPos( &mousePosition );
+	ScreenToClient( ( HWND ) g_theWindow->m_hwnd , &mousePosition );
+	Vec2 clientMousePosition( ( float ) mousePosition.x , ( float ) mousePosition.y );
+
+	RECT clientRect;
+	GetClientRect( ( HWND ) g_theWindow->m_hwnd , &clientRect );
+	AABB2 clientBounds = AABB2( clientRect.left , clientRect.top , clientRect.right , clientRect.bottom );
+	m_mouseNormalizedPosition = clientBounds.GetUVForPoint( clientMousePosition );
+	m_mouseNormalizedPosition.y = 1.f - m_mouseNormalizedPosition.y;
 //	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
 }
 

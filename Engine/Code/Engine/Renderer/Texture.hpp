@@ -27,12 +27,13 @@ public:
 	unsigned int	 GetTextureID() const;
 		     float	 GetAspect() const;
 	const    IntVec2 GetDimensions() const;
-
+	const   ID3D11Texture2D* GetHandle() const { return m_handle; }
 private:
 	RenderContext*		m_owner = nullptr;
 	ID3D11Texture2D*	m_handle = nullptr;
 	//ID3D11Texture1D*
 	//ID3D11Texture3D*
+	
 	TextureView*		m_renderTargetView = nullptr;
 	TextureView*		m_shaderResourceView = nullptr;
 
