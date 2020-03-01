@@ -62,6 +62,7 @@ public:
 
 	void			SetColorTarget( Texture* texture );
 	void			SetDepthStencilTarget( Texture* texture );
+
 	RenderBuffer*	UpdateUBO( RenderContext* ctx );
 	Texture*		GetColorTarget() const																			{ return m_colorTarget; }
 	Mat44			GetViewMatrix();
@@ -76,14 +77,14 @@ private:
 
 	eCameraClearBitFlag	m_clearMode				= CLEAR_COLOR_BIT;
 	Rgba8				m_clearColor			= BLACK;
-	Texture*			m_colorTarget			= nullptr;
 	Mat44				m_projection;
 	Mat44				m_view;
 	Transform			m_transform;
+	Texture*			m_colorTarget			= nullptr;
 	Texture*			m_depthStencilTarget	= nullptr;
 	float				m_clearDepth			= 1.0f;
 	float				m_clearStencil			= 0.f;
-	Vec2 m_outputSize;
+	Vec2				m_outputSize;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

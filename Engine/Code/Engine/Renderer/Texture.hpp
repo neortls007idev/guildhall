@@ -34,10 +34,11 @@ private:
 	//ID3D11Texture1D*
 	//ID3D11Texture3D*
 	
-	TextureView*		m_renderTargetView = nullptr;
-	TextureView*		m_shaderResourceView = nullptr;
+	TextureView*		m_renderTargetView		= nullptr;
+	TextureView*		m_shaderResourceView	= nullptr;
+	TextureView*		m_depthStencilView		= nullptr;
 
-	const char*			m_imageFilePath = nullptr;
+	const char*			m_imageFilePath			= nullptr;
 	unsigned int		m_textureID;
 	IntVec2				m_dimensions;
 	//Rgba8				m_color;

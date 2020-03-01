@@ -42,7 +42,7 @@ class DevConsole
 public:
 
 	DevConsole();
-	~DevConsole(){};
+	~DevConsole();
 	void Startup();
 
 	void InitializeCommands();
@@ -67,7 +67,7 @@ public:
 	void ProcessInput();
 	void OnKeyPress( char character );
 	bool AddCharacterToInput( char character );
-	int	 GetCurrentInputLength() const																				{ return ( int ) m_currentText.length(); }
+	int	 GetCurrentInputLength() const																{ return ( int ) m_currentText.length(); }
 	void ResetCurrentInput();
 
 	void ProcessCommand();
@@ -89,6 +89,8 @@ public:
 	void ChangeOverlayColor( Rgba8 newOverlayColor );
 	void HandleInput( unsigned char keycode );
 
+	Camera* GetDevConsoleCamera() const																{ return m_devConsoleCamera; }
+
 protected:
 
 	static bool								m_isConsoleOpen;
@@ -101,12 +103,23 @@ protected:
 
 private:
 	static std::string						m_currentText;
-	Vertex_PCU m_devConsoleAnimVerts[ 6 ] = {};
 	Vec2 m_animUVMaxs;
 	Vec2 m_animUVMins;
 	float							m_catAnimationDuration		= 4.4f;
-	float							m_currentCatAnimFrame	= 0.f;
+	float							m_currentCatAnimFrame		= 0.f;
 	float							m_phoenixAnimationDuration	= 3.8f;
 	float							m_currentPhoenixAnimFrame	= 0.f;
 	Rgba8							m_devConsoleAnimationColor	= Rgba8( 255 , 255 , 255 , 127 );
+	Camera*							m_devConsoleCamera			= nullptr;
+	Vertex_PCU						m_devConsoleAnimVerts[ 6 ]	= {
+
+				Vertex_PCU( Vec3( -0.4f , -0.225f , 0.f ) , Rgba8( 255 , 255 , 255 ) , m_animUVMins ),
+				Vertex_PCU( Vec3( 0.4f  , -0.225f , 0.f ) , Rgba8( 255 , 255 , 255 ) , Vec2( m_animUVMaxs.x , m_animUVMins.y ) ),
+				Vertex_PCU( Vec3( -0.4f , 0.225f  , 0.f ) , Rgba8( 255 , 255 , 255 ) , Vec2( m_animUVMins.x , m_animUVMaxs.y ) ),
+
+				Vertex_PCU( Vec3( 0.4f  , -0.225f , 0.f ) , Rgba8( 255 , 255 , 255 ) , Vec2( m_animUVMaxs.x , m_animUVMins.y ) ),
+				Vertex_PCU( Vec3( 0.4f  ,  0.225f , 0.f ) , Rgba8( 255 , 255 , 255 ) , m_animUVMaxs ),
+				Vertex_PCU( Vec3( -0.4f ,  0.225f , 0.f ) , Rgba8( 255 , 255 , 255 ) , Vec2( m_animUVMins.x , m_animUVMaxs.y ) )
+	};
+
 };

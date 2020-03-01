@@ -6,6 +6,8 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Time/Time.hpp"
 #include "Game/Game.hpp"
+
+#include "Engine/Math/MathConstants.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
 
@@ -27,66 +29,51 @@ Game::Game()
 	m_cubeTransform.SetPosition( 1.f , 0.5f , -15.0f );
 
 	std::vector<Vertex_PCU> meshVerts;
-	
-	Vertex_PCU CubeVerts[ 20 ] = {
-		// FRONT FACE VERTS
-						Vertex_PCU( Vec3( -1.f,-1.f,1.f ) , WHITE, Vec2( 0.f, 0.f ) ),
-						Vertex_PCU( Vec3( 1.f,-1.f,1.f ) , WHITE, Vec2( 1.f, 0.f ) ),
+	AddCubeVerts( meshVerts , nullptr );
 
-						Vertex_PCU( Vec3( 1.f,1.f,1.f ) , WHITE, Vec2( 1.f, 1.f ) ),
-						Vertex_PCU( Vec3( -1.f,1.f,1.f ) , WHITE, Vec2( 1.f, 0.f ) ),
-		// BACK FACE VERTS
-						Vertex_PCU( Vec3( -1.f,-1.f,-1.f ) , GREEN, Vec2( 0.f, 0.f ) ),
-						Vertex_PCU( Vec3( 1.f,-1.f,-1.f ) , GREEN, Vec2( 1.f, 0.f ) ),
+	m_meshCube->UpdateVertices( meshVerts );
+	m_meshCube->UpdateIndices( 36 , GetCubeIndices() );
 
-						Vertex_PCU( Vec3( 1.f,1.f,-1.f )  , GREEN, Vec2( 1.f, 1.f ) ),
-						Vertex_PCU( Vec3( -1.f,1.f,-1.f ) , GREEN, Vec2( 1.f, 0.f ) ),
-		// RIGHT FACE VERTS
-						Vertex_PCU( Vec3( 1.f,-1.f,1.f ) ,BLUE, Vec2( 0.f, 0.f ) ),
-						Vertex_PCU( Vec3( 1.f,-1.f,-1.f ) ,BLUE, Vec2( 1.f, 0.f ) ),
+	int stacks = 100;
+	int slices = 100;
+	std::vector<Vertex_PCU> sphereMeshVerts;
+	for ( int t = 0; t < stacks; t++ ) // stacks are ELEVATION so they count theta
+	{
+		float theta1 = ( ( float ) ( t ) / stacks ) * PI;
+		float theta2 = ( ( float ) ( t + 1 ) / stacks ) * PI;
 
-						Vertex_PCU( Vec3( 1.f,1.f,-1.f ) , BLUE, Vec2( 1.f, 1.f ) ),
-						Vertex_PCU( Vec3( 1.f,1.f,1.f ) ,BLUE, Vec2( 1.f, 0.f ) ),
-		// LEFT FACE VERTS
-						Vertex_PCU( Vec3( -1.f,-1.f,1.f ) ,CYAN, Vec2( 0.f, 0.f ) ),
-						Vertex_PCU( Vec3( -1.f,-1.f,-1.f ) ,CYAN, Vec2( 1.f, 0.f ) ),
+		for ( int p = 0; p < slices; p++ ) // slices are ORANGE SLICES so the count azimuth
+		{
+			float phi1 = ( ( float ) ( p ) / slices ) * 2 * PI; // azimuth goes around 0 .. 2*PI
+			float phi2 = ( ( float ) ( p + 1 ) / slices ) * 2 * PI;
 
-						Vertex_PCU( Vec3( -1.f,1.f,-1.f ) , CYAN, Vec2( 1.f, 1.f ) ),
-						Vertex_PCU( Vec3( -1.f,1.f,1.f ) ,CYAN, Vec2( 1.f, 0.f ) ),
-		// TOP FACE VERTS
-						Vertex_PCU( Vec3( -1.f, 1.f, 1.f ) ,RED, Vec2( 0.f, 0.f ) ),
-						Vertex_PCU( Vec3(  1.f, 1.f, 1.f ) ,RED, Vec2( 1.f, 0.f ) ),
+			//phi2   phi1
+			// |      |
+			// 2------1 -- theta1
+			// |\ _   |
+			// |    \ |
+			// 3------4 -- theta2
+			//
 
-						Vertex_PCU( Vec3(  1.f,1.f,-1.f ) , RED, Vec2( 1.f, 1.f ) ),
-						Vertex_PCU( Vec3( -1.f,1.f, -1.f ) ,RED, Vec2( 1.f, 0.f ) ),
-		// BOTTOM FACE VERTS
+			//vertex1 = vertex on a sphere of radius r at spherical coords theta1, phi1
+			//vertex2 = vertex on a sphere of radius r at spherical coords theta1, phi2
+			//vertex3 = vertex on a sphere of radius r at spherical coords theta2, phi2
+			//vertex4 = vertex on a sphere of radius r at spherical coords theta2, phi1
 
-						};
-
-	uint Indices[ 30 ] = {
-		// FRONT FACE INDICES
-							0,1,2,
-							2,3,0,
-		// BACK FACE INDICES
-							4,5,6,
-							6,7,4,
-		// RIGHT FACE INDICES
-							8,9,10,
-							10,11,8,
-		// LEFT FACE INDICES
-							12,13,14,
-							14,15,12,
-		// TOP FACE INDICES
-							16,17,18,
-							18,19,16,
-							};
-
-	//AABB2 meshTest( -10 , -10 , 10 , 10 );
-
-	//AppendVertsForAABB2( meshVerts , meshTest , BLUE );
-	m_meshCube->UpdateVertices( 20 , &CubeVerts[ 0 ] , sizeof( Vertex_PCU ) , Vertex_PCU::LAYOUT );
-	m_meshCube->UpdateIndices( 30 , Indices );
-
+			// facing out
+//			if ( t == 0 ) // top cap
+				
+// 				mesh->addTri( vertex1 , vertex3 , vertex4 ); //t1p1, t2p2, t2p1
+// 			else if ( t + 1 == stacks ) //end cap
+// 				mesh->addTri( vertex3 , vertex1 , vertex2 ); //t2p2, t1p1, t1p2
+// 			else
+// 			{
+// 				// body, facing OUT:
+// 				mesh->addTri( vertex1 , vertex2 , vertex4 );
+// 				mesh->addTri( vertex2 , vertex3 , vertex4 );
+//			}
+		}
+	}
 
 	m_normalImage = AABB2( -WORLD_CAMERA_SIZE_X , -WORLD_CAMERA_SIZE_Y , WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y );
 	AABB2 boxCopy = m_normalImage;
@@ -114,7 +101,9 @@ Game::~Game()
 
 void Game::Update( float deltaSeconds )
 {
-	m_cubeTransform.SetRotation( 10.f * ( float ) GetCurrentTimeSeconds() , 0.f , 0.f );
+	static float y = 0;
+	y += deltaSeconds;
+	m_cubeTransform.SetRotation( 180.f * SinDegrees( y )/*( float ) GetCurrentTimeSeconds()*/ , 0.f , 0.f );
 	UpdateFromKeyBoard( deltaSeconds );
 }
 

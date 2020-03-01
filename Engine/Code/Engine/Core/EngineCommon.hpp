@@ -74,3 +74,6 @@ const Vec2 ALIGN_TOP_LEFT( 0.0f , 1.0f );
 const Vec2 ALIGN_TOP_CENTERED( 0.5f , 1.0f );
 const Vec2 ALIGN_TOP_RIGHT( 1.0f , 1.0f );
 
+
+constexpr float DEVCONSOLE_CAMERA_SIZE_Y = 800.f;
+constexpr float DEVCONSOLE_CAMERA_SIZE_X = DEVCONSOLE_CAMERA_SIZE_Y * ( 16.f / 9.f );

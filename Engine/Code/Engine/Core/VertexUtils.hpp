@@ -3,11 +3,11 @@
 #include "Engine/Primitives/AABB2.hpp"
 #include <vector>
 #include "Engine/Primitives/AABB3.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TransformVertexArray2D(int NumberOfVertices, Vertex_PCU* verts, float scale, float Orientation, Vec2 translation);
-
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // APPEND FUNCITONS
@@ -21,4 +21,8 @@ void AppendVertsForAABB3( std::vector<Vertex_PCU>& vertexArray , const AABB3& bo
 void AppendVertsForAABB3( std::vector<Vertex_PCU>& vertexArray , const AABB3& box , const Rgba8& tint , const Vec2& uvAtMins , const Vec2& uvAtMaxs );
 
 void AppendVertsForPolygon( std::vector<Vertex_PCU>& vertexArray , const Vec2* points , const unsigned int count , const Rgba8& tint );
+
+void AddCubeVerts( std::vector<Vertex_PCU>& cubeVertexArray , const Rgba8* tint );
+
+uint* GetCubeIndices();
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -36,6 +36,17 @@ DevConsole::DevConsole()
 	m_carrotPosX = 0.f;
 	m_carrotOffset = 0;
 	m_currentText = "";
+	m_devConsoleCamera = new Camera();
+	m_devConsoleCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( DEVCONSOLE_CAMERA_SIZE_X , DEVCONSOLE_CAMERA_SIZE_Y ) );
+	m_devConsoleCamera->SetClearMode( CLEAR_NONE , GRAY );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+DevConsole::~DevConsole()
+{
+	delete m_devConsoleCamera;
+	m_devConsoleCamera = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -138,24 +149,51 @@ void DevConsole::PrintString( const std::string& devConsolePrintString /*= "INVA
 
 void DevConsole::Render( RenderContext& renderer , const Camera& camera , float lineHeight ) const
 {
+	AABB2 consoleArea = AABB2( camera.GetOrthoMin().x , camera.GetOrthoMin().y , camera.GetOrthoMax().x , camera.GetOrthoMax().y );
+	AABB2 typingArea = consoleArea.CarveBoxOffBottom( 0.075f , 0.f );
+	consoleArea = consoleArea.CarveBoxOffTop( 0.925f , 0.f );
+
+	Vec2 caratDimensions = typingArea.GetDimensions();
+
+	AABB2 carat = typingArea.GetBoxAtLeft( 0.995f , 0.f );
+	carat.SetDimensions( carat.GetDimensions() * 0.7f );
+	carat.AlignWithinAABB2( typingArea , ALIGN_CENTERED_LEFT );
+
+	float offsetBetweenLines = 0.075f * lineHeight;
 
 	float dimensionOfConsole = camera.GetOrthoMax().y - camera.GetOrthoMin().y;
-	float offsetBetweenLines = 1.f;
-	int numberOfLinesToDisplay = RoundDownToInt( dimensionOfConsole / ( lineHeight + offsetBetweenLines) );
+	int numberOfLinesToDisplay = RoundDownToInt( dimensionOfConsole / ( lineHeight + offsetBetweenLines ) );
+	Vec2 startMins = Vec2( camera.GetOrthoMin().x , camera.GetOrthoMin().y );
 	int myStringIndex = ( int ) m_consoleText.size() - 1;
 	Vec2 alignment = ALIGN_BOTTOM_LEFT;
 	float alignmentDeltaChange = 0.f;
 	
-	//renderer.BeginCamera( camera );
+// 	float dimensionOfConsole = camera.GetOrthoMax().y - camera.GetOrthoMin().y;
+// 	float offsetBetweenLines = 1.f;
+// 	int numberOfLinesToDisplay = RoundDownToInt( dimensionOfConsole / ( lineHeight + offsetBetweenLines) );
+// 	int myStringIndex = ( int ) m_consoleText.size() - 1;
+// 	Vec2 alignment = ALIGN_BOTTOM_LEFT;
+// 	float alignmentDeltaChange = 0.f;
 	
-	//renderer.DrawAABB2( consoleArea , m_OverlayColor );
-	//renderer.DrawAABB2( typingArea , Rgba8( 0 , 0 , 255 , 100 ) );
+	renderer.BeginCamera( camera );
+	renderer.BindShader( nullptr );
+
+	AABB2 devConsolePhoenixAnimArea = consoleArea.GetBoxAtTop( 0.5f , 0.f ).GetBoxAtRight( 0.5f , 0.f );
+	devConsolePhoenixAnimArea.AlignWithinAABB2( consoleArea , ALIGN_TOP_RIGHT );
+	RenderPhoenixAnimation( renderer , camera , devConsolePhoenixAnimArea );
+
+	AABB2 devConsoleCatAnimArea = consoleArea.GetBoxAtBottom( 0.5f , 0.f ).GetBoxAtRight( 0.5f , 0.f );
+	devConsoleCatAnimArea.AlignWithinAABB2( consoleArea , ALIGN_BOTTOM_RIGHT );
+	RenderCatAnimation( renderer , camera , devConsoleCatAnimArea );
+	
+	renderer.DrawAABB2( consoleArea , m_OverlayColor );
+	renderer.DrawAABB2( typingArea , Rgba8( 0 , 0 , 255 , 100 ) );
 
 	/*MoveCarrot( lineHeight );*/
 
 	float translateCaratX = ( m_currentText.length() - m_carrotOffset ) * lineHeight;
-	//carat.Translate( Vec2( translateCaratX , 0.f ) );
-	//renderer.DrawAABB2( carat , m_carrotColor );
+	carat.Translate( Vec2( translateCaratX , 0.f ) );
+	renderer.DrawAABB2( carat , m_carrotColor );
 
 	std::vector<Vertex_PCU> consoleTextVerts;
 
@@ -166,7 +204,7 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 			break;
 		}
 
-	//	g_bitmapFont->AddVertsForTextInBox2D( consoleTextVerts , consoleArea , lineHeight , m_consoleText[ myStringIndex ].text , m_consoleText[ myStringIndex ].lineColor , 1.f , alignment );
+		g_bitmapFont->AddVertsForTextInBox2D( consoleTextVerts , consoleArea , lineHeight , m_consoleText[ myStringIndex ].text , m_consoleText[ myStringIndex ].lineColor , 1.f , alignment );
 		myStringIndex--;
 
 		alignmentDeltaChange += ( offsetBetweenLines );
@@ -174,10 +212,10 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 		alignment.y = RangeMapFloat( 0.f , ( float ) numberOfLinesToDisplay , 0.f , 1.f , alignmentDeltaChange );
 	}
 	std::vector<Vertex_PCU> curretnTextVerts;
-//	g_bitmapFont->AddVertsForTextInBox2D( curretnTextVerts , typingArea , lineHeight , m_currentText , WHITE , 1.f , ALIGN_CENTERED_LEFT );
-
-
+	g_bitmapFont->AddVertsForTextInBox2D( curretnTextVerts , typingArea , lineHeight , m_currentText , WHITE , 1.f , ALIGN_CENTERED_LEFT );
+	
 	renderer.BindTexture( g_bitmapFont->GetTexture() );
+	
 	if ( consoleTextVerts.size() > 0)
 	{
 		renderer.DrawVertexArray( consoleTextVerts );
@@ -189,7 +227,9 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	}
 
 	renderer.BindTexture( nullptr );
+	renderer.BindShader( nullptr );
 	curretnTextVerts.clear();
+	renderer.EndCamera( camera );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -286,7 +326,7 @@ void DevConsole::RenderPhoenixAnimation( RenderContext& renderer , const Camera&
 
 	TransformVertexArray2D( 6 , tempDevConsoleAnim , animArea.GetDimensions().y , 0.f , animArea.GetCenter() + ( animArea.m_maxs - animArea.GetCenter() ) / 2.f );
 	renderer.BindTexture( texture );
-	renderer.SetBlendMode( BlendMode::ADDITIVE );
+	renderer.SetBlendMode( BlendMode::ALPHA );
 	renderer.DrawVertexArray( 6 , tempDevConsoleAnim );
 	renderer.SetBlendMode( BlendMode::ALPHA );
 	renderer.BindTexture( nullptr );
@@ -320,10 +360,7 @@ void DevConsole::RenderCatAnimation( RenderContext& renderer , const Camera& cam
 	tempDevConsoleAnim[ 4 ].m_uvTexCoords = uvMaxs;
 	tempDevConsoleAnim[ 5 ].m_uvTexCoords = Vec2( uvMins.x , uvMaxs.y );
 
-	Vec2 translateBy = animArea.m_mins + ( animArea.m_maxs - animArea.GetCenter() ) / 2.f ;
-	translateBy.x -= 200.f;
-
-	TransformVertexArray2D( 6 , tempDevConsoleAnim , animArea.GetDimensions().y , 0.f , translateBy );
+	TransformVertexArray2D( 6 , tempDevConsoleAnim , animArea.GetDimensions().y , 0.f , animArea.GetCenter() );
 	renderer.BindTexture( texture );
 	renderer.SetBlendMode( BlendMode::ALPHA );
 	renderer.DrawVertexArray( 6 , tempDevConsoleAnim );

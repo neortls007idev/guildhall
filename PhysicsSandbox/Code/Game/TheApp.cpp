@@ -176,7 +176,7 @@ void TheApp::Render() const
 
 		if ( g_theDevConsole->IsOpen() )
 		{
-			g_theDevConsole->Render( *g_theRenderer , g_theGame->m_worldCamera , 10.f );
+			g_theDevConsole->Render( *g_theRenderer , *g_theDevConsole->GetDevConsoleCamera() , 20.f );
 		}
 
 }

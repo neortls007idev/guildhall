@@ -15,6 +15,7 @@
 #include "Engine/Renderer/VertexBuffer.hpp"
 #include "Engine/Renderer/IndexBuffer.hpp"
 #include "Engine/Time/Time.hpp"
+#include "Engine/Renderer/DepthStencilTargetView.hpp"
 //#include "Engine/Renderer/RenderBuffer.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -42,6 +43,7 @@
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/Sampler.hpp"
 #include "Engine/Primitives/GPUMesh.hpp"
+#include "Engine/Renderer/DepthStencilTargetView.hpp"
 
 #pragma comment( lib, "d3d11.lib" )         // needed a01
 #pragma comment( lib, "dxgi.lib" )          // needed a01
@@ -300,7 +302,11 @@ void RenderContext::BeginCamera( const Camera& camera )
 	m_context->RSSetViewports( 1 , &viewport );
 
 	ID3D11RenderTargetView* rtv = m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
+	//BindDepthStencil( m_textureTarget );
 	m_context->OMSetRenderTargets( 1 , &rtv , nullptr );
+
+// 	DepthStencilTargetView* dsv = new DepthStencilTargetView( this );
+// 	dsv->CreateDepthStencilState();
 
 	//ClearScreen( camera.GetClearColor() );
 	BindShader( "" );
@@ -314,7 +320,7 @@ void RenderContext::BeginCamera( const Camera& camera )
 
 	BindTexture( m_textureDefault );
 	BindSampler( m_defaultSampler );
-	SetBlendMode( BlendMode::ALPHA );
+	SetBlendMode( BlendMode::SOLID );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1128,6 +1134,24 @@ void RenderContext::BindSampler( const Sampler* sampler )
 	}
 	ID3D11SamplerState* samplerHandle = sampler->GetHandle();
 	m_context->PSSetSamplers( 0 , 1 , &samplerHandle );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::BindDepthStencilData( DepthStencilTargetView* depthStencilView )
+{
+	
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::BindDepthStencil( Texture* depthStencilView )
+{
+	TextureView* dsv = depthStencilView->GetOrCreateDepthStencilView();
+	ID3D11RenderTargetView* const* rtv = ( ID3D11RenderTargetView* const* )m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
+	m_context->OMSetRenderTargets( 1 ,          // One rendertarget view
+		 rtv ,      // Render target view, created earlier
+		dsv->m_dsv );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

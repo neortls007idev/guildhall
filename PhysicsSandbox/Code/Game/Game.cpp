@@ -103,6 +103,7 @@ void Game::Render() const
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->SetBlendMode( ALPHA );
 
 	for ( unsigned int index = 0; index < ( unsigned int ) m_gameObjects.size(); index++ )
 	{
@@ -122,6 +123,7 @@ void Game::Render() const
 	DrawMouseCurrentPosition( m_worldCamera );
 
 	RenderDrawFromPointCloudMode();
+	g_theRenderer->SetBlendMode( SOLID );
 	g_theRenderer->EndCamera( m_worldCamera );
 	RenderUI();
 }
@@ -131,7 +133,9 @@ void Game::Render() const
 void Game::RenderUI() const
 {
 	g_theRenderer->BeginCamera( m_UICamera );
+	g_theRenderer->SetBlendMode( ALPHA );
 	RenderGravityUI();
+	g_theRenderer->SetBlendMode( SOLID );
 	g_theRenderer->EndCamera( m_UICamera );
 }
 

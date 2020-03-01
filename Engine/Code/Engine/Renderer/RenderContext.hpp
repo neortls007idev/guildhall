@@ -30,6 +30,7 @@ class RenderBuffer;
 class Sampler;
 class Image;
 class IndexBuffer;
+class DepthStencilTargetView;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -138,6 +139,8 @@ public:
 	void		BindUniformBuffer( unsigned int slot , RenderBuffer* ubo ); // ubo - uniform buffer object
 	void		SetModelMatrix( Mat44 modelmat );
 	void		BindSampler( const Sampler* sampler );
+	void		BindDepthStencilData( DepthStencilTargetView* depthStencilView );
+	void		BindDepthStencil( Texture* depthStencilView );
 	Texture*	CreateTextureFromColor( Rgba8 color );
 	Texture*	CreateFromImage( Image* image );
 

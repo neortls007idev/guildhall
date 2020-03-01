@@ -283,6 +283,9 @@
     <ClCompile Include="Renderer\D3D11Common.cpp">
       <Filter>Renderer\Pipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\DepthStencilTargetView.cpp">
+      <Filter>Renderer\Pipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -530,6 +533,9 @@
     </ClInclude>
     <ClInclude Include="Primitives\AABB3.hpp">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\DepthStencilTargetView.hpp">
+      <Filter>Renderer\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
