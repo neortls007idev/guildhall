@@ -178,11 +178,11 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	renderer.BeginCamera( camera );
 	renderer.BindShader( nullptr );
 
-	AABB2 devConsolePhoenixAnimArea = consoleArea.GetBoxAtTop( 0.5f , 0.f ).GetBoxAtRight( 0.5f , 0.f );
+	AABB2 devConsolePhoenixAnimArea = consoleArea.GetBoxAtTop( 0.75f , 0.f ).GetBoxAtRight( 0.25f , 0.f );
 	devConsolePhoenixAnimArea.AlignWithinAABB2( consoleArea , ALIGN_TOP_RIGHT );
 	RenderPhoenixAnimation( renderer , camera , devConsolePhoenixAnimArea );
 
-	AABB2 devConsoleCatAnimArea = consoleArea.GetBoxAtBottom( 0.5f , 0.f ).GetBoxAtRight( 0.5f , 0.f );
+	AABB2 devConsoleCatAnimArea = consoleArea.GetBoxAtBottom( 0.75f , 0.f ).GetBoxAtRight( 0.25f , 0.f );
 	devConsoleCatAnimArea.AlignWithinAABB2( consoleArea , ALIGN_BOTTOM_RIGHT );
 	RenderCatAnimation( renderer , camera , devConsoleCatAnimArea );
 	
@@ -307,27 +307,12 @@ void DevConsole::RenderPhoenixAnimation( RenderContext& renderer , const Camera&
 	Vec2 uvMaxs;
 	devConsoleAnim.GetUVs( uvMins , uvMaxs );
 
-	Vertex_PCU tempDevConsoleAnim[ 6 ];
-	for ( int index = 0; index < 6; index++ )
-	{
+	std::vector<Vertex_PCU> tempDevConsoleAnim;
+	AppendVertsForAABB2( tempDevConsoleAnim , animArea , m_devConsoleAnimationColor , uvMins , uvMaxs );
 
-		tempDevConsoleAnim[ index ]					= m_devConsoleAnimVerts[ index ];
-		tempDevConsoleAnim[ index ].m_color			= m_devConsoleAnimationColor;
-	}
-	tempDevConsoleAnim[ 0 ].m_uvTexCoords = uvMins;
-	tempDevConsoleAnim[ 1 ].m_uvTexCoords = Vec2( uvMaxs.x , uvMins.y );
-	tempDevConsoleAnim[ 2 ].m_uvTexCoords = Vec2( uvMins.x , uvMaxs.y );
-
-	tempDevConsoleAnim[ 3 ].m_uvTexCoords = Vec2( uvMaxs.x , uvMins.y );
-	tempDevConsoleAnim[ 4 ].m_uvTexCoords = uvMaxs;
-	tempDevConsoleAnim[ 5 ].m_uvTexCoords = Vec2( uvMins.x , uvMaxs.y );
-
-	Vec2 translateBy = animArea.GetCenter() + ( animArea.m_maxs - animArea.GetCenter() ) / 2.f;
-
-	TransformVertexArray2D( 6 , tempDevConsoleAnim , animArea.GetDimensions().y , 0.f , animArea.GetCenter() + ( animArea.m_maxs - animArea.GetCenter() ) / 2.f );
 	renderer.BindTexture( texture );
 	renderer.SetBlendMode( BlendMode::ALPHA );
-	renderer.DrawVertexArray( 6 , tempDevConsoleAnim );
+	renderer.DrawVertexArray( tempDevConsoleAnim );
 	renderer.SetBlendMode( BlendMode::ALPHA );
 	renderer.BindTexture( nullptr );
 }
@@ -344,26 +329,13 @@ void DevConsole::RenderCatAnimation( RenderContext& renderer , const Camera& cam
 	Vec2 uvMins;
 	Vec2 uvMaxs;
 	devConsoleAnim.GetUVs( uvMins , uvMaxs );
-
-	Vertex_PCU tempDevConsoleAnim[ 6 ];
-	for ( int index = 0; index < 6; index++ )
-	{
-
-		tempDevConsoleAnim[ index ] = m_devConsoleAnimVerts[ index ];
-		tempDevConsoleAnim[ index ].m_color = m_devConsoleAnimationColor;
-	}
-	tempDevConsoleAnim[ 0 ].m_uvTexCoords = uvMins;
-	tempDevConsoleAnim[ 1 ].m_uvTexCoords = Vec2( uvMaxs.x , uvMins.y );
-	tempDevConsoleAnim[ 2 ].m_uvTexCoords = Vec2( uvMins.x , uvMaxs.y );
-
-	tempDevConsoleAnim[ 3 ].m_uvTexCoords = Vec2( uvMaxs.x , uvMins.y );
-	tempDevConsoleAnim[ 4 ].m_uvTexCoords = uvMaxs;
-	tempDevConsoleAnim[ 5 ].m_uvTexCoords = Vec2( uvMins.x , uvMaxs.y );
-
-	TransformVertexArray2D( 6 , tempDevConsoleAnim , animArea.GetDimensions().y , 0.f , animArea.GetCenter() );
+	
+	std::vector<Vertex_PCU> tempDevConsoleAnim;
+	AppendVertsForAABB2( tempDevConsoleAnim , animArea , m_devConsoleAnimationColor , uvMins , uvMaxs );
+	
 	renderer.BindTexture( texture );
 	renderer.SetBlendMode( BlendMode::ALPHA );
-	renderer.DrawVertexArray( 6 , tempDevConsoleAnim );
+	renderer.DrawVertexArray( tempDevConsoleAnim );
 	renderer.SetBlendMode( BlendMode::ALPHA );
 	renderer.BindTexture( nullptr );
 }

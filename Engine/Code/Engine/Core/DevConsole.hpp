@@ -111,15 +111,4 @@ private:
 	float							m_currentPhoenixAnimFrame	= 0.f;
 	Rgba8							m_devConsoleAnimationColor	= Rgba8( 255 , 255 , 255 , 127 );
 	Camera*							m_devConsoleCamera			= nullptr;
-	Vertex_PCU						m_devConsoleAnimVerts[ 6 ]	= {
-
-				Vertex_PCU( Vec3( -0.4f , -0.225f , 0.f ) , Rgba8( 255 , 255 , 255 ) , m_animUVMins ),
-				Vertex_PCU( Vec3( 0.4f  , -0.225f , 0.f ) , Rgba8( 255 , 255 , 255 ) , Vec2( m_animUVMaxs.x , m_animUVMins.y ) ),
-				Vertex_PCU( Vec3( -0.4f , 0.225f  , 0.f ) , Rgba8( 255 , 255 , 255 ) , Vec2( m_animUVMins.x , m_animUVMaxs.y ) ),
-
-				Vertex_PCU( Vec3( 0.4f  , -0.225f , 0.f ) , Rgba8( 255 , 255 , 255 ) , Vec2( m_animUVMaxs.x , m_animUVMins.y ) ),
-				Vertex_PCU( Vec3( 0.4f  ,  0.225f , 0.f ) , Rgba8( 255 , 255 , 255 ) , m_animUVMaxs ),
-				Vertex_PCU( Vec3( -0.4f ,  0.225f , 0.f ) , Rgba8( 255 , 255 , 255 ) , Vec2( m_animUVMins.x , m_animUVMaxs.y ) )
-	};
-
 };
