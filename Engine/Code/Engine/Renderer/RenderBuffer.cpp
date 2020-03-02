@@ -153,6 +153,9 @@ bool RenderBuffer::Create( size_t dataByteSize , size_t elementByteSize )
 	desc.Usage					= ToDXMemoryUsage( m_memHint );
 	desc.BindFlags				= ToDXUsage( m_usage );
 	desc.CPUAccessFlags			= 0U;		//	->					What can the CPU do to this memory we are going to infer this form memory hint
+
+	int bufferType = ( int ) desc.Usage;
+	
 	if ( m_memHint == MEMORY_HINT_DYNAMIC )
 	{
 		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -169,6 +172,18 @@ bool RenderBuffer::Create( size_t dataByteSize , size_t elementByteSize )
 	 
 	if ( m_handle )
 	{
+		std::string debugName;
+		
+		switch( bufferType )
+		{
+		case 1: debugName = "";
+				break;
+		case 2: debugName = "";
+				break;
+		case 3: debugName = "";
+				break;
+		}
+		SetDebugName( ( ID3D11DeviceChild* ) m_handle , &debugName );
 		return true;
 	}
 	else

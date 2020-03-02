@@ -4,6 +4,7 @@
 
 struct ID3D11RenderTargetView;
 struct ID3D11ShaderResourceView;
+struct ID3D11DepthStencilView;
 struct ID3D11Resource;
 
 class  Texture;
@@ -25,6 +26,7 @@ public:
          ID3D11Resource*			m_handle;			// A01
          ID3D11ShaderResourceView*	m_srv;				// A03 - what is bound to a shader stage for reading
          ID3D11RenderTargetView*	m_rtv;				// A01 - alias as an rtv
+		 ID3D11DepthStencilView*	m_dsv;
       }; 
 
 private:

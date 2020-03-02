@@ -15,6 +15,7 @@
 #include "Engine/Renderer/VertexBuffer.hpp"
 #include "Engine/Renderer/IndexBuffer.hpp"
 #include "Engine/Time/Time.hpp"
+#include "Engine/Renderer/DepthStencilTargetView.hpp"
 //#include "Engine/Renderer/RenderBuffer.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -42,6 +43,7 @@
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/Sampler.hpp"
 #include "Engine/Primitives/GPUMesh.hpp"
+#include "Engine/Renderer/DepthStencilTargetView.hpp"
 
 #pragma comment( lib, "d3d11.lib" )         // needed a01
 #pragma comment( lib, "dxgi.lib" )          // needed a01
@@ -53,32 +55,78 @@ extern char const* g_errorShaderCode;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-// TODO :- move to D3D11 common
-
-void SetDebugName( ID3D11DeviceChild* child , const std::string* name )
-{
-	if ( child != nullptr && name != nullptr )
-		child->SetPrivateData( WKPDID_D3DDebugObjectName , ( UINT ) name->size() , name->c_str() );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 RenderContext::~RenderContext()
 {
-	delete g_bitmapFont;
-	g_bitmapFont = nullptr;
 
-	m_LoadedTextures.clear();
-	m_LoadedBitMapFonts.clear();
-	m_LoadedShaders.clear();
+	// 	delete g_bitmapFont;
+	// 	g_bitmapFont = nullptr;
+
+	for ( int index = 0; index < BlendMode::TOTAL; index++ )
+	{
+		DX_SAFE_RELEASE( m_blendStates[ index ] );
+	}
+
+	delete m_textureDefault;
+	m_textureDefault = nullptr;
+
+	m_defaultShader = nullptr;
+
+	for ( auto& shaderIndex : m_LoadedShaders )
+	{
+		if ( shaderIndex.second != nullptr )
+		{
+			delete shaderIndex.second;
+			shaderIndex.second = nullptr;
+		}
+	}
+
+	for ( auto& textureIndex : m_LoadedTextures )
+	{
+		if ( textureIndex.second != nullptr )
+		{
+			delete textureIndex.second;
+			textureIndex.second = nullptr;
+		}
+	}
+
+	for ( auto& bitmapFontIndex : m_LoadedBitMapFonts )
+	{
+		if ( bitmapFontIndex.second != nullptr )
+		{
+			delete bitmapFontIndex.second;
+			bitmapFontIndex.second = nullptr;
+		}
+	}
+
+	delete m_defaultSampler;
+	m_defaultSampler = nullptr;
+
+	delete m_immediateVBO;
+	m_immediateVBO = nullptr;
+
+	delete m_modelMatrixUBO;
+	m_modelMatrixUBO = nullptr;
+
+	delete m_frameUBO;
+	m_frameUBO = nullptr;
+
+	m_currentCamera = nullptr;
+
+
+	// 	DX_SAFE_RELEASE( m_lastBoundIBO );
+	// 	DX_SAFE_RELEASE( m_lastBoundVBO );
+	m_lastBoundIBO = nullptr;
+	m_lastBoundVBO = nullptr;
 
 	delete m_swapChain;
 	m_swapChain = nullptr;
 
-	DX_SAFE_RELEASE( m_lastBoundIBO );
-	DX_SAFE_RELEASE( m_lastBoundVBO );
 	DX_SAFE_RELEASE( m_context );
 	DX_SAFE_RELEASE( m_device );
+
+	ReportLiveObjects();    // do our leak reporting just before shutdown to give us a better detailed list;
+	DestroyDebugModule();
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -143,6 +191,8 @@ void RenderContext::Startup( Window* window )
 	GUARANTEE_OR_DIE( SUCCEEDED( result ) , "FAILED TO CREATE RESOURCES" );
 	m_swapChain = new SwapChain( this , swapchain );
 
+	std::string debugName = "RenderContext Resource";
+	
 	/*Shader::s_errorShader->CreateFromString( this , g_errorShaderCode );*/
 
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/default.hlsl" );
@@ -190,57 +240,6 @@ void RenderContext::EndFrame()
 void RenderContext::Shutdown()
 {
 
-	delete g_bitmapFont;
-	g_bitmapFont = nullptr;
-
-
-	for ( int index = 0; index < BlendMode::TOTAL; index++ )
-	{
-		DX_SAFE_RELEASE( m_blendStates[ index ] );
-	}
-
-	delete m_textureDefault;
-	m_textureDefault = nullptr;
-
-	//delete m_defaultShader;
-	m_defaultShader = nullptr;
-
- 	for ( auto& shaderIndex : m_LoadedShaders )
- 	{
- 		if ( shaderIndex.second != nullptr )
- 		{
- 			delete shaderIndex.second;
- 			shaderIndex.second = nullptr;
- 		}
- 	}
-
-	delete m_defaultSampler;
-	m_defaultSampler = nullptr;
-
-
-
-	delete m_immediateVBO;
-	m_immediateVBO = nullptr;
-
-	delete m_modelMatrixUBO;
-	m_modelMatrixUBO = nullptr;
-
-	delete m_frameUBO;
-	m_frameUBO = nullptr;
-
-	m_lastBoundIBO = nullptr;
-	m_lastBoundVBO = nullptr;
-	m_currentCamera = nullptr;
-
-	delete m_swapChain;
-	m_swapChain = nullptr;
-
-
-	DX_SAFE_RELEASE( m_context );
-	DX_SAFE_RELEASE( m_device );
-
-	ReportLiveObjects();    // do our leak reporting just before shutdown to give us a better detailed list;
-	DestroyDebugModule();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -303,9 +302,13 @@ void RenderContext::BeginCamera( const Camera& camera )
 	m_context->RSSetViewports( 1 , &viewport );
 
 	ID3D11RenderTargetView* rtv = m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
+	//BindDepthStencil( m_textureTarget );
 	m_context->OMSetRenderTargets( 1 , &rtv , nullptr );
 
-	ClearScreen( camera.GetClearColor() );
+// 	DepthStencilTargetView* dsv = new DepthStencilTargetView( this );
+// 	dsv->CreateDepthStencilState();
+
+	//ClearScreen( camera.GetClearColor() );
 	BindShader( "" );
 	m_lastBoundVBO = nullptr;
 	BindUniformBuffer( UBO_FRAME_SLOT , m_frameUBO );
@@ -317,7 +320,7 @@ void RenderContext::BeginCamera( const Camera& camera )
 
 	BindTexture( m_textureDefault );
 	BindSampler( m_defaultSampler );
-	SetBlendMode( BlendMode::ALPHA );
+	SetBlendMode( BlendMode::SOLID );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -393,7 +396,7 @@ void RenderContext::ReportLiveObjects()
 {
 	if ( nullptr != m_debug )
 	{
-		m_debug->ReportLiveObjects( DXGI_DEBUG_ALL , DXGI_DEBUG_RLO_DETAIL );
+		m_debug->ReportLiveObjects( DXGI_DEBUG_ALL , DXGI_DEBUG_RLO_ALL );
 	}
 }
 
@@ -467,6 +470,8 @@ Texture* RenderContext::CreateTextureFromFile( const char* imageFilePath )
 		m_LoadedTextures[ imageFilePath ] = temp;
 		//delete temp;
 		//temp = nullptr;
+		std::string filePath = imageFilePath;
+		SetDebugName( ( ID3D11DeviceChild* ) temp->GetHandle() , &filePath );
 		return m_LoadedTextures[ imageFilePath ];
 }
 
@@ -672,7 +677,7 @@ void RenderContext::DrawIndexed( uint indexCount , uint startIndex , uint indexS
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext:: DrawLine(const Vec2& start, const Vec2& end, const Rgba8& color, float thickness)
+void RenderContext:: DrawLine(const Vec2& start, const Vec2& end, const Rgba8& color, float thickness, float scale , float orientationDegrees , Vec2 translate )
 {
 	Vec2 displacement = end - start;
 	Vec2 forward = displacement.GetNormalized();
@@ -689,14 +694,14 @@ void RenderContext:: DrawLine(const Vec2& start, const Vec2& end, const Rgba8& c
 	Vec3 startLeftVec3( startLeft.x , startLeft.y , 0.f );
 	Vec3 startRightVec3( startRight.x , startRight.y , 0.f );
 
-	const Vertex_PCU lineVerts[6] = { Vertex_PCU(startRightVec3, color, Vec2(0.f, 0.f)),
+	Vertex_PCU lineVerts[6] = { Vertex_PCU(startRightVec3, color, Vec2(0.f, 0.f)),
 								Vertex_PCU(endRightVec3  , color, Vec2(0.f, 0.f)),
 								Vertex_PCU(endLeftVec3   , color, Vec2(0.f, 0.f)),
 								Vertex_PCU(endLeftVec3   , color, Vec2(0.f, 0.f)),
 								Vertex_PCU(startLeftVec3 , color, Vec2(0.f, 0.f)),
 								Vertex_PCU(startRightVec3, color, Vec2(0.f, 0.f)) };
 
-
+	TransformVertexArray2D( 6 , lineVerts , scale , orientationDegrees , translate );
 	DrawVertexArray(6, lineVerts);
 }
 
@@ -812,6 +817,52 @@ void RenderContext::DrawDisc( const Disc2D& disc , const Rgba8& tint )
 
 	// MOVE  THIS LINE OF CODE INTO A SEPARATE FUNCTION LATER
 	TransformVertexArray2D( NUMBER_OF_DISC_VERTS , discVerts , 1 , 0.f , disc.m_center );
+	DrawVertexArray( NUMBER_OF_DISC_VERTS , discVerts );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::DrawDisc( const Vec2& center , const float& radius , const Rgba8& tint )
+{
+	constexpr int  NUMBER_OF_DISC_VERTS = 120;
+	Vertex_PCU discVerts[ NUMBER_OF_DISC_VERTS ];
+	const Vec2 UVCoordsAtCenter = Vec2( 0.5f , 0.5f );
+	const float UVRadius = 0.5f;
+
+	float angleInDegreesBetweenDiscTriangles = 0.f;
+
+	discVerts[ 0 ] = Vertex_PCU( ( Vec3( 0.f , 0.f , 0.f ) ) , tint , Vec2( 0.5f , 0.5f ) );
+	discVerts[ 1 ] = Vertex_PCU( ( Vec3( radius , 0.f , 0.f ) ) , tint , Vec2( 1.f , 0.5f ) );
+	angleInDegreesBetweenDiscTriangles = ( 360.f * 3.f ) / static_cast< float >( NUMBER_OF_DISC_VERTS );
+
+	//-----------------------------------------------------------------------------------------------------------------
+	float costheta = CosDegrees( angleInDegreesBetweenDiscTriangles );
+	float intialXVertex = radius * costheta;
+
+	float sintheha = SinDegrees( angleInDegreesBetweenDiscTriangles );
+	float initialYVertex = radius * sintheha;
+
+	discVerts[ 2 ] = Vertex_PCU( ( Vec3( intialXVertex , initialYVertex , 0.f ) ) , tint , Vec2( UVRadius + UVRadius * costheta , UVRadius + UVRadius * sintheha ) );
+
+	//-----------------------------------------------------------------------------------------------------------------
+	int discVertIndex = 3;
+	for ( discVertIndex = 3; discVertIndex < NUMBER_OF_DISC_VERTS; discVertIndex += 3 )
+	{
+		angleInDegreesBetweenDiscTriangles = angleInDegreesBetweenDiscTriangles + ( ( 360.f * 3.f ) / ( NUMBER_OF_DISC_VERTS ) );
+		discVerts[ discVertIndex ] = discVerts[ discVertIndex - 3 ];
+		discVerts[ discVertIndex + 1 ] = discVerts[ discVertIndex - 1 ];
+
+		discVerts[ discVertIndex + 2 ].m_position = Vec3( radius * CosDegrees( angleInDegreesBetweenDiscTriangles ) ,
+			radius * SinDegrees( angleInDegreesBetweenDiscTriangles ) , 0.f );
+		discVerts[ discVertIndex + 2 ].m_color = tint;
+		discVerts[ discVertIndex + 2 ].m_uvTexCoords = Vec2( UVRadius + UVRadius * CosDegrees( angleInDegreesBetweenDiscTriangles ) ,
+			UVRadius + UVRadius * SinDegrees( angleInDegreesBetweenDiscTriangles ) );
+	}
+	discVerts[ NUMBER_OF_DISC_VERTS - 1 ] = discVerts[ 1 ];
+
+
+	// MOVE  THIS LINE OF CODE INTO A SEPARATE FUNCTION LATER
+	TransformVertexArray2D( NUMBER_OF_DISC_VERTS , discVerts , 1 , 0.f , center );
 	DrawVertexArray( NUMBER_OF_DISC_VERTS , discVerts );
 }
 
@@ -1087,6 +1138,24 @@ void RenderContext::BindSampler( const Sampler* sampler )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void RenderContext::BindDepthStencilData( DepthStencilTargetView* depthStencilView )
+{
+	
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::BindDepthStencil( Texture* depthStencilView )
+{
+	TextureView* dsv = depthStencilView->GetOrCreateDepthStencilView();
+	ID3D11RenderTargetView* const* rtv = ( ID3D11RenderTargetView* const* )m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
+	m_context->OMSetRenderTargets( 1 ,          // One rendertarget view
+		 rtv ,      // Render target view, created earlier
+		dsv->m_dsv );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Texture* RenderContext::CreateTextureFromColor( Rgba8 color )
 {
 	// make a 1x1 texture of that color, and return it;
@@ -1126,6 +1195,30 @@ Texture* RenderContext::CreateTextureFromColor( Rgba8 color )
 	Texture* temp = new Texture( this , texHandle );
 
 	return temp;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::DrawPolygon( const Vec2* points , unsigned int count , const Rgba8& tint )
+{
+	if ( count < 3 )
+	{
+		return;
+	}
+
+	std::vector<Vertex_PCU> polygonVerts;
+
+	AppendVertsForPolygon( polygonVerts , points , count , tint );
+
+	DrawVertexArray( ( int ) polygonVerts.size() , &polygonVerts[ 0 ] );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::DrawX( Vec2 position , const Rgba8& color , float scale , float thickness )
+{
+	DrawLine( Vec2(  -100.f , -100.f ) , Vec2(  100.f ,  100.f ) , color , thickness , scale );
+	DrawLine( Vec2( -100.f , -100.f ) , Vec2( 100.f , 100.f ) , color , thickness , scale , 90.f );
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------

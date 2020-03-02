@@ -46,10 +46,33 @@ public:
 	const KeyButtonState& GetButtonState( unsigned char keyCode ) const;
 	const XboxController& GetXboxController( int controllerID );
 
+	bool WasLeftMouseButtonJustPressed() const;
+	bool WasLeftMouseButtonJustReleased() const;
+	bool  IsLeftMouseButtonHeldDown() const;
+
+	bool HandleLeftMouseButtonPressed();
+	bool HandleLeftMouseButtonReleased();
+
+	bool WasRightMouseButtonJustPressed() const;
+	bool WasRightMouseButtonJustReleased() const;
+	bool  IsRightMouseButtonHeldDown() const;
+
+	bool HandleRightMouseButtonPressed();
+	bool HandleRightMouseButtonReleased();
+
+	bool WasMiddleMouseButtonJustPressed() const;
+	bool WasMiddleMouseButtonJustReleased() const;
+	bool  IsMiddleMouseButtonHeldDown() const;
+
+	bool HandleMiddleMouseButtonPressed();
+	bool HandleMiddleMouseButtonReleased();
+
 	IntVec2 GetMouseRawDesktopPosition() const;
 	Vec2    GetMouseNormalizedClientPosition() const;
 
 	void UpdateMouse();
+	void UpdateMouseWheel( int deltaWheel );
+	int GetMouseWheelValue() const			{ return m_mouseWheel; }
 
 	void HideSystemCursor();
 	void ShowSystemCursor();
@@ -72,6 +95,14 @@ private:
 	Vec2 m_positionLastFrame	= Vec2::ZERO;
 
 	KeyButtonState m_keyStates[ MAX_KEYS ];
+
+	KeyButtonState m_leftMouseButton;
+	KeyButtonState m_rightMouseButton;
+	KeyButtonState m_middleMouseButton;
+	int			   m_mouseWheel				 = 0;
+	Vec2		   m_mouseNormalizedPosition = Vec2::ZERO;
+
+
 	XboxController m_controllers[ MAX_XBOX_CONTROLLERS ] =
 	{
 		XboxController( 0 ),
@@ -80,7 +111,6 @@ private:
 		XboxController( 3 ),
 	};
 
-	Vec2 m_mouseNormalizedPosition = Vec2::ZERO;
 
 };
 

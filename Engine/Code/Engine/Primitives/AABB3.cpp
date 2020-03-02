@@ -49,6 +49,7 @@ AABB3::AABB3( int minX , int minY , int minZ , int maxX , int maxY , int maxZ )
 bool AABB3::IsPointInside( const Vec3& point ) const
 {
 	// TODO :- IMPLEMENT ME
+	UNUSED( point );
 	__debugbreak();
 	return true;
 }
@@ -72,6 +73,7 @@ const Vec3 AABB3::GetDimensions() const
 const Vec3 AABB3::GetNearestPoint( const Vec3& referencePosition ) const
 {
 	// TODO :- IMPLEMENT ME
+	UNUSED( referencePosition );
 	__debugbreak();
 	return Vec3::ZERO;
 }
@@ -80,8 +82,10 @@ const Vec3 AABB3::GetNearestPoint( const Vec3& referencePosition ) const
 
 const Vec3 AABB3::GetPointForUV( const Vec3& uvCoordsZeroToOne ) const
 {
-	Vec3 PointCoords;
 	// TODO :- IMPLEMENT ME
+	Vec3 PointCoords;
+	UNUSED( uvCoordsZeroToOne );
+	UNUSED( PointCoords );
 	__debugbreak();
 	return PointCoords;
 }
@@ -92,6 +96,8 @@ const Vec3 AABB3::GetUVForPoint( const Vec3& point ) const
 {
 	Vec3 uvCoords;
 	// TODO :- IMPLEMENT ME
+	UNUSED( uvCoords );
+	UNUSED( point );
 	__debugbreak();
 	return uvCoords;
 }

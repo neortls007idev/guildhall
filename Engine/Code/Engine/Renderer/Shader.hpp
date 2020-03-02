@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-#include <string.h>
+#include <string>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -45,7 +45,8 @@ public:
 
 public:
 	// a stage could be any one of these types,
-	// so we use a enum to identify it, and a union to store it; 
+	// so we use a enum to identify it, and a union to store it;
+	std::string				m_user;
 	SHADER_STAGE_TYPE		m_stage;
 	ID3D10Blob*				m_byteCode = nullptr ;
 
@@ -65,7 +66,7 @@ public:
 	Shader( RenderContext* context );
 	~Shader();
 	bool CreateFromFile( RenderContext* ctx , std::string const& filename );    
-	bool CreateFromString( RenderContext* ctx , std::string const& filename );   
+	bool CreateFromString( RenderContext* ctx , std::string const& stringName );   
 	// for hooking IA (input assembler) to the VS (vertex shader), 
 	// needs to vertex shader and vertex format to make the binding
 	//ID3D11InputLayout* GetOrCreateInputLayout( VertexBuffer* vbo );            
@@ -79,6 +80,7 @@ public:
 	   
 public:
 	//static Shader*				s_errorShader;
+	std::string					m_user;
 	ShaderStage					m_vertexStage;
 	ShaderStage					m_fragmentStage;
 	ID3D11RasterizerState*		m_rasterState		  = nullptr;

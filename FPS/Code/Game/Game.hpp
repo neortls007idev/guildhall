@@ -48,6 +48,7 @@ public:
 	AABB2		m_normalImage;
 	AABB2		m_invertedColorImage;
 	GPUMesh*	m_meshCube;
+	GPUMesh*	m_meshSphere;
 	Transform	m_cubeTransform;
 	Texture*	m_imageTex				= nullptr;
 

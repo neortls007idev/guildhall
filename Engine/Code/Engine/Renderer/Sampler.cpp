@@ -36,6 +36,9 @@ Sampler::Sampler( RenderContext* ctx , eSamplerType type )
 	desc.MaxLOD = 0.0f;
 
 	device->CreateSamplerState( &desc , &m_handle );
+
+	std::string debugName = "RenderContext Resource";
+	SetDebugName( m_handle , &debugName );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

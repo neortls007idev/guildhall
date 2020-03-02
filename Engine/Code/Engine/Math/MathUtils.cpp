@@ -1000,3 +1000,125 @@ float SmoothStep3( float t )
 {
 	return ( ( t * t ) * ( 3 - ( 2 * t ) ) );
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const Vec2* GetLeftMostPointFromPointCloud( Vec2 const* points , uint pointCount )
+{
+	int indexOfLeftMostPoint = 0;
+
+	for ( uint index = 1; index < pointCount; index++ )
+	{
+		if ( points[ index ].x < points[ indexOfLeftMostPoint ].x )
+			indexOfLeftMostPoint = index;
+	}
+
+	return &points[ indexOfLeftMostPoint ];
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const uint GetIndexOfLeftMostPointFromPointCloud( Vec2 const* points , uint pointCount )
+{
+	uint indexOfLeftMostPoint = 0;
+
+	for ( uint index = 1; index < pointCount; index++ )
+	{
+		if ( points[ index ].x < points[ indexOfLeftMostPoint ].x )
+			indexOfLeftMostPoint = index;
+	}
+
+	return indexOfLeftMostPoint;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const Vec2* GetBottomMostPointFromPointCloud( Vec2 const* points , uint pointCount )
+{
+	int indexOfBottomMostPoint = 0;
+
+	for ( uint index = 1; index < pointCount; index++ )
+	{
+		if ( points[ index ].y < points[ indexOfBottomMostPoint ].y )
+			indexOfBottomMostPoint = index;
+	}
+
+	return &points[ indexOfBottomMostPoint ];
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const uint GetIndexOfBottomMostPointFromPointCloud( Vec2 const* points , uint pointCount )
+{
+	uint indexOfBottomMostPoint = 0;
+
+	for ( uint index = 1; index < pointCount; index++ )
+	{
+		if ( points[ index ].y < points[ indexOfBottomMostPoint ].y )
+			indexOfBottomMostPoint = index;
+	}
+
+	return indexOfBottomMostPoint;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const Vec2* GetRightMostPointFromPointCloud( Vec2 const* points , uint pointCount )
+{
+	int indexOfRightMostPoint = 0;
+
+	for ( uint index = 1; index < pointCount; index++ )
+	{
+		if ( points[ index ].x > points[ indexOfRightMostPoint ].x )
+			indexOfRightMostPoint = index;
+	}
+
+	return &points[ indexOfRightMostPoint ];
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const uint GetIndexOfRightMostPointFromPointCloud( Vec2 const* points , uint pointCount )
+{
+	uint indexOfRightMostPoint = 0;
+
+	for ( uint index = 1; index < pointCount; index++ )
+	{
+		if ( points[ index ].x > points[ indexOfRightMostPoint ].x )
+			indexOfRightMostPoint = index;
+	}
+
+	return indexOfRightMostPoint;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const Vec2* GetTopMostPointFromPointCloud( Vec2 const* points , uint pointCount )
+{
+	int indexOfTopMostPoint = 0;
+
+	for ( uint index = 1; index < pointCount; index++ )
+	{
+		if ( points[ index ].y > points[ indexOfTopMostPoint ].y )
+			indexOfTopMostPoint = index;
+	}
+
+	return &points[ indexOfTopMostPoint ];
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const uint GetIndexOfTopMostPointFromPointCloud( Vec2 const* points , uint pointCount )
+{
+	uint indexOfTopMostPoint = 0;
+
+	for ( uint index = 1; index < pointCount; index++ )
+	{
+		if ( points[ index ].y > points[ indexOfTopMostPoint ].y )
+			indexOfTopMostPoint = index;
+	}
+
+	return indexOfTopMostPoint;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

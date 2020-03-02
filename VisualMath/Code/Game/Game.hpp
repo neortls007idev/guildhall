@@ -32,6 +32,7 @@ public:
 	void RandomizeLineSegment( Vec2 mins , Vec2 maxs , RandomNumberGenerator rng );
 	void RandomizeCapsule( Vec2 mins , Vec2 maxs , RandomNumberGenerator rng );
 	void RandomizeDisc( Vec2 mins , Vec2 maxs , RandomNumberGenerator rng );
+	void RandomizePolygon( Vec2 mins , Vec2 maxs , unsigned int count , RandomNumberGenerator rng );
 	void RandomizeShapes( Vec2 mins , Vec2 maxs , RandomNumberGenerator* rng );
 
 	void DrawMouseCurrentPosition( const Camera& camera ) const;
@@ -65,6 +66,7 @@ public:
 		   Capsule2D			 m_capsule2D			= Capsule2D::UNITCAPSULE;
 		   Disc2D				 m_disc2D				= Disc2D::UNITDISC;
 		   Vec2					 m_mousePosition		= Vec2::ZERO;
+		   std::vector<Vec2>	 m_polygon;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

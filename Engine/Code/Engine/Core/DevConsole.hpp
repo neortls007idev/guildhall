@@ -42,6 +42,7 @@ class DevConsole
 public:
 
 	DevConsole();
+	~DevConsole();
 	void Startup();
 
 	void InitializeCommands();
@@ -50,10 +51,14 @@ public:
 	void EndFrame();
 	void Shutdown();
 
-	void Update();
+	void Update( float deltaSeconds );
 
 	void Render( RenderContext& renderer , const Camera& camera , float lineHeight ) const;
+	void RenderPhoenixAnimation( RenderContext& renderer , const Camera& camera , const AABB2& animArea ) const;
+	void RenderCatAnimation( RenderContext& renderer , const Camera& camera , const AABB2& animArea ) const;
 
+
+	//void PrintString( const Rgba8& textColor = WHITE, const std::string& devConsolePrintString = "INVALID STRING");
 	static void PrintString( const Rgba8& textColor = WHITE , const std::string& devConsolePrintString = "INVALID STRING" ,
 								eDevConsoleMessageType messageType= DEVCONSOLE_USERINPUT );
 
@@ -62,7 +67,7 @@ public:
 	void ProcessInput();
 	void OnKeyPress( char character );
 	bool AddCharacterToInput( char character );
-	int	 GetCurrentInputLength() const																				{ return ( int ) m_currentText.length(); }
+	int	 GetCurrentInputLength() const																{ return ( int ) m_currentText.length(); }
 	void ResetCurrentInput();
 
 	void ProcessCommand();
@@ -84,6 +89,8 @@ public:
 	void ChangeOverlayColor( Rgba8 newOverlayColor );
 	void HandleInput( unsigned char keycode );
 
+	Camera* GetDevConsoleCamera() const																{ return m_devConsoleCamera; }
+
 protected:
 
 	static bool								m_isConsoleOpen;
@@ -96,4 +103,12 @@ protected:
 
 private:
 	static std::string						m_currentText;
+	Vec2 m_animUVMaxs;
+	Vec2 m_animUVMins;
+	float							m_catAnimationDuration		= 4.4f;
+	float							m_currentCatAnimFrame		= 0.f;
+	float							m_phoenixAnimationDuration	= 3.8f;
+	float							m_currentPhoenixAnimFrame	= 0.f;
+	Rgba8							m_devConsoleAnimationColor	= Rgba8( 255 , 255 , 255 , 127 );
+	Camera*							m_devConsoleCamera			= nullptr;
 };

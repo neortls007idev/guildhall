@@ -46,6 +46,8 @@ Game::Game()
 	RandomizeCapsule(	  cameraBottomLeft , cameraTopRight , m_rng );
 	m_rng.manuallyIncrementPosition();
 	RandomizeDisc(		  cameraBottomLeft , cameraTopRight , m_rng );
+	m_rng.manuallyIncrementPosition();
+	RandomizePolygon( cameraBottomLeft , cameraTopRight , m_rng.RollRandomIntInRange( 3 , 13 ) , m_rng );
 
 	m_color.RollRandomColor( m_rng );
 	m_color.a = 100;
@@ -97,6 +99,33 @@ void Game::RandomizeDisc( Vec2 cameraBottomLeft , Vec2 cameraTopRight , RandomNu
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Game::RandomizePolygon( Vec2 mins , Vec2 maxs , unsigned int count , RandomNumberGenerator rng )
+{
+	m_polygon.clear();
+
+// 	for ( unsigned int pointIndex = 0; pointIndex < 4/*count*/ ; pointIndex++ )
+// 	{
+// 		//rng.manuallyIncrementPosition();
+// 		Vec2 tempPoint( rng.RollRandomFloatInRange( mins.x , maxs.x ) , rng.RollRandomFloatInRange( mins.y , maxs.y ) );
+// 		m_polygon.push_back( tempPoint );
+// 	}
+
+	m_polygon.push_back( Vec2( 10 , 10 ) );
+	m_polygon.push_back( Vec2( 10 , 100 ) );
+	m_polygon.push_back( Vec2( 50 , 150 ) );
+
+	m_polygon.push_back( Vec2( 10 , 10 ) );
+	m_polygon.push_back( Vec2( 50 , 150 ) );
+	m_polygon.push_back( Vec2( 100 , 100 ) );
+
+	m_polygon.push_back( Vec2( 10 , 10 ) );
+	m_polygon.push_back( Vec2( 100 , 100 ) );
+	m_polygon.push_back( Vec2( 100 , 10 ) );
+	
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Game::RandomizeShapes( Vec2 mins , Vec2 maxs , RandomNumberGenerator* rng )
 {
 	rng->manuallyIncrementPosition();
@@ -109,6 +138,8 @@ void Game::RandomizeShapes( Vec2 mins , Vec2 maxs , RandomNumberGenerator* rng )
 	RandomizeCapsule(	  mins , maxs , *rng );
 	rng->manuallyIncrementPosition();
 	RandomizeDisc(		  mins , maxs , *rng );
+	rng->manuallyIncrementPosition();
+	RandomizePolygon( mins , maxs , rng->RollRandomIntInRange( 3 , 15 ) , *rng );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -206,6 +237,8 @@ void Game::Render() const
 	}
 
 	g_theRenderer->DrawLine( m_lineSegment2D.m_start, m_lineSegment2D.m_end , m_color , 5.f );
+
+	g_theRenderer->DrawPolygon( &m_polygon[ 0 ] , m_polygon.size() , WHITE );
 
 	DrawMouseCurrentPosition( m_worldCamera );
 }

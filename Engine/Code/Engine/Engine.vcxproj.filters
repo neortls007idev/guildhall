@@ -32,6 +32,12 @@
     <Filter Include="Math\RNG &amp; Noise">
       <UniqueIdentifier>{3fbc4248-dff3-4d36-a6aa-c8ccf9017eb6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Physics">
+      <UniqueIdentifier>{f29748e3-1432-455f-a59d-88acc662bc57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Devconsole">
+      <UniqueIdentifier>{cf0c3c51-1c20-4171-b436-272996546e5b}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Platform">
       <UniqueIdentifier>{0be3e79f-9125-4a7a-b052-d9f48a7a32d1}</UniqueIdentifier>
     </Filter>
@@ -139,9 +145,6 @@
     <ClCompile Include="Core\EngineCommon.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Core\DevConsole.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Core\EventSystem.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -186,6 +189,42 @@
     </ClCompile>
     <ClCompile Include="Math\SmoothNoise.cpp">
       <Filter>Math\RNG &amp; Noise</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Collider2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\DiscCollider2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Physics2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Rigidbody2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DevConsole.cpp">
+      <Filter>Core\Devconsole</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\MatUtils.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Primitives\Plane.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="Primitives\Polygon2D.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\PolygonCollider2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Collision2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Manifold2D.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\PhysicsMaterial.cpp">
+      <Filter>Physics</Filter>
     </ClCompile>
     <ClCompile Include="Platform\Window.cpp">
       <Filter>Platform</Filter>
@@ -240,6 +279,12 @@
     </ClCompile>
     <ClCompile Include="Primitives\AABB3.cpp">
       <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\D3D11Common.cpp">
+      <Filter>Renderer\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\DepthStencilTargetView.cpp">
+      <Filter>Renderer\Pipeline</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -348,9 +393,6 @@
     <ClInclude Include="Core\NamedStrings.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Core\DevConsole.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="Core\EventSystem.hpp">
       <Filter>Core</Filter>
     </ClInclude>
@@ -395,6 +437,42 @@
     </ClInclude>
     <ClInclude Include="Math\SmoothNoise.hpp">
       <Filter>Math\RNG &amp; Noise</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Collider2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\DiscCollider2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Physics2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Rigidbody2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DevConsole.hpp">
+      <Filter>Core\Devconsole</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\MatUtils.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Primitives\Plane.hpp">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="Primitives\Polygon2D.hpp">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\PolygonCollider2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Collision2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Manifold2D.hpp">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\PhysicsMaterial.hpp">
+      <Filter>Physics</Filter>
     </ClInclude>
     <ClInclude Include="Platform\Window.hpp">
       <Filter>Platform</Filter>
@@ -455,6 +533,9 @@
     </ClInclude>
     <ClInclude Include="Primitives\AABB3.hpp">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\DepthStencilTargetView.hpp">
+      <Filter>Renderer\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

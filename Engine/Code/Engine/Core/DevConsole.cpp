@@ -2,6 +2,8 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Renderer/SpriteAnimation.hpp"
+#include "VertexUtils.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Core/StringUtils.hpp"
@@ -14,8 +16,6 @@
 extern BitmapFont*	g_bitmapFont;
 extern InputSystem* g_theInput;
 extern Window*		g_theWindow;
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
 
 STATIC bool DevConsole::m_isConsoleOpen;
 STATIC Rgba8 DevConsole::m_OverlayColor;
@@ -36,6 +36,17 @@ DevConsole::DevConsole()
 	m_carrotPosX = 0.f;
 	m_carrotOffset = 0;
 	m_currentText = "";
+	m_devConsoleCamera = new Camera();
+	m_devConsoleCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( DEVCONSOLE_CAMERA_SIZE_X , DEVCONSOLE_CAMERA_SIZE_Y ) );
+	m_devConsoleCamera->SetClearMode( CLEAR_NONE , GRAY );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+DevConsole::~DevConsole()
+{
+	delete m_devConsoleCamera;
+	m_devConsoleCamera = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -80,6 +91,22 @@ void DevConsole::EndFrame()
 void DevConsole::Shutdown()
 {
 
+}
+
+void DevConsole::Update( float deltaSeconds )
+{
+	m_currentPhoenixAnimFrame += deltaSeconds;
+	if ( m_currentPhoenixAnimFrame >= m_phoenixAnimationDuration )
+	{
+		m_currentPhoenixAnimFrame = 0.f;
+	}
+
+	m_currentCatAnimFrame += deltaSeconds;
+	if ( m_currentCatAnimFrame >= m_catAnimationDuration )
+	{
+		m_currentCatAnimFrame = 0.f;
+	}
+	ProcessInput();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -128,20 +155,37 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 
 	Vec2 caratDimensions = typingArea.GetDimensions();
 
-
 	AABB2 carat = typingArea.GetBoxAtLeft( 0.995f , 0.f );
 	carat.SetDimensions( carat.GetDimensions() * 0.7f );
 	carat.AlignWithinAABB2( typingArea , ALIGN_CENTERED_LEFT );
 
-	float offsetBetweenLines = 0.75f;
+	float offsetBetweenLines = 0.075f * lineHeight;
 
 	float dimensionOfConsole = camera.GetOrthoMax().y - camera.GetOrthoMin().y;
-	int numberOfLinesToDisplay = RoundDownToInt( dimensionOfConsole / ( lineHeight + offsetBetweenLines) );
+	int numberOfLinesToDisplay = RoundDownToInt( dimensionOfConsole / ( lineHeight + offsetBetweenLines ) );
 	Vec2 startMins = Vec2( camera.GetOrthoMin().x , camera.GetOrthoMin().y );
 	int myStringIndex = ( int ) m_consoleText.size() - 1;
 	Vec2 alignment = ALIGN_BOTTOM_LEFT;
 	float alignmentDeltaChange = 0.f;
+	
+// 	float dimensionOfConsole = camera.GetOrthoMax().y - camera.GetOrthoMin().y;
+// 	float offsetBetweenLines = 1.f;
+// 	int numberOfLinesToDisplay = RoundDownToInt( dimensionOfConsole / ( lineHeight + offsetBetweenLines) );
+// 	int myStringIndex = ( int ) m_consoleText.size() - 1;
+// 	Vec2 alignment = ALIGN_BOTTOM_LEFT;
+// 	float alignmentDeltaChange = 0.f;
+	
+	renderer.BeginCamera( camera );
+	renderer.BindShader( nullptr );
 
+	AABB2 devConsolePhoenixAnimArea = consoleArea.GetBoxAtTop( 0.75f , 0.f ).GetBoxAtRight( 0.25f , 0.f );
+	devConsolePhoenixAnimArea.AlignWithinAABB2( consoleArea , ALIGN_TOP_RIGHT );
+	RenderPhoenixAnimation( renderer , camera , devConsolePhoenixAnimArea );
+
+	AABB2 devConsoleCatAnimArea = consoleArea.GetBoxAtBottom( 0.75f , 0.f ).GetBoxAtRight( 0.25f , 0.f );
+	devConsoleCatAnimArea.AlignWithinAABB2( consoleArea , ALIGN_BOTTOM_RIGHT );
+	RenderCatAnimation( renderer , camera , devConsoleCatAnimArea );
+	
 	renderer.DrawAABB2( consoleArea , m_OverlayColor );
 	renderer.DrawAABB2( typingArea , Rgba8( 0 , 0 , 255 , 100 ) );
 
@@ -169,8 +213,9 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	}
 	std::vector<Vertex_PCU> curretnTextVerts;
 	g_bitmapFont->AddVertsForTextInBox2D( curretnTextVerts , typingArea , lineHeight , m_currentText , WHITE , 1.f , ALIGN_CENTERED_LEFT );
-
+	
 	renderer.BindTexture( g_bitmapFont->GetTexture() );
+	
 	if ( consoleTextVerts.size() > 0)
 	{
 		renderer.DrawVertexArray( consoleTextVerts );
@@ -182,7 +227,9 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	}
 
 	renderer.BindTexture( nullptr );
+	renderer.BindShader( nullptr );
 	curretnTextVerts.clear();
+	renderer.EndCamera( camera );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -249,6 +296,52 @@ void DevConsole::CreateCommand( std::string newCommand , std::string commandDesc
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void DevConsole::RenderPhoenixAnimation( RenderContext& renderer , const Camera& camera, const AABB2& animArea ) const
+{
+	UNUSED( camera );
+	Texture* texture = renderer.GetOrCreateTextureFromFile( "Data/DevConsole/devconsolePhoenixSpriteSheet4.png" );
+	SpriteSheet* spriteSheet = new SpriteSheet( *texture , IntVec2( 5 , 8 ) );
+	SpriteAnimDefinition anim = SpriteAnimDefinition( *spriteSheet , 0 , 39 , m_phoenixAnimationDuration , SpriteAnimPlaybackType::LOOP );
+	const SpriteDefinition& devConsoleAnim = anim.GetSpriteDefAtTime( m_currentPhoenixAnimFrame );
+	Vec2 uvMins;
+	Vec2 uvMaxs;
+	devConsoleAnim.GetUVs( uvMins , uvMaxs );
+
+	std::vector<Vertex_PCU> tempDevConsoleAnim;
+	AppendVertsForAABB2( tempDevConsoleAnim , animArea , m_devConsoleAnimationColor , uvMins , uvMaxs );
+
+	renderer.BindTexture( texture );
+	renderer.SetBlendMode( BlendMode::ALPHA );
+	renderer.DrawVertexArray( tempDevConsoleAnim );
+	renderer.SetBlendMode( BlendMode::ALPHA );
+	renderer.BindTexture( nullptr );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DevConsole::RenderCatAnimation( RenderContext& renderer , const Camera& camera , const AABB2& animArea ) const
+{
+	UNUSED( camera );
+	Texture* texture = renderer.GetOrCreateTextureFromFile( "Data/DevConsole/GamerCatHFlippedSpriteSheet2.png" );
+	SpriteSheet* spriteSheet = new SpriteSheet( *texture , IntVec2( 3 , 11 ) );
+	SpriteAnimDefinition anim = SpriteAnimDefinition( *spriteSheet , 0 , 32 , m_catAnimationDuration , SpriteAnimPlaybackType::LOOP );
+	const SpriteDefinition& devConsoleAnim = anim.GetSpriteDefAtTime( m_currentCatAnimFrame );
+	Vec2 uvMins;
+	Vec2 uvMaxs;
+	devConsoleAnim.GetUVs( uvMins , uvMaxs );
+	
+	std::vector<Vertex_PCU> tempDevConsoleAnim;
+	AppendVertsForAABB2( tempDevConsoleAnim , animArea , m_devConsoleAnimationColor , uvMins , uvMaxs );
+	
+	renderer.BindTexture( texture );
+	renderer.SetBlendMode( BlendMode::ALPHA );
+	renderer.DrawVertexArray( tempDevConsoleAnim );
+	renderer.SetBlendMode( BlendMode::ALPHA );
+	renderer.BindTexture( nullptr );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void DevConsole::SetIsOpen( bool isOpen )
 {
 	m_isConsoleOpen = isOpen;
@@ -295,13 +388,6 @@ bool DevConsole::IsOpen() const
 void DevConsole::ChangeOverlayColor( Rgba8 newOverlayColor )
 {
 	m_OverlayColor = newOverlayColor;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void DevConsole::Update()
-{
-	ProcessInput();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

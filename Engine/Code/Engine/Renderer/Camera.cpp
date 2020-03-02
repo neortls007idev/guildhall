@@ -1,13 +1,93 @@
-#include "Engine/Math/Vec2.hpp"
-#include "Engine/Renderer/Camera.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-#include "Engine/Renderer/Texture.hpp"
+#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Math/MatrixUtils.hpp"
+#include "Engine/Math/Vec2.hpp"
+#include "Engine/Math/Vec4.hpp"
+#include "Engine/Renderer/Camera.hpp"
 #include "Engine/Renderer/RenderBuffer.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
-#include "Engine/Math/MatrixUtils.hpp"
-#include "Engine/Math/Vec4.hpp"
+#include "Engine/Renderer/Texture.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+extern Vec2 g_windowDimensions;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+//void Camera::SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight ) 
+void Camera::SetPosition( Vec3 position )
+{
+	m_transform.SetPosition( position );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec2 Camera::GetOutputSize() const
+{
+	return m_outputSize;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec3 Camera::GetPosition() const
+{
+	return m_transform.GetPostion();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Camera::SetOutputSize( Vec2 size )
+{
+	m_outputSize = size;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Camera::SetProjectionOrthographic( float height , float nearZ , float farZ )
+{
+	UNUSED( nearZ );
+	UNUSED( farZ );
+	float width  = height * GetAspectRatio();
+	m_outputSize = Vec2( width , height );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec2 Camera::GetClientToWorldPosition( Vec2 clientPos ) const
+{
+	Vec2 worldPos;
+// 	Vec2 outputDimensions = GetOrthoMax()-GetOrthoMin();
+//  	Vec2 pixelpos = Vec2::ZERO;
+//  	pixelpos.x = RangeMapFloat( 0.f , m_outputSize.x , 0.f , m_outputSize.x , worldPos.x );
+//  	pixelpos.y = RangeMapFloat( 0.f , m_outputSize.y , 0.f , m_outputSize.y , worldPos.y );
+
+	Vec3 cameraBottomLeft = GetOrthoMin();
+	Vec3 cameraTopRight = GetOrthoMax();
+
+	Vec2 outputDimensions = m_outputSize;
+	worldPos.x = RangeMapFloat( 0.f , 1.f , cameraBottomLeft.x , cameraTopRight.x , clientPos.x );
+	worldPos.y = RangeMapFloat( 0.f , 1.f , cameraBottomLeft.y , cameraTopRight.y , clientPos.y );
+	return worldPos;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec2 Camera::GetWorldNormalizedToClientPosition( Vec2 worldPos ) const
+{
+	Vec2 clientPos;
+
+	Vec3 cameraBottomLeft	= GetOrthoMin();
+	Vec3 cameraTopRight		= GetOrthoMax();
+
+	Vec2 outputDimensions = m_outputSize;
+	clientPos.x = RangeMapFloat( 0.f,1.f, cameraBottomLeft.x , cameraTopRight.x , worldPos.x );
+	clientPos.y = RangeMapFloat( 0.f,1.f, cameraBottomLeft.y , cameraTopRight.y , worldPos.y );
+	return clientPos;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+//float Camera::GetAspectRatio() const
 
 Camera::~Camera()
 {
@@ -16,6 +96,9 @@ Camera::~Camera()
 
 	delete m_colorTarget;
 	m_colorTarget = nullptr;
+
+	delete m_depthStencilTarget;
+	m_depthStencilTarget = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -39,14 +122,28 @@ void Camera::SetPitchRollYawRotation( float pitch , float yaw , float roll )
 	m_transform.SetRotation( pitch , yaw , roll );
 }
 
+float Camera::GetAspectRatio() const
+{
+	return  ( GetOrthoMax().x - GetOrthoMin().x ) / ( GetOrthoMax().y - GetOrthoMin().y );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Camera::CorrectAspectRaio( float clientAspectRatio )
+{
+	// TODO - IMPLEMENT ME
+}
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Camera::SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight )
 {
 	m_projection	= CreateOrthoGraphicProjeciton( Vec3( bottomLeft, 0.0f ) , Vec3( topRight , 1.0f ) );
+	m_outputSize = ( GetOrthoMax() - GetOrthoMin() ).GetXYComponents();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+// TODO :- FIND ME - void Camera::CorrectAspectRaio( float clientAspectRatio )
 
 Vec3 Camera::GetOrthoMin() const
 {
@@ -78,13 +175,6 @@ Vec3 Camera::GetOrthoMax() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Camera::Translate2D(const Vec2 cameraTranslate)
-{
-	// TODO :- IMPLEMENT DOES NOTHING FOR NOW
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 void Camera::SetClearMode( eCameraClearBitFlag clearFlags , Rgba8 color , float depth /*= 0.f */ , unsigned int stencil /*= 0 */ )
 {
 	m_clearMode = clearFlags;
@@ -92,15 +182,6 @@ void Camera::SetClearMode( eCameraClearBitFlag clearFlags , Rgba8 color , float 
 
 	UNUSED( depth );
 	UNUSED( stencil );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Camera::SetProjectionOrthographic( float x , float y , float z )
-{
-	UNUSED( x );
-	UNUSED( y );
-	UNUSED( z );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

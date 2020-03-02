@@ -3,6 +3,7 @@
 #include "Engine/Primitives/Disc2D.hpp"
 #include "Engine/Primitives/OBB2.hpp"
 #include "Engine/Math/FloatRange.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 //-----------------------------------------------------------------------------------------------------------------
 // FORAWRD TYPE DECLARATIONS
@@ -127,3 +128,16 @@ float SmoothStop5( float t );
 float SmoothStep3( float t );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+// POLYGON UTILS
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const Vec2* GetLeftMostPointFromPointCloud( Vec2 const* points , uint pointCount );
+const uint	GetIndexOfLeftMostPointFromPointCloud( Vec2 const* points , uint pointCount );
+const Vec2* GetBottomMostPointFromPointCloud( Vec2 const* points , uint pointCount );
+const uint	GetIndexOfBottomMostPointFromPointCloud( Vec2 const* points , uint pointCount );
+const Vec2* GetRightMostPointFromPointCloud( Vec2 const* points , uint pointCount );
+const uint	GetIndexOfRightMostPointFromPointCloud( Vec2 const* points , uint pointCount );
+const Vec2* GetTopMostPointFromPointCloud( Vec2 const* points , uint pointCount );
+const uint	GetIndexOfTopMostPointFromPointCloud( Vec2 const* points , uint pointCount );
+
+//--------------------------------------------------------------------------------------------------------------------------------------------x

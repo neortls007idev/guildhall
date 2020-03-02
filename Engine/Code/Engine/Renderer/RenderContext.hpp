@@ -30,6 +30,7 @@ class RenderBuffer;
 class Sampler;
 class Image;
 class IndexBuffer;
+class DepthStencilTargetView;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -115,14 +116,17 @@ public:
 	void DrawVertexArray( int numVertexes , VertexBuffer* vertices );
 	void DrawMesh( const GPUMesh* mesh );
 
-	void DrawLine(const Vec2& start, const Vec2& end, const Rgba8& color, float thickness);
+	void DrawLine( const Vec2& start , const Vec2& end , const Rgba8& color , float thickness , float scale = 1.f , float orientationDegrees = 0.f , Vec2 translate = Vec2::ZERO );
 	void DrawRing(const Vec2& center, float radius, const Rgba8& color, float thickness);
 	void DrawAABB2( const AABB2& box, const Rgba8& tint);
-	void DrawDisc( const Disc2D& disc, const Rgba8& tint);
+	void DrawDisc( const Disc2D& disc, const Rgba8& tint); 
+	void DrawDisc( const Vec2& center, const float& radius , const Rgba8& tint );
 	void DrawOBB2( const OBB2& box , const Rgba8& tint );
 	void DrawCapsule2D( const Vec2& capsuleMidStart , const Vec2& capsuleMidEnd , const float capsuleRadius, const Rgba8& tint );
  	void DrawDiscFraction(const Disc2D& disc, const float drawFraction, const Rgba8& tint, const float orientationDegrees );
+	void DrawPolygon( const Vec2* points , unsigned int count , const Rgba8& tint );
  	void DrawRegularPolygon(); // TO DO
+	void DrawX( Vec2 position , const Rgba8& color , float scale , float thickness );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	bool		IsDrawing() const;
@@ -135,6 +139,8 @@ public:
 	void		BindUniformBuffer( unsigned int slot , RenderBuffer* ubo ); // ubo - uniform buffer object
 	void		SetModelMatrix( Mat44 modelmat );
 	void		BindSampler( const Sampler* sampler );
+	void		BindDepthStencilData( DepthStencilTargetView* depthStencilView );
+	void		BindDepthStencil( Texture* depthStencilView );
 	Texture*	CreateTextureFromColor( Rgba8 color );
 	Texture*	CreateFromImage( Image* image );
 
@@ -143,7 +149,7 @@ private:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // TEXTURE FUNCTIONS ( TO BE ACCESSED BY THE RENDERER ONLY )
 //--------------------------------------------------------------------------------------------------------------------------------------------
-	Shader*		CreateShaderFromFile( char const* shaderFillePath );
+	Shader*		CreateShaderFromFile( char const* shaderFilePath );
 	Texture*	CreateTextureFromFile( const char* imageFilePath );
 	BitmapFont* CreateBitMapFontFromFile( std::string bitmapFontFilePath );
 
