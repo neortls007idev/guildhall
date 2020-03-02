@@ -13,14 +13,12 @@
 
 extern	DevConsole* g_theDevConsole;
 extern	Window*		g_theWindow;
-static RECT			s_mouseOriginalClipArea;        // previous area for ClipCursor
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 InputSystem::InputSystem()
 {
 
-	GetClipCursor( &s_mouseOriginalClipArea );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -53,7 +51,6 @@ void InputSystem::BeginFrame()
 void InputSystem::Update( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
-	UpdateRelativeMode();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -70,7 +67,7 @@ void InputSystem::EndFrame()
 	m_middleMouseButton.m_wasPressedLastFrame = m_middleMouseButton.m_isPressed;
 
 	m_mouseWheel = ( int ) 0;
-
+	m_relativeMovement = Vec2::ZERO;
 	//m_characters.clear();
 }
 
@@ -269,6 +266,10 @@ void InputSystem::UpdateMouse()
 	m_mouseNormalizedPosition = clientBounds.GetUVForPoint( clientMousePosition );
 	m_mouseNormalizedPosition.y = 1.f - m_mouseNormalizedPosition.y;
 //	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
+	if ( m_mouseMode == RELATIVE_MODE )
+	{
+		UpdateRelativeMode();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -330,7 +331,7 @@ void InputSystem::ClipSystemCursor( eMouseClipping mouseLockMode )
 										ClipCursor( &mouseNewClipArea );
 										break;
 		case  MOUSE_IS_UNLOCKED		:
-										ClipCursor( &s_mouseOriginalClipArea );
+										ClipCursor( nullptr );
 										break;
 	}
 }
@@ -339,7 +340,9 @@ void InputSystem::ClipSystemCursor( eMouseClipping mouseLockMode )
 
 void InputSystem::SetCursorMode( eMouseMode mode )
 {
-	switch ( mode )
+	m_mouseMode = mode;
+	
+	switch ( m_mouseMode )
 	{
 		case RELATIVE_MODE: ClipSystemCursor( MOUSE_IS_WINDOWLOCKED );
 							HideSystemCursor();
@@ -356,9 +359,10 @@ void InputSystem::SetCursorMode( eMouseMode mode )
 
 void InputSystem::UpdateRelativeMode()
 {
-		Vec2 positionThisFrame = Vec2::ZERO;
-
-		GetCursorPos( reinterpret_cast< LPPOINT >( &positionThisFrame ) );
+		POINT cursorPos;
+		GetCursorPos( &cursorPos );
+	
+		Vec2 positionThisFrame( cursorPos.x , cursorPos.y );
 		m_relativeMovement = positionThisFrame - m_positionLastFrame;
 		// remap relative movement ()
 
@@ -367,13 +371,13 @@ void InputSystem::UpdateRelativeMode()
 		GetWindowRect( ( HWND ) g_theWindow->m_hwnd , &clientWindow );
 
 		// GetClientRect() to get rectangle, find center of that
-		Vec2 windowCenter = Vec2( clientWindow.right - clientWindow.left , clientWindow.bottom - clientWindow.top );
+		Vec2 windowCenter = Vec2( clientWindow.right - clientWindow.left , clientWindow.bottom - clientWindow.top ) * 0.5f;
 
 		SetCursorPos( ( int ) windowCenter.x , ( int ) windowCenter.y );
 
 		// one little trick... without - will cause drift (maybe)
-		Vec2 point;
-		GetCursorPos( reinterpret_cast< LPPOINT >( &point ) );
+		POINT point;
+		GetCursorPos( &point  );
 		windowCenter = Vec2( point.x , point.y );
 
 		// recenter

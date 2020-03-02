@@ -71,6 +71,9 @@
     <Filter Include="Core\Experimental">
       <UniqueIdentifier>{a29428e4-41a5-489e-8888-b412c27b8578}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Time">
+      <UniqueIdentifier>{86237413-cdcc-44d5-9f4d-ad0ad386f060}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Rgba8.cpp">
@@ -99,9 +102,6 @@
     </ClCompile>
     <ClCompile Include="Math\MathUtils.cpp">
       <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Time\Time.cpp">
-      <Filter>Time</Filter>
     </ClCompile>
     <ClCompile Include="Primitives\AABB2.cpp">
       <Filter>Primitives</Filter>
@@ -286,6 +286,15 @@
     <ClCompile Include="Renderer\DepthStencilTargetView.cpp">
       <Filter>Renderer\Pipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Time\Clock.cpp">
+      <Filter>Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Time\Time.cpp">
+      <Filter>Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Time\Timer.cpp">
+      <Filter>Time</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -317,9 +326,6 @@
     </ClInclude>
     <ClInclude Include="Math\MathUtils.hpp">
       <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Time\Time.hpp">
-      <Filter>Time</Filter>
     </ClInclude>
     <ClInclude Include="Input\VirtualKeyboard.hpp">
       <Filter>Input</Filter>
@@ -536,6 +542,15 @@
     </ClInclude>
     <ClInclude Include="Renderer\DepthStencilTargetView.hpp">
       <Filter>Renderer\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\Clock.hpp">
+      <Filter>Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\Time.hpp">
+      <Filter>Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\Timer.hpp">
+      <Filter>Time</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

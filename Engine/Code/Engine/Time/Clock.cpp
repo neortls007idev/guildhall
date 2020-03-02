@@ -1,142 +1,180 @@
-#include "Engine/Physics/Rigidbody2D.hpp"
+﻿#include "Engine/Time/Clock.hpp"
+
 #include "Engine/Core/EngineCommon.hpp"
-#include "Engine/Physics/Collider2D.hpp"
+#include "Engine/Core/ErrorWarningAssert.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Rigidbody2D::Rigidbody2D( Physics2D* system , Vec2 worldPosition , Collider2D* collider ) :
-																		m_system( system ) ,
-																		m_worldPosition( worldPosition ),
-																		m_collider( collider )
-{
-	SetSimulationModeBasedOnCollider( collider );
-}
+Clock* g_theMasterClock = nullptr;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Rigidbody2D::Rigidbody2D( Physics2D* system, Vec2 worldPosition ) :
-																		m_system( system ),
-																		m_worldPosition( worldPosition )
+Clock::Clock()
 {
-
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Rigidbody2D::Destroy()
-{
-	m_isGarbage = true;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Rigidbody2D::Update( float deltaSeconds )
-{
-	UNUSED( deltaSeconds );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Rigidbody2D::TakeCollider( Collider2D* collider )
-{
-	if ( nullptr != m_collider && collider != m_collider )
+	if ( g_theMasterClock!= nullptr )
 	{
-		m_collider->Destroy();
+		m_allClocks.push_back( this );
 	}
-	m_collider = collider;
-
-	SetSimulationModeBasedOnCollider( collider );
-
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Rigidbody2D::SetSimulationModeBasedOnCollider( Collider2D* collider )
-{
-	switch ( collider->GetType() )
+	else
 	{
-	case COLLIDER2D_DISC:		SetSimulationMode( SIMULATIONMODE_DYNAMIC );
-		break;
-	case COLLIDER2D_CONVEXGON:	SetSimulationMode( SIMULATIONMODE_STATIC );
-		break;
+		// TODO :- find location of masterCLock and replace
 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Rigidbody2D::ApplyImpulse( Vec2 impulse , Vec2 point )
+Clock::Clock( Clock* parent )
 {
-	UNUSED( point );
-	m_velocity += impulse / m_mass;
+	m_parent = parent;
+	m_allClocks.push_back( this );
+	parent->m_children.push_back( this );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Rigidbody2D::SetCollider( Collider2D* collider )
+Clock::~Clock()
 {
-	m_collider = collider;
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Rigidbody2D::SetPosition( Vec2 position )
+void Clock::Update( double deltaSeconds )
 {
-	m_worldPosition = position;
+	double deltaTime = deltaSeconds;
+	if ( m_isClockPaused )
+	{
+		deltaTime = 0.0;
+	}
+	else
+	{
+		deltaTime *= m_scale;
+	}
+	m_lastFrameDeltaSeconds	 = deltaTime;
+	m_totalTimeElapsed		+= m_lastFrameDeltaSeconds;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Rigidbody2D::SetVelocity( Vec2 velocity )
+void Clock::Reset()
 {
-	m_velocity = velocity;
+	m_totalTimeElapsed = 0.0;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Rigidbody2D::ReverseVelocityY()
+void Clock::Pause()
 {
-	m_velocity.y = -m_velocity.y;
+	m_isClockPaused = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Rigidbody2D::SetSimulationMode( eSimulationMode simulationMode )
+void Clock::Resume()
 {
-	m_simulationMode = simulationMode;
+	m_isClockPaused = false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Rigidbody2D::SetMass( float newMass )
+void Clock::SetScale( double scale )
 {
-	m_mass = newMass;
+	m_scale = scale;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Rigidbody2D::SetDrag( float newDrag )
+double Clock::GetTotalElapsedSeconds() const
 {
-	m_drag = newDrag;
+	return m_totalTimeElapsed;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Rigidbody2D::ChangeIsSimulationActive( bool newSimulationStatus )
+double Clock::GetLastDeltaSeconds() const
 {
-	m_isSimulationActive = newSimulationStatus;
+	return m_lastFrameDeltaSeconds;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Rigidbody2D::Move( Vec2 moveToPosition )
+double Clock::GetScale() const
 {
-	m_worldPosition += moveToPosition;
+	return m_scale;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Rigidbody2D::~Rigidbody2D()
+bool Clock::IsPaused() const
 {
+	return m_isClockPaused;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Clock::SetFrameLimits( double minFrameTime , double maxFrameTime )
+{
+	m_minFrameLimit = minFrameTime;
+	m_maxFrameLimit = maxFrameTime;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Clock::SetParent( Clock* clock )
+{
+	m_parent = clock;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Clock::AddChild( Clock* clock )
+{
+	Clock* newChild = new Clock( this );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC void Clock::Startup()
+{
+	g_theMasterClock = new Clock();
+	g_theMasterClock->Reset();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC void Clock::Shutdown()
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC void Clock::BeginFrame()
+{
+	Clock* clockGod = GetMaster();
+	clockGod->Update( 1.0 / 60.0 );	
+}
+
+STATIC void Clock::EndFrame()
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC Clock* Clock::GetMaster()
+{
+	for ( size_t index = 0; index < m_allClocks.size(); index++ )
+	{
+		if ( !m_allClocks[ index ] )
+		{
+			continue;
+		}
+
+		if ( m_allClocks[ index ]->GetParent() )
+		{
+			return m_allClocks[ index ];
+		}
+		ASSERT_OR_DIE( index == ( m_allClocks.size() - 1 ) , "No Master Clock Present" );
+	}
+}

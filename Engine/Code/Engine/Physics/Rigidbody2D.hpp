@@ -38,6 +38,7 @@ public:
 	Vec2			GetVelocity() const								{ return m_velocity; }
 	eSimulationMode GetSimulationMode() const						{ return m_simulationMode; }
 	float			GetMass() const									{ return m_mass; }
+	float			GetDrag() const									{ return m_drag; }
 	bool			IsSimulationActive() const						{ return m_isSimulationActive; }
 	void			ApplyImpulse( Vec2 impulse , Vec2 point = Vec2::ZERO );
 	void			SetCollider( Collider2D* collider );
@@ -46,6 +47,7 @@ public:
 	void			ReverseVelocityY();
 	void			SetSimulationMode( eSimulationMode simulationMode );
 	void			SetMass( float newMass );
+	void			SetDrag( float newDrag );
 	void			ChangeIsSimulationActive( bool newSimulationStatus );
 	void			Move( Vec2 moveToPosition );
 
@@ -58,6 +60,7 @@ public:
 	float				m_mass					= 1.0f;
 	eSimulationMode		m_simulationMode		= SIMULATIONMODE_DYNAMIC;
 	bool				m_isSimulationActive	= true;
+	float				m_drag					= 0.f;
 
 private:
 	~Rigidbody2D();																					// destroys the collider

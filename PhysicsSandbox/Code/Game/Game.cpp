@@ -472,6 +472,73 @@ void Game::UpdateGravity()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Game::UpdateFriction()
+{
+	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( '<' ) )
+	{
+		Collider2D* currentObjectCollider = m_selectedGameObject->m_rigidbody->GetCollider();
+		float friction = currentObjectCollider->GetPhysicsMaterial()->GetFriction();
+		friction -= DELTA_FRICTION_CHANGE;
+		friction = ClampZeroToOne( friction );
+		currentObjectCollider->GetPhysicsMaterial()->SetFriciton( friction );
+	}
+
+	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( '>' ) )
+	{
+		Collider2D* currentObjectCollider = m_selectedGameObject->m_rigidbody->GetCollider();
+		float friction = currentObjectCollider->GetPhysicsMaterial()->GetFriction();
+		friction += DELTA_FRICTION_CHANGE;
+		friction = ClampZeroToOne( friction );
+		currentObjectCollider->GetPhysicsMaterial()->SetFriciton( friction );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateMass()
+{
+	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( '[' ) )
+	{
+		Rigidbody2D* currentObjectRigidBody = m_selectedGameObject->m_rigidbody;
+		float mass = m_selectedGameObject->m_rigidbody->GetMass();
+		mass -= DELTA_MASS_CHANGE;
+		mass = Clamp( mass,0.001f, INFINITY );
+		currentObjectRigidBody->SetMass( mass );
+	}
+
+	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( ']' ) )
+	{
+		Rigidbody2D* currentObjectRigidBody = m_selectedGameObject->m_rigidbody;
+		float mass = m_selectedGameObject->m_rigidbody->GetMass();
+		mass += DELTA_MASS_CHANGE;
+		mass = Clamp( mass , 0.001f , INFINITY );
+		currentObjectRigidBody->SetMass( mass );
+	}
+}
+
+void Game::UpdateDrag()
+{
+	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( ':' ) )
+	{
+		Rigidbody2D* currentObjectRigidBody = m_selectedGameObject->m_rigidbody;
+		float drag = m_selectedGameObject->m_rigidbody->GetDrag();
+		drag -= DELTA_DRAG_CHANGE;
+		drag = ClampZeroToOne( drag );
+		currentObjectRigidBody->SetDrag( drag );
+	}
+
+	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( '/' ) )
+	{
+		Rigidbody2D* currentObjectRigidBody = m_selectedGameObject->m_rigidbody;
+		float drag = m_selectedGameObject->m_rigidbody->GetMass();
+		drag += DELTA_MASS_CHANGE;
+		drag = ClampZeroToOne( drag );
+		currentObjectRigidBody->SetDrag( drag );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Vec2 Game::GetMouseDragVelocity() const
 {
 	return m_MouseDragFrames[0] - m_MouseDragFrames[ m_frameCount ];

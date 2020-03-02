@@ -117,7 +117,7 @@ void Camera::Translate( const Vec3& translation )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Camera::SetPitchRollYawRotation( float pitch , float yaw , float roll )
+void Camera::SetPitchYawRollRotation( float pitch , float yaw , float roll )
 {
 	m_transform.SetRotation( pitch , yaw , roll );
 }

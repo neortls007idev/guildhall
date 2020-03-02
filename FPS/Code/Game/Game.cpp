@@ -138,6 +138,9 @@ void Game::Render() const
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindShader( nullptr );
+
+	Vec2 mouseRelPos = g_theInput->GetRelativeMovement();
+	g_theRenderer->DrawDisc( mouseRelPos , 3.f , RED );
 	g_theRenderer->EndCamera( m_gameCamera );
 }
 
@@ -273,21 +276,21 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 		speed = 20.f;
 	}
 
-	Vec2 mousePos = g_theInput->GetMouseNormalizedClientPosition();
-	mousePos.Normalize();
+	Vec2 mousePos = g_theInput->GetRelativeMovement();
+	
+// 	float rotationPitch = RangeMapFloat( 0.f , 1.f , -90.f , 90.f , mousePos.y );
+// 	float rotationYaw = RangeMapFloat( 0.f , 1.f , -180.f , 180.f , mousePos.x );
 
-	float rotationPitch = RangeMapFloat( 0.f , 1.f , -90.f , 90.f , mousePos.y );
-	float rotationYaw = RangeMapFloat( 0.f , 1.f , -180.f , 180.f , mousePos.x );
-
-	m_cameraPosition += movement * speed * deltaSeconds;
-	m_cameraRotation += /*Vec3( rotationPitch , 0.f , rotationYaw )*/ rotation * speed * deltaSeconds;;
+	m_cameraPosition	+= movement * speed * deltaSeconds;
+	m_cameraRotation.x	+= mousePos.y * 0.1f;
+	m_cameraRotation.y	+= mousePos.x * 0.1f;
 
 	float finalPitch = Clamp( m_cameraRotation.x , -180.f , 180.f );
 	float finalYaw	 = Clamp( m_cameraRotation.y, -180.f , 180.f );
 	float finalRoll  = Clamp( m_cameraRotation.z, -90.f , 90.f );
 
 	m_gameCamera.SetPostion( m_cameraPosition );
-	m_gameCamera.SetPitchRollYawRotation( m_cameraRotation.x , m_cameraRotation.z , m_cameraRotation.y );
+	m_gameCamera.SetPitchYawRollRotation( finalPitch , finalRoll, finalYaw  );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

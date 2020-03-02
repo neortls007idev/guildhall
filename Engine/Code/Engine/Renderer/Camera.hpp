@@ -44,7 +44,7 @@ public:
 
 	void  SetPostion( const Vec3& position );
 	void  Translate( const Vec3& translation );
-	void  SetPitchRollYawRotation( float pitch , float yaw , float roll );
+	void  SetPitchYawRollRotation( float pitch , float yaw , float roll );
 	float GetAspectRatio() const;
 	void  CorrectAspectRaio( float clientAspectRatio );
 

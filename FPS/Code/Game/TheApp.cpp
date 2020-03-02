@@ -130,7 +130,12 @@ void TheApp::Update( float deltaSeconds )
 
 	if ( g_theDevConsole->IsOpen() )
 	{
+		g_theInput->SetCursorMode( ABSOLUTE_MODE );
 		g_theDevConsole->Update( deltaSeconds );
+	}
+	else
+	{
+		g_theInput->SetCursorMode( RELATIVE_MODE );
 	}
 
 	g_theInput->EndFrame();

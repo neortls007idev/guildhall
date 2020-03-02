@@ -47,6 +47,9 @@ public:
 
 	void UpdateSimulationType( eSimulationMode* simMode );
 	void UpdateGravity();
+	void UpdateFriction();
+	void UpdateMass();
+	void UpdateDrag();
 	Vec2 GetMouseDragVelocity() const;
 
 	void RandomizePointCloud( RandomNumberGenerator rng );

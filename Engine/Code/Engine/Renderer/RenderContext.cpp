@@ -112,7 +112,6 @@ RenderContext::~RenderContext()
 
 	m_currentCamera = nullptr;
 
-
 	// 	DX_SAFE_RELEASE( m_lastBoundIBO );
 	// 	DX_SAFE_RELEASE( m_lastBoundVBO );
 	m_lastBoundIBO = nullptr;

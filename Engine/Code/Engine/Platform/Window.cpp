@@ -51,13 +51,15 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 		}
 
 		case WM_ACTIVATE:
-// 						g_theInput->HideSystemCursor();
-// 						g_theInput->ClipSystemCursor( MOUSE_IS_WINDOWLOCKED );
- 						break;
-		case WA_INACTIVE:
-// 						g_theInput->ClipSystemCursor( MOUSE_IS_UNLOCKED );
-// 						g_theInput->ShowSystemCursor();
- 						break;
+			if ( g_theInput &&  ( wParam ==  1  || wParam == 2 ) )
+			{
+				g_theInput->SetCursorMode( RELATIVE_MODE );
+			}
+			if ( g_theInput && wParam == 0 )
+			{
+				g_theInput->SetCursorMode( ABSOLUTE_MODE );
+			}break;		
+ 						
 		case WM_CHAR:
 		{
 			char character = ( char ) wParam;
