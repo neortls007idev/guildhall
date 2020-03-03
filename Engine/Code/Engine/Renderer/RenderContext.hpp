@@ -23,6 +23,7 @@ struct ID3D11DeviceContext;
 struct IDXGIDebug;
 struct ID3D11Buffer;
 struct ID3D11BlendState;
+struct ID3D11DepthStencilState;
 
 class Shader;
 class VertexBuffer;
@@ -86,9 +87,12 @@ public:
 	void EndFrame();
 	void Shutdown();
 
-	void ClearScreen( const Rgba8& clearColor ); // Clear Color
-	void ClearDepth( Texture* depthStencilTexture , float depth );
-	void SetDepthTest( eCompareOp compare , bool writeOnPass );
+	void ClearScreen( const Rgba8& clearColor );										// Clear Color
+	void ClearColor( Texture* colorTarget , Rgba8 color );								// TODO :- IMPLEMENT ME
+	void ClearDepth( Texture* depthStencilTextureTarget , float depth );				// TODO :- IMPLEMENT ME
+	void SetDepthTest( eCompareOp compare , bool writeOnPass );							// TODO :- IMPLEMENT ME
+	Texture* GetFrameColorTarget();														// TODO :- IMPLEMENT ME
+	
 	void BeginCamera( const Camera& camera );
 	void EndCamera( const Camera& camera);
 
@@ -157,29 +161,31 @@ private:
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 public:
-	ID3D11Device*		 m_device								= nullptr ;
-	ID3D11DeviceContext* m_context								= nullptr ; // Immediate context
-	SwapChain*			 m_swapChain							= nullptr;
-	Camera*				 m_currentCamera						= nullptr;
+	ID3D11Device*				m_device								= nullptr ;
+	ID3D11DeviceContext*		m_context								= nullptr ; // Immediate context
+	SwapChain*					m_swapChain								= nullptr;
+	ID3D11DepthStencilState*	m_currentDepthStencilState				= nullptr;
 
-	void*				 m_debugModule							= nullptr;
-	IDXGIDebug*			 m_debug								= nullptr;
+	Camera*						m_currentCamera							= nullptr;
 
-	Shader*				 m_defaultShader						= nullptr;
-	Shader*				 m_currentShader						= nullptr;
-	VertexBuffer*		 m_immediateVBO							= nullptr;
-	//IndexBuffer*		 m_immediateIBO							= nullptr;
-	GPUMesh*			 m_immediateMesh						= nullptr;
-	ID3D11Buffer*		 m_lastBoundVBO							= nullptr;
-	ID3D11Buffer*		 m_lastBoundIBO							= nullptr;
-	Texture*			 m_textureTarget						= nullptr;
+	void*						m_debugModule							= nullptr;
+	IDXGIDebug*					m_debug									= nullptr;
 
-	ID3D11BlendState*	 m_blendStates[BlendMode::TOTAL];
+	Shader*						m_defaultShader							= nullptr;
+	Shader*						m_currentShader							= nullptr;
+	VertexBuffer*				m_immediateVBO							= nullptr;
+	//IndexBuffer*				m_immediateIBO							= nullptr;
+	GPUMesh*					m_immediateMesh							= nullptr;
+	ID3D11Buffer*				m_lastBoundVBO							= nullptr;
+	ID3D11Buffer*				m_lastBoundIBO							= nullptr;
+	Texture*					m_textureTarget							= nullptr;
 
-	RenderBuffer*		 m_frameUBO								= nullptr;
-	RenderBuffer*		 m_modelMatrixUBO						= nullptr;
-	Sampler*			 m_defaultSampler						= nullptr;
-	Texture*			 m_textureDefault						= nullptr;
+	ID3D11BlendState*			m_blendStates[BlendMode::TOTAL];
+
+	RenderBuffer*				m_frameUBO								= nullptr;
+	RenderBuffer*				m_modelMatrixUBO						= nullptr;
+	Sampler*					m_defaultSampler						= nullptr;
+	Texture*					m_textureDefault						= nullptr;
 
 private:
 
@@ -188,3 +194,4 @@ private:
 	std::map<std::string , Shader*>		m_LoadedShaders;	 // LOOKUP TABLE OF FILEPATH & Shaders
 };
 
+//--------------------------------------------------------------------------------------------------------------------------------------------

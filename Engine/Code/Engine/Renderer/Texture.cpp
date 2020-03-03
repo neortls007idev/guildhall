@@ -2,6 +2,7 @@
 #include "Engine/Renderer/D3D11Common.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/TextureView.hpp"
+#include "Engine/Renderer/SwapChain.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -12,7 +13,7 @@ Texture::Texture( const char* imageFilePath , unsigned int textureID , IntVec2 d
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Texture::Texture():m_imageFilePath(nullptr),m_textureID(0)
+Texture::Texture() :m_imageFilePath( nullptr ) , m_textureID( 0 )
 {
 
 }
@@ -20,8 +21,8 @@ Texture::Texture():m_imageFilePath(nullptr),m_textureID(0)
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Texture::Texture( RenderContext* renderContext , ID3D11Texture2D* handle ) :
-																				m_owner( renderContext ) , 
-																				m_handle( handle )
+	m_owner( renderContext ) ,
+	m_handle( handle )
 {
 	D3D11_TEXTURE2D_DESC desc;
 	handle->GetDesc( &desc );
@@ -33,13 +34,13 @@ Texture::Texture( RenderContext* renderContext , ID3D11Texture2D* handle ) :
 Texture::Texture( const char* filePath , RenderContext* renderContext , ID3D11Texture2D* handle ) : Texture( renderContext , handle )
 {
 	m_imageFilePath = filePath;
-// 	m_owner = renderContext;
-// 	m_handle = handle;
-// 
-// 	D3D11_TEXTURE2D_DESC desc;
-// 	m_handle->GetDesc( &desc );
-// 	m_dimensions.x = desc.Width;
-// 	m_dimensions.y = desc.Height;
+	// 	m_owner = renderContext;
+	// 	m_handle = handle;
+	// 
+	// 	D3D11_TEXTURE2D_DESC desc;
+	// 	m_handle->GetDesc( &desc );
+	// 	m_dimensions.x = desc.Width;
+	// 	m_dimensions.y = desc.Height;
 }
 // 
 // Texture::Texture( Rgba8 color , RenderContext* renderContext , ID3D11Texture2D* handle ) : Texture( renderContext , handle )
@@ -53,7 +54,7 @@ Texture::~Texture()
 {
 	delete m_depthStencilView;
 	m_depthStencilView = nullptr;
-	
+
 	delete m_shaderResourceView;
 	m_shaderResourceView = nullptr;
 
@@ -67,7 +68,7 @@ Texture::~Texture()
 
 TextureView* Texture::GetOrCreateRenderTargetView()
 {
-	if ( m_renderTargetView)
+	if ( m_renderTargetView )
 	{
 		return m_renderTargetView;
 	}
@@ -96,7 +97,7 @@ TextureView* Texture::GetOrCreateShaderResourceView()
 	ID3D11ShaderResourceView* srv = nullptr;
 
 	device->CreateShaderResourceView( m_handle , nullptr , &srv );
-	
+
 	if ( srv )
 	{
 		m_shaderResourceView = new TextureView();
@@ -115,8 +116,24 @@ TextureView* Texture::GetOrCreateDepthStencilView()
 		return m_depthStencilView;
 	}
 
-	ID3D11Device* device			= m_owner->m_device;
-	ID3D11DepthStencilView* dsv		= nullptr;
+	ID3D11Device* device = m_owner->m_device;
+	ID3D11DepthStencilView* dsv = nullptr;
+
+	
+// 	ID3D11Texture2D* pDepthStencil = NULL;
+// 	D3D11_TEXTURE2D_DESC descDepth;
+// 	descDepth.Width = m_owner->m_swapChain->GetBackBuffer()->GetDimensions().x;
+// 	descDepth.Height = m_owner->m_swapChain->GetBackBuffer()->GetDimensions().y;
+// 	descDepth.MipLevels = 1;
+// 	descDepth.ArraySize = 1;
+// 	descDepth.Format = DXGI_FORMAT_R32_TYPELESS;
+// 	descDepth.SampleDesc.Count = 1;
+// 	descDepth.SampleDesc.Quality = 0;
+// 	descDepth.Usage = D3D11_USAGE_IMMUTABLE;
+// 	descDepth.BindFlags = D3D10_BIND_DEPTH_STENCIL | D3D10_BIND_SHADER_RESOURCE;
+// 	descDepth.CPUAccessFlags = 0;
+// 	descDepth.MiscFlags = 0;
+// 	device->CreateTexture2D( &descDepth , NULL , &pDepthStencil );
 	
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
 	//descDSV.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
@@ -126,8 +143,8 @@ TextureView* Texture::GetOrCreateDepthStencilView()
 
 	// Create the depth stencil view	
 	device->CreateDepthStencilView( m_handle ,				// Depth stencil texture
-									&descDSV ,				// Depth stencil desc
-									&dsv );				// [out] Depth stencil view
+		&descDSV ,				// Depth stencil desc
+		&dsv );				// [out] Depth stencil view
 
 	if ( dsv )
 	{

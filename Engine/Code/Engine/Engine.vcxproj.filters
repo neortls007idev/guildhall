@@ -283,9 +283,6 @@
     <ClCompile Include="Renderer\D3D11Common.cpp">
       <Filter>Renderer\Pipeline</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\DepthStencilTargetView.cpp">
-      <Filter>Renderer\Pipeline</Filter>
-    </ClCompile>
     <ClCompile Include="Time\Clock.cpp">
       <Filter>Time</Filter>
     </ClCompile>
@@ -539,9 +536,6 @@
     </ClInclude>
     <ClInclude Include="Primitives\AABB3.hpp">
       <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\DepthStencilTargetView.hpp">
-      <Filter>Renderer\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="Time\Clock.hpp">
       <Filter>Time</Filter>

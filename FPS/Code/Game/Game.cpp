@@ -91,19 +91,6 @@ void Game::Render() const
 
 	g_theRenderer->BindShader( nullptr );
 
-	//g_theRenderer->SetBlendMode( BlendMode::ALPHA );
-// 	const Vertex_PCU AABB2Verts[ 6 ] = {
-// 							Vertex_PCU( Vec3( -5.f,-5.f,-10.f ) , WHITE, Vec2( 0.f, 0.f ) ),
-// 							Vertex_PCU( Vec3( 5.f,-5.f,-10.f ) , WHITE, Vec2( 1.f, 0.f ) ),
-// 							Vertex_PCU( Vec3( 5.f,5.f,-10.f ) , WHITE, Vec2( 0.f, 1.f ) ),
-// 
-// 							Vertex_PCU( Vec3( 5.f,5.f,-10.f ) , WHITE, Vec2( 1.f, 0.f ) ),
-// 							Vertex_PCU( Vec3( -5.f,5.f,-10.f ) , WHITE, Vec2( 1.f, 1.f ) ),
-// 							Vertex_PCU( Vec3( -5.f,-5.f,-10.f ) , WHITE, Vec2( 0.f, 1.f ) ) };
-// 
-// 	g_theRenderer->DrawVertexArray( 6 , AABB2Verts );
-
-	//g_theRenderer->DrawVertexArray( m_meshCube->GetVertexCount() , m_meshCube->GetVertexBuffer() );
 	g_theRenderer->DrawMesh( m_meshCube );
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 

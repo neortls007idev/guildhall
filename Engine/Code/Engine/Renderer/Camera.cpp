@@ -10,18 +10,6 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-extern Vec2 g_windowDimensions;
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-//void Camera::SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight ) 
-void Camera::SetPosition( Vec3 position )
-{
-	m_transform.SetPosition( position );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 Vec2 Camera::GetOutputSize() const
 {
 	return m_outputSize;
@@ -196,6 +184,16 @@ void Camera::SetProjectionPerspective( float fov , float aspectRatio , float nea
 void Camera::SetColorTarget( Texture* texture )
 {
 	m_colorTarget = texture;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Camera::CreateMatchingDepthStencilTarget()
+{
+	if ( !m_depthStencilTarget )
+	{
+		m_depthStencilTarget->GetOrCreateDepthStencilView();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
