@@ -2,6 +2,7 @@
 
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Time.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -152,6 +153,17 @@ STATIC void Clock::Shutdown()
 STATIC void Clock::BeginFrame()
 {
 	Clock* clockGod = GetMaster();
+
+	static double timePreviousFrame = GetCurrentTimeSeconds();
+	double timeThisFrame = GetCurrentTimeSeconds();
+
+	double dt;
+
+	dt = timeThisFrame - timePreviousFrame;
+	timePreviousFrame = timeThisFrame;
+
+	clockGod->Update( dt );
+	
 	clockGod->Update( 1.0 / 60.0 );	
 }
 
@@ -178,3 +190,6 @@ STATIC Clock* Clock::GetMaster()
 		ASSERT_OR_DIE( index == ( m_allClocks.size() - 1 ) , "No Master Clock Present" );
 	}
 }
+
+//STATIC Clock g_masterClock( nullptr );
+

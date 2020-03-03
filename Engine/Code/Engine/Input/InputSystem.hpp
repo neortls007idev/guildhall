@@ -2,6 +2,8 @@
 #include "Engine/Input/XboxController.hpp"
 #include <queue>
 
+#include "Engine/Core/EngineCommon.hpp"
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 constexpr int MAX_XBOX_CONTROLLERS = 4;
@@ -72,7 +74,7 @@ public:
 
 	void UpdateMouse();
 	void UpdateMouseWheel( int deltaWheel );
-	int GetMouseWheelValue() const			{ return m_mouseWheel; }
+	int GetMouseWheelValue() const															{ return m_mouseWheel; }
 
 	void HideSystemCursor();
 	void ShowSystemCursor();
@@ -81,7 +83,8 @@ public:
 	void UpdateRelativeMode();
 	Vec2 GetRelativeMovement() const;
 
-	eMouseMode GetCursorMode() const														{ return m_mouseMode;  }
+	eMouseMode	GetCursorMode() const														{ return m_mouseMode;  }
+	Vec2		GetMouseDragVelocity() const												{ return m_mouseDragVelocity; }
 
 	void PushCharacter( char character );
 	bool PopCharacter( char* outCharacter );
@@ -90,18 +93,20 @@ public:
 	std::queue<char> m_characters;
 
 private:
-	eMouseMode m_mouseMode		= ABSOLUTE_MODE;
-	Vec2 m_relativeMovement		= Vec2::ZERO;
-	Vec2 m_positionLastFrame	= Vec2::ZERO;
+	eMouseMode		m_mouseMode			= ABSOLUTE_MODE;
+	Vec2			m_relativeMovement	= Vec2::ZERO;
+	Vec2			m_positionLastFrame	= Vec2::ZERO;
 
-	KeyButtonState m_keyStates[ MAX_KEYS ];
+	KeyButtonState	m_keyStates[ MAX_KEYS ];
 
-	KeyButtonState m_leftMouseButton;
-	KeyButtonState m_rightMouseButton;
-	KeyButtonState m_middleMouseButton;
-	int			   m_mouseWheel				 = 0;
-	Vec2		   m_mouseNormalizedPosition = Vec2::ZERO;
-
+	KeyButtonState	m_leftMouseButton;
+	KeyButtonState	m_rightMouseButton;
+	KeyButtonState	m_middleMouseButton;
+	int				m_mouseWheel					= 0;
+	Vec2			m_mouseNormalizedPosition		= Vec2::ZERO;
+	Vec2			m_trackMouseVelocityOverFrames[ TOTAL_MOUSE_DRAG_TRACK_FRAMES ];
+	int				m_currentlyTrackingFrameIndex	= 0;
+	Vec2			m_mouseDragVelocity;
 
 	XboxController m_controllers[ MAX_XBOX_CONTROLLERS ] =
 	{

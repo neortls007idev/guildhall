@@ -52,6 +52,11 @@ private:
 	static std::vector<Clock*>	m_allClocks;
 };
 
+//static Clock g_masterClock( nullptr );
+
+	
+
+
 // Example Usage
 // void Game::Startup()
 // {

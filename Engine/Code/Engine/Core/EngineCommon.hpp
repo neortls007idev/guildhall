@@ -43,6 +43,8 @@ enum eBufferFormatType
 	BUFFER_FORMAT_R8G8B8A8_UNORM ,
 };
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 struct buffer_attribute_t
 {
 	std::string name; 			// used to link to a D3D11 shader
@@ -52,6 +54,20 @@ struct buffer_attribute_t
 
 	buffer_attribute_t( char const* n , eBufferFormatType t , uint offset_o );
 	buffer_attribute_t();
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum eCompareOp            // A04
+{
+	COMPARE_NEVER ,       // false,      "never"
+	COMPARE_ALWAYS ,      // true,       "always"
+	COMPARE_EQUAL ,       // ==,         "equal"
+	COMPARE_NOTEQUAL ,    // !=,         "not"
+	COMPARE_LESS ,        // <           "less"
+	COMPARE_LEQUAL ,      // <=          "lequal"
+	COMPARE_GREATER ,     // >           "greater"
+	COMPARE_GEQUAL ,      // >=          "gequal"
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -75,5 +91,11 @@ const Vec2 ALIGN_TOP_CENTERED( 0.5f , 1.0f );
 const Vec2 ALIGN_TOP_RIGHT( 1.0f , 1.0f );
 
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 constexpr float DEVCONSOLE_CAMERA_SIZE_Y = 800.f;
 constexpr float DEVCONSOLE_CAMERA_SIZE_X = DEVCONSOLE_CAMERA_SIZE_Y * ( 16.f / 9.f );
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+constexpr int	TOTAL_MOUSE_DRAG_TRACK_FRAMES = 30;

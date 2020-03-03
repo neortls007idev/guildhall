@@ -189,6 +189,47 @@ uint* GetCubeIndices()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void CreateUVSphere( uint hCuts , uint vCuts , std::vector<Vertex_PCU>& sphereMeshVerts , std::vector<uint>& sphereIndices )
+{
+	float deltaTheta = 360.f / ( float ) hCuts;
+	float deltaPhi = 180.f / ( float ) vCuts;
+
+	for ( float theta = 0.f; theta <= 360.0; theta += deltaTheta )
+	{
+		for ( float phi = -90.f; phi <= 90.0; phi += deltaPhi )
+		{
+			Vec3 currentCoords = Vec3::MakeFromSpericalCoordinates( theta , phi , 5.f );
+			float u = RangeMapFloat( 0.f , 360.f , 0.f , 1.f , theta );
+			float v = RangeMapFloat( -90.f , 90.f , 0.f , 1.f , phi );
+
+			Vertex_PCU currentCoordVerts = Vertex_PCU( currentCoords , WHITE , Vec2( u , v ) );
+
+			sphereMeshVerts.push_back( currentCoordVerts );
+		}
+	}
+
+	for ( uint hcutIndex = 0; hcutIndex < hCuts; hcutIndex++ )
+	{
+		for ( uint vCutIndex = 0; vCutIndex < vCuts; vCutIndex++ )
+		{
+			uint index0 = hcutIndex + ( ( hCuts + 1 ) * vCutIndex );
+			uint index1 = index0 + 1;
+			uint index2 = index0 + hCuts + 1;
+			uint index3 = index2 + 1;
+
+			sphereIndices.push_back( index0 );
+			sphereIndices.push_back( index1 );
+			sphereIndices.push_back( index3 );
+
+			sphereIndices.push_back( index0 );
+			sphereIndices.push_back( index3 );
+			sphereIndices.push_back( index2 );
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void AppendVertsForAABB3( std::vector<Vertex_PCU>& vertexArray , const AABB3& box , const Rgba8& tint )
 {
 	// TODO :- FIX ME

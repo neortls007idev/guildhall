@@ -265,6 +265,28 @@ void RenderContext::ClearScreen( const Rgba8& clearColor )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void RenderContext::ClearDepth( Texture* depthStencilTexture , float depth )
+{
+	TextureView* view = depthStencilTexture->GetOrCreateDepthStencilView();
+	ID3D11DepthStencilView* dsv = view->GetDSVHandle();
+	m_context->ClearDepthStencilView( dsv , D3D11_CLEAR_DEPTH , depth , 0 );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::SetDepthTest( eCompareOp compare , bool writeOnPass )
+{
+	D3D11_DEPTH_STENCIL_DESC desc;
+	
+	
+	switch ( compare )
+	{
+		
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void RenderContext::BeginCamera( const Camera& camera )
 {
 	m_currentCamera = const_cast< Camera* >( &camera );

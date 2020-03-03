@@ -86,7 +86,9 @@ public:
 	void EndFrame();
 	void Shutdown();
 
-	void ClearScreen( const Rgba8& clearColor );
+	void ClearScreen( const Rgba8& clearColor ); // Clear Color
+	void ClearDepth( Texture* depthStencilTexture , float depth );
+	void SetDepthTest( eCompareOp compare , bool writeOnPass );
 	void BeginCamera( const Camera& camera );
 	void EndCamera( const Camera& camera);
 

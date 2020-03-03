@@ -51,6 +51,10 @@ public:
 	GPUMesh*	m_meshSphere;
 	Transform	m_cubeTransform;
 	Texture*	m_imageTex				= nullptr;
+	Texture*	m_worldMapSphere		= nullptr;
+
+	uint		m_hCuts					= 64;		// slices
+	uint		m_vCuts					= 32;		// stacks
 
 	Camera		m_gameCamera;
 	Camera		m_uiCamera;

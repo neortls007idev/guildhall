@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Engine/Math/Vec2.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ public:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 	const Vec3 SetFromText( const char* text );
-
+	static Vec3 MakeFromSpericalCoordinates( float YToXZPlaneDegrees /* Θ (theta) */ , float XToZYPlaneDegrees /* Φ (phi) */  , float radius );
 };
 
 

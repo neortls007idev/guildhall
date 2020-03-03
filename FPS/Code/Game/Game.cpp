@@ -22,6 +22,7 @@ Game::Game()
 	m_color = BLACK;
 	m_invertColorShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/InvertColor.hlsl" );
 	m_imageTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/PlayerTankBase.png" );
+	m_worldMapSphere = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/2kEarthDaymap.png" );
 	m_gameCamera.SetProjectionPerspective( 60.f , CLIENT_ASPECT , -.1f , -100.f );
 	m_gameCamera.SetPostion( Vec3( 0.f , 0.f , 0.f ) );
 
@@ -33,48 +34,16 @@ Game::Game()
 
 	m_meshCube->UpdateVertices( meshVerts );
 	m_meshCube->UpdateIndices( 36 , GetCubeIndices() );
-
-	int stacks = 100;
-	int slices = 100;
+	
 	std::vector<Vertex_PCU> sphereMeshVerts;
-	for ( int t = 0; t < stacks; t++ ) // stacks are ELEVATION so they count theta
-	{
-		float theta1 = ( ( float ) ( t ) / stacks ) * PI;
-		float theta2 = ( ( float ) ( t + 1 ) / stacks ) * PI;
+	std::vector<uint>		sphereIndices;
+	
+	CreateUVSphere( m_hCuts , m_vCuts , sphereMeshVerts , sphereIndices );
 
-		for ( int p = 0; p < slices; p++ ) // slices are ORANGE SLICES so the count azimuth
-		{
-			float phi1 = ( ( float ) ( p ) / slices ) * 2 * PI; // azimuth goes around 0 .. 2*PI
-			float phi2 = ( ( float ) ( p + 1 ) / slices ) * 2 * PI;
-
-			//phi2   phi1
-			// |      |
-			// 2------1 -- theta1
-			// |\ _   |
-			// |    \ |
-			// 3------4 -- theta2
-			//
-
-			//vertex1 = vertex on a sphere of radius r at spherical coords theta1, phi1
-			//vertex2 = vertex on a sphere of radius r at spherical coords theta1, phi2
-			//vertex3 = vertex on a sphere of radius r at spherical coords theta2, phi2
-			//vertex4 = vertex on a sphere of radius r at spherical coords theta2, phi1
-
-			// facing out
-//			if ( t == 0 ) // top cap
-				
-// 				mesh->addTri( vertex1 , vertex3 , vertex4 ); //t1p1, t2p2, t2p1
-// 			else if ( t + 1 == stacks ) //end cap
-// 				mesh->addTri( vertex3 , vertex1 , vertex2 ); //t2p2, t1p1, t1p2
-// 			else
-// 			{
-// 				// body, facing OUT:
-// 				mesh->addTri( vertex1 , vertex2 , vertex4 );
-// 				mesh->addTri( vertex2 , vertex3 , vertex4 );
-//			}
-		}
-	}
-
+	m_meshSphere = new GPUMesh( g_theRenderer );
+	m_meshSphere->UpdateVertices( sphereMeshVerts );
+	m_meshSphere->UpdateIndices( sphereIndices );
+	
 	m_normalImage = AABB2( -WORLD_CAMERA_SIZE_X , -WORLD_CAMERA_SIZE_Y , WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y );
 	AABB2 boxCopy = m_normalImage;
 	m_invertedColorImage = boxCopy.CarveBoxOffRight( 0.5f , 0.f );
@@ -92,9 +61,15 @@ Game::Game()
 
 Game::~Game()
 {
-
 	delete m_meshCube;
-	m_meshCube = nullptr;
+	m_meshCube			= nullptr;
+
+	delete m_meshSphere;
+	m_meshSphere		= nullptr;
+
+	m_imageTex			= nullptr;
+	m_invertColorShader = nullptr;
+	m_worldMapSphere	= nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -131,16 +106,20 @@ void Game::Render() const
 	//g_theRenderer->DrawVertexArray( m_meshCube->GetVertexCount() , m_meshCube->GetVertexBuffer() );
 	g_theRenderer->DrawMesh( m_meshCube );
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
-	g_theRenderer->BindTexture( m_imageTex );
-	g_theRenderer->DrawAABB2( m_normalImage , WHITE );
-	g_theRenderer->BindShader( m_invertColorShader );
-	g_theRenderer->DrawAABB2( m_invertedColorImage , WHITE );
+
+	g_theRenderer->SetBlendMode( SOLID );
+	g_theRenderer->BindTexture( m_worldMapSphere );
+	g_theRenderer->DrawMesh( m_meshSphere );
+	g_theRenderer->BindTexture( nullptr );
+
+	//g_theRenderer->BindTexture( m_imageTex );
+	//g_theRenderer->DrawAABB2( m_normalImage , WHITE );
+
+	//g_theRenderer->BindShader( m_invertColorShader );
+	//g_theRenderer->DrawAABB2( m_invertedColorImage , WHITE );
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindShader( nullptr );
-
-	Vec2 mouseRelPos = g_theInput->GetRelativeMovement();
-	g_theRenderer->DrawDisc( mouseRelPos , 3.f , RED );
 	g_theRenderer->EndCamera( m_gameCamera );
 }
 

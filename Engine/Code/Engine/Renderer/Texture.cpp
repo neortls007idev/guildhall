@@ -116,10 +116,11 @@ TextureView* Texture::GetOrCreateDepthStencilView()
 	}
 
 	ID3D11Device* device			= m_owner->m_device;
-	ID3D11DepthStencilView* dsv	= nullptr;
+	ID3D11DepthStencilView* dsv		= nullptr;
 	
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
-	descDSV.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+	//descDSV.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+	descDSV.Format = DXGI_FORMAT_D32_FLOAT;
 	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	descDSV.Texture2D.MipSlice = 0;
 

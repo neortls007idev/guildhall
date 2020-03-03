@@ -32,7 +32,11 @@ InputSystem::~InputSystem()
 
 void InputSystem::Startup()
 {
-
+	POINT cursorPos;
+	GetCursorPos( &cursorPos );
+	ScreenToClient( ( HWND ) g_theWindow->m_hwnd , &cursorPos );
+	m_trackMouseVelocityOverFrames[ 0 ] = Vec2( cursorPos.x , cursorPos.y );
+	m_currentlyTrackingFrameIndex++;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -44,6 +48,7 @@ void InputSystem::BeginFrame()
 			m_controllers[controllerID].Update();
 	}
 	UpdateMouse();
+	m_currentlyTrackingFrameIndex %= TOTAL_MOUSE_DRAG_TRACK_FRAMES;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -51,6 +56,20 @@ void InputSystem::BeginFrame()
 void InputSystem::Update( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
+	POINT cursorPos;
+	GetCursorPos( &cursorPos );
+	ScreenToClient( ( HWND ) g_theWindow->m_hwnd , &cursorPos );
+
+	m_trackMouseVelocityOverFrames[ m_currentlyTrackingFrameIndex % TOTAL_MOUSE_DRAG_TRACK_FRAMES ] =
+		Vec2( cursorPos.x , cursorPos.y ) - m_trackMouseVelocityOverFrames[ m_currentlyTrackingFrameIndex ] * 1.f / deltaSeconds;
+
+	Vec2 tempVelocity = Vec2::ZERO;
+	for ( int index = 0 ; index < TOTAL_MOUSE_DRAG_TRACK_FRAMES ; index++ )
+	{
+		tempVelocity += m_trackMouseVelocityOverFrames[ index ];
+	}
+
+	m_mouseDragVelocity = tempVelocity * static_cast< float >( 1 / TOTAL_MOUSE_DRAG_TRACK_FRAMES );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -265,7 +284,7 @@ void InputSystem::UpdateMouse()
 	AABB2 clientBounds = AABB2( clientRect.left , clientRect.top , clientRect.right , clientRect.bottom );
 	m_mouseNormalizedPosition = clientBounds.GetUVForPoint( clientMousePosition );
 	m_mouseNormalizedPosition.y = 1.f - m_mouseNormalizedPosition.y;
-//	GUARANTEE_OR_DIE( false , "Starting Stuff replace with D3D11" );
+
 	if ( m_mouseMode == RELATIVE_MODE )
 	{
 		UpdateRelativeMode();

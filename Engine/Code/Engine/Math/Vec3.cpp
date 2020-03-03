@@ -292,3 +292,14 @@ const Vec3 Vec3::SetFromText( const char* text )
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC Vec3 Vec3::MakeFromSpericalCoordinates( float YToXZPlaneDegrees , float XToZYPlaneDegrees , float radius )
+{
+	Vec3 coords;
+	coords.x = CosDegrees( XToZYPlaneDegrees ) * CosDegrees( YToXZPlaneDegrees ) * radius;
+	coords.y = SinDegrees( XToZYPlaneDegrees ) * radius;
+	coords.z = CosDegrees( XToZYPlaneDegrees ) * SinDegrees( YToXZPlaneDegrees ) * radius;
+	return coords;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

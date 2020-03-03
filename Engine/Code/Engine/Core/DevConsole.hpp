@@ -81,6 +81,9 @@ public:
 	static bool ExecuteQuit( EventArgs& commandArgs );
 	static bool Close( EventArgs& commandArgs );
 
+	// TODO :- Add more commands with arguments
+	// TODO :- Move commands to XML;
+	
 	void SetIsOpen( bool isOpen );
 	void ToggleVisibility();
 	void Close();

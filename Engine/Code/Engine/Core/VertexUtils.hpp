@@ -23,6 +23,7 @@ void AppendVertsForAABB3( std::vector<Vertex_PCU>& vertexArray , const AABB3& bo
 void AppendVertsForPolygon( std::vector<Vertex_PCU>& vertexArray , const Vec2* points , const unsigned int count , const Rgba8& tint );
 
 void AddCubeVerts( std::vector<Vertex_PCU>& cubeVertexArray , const Rgba8* tint );
-
 uint* GetCubeIndices();
+
+void CreateUVSphere( uint hCuts , uint vCuts , std::vector<Vertex_PCU>& sphereMeshVerts , std::vector<uint>& sphereIndices );
 //--------------------------------------------------------------------------------------------------------------------------------------------
