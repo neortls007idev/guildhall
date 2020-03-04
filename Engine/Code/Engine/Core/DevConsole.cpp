@@ -38,7 +38,7 @@ DevConsole::DevConsole()
 	m_currentText = "";
 	m_devConsoleCamera = new Camera();
 	m_devConsoleCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( DEVCONSOLE_CAMERA_SIZE_X , DEVCONSOLE_CAMERA_SIZE_Y ) );
-	m_devConsoleCamera->SetClearMode( CLEAR_NONE , GRAY );
+	m_devConsoleCamera->SetClearMode( CLEAR_NONE | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , GRAY );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

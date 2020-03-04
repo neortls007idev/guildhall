@@ -174,15 +174,21 @@ bool RenderBuffer::Create( size_t dataByteSize , size_t elementByteSize )
 	{
 		std::string debugName;
 		
-		switch( bufferType )
+		if ( ( bufferType ^ VERTEX_BUFFER_BIT ) == 0 )
 		{
-		case 1: debugName = "";
-				break;
-		case 2: debugName = "";
-				break;
-		case 3: debugName = "";
-				break;
+			debugName = " Unreleased Vertex Buffer ";
 		}
+			
+		if ( ( bufferType ^ INDEX_BUFFER_BIT ) == 0 )
+		{
+			debugName = " Unreleased Index Buffer ";
+		}
+
+		if ( ( bufferType ^ UNIFORM_BUFFER_BIT ) == 0 )
+		{
+			debugName = " Unreleased Uniform Buffer ";
+		}
+
 		SetDebugName( ( ID3D11DeviceChild* ) m_handle , &debugName );
 		return true;
 	}

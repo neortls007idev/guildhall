@@ -6,7 +6,12 @@
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Renderer/RenderBuffer.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Renderer/Texture.hpp"
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+extern RenderContext* g_theRenderer;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -75,6 +80,13 @@ Vec2 Camera::GetWorldNormalizedToClientPosition( Vec2 worldPos ) const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Camera::Camera()
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 //float Camera::GetAspectRatio() const
 
 Camera::~Camera()
@@ -82,7 +94,7 @@ Camera::~Camera()
 	delete m_cameraUBO;
 	m_cameraUBO = nullptr;
 
-	delete m_colorTarget;
+	//delete m_colorTarget;
 	m_colorTarget = nullptr;
 
 	delete m_depthStencilTarget;
@@ -163,13 +175,14 @@ Vec3 Camera::GetOrthoMax() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Camera::SetClearMode( eCameraClearBitFlag clearFlags , Rgba8 color , float depth /*= 0.f */ , unsigned int stencil /*= 0 */ )
+void Camera::SetClearMode( unsigned int clearFlags , Rgba8 color , float depth /*= 0.f */ , unsigned int stencil /*= 0 */ )
 {
-	m_clearMode = clearFlags;
+	m_clearMode = ( eCameraClearBitFlag ) clearFlags;
 	m_clearColor = color;
 
-	UNUSED( depth );
-	UNUSED( stencil );
+	m_clearDepth = depth;
+	
+	m_clearStencil =  stencil;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -228,6 +241,21 @@ RenderBuffer* Camera::UpdateUBO( RenderContext* ctx )
 
 	return m_cameraUBO;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec2 Camera::GetColorTargetSize() const // is needed for depth buffers
+{
+	if ( m_colorTarget != nullptr )
+	{
+		return Vec2( m_colorTarget->GetDimensions() );
+	}
+	else
+	{
+		return Vec2( g_theRenderer->m_swapChain->GetBackBuffer()->GetDimensions() );
+	}
+}
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

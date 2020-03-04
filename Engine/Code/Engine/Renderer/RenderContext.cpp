@@ -318,7 +318,7 @@ void RenderContext::BeginCamera( const Camera& camera )
 {
 	m_currentCamera = const_cast< Camera* >( &camera );
 
-#if defined(RENDER_DEBUG)
+#if defined( RENDER_DEBUG )
 	m_context->ClearState();
 #endif
 
@@ -327,15 +327,30 @@ void RenderContext::BeginCamera( const Camera& camera )
 		ClearScreen( camera.GetClearColor() );
 	}
 
+	if ( ( camera.GetDepthStencilTarget() ) && ( camera.GetClearMode() & CLEAR_DEPTH_BIT ) )
+	{
+		ClearDepth( camera.GetDepthStencilTarget() , 1.f );
+	}
+
 // TEMPORARY - this will be moved
 //Set up the GPU for a draw
 
 	m_textureTarget = camera.GetColorTarget();
-
+		
 	if ( m_textureTarget  == nullptr )
 	{
 		m_textureTarget = m_swapChain->GetBackBuffer();
 	}
+
+	Vec2 backBufferDimensions = Vec2( m_textureTarget->GetDimensions() );
+
+	if ( !m_currentCamera->GetDepthStencilTarget() )
+	{
+		Texture* depthStencilTexture = new Texture( this , m_textureTarget->GetDimensions() );
+		depthStencilTexture->GetOrCreateDepthStencilView( backBufferDimensions );
+		m_currentCamera->SetDepthStencilTarget( depthStencilTexture );
+	}
+	
 
 	IntVec2 output = m_textureTarget->GetDimensions();
 
@@ -369,6 +384,8 @@ void RenderContext::BeginCamera( const Camera& camera )
 	BindTexture( m_textureDefault );
 	BindSampler( m_defaultSampler );
 	SetBlendMode( BlendMode::SOLID );
+	SetDepthTest( COMPARE_ALWAYS , true );
+	BindDepthStencil( m_currentCamera->GetDepthStencilTarget() );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -622,7 +639,7 @@ void RenderContext::CreateBlendStates()
 	opaqueDesc.RenderTarget[ 0 ].BlendEnable = false;
 	opaqueDesc.RenderTarget[ 0 ].BlendOp = D3D11_BLEND_OP_ADD;
 	opaqueDesc.RenderTarget[ 0 ].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-	opaqueDesc.RenderTarget[ 0 ].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	opaqueDesc.RenderTarget[ 0 ].DestBlend = D3D11_BLEND_ZERO;
 
 	opaqueDesc.RenderTarget[ 0 ].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	opaqueDesc.RenderTarget[ 0 ].SrcBlendAlpha = D3D11_BLEND_ONE;
@@ -630,7 +647,7 @@ void RenderContext::CreateBlendStates()
 
 	// render all output
 	opaqueDesc.RenderTarget[ 0 ].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-	m_device->CreateBlendState( &additiveDesc , &m_blendStates[ BlendMode::SOLID ] );
+	m_device->CreateBlendState( &opaqueDesc , &m_blendStates[ BlendMode::SOLID ] );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1186,17 +1203,11 @@ void RenderContext::BindSampler( const Sampler* sampler )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::BindDepthStencilData( DepthStencilTargetView* depthStencilView )
-{
-	
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 void RenderContext::BindDepthStencil( Texture* depthStencilView )
 {
 	TextureView* dsv = depthStencilView->GetOrCreateDepthStencilView();
-	ID3D11RenderTargetView* const* rtv = ( ID3D11RenderTargetView* const* )m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
+	ID3D11RenderTargetView*  rtvCopy = m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
+	ID3D11RenderTargetView* const* rtv = &rtvCopy;
 	m_context->OMSetRenderTargets( 1 ,          // One rendertarget view
 		 rtv ,      // Render target view, created earlier
 		dsv->m_dsv );
@@ -1262,11 +1273,3 @@ void RenderContext::DrawPolygon( const Vec2* points , unsigned int count , const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-
-void RenderContext::DrawX( Vec2 position , const Rgba8& color , float scale , float thickness )
-{
-	DrawLine( Vec2(  -100.f , -100.f ) , Vec2(  100.f ,  100.f ) , color , thickness , scale );
-	DrawLine( Vec2( -100.f , -100.f ) , Vec2( 100.f , 100.f ) , color , thickness , scale , 90.f );
-}
-
-//---------------------------------------------------------------------------------------------------------------------------------------------

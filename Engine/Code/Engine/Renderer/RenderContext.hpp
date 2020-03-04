@@ -1,37 +1,36 @@
 #pragma once
-#include "Engine/Core/Vertex_PCU.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/Rgba8.hpp"
+#include "Engine/Core/Vertex_PCU.hpp"
+#include "Engine/Primitives/AABB2.hpp"
+#include "Engine/Primitives/Disc2D.hpp"
+#include "Engine/Primitives/OBB2.hpp"
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Renderer/Texture.hpp"
-#include "Engine/Primitives/AABB2.hpp"
-#include "Engine/Primitives/OBB2.hpp"
-#include "Engine/Primitives/Disc2D.hpp"
- #include <vector>
- #include <map>
- #include <string>
-//#include "Engine/Renderer/IndexBuffer.hpp"
-#include "Engine/Core/EngineCommon.hpp"
+
+#include <map>
+#include <string>
+#include <vector>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-class GPUMesh;
-class BitmapFont;
-class Window;
-class SwapChain;
-struct ID3D11Device;
-struct ID3D11DeviceContext;
-struct IDXGIDebug;
-struct ID3D11Buffer;
-struct ID3D11BlendState;
-struct ID3D11DepthStencilState;
+class	GPUMesh;
+class	BitmapFont;
+class	Window;
+class	SwapChain;
+class	Shader;
+class	VertexBuffer;
+class	RenderBuffer;
+class	Sampler;
+class	Image;
+class	IndexBuffer;
 
-class Shader;
-class VertexBuffer;
-class RenderBuffer;
-class Sampler;
-class Image;
-class IndexBuffer;
-class DepthStencilTargetView;
+struct	ID3D11Device;
+struct	ID3D11DeviceContext;
+struct	IDXGIDebug;
+struct	ID3D11Buffer;
+struct	ID3D11BlendState;
+struct	ID3D11DepthStencilState;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -89,7 +88,7 @@ public:
 
 	void ClearScreen( const Rgba8& clearColor );										// Clear Color
 	void ClearColor( Texture* colorTarget , Rgba8 color );								// TODO :- IMPLEMENT ME
-	void ClearDepth( Texture* depthStencilTextureTarget , float depth );				// TODO :- IMPLEMENT ME
+	void ClearDepth( Texture* depthStencilTextureTarget , float depth );				// TODO :- TEST ME
 	void SetDepthTest( eCompareOp compare , bool writeOnPass );							// TODO :- IMPLEMENT ME
 	Texture* GetFrameColorTarget();														// TODO :- IMPLEMENT ME
 	
@@ -111,15 +110,15 @@ public:
 	BitmapFont* GetOrCreateBitmapFontFromFile( std::string bitmapFontFilePath );
 	void		BindTexture( const Texture* constTexture );
 	void		CreateBlendStates();
+	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // DRAW FUNCTIONS
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	void Draw( int numVertexes , int vertexOffset = 0 );
 	void DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes );
 	void DrawVertexArray( const std::vector<Vertex_PCU>& vertexArray );
-	//void DrawIndexed( const IndexBuffer indexBuffer );
-	void DrawIndexed( uint indexCount , uint startIndex, uint indexStride );
 	void DrawVertexArray( int numVertexes , VertexBuffer* vertices );
+	void DrawIndexed( uint indexCount , uint startIndex, uint indexStride );
 	void DrawMesh( const GPUMesh* mesh );
 
 	void DrawLine( const Vec2& start , const Vec2& end , const Rgba8& color , float thickness , float scale = 1.f , float orientationDegrees = 0.f , Vec2 translate = Vec2::ZERO );
@@ -131,8 +130,7 @@ public:
 	void DrawCapsule2D( const Vec2& capsuleMidStart , const Vec2& capsuleMidEnd , const float capsuleRadius, const Rgba8& tint );
  	void DrawDiscFraction(const Disc2D& disc, const float drawFraction, const Rgba8& tint, const float orientationDegrees );
 	void DrawPolygon( const Vec2* points , unsigned int count , const Rgba8& tint );
- 	void DrawRegularPolygon(); // TO DO
-	void DrawX( Vec2 position , const Rgba8& color , float scale , float thickness );
+ 	void DrawRegularPolygon(); // TODO :- IMPLEMENT ME
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	bool		IsDrawing() const;
@@ -140,15 +138,15 @@ public:
 	void		BindShader( std::string shaderFileName );
 	void		ReCompileAllShaders();
 	bool		HasAnyShaderChangedAtPath( const wchar_t* relativePath );
+	
 	void		BindVertexBuffer( VertexBuffer* vbo );
 	void		BindIndexBuffer( IndexBuffer* ibo );
-	void		BindUniformBuffer( unsigned int slot , RenderBuffer* ubo ); // ubo - uniform buffer object
+	void		BindUniformBuffer( unsigned int slot , RenderBuffer* ubo ); // UBO - uniform buffer object
 	void		SetModelMatrix( Mat44 modelmat );
 	void		BindSampler( const Sampler* sampler );
-	void		BindDepthStencilData( DepthStencilTargetView* depthStencilView );
 	void		BindDepthStencil( Texture* depthStencilView );
 	Texture*	CreateTextureFromColor( Rgba8 color );
-	Texture*	CreateFromImage( Image* image );
+	Texture*	CreateFromImage( Image* image );									// TODO :- UPDATE ME
 
 private:
 

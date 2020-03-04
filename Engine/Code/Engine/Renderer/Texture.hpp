@@ -14,20 +14,24 @@ class Texture
 
 public:
 	 Texture(); // DEFAULT CONSTRUCTOR ENSURING THE FILE PATH IS NULL AND NO TEXTURE IS MAPPED TO THE OBJECT
-	 Texture( const char* imageFilePath, unsigned int textureID, IntVec2 dimensions );
+	 Texture( RenderContext* renderContext , IntVec2 dimensions );
 	 Texture( RenderContext* renderContext , ID3D11Texture2D* handle );
+	 Texture( const char* imageFilePath, unsigned int textureID, IntVec2 dimensions );
 	 Texture( const char* filePath, RenderContext* renderContext , ID3D11Texture2D* handle );
 	 //Texture( Rgba8 color , RenderContext* renderContext , ID3D11Texture2D* handle );
 	~Texture();
 
 	TextureView*	GetOrCreateRenderTargetView();
 	TextureView*	GetOrCreateShaderResourceView();
-	TextureView*	GetOrCreateDepthStencilView();
+	TextureView*	GetOrCreateDepthStencilView( Vec2 dimension = Vec2::ZERO );
 
 	unsigned int	 GetTextureID() const;
 		     float	 GetAspect() const;
 	const    IntVec2 GetDimensions() const;
-	const   ID3D11Texture2D* GetHandle() const { return m_handle; }
+	const   ID3D11Texture2D* GetHandle() const																			{ return m_handle; }
+
+	Texture* CreateDepthStencil( Vec2 outputDimensions );
+
 private:
 	RenderContext*		m_owner = nullptr;
 	ID3D11Texture2D*	m_handle = nullptr;

@@ -26,6 +26,8 @@ Game::Game()
 	m_gameCamera.SetProjectionPerspective( 60.f , CLIENT_ASPECT , -.1f , -100.f );
 	m_gameCamera.SetPostion( Vec3( 0.f , 0.f , 0.f ) );
 
+	m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT, BLACK , 1.f , 0 );
+	
 	m_meshCube = new GPUMesh( g_theRenderer );
 	m_cubeTransform.SetPosition( 1.f , 0.5f , -15.0f );
 
@@ -78,7 +80,7 @@ void Game::Update( float deltaSeconds )
 {
 	static float y = 0;
 	y += deltaSeconds;
-	m_cubeTransform.SetRotation( 180.f * SinDegrees( y )/*( float ) GetCurrentTimeSeconds()*/ , 0.f , 0.f );
+	m_cubeTransform.SetRotation( 0.f , 20.f * GetCurrentTimeSeconds() , 0.f );
 	UpdateFromKeyBoard( deltaSeconds );
 }
 
@@ -92,7 +94,8 @@ void Game::Render() const
 	g_theRenderer->BindShader( nullptr );
 
 	g_theRenderer->DrawMesh( m_meshCube );
-	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
+
+	//g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 
 	g_theRenderer->SetBlendMode( SOLID );
 	g_theRenderer->BindTexture( m_worldMapSphere );
@@ -248,12 +251,12 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 // 	float rotationYaw = RangeMapFloat( 0.f , 1.f , -180.f , 180.f , mousePos.x );
 
 	m_cameraPosition	+= movement * speed * deltaSeconds;
-	m_cameraRotation.x	+= mousePos.y * 0.1f;
-	m_cameraRotation.y	+= mousePos.x * 0.1f;
+	m_cameraRotation.x	-= mousePos.y * speed * deltaSeconds;
+	m_cameraRotation.y	-= mousePos.x * speed * deltaSeconds;
 
 	float finalPitch = Clamp( m_cameraRotation.x , -180.f , 180.f );
-	float finalYaw	 = Clamp( m_cameraRotation.y, -180.f , 180.f );
-	float finalRoll  = Clamp( m_cameraRotation.z, -90.f , 90.f );
+	float finalYaw	 = Clamp( m_cameraRotation.z, -180.f , 180.f );
+	float finalRoll  = Clamp( m_cameraRotation.y, -90.f , 90.f );
 
 	m_gameCamera.SetPostion( m_cameraPosition );
 	m_gameCamera.SetPitchYawRollRotation( finalPitch , finalRoll, finalYaw  );

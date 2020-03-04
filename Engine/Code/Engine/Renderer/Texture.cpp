@@ -42,6 +42,17 @@ Texture::Texture( const char* filePath , RenderContext* renderContext , ID3D11Te
 	// 	m_dimensions.x = desc.Width;
 	// 	m_dimensions.y = desc.Height;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Texture::Texture( RenderContext* renderContext , IntVec2 dimensions )
+{
+	m_owner = renderContext;
+	m_dimensions = dimensions;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 // 
 // Texture::Texture( Rgba8 color , RenderContext* renderContext , ID3D11Texture2D* handle ) : Texture( renderContext , handle )
 // {
@@ -109,43 +120,42 @@ TextureView* Texture::GetOrCreateShaderResourceView()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-TextureView* Texture::GetOrCreateDepthStencilView()
+TextureView* Texture::GetOrCreateDepthStencilView( Vec2 dimension )
 {
-	if ( m_depthStencilView )
+	if ( m_depthStencilView != nullptr )
 	{
 		return m_depthStencilView;
 	}
 
-	ID3D11Device* device = m_owner->m_device;
-	ID3D11DepthStencilView* dsv = nullptr;
+ 	ID3D11Device* device = m_owner->m_device;
+ 	ID3D11DepthStencilView* dsv = nullptr;
 
-	
-// 	ID3D11Texture2D* pDepthStencil = NULL;
-// 	D3D11_TEXTURE2D_DESC descDepth;
-// 	descDepth.Width = m_owner->m_swapChain->GetBackBuffer()->GetDimensions().x;
-// 	descDepth.Height = m_owner->m_swapChain->GetBackBuffer()->GetDimensions().y;
-// 	descDepth.MipLevels = 1;
-// 	descDepth.ArraySize = 1;
-// 	descDepth.Format = DXGI_FORMAT_R32_TYPELESS;
-// 	descDepth.SampleDesc.Count = 1;
-// 	descDepth.SampleDesc.Quality = 0;
-// 	descDepth.Usage = D3D11_USAGE_IMMUTABLE;
-// 	descDepth.BindFlags = D3D10_BIND_DEPTH_STENCIL | D3D10_BIND_SHADER_RESOURCE;
-// 	descDepth.CPUAccessFlags = 0;
-// 	descDepth.MiscFlags = 0;
-// 	device->CreateTexture2D( &descDepth , NULL , &pDepthStencil );
+	D3D11_TEXTURE2D_DESC descDepth;
+	descDepth.Width = dimension.x;
+	descDepth.Height = dimension.y;
+	descDepth.MipLevels = 0;
+	descDepth.ArraySize = 1;
+	descDepth.Format = DXGI_FORMAT_D32_FLOAT;
+	descDepth.SampleDesc.Count = 1;
+	descDepth.SampleDesc.Quality = 0;
+	descDepth.Usage = D3D11_USAGE_DEFAULT;
+	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL /*| D3D11_BIND_SHADER_RESOURCE*/;
+	descDepth.CPUAccessFlags = 0;
+	descDepth.MiscFlags = 0;
+	device->CreateTexture2D( &descDepth , NULL , &m_handle );
 	
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
-	//descDSV.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+	memset( &descDSV , 0 , sizeof( D3D11_DEPTH_STENCIL_VIEW_DESC ) );
+	
 	descDSV.Format = DXGI_FORMAT_D32_FLOAT;
 	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	descDSV.Texture2D.MipSlice = 0;
-
+	
 	// Create the depth stencil view	
 	device->CreateDepthStencilView( m_handle ,				// Depth stencil texture
-		&descDSV ,				// Depth stencil desc
-		&dsv );				// [out] Depth stencil view
-
+		&descDSV ,												// Depth stencil desc
+		&dsv );													// [out] Depth stencil view
+	
 	if ( dsv )
 	{
 		m_depthStencilView = new TextureView();
@@ -174,6 +184,13 @@ float Texture::GetAspect() const
 const IntVec2 Texture::GetDimensions() const
 {
 	return m_dimensions;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Texture* Texture::CreateDepthStencil( Vec2 outputDimensions )
+{
+	return nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

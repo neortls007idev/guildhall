@@ -24,7 +24,16 @@ extern BitmapFont* g_bitmapFont;
 
 TheApp::TheApp()
 {
+	if ( g_theEventSystem == nullptr )
+	{
+		g_theEventSystem = new EventSystem();
+	}
+	g_theEventSystem->Startup();
 
+	if ( g_theInput == nullptr )
+	{
+		g_theInput = new InputSystem();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -39,17 +48,8 @@ TheApp::~TheApp()
 
 void TheApp::Startup()
 {
-	if ( g_theEventSystem == nullptr )
-	{
-		g_theEventSystem = new EventSystem();
-	}
-	g_theEventSystem->Startup();
-
- 	if ( g_theInput == nullptr )
- 	{
-		g_theInput = new InputSystem();
-		g_theWindow->SetInputSystem( g_theInput );
- 	}
+	
+	g_theWindow->SetInputSystem( g_theInput );
 	g_theInput->Startup();
 
 	if ( g_theRenderer == nullptr )
@@ -147,6 +147,7 @@ void TheApp::Render() const
 {
  		g_theGame->Render();
 
+		//g_theRenderer->BeginCamera( g_theDevConsole->GetDevConsoleCamera() )
 		if ( g_theDevConsole->IsOpen() )
 		{
 			g_theDevConsole->Render( *g_theRenderer , *g_theDevConsole->GetDevConsoleCamera() , 20.f );

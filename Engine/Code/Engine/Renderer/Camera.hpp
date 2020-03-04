@@ -33,7 +33,7 @@ struct CameraDataT
 class Camera
 {
 public:
-	Camera() {};
+	Camera();
 	~Camera();
 
 	Vec2			GetWorldNormalizedToClientPosition( Vec2 worldPos ) const;
@@ -48,12 +48,12 @@ public:
 	Rgba8			GetClearColor() const																			{ return m_clearColor; }
 	unsigned int	GetClearMode() const																			{ return m_clearMode; }
 	Texture*		GetColorTarget() const																			{ return m_colorTarget; }
+	Vec2			GetColorTargetSize() const;
+	Texture*		GetDepthStencilTarget() const																	{ return m_depthStencilTarget; }
 
 	Mat44			GetProjectionMatrix() const																		{ return m_projection; }
 	Mat44			GetViewMatrix();
 	float			GetAspectRatio() const;
-
-	
 
 	void			SetPostion( const Vec3& position );
 	void			Translate( const Vec3& translation );
@@ -63,7 +63,7 @@ public:
 	void			CorrectAspectRaio( float clientAspectRatio );
 
 	void			SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
-	void			SetClearMode( eCameraClearBitFlag clearFlags , Rgba8 color , float depth = 0.f , unsigned int stencil = 0 );
+	void			SetClearMode( unsigned int clearFlags , Rgba8 color , float depth = 0.f , unsigned int stencil = 0 );
 	void			SetColorTarget( Texture* texture );
 	void			CreateMatchingDepthStencilTarget();
 	void			SetDepthStencilTarget( Texture* texture );
