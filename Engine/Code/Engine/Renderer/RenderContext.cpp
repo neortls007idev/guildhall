@@ -1205,9 +1205,18 @@ void RenderContext::BindSampler( const Sampler* sampler )
 
 void RenderContext::BindDepthStencil( Texture* depthStencilView )
 {
-	TextureView* dsv = depthStencilView->GetOrCreateDepthStencilView();
 	ID3D11RenderTargetView*  rtvCopy = m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
 	ID3D11RenderTargetView* const* rtv = &rtvCopy;
+	
+	if ( depthStencilView == nullptr )
+	{
+		m_context->OMSetRenderTargets( 1 ,          // One rendertarget view
+			rtv ,      // Render target view, created earlier
+			nullptr );
+		return;
+	}
+	
+	TextureView* dsv = depthStencilView->GetOrCreateDepthStencilView();
 	m_context->OMSetRenderTargets( 1 ,          // One rendertarget view
 		 rtv ,      // Render target view, created earlier
 		dsv->m_dsv );

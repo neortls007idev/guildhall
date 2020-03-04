@@ -176,6 +176,8 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 // 	float alignmentDeltaChange = 0.f;
 	
 	renderer.BeginCamera( camera );
+	renderer.BindDepthStencil( nullptr );
+	renderer.SetBlendMode( ALPHA );
 	renderer.BindShader( nullptr );
 
 	AABB2 devConsolePhoenixAnimArea = consoleArea.GetBoxAtTop( 0.75f , 0.f ).GetBoxAtRight( 0.25f , 0.f );
