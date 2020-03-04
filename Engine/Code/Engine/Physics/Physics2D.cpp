@@ -45,18 +45,36 @@ void Physics2D::Update( float deltaSeconds )
 
 void Physics2D::AdvanceSimulation( float deltaSeconds )
 {
+	Vec2 currentRigidBodyPos;
 	for ( size_t index = 0; index < m_rigidBodies2D.size(); index++ )
 	{
 		if ( !m_rigidBodies2D[index] || !m_rigidBodies2D[index]->m_isSimulationActive )
 		{
 			continue;
 		}
-	ApplyEffectors( m_rigidBodies2D[index] , deltaSeconds );
-	MoveRigidbodies( m_rigidBodies2D[ index ] , deltaSeconds );
+
+		currentRigidBodyPos = m_rigidBodies2D[ index ]->GetPosition();
+
+		ApplyEffectors( m_rigidBodies2D[index] , deltaSeconds );
+		MoveRigidbodies( m_rigidBodies2D[ index ] , deltaSeconds );
 	}
+
 	ResetCollisions();
 	DetectCollisions();
 	ResolveCollisions();
+
+	for ( size_t index = 0; index < m_rigidBodies2D.size(); index++ )
+	{
+		if ( !m_rigidBodies2D[ index ] || !m_rigidBodies2D[ index ]->m_isSimulationActive )
+		{
+			continue;
+		}
+
+		Vec2 currentRigidBodyNewPos = m_rigidBodies2D[ index ]->GetPosition();
+		Vec2 rbVerletVelocity = ( currentRigidBodyNewPos - currentRigidBodyPos ) / deltaSeconds;
+		m_rigidBodies2D[ index ]->SetVerletVelocity( rbVerletVelocity );
+	}
+	
 	CleanupDestroyedObjects();
 }
 
@@ -200,13 +218,20 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	float impulse = ( myMass * theirMass ) / ( myMass + theirMass ) * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) *
 		DotProduct2D( ( collision.m_them->GetRigidBody()->GetVelocity() - collision.m_me->GetRigidBody()->GetVelocity() ) , collision.m_collisionManifold.m_normal );
 
+	//float friction = ( myMass * theirMass ) / ( myMass + theirMass ) * ( 1 - collision.m_me->GetFrictionWith( collision.m_them ) ) *
+	//	DotProduct2D( ( collision.m_them->GetRigidBody()->GetVelocity() - collision.m_me->GetRigidBody()->GetVelocity() ) , collision.m_collisionManifold.m_normal.GetRotatedMinus90Degrees() );
+	
 	impulse = ( impulse < 0 ) ? 0 : impulse;
+	//friction = ( friction < 0 ) ? 0 : friction;
 
 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC   || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
 		 collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
 	{
 		collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
 		collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
+
+		//collision.m_me->GetRigidBody()->ApplyFriction( impulse * collision.m_collisionManifold.m_normal );
+		//collision.m_them->GetRigidBody()->ApplyFriction( -impulse * collision.m_collisionManifold.m_normal );
 		return;
 	}
 
@@ -218,11 +243,13 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	if ( collision.CheckCollisionType() == STATIC_VS_KINEMATIC || collision.CheckCollisionType() == STATIC_VS_DYNAMIC )
 	{
 		collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
+		//collision.m_them->GetRigidBody()->ApplyFriction( friction * collision.m_collisionManifold.m_normal );
 	}
 
 	if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_STATIC )
 	{
 		collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
+		//collision.m_me->GetRigidBody()->ApplyFriction( friction * collision.m_collisionManifold.m_normal );
 	}
 }
 

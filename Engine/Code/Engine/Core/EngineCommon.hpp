@@ -98,4 +98,4 @@ constexpr float DEVCONSOLE_CAMERA_SIZE_X = DEVCONSOLE_CAMERA_SIZE_Y * ( 16.f / 9
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-constexpr int	TOTAL_MOUSE_DRAG_TRACK_FRAMES = 30;
+constexpr int	TOTAL_MOUSE_DRAG_TRACK_FRAMES = 120;

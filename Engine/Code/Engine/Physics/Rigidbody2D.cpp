@@ -64,10 +64,25 @@ void Rigidbody2D::SetSimulationModeBasedOnCollider( Collider2D* collider )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Rigidbody2D::SetVerletVelocity( Vec2 updatedVerletVelocity )
+{
+	m_verletVelocity = updatedVerletVelocity;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Rigidbody2D::ApplyImpulse( Vec2 impulse , Vec2 point )
 {
 	UNUSED( point );
 	m_velocity += impulse / m_mass;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Rigidbody2D::ApplyFriction( Vec2 friction , Vec2 point /*= Vec2::ZERO */ )
+{
+	UNUSED( point );
+	m_velocity -= friction / m_mass;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

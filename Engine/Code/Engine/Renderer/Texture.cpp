@@ -131,8 +131,8 @@ TextureView* Texture::GetOrCreateDepthStencilView( Vec2 dimension )
  	ID3D11DepthStencilView* dsv = nullptr;
 
 	D3D11_TEXTURE2D_DESC descDepth;
-	descDepth.Width = dimension.x;
-	descDepth.Height = dimension.y;
+	descDepth.Width = ( UINT ) dimension.x;
+	descDepth.Height = ( UINT ) dimension.y;
 	descDepth.MipLevels = 0;
 	descDepth.ArraySize = 1;
 	descDepth.Format = DXGI_FORMAT_D32_FLOAT;

@@ -140,6 +140,7 @@ void TheApp::BeginFrame()
 	g_theEventSystem->BeginFrame();
 	g_theWindow->BeginFrame();
 	g_theInput->BeginFrame();
+	g_theInput->SetCursorMode( ABSOLUTE_MODE );
 	g_theRenderer->BeginFrame();
 	g_theDevConsole->BeginFrame();
 	g_thePhysicsSystem->BeginFrame();
@@ -150,7 +151,9 @@ void TheApp::BeginFrame()
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::Update( float deltaSeconds )
-{	
+{
+
+	g_theInput->Update( deltaSeconds );
 	UpdateFromKeyboard();
 
 	g_thePhysicsSystem->Update( deltaSeconds );

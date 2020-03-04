@@ -25,5 +25,5 @@ void AppendVertsForPolygon( std::vector<Vertex_PCU>& vertexArray , const Vec2* p
 void AddCubeVerts( std::vector<Vertex_PCU>& cubeVertexArray , const Rgba8* tint );
 uint* GetCubeIndices();
 
-void CreateUVSphere( uint hCuts , uint vCuts , std::vector<Vertex_PCU>& sphereMeshVerts , std::vector<uint>& sphereIndices );
+void CreateUVSphere( uint hCuts , uint vCuts , std::vector<Vertex_PCU>& sphereMeshVerts , std::vector<uint>& sphereIndices, float radius = 1.f , Vec3 center = Vec3::ZERO );
 //--------------------------------------------------------------------------------------------------------------------------------------------

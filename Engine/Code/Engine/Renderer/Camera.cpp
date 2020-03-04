@@ -103,7 +103,7 @@ Camera::~Camera()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Camera::SetPostion( const Vec3& position )
+void Camera::SetPosition( const Vec3& position )
 {
 	m_transform.SetPosition( position );
 }
@@ -129,8 +129,10 @@ float Camera::GetAspectRatio() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Camera::CorrectAspectRaio( float clientAspectRatio )
+// TODO :- FIND ME - void Camera::CorrectAspectRaio( float clientAspectRatio )
+void Camera::CorrectAspectRatio( float clientAspectRatio )
 {
+	UNUSED( clientAspectRatio );
 	// TODO - IMPLEMENT ME
 }
 
@@ -143,7 +145,6 @@ void Camera::SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight )
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-// TODO :- FIND ME - void Camera::CorrectAspectRaio( float clientAspectRatio )
 
 Vec3 Camera::GetOrthoMin() const
 {
@@ -182,7 +183,7 @@ void Camera::SetClearMode( unsigned int clearFlags , Rgba8 color , float depth /
 
 	m_clearDepth = depth;
 	
-	m_clearStencil =  stencil;
+	m_clearStencil = ( float ) stencil;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -235,7 +236,7 @@ RenderBuffer* Camera::UpdateUBO( RenderContext* ctx )
 	// View -> worldToCamera
 	// Mat44 View  = Invert(cameraModel);
 
-	cameraData.view = GetViewMatrix()/*Mat44::CreateTranslation3D( -m_transform.GetPostion() )*/;
+	cameraData.view = GetViewMatrix();
 
 	m_cameraUBO->Update( &cameraData , sizeof( cameraData ) , sizeof( cameraData ) );
 
@@ -271,7 +272,32 @@ Mat44 Camera::GetViewMatrix()
 
 Vec3 Camera::ClientToWorld( Vec2 client , float ndcZ )
 {
-	return Vec3::ZERO;
+	// map client to ndc
+	// TODO :- FIX ME  read more here https://github.com/tocchan/guildhall/blob/master/sd2/c29/assignments/a04_perspective/clientToWorld.cpp also check GEtOrthoMin and Get orthoMax when implementing
+	UNUSED( ndcZ );
+	Vec3 ndc;
+	
+//		= RangeMapFloat()
+// 		RangeMap( Vec3( client , ndcZ ) ,
+// 		Vec3( 0 , 0 , 0 ) , Vec3( 1 , 1 , 1 ) ,
+// 		Vec3( -1 , -1 , 0 ) , Vec3( 1 , 1 , 1 ) );
+
+	// get this to world
+	// view        : world -> camera
+	// projection  : camera -> clip  (homogeneous ndc)
+	// clip -> world
+
+	Mat44 proj = GetProjectionMatrix();
+	Mat44 worldToClip = proj;
+	worldToClip.TransformBy( GetViewMatrix() );
+
+	Mat44 clipToWorld = worldToClip.GetInverse();
+	Vec4 worldHomogeneous = clipToWorld.TransformHomogeneousPoint3D( Vec4( ndc , 1 ) );
+	Vec3 worldPos = worldHomogeneous.GetXYZ() / worldHomogeneous.w;
+	__debugbreak();
+	
+	// TODO :- FIX ME
+	return worldPos;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

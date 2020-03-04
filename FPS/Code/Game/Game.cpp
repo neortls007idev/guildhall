@@ -6,8 +6,6 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Time/Time.hpp"
 #include "Game/Game.hpp"
-
-#include "Engine/Math/MathConstants.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
 
@@ -24,12 +22,12 @@ Game::Game()
 	m_imageTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/PlayerTankBase.png" );
 	m_worldMapSphere = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/2kEarthDaymap.png" );
 	m_gameCamera.SetProjectionPerspective( 60.f , CLIENT_ASPECT , -.1f , -100.f );
-	m_gameCamera.SetPostion( Vec3( 0.f , 0.f , 0.f ) );
+	m_gameCamera.SetPosition( Vec3( 0.f , 0.f , 0.f ) );
 
 	m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT, BLACK , 1.f , 0 );
 	
 	m_meshCube = new GPUMesh( g_theRenderer );
-	m_cubeTransform.SetPosition( 1.f , 0.5f , -15.0f );
+	m_cubeTransform.SetPosition( 1.f , 0.5f , -12.0f );
 
 	std::vector<Vertex_PCU> meshVerts;
 	AddCubeVerts( meshVerts , nullptr );
@@ -40,7 +38,7 @@ Game::Game()
 	std::vector<Vertex_PCU> sphereMeshVerts;
 	std::vector<uint>		sphereIndices;
 	
-	CreateUVSphere( m_hCuts , m_vCuts , sphereMeshVerts , sphereIndices );
+	CreateUVSphere( m_hCuts , m_vCuts , sphereMeshVerts , sphereIndices , 1.f );
 
 	m_meshSphere = new GPUMesh( g_theRenderer );
 	m_meshSphere->UpdateVertices( sphereMeshVerts );
@@ -80,7 +78,8 @@ void Game::Update( float deltaSeconds )
 {
 	static float y = 0;
 	y += deltaSeconds;
-	m_cubeTransform.SetRotation( 0.f , 20.f * GetCurrentTimeSeconds() , 0.f );
+	m_cubeTransform.SetRotation( 0.f ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
+	m_sphereTransform.SetRotation( 0.f ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	UpdateFromKeyBoard( deltaSeconds );
 }
 
@@ -95,18 +94,21 @@ void Game::Render() const
 
 	g_theRenderer->DrawMesh( m_meshCube );
 
-	//g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
-
 	g_theRenderer->SetBlendMode( SOLID );
 	g_theRenderer->BindTexture( m_worldMapSphere );
-	g_theRenderer->DrawMesh( m_meshSphere );
+	Transform sphereRing;
+	float deltaDegrees = 360.f / 30.f;
+	for ( float sphereIndex = 0 ; sphereIndex <= 360 ; sphereIndex += deltaDegrees )
+	{
+		Vec3 position = Vec3::MakeFromSpericalCoordinates( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 15.f );
+		position.z -= 30.f;
+		sphereRing.SetPosition( position );
+		sphereRing.SetRotation( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 0.f );
+		g_theRenderer->SetModelMatrix( sphereRing.GetAsMatrix() );
+		g_theRenderer->DrawMesh( m_meshSphere );
+	}
+
 	g_theRenderer->BindTexture( nullptr );
-
-	//g_theRenderer->BindTexture( m_imageTex );
-	//g_theRenderer->DrawAABB2( m_normalImage , WHITE );
-
-	//g_theRenderer->BindShader( m_invertColorShader );
-	//g_theRenderer->DrawAABB2( m_invertedColorImage , WHITE );
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindShader( nullptr );
@@ -255,10 +257,10 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	m_cameraRotation.y	-= mousePos.x * speed * deltaSeconds;
 
 	float finalPitch = Clamp( m_cameraRotation.x , -180.f , 180.f );
-	float finalYaw	 = Clamp( m_cameraRotation.z, -180.f , 180.f );
-	float finalRoll  = Clamp( m_cameraRotation.y, -90.f , 90.f );
+	float finalYaw	 = Clamp( m_cameraRotation.z, -175.f , 175.f );
+	float finalRoll  = Clamp( m_cameraRotation.y, -85.f , 85.f );
 
-	m_gameCamera.SetPostion( m_cameraPosition );
+	m_gameCamera.SetPosition( m_cameraPosition );
 	m_gameCamera.SetPitchYawRollRotation( finalPitch , finalRoll, finalYaw  );
 }
 

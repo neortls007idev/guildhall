@@ -36,11 +36,15 @@ public:
 	Collider2D*		GetCollider() const								{ return m_collider; }
 	Vec2			GetPosition() const								{ return m_worldPosition; }
 	Vec2			GetVelocity() const								{ return m_velocity; }
+	Vec2			GetVerletVelocity() const						{ return m_verletVelocity; }
 	eSimulationMode GetSimulationMode() const						{ return m_simulationMode; }
 	float			GetMass() const									{ return m_mass; }
 	float			GetDrag() const									{ return m_drag; }
 	bool			IsSimulationActive() const						{ return m_isSimulationActive; }
+
+	void			SetVerletVelocity( Vec2 updatedVerletVelocity );
 	void			ApplyImpulse( Vec2 impulse , Vec2 point = Vec2::ZERO );
+	void			ApplyFriction( Vec2 friction , Vec2 point = Vec2::ZERO );
 	void			SetCollider( Collider2D* collider );
 	void			SetPosition( Vec2 position );
 	void			SetVelocity( Vec2 velocity );
@@ -56,7 +60,8 @@ public:
 	bool				m_isGarbage				= false;
 	Collider2D*			m_collider				= nullptr;
 	Vec2				m_worldPosition;															// where in the world is this rigidbody
-	Vec2				m_velocity				= Vec2( 0.f , 0.f );
+	Vec2				m_velocity				= Vec2::ZERO;
+	Vec2				m_verletVelocity		= Vec2::ZERO;
 	float				m_mass					= 1.0f;
 	eSimulationMode		m_simulationMode		= SIMULATIONMODE_DYNAMIC;
 	bool				m_isSimulationActive	= true;

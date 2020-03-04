@@ -13,6 +13,8 @@
 
 #include "Game/TheApp.hpp"
 #include "Game/Game.hpp"
+
+#include "Engine/Core/StringUtils.hpp"
 #include "Game/Gameobject.hpp"
 //#include "Engine/Physics/Polygon2D.hpp"
 
@@ -93,6 +95,16 @@ void Game::Update( float deltaSeconds )
 	UpdateFromUserInput( deltaSeconds );
 	DrawConvexgonMode();
 	g_thePhysicsSystem->Update( deltaSeconds );
+
+	if ( !m_selectedGameObject )
+	{
+		Vec2 PickObjectPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+		m_tooltipObject = PickGameobject( PickObjectPosition );
+	}
+	else
+	{
+		m_tooltipObject = m_selectedGameObject;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -101,6 +113,7 @@ void Game::Render() const
 {
 	g_theRenderer->BeginCamera( m_worldCamera );
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
+	g_theRenderer->BindDepthStencil( nullptr );
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->SetBlendMode( ALPHA );
@@ -121,7 +134,7 @@ void Game::Render() const
 	}
 
 	DrawMouseCurrentPosition( m_worldCamera );
-
+	DrawGameObjectToolTip();
 	RenderDrawFromPointCloudMode();
 	g_theRenderer->SetBlendMode( SOLID );
 	g_theRenderer->EndCamera( m_worldCamera );
@@ -133,6 +146,7 @@ void Game::Render() const
 void Game::RenderUI() const
 {
 	g_theRenderer->BeginCamera( m_UICamera );
+	g_theRenderer->BindDepthStencil( nullptr );
 	g_theRenderer->SetBlendMode( ALPHA );
 	RenderGravityUI();
 	g_theRenderer->SetBlendMode( SOLID );
@@ -395,12 +409,12 @@ void Game::UpdateCamera()
 {
 	m_worldCamera.SetPosition( m_cameraCurrentPosition );
 	m_worldCamera.SetOutputSize( m_currentCameraOutputSize );
-	m_worldCamera.CorrectAspectRaio( CLIENT_ASPECT );
+	m_worldCamera.CorrectAspectRatio( CLIENT_ASPECT );
 	m_worldCamera.SetProjectionOrthographic( m_currentCameraOutputSize.y );
 
 	m_UICamera.SetPosition( m_cameraCurrentPosition );
 	m_UICamera.SetOutputSize( m_currentCameraOutputSize );
-	m_UICamera.CorrectAspectRaio( CLIENT_ASPECT );
+	m_UICamera.CorrectAspectRatio( CLIENT_ASPECT );
 	m_UICamera.SetProjectionOrthographic( m_currentCameraOutputSize.y );
 }
 
@@ -541,7 +555,16 @@ void Game::UpdateDrag()
 
 Vec2 Game::GetMouseDragVelocity() const
 {
-	return m_MouseDragFrames[0] - m_MouseDragFrames[ m_frameCount ];
+	Vec2 temp;
+	
+	 for ( int index = 0; index < 10; index ++ )
+	 {
+		 temp += m_MouseDragFrames[ index ];
+	 }
+
+	 temp /= 10.f;
+	 return temp;
+	//return m_MouseDragFrames[0] - m_MouseDragFrames[ m_frameCount ];
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -722,6 +745,39 @@ GameObject* Game::PickGameobject( Vec2 mousePos )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Game::DrawGameObjectToolTip() const
+{
+	
+	Vec2 PickObjectPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+
+
+	AABB2 temp = AABB2( PickObjectPosition , Vec2( PickObjectPosition.x + 600.f , PickObjectPosition.y + 25.f ) );
+	
+	Vec2 textOffset = Vec2( 0.f , temp.GetDimensions().y );
+		
+	if ( m_tooltipObject )
+	{
+		Strings objectInfo = m_tooltipObject->GetGameObjectInfo();
+		std::vector<Vertex_PCU> actorInfoVerts;
+		AABB2 objectDetailsAABB2 = temp;
+		
+		for ( int index = 0; index < objectInfo.size(); index++ )
+		{
+			g_bitmapFont->AddVertsForTextInBox2D( actorInfoVerts , objectDetailsAABB2 , 12.f , objectInfo[ index ] , MAGENTA , 1.f , ALIGN_CENTERED_LEFT );
+			objectDetailsAABB2 = AABB2( objectDetailsAABB2.m_mins , objectDetailsAABB2.m_maxs + textOffset );
+		}
+		g_theRenderer->SetBlendMode( ALPHA );
+		g_theRenderer->DrawAABB2( objectDetailsAABB2 , Rgba8( 0 , 0 , 255 , 200 ) );
+		g_theRenderer->BindTexture( g_bitmapFont->GetTexture() );
+		g_theRenderer->DrawVertexArray( actorInfoVerts );
+		g_theRenderer->BindTexture( nullptr );
+	}
+	g_theRenderer->BindTexture( g_bitmapFont->GetTexture() );
+	g_theRenderer->BindTexture( nullptr );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Game::UpdateFromUserInput( float deltaSeconds )
 {
 
@@ -775,7 +831,8 @@ void Game::SelectGameObjectFormUserInput()
 			{
 				if ( m_selectedGameObject != nullptr )
 				{
-					Vec2 newVelocity = GetMouseDragVelocity() / ( m_dragTime );
+					Vec2 newVelocity = GetMouseDragVelocity().GetNormalized() / ( m_dragTime );
+					//newVelocity = g_theInput->GetMouseDragVelocity();
 					m_selectedGameObject->m_rigidbody->SetVelocity( newVelocity );
 					m_selectedGameObject->m_rigidbody->ChangeIsSimulationActive( true );
 					m_selectedGameObject->m_isSelected = false;

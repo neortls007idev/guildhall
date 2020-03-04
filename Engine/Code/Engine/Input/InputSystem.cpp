@@ -36,7 +36,7 @@ void InputSystem::Startup()
 	GetCursorPos( &cursorPos );
 	ScreenToClient( ( HWND ) g_theWindow->m_hwnd , &cursorPos );
 	m_trackMouseVelocityOverFrames[ 0 ] = Vec2( cursorPos.x , cursorPos.y );
-	m_currentlyTrackingFrameIndex++;
+	m_currentlyTrackingFrameIndex ++;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -48,6 +48,7 @@ void InputSystem::BeginFrame()
 			m_controllers[controllerID].Update();
 	}
 	UpdateMouse();
+	m_currentlyTrackingFrameIndex++;
 	m_currentlyTrackingFrameIndex %= TOTAL_MOUSE_DRAG_TRACK_FRAMES;
 }
 
@@ -61,7 +62,7 @@ void InputSystem::Update( float deltaSeconds )
 	ScreenToClient( ( HWND ) g_theWindow->m_hwnd , &cursorPos );
 
 	m_trackMouseVelocityOverFrames[ m_currentlyTrackingFrameIndex % TOTAL_MOUSE_DRAG_TRACK_FRAMES ] =
-		Vec2( cursorPos.x , cursorPos.y ) - m_trackMouseVelocityOverFrames[ m_currentlyTrackingFrameIndex ] * 1.f / deltaSeconds;
+		( Vec2( cursorPos.x , cursorPos.y ) - m_trackMouseVelocityOverFrames[ m_currentlyTrackingFrameIndex ] ) * ( 1.f / 60.f );
 
 	Vec2 tempVelocity = Vec2::ZERO;
 	for ( int index = 0 ; index < TOTAL_MOUSE_DRAG_TRACK_FRAMES ; index++ )
@@ -69,7 +70,7 @@ void InputSystem::Update( float deltaSeconds )
 		tempVelocity += m_trackMouseVelocityOverFrames[ index ];
 	}
 
-	m_mouseDragVelocity = tempVelocity * static_cast< float >( 1 / TOTAL_MOUSE_DRAG_TRACK_FRAMES );
+	m_mouseDragVelocity = tempVelocity / TOTAL_MOUSE_DRAG_TRACK_FRAMES ;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

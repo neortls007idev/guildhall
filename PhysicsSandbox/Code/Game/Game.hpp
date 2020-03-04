@@ -56,6 +56,7 @@ public:
 
 	void DrawMouseCurrentPosition( const Camera& camera ) const;
 	GameObject* PickGameobject( Vec2 mousePos );
+	void DrawGameObjectToolTip() const;
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 private:
@@ -91,6 +92,7 @@ public:
 		   Vec2						m_mousePosition				= Vec2::ZERO;
 		   Vec2						m_rigidBodyMouseOffset		= Vec2::ZERO;
 		   GameObject*				m_selectedGameObject		= nullptr;
+		   GameObject*				m_tooltipObject				= nullptr;
 		   bool						m_isDragOffsetSet			= false;
 		   bool						m_isGameObjectSelected		= false;
 

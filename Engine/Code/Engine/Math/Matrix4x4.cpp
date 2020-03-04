@@ -860,9 +860,9 @@ Mat44 Mat44::CreateFromScaleRotationTransformation( const Vec3& scale , const Ve
 	Mat44 tranformRoll	= CreateYRotationDegrees( eulerRotation.y );
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	transform.TransformBy( translateBy );
-	transform.TransformBy( tranformPitch );
-	transform.TransformBy( tranformYaw );
 	transform.TransformBy( tranformRoll );
+	transform.TransformBy( tranformYaw );
+	transform.TransformBy( tranformPitch );
 	transform.TransformBy( scaleMatrix );
 
 	return transform;

@@ -30,9 +30,6 @@ public:
 	void DetectCollisions();
 
 	void ResolveCollision( Collision2D collision );
-	//void ResolveDiscVsDiscCollisions( Collision2D& collision );
-	//void ResolvePolygonVsDiscCollisions(Collision2D& collision);
-	//void ResolveDiscVsPolygonCollisions(Collision2D& collision);
 
 	void ResolveCollisions();
 	void CleanupDestroyedObjects();

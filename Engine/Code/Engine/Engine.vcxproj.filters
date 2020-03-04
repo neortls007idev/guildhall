@@ -71,9 +71,6 @@
     <Filter Include="Core\Experimental">
       <UniqueIdentifier>{a29428e4-41a5-489e-8888-b412c27b8578}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Time">
-      <UniqueIdentifier>{86237413-cdcc-44d5-9f4d-ad0ad386f060}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Rgba8.cpp">

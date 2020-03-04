@@ -19,10 +19,11 @@ public:
 	// CONSTRUCTION/DESTRUCITON
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
-	~Vec4() {}															// DESTRUCTOR ( DOES NOTHING )
-	Vec4() {}															// DEFAULT CONSTRUCOTR ( DOES NOTHING )
-	Vec4( const Vec4& copyFrom );										// COPY CONSTRUCTOR ( FROM ANOTHER VEC3 )
+	~Vec4() {}																			// DESTRUCTOR ( DOES NOTHING )
+	Vec4() {}																			// DEFAULT CONSTRUCOTR ( DOES NOTHING )
+	Vec4( const Vec4& copyFrom );														// COPY CONSTRUCTOR ( FROM ANOTHER VEC3 )
 	explicit Vec4( float initialX , float initialY , float initialZ , float initialW );	// EXPLICIT CONSTRUCTOR ( FROM FLOATING TYPE X, Y, Z )
+	explicit Vec4( Vec3 initialValues , float initialW );								// EXPLICIT CONSTRUCTOR ( FROM FLOATING TYPE X, Y, Z )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // OPERATORS ( CONST )
@@ -68,6 +69,7 @@ public:
 	const Vec4  GetRotatedAboutZDegrees( float deltaDegrees ) const;
 	const Vec4	GetClamped( float maxLength ) const;
 	const Vec4	GetNormalized() const;
+	const Vec3  GetXYZ() const;
 
 };
 

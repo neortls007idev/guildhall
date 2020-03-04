@@ -105,7 +105,7 @@ private:
 	int				m_mouseWheel					= 0;
 	Vec2			m_mouseNormalizedPosition		= Vec2::ZERO;
 	Vec2			m_trackMouseVelocityOverFrames[ TOTAL_MOUSE_DRAG_TRACK_FRAMES ];
-	int				m_currentlyTrackingFrameIndex	= 0;
+	int				m_currentlyTrackingFrameIndex	= -1;
 	Vec2			m_mouseDragVelocity;
 
 	XboxController m_controllers[ MAX_XBOX_CONTROLLERS ] =

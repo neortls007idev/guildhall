@@ -19,6 +19,56 @@ GameObject::GameObject( Physics2D* system , Vec2 rigidBodyPosition , Vec2 colide
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Strings GameObject::GetGameObjectInfo() const
+{
+	Strings objectDetails;
+	std::string trueTextForBoolean = "true";
+	std::string FalseTextForBoolean = "false";
+
+	Vec2 velocity		= m_rigidbody->GetVelocity();
+	Vec2 verletVelocity = m_rigidbody->GetVerletVelocity();
+	Vec2 position		= m_rigidbody->GetPosition();
+	float mass			= m_rigidbody->GetMass();
+
+	std::string objectPos = "Position = ";
+	objectPos += std::to_string( position.x ) + " , " + std::to_string( position.y );
+
+	std::string objectVelocity = "Velocity = ";
+	objectVelocity += std::to_string( velocity.x ) + " , " + std::to_string( velocity.y );
+
+	std::string objectVerletVelocity = "Verlet Velocity = ";
+	objectVerletVelocity += std::to_string( verletVelocity.x ) + " , " + std::to_string( verletVelocity.y );
+	
+	std::string objectMass = "Mass = ";
+	objectMass += std::to_string( mass );
+
+	std::string objectSimMode = "Simulation Mode = ";
+
+	switch ( m_rigidbody->GetSimulationMode() )
+	{
+		case SIMULATIONMODE_DYNAMIC :
+									objectSimMode += "DYNAMIC";
+									break;
+		case SIMULATIONMODE_STATIC:
+									objectSimMode += "STATIC";
+									break;
+		case SIMULATIONMODE_KINEMATIC:
+									objectSimMode += "KINEMATIC";
+									break;
+	}
+
+	
+	objectDetails.push_back( objectSimMode );
+	objectDetails.push_back( objectMass );
+	objectDetails.push_back( objectVelocity );
+	objectDetails.push_back( objectVerletVelocity );
+	objectDetails.push_back( objectPos );
+	
+	return objectDetails;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 GameObject::~GameObject()
 {
 	// delete m_rigidbody; // this should be an error if setup right

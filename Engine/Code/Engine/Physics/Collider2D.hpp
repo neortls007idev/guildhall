@@ -36,6 +36,7 @@ public:
 	bool					Intersects( Collider2D const* other ) const;
 	Manifold2D				GenrateManifold( Collider2D const* other );
 	float					GetBounceWith( Collider2D const* other ) const;
+	float					GetFrictionWith( Collider2D const* other ) const;
 
 	virtual void			DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor ) = 0;
 	virtual Vec2			GetPosition() const = 0;

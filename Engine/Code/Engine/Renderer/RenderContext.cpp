@@ -276,6 +276,12 @@ void RenderContext::ClearDepth( Texture* depthStencilTexture , float depth )
 
 void RenderContext::SetDepthTest( eCompareOp compare , bool writeOnPass )
 {
+
+	UNUSED( compare );
+	UNUSED( writeOnPass );
+
+	// TODO :- UPGRADE ME
+	
 	if ( m_currentDepthStencilState )
 	{
 		DX_SAFE_RELEASE( m_currentDepthStencilState );

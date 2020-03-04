@@ -20,6 +20,16 @@ Vec4::Vec4( float initialX , float initialY , float initialZ, float initialW ) :
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Vec4::Vec4( Vec3 initialValues , float initialW )
+{
+	x = initialValues.x;
+	y = initialValues.y;
+	z = initialValues.z;
+	w = initialW;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 const Vec4 Vec4::operator + ( const Vec4& vecToAdd ) const
 {
 	return Vec4( vecToAdd.x + x , vecToAdd.y + y , vecToAdd.z + z, w );
@@ -259,6 +269,13 @@ const Vec4 Vec4::GetNormalized() const
 	Copy = Copy * ( 1.f / length );
 
 	return Copy;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const Vec3 Vec4::GetXYZ() const
+{
+	return Vec3( x , y , z );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

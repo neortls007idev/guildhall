@@ -55,12 +55,12 @@ public:
 	Mat44			GetViewMatrix();
 	float			GetAspectRatio() const;
 
-	void			SetPostion( const Vec3& position );
+	void			SetPosition( const Vec3& position );
 	void			Translate( const Vec3& translation );
 	void			Translate2D( const Vec2 cameraTranslate );
 	void			SetPitchYawRollRotation( float pitch , float yaw , float roll );
 	void			SetOutputSize( Vec2 size );
-	void			CorrectAspectRaio( float clientAspectRatio );
+	void			CorrectAspectRatio( float clientAspectRatio );
 
 	void			SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
 	void			SetClearMode( unsigned int clearFlags , Rgba8 color , float depth = 0.f , unsigned int stencil = 0 );
