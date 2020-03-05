@@ -1,4 +1,4 @@
-#include "Game/Gameobject.hpp"
+﻿#include "Game/Gameobject.hpp"
 #include "Engine/Physics/Physics2D.hpp"
 #include "Engine/Physics/Rigidbody2D.hpp"
 
@@ -29,21 +29,29 @@ Strings GameObject::GetGameObjectInfo() const
 	Vec2 verletVelocity = m_rigidbody->GetVerletVelocity();
 	Vec2 position		= m_rigidbody->GetPosition();
 	float mass			= m_rigidbody->GetMass();
+	float friction		= m_rigidbody->GetCollider()->GetPhysicsMaterial()->GetFriction();
+	float drag			= m_rigidbody->GetDrag();
 
-	std::string objectPos = "Position = ";
+	std::string objectPos = "           Position = ";
 	objectPos += std::to_string( position.x ) + " , " + std::to_string( position.y );
 
-	std::string objectVelocity = "Velocity = ";
+	std::string objectVelocity = "           Velocity = ";
 	objectVelocity += std::to_string( velocity.x ) + " , " + std::to_string( velocity.y );
 
-	std::string objectVerletVelocity = "Verlet Velocity = ";
+	std::string objectVerletVelocity = "           Verlet Velocity = ";
 	objectVerletVelocity += std::to_string( verletVelocity.x ) + " , " + std::to_string( verletVelocity.y );
 	
-	std::string objectMass = "Mass = ";
+	std::string objectMass = " [  ,  ] : Mass = ";
 	objectMass += std::to_string( mass );
 
-	std::string objectSimMode = "Simulation Mode = ";
+	std::string objectSimMode = " 1 , 2 , 3 : Simulation Mode = ";
 
+	std::string objectFriction = " <- , -> : Friction = ";
+	objectFriction += std::to_string( friction );
+
+	std::string objectDrag = " :  ,  \\ : Drag = ";
+	objectDrag += std::to_string( drag );
+	
 	switch ( m_rigidbody->GetSimulationMode() )
 	{
 		case SIMULATIONMODE_DYNAMIC :
@@ -60,10 +68,12 @@ Strings GameObject::GetGameObjectInfo() const
 	
 	objectDetails.push_back( objectSimMode );
 	objectDetails.push_back( objectMass );
+	objectDetails.push_back( objectDrag );
+	objectDetails.push_back( objectFriction );
 	objectDetails.push_back( objectVelocity );
 	objectDetails.push_back( objectVerletVelocity );
 	objectDetails.push_back( objectPos );
-	
+		
 	return objectDetails;
 }
 

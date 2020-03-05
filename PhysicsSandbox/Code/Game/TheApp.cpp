@@ -13,6 +13,7 @@
 #include "Game/TheApp.hpp"
 
 #include "Engine/Time/Clock.hpp"
+#include "Engine/Time/Timer.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			GLOBAL VARIABLES
@@ -148,6 +149,14 @@ void TheApp::BeginFrame()
 	g_theInput->SetCursorMode( ABSOLUTE_MODE );
 	g_theRenderer->BeginFrame();
 	g_theDevConsole->BeginFrame();
+	if ( m_isPaused )
+	{
+		g_thePhysicsSystem->m_clock->Pause();
+	}
+	else
+	{
+		g_thePhysicsSystem->m_clock->Resume();
+	}
 	g_thePhysicsSystem->BeginFrame();
 	g_theAudioSystem->BeginFrame();
 	
@@ -251,22 +260,36 @@ void TheApp::UpdateFromKeyboard()
 			
 		}
 	}
+
+	if ( g_theInput->WasKeyJustPressed('8') )
+	{
+		double currentTimeScale = g_thePhysicsSystem->m_clock->GetScale();
+		g_thePhysicsSystem->m_clock->SetScale( currentTimeScale * 0.5 );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( '9' ) )
+	{
+		double currentTimeScale = g_thePhysicsSystem->m_clock->GetScale();
+		g_thePhysicsSystem->m_clock->SetScale( currentTimeScale * 2.0 );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( '0' ) )
+	{
+		g_thePhysicsSystem->m_clock->SetScale( 1.0 );
+		g_thePhysicsSystem->m_clock->Reset();
+		g_thePhysicsSystem->m_timer->Reset();
+	}
+	
 	if ( g_theInput->GetButtonState( KEY_F8 ).WasJustPressed() )
 	{
 		delete g_theGame;
 		g_theGame = nullptr;
 		delete g_thePhysicsSystem;
 		g_thePhysicsSystem = new Physics2D();
+		g_thePhysicsSystem->Startup();
 		g_theGame = new Game();
 		
-	}
-	
-	if ( g_theInput->GetButtonState( KEY_TILDE ).WasJustPressed() )
-	{
-		//m_isDevConsoleVisbile = !m_isDevConsoleVisbile;
-		//g_theDevConsole->SetIsOpen( m_isDevConsoleVisbile );
-		g_theDevConsole->ToggleVisibility();
-	}
+	}	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

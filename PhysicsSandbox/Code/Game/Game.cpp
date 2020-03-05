@@ -488,7 +488,7 @@ void Game::UpdateGravity()
 
 void Game::UpdateFriction()
 {
-	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( '<' ) )
+	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( KEY_LEFTARROW ) )
 	{
 		Collider2D* currentObjectCollider = m_selectedGameObject->m_rigidbody->GetCollider();
 		float friction = currentObjectCollider->GetPhysicsMaterial()->GetFriction();
@@ -497,7 +497,7 @@ void Game::UpdateFriction()
 		currentObjectCollider->GetPhysicsMaterial()->SetFriciton( friction );
 	}
 
-	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( '>' ) )
+	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( KEY_RIGHTARROW ) )
 	{
 		Collider2D* currentObjectCollider = m_selectedGameObject->m_rigidbody->GetCollider();
 		float friction = currentObjectCollider->GetPhysicsMaterial()->GetFriction();
@@ -539,7 +539,7 @@ void Game::UpdateDrag()
 		Rigidbody2D* currentObjectRigidBody = m_selectedGameObject->m_rigidbody;
 		float drag = m_selectedGameObject->m_rigidbody->GetDrag();
 		drag -= DELTA_DRAG_CHANGE;
-		drag = ClampZeroToOne( drag );
+		drag = Clamp( drag , 0.0f , INFINITY );
 		currentObjectRigidBody->SetDrag( drag );
 	}
 
@@ -548,7 +548,7 @@ void Game::UpdateDrag()
 		Rigidbody2D* currentObjectRigidBody = m_selectedGameObject->m_rigidbody;
 		float drag = m_selectedGameObject->m_rigidbody->GetMass();
 		drag += DELTA_MASS_CHANGE;
-		drag = ClampZeroToOne( drag );
+		drag = Clamp( drag , 0.0f , INFINITY );
 		currentObjectRigidBody->SetDrag( drag );
 	}
 }
@@ -909,8 +909,20 @@ void Game::UpdateCameraFromUserInput( float deltaSeconds )
 	if ( g_theInput->GetMouseWheelValue() < 0 )
 	{
 		m_currentCameraOutputSize = m_worldCamera.GetOutputSize() + ( Vec2( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y ) * deltaSeconds );
-		m_currentCameraOutputSize.x = Clamp( m_currentCameraOutputSize.x , 200.f , 20000.f );
-		m_currentCameraOutputSize.y = Clamp( m_currentCameraOutputSize.y , 200.f , 20000.f );
+		Vec3 orthoMin			  = m_worldCamera.GetOrthoMin();
+		Vec3 orthoMax			  = m_worldCamera.GetOrthoMax();
+		orthoMin -= ( Vec3( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y ,0.f ) * deltaSeconds ) * 0.5f;
+		orthoMax += ( Vec3( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y ,0.f ) * deltaSeconds ) * 0.5f;
+		orthoMin.x = Clamp( orthoMin.x , 200.f , 20000.f );
+		orthoMin.y = Clamp( orthoMin.y , 200.f , 20000.f );
+		orthoMax.x = Clamp( orthoMax.x , 200.f , 20000.f );
+		orthoMax.y = Clamp( orthoMax.y , 200.f , 20000.f );
+
+		orthoMin.x = orthoMin.y * CLIENT_ASPECT;
+		orthoMax.x = orthoMax.y * CLIENT_ASPECT;
+		//m_currentCameraOutputSize.x = Clamp( m_currentCameraOutputSize.x , 200.f , 20000.f );
+		//m_currentCameraOutputSize.y = Clamp( m_currentCameraOutputSize.y , 200.f , 20000.f );
+		m_worldCamera.SetOrthoView( orthoMin.GetXYComponents() , orthoMax.GetXYComponents() );
 	}
 
 	if ( g_theInput->GetMouseWheelValue() > 0 )
@@ -918,6 +930,18 @@ void Game::UpdateCameraFromUserInput( float deltaSeconds )
 		m_currentCameraOutputSize = m_worldCamera.GetOutputSize() - ( Vec2( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y ) * deltaSeconds );
 		m_currentCameraOutputSize.x = Clamp( m_currentCameraOutputSize.x , 200.f , 20000.f );
 		m_currentCameraOutputSize.y = Clamp( m_currentCameraOutputSize.y , 200.f , 20000.f );
+		Vec3 orthoMin = m_worldCamera.GetOrthoMin();
+		Vec3 orthoMax = m_worldCamera.GetOrthoMax();
+		orthoMin += ( Vec3( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y , 0.f ) * deltaSeconds ) * 0.5f;
+		orthoMax -= ( Vec3( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y , 0.f ) * deltaSeconds ) * 0.5f;
+		orthoMin.x = Clamp( orthoMin.x , 200.f , 20000.f );
+		orthoMin.y = Clamp( orthoMin.y , 200.f , 20000.f );
+		orthoMax.x = Clamp( orthoMax.x , 200.f , 20000.f );
+		orthoMax.y = Clamp( orthoMax.y , 200.f , 20000.f );
+
+		orthoMin.x = orthoMin.y * CLIENT_ASPECT;
+		orthoMax.x = orthoMax.y * CLIENT_ASPECT;
+		m_worldCamera.SetOrthoView( orthoMin.GetXYComponents() , orthoMax.GetXYComponents() );
 	}
 }
 
