@@ -6,36 +6,44 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Clock* g_theMasterClock = nullptr;
+STATIC Clock Clock::g_theMasterClock = Clock( nullptr );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Clock::Clock()
 {
-	if ( g_theMasterClock!= nullptr )
-	{
-		m_allClocks.push_back( this );
-	}
-	else
-	{
-		// TODO :- find location of masterCLock and replace
-	}
+	m_parent = &g_theMasterClock;
+	g_theMasterClock.AddChild( this );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Clock::Clock( Clock* parent )
 {
-	m_parent = parent;
-	m_allClocks.push_back( this );
-	parent->m_children.push_back( this );
+	if ( parent )
+	{
+		m_parent = parent;
+		parent->AddChild( this );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Clock::~Clock()
 {
+	if ( this == &g_theMasterClock )
+	{
+		m_children.clear();
+		return;
+	}
 
+	for ( int index = 0; index , m_children.size(); index++ )
+	{
+		if ( m_children[index] )
+		{
+			m_children[ index ]->SetParent( m_parent );
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -47,12 +55,16 @@ void Clock::Update( double deltaSeconds )
 	{
 		deltaTime = 0.0;
 	}
-	else
-	{
-		deltaTime *= m_scale;
-	}
+	
+	deltaTime *= m_scale;
+	
 	m_lastFrameDeltaSeconds	 = deltaTime;
 	m_totalTimeElapsed		+= m_lastFrameDeltaSeconds;
+
+	for ( int index = 0; index < m_children.size(); index++ )
+	{
+		m_children[ index ]->Update( deltaSeconds );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -60,6 +72,7 @@ void Clock::Update( double deltaSeconds )
 void Clock::Reset()
 {
 	m_totalTimeElapsed = 0.0;
+	m_lastFrameDeltaSeconds = 0.0;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -113,32 +126,40 @@ bool Clock::IsPaused() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Clock::SetFrameLimits( double minFrameTime , double maxFrameTime )
-{
-	m_minFrameLimit = minFrameTime;
-	m_maxFrameLimit = maxFrameTime;
-}
+// void Clock::SetFrameLimits( double minFrameTime , double maxFrameTime )
+// {
+// 	m_minFrameLimit = minFrameTime;
+// 	m_maxFrameLimit = maxFrameTime;
+// }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Clock::SetParent( Clock* clock )
 {
+	if ( clock == nullptr )
+	{
+		m_parent = &g_theMasterClock;
+		g_theMasterClock.AddChild( clock );
+		return;
+	}
+	
 	m_parent = clock;
+	clock->AddChild( this );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Clock::AddChild( Clock* clock )
 {
-	Clock* newChild = new Clock( this );
+	ASSERT_OR_DIE( clock != nullptr , "Don't pass a root clock as a child" );
+	m_children.push_back( clock );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 STATIC void Clock::Startup()
 {
-	g_theMasterClock = new Clock();
-	g_theMasterClock->Reset();
+	g_theMasterClock.Reset();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -152,20 +173,17 @@ STATIC void Clock::Shutdown()
 
 STATIC void Clock::BeginFrame()
 {
-	Clock* clockGod = GetMaster();
-
 	static double timePreviousFrame = GetCurrentTimeSeconds();
 	double timeThisFrame = GetCurrentTimeSeconds();
 
-	double dt;
-
-	dt = timeThisFrame - timePreviousFrame;
+	
+	double dt = timeThisFrame - timePreviousFrame;
 	timePreviousFrame = timeThisFrame;
 
-	clockGod->Update( dt );
-	
-	clockGod->Update( 1.0 / 60.0 );	
+	g_theMasterClock.Update( dt );
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 STATIC void Clock::EndFrame()
 {
@@ -176,20 +194,7 @@ STATIC void Clock::EndFrame()
 
 STATIC Clock* Clock::GetMaster()
 {
-	for ( size_t index = 0; index < m_allClocks.size(); index++ )
-	{
-		if ( !m_allClocks[ index ] )
-		{
-			continue;
-		}
-
-		if ( m_allClocks[ index ]->GetParent() )
-		{
-			return m_allClocks[ index ];
-		}
-		ASSERT_OR_DIE( index == ( m_allClocks.size() - 1 ) , "No Master Clock Present" );
-	}
+	return &g_theMasterClock;
 }
 
-//STATIC Clock g_masterClock( nullptr );
-
+//--------------------------------------------------------------------------------------------------------------------------------------------

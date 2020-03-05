@@ -82,7 +82,7 @@ void Rigidbody2D::ApplyImpulse( Vec2 impulse , Vec2 point )
 void Rigidbody2D::ApplyFriction( Vec2 friction , Vec2 point /*= Vec2::ZERO */ )
 {
 	UNUSED( point );
-	m_velocity -= friction / m_mass;
+	m_velocity += friction / m_mass;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

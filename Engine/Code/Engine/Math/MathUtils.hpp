@@ -140,4 +140,6 @@ const uint	GetIndexOfRightMostPointFromPointCloud( Vec2 const* points , uint poi
 const Vec2* GetTopMostPointFromPointCloud( Vec2 const* points , uint pointCount );
 const uint	GetIndexOfTopMostPointFromPointCloud( Vec2 const* points , uint pointCount );
 
-//--------------------------------------------------------------------------------------------------------------------------------------------x
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+float SignFloat( float val );

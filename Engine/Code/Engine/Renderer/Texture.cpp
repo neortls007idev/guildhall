@@ -97,6 +97,8 @@ TextureView* Texture::GetOrCreateRenderTargetView()
 	return m_renderTargetView;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 TextureView* Texture::GetOrCreateShaderResourceView()
 {
 	if ( m_shaderResourceView )

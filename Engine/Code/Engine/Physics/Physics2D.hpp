@@ -11,6 +11,8 @@ class DiscCollider2D;
 class Rigidbody2D;
 class Collider2D;
 class Camera;
+class Timer;
+class Clock;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -20,8 +22,11 @@ public:
 	Physics2D();
 	~Physics2D();
 
+	void Startup();
 	void BeginFrame();
-	void Update( float deltaSeconds );
+	void Update();
+	void EndFrame();    // cleanup destroyed objects
+	void Shutdown();
 
 	void AdvanceSimulation( float deltaSeconds );
 	void ApplyEffectors( Rigidbody2D* rigidbody , float deltaSeconds );
@@ -34,7 +39,6 @@ public:
 	void ResolveCollisions();
 	void CleanupDestroyedObjects();
 
-	void EndFrame();    // cleanup destroyed objects
 
 	// factory style create/destroy
 	Rigidbody2D* CreateRigidbody( Vec2 rigidBodyPosition , Vec2 coliderPositionRelativeToRigidBody , float ColliderRadius );
@@ -49,6 +53,10 @@ public:
 	void GravityBounce( Camera* sceneCamera, Rigidbody2D* rigidBody );
 	void ScreenWrapAround( Camera* sceneCamera , Rigidbody2D* rigidBody );
 
+	static void SetFixedStepTime( double newTimeStep );
+	
+	static bool SetPhysicsUpdateStep( EventArgs& args );
+	
 public:
 	Vec2 m_sceneGravity = Vec2( 0.f , -9.8f );
 	// storage for all rigid bodies
@@ -56,8 +64,11 @@ public:
 	// storage for all colliders
 	std::vector<Collider2D*>	m_colliders2D;
 	std::vector<Collision2D>	m_frameCollisions;
-	Camera*						m_sceneCamera = nullptr;
+	Camera*						m_sceneCamera			= nullptr;
 
+	Clock*						m_clock					= nullptr;
+	Timer*						m_timer					= nullptr;
+	static double				m_fixedTimeStep;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

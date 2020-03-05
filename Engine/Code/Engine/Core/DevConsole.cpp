@@ -206,7 +206,7 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 			break;
 		}
 
-		g_bitmapFont->AddVertsForTextInBox2D( consoleTextVerts , consoleArea , lineHeight , m_consoleText[ myStringIndex ].text , m_consoleText[ myStringIndex ].lineColor , 1.f , alignment );
+		g_bitmapFont->AddVertsForTextInBox2D( consoleTextVerts , consoleArea , lineHeight , m_consoleText[ myStringIndex ].text , m_consoleText[ myStringIndex ].lineColor , 0.75f , alignment );
 		myStringIndex--;
 
 		alignmentDeltaChange += ( offsetBetweenLines );
@@ -260,10 +260,31 @@ void DevConsole::ResetCurrentInput()
 
 void DevConsole::ProcessCommand()
 {
-	std::string currentCommand( m_currentText );
+	//std::string currentCommand( m_currentText );
+	Strings currentCompleteCommand = SplitStringAtGivenDelimiter( m_currentText , ' ' );
+
+	
+	EventArgs currentCommandArgs;
+
+	for ( size_t index = 0; index < m_consoleCommands.size(); index++ )
+	{
+		if ( StringCompare( currentCompleteCommand[ 0 ] , m_consoleCommands[ index ].command ) )
+		{
+			currentCommandArgs = m_consoleCommands[ index ].commandArgs;
+		}
+	}
+
+	if ( currentCompleteCommand.size() % 2 == 1 )
+	{
+		for ( size_t index = 1 ; index < currentCompleteCommand.size() ; index += 2 )
+		{
+			currentCommandArgs.SetValue( currentCompleteCommand[ index ] , currentCompleteCommand[ index + 1 ] );
+		}
+	}
+	
 	m_currentText = "";
 
-	if ( !g_theEventSystem->FireEvent( currentCommand ) )
+	if ( !g_theEventSystem->FireEvent( currentCompleteCommand[0] , currentCommandArgs ) )
 	{
 		PrintString( RED , "Invalid Console Command :- Use \"help\" command  ", DEVCONSOLE_ERROR );
 	}
@@ -294,6 +315,7 @@ void DevConsole::CreateCommand( std::string newCommand , std::string commandDesc
 	newConsoleCommand.command = newCommand;
 	newConsoleCommand.Description = commandDescription;
 	newConsoleCommand.commandArgs = commandArgs;
+	m_consoleCommands.push_back( newConsoleCommand );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

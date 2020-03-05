@@ -52,7 +52,7 @@ Game::Game()
 
 	RandomizePointCloud( m_rng );
 
-	InitialGameObjectsSpawner();
+	//InitialGameObjectsSpawner();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ void Game::Update( float deltaSeconds )
 	UpdateGameObjects();
 	UpdateFromUserInput( deltaSeconds );
 	DrawConvexgonMode();
-	g_thePhysicsSystem->Update( deltaSeconds );
+	g_thePhysicsSystem->Update();
 
 	if ( !m_selectedGameObject )
 	{
@@ -511,7 +511,7 @@ void Game::UpdateFriction()
 
 void Game::UpdateMass()
 {
-	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( '[' ) )
+	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( KEY_LEFT_SQ_BRACKET ) )
 	{
 		Rigidbody2D* currentObjectRigidBody = m_selectedGameObject->m_rigidbody;
 		float mass = m_selectedGameObject->m_rigidbody->GetMass();
@@ -520,7 +520,7 @@ void Game::UpdateMass()
 		currentObjectRigidBody->SetMass( mass );
 	}
 
-	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( ']' ) )
+	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( KEY_RIGHT_SQ_BRACKET ) )
 	{
 		Rigidbody2D* currentObjectRigidBody = m_selectedGameObject->m_rigidbody;
 		float mass = m_selectedGameObject->m_rigidbody->GetMass();
@@ -530,9 +530,11 @@ void Game::UpdateMass()
 	}
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Game::UpdateDrag()
 {
-	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( ':' ) )
+	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( KEY_COLON ) )
 	{
 		Rigidbody2D* currentObjectRigidBody = m_selectedGameObject->m_rigidbody;
 		float drag = m_selectedGameObject->m_rigidbody->GetDrag();
@@ -541,7 +543,7 @@ void Game::UpdateDrag()
 		currentObjectRigidBody->SetDrag( drag );
 	}
 
-	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( '/' ) )
+	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( KEY_FORWARDSLASH ) )
 	{
 		Rigidbody2D* currentObjectRigidBody = m_selectedGameObject->m_rigidbody;
 		float drag = m_selectedGameObject->m_rigidbody->GetMass();
@@ -784,6 +786,9 @@ void Game::UpdateFromUserInput( float deltaSeconds )
 	if ( !m_isDrawModeActive )
 	{
 		UpdateGravity();
+		UpdateMass();
+		UpdateFriction();
+		UpdateDrag();
 	}
 
 	if ( !m_selectedGameObject )

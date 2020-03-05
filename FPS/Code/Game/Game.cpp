@@ -79,7 +79,6 @@ void Game::Update( float deltaSeconds )
 	static float y = 0;
 	y += deltaSeconds;
 	m_cubeTransform.SetRotation( 0.f ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
-	m_sphereTransform.SetRotation( 0.f ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	UpdateFromKeyBoard( deltaSeconds );
 }
 

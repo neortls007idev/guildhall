@@ -12,6 +12,8 @@
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
 
+#include "Engine/Time/Clock.hpp"
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			GLOBAL VARIABLES
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -63,6 +65,8 @@ TheApp::~TheApp()
 
 void TheApp::Startup()
 {
+	Clock::Startup();
+	
 	if ( g_theEventSystem == nullptr )
 	{
 		g_theEventSystem = new EventSystem();
@@ -102,7 +106,7 @@ void TheApp::Startup()
 	{
 		g_thePhysicsSystem = new Physics2D();
 	}
-	//g_thePhysicsSystem->Startup();
+	g_thePhysicsSystem->Startup();
 	
 	if ( g_theAudioSystem == nullptr )
 	{
@@ -121,13 +125,13 @@ void TheApp::Startup()
 
 void TheApp::RunFrame()
 {
-	static double timeLastFrameStarted = GetCurrentTimeSeconds();
-	double        timeThisFrameStarted = GetCurrentTimeSeconds();
-	double		  deltaSeconds		   = timeThisFrameStarted - timeLastFrameStarted;
-	timeLastFrameStarted			   = timeThisFrameStarted;
+// 	static double timeLastFrameStarted = GetCurrentTimeSeconds();
+// 	double        timeThisFrameStarted = GetCurrentTimeSeconds();
+// 	double		  deltaSeconds		   = timeThisFrameStarted - timeLastFrameStarted;
+// 	timeLastFrameStarted			   = timeThisFrameStarted;
 	
 	BeginFrame();                        // all engine system and not game systems
-	Update( ( float ) deltaSeconds );	
+	Update( ( float ) Clock::g_theMasterClock.GetLastDeltaSeconds() );	
 	Render();
 	EndFrame();
 }
@@ -137,6 +141,7 @@ void TheApp::RunFrame()
 void TheApp::BeginFrame()
 {
 	// all engine things that must begin at the beginning of each frame and not the game
+	Clock::BeginFrame();
 	g_theEventSystem->BeginFrame();
 	g_theWindow->BeginFrame();
 	g_theInput->BeginFrame();
@@ -156,7 +161,7 @@ void TheApp::Update( float deltaSeconds )
 	g_theInput->Update( deltaSeconds );
 	UpdateFromKeyboard();
 
-	g_thePhysicsSystem->Update( deltaSeconds );
+	g_thePhysicsSystem->Update();
 
 	if ( g_theDevConsole->IsOpen() )
 	{
@@ -179,7 +184,7 @@ void TheApp::Render() const
 
 		if ( g_theDevConsole->IsOpen() )
 		{
-			g_theDevConsole->Render( *g_theRenderer , *g_theDevConsole->GetDevConsoleCamera() , 20.f );
+			g_theDevConsole->Render( *g_theRenderer , *g_theDevConsole->GetDevConsoleCamera() , 15.f );
 		}
 
 }
@@ -189,7 +194,7 @@ void TheApp::Render() const
 void TheApp::EndFrame()
 {
 	// all engine things that must end at the end of the frame and not the game
-	//SwapBuffers( m_displayDeviceContext );
+	
 	g_theAudioSystem->EndFrame();
 	g_thePhysicsSystem->EndFrame();
 	g_theDevConsole->EndFrame();
@@ -197,6 +202,7 @@ void TheApp::EndFrame()
 	g_theInput->EndFrame();
 	// TODO :- Create this function g_theWindow->EndFrame();
 	g_theEventSystem->EndFrame();
+	Clock::EndFrame();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -204,12 +210,13 @@ void TheApp::EndFrame()
 void TheApp::Shutdown()
 {
 	g_theAudioSystem->Shutdown();
-	// TODO :- write me g_thePhysicsSystem->Shutdown();
+	g_thePhysicsSystem->Shutdown();
 	g_theDevConsole->Shutdown();
 	g_theRenderer->Shutdown();
 	g_theInput->Shutdown();
 	// TODO :- write me g_theWindow->Shutdown();
 	g_theEventSystem->Shutdown();
+	Clock::Shutdown();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

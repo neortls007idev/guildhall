@@ -23,7 +23,7 @@ public:
 	double	GetScale() const;
 	bool	IsPaused() const;
 
-	void	SetFrameLimits( double minFrameTime, double maxFrameTime ); // useful if you never want a simluation jumping too far (for exapmle, while stuck on a breakpoint)
+	//void	SetFrameLimits( double minFrameTime, double maxFrameTime ); // useful if you never want a simluation jumping too far (for exapmle, while stuck on a breakpoint)
 
 public:
 	// used more internally
@@ -39,20 +39,20 @@ public:									// accessor for the master clock of our engine
 
 	static Clock* GetMaster();
 
+	static Clock g_theMasterClock;
+
 private:
 	bool						m_isClockPaused				= false;
 	bool						m_isARootClock				= false;
 	double						m_scale						= 1.0;
 	double						m_totalTimeElapsed			= 0.0;
-	static double				m_lastFrameDeltaSeconds;
+	double						m_lastFrameDeltaSeconds		= 0.0;
 	double						m_minFrameLimit				= 0.0;
 	double						m_maxFrameLimit				= 1.0/60.0;
 	Clock*						m_parent					= nullptr;
 	std::vector<Clock*>			m_children;
-	static std::vector<Clock*>	m_allClocks;
 };
 
-//static Clock g_masterClock( nullptr );
 
 	
 
