@@ -78,7 +78,7 @@ void Game::Update( float deltaSeconds )
 {
 	static float y = 0;
 	y += deltaSeconds;
-	m_cubeTransform.SetRotation( 0.f ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
+	m_cubeTransform.SetRotation( 0.f ,  5.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	UpdateFromKeyBoard( deltaSeconds );
 }
 
@@ -264,9 +264,9 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	m_cameraRotation.x	-= mousePos.y * speed * deltaSeconds;
 	m_cameraRotation.y	-= mousePos.x * speed * deltaSeconds;
 
-	float finalPitch = Clamp( m_cameraRotation.x , -180.f , 180.f );
+	float finalPitch = Clamp( m_cameraRotation.x , -85.f , 85.f );
 	float finalYaw	 = Clamp( m_cameraRotation.z, -175.f , 175.f );
-	float finalRoll  = Clamp( m_cameraRotation.y, -85.f , 85.f );
+	float finalRoll  = Clamp( m_cameraRotation.y, -175.f , 175.f );
 
 	m_gameCamera.SetPosition( m_cameraPosition );
 	m_gameCamera.SetPitchYawRollRotation( finalPitch , finalRoll, finalYaw  );

@@ -17,7 +17,13 @@ void Transform::SetRotation( float pitch , float yaw , float roll )
 // 	float finalRoll	 = fmodf( roll , 180.f ) - 90.f;
 // 
 // 	m_rotationDegrees = Vec3( finalPitch , finalYaw , finalRoll );
-	m_rotationDegrees = Vec3( pitch , yaw , roll );
+
+ 	float finalPitch	= Clamp( pitch	,-90.f ,90.f );
+	float finalYaw		= Clamp( yaw	,-180.f, 180.f );
+	float finalRoll		= Clamp( roll	, -180.f , 180.f );
+ 	
+ 	m_rotationDegrees = Vec3( finalPitch , finalYaw , finalRoll );
+	//m_rotationDegrees = Vec3( pitch , yaw , roll );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
