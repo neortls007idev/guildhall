@@ -22,7 +22,7 @@ Physics2D::Physics2D()
 {
 	s_clock			= new Clock();
 	s_timer			= new Timer();
-	s_fixedTimeStep = 1.0 / 60.0;
+	s_fixedTimeStep = 1.0 / 120.0;
 
 	EventArgs physicsStepArgs;
 
