@@ -120,6 +120,8 @@ public:
 		   float					m_dragTime = 0.f;
 		   int						m_frameCount = 0;
 		   int						m_frameDelay = 0;
+private:
+	float							m_gameCameraCurrentHeight	= 1600.f;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -33,6 +33,8 @@ Vec3 Camera::GetPosition() const
 
 void Camera::SetOutputSize( Vec2 size )
 {
+	//Vec2 sizeDiff = size - m_outputSize;
+	//Vec2
 	m_outputSize = size;
 }
 
@@ -42,8 +44,13 @@ void Camera::SetProjectionOrthographic( float height , float nearZ , float farZ 
 {
 	UNUSED( nearZ );
 	UNUSED( farZ );
+
 	float width  = height * GetAspectRatio();
 	m_outputSize = Vec2( width , height );
+
+	Vec2 bottomLeft = m_transform.GetPostion().GetXYComponents() -( m_outputSize * 0.5f );
+	Vec2 topRight = m_transform.GetPostion().GetXYComponents() + ( m_outputSize * 0.5f );
+	m_projection = CreateOrthoGraphicProjeciton( Vec3( bottomLeft , 0.0f ) , Vec3( topRight , 1.0f ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

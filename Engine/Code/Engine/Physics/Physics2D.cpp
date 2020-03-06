@@ -22,7 +22,7 @@ Physics2D::Physics2D()
 {
 	s_clock			= new Clock();
 	s_timer			= new Timer();
-	s_fixedTimeStep = 1.0 / 120.0;
+	s_fixedTimeStep = 1.0 / 60.0;
 
 	EventArgs physicsStepArgs;
 
@@ -67,17 +67,18 @@ void Physics2D::Update()
 	while ( s_timer->CheckAndDecrement() )
 	{
 		AdvanceSimulation( ( float ) s_fixedTimeStep );
-		
-		for ( size_t rigidBodyIndex = 0; rigidBodyIndex < m_rigidBodies2D.size(); ++rigidBodyIndex )
-		{
-			m_rigidBodies2D[ rigidBodyIndex ]->Update( ( float ) s_fixedTimeStep );
-		}
  	}
+	
+	DetectCollisions();
+	ResolveCollisions();
+	ResetCollisions();
 	
 	for ( size_t colliderIndex = 0; colliderIndex < m_colliders2D.size(); ++colliderIndex )
 	{
 		m_colliders2D[ colliderIndex ]->UpdateWorldShape();
 	}
+	
+	CleanupDestroyedObjects();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -98,11 +99,7 @@ void Physics2D::AdvanceSimulation( float deltaSeconds )
 		m_rigidBodies2D[ index ]->ApplyDrag( deltaSeconds );
 		MoveRigidbodies( m_rigidBodies2D[ index ] , deltaSeconds );
 	}
-
-	ResetCollisions();
-	DetectCollisions();
-	ResolveCollisions();
-
+	
 	for ( size_t index = 0; index < m_rigidBodies2D.size(); index++ )
 	{
 		if ( !m_rigidBodies2D[ index ] )
@@ -114,8 +111,6 @@ void Physics2D::AdvanceSimulation( float deltaSeconds )
 		Vec2 rbVerletVelocity = ( currentRigidBodyNewPos - currentRigidBodyPos ) / deltaSeconds;
 		//m_rigidBodies2D[ index ]->SetVerletVelocity( rbVerletVelocity );
 	}
-	
-	CleanupDestroyedObjects();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -187,6 +182,11 @@ void Physics2D::DetectCollisions()
 			Rigidbody2D* firstRigidBody = m_colliders2D[ firstColliderIndex ]->GetRigidBody();
 			Rigidbody2D* secondRigidBody = m_colliders2D[ secondColliderIndex ]->GetRigidBody();
 
+			if (  !firstRigidBody || !secondRigidBody  )
+			{
+				continue;
+			}
+
 			if ( firstRigidBody && secondRigidBody )
 			{
 				//g_theDevConsole->PrintString( RED , "Collider has no rigid body attached." );
@@ -196,8 +196,7 @@ void Physics2D::DetectCollisions()
 				}
 			}
 
-			if ( ( !firstRigidBody || !secondRigidBody ) && 
-				( !firstRigidBody->m_isSimulationActive || !secondRigidBody->m_isSimulationActive ) )
+			if ( !firstRigidBody->m_isSimulationActive || !secondRigidBody->m_isSimulationActive )
 			{
 				continue;
 			}
@@ -223,11 +222,10 @@ void Physics2D::ResolveCollision( Collision2D collision )
 {
 	float myMass = collision.m_me->GetRigidBody()->GetMass();
 	float theirMass = collision.m_them->GetRigidBody()->GetMass();
-	float pushMe = theirMass / ( myMass + theirMass );
-	float pushThem = 1.0f - pushMe;
-
-
-	if ( collision.m_me->GetRigidBody() == nullptr || collision.m_them->GetRigidBody() == nullptr )
+	//float pushMe = theirMass / ( myMass + theirMass );
+	//float pushThem = 1.0f - pushMe;
+	
+	if ( ( collision.m_me->GetRigidBody() == nullptr ) || ( collision.m_them->GetRigidBody() == nullptr ) )
 	{
 		return;
 	}
@@ -241,18 +239,18 @@ void Physics2D::ResolveCollision( Collision2D collision )
 
 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
 	{
-		collision.m_me->GetRigidBody()->Move( pushMe * collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * 0.5f );
-		collision.m_them->GetRigidBody()->Move( -pushThem * collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * 0.5f );
+		collision.m_me->GetRigidBody()->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * 0.5f );
+		collision.m_them->GetRigidBody()->Move( -collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * 0.5f );
 	}
 
 	if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC )
 	{
-		collision.m_me->GetRigidBody()->Move( pushMe * collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap );
+		collision.m_me->GetRigidBody()->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap );
 	}
 
 	if ( collision.CheckCollisionType() == STATIC_VS_KINEMATIC || collision.CheckCollisionType() == STATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC )
 	{
-		collision.m_them->GetRigidBody()->Move( -pushThem * collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap );
+		collision.m_them->GetRigidBody()->Move( -collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap );
 	}
 
 	// 8 ways to apply impulse

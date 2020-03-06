@@ -18,6 +18,7 @@
 
 #include "Engine/Core/StringUtils.hpp"
 #include "Game/Gameobject.hpp"
+#include "Engine/Core/DevConsole.hpp"
 //#include "Engine/Physics/Polygon2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -27,6 +28,7 @@
 extern RenderContext*	g_theRenderer;
 extern AudioSystem*		g_theAudioSystem;
 extern Physics2D*		g_thePhysicsSystem;
+extern DevConsole*		g_theDevConsole;
 extern TheApp*			g_theApp;
 extern BitmapFont*		g_bitmapFont;
 
@@ -42,7 +44,7 @@ Game::Game()
 	m_worldCamera.SetPosition( m_cameraDefaultPosition );
 
 	//m_worldCamera.SetProjectionOrthographic( 800.f );
-	m_worldCamera.SetOrthoView( Vec2::ZERO , Vec2( 1600.f , 800.f ) );
+	m_worldCamera.SetOrthoView( Vec2(-800.f,-400.f) , Vec2( 800.f , 400.f ) );
 
 	m_UICamera.SetOutputSize( m_currentCameraOutputSize );
 	m_UICamera.SetPosition( m_cameraDefaultPosition );
@@ -78,6 +80,10 @@ void Game::InitialGameObjectsSpawner()
 
 void Game::Update( float deltaSeconds )
 {
+	if ( g_theDevConsole->IsOpen() )
+	{
+		return;
+	}
 	m_mousePosition = m_worldCamera.ClientToWorld( m_mousePosition , 0 ).GetXYComponents();
 	m_mousePosition = m_worldCamera.GetWorldNormalizedToClientPosition( m_mousePosition );
 
@@ -86,27 +92,27 @@ void Game::Update( float deltaSeconds )
 	if ( m_frameDelay % 5 == 0 )
 	{
 		Vec3 temp = m_worldCamera.ClientToWorld( g_theInput->GetMouseNormalizedClientPosition() , 0 );
-		m_MouseDragFrames[ m_frameCount ] = Vec2(temp.x,temp.y);
+		m_MouseDragFrames[ m_frameCount ] = Vec2( temp.x , temp.y );
 		m_frameCount++;
 		m_frameCount %= 10;
 		m_frameDelay = 0;
 		m_dragTime += deltaSeconds;
 	}
-	UpdateCamera();
+	//UpdateCamera();
 	UpdateGameObject( deltaSeconds );
 	UpdateGameObjects();
 	UpdateFromUserInput( deltaSeconds );
 	DrawConvexgonMode();
-	
-	if ( !m_selectedGameObject )
-	{
-		Vec2 PickObjectPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
-		m_tooltipObject = PickGameobject( PickObjectPosition );
-	}
-	else
-	{
-		m_tooltipObject = m_selectedGameObject;
-	}
+
+ 	if ( m_selectedGameObject == nullptr )
+ 	{
+ 		Vec2 PickObjectPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+ 		m_tooltipObject = PickGameobject( PickObjectPosition );
+ 	}
+ 	else
+ 	{
+ 		m_tooltipObject = m_selectedGameObject;
+ 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -122,7 +128,7 @@ void Game::Render() const
 
 	for ( unsigned int index = 0; index < ( unsigned int ) m_gameObjects.size(); index++ )
 	{
-		if ( m_gameObjects[index] == nullptr )
+		if ( m_gameObjects[ index ] == nullptr )
 		{
 			continue;
 		}
@@ -131,11 +137,11 @@ void Game::Render() const
 
 		if ( Collider )
 		{
-			Collider->DebugRender( g_theRenderer , m_gameObjects[index]->m_borderColor , m_gameObjects[index]->m_fillColor );
+			Collider->DebugRender( g_theRenderer , m_gameObjects[ index ]->m_borderColor , m_gameObjects[ index ]->m_fillColor );
 		}
 	}
 
-	DrawMouseCurrentPosition( m_worldCamera );
+	//DrawMouseCurrentPosition( m_worldCamera );
 	DrawGameObjectToolTip();
 	RenderDrawFromPointCloudMode();
 	g_theRenderer->SetBlendMode( SOLID );
@@ -150,7 +156,7 @@ void Game::RenderUI() const
 	g_theRenderer->BeginCamera( m_UICamera );
 	g_theRenderer->BindDepthStencil( nullptr );
 	g_theRenderer->SetBlendMode( ALPHA );
-	
+
 	AABB2 uiArea = AABB2( m_UICamera.GetOrthoMin().GetXYComponents() , m_UICamera.GetOrthoMax().GetXYComponents() );
 
 	AABB2 uiArea2 = uiArea.GetBoxAtTop( 0.9f , 0.f ).GetBoxAtLeft( 1.f , 0.f );
@@ -170,11 +176,11 @@ void Game::RenderUI() const
 
 	std::string physicsTimeScale = "Physics Time Scale = ";
 	physicsTimeScale += std::to_string( g_thePhysicsSystem->s_clock->GetScale() );
-	
+
 	std::string physicsClockStatus = "Physics Clock Status : ";
 
 	std::string phyClockStatus = "";
-	
+
 	if ( g_thePhysicsSystem->s_clock->IsPaused() )
 	{
 		phyClockStatus = "PAUSED";
@@ -189,10 +195,10 @@ void Game::RenderUI() const
 	//std::string clockTime = std::to_string( Clock::g_theMasterClock.GetTotalElapsedSeconds() );
 	//physicsClockStatus += clockTime;
 	//std::string timerStartTIme = "TIMER START TIME :" + std::to_string( g_thePhysicsSystem->s_timer->m_startSeconds ) + "  RUNCOUNT = " + std::to_string( g_thePhysicsSystem->s_debugCounter );
-		
-	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea , uiArea.GetDimensions().y  * 0.13f , currGravityX , RED , 0.75f , ALIGN_TOP_RIGHT );
-	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea , uiArea.GetDimensions().y  * 0.13f , currGravityY , RED , 0.75f , ALIGN_CENTERED_RIGHT );
-	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea , uiArea.GetDimensions().y  * 0.13f , "Press + or - key to change Gravity" , RED , 0.75f , ALIGN_BOTTOM_RIGHT );
+
+	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea , uiArea.GetDimensions().y * 0.13f , currGravityX , RED , 0.75f , ALIGN_TOP_RIGHT );
+	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea , uiArea.GetDimensions().y * 0.13f , currGravityY , RED , 0.75f , ALIGN_CENTERED_RIGHT );
+	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea , uiArea.GetDimensions().y * 0.13f , "Press + or - key to change Gravity" , RED , 0.75f , ALIGN_BOTTOM_RIGHT );
 	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea2 , uiArea.GetDimensions().y * 0.13f , physicsTimeStep , CYAN , 0.75f , ALIGN_TOP_LEFT );
 	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea2 , uiArea.GetDimensions().y * 0.13f , physicsTimeScale , CYAN , 0.75f , ALIGN_CENTERED_LEFT );
 	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea2 , uiArea.GetDimensions().y * 0.13f , physicsClockStatus , CYAN , 0.75f , ALIGN_BOTTOM_LEFT );
@@ -222,7 +228,7 @@ void Game::RenderDrawMode() const
 		return;
 	}
 
-	for ( size_t index = 0 ; index < m_drawModePoints.size() ; index++ )
+	for ( size_t index = 0; index < m_drawModePoints.size(); index++ )
 	{
 		g_theRenderer->DrawDisc( Disc2D( m_drawModePoints[ index ] , 2.f ) , CYAN );
 	}
@@ -321,7 +327,7 @@ void Game::PolygonDrawMode()
 		}
 
 		Vec2 point = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
-		
+
 		if ( IsPolygonPotentiallyConvex( point ) )
 		{
 			m_drawModePoints.push_back( point );
@@ -467,12 +473,12 @@ void Game::UpdateGameObject( float deltaSeconds )
 	else
 	{
 		UpdateSimulationType( &m_simMode );
-		Vec2 colliderPos		= m_selectedGameObject->m_rigidbody->GetPosition();
-		Vec2 newWorldPosition	= m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+		Vec2 colliderPos = m_selectedGameObject->m_rigidbody->GetPosition();
+		Vec2 newWorldPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
 
 		if ( !m_isDragOffsetSet )
 		{
-			m_rigidBodyMouseOffset	=  newWorldPosition - colliderPos;
+			m_rigidBodyMouseOffset = newWorldPosition - colliderPos;
 			m_isDragOffsetSet = true;
 			originalPosition = newWorldPosition;
 		}
@@ -550,7 +556,7 @@ void Game::UpdateMass()
 		Rigidbody2D* currentObjectRigidBody = m_selectedGameObject->m_rigidbody;
 		float mass = m_selectedGameObject->m_rigidbody->GetMass();
 		mass -= DELTA_MASS_CHANGE;
-		mass = Clamp( mass,0.001f, INFINITY );
+		mass = Clamp( mass , 0.001f , INFINITY );
 		currentObjectRigidBody->SetMass( mass );
 	}
 
@@ -592,15 +598,15 @@ void Game::UpdateDrag()
 Vec2 Game::GetMouseDragVelocity() const
 {
 	Vec2 temp;
-	
-	 for ( int index = 0; index < 10; index ++ )
-	 {
-		 temp += m_MouseDragFrames[ index ];
-	 }
 
-	 temp /= 10.f;
+	for ( int index = 0; index < 10; index++ )
+	{
+		temp += m_MouseDragFrames[ index ];
+	}
+
+	temp /= 10.f;
 	// return temp;
-	return m_MouseDragFrames[0] - m_MouseDragFrames[ m_frameCount ];
+	return m_MouseDragFrames[ 0 ] - m_MouseDragFrames[ m_frameCount ];
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -733,59 +739,38 @@ void Game::RandomizePointCloud( RandomNumberGenerator rng )
 
 void Game::DrawMouseCurrentPosition( const Camera& camera ) const
 {
-	Camera curCamera = const_cast< Camera& >( camera );
-	
-	Vec2 mouseNormalizedPos = g_theInput->GetMouseNormalizedClientPosition();
-	Vec2 mouseCurrentClientPosition = curCamera.ClientToWorld( g_theInput->GetMouseNormalizedClientPosition() , 0 ).GetXYComponents();
-	g_theRenderer->DrawDisc( Disc2D( mouseCurrentClientPosition , 2.5f ) , RED );
+	UNUSED( camera );
+	//Camera curCamera = const_cast< Camera& >( camera );
+
+	//Vec2 mouseNormalizedPos = g_theInput->GetMouseNormalizedClientPosition();
+	//Vec2 mouseCurrentClientPosition = camera.ClientToWorld( g_theInput->GetMouseNormalizedClientPosition() , 0 ).GetXYComponents();
+	//g_theRenderer->DrawDisc( Disc2D( mouseCurrentClientPosition , 2.5f ) , RED );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 GameObject* Game::PickGameobject( Vec2 mousePos )
 {
-	bool isMouseOverAnygameobject = false;
-	for ( size_t gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
+	for ( int index = ( int ) m_gameObjects.size() - 1; index >= 0; index-- )
 	{
-		if ( !m_gameObjects[gameObjectIndex] )
+		if ( !m_gameObjects[ index ] )
 		{
-			m_isMouseOnGameObject[ gameObjectIndex ] = false;
 			continue;
 		}
-
-		Collider2D* collider = m_gameObjects[ gameObjectIndex ]->m_rigidbody->m_collider;
-
-		if ( collider && collider->Contains( mousePos ) )
+		if ( m_gameObjects[ index ]->m_rigidbody->m_collider->Contains( mousePos ) )
 		{
-			m_isMouseOnGameObject[ gameObjectIndex ] = true;
-			isMouseOverAnygameobject = true;
+			return m_gameObjects[ index ];
 		}
 	}
 
-	if ( !isMouseOverAnygameobject  || m_gameObjects.size() == 0 )
-	{
-		return nullptr;
-	}
-	else
-	{
-		size_t gameObjectIndex = m_isMouseOnGameObject.size();
-
-		for ( --gameObjectIndex; gameObjectIndex >= 0; --gameObjectIndex )
-		{
-			if ( m_isMouseOnGameObject[ gameObjectIndex ] )
-			{
-				return m_gameObjects[ gameObjectIndex ];
-			}
-		}
-		return nullptr;
-	}
+	return nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Game::DrawGameObjectToolTip() const
 {
-	
+
 	Vec2 PickObjectPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
 
 	AABB2 screenSize = AABB2( m_worldCamera.GetOrthoMin().GetXYComponents() , m_worldCamera.GetOrthoMax().GetXYComponents() );
@@ -793,15 +778,15 @@ void Game::DrawGameObjectToolTip() const
 	AABB2 temp = AABB2( PickObjectPosition , Vec2( PickObjectPosition.x + 600.f , PickObjectPosition.y + 25.f ) );
 
 	temp.FitWithinBounds( screenSize );
-	
+
 	Vec2 textOffset = Vec2( 0.f , temp.GetDimensions().y );
-		
-	if ( m_tooltipObject )
+
+	if ( m_tooltipObject != nullptr )
 	{
 		Strings objectInfo = m_tooltipObject->GetGameObjectInfo();
 		std::vector<Vertex_PCU> actorInfoVerts;
 		AABB2 objectDetailsAABB2 = temp;
-		
+
 		for ( int index = 0; index < objectInfo.size(); index++ )
 		{
 			g_bitmapFont->AddVertsForTextInBox2D( actorInfoVerts , objectDetailsAABB2 , 12.f , objectInfo[ index ] , MAGENTA , 1.f , ALIGN_CENTERED_LEFT );
@@ -858,14 +843,14 @@ void Game::SelectGameObjectFormUserInput()
 		{
 			if ( !m_isGameObjectSelected )
 			{
-				
-				Vec3 PickObjectPosition = m_worldCamera.ClientToWorld( g_theInput->GetMouseNormalizedClientPosition(),0 );
+
+				Vec3 PickObjectPosition = m_worldCamera.ClientToWorld( g_theInput->GetMouseNormalizedClientPosition() , 0 );
 				m_selectedGameObject = PickGameobject( PickObjectPosition.GetXYComponents() );
 				if ( m_selectedGameObject )
 				{
 					m_dragTime = 0.f;
 					m_frameCount = 0;
-					m_MouseDragFrames[ m_frameCount ] = m_worldCamera.ClientToWorld( g_theInput->GetMouseNormalizedClientPosition(),0 ).GetXYComponents();
+					m_MouseDragFrames[ m_frameCount ] = m_worldCamera.ClientToWorld( g_theInput->GetMouseNormalizedClientPosition() , 0 ).GetXYComponents();
 					m_selectedGameObject->m_rigidbody->ChangeIsSimulationActive( false );
 					m_selectedGameObject->m_borderColor = Rgba8( 0 , 127 , 0 , 255 );
 					m_selectedGameObject->m_isSelected = true;
@@ -948,40 +933,48 @@ void Game::UpdateCameraFromUserInput( float deltaSeconds )
 
 	if ( g_theInput->GetMouseWheelValue() < 0 )
 	{
-		m_currentCameraOutputSize = m_worldCamera.GetOutputSize() + ( Vec2( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y ) * deltaSeconds );
-		Vec3 orthoMin			  = m_worldCamera.GetOrthoMin();
-		Vec3 orthoMax			  = m_worldCamera.GetOrthoMax();
-		orthoMin -= ( Vec3( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y ,0.f ) * deltaSeconds ) * 0.5f;
-		orthoMax += ( Vec3( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y ,0.f ) * deltaSeconds ) * 0.5f;
-		orthoMin.x = Clamp( orthoMin.x , 200.f , 20000.f );
-		orthoMin.y = Clamp( orthoMin.y , 200.f , 20000.f );
-		orthoMax.x = Clamp( orthoMax.x , 200.f , 20000.f );
-		orthoMax.y = Clamp( orthoMax.y , 200.f , 20000.f );
+// 		m_currentCameraOutputSize = m_worldCamera.GetOutputSize() + ( Vec2( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y ) * deltaSeconds );
+// 		Vec3 orthoMin = m_worldCamera.GetOrthoMin();
+// 		Vec3 orthoMax = m_worldCamera.GetOrthoMax();
+// 		orthoMin -= ( Vec3( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y , 0.f ) * deltaSeconds ) * 0.5f;
+// 		orthoMax += ( Vec3( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y , 0.f ) * deltaSeconds ) * 0.5f;
+// 		orthoMin.x = Clamp( orthoMin.x , 200.f , 20000.f );
+// 		orthoMin.y = Clamp( orthoMin.y , 200.f , 20000.f );
+// 		orthoMax.x = Clamp( orthoMax.x , 200.f , 20000.f );
+// 		orthoMax.y = Clamp( orthoMax.y , 200.f , 20000.f );
+// 
+// 		orthoMin.x = orthoMin.y * CLIENT_ASPECT;
+// 		orthoMax.x = orthoMax.y * CLIENT_ASPECT;
+// 		//m_currentCameraOutputSize.x = Clamp( m_currentCameraOutputSize.x , 200.f , 20000.f );
+// 		//m_currentCameraOutputSize.y = Clamp( m_currentCameraOutputSize.y , 200.f , 20000.f );
+// 		m_worldCamera.SetOrthoView( orthoMin.GetXYComponents() , orthoMax.GetXYComponents() );
 
-		orthoMin.x = orthoMin.y * CLIENT_ASPECT;
-		orthoMax.x = orthoMax.y * CLIENT_ASPECT;
-		//m_currentCameraOutputSize.x = Clamp( m_currentCameraOutputSize.x , 200.f , 20000.f );
-		//m_currentCameraOutputSize.y = Clamp( m_currentCameraOutputSize.y , 200.f , 20000.f );
-		m_worldCamera.SetOrthoView( orthoMin.GetXYComponents() , orthoMax.GetXYComponents() );
+		m_gameCameraCurrentHeight += MAX_CAMERA_ZOOM_VELOCITY_Y * deltaSeconds;
+		m_gameCameraCurrentHeight = Clamp( m_gameCameraCurrentHeight , 200.f , 20000.f );
+		m_worldCamera.SetProjectionOrthographic( m_gameCameraCurrentHeight );
 	}
 
 	if ( g_theInput->GetMouseWheelValue() > 0 )
 	{
-		m_currentCameraOutputSize = m_worldCamera.GetOutputSize() - ( Vec2( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y ) * deltaSeconds );
-		m_currentCameraOutputSize.x = Clamp( m_currentCameraOutputSize.x , 200.f , 20000.f );
-		m_currentCameraOutputSize.y = Clamp( m_currentCameraOutputSize.y , 200.f , 20000.f );
-		Vec3 orthoMin = m_worldCamera.GetOrthoMin();
-		Vec3 orthoMax = m_worldCamera.GetOrthoMax();
-		orthoMin += ( Vec3( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y , 0.f ) * deltaSeconds ) * 0.5f;
-		orthoMax -= ( Vec3( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y , 0.f ) * deltaSeconds ) * 0.5f;
-		orthoMin.x = Clamp( orthoMin.x , 200.f , 20000.f );
-		orthoMin.y = Clamp( orthoMin.y , 200.f , 20000.f );
-		orthoMax.x = Clamp( orthoMax.x , 200.f , 20000.f );
-		orthoMax.y = Clamp( orthoMax.y , 200.f , 20000.f );
+// 		m_currentCameraOutputSize = m_worldCamera.GetOutputSize() - ( Vec2( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y ) * deltaSeconds );
+// 		m_currentCameraOutputSize.x = Clamp( m_currentCameraOutputSize.x , 200.f , 20000.f );
+// 		m_currentCameraOutputSize.y = Clamp( m_currentCameraOutputSize.y , 200.f , 20000.f );
+// 		Vec3 orthoMin = m_worldCamera.GetOrthoMin();
+// 		Vec3 orthoMax = m_worldCamera.GetOrthoMax();
+// 		orthoMin += ( Vec3( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y , 0.f ) * deltaSeconds ) * 0.5f;
+// 		orthoMax -= ( Vec3( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y , 0.f ) * deltaSeconds ) * 0.5f;
+// 		orthoMin.x = Clamp( orthoMin.x , 200.f , 20000.f );
+// 		orthoMin.y = Clamp( orthoMin.y , 200.f , 20000.f );
+// 		orthoMax.x = Clamp( orthoMax.x , 200.f , 20000.f );
+// 		orthoMax.y = Clamp( orthoMax.y , 200.f , 20000.f );
+// 
+// 		orthoMin.x = orthoMin.y * CLIENT_ASPECT;
+// 		orthoMax.x = orthoMax.y * CLIENT_ASPECT;
+// 		m_worldCamera.SetOrthoView( orthoMin.GetXYComponents() , orthoMax.GetXYComponents() );
 
-		orthoMin.x = orthoMin.y * CLIENT_ASPECT;
-		orthoMax.x = orthoMax.y * CLIENT_ASPECT;
-		m_worldCamera.SetOrthoView( orthoMin.GetXYComponents() , orthoMax.GetXYComponents() );
+		m_gameCameraCurrentHeight -= MAX_CAMERA_ZOOM_VELOCITY_Y * deltaSeconds;
+		m_gameCameraCurrentHeight = Clamp( m_gameCameraCurrentHeight , 200.f , 20000.f );
+		m_worldCamera.SetProjectionOrthographic( m_gameCameraCurrentHeight );
 	}
 }
 
@@ -989,11 +982,11 @@ void Game::UpdateCameraFromUserInput( float deltaSeconds )
 
 void Game::UpdateSelectedGameObjectBouncinessFromUserInput( float deltaSeconds )
 {
-	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown(KEY_SHIFT) && g_theInput->GetMouseWheelValue() < 0 )
+	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->GetMouseWheelValue() < 0 )
 	{
 		Collider2D* currentObjectCollider = m_selectedGameObject->m_rigidbody->GetCollider();
 		float bounciness = m_selectedGameObject->m_rigidbody->GetCollider()->GetPhysicsMaterial()->GetBounciness();
-		bounciness  += DELTA_BOUNCINESS_CHANGE * deltaSeconds;
+		bounciness += DELTA_BOUNCINESS_CHANGE * deltaSeconds;
 		bounciness = ClampZeroToOne( bounciness );
 		currentObjectCollider->GetPhysicsMaterial()->SetBounciness( bounciness );
 	}
