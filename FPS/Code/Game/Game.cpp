@@ -110,6 +110,13 @@ void Game::Render() const
 	}
 
 	g_theRenderer->BindTexture( nullptr );
+
+	Transform quadTransform;
+	quadTransform.SetPosition( 0.f , 0.f , -10.f );
+	g_theRenderer->BindShader( nullptr );
+	g_theRenderer->SetModelMatrix( quadTransform.GetAsMatrix() );
+	g_theRenderer->DrawAABB2( AABB2( Vec2( 0.f , 0.f ) , Vec2( 2.f , 2.f ) ) , PINK );
+	
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindShader( nullptr );
