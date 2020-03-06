@@ -56,8 +56,8 @@ public:
 	uint		m_hCuts					= 64;		// slices
 	uint		m_vCuts					= 32;		// stacks
 
-	Camera		m_gameCamera;
-	Camera		m_uiCamera;
+	mutable Camera		m_gameCamera;
+	Camera				m_uiCamera;
 
 	Rgba8		m_color;
 	Vec3		m_cameraPosition = Vec3::ZERO;

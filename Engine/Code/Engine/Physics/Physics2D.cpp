@@ -8,18 +8,21 @@
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Time/Timer.hpp"
 
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-STATIC double Physics2D::m_fixedTimeStep;
+STATIC Clock* Physics2D::s_clock;
+STATIC Timer* Physics2D::s_timer;
+STATIC double Physics2D::s_fixedTimeStep;
 extern DevConsole* g_theDevConsole;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Physics2D::Physics2D()
 {
-	m_clock			= new Clock();
-	m_timer			= new Timer();
-	m_fixedTimeStep = 1.0 / 120.0;
+	s_clock			= new Clock();
+	s_timer			= new Timer();
+	s_fixedTimeStep = 1.0 / 120.0;
 
 	EventArgs physicsStepArgs;
 
@@ -39,7 +42,7 @@ Physics2D::~Physics2D()
 
 void Physics2D::Startup()
 {
-	m_timer->SetSeconds( m_clock , m_fixedTimeStep );
+	s_timer->SetSeconds( s_clock , s_fixedTimeStep );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -52,16 +55,25 @@ void Physics2D::BeginFrame()
 
 void Physics2D::Update()
 {
-	while ( m_timer->CheckAndDecrement() )
+	for(int rigidBodyIndex=0; rigidBodyIndex<m_rigidBodies2D.size(); ++rigidBodyIndex )
 	{
-		AdvanceSimulation( ( float ) m_fixedTimeStep );
+		if(!m_rigidBodies2D[rigidBodyIndex])
+		{
+			continue;
+		}
+		m_rigidBodies2D[ rigidBodyIndex ]->m_framePosition = m_rigidBodies2D[ rigidBodyIndex ]->GetPosition();
+	}
+	
+	while ( s_timer->CheckAndDecrement() )
+	{
+		AdvanceSimulation( ( float ) s_fixedTimeStep );
 		
 		for ( size_t rigidBodyIndex = 0; rigidBodyIndex < m_rigidBodies2D.size(); ++rigidBodyIndex )
 		{
-			m_rigidBodies2D[ rigidBodyIndex ]->Update( ( float ) m_fixedTimeStep );
-		}		
-	}
-
+			m_rigidBodies2D[ rigidBodyIndex ]->Update( ( float ) s_fixedTimeStep );
+		}
+ 	}
+	
 	for ( size_t colliderIndex = 0; colliderIndex < m_colliders2D.size(); ++colliderIndex )
 	{
 		m_colliders2D[ colliderIndex ]->UpdateWorldShape();
@@ -83,6 +95,7 @@ void Physics2D::AdvanceSimulation( float deltaSeconds )
 		currentRigidBodyPos = m_rigidBodies2D[ index ]->GetPosition();
 
 		ApplyEffectors( m_rigidBodies2D[index] , deltaSeconds );
+		m_rigidBodies2D[ index ]->ApplyDrag( deltaSeconds );
 		MoveRigidbodies( m_rigidBodies2D[ index ] , deltaSeconds );
 	}
 
@@ -99,7 +112,7 @@ void Physics2D::AdvanceSimulation( float deltaSeconds )
 
 		Vec2 currentRigidBodyNewPos = m_rigidBodies2D[ index ]->GetPosition();
 		Vec2 rbVerletVelocity = ( currentRigidBodyNewPos - currentRigidBodyPos ) / deltaSeconds;
-		m_rigidBodies2D[ index ]->SetVerletVelocity( rbVerletVelocity );
+		//m_rigidBodies2D[ index ]->SetVerletVelocity( rbVerletVelocity );
 	}
 	
 	CleanupDestroyedObjects();
@@ -112,6 +125,7 @@ void Physics2D::ApplyEffectors( Rigidbody2D* rigidbody , float deltaSeconds )
 
 		eSimulationMode simulationMode = rigidbody->GetSimulationMode();
 		Vec2 currentVelocity = rigidbody->GetVelocity();
+		float currentRBMass  = rigidbody->GetMass();
 
 		switch ( simulationMode )
 		{
@@ -121,7 +135,7 @@ void Physics2D::ApplyEffectors( Rigidbody2D* rigidbody , float deltaSeconds )
 			case SIMULATIONMODE_KINEMATIC:	/*m_rigidBodied2D[ index ]->SetVeloity( currentVelocity );*/
 											break;
 
-			case SIMULATIONMODE_DYNAMIC:	rigidbody->SetVelocity( currentVelocity + ( m_sceneGravity * deltaSeconds ) );
+			case SIMULATIONMODE_DYNAMIC:	rigidbody->SetVelocity( currentVelocity + ( currentRBMass *  m_sceneGravity * deltaSeconds ) );
 											break;
 
 			default:
@@ -182,7 +196,8 @@ void Physics2D::DetectCollisions()
 				}
 			}
 
-			if ( !firstRigidBody->m_isSimulationActive || !secondRigidBody->m_isSimulationActive )
+			if ( ( !firstRigidBody || !secondRigidBody ) && 
+				( !firstRigidBody->m_isSimulationActive || !secondRigidBody->m_isSimulationActive ) )
 			{
 				continue;
 			}
@@ -255,10 +270,6 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	{
 		frictionNormal = SignFloat( frictionNormal ) * impulse * friction;
 	}
-	else
-	{
-		frictionNormal *= friction;
-	}
 	
 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC   || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
 		 collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
@@ -287,8 +298,6 @@ void Physics2D::ResolveCollision( Collision2D collision )
 		collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
 		collision.m_me->GetRigidBody()->ApplyFriction( frictionNormal * collision.m_collisionManifold.m_normal.GetRotated90Degrees() );
 	}
-
-	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -312,6 +321,17 @@ void Physics2D::CleanupDestroyedObjects()
 
 void Physics2D::EndFrame()
 {
+	for(int rigidBodyIndex=0; rigidBodyIndex<m_rigidBodies2D.size(); rigidBodyIndex++ )
+	{
+		if ( !m_rigidBodies2D[ rigidBodyIndex ] )
+		{
+			continue;
+		}
+
+		Vec2 verletVelocity = ( -m_rigidBodies2D[ rigidBodyIndex ]->m_framePosition + m_rigidBodies2D[ rigidBodyIndex ]->GetPosition() ) / ( float ) s_fixedTimeStep;
+		m_rigidBodies2D[ rigidBodyIndex ]->SetVerletVelocity( verletVelocity );
+	}
+	
 	for ( size_t rigidBodyIndex = 0; rigidBodyIndex < m_rigidBodies2D.size(); rigidBodyIndex++ )
 	{
 		if ( !m_rigidBodies2D[ rigidBodyIndex ] )
@@ -341,8 +361,8 @@ void Physics2D::EndFrame()
 
 void Physics2D::Shutdown()
 {
-	delete m_timer;
-	delete m_clock;
+	delete s_timer;
+	delete s_clock;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -502,7 +522,8 @@ void Physics2D::ScreenWrapAround( Camera* sceneCamera , Rigidbody2D* rigidBody )
 
 void Physics2D::SetFixedStepTime( double newTimeStep )
 {
-	m_fixedTimeStep = newTimeStep;
+	s_fixedTimeStep = newTimeStep;
+	s_timer->SetSeconds( s_clock , s_fixedTimeStep );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -510,7 +531,7 @@ void Physics2D::SetFixedStepTime( double newTimeStep )
 STATIC bool Physics2D::SetPhysicsUpdateStep( EventArgs& args )
 {
 	//g_theDevConsole
-	double dt = ( double ) args.GetValue( "StepFrequency" , ( float ) m_fixedTimeStep );
+	double dt = ( double ) args.GetValue( "StepFrequency" , ( float ) s_fixedTimeStep );
 	SetFixedStepTime( ( double ) 1.0/dt );
 	return false;
 }

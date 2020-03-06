@@ -81,7 +81,7 @@ int Timer::CheckAndDecrementAll()
 	{
 		return 0;
 	}
-	int numIntervals = ( currentTime - m_startSeconds ) / m_durationSeconds;
+	int numIntervals = ( int ) ( ( currentTime - m_startSeconds ) / m_durationSeconds );
 	m_startSeconds += numIntervals * m_durationSeconds;
 	return numIntervals;
 }

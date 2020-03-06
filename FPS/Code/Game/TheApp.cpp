@@ -163,10 +163,10 @@ void TheApp::EndFrame()
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
 
-// 	if ( g_theRenderer->HasAnyShaderChangedAtPath( L"\\Data\\Shaders\\" ) )
-// 	{
-// 		g_theRenderer->ReCompileAllShaders();
-// 	}
+	if ( g_theRenderer->HasAnyShaderChangedAtPath( L"\\Data\\Shaders\\" , 3.f ) )
+	{
+		g_theRenderer->ReCompileAllShaders();
+	}
 }
 
 

@@ -66,9 +66,9 @@ public:
 	std::vector<Collision2D>	m_frameCollisions;
 	Camera*						m_sceneCamera			= nullptr;
 
-	Clock*						m_clock					= nullptr;
-	Timer*						m_timer					= nullptr;
-	static double				m_fixedTimeStep;
+	static Clock*				s_clock;
+	static Timer*				s_timer;
+	static double				s_fixedTimeStep;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

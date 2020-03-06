@@ -151,11 +151,11 @@ void TheApp::BeginFrame()
 	g_theDevConsole->BeginFrame();
 	if ( m_isPaused )
 	{
-		g_thePhysicsSystem->m_clock->Pause();
+		g_thePhysicsSystem->s_clock->Pause();
 	}
 	else
 	{
-		g_thePhysicsSystem->m_clock->Resume();
+		g_thePhysicsSystem->s_clock->Resume();
 	}
 	g_thePhysicsSystem->BeginFrame();
 	g_theAudioSystem->BeginFrame();
@@ -232,7 +232,7 @@ void TheApp::Shutdown()
 
 void TheApp::UpdateFromKeyboard()
 {
-	if ( g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() ) { g_theWindow->HandleQuitRequested(); }
+	if ( g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() && !g_theGame->m_isDrawModeActive ) { g_theWindow->HandleQuitRequested(); }
 
 	if ( g_theInput->WasKeyJustPressed( KEY_TILDE ) )
 	{
@@ -263,21 +263,21 @@ void TheApp::UpdateFromKeyboard()
 
 	if ( g_theInput->WasKeyJustPressed('8') )
 	{
-		double currentTimeScale = g_thePhysicsSystem->m_clock->GetScale();
-		g_thePhysicsSystem->m_clock->SetScale( currentTimeScale * 0.5 );
+		double currentTimeScale = g_thePhysicsSystem->s_clock->GetScale();
+		g_thePhysicsSystem->s_clock->SetScale( currentTimeScale * 0.5 );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( '9' ) )
 	{
-		double currentTimeScale = g_thePhysicsSystem->m_clock->GetScale();
-		g_thePhysicsSystem->m_clock->SetScale( currentTimeScale * 2.0 );
+		double currentTimeScale = g_thePhysicsSystem->s_clock->GetScale();
+		g_thePhysicsSystem->s_clock->SetScale( currentTimeScale * 2.0 );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( '0' ) )
 	{
-		g_thePhysicsSystem->m_clock->SetScale( 1.0 );
-		g_thePhysicsSystem->m_clock->Reset();
-		g_thePhysicsSystem->m_timer->Reset();
+		g_thePhysicsSystem->s_clock->SetScale( 1.0 );
+		g_thePhysicsSystem->s_clock->Reset();
+		g_thePhysicsSystem->s_timer->Reset();
 	}
 	
 	if ( g_theInput->GetButtonState( KEY_F8 ).WasJustPressed() )

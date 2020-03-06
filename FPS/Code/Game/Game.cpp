@@ -87,6 +87,8 @@ void Game::Update( float deltaSeconds )
 void Game::Render() const
 {
 	g_theRenderer->BeginCamera( m_gameCamera );
+	m_gameCamera.CreateMatchingDepthStencilTarget(); 
+	g_theRenderer->BindDepthStencil( m_gameCamera.GetDepthStencilTarget() );
 	g_theRenderer->SetModelMatrix( m_cubeTransform.GetAsMatrix() );
 
 	g_theRenderer->BindShader( nullptr );

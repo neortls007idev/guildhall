@@ -258,7 +258,7 @@ void AABB2::FitWithinBounds( const AABB2& bounds )
 	}
 	if ( m_maxs.y > bounds.m_maxs.y )
 	{
-		Translate( Vec2( 0.f , bounds.m_mins.y - m_mins.y ) );
+		Translate( Vec2( 0.f , bounds.m_maxs.y - m_maxs.y ) );
 	}
 
 }

@@ -137,7 +137,7 @@ public:
 	bool		BindShader( Shader* shader );
 	void		BindShader( std::string shaderFileName );
 	void		ReCompileAllShaders();
-	bool		HasAnyShaderChangedAtPath( const wchar_t* relativePath );
+	bool		HasAnyShaderChangedAtPath( const wchar_t* relativePath , float waitInMilliseconds );
 	
 	void		BindVertexBuffer( VertexBuffer* vbo );
 	void		BindIndexBuffer( IndexBuffer* ibo );

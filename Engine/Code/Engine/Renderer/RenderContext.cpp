@@ -277,6 +277,8 @@ void RenderContext::ClearDepth( Texture* depthStencilTexture , float depth )
 void RenderContext::SetDepthTest( eCompareOp compare , bool writeOnPass )
 {
 
+	ASSERT_OR_DIE( m_currentCamera != nullptr , "Must Be Used after begin Camera" );
+	
 	UNUSED( compare );
 	UNUSED( writeOnPass );
 
@@ -289,6 +291,13 @@ void RenderContext::SetDepthTest( eCompareOp compare , bool writeOnPass )
 	
 	D3D11_DEPTH_STENCIL_DESC dsDesc;
 
+	/*
+	  memset(&dsDesc , sizeof(dsDesc) , 0 );							// set everything to 0; 
+
+		dsDesc.DepthEnable = TRUE;
+		dsDESC.
+
+	*/
 	// Depth test parameters
 	dsDesc.DepthEnable = true;
 	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
@@ -346,17 +355,10 @@ void RenderContext::BeginCamera( const Camera& camera )
 	if ( m_textureTarget  == nullptr )
 	{
 		m_textureTarget = m_swapChain->GetBackBuffer();
+		m_currentCamera->SetColorTarget( m_textureTarget );
 	}
 
 	Vec2 backBufferDimensions = Vec2( m_textureTarget->GetDimensions() );
-
-	if ( !m_currentCamera->GetDepthStencilTarget() )
-	{
-		Texture* depthStencilTexture = new Texture( this , m_textureTarget->GetDimensions() );
-		depthStencilTexture->GetOrCreateDepthStencilView( backBufferDimensions );
-		m_currentCamera->SetDepthStencilTarget( depthStencilTexture );
-	}
-	
 
 	IntVec2 output = m_textureTarget->GetDimensions();
 
@@ -370,9 +372,9 @@ void RenderContext::BeginCamera( const Camera& camera )
 
 	m_context->RSSetViewports( 1 , &viewport );
 
-	ID3D11RenderTargetView* rtv = m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
+	//ID3D11RenderTargetView* rtv = m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
 	//BindDepthStencil( m_textureTarget );
-	m_context->OMSetRenderTargets( 1 , &rtv , nullptr );
+	//m_context->OMSetRenderTargets( 1 , &rtv , nullptr );
 
 // 	DepthStencilTargetView* dsv = new DepthStencilTargetView( this );
 // 	dsv->CreateDepthStencilState();
@@ -390,8 +392,8 @@ void RenderContext::BeginCamera( const Camera& camera )
 	BindTexture( m_textureDefault );
 	BindSampler( m_defaultSampler );
 	SetBlendMode( BlendMode::SOLID );
-	SetDepthTest( COMPARE_ALWAYS , true );
-	BindDepthStencil( m_currentCamera->GetDepthStencilTarget() );
+	//SetDepthTest( COMPARE_ALWAYS , true );
+	//BindDepthStencil( m_currentCamera->GetDepthStencilTarget() );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1097,7 +1099,7 @@ void RenderContext::BindShader( std::string shaderFileName )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-bool RenderContext::HasAnyShaderChangedAtPath( const wchar_t* relativePath )
+bool RenderContext::HasAnyShaderChangedAtPath( const wchar_t* relativePath , float waitInMilliseconds )
 {
 	TCHAR path[ MAX_PATH + 1 ] = L"";
 
@@ -1114,7 +1116,7 @@ bool RenderContext::HasAnyShaderChangedAtPath( const wchar_t* relativePath )
 		return false;
 	}
 
-	DWORD waitResult = WaitForMultipleObjects( 1 , ptrResult , FALSE , 5 );
+	DWORD waitResult = WaitForMultipleObjects( 1 , ptrResult , FALSE , ( DWORD ) waitInMilliseconds );
 
 // 	if ( FindNextChangeNotification( result ) )
 // 	{
@@ -1162,7 +1164,7 @@ void RenderContext::BindIndexBuffer( IndexBuffer* ibo )
 	if ( m_lastBoundIBO != iboHandle )
 	{
 		m_context->IASetIndexBuffer( iboHandle , DXGI_FORMAT_R32_UINT , offset );
-		//m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+		//m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_LINELIST );
 		m_lastBoundIBO = iboHandle;
 	}
 	else

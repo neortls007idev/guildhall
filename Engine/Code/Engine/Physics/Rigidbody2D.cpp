@@ -87,6 +87,14 @@ void Rigidbody2D::ApplyFriction( Vec2 friction , Vec2 point /*= Vec2::ZERO */ )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Rigidbody2D::ApplyDrag( float deltaSeconds )
+{
+	Vec2 dragDirection = 1.f / m_mass * GetVerletVelocity().GetNormalized().GetRotated90Degrees().GetRotated90Degrees();
+	m_velocity += m_drag * dragDirection * deltaSeconds;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Rigidbody2D::SetCollider( Collider2D* collider )
 {
 	m_collider = collider;

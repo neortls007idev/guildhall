@@ -26,6 +26,7 @@ public:
 	void Render() const;
 	void RenderUI() const;
 	void RenderGravityUI() const;
+	void PhysicsGravityUI() const;
 	void RenderDrawMode() const;
 	void RenderDrawFromPointCloudMode() const;
 	void DebugRender() const;
@@ -82,7 +83,7 @@ private:
 public:
 
 	static RandomNumberGenerator	m_rng;
-		   Camera					m_worldCamera;
+	mutable  Camera					m_worldCamera;
 		   Camera					m_UICamera;
 
 		   Rgba8					m_fillColor					= Rgba8( 255 , 255 , 255 , 0 );

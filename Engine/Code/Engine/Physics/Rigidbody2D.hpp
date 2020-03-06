@@ -45,6 +45,7 @@ public:
 	void			SetVerletVelocity( Vec2 updatedVerletVelocity );
 	void			ApplyImpulse( Vec2 impulse , Vec2 point = Vec2::ZERO );
 	void			ApplyFriction( Vec2 friction , Vec2 point = Vec2::ZERO );
+	void			ApplyDrag( float deltaSeconds );
 	void			SetCollider( Collider2D* collider );
 	void			SetPosition( Vec2 position );
 	void			SetVelocity( Vec2 velocity );
@@ -62,6 +63,7 @@ public:
 	Vec2				m_worldPosition;															// where in the world is this rigidbody
 	Vec2				m_velocity				= Vec2::ZERO;
 	Vec2				m_verletVelocity		= Vec2::ZERO;
+	Vec2				m_framePosition			= Vec2::ZERO;
 	float				m_mass					= 1.0f;
 	eSimulationMode		m_simulationMode		= SIMULATIONMODE_DYNAMIC;
 	bool				m_isSimulationActive	= true;

@@ -4,6 +4,8 @@
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Math/Vec4.hpp"
 #include "Engine/Renderer/Camera.hpp"
+
+#include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Renderer/RenderBuffer.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SwapChain.hpp"
@@ -63,7 +65,7 @@ Vec2 Camera::GetClientToWorldPosition( Vec2 clientPos ) const
 	return worldPos;
 }
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
+// //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Vec2 Camera::GetWorldNormalizedToClientPosition( Vec2 worldPos ) const
 {
@@ -206,7 +208,9 @@ void Camera::CreateMatchingDepthStencilTarget()
 {
 	if ( !m_depthStencilTarget )
 	{
-		m_depthStencilTarget->GetOrCreateDepthStencilView();
+		Texture* depthStencilTexture = new Texture( g_theRenderer , m_colorTarget->GetDimensions() );
+		depthStencilTexture->GetOrCreateDepthStencilView( Vec2( m_colorTarget->GetDimensions() ) );
+		SetDepthStencilTarget( depthStencilTexture );
 	}
 }
 
@@ -264,6 +268,9 @@ Mat44 Camera::GetViewMatrix()
 {
 	Mat44 cameraModel = m_transform.GetAsMatrix();
 
+	//bool check = IsMatrixOrtonormal( cameraModel );
+	//ASSERT_RECOVERABLE( check , " Are you sure the CAmera MOdel Matrix is coorect? " );
+	
 	m_view = MatrixInvertOrthoNormal( cameraModel );
 	return m_view;
 }
@@ -272,31 +279,48 @@ Mat44 Camera::GetViewMatrix()
 
 Vec3 Camera::ClientToWorld( Vec2 client , float ndcZ )
 {
-	// map client to ndc
-	// TODO :- FIX ME  read more here https://github.com/tocchan/guildhall/blob/master/sd2/c29/assignments/a04_perspective/clientToWorld.cpp also check GEtOrthoMin and Get orthoMax when implementing
-	UNUSED( ndcZ );
+//	// map client to ndc
+//	// TODO :- FIX ME  read more here https://github.com/tocchan/guildhall/blob/master/sd2/c29/assignments/a04_perspective/clientToWorld.cpp also check GEtOrthoMin and Get orthoMax when implementing
+//	UNUSED( ndcZ );
+//	Vec3 ndc;
+//	
+////		= RangeMapFloat()
+//// 		RangeMap( Vec3( client , ndcZ ) ,
+//// 		Vec3( 0 , 0 , 0 ) , Vec3( 1 , 1 , 1 ) ,
+//// 		Vec3( -1 , -1 , 0 ) , Vec3( 1 , 1 , 1 ) );
+//
+//	// get this to world
+//	// view        : world -> camera
+//	// projection  : camera -> clip  (homogeneous ndc)
+//	// clip -> world
+//
+//	Mat44 proj = GetProjectionMatrix();
+//	Mat44 worldToClip = proj;
+//	worldToClip.TransformBy( GetViewMatrix() );
+//
+//	Mat44 clipToWorld = worldToClip.GetInverse();
+//	Vec4 worldHomogeneous = clipToWorld.TransformHomogeneousPoint3D( Vec4( ndc , 1 ) );
+//	Vec3 worldPos = worldHomogeneous.GetXYZ() / worldHomogeneous.w;
+//	__debugbreak();
+//	
+//	// TODO :- FIX ME
+//	return worldPos;
+//
+
 	Vec3 ndc;
-	
-//		= RangeMapFloat()
-// 		RangeMap( Vec3( client , ndcZ ) ,
-// 		Vec3( 0 , 0 , 0 ) , Vec3( 1 , 1 , 1 ) ,
-// 		Vec3( -1 , -1 , 0 ) , Vec3( 1 , 1 , 1 ) );
-
-	// get this to world
-	// view        : world -> camera
-	// projection  : camera -> clip  (homogeneous ndc)
-	// clip -> world
-
-	Mat44 proj = GetProjectionMatrix();
-	Mat44 worldToClip = proj;
+	ndc.x = RangeMapFloat( 0.f , 1.f , -1.f , 1.f , client.x );
+	ndc.y = RangeMapFloat( 0.f , 1.f , -1.f , 1.f , client.y );
+	ndc.z = RangeMapFloat( 0.f , 1.f , 0.f , 1.f , ndcZ );
+	Mat44 projection = m_projection;
+	Mat44 worldToClip = projection;
 	worldToClip.TransformBy( GetViewMatrix() );
-
-	Mat44 clipToWorld = worldToClip.GetInverse();
-	Vec4 worldHomogeneous = clipToWorld.TransformHomogeneousPoint3D( Vec4( ndc , 1 ) );
-	Vec3 worldPos = worldHomogeneous.GetXYZ() / worldHomogeneous.w;
-	__debugbreak();
-	
-	// TODO :- FIX ME
+	MatrixInvert( worldToClip );
+	Mat44 clipToWorld = worldToClip;
+	Vec4 worldHomogeneousPt = clipToWorld.TransformHomogeneousPoint3D( Vec4( ndc.x , ndc.y , ndc.z , 1 ) );
+	Vec3 worldPos;
+	worldPos.x = worldHomogeneousPt.x / worldHomogeneousPt.w;
+	worldPos.y = worldHomogeneousPt.y / worldHomogeneousPt.w;
+	worldPos.z = worldHomogeneousPt.z / worldHomogeneousPt.w;
 	return worldPos;
 }
 

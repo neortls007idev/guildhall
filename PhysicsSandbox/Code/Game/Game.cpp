@@ -10,6 +10,8 @@
 #include "Engine/Physics/Collider2D.hpp"
 #include "Engine/Physics/Rigidbody2D.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
+#include "Engine/Time/Clock.hpp"
+#include "Engine/Time/Timer.hpp"
 
 #include "Game/TheApp.hpp"
 #include "Game/Game.hpp"
@@ -48,7 +50,7 @@ Game::Game()
 	g_thePhysicsSystem->m_sceneCamera = &m_worldCamera;
 
 	m_mousePosition = g_theInput->GetMouseNormalizedClientPosition();
-	m_mousePosition = m_worldCamera.GetClientToWorldPosition( m_mousePosition );
+	m_mousePosition = m_worldCamera.ClientToWorld( g_theInput->GetMouseNormalizedClientPosition() , 0 ).GetXYComponents();
 
 	RandomizePointCloud( m_rng );
 
@@ -76,14 +78,15 @@ void Game::InitialGameObjectsSpawner()
 
 void Game::Update( float deltaSeconds )
 {
-	m_mousePosition = m_worldCamera.GetClientToWorldPosition( m_mousePosition );
+	m_mousePosition = m_worldCamera.ClientToWorld( m_mousePosition , 0 ).GetXYComponents();
 	m_mousePosition = m_worldCamera.GetWorldNormalizedToClientPosition( m_mousePosition );
 
 	m_frameDelay++;
 
 	if ( m_frameDelay % 5 == 0 )
 	{
-		m_MouseDragFrames[ m_frameCount ] = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+		Vec3 temp = m_worldCamera.ClientToWorld( g_theInput->GetMouseNormalizedClientPosition() , 0 );
+		m_MouseDragFrames[ m_frameCount ] = Vec2(temp.x,temp.y);
 		m_frameCount++;
 		m_frameCount %= 10;
 		m_frameDelay = 0;
@@ -94,8 +97,7 @@ void Game::Update( float deltaSeconds )
 	UpdateGameObjects();
 	UpdateFromUserInput( deltaSeconds );
 	DrawConvexgonMode();
-	g_thePhysicsSystem->Update();
-
+	
 	if ( !m_selectedGameObject )
 	{
 		Vec2 PickObjectPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
@@ -148,17 +150,10 @@ void Game::RenderUI() const
 	g_theRenderer->BeginCamera( m_UICamera );
 	g_theRenderer->BindDepthStencil( nullptr );
 	g_theRenderer->SetBlendMode( ALPHA );
-	RenderGravityUI();
-	g_theRenderer->SetBlendMode( SOLID );
-	g_theRenderer->EndCamera( m_UICamera );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Game::RenderGravityUI() const
-{
+	
 	AABB2 uiArea = AABB2( m_UICamera.GetOrthoMin().GetXYComponents() , m_UICamera.GetOrthoMax().GetXYComponents() );
 
+	AABB2 uiArea2 = uiArea.GetBoxAtTop( 0.9f , 0.f ).GetBoxAtLeft( 1.f , 0.f );
 	uiArea = uiArea.GetBoxAtTop( 0.9f , 0.f ).GetBoxAtRight( 0.5f , 0.f );
 	/*uiArea.CarveBoxOffRight( 0.5f , 0.f );*/
 
@@ -170,13 +165,52 @@ void Game::RenderGravityUI() const
 	std::string currGravityY = "Current Gravity Along Y= ";
 	currGravityY += std::to_string( g_thePhysicsSystem->GetSceneGravity().y );
 
-	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea , uiArea.GetDimensions().y * 0.2f , currGravityX , RED , 1.f , ALIGN_TOP_RIGHT );
-	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea , uiArea.GetDimensions().y * 0.2f , currGravityY , RED, 1.f , ALIGN_CENTERED_RIGHT  );
-	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea , uiArea.GetDimensions().y * 0.2f , "Press + or - key to change Gravity" , RED , 1.f , ALIGN_BOTTOM_RIGHT );
+	std::string physicsTimeStep = "Physics Time Step (HZ) = ";
+	physicsTimeStep += std::to_string( 1.f / ( float ) g_thePhysicsSystem->s_fixedTimeStep );
+
+	std::string physicsTimeScale = "Physics Time Scale = ";
+	physicsTimeScale += std::to_string( g_thePhysicsSystem->s_clock->GetScale() );
+	
+	std::string physicsClockStatus = "Physics Clock Status : ";
+
+	std::string phyClockStatus = "";
+	
+	if ( g_thePhysicsSystem->s_clock->IsPaused() )
+	{
+		phyClockStatus = "PAUSED";
+	}
+	else
+	{
+		phyClockStatus = "IS RUNNING";
+	}
+
+	physicsClockStatus += phyClockStatus;
+
+	//std::string clockTime = std::to_string( Clock::g_theMasterClock.GetTotalElapsedSeconds() );
+	//physicsClockStatus += clockTime;
+	//std::string timerStartTIme = "TIMER START TIME :" + std::to_string( g_thePhysicsSystem->s_timer->m_startSeconds ) + "  RUNCOUNT = " + std::to_string( g_thePhysicsSystem->s_debugCounter );
+		
+	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea , uiArea.GetDimensions().y  * 0.13f , currGravityX , RED , 0.75f , ALIGN_TOP_RIGHT );
+	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea , uiArea.GetDimensions().y  * 0.13f , currGravityY , RED , 0.75f , ALIGN_CENTERED_RIGHT );
+	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea , uiArea.GetDimensions().y  * 0.13f , "Press + or - key to change Gravity" , RED , 0.75f , ALIGN_BOTTOM_RIGHT );
+	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea2 , uiArea.GetDimensions().y * 0.13f , physicsTimeStep , CYAN , 0.75f , ALIGN_TOP_LEFT );
+	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea2 , uiArea.GetDimensions().y * 0.13f , physicsTimeScale , CYAN , 0.75f , ALIGN_CENTERED_LEFT );
+	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea2 , uiArea.GetDimensions().y * 0.13f , physicsClockStatus , CYAN , 0.75f , ALIGN_BOTTOM_LEFT );
+	//g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea2 , uiArea.GetDimensions().y * 0.13f , timerStartTIme , YELLOW , 0.75f , ALIGN_CENTERED_LEFT );
 
 	g_theRenderer->BindTexture( g_bitmapFont->GetTexture() );
 	g_theRenderer->DrawVertexArray( uiVerts );
+
 	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->SetBlendMode( SOLID );
+	g_theRenderer->EndCamera( m_UICamera );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::RenderGravityUI() const
+{
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -546,8 +580,8 @@ void Game::UpdateDrag()
 	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( KEY_FORWARDSLASH ) )
 	{
 		Rigidbody2D* currentObjectRigidBody = m_selectedGameObject->m_rigidbody;
-		float drag = m_selectedGameObject->m_rigidbody->GetMass();
-		drag += DELTA_MASS_CHANGE;
+		float drag = m_selectedGameObject->m_rigidbody->GetDrag();
+		drag += DELTA_DRAG_CHANGE;
 		drag = Clamp( drag , 0.0f , INFINITY );
 		currentObjectRigidBody->SetDrag( drag );
 	}
@@ -565,8 +599,8 @@ Vec2 Game::GetMouseDragVelocity() const
 	 }
 
 	 temp /= 10.f;
-	 return temp;
-	//return m_MouseDragFrames[0] - m_MouseDragFrames[ m_frameCount ];
+	// return temp;
+	return m_MouseDragFrames[0] - m_MouseDragFrames[ m_frameCount ];
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -699,8 +733,10 @@ void Game::RandomizePointCloud( RandomNumberGenerator rng )
 
 void Game::DrawMouseCurrentPosition( const Camera& camera ) const
 {
+	Camera curCamera = const_cast< Camera& >( camera );
+	
 	Vec2 mouseNormalizedPos = g_theInput->GetMouseNormalizedClientPosition();
-	Vec2 mouseCurrentClientPosition = camera.GetClientToWorldPosition( mouseNormalizedPos );
+	Vec2 mouseCurrentClientPosition = curCamera.ClientToWorld( g_theInput->GetMouseNormalizedClientPosition() , 0 ).GetXYComponents();
 	g_theRenderer->DrawDisc( Disc2D( mouseCurrentClientPosition , 2.5f ) , RED );
 }
 
@@ -752,8 +788,11 @@ void Game::DrawGameObjectToolTip() const
 	
 	Vec2 PickObjectPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
 
+	AABB2 screenSize = AABB2( m_worldCamera.GetOrthoMin().GetXYComponents() , m_worldCamera.GetOrthoMax().GetXYComponents() );
 
 	AABB2 temp = AABB2( PickObjectPosition , Vec2( PickObjectPosition.x + 600.f , PickObjectPosition.y + 25.f ) );
+
+	temp.FitWithinBounds( screenSize );
 	
 	Vec2 textOffset = Vec2( 0.f , temp.GetDimensions().y );
 		
@@ -809,7 +848,7 @@ void Game::SelectGameObjectFormUserInput()
 		if ( g_theInput->WasRightMouseButtonJustPressed() && !m_selectedGameObject )
 		{
 			m_currentColliderRadius = m_rng.RollRandomFloatInRange( m_minColliderRadius , m_maxColliderRadius );
-			Vec2 spawnPos = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+			Vec2 spawnPos = m_worldCamera.ClientToWorld( g_theInput->GetMouseNormalizedClientPosition() , 0 ).GetXYComponents();
 			GameObject* temp = new GameObject( g_thePhysicsSystem , spawnPos , Vec2::ZERO , m_currentColliderRadius );
 			m_gameObjects.push_back( temp );
 			m_isMouseOnGameObject.push_back( false );
@@ -819,13 +858,14 @@ void Game::SelectGameObjectFormUserInput()
 		{
 			if ( !m_isGameObjectSelected )
 			{
-				Vec2 PickObjectPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
-				m_selectedGameObject = PickGameobject( PickObjectPosition );
+				
+				Vec3 PickObjectPosition = m_worldCamera.ClientToWorld( g_theInput->GetMouseNormalizedClientPosition(),0 );
+				m_selectedGameObject = PickGameobject( PickObjectPosition.GetXYComponents() );
 				if ( m_selectedGameObject )
 				{
 					m_dragTime = 0.f;
 					m_frameCount = 0;
-					m_MouseDragFrames[ m_frameCount ] = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+					m_MouseDragFrames[ m_frameCount ] = m_worldCamera.ClientToWorld( g_theInput->GetMouseNormalizedClientPosition(),0 ).GetXYComponents();
 					m_selectedGameObject->m_rigidbody->ChangeIsSimulationActive( false );
 					m_selectedGameObject->m_borderColor = Rgba8( 0 , 127 , 0 , 255 );
 					m_selectedGameObject->m_isSelected = true;
@@ -836,7 +876,7 @@ void Game::SelectGameObjectFormUserInput()
 			{
 				if ( m_selectedGameObject != nullptr )
 				{
-					Vec2 newVelocity = GetMouseDragVelocity().GetNormalized() / ( m_dragTime );
+					Vec2 newVelocity = GetMouseDragVelocity().GetNormalized() / ( m_dragTime ) * 10.f;
 					//newVelocity = g_theInput->GetMouseDragVelocity();
 					m_selectedGameObject->m_rigidbody->SetVelocity( newVelocity );
 					m_selectedGameObject->m_rigidbody->ChangeIsSimulationActive( true );
