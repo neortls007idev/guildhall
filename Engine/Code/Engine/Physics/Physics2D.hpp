@@ -34,11 +34,12 @@ public:
 	void ResetCollisions();
 	void DetectCollisions();
 
+	void ResolveCollisions();
 	void ResolveCollision( Collision2D collision );
 
-	void ResolveCollisions();
 	void CleanupDestroyedObjects();
-
+	void CleanupDestroyedColliders();
+	void CleanupDestroyedRigidBodies();
 
 	// factory style create/destroy
 	Rigidbody2D* CreateRigidbody( Vec2 rigidBodyPosition , Vec2 coliderPositionRelativeToRigidBody , float ColliderRadius );
@@ -49,7 +50,7 @@ public:
 	void DestroyCollider( Collider2D* collider );
 
 	void ChangeSceneGravity( Vec2 newGravity );
-	Vec2 GetSceneGravity() const																							{ return m_sceneGravity; }
+	Vec2 GetSceneGravity() const																					{ return m_sceneGravity; }
 	void GravityBounce( Camera* sceneCamera, Rigidbody2D* rigidBody );
 	void ScreenWrapAround( Camera* sceneCamera , Rigidbody2D* rigidBody );
 

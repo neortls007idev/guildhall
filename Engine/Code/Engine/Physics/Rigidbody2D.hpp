@@ -1,4 +1,6 @@
 #pragma once
+#include "Engine/Math/MathConstants.hpp"
+#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Physics/Physics2D.hpp"
 #include "Engine/Math/Vec2.hpp"
 
@@ -40,6 +42,14 @@ public:
 	eSimulationMode GetSimulationMode() const						{ return m_simulationMode; }
 	float			GetMass() const									{ return m_mass; }
 	float			GetDrag() const									{ return m_drag; }
+
+	float			GetRotationInRadians() const					{ return m_rotationInRadians; }
+	float			GetRotationInDegrees() const					{ return ConvertRadiansToDegrees(m_rotationInRadians); }
+	float			GetAngularVelocityInRadians() const				{ return m_angularVelocity; }
+	float			GetAngularVelocityInDegrees() const				{ return ConvertRadiansToDegrees( m_angularVelocity ); }
+	float			GetframeTorque() const							{ return m_frameTorque; }
+	float			GetMoment() const								{ return m_moment; }
+	
 	bool			IsSimulationActive() const						{ return m_isSimulationActive; }
 
 	void			SetVerletVelocity( Vec2 updatedVerletVelocity );
@@ -56,6 +66,13 @@ public:
 	void			ChangeIsSimulationActive( bool newSimulationStatus );
 	void			Move( Vec2 moveToPosition );
 
+	void			SetRotationInRadians( float newRotationRadians );
+	void			SetRotationInDegrees( float newRotationDegrees );
+	void			SetAngularVelocityInRadians( float newAngularVelocityRadians );
+	void			SetAngularVelocityInDegrees( float newAngularVelocityDegrees );
+	void			SetframeTorque( float newTorque );
+	void			SetMoment( float newMoment );
+
 public:
 	Physics2D*			m_system				= nullptr;											// which scene created/owns this object
 	bool				m_isGarbage				= false;
@@ -68,6 +85,11 @@ public:
 	eSimulationMode		m_simulationMode		= SIMULATIONMODE_DYNAMIC;
 	bool				m_isSimulationActive	= true;
 	float				m_drag					= 0.f;
+
+	float				m_rotationInRadians		= 0.f;
+	float				m_angularVelocity		= 10.f;												// Radians per Second
+	float				m_frameTorque			= 0.f;
+	float				m_moment				= 0.f;
 
 private:
 	~Rigidbody2D();																					// destroys the collider

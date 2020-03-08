@@ -22,7 +22,7 @@ Physics2D::Physics2D()
 {
 	s_clock			= new Clock();
 	s_timer			= new Timer();
-	s_fixedTimeStep = 1.0 / 60.0;
+	s_fixedTimeStep = 1.0 / 120.0;
 
 	EventArgs physicsStepArgs;
 
@@ -67,18 +67,18 @@ void Physics2D::Update()
 	while ( s_timer->CheckAndDecrement() )
 	{
 		AdvanceSimulation( ( float ) s_fixedTimeStep );
+		DetectCollisions();
+		ResolveCollisions();
+		
+		for ( size_t colliderIndex = 0; colliderIndex < m_colliders2D.size(); ++colliderIndex )
+		{
+			if ( !m_colliders2D[ colliderIndex ] )
+			{
+				continue;
+			}
+			m_colliders2D[ colliderIndex ]->UpdateWorldShape();
+		}
  	}
-	
-	DetectCollisions();
-	ResolveCollisions();
-	ResetCollisions();
-	
-	for ( size_t colliderIndex = 0; colliderIndex < m_colliders2D.size(); ++colliderIndex )
-	{
-		m_colliders2D[ colliderIndex ]->UpdateWorldShape();
-	}
-	
-	CleanupDestroyedObjects();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -93,6 +93,7 @@ void Physics2D::AdvanceSimulation( float deltaSeconds )
 			continue;
 		}
 
+		m_rigidBodies2D[ index ]->Update( deltaSeconds );
 		currentRigidBodyPos = m_rigidBodies2D[ index ]->GetPosition();
 
 		ApplyEffectors( m_rigidBodies2D[index] , deltaSeconds );
@@ -156,6 +157,11 @@ void Physics2D::ResetCollisions()
 {
 	for ( size_t index = 0; index < m_colliders2D.size(); index++ )
 	{
+		if ( !m_colliders2D[ index ] )
+		{
+			continue;
+		}
+		
 		m_colliders2D[ index ]->m_isColliding = false;
 	}
 	m_frameCollisions.clear();
@@ -312,7 +318,46 @@ void Physics2D::ResolveCollisions()
 
 void Physics2D::CleanupDestroyedObjects()
 {
+	CleanupDestroyedColliders();
+	CleanupDestroyedRigidBodies();
+}
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Physics2D::CleanupDestroyedRigidBodies()
+{
+	for ( size_t rigidBodyIndex = 0; rigidBodyIndex < m_rigidBodies2D.size(); rigidBodyIndex++ )
+	{
+		if ( !m_rigidBodies2D[ rigidBodyIndex ] )
+		{
+			continue;
+		}
+
+		if ( m_rigidBodies2D[ rigidBodyIndex ]->m_isGarbage )
+		{
+			delete m_rigidBodies2D[ rigidBodyIndex ];
+			m_rigidBodies2D[ rigidBodyIndex ] = nullptr;
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Physics2D::CleanupDestroyedColliders()
+{
+	for ( size_t colliderIndex = 0; colliderIndex < m_colliders2D.size(); colliderIndex++ )
+	{
+		if ( !m_colliders2D[ colliderIndex ] )
+		{
+			continue;
+		}
+		
+		if ( m_colliders2D[ colliderIndex ]->m_isGarbage == true )
+		{
+			delete m_colliders2D[ colliderIndex ];
+			m_colliders2D[ colliderIndex ] = nullptr;
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -330,29 +375,8 @@ void Physics2D::EndFrame()
 		m_rigidBodies2D[ rigidBodyIndex ]->SetVerletVelocity( verletVelocity );
 	}
 	
-	for ( size_t rigidBodyIndex = 0; rigidBodyIndex < m_rigidBodies2D.size(); rigidBodyIndex++ )
-	{
-		if ( !m_rigidBodies2D[ rigidBodyIndex ] )
-		{
-			continue;
-		}
-
-		if ( m_rigidBodies2D[ rigidBodyIndex ]->m_isGarbage )
-		{
-			delete m_rigidBodies2D[ rigidBodyIndex ];
-			m_rigidBodies2D[ rigidBodyIndex ] = nullptr;
-		}
-	}
-
-	for ( size_t colliderIndex = 0; colliderIndex < m_colliders2D.size(); colliderIndex++ )
-	{
-		if ( m_colliders2D[ colliderIndex ]->m_isGarbage )
-		{
-			delete m_colliders2D[ colliderIndex ];
-			m_colliders2D[ colliderIndex ] = nullptr;
-		}
-	}
-	//ResetCollisions();
+	CleanupDestroyedObjects();
+	ResetCollisions();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -16,8 +16,6 @@ public:
 	DiscCollider2D( Physics2D* system , Rigidbody2D* rigidbody , Vec2 localPosition , float radius = 1.f );
 	virtual ~DiscCollider2D() override;
 
-	virtual void	Destroy() override;
-
 	virtual void	UpdateWorldShape() override; // UpdateShape world location when the rigidbody moves.
 
 	virtual Vec2	GetClosestPoint( Vec2 pos ) const override;

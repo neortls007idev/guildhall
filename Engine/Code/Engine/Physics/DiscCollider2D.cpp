@@ -24,13 +24,6 @@ DiscCollider2D::~DiscCollider2D()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void DiscCollider2D::Destroy()
-{
-	m_isGarbage = true;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 void DiscCollider2D::UpdateWorldShape()
 {
 	m_worldPosition = m_rigidbody->m_worldPosition + m_localPosition;
@@ -72,13 +65,17 @@ bool DiscCollider2D::Contains( Vec2 pos ) const
 
 void DiscCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor )
 {
-	ctx->DrawDisc( m_worldPosition , m_radius , fillColor );
-	ctx->DrawRing( m_worldPosition , m_radius - ( 0.05f * m_radius ) , borderColor , 0.1f * m_radius );
+	float orientationDegrees = m_rigidbody->GetRotationInDegrees();
+	ctx->DrawDisc( m_worldPosition , m_radius , fillColor , 1.f, orientationDegrees );
 	// Reducing half the thickness on the border radius so that the drawing itself does not feel buggy.
 
-	Vec2 line1 = Vec2::MakeFromPolarDegrees( 45.f , 0.3f * m_radius );
-	Vec2 line2 = Vec2::MakeFromPolarDegrees( -45.f , 0.3f * m_radius );
+	Vec2 line1 = Vec2::MakeFromPolarDegrees( 45.f + orientationDegrees, 0.3f * m_radius );
+	Vec2 line2 = Vec2::MakeFromPolarDegrees( -45.f + orientationDegrees, 0.3f * m_radius );
 
+	
+	Vec2 rotationLine = Vec2::MakeFromPolarDegrees( orientationDegrees , m_radius );
+	ctx->DrawLine( m_worldPosition , m_worldPosition + rotationLine , PURPLE , .1f * m_radius );
+	
 	if ( m_rigidbody->m_isSimulationActive )
 	{
 		ctx->DrawLine( m_worldPosition - line1 , m_worldPosition + line1 , BLUE , .1f * m_radius );
@@ -89,6 +86,9 @@ void DiscCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor 
 		ctx->DrawLine( m_worldPosition - line1 , m_worldPosition + line1 , RED , .1f * m_radius );
 		ctx->DrawLine( m_worldPosition - line2 , m_worldPosition + line2 , RED , .1f * m_radius );
 	}
+
+	ctx->DrawRing( m_worldPosition , m_radius - ( 0.05f * m_radius ) , borderColor , 0.1f * m_radius );
+	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

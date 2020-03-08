@@ -25,6 +25,7 @@ Rigidbody2D::Rigidbody2D( Physics2D* system, Vec2 worldPosition ) :
 
 void Rigidbody2D::Destroy()
 {
+	m_collider->Destroy();
 	m_isGarbage = true;
 }
 
@@ -32,7 +33,8 @@ void Rigidbody2D::Destroy()
 
 void Rigidbody2D::Update( float deltaSeconds )
 {
-	UNUSED( deltaSeconds );
+	m_angularVelocity	+= m_frameTorque * deltaSeconds;
+	m_rotationInRadians += m_angularVelocity * deltaSeconds;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -154,6 +156,48 @@ void Rigidbody2D::ChangeIsSimulationActive( bool newSimulationStatus )
 void Rigidbody2D::Move( Vec2 moveToPosition )
 {
 	m_worldPosition += moveToPosition;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Rigidbody2D::SetRotationInRadians( float newRotationRadians )
+{
+	m_rotationInRadians = newRotationRadians;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Rigidbody2D::SetRotationInDegrees( float newRotationDegrees )
+{
+	m_rotationInRadians = ConvertDegreesToRadians( newRotationDegrees );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Rigidbody2D::SetAngularVelocityInRadians( float newAngularVelocityRadians )
+{
+	m_angularVelocity = newAngularVelocityRadians;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Rigidbody2D::SetAngularVelocityInDegrees( float newAngularVelocityDegrees )
+{
+	m_angularVelocity = ConvertDegreesToRadians( newAngularVelocityDegrees );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Rigidbody2D::SetframeTorque( float newTorque )
+{
+	m_frameTorque = newTorque;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Rigidbody2D::SetMoment( float newMoment )
+{
+	m_moment = newMoment;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

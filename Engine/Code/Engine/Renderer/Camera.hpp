@@ -35,6 +35,7 @@ class Camera
 public:
 	Camera();
 	~Camera();
+	Camera( const Camera& copy ) = delete;
 
 	Vec2			GetWorldNormalizedToClientPosition( Vec2 worldPos ) const;
 	Vec2			GetClientToWorldPosition( Vec2 clientPos ) const;

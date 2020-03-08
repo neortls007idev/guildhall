@@ -77,7 +77,10 @@ bool RenderBuffer::Update( void const* data , size_t dataByteSize , size_t eleme
 
 
 	// 2 -> If no buffer, create one that is compatible
-	Create( dataByteSize , elementByteSize );
+	if ( m_handle == nullptr )
+	{
+		Create( dataByteSize , elementByteSize );
+	}
 
 	// 3. -> Updating the buffer
 	ID3D11DeviceContext* ctx = m_owner->m_context;
@@ -189,6 +192,9 @@ bool RenderBuffer::Create( size_t dataByteSize , size_t elementByteSize )
 			debugName = " Unreleased Uniform Buffer ";
 		}
 
+		m_elementBysize = elementByteSize;
+		m_bufferByteSize = dataByteSize;
+		
 		SetDebugName( ( ID3D11DeviceChild* ) m_handle , &debugName );
 		return true;
 	}

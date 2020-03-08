@@ -289,6 +289,9 @@
     <ClCompile Include="Time\Timer.cpp">
       <Filter>Time</Filter>
     </ClCompile>
+    <ClCompile Include="Core\DebugRender.cpp">
+      <Filter>Core\Debug</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -542,6 +545,9 @@
     </ClInclude>
     <ClInclude Include="Time\Timer.hpp">
       <Filter>Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DebugRender.hpp">
+      <Filter>Core\Debug</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

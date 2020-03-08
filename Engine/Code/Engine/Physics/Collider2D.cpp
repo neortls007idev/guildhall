@@ -138,6 +138,13 @@ Collider2D::Collider2D( Physics2D* system , Rigidbody2D* rigidbody , COLLIDER2D_
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Collider2D::Destroy()
+{
+	m_isGarbage = true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 bool Collider2D::Intersects( Collider2D const* other ) const
 {
 	COLLIDER2D_TYPE myType = GetType();

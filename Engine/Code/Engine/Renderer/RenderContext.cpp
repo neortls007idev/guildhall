@@ -814,7 +814,7 @@ void RenderContext::DrawMesh( const GPUMesh* mesh )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::DrawRing(const Vec2& center, float radius, const Rgba8& color, float thickness)
+void RenderContext::DrawRing(const Vec2& center, float radius, const Rgba8& color, float thickness , float scale , float orientationDegrees , Vec2 translate )
 {
 	constexpr float degreePerSide = 360.f / 64.f;
 
@@ -849,7 +849,7 @@ void RenderContext::DrawAABB2( const AABB2& box , const Rgba8& tint )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::DrawDisc( const Disc2D& disc , const Rgba8& tint )
+void RenderContext::DrawDisc( const Disc2D& disc , const Rgba8& tint , float scale, float orientationDegrees , Vec2 translate )
 {
 	constexpr int  NUMBER_OF_DISC_VERTS = 120;
 	Vertex_PCU discVerts[ NUMBER_OF_DISC_VERTS ];
@@ -889,13 +889,13 @@ void RenderContext::DrawDisc( const Disc2D& disc , const Rgba8& tint )
 
 
 	// MOVE  THIS LINE OF CODE INTO A SEPARATE FUNCTION LATER
-	TransformVertexArray2D( NUMBER_OF_DISC_VERTS , discVerts , 1 , 0.f , disc.m_center );
+	TransformVertexArray2D( NUMBER_OF_DISC_VERTS , discVerts , scale , orientationDegrees , disc.m_center + translate );
 	DrawVertexArray( NUMBER_OF_DISC_VERTS , discVerts );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::DrawDisc( const Vec2& center , const float& radius , const Rgba8& tint )
+void RenderContext::DrawDisc( const Vec2& center , const float& radius , const Rgba8& tint , float scale , float orientationDegrees , Vec2 translate )
 {
 	constexpr int  NUMBER_OF_DISC_VERTS = 120;
 	Vertex_PCU discVerts[ NUMBER_OF_DISC_VERTS ];
@@ -935,7 +935,7 @@ void RenderContext::DrawDisc( const Vec2& center , const float& radius , const R
 
 
 	// MOVE  THIS LINE OF CODE INTO A SEPARATE FUNCTION LATER
-	TransformVertexArray2D( NUMBER_OF_DISC_VERTS , discVerts , 1 , 0.f , center );
+	TransformVertexArray2D( NUMBER_OF_DISC_VERTS , discVerts , scale , orientationDegrees , center + translate );
 	DrawVertexArray( NUMBER_OF_DISC_VERTS , discVerts );
 }
 
