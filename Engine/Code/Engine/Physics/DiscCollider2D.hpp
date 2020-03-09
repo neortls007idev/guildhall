@@ -25,6 +25,7 @@ public:
 	virtual void	DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor ) override;
 	virtual Vec2	GetPosition() const override																				{ return m_worldPosition;  }
 			float	GetRadius() const 																							{ return m_radius;  }
+	virtual float	CalculateMoment( float mass ) const override;
 
 public:
 	Vec2	m_localPosition; // my local offset from my parent

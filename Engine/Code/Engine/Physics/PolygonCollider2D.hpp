@@ -18,16 +18,17 @@ public:
 	PolygonCollider2D( Physics2D* system , Rigidbody2D* rigidbody , Vec2 localPosition , Polygon2D convexgon );
 	~PolygonCollider2D() {};
 
-	virtual void UpdateWorldShape() override;
+	virtual void	UpdateWorldShape() override;
 	
-	virtual Vec2 GetClosestPoint( Vec2 pos ) const override;
-	virtual bool Contains( Vec2 pos ) const override;
+	virtual Vec2	GetClosestPoint( Vec2 pos ) const override;
+	virtual bool	Contains( Vec2 pos ) const override;
 	//virtual bool Intersects( Collider2D const* other ) const override;
 
-	virtual void DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor ) override;
-	virtual Vec2 GetPosition() const override																		{ return m_worldPosition;  }
-			Vec2 GetWorldBounds() const;
-			void CreateBoundingDisc();
+	virtual void	DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor ) override;
+	virtual Vec2	GetPosition() const override																		{ return m_worldPosition;  }
+			Vec2	GetWorldBounds() const;
+			void	CreateBoundingDisc();
+	virtual float	CalculateMoment( float mass ) const override;
 
 	// accessors
 

@@ -8,6 +8,7 @@
 #include <math.h>
 
 #include "Engine/Core/VertexUtils.hpp"
+#include "PhysicsUtils.hpp"
 
 
 extern InputSystem* g_theInput;
@@ -141,21 +142,13 @@ void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderCol
 	ctx->DrawPolygon( &m_polygon.m_points[ 0 ] , ( unsigned int ) m_polygon.m_points.size() , fillColor );
 
 	size_t totalPoints = m_polygon.m_points.size();
-	//std::vector<Vertex_PCU> borderVerts;
 	
 	for ( size_t index = 0; index < totalPoints; index++ )
 	{
 		size_t startPoint	= index % totalPoints;
 		size_t endPoint		= ( index + 1 ) % totalPoints;
-		//AppendLine2( borderVerts , m_polygon.m_points[ startPoint ] , m_polygon.m_points[ endPoint ] , borderColor , 5.f );
 		ctx->DrawLine( m_polygon.m_points[ startPoint ] , m_polygon.m_points[ endPoint ] , borderColor , 5.f , 1.f );
 	}
-
-	//TransformVertexArray2D( ( int ) borderVerts.size() , &borderVerts[ 0 ] , 1.f , 0.f , -m_worldPosition );
-	//TransformVertexArray2D( ( int ) borderVerts.size() , &borderVerts[ 0 ] , 1.f , orientationDegrees , Vec2::ZERO );
-	//TransformVertexArray2D( ( int ) borderVerts.size() , &borderVerts[ 0 ] , 1.f , 0.f ,  m_worldPosition );
-
-	//ctx->DrawVertexArray( borderVerts );
 	
 	float m_width = GetRightMostPointFromPointCloud( &m_polygon.m_points[ 0 ] , ( uint ) m_polygon.m_points.size() )->x -
 		GetLeftMostPointFromPointCloud( &m_polygon.m_points[ 0 ] , ( uint ) m_polygon.m_points.size() )->x;
@@ -236,6 +229,33 @@ void PolygonCollider2D::CreateBoundingDisc()
 
 	m_boundingDisc.m_center = Vec2( centerX , centerY );
 	m_boundingDisc.m_radius = /*finalRadius;*/sqrtf( ( width * width * 0.25f ) + ( height * height * 0.25f ) );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+float PolygonCollider2D::CalculateMoment( float mass ) const
+{
+	float momentOfPolygon = 0.f;
+	
+	uint totalSidesInPolygon = static_cast< uint >( m_polygon.m_points.size() - 2 );
+
+	float areaOfPolygon = CalculateAreaOfPolygon( m_polygon );
+
+	const Vec2 vert0 = m_polygon.m_points[ 0 ];
+		  Vec2 vert1;
+		  Vec2 vert2;
+	
+	for ( size_t pointIndex = 2; pointIndex < m_polygon.m_points.size(); pointIndex += 2 )
+	{
+		vert1 = m_polygon.m_points[ pointIndex - 1 ];
+		vert2 = m_polygon.m_points[ pointIndex ];
+		float areaOfCurrentTriangle = CalculateAreaOfTriangle( vert0 , vert1 , vert2 );
+		float massOfCurrentTraingle = mass * ( areaOfCurrentTriangle / areaOfPolygon );
+		momentOfPolygon += CalculateMomentOfInertiaOfTriangle( vert0 , vert1 , vert2 , massOfCurrentTraingle );
+
+		pointIndex--;
+	}
+	return momentOfPolygon;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

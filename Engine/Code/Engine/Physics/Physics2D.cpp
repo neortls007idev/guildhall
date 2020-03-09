@@ -286,7 +286,7 @@ void Physics2D::ResolveCollision( Collision2D collision )
 		return;
 	}
 
-	impulse = ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) *
+	impulse =  theirMass * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) *
 		DotProduct2D( ( collision.m_them->GetRigidBody()->GetVelocity() - collision.m_me->GetRigidBody()->GetVelocity() ) , collision.m_collisionManifold.m_normal );
 	
 	impulse = ( impulse < 0 ) ? 0 : impulse;
@@ -297,6 +297,11 @@ void Physics2D::ResolveCollision( Collision2D collision )
 		collision.m_them->GetRigidBody()->ApplyFriction( -frictionNormal * collision.m_collisionManifold.m_normal.GetRotated90Degrees() );
 	}
 
+	impulse = myMass * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) *
+		DotProduct2D( ( collision.m_them->GetRigidBody()->GetVelocity() - collision.m_me->GetRigidBody()->GetVelocity() ) , collision.m_collisionManifold.m_normal );
+
+	impulse = ( impulse < 0 ) ? 0 : impulse;
+	
 	if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_STATIC )
 	{
 		collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );

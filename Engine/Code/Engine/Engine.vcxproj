@@ -194,7 +194,6 @@
     <ClCompile Include="Math\IntVec2.cpp" />
     <ClCompile Include="Math\MathUtils.cpp" />
     <ClCompile Include="Math\Matrix4x4.cpp" />
-    <ClCompile Include="Math\MatUtils.cpp" />
     <ClCompile Include="Math\MatrixUtils.cpp" />
     <ClCompile Include="Math\RandomNumberGenerator.cpp" />
     <ClCompile Include="Math\RawNoise.cpp" />
@@ -209,6 +208,7 @@
     <ClCompile Include="Physics\DiscCollider2D.cpp" />
     <ClCompile Include="Physics\Physics2D.cpp" />
     <ClCompile Include="Physics\PhysicsMaterial.cpp" />
+    <ClCompile Include="Physics\PhysicsUtils.cpp" />
     <ClCompile Include="Physics\PolygonCollider2D.cpp" />
     <ClCompile Include="Physics\Rigidbody2D.cpp" />
     <ClCompile Include="Platform\Window.cpp" />
@@ -280,7 +280,6 @@
     <ClInclude Include="Math\MathConstants.hpp" />
     <ClInclude Include="Math\MathUtils.hpp" />
     <ClInclude Include="Math\Matrix4x4.hpp" />
-    <ClInclude Include="Math\MatUtils.hpp" />
     <ClInclude Include="Math\MatrixUtils.hpp" />
     <ClInclude Include="Math\RandomNumberGenerator.hpp" />
     <ClInclude Include="Math\RawNoise.hpp" />
@@ -295,6 +294,7 @@
     <ClInclude Include="Physics\DiscCollider2D.hpp" />
     <ClInclude Include="Physics\Physics2D.hpp" />
     <ClInclude Include="Physics\PhysicsMaterial.hpp" />
+    <ClInclude Include="Physics\PhysicsUtils.hpp" />
     <ClInclude Include="Physics\PolygonCollider2D.hpp" />
     <ClInclude Include="Physics\Rigidbody2D.hpp" />
     <ClInclude Include="Platform\Window.hpp" />

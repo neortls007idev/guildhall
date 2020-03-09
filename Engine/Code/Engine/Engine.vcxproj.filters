@@ -202,9 +202,6 @@
     <ClCompile Include="Core\DevConsole.cpp">
       <Filter>Core\Devconsole</Filter>
     </ClCompile>
-    <ClCompile Include="Math\MatUtils.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="Primitives\Plane.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -291,6 +288,9 @@
     </ClCompile>
     <ClCompile Include="Core\DebugRender.cpp">
       <Filter>Core\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\PhysicsUtils.cpp">
+      <Filter>Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -456,9 +456,6 @@
     <ClInclude Include="Core\DevConsole.hpp">
       <Filter>Core\Devconsole</Filter>
     </ClInclude>
-    <ClInclude Include="Math\MatUtils.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="Primitives\Plane.hpp">
       <Filter>Primitives</Filter>
     </ClInclude>
@@ -548,6 +545,9 @@
     </ClInclude>
     <ClInclude Include="Core\DebugRender.hpp">
       <Filter>Core\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\PhysicsUtils.hpp">
+      <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

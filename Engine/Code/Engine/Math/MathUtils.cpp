@@ -5,6 +5,7 @@
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Math/Vec4.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Primitives/Polygon2D.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 
 
@@ -1126,6 +1127,47 @@ const uint GetIndexOfTopMostPointFromPointCloud( Vec2 const* points , uint point
 float SignFloat( float val )
 {
 	return ( val >= 0.0f ) ? 1.0f : -1.0f;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+float CalculateAreaOfTriangle( const Vec2& vertex0 , const Vec2& vertex1 , const Vec2& vertex2 )
+{
+	Vec2 u = vertex1 - vertex0;
+	Vec2 v = vertex2 - vertex0;
+
+	float b = u.GetLength();															// base DotProduct( u , u ) = GetLengthSquared
+	float h = ( v - ( ( DotProduct2D( v , u ) / u.GetLengthSquared() ) * u ) ).GetLength();		// height =   |v (V.u) . u  |
+																						//			  |   (u.u)	    |
+
+	return  0.5f * ( b * h );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+float CalculateAreaOfPolygon( const Polygon2D& polygon )
+{
+	if ( polygon.m_points.size() < 3 )
+	{
+		return 0.f;
+	}
+
+	float areaOfPolygon = 0.f;
+	
+	const Vec2 vert0 = polygon.m_points[ 0 ];
+	Vec2 vert1;
+	Vec2 vert2;
+
+	for ( size_t pointIndex = 2; pointIndex < polygon.m_points.size(); pointIndex += 2 )
+	{
+		vert1 = polygon.m_points[ pointIndex - 1 ];
+		vert2 = polygon.m_points[ pointIndex ];
+		pointIndex--;
+		
+		areaOfPolygon += CalculateAreaOfTriangle( vert0 , vert1 , vert2 );
+	}
+
+	return areaOfPolygon;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

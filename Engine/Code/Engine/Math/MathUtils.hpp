@@ -9,6 +9,7 @@
 // FORAWRD TYPE DECLARATIONS
 //-----------------------------------------------------------------------------------------------------------------
 
+class Polygon2D;
 struct Vec2;
 struct Vec3;
 struct Vec4;
@@ -143,3 +144,6 @@ const uint	GetIndexOfTopMostPointFromPointCloud( Vec2 const* points , uint point
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 float SignFloat( float val );
+
+float CalculateAreaOfTriangle( const Vec2& vertex0 , const Vec2& vertex1 , const Vec2& vertex2 );
+float CalculateAreaOfPolygon( const Polygon2D&  polygon );
