@@ -7,6 +7,8 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include <math.h>
 
+#include "Engine/Core/VertexUtils.hpp"
+
 
 extern InputSystem* g_theInput;
 
@@ -28,6 +30,9 @@ void PolygonCollider2D::UpdateWorldShape()
 	m_worldPosition = m_rigidbody->m_worldPosition + m_localPosition;
 	m_polygon.SetPosition( m_worldPosition );
 	m_boundingDisc.m_center = m_worldPosition;
+
+	float orientationDegrees = ConvertRadiansToDegrees( m_rigidbody->m_frameRotation );
+	RotateDegreesPolygonAboutPoint( m_polygon , m_worldPosition , orientationDegrees );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -131,22 +136,32 @@ bool PolygonCollider2D::Contains( Vec2 pos ) const
 
 void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor )
 {
+	float orientationDegrees = m_rigidbody->GetRotationInDegrees();
+
 	ctx->DrawPolygon( &m_polygon.m_points[ 0 ] , ( unsigned int ) m_polygon.m_points.size() , fillColor );
 
 	size_t totalPoints = m_polygon.m_points.size();
-
+	//std::vector<Vertex_PCU> borderVerts;
+	
 	for ( size_t index = 0; index < totalPoints; index++ )
 	{
 		size_t startPoint	= index % totalPoints;
 		size_t endPoint		= ( index + 1 ) % totalPoints;
-		ctx->DrawLine( m_polygon.m_points[ startPoint ] , m_polygon.m_points[ endPoint ] , borderColor , 5.f );
+		//AppendLine2( borderVerts , m_polygon.m_points[ startPoint ] , m_polygon.m_points[ endPoint ] , borderColor , 5.f );
+		ctx->DrawLine( m_polygon.m_points[ startPoint ] , m_polygon.m_points[ endPoint ] , borderColor , 5.f , 1.f );
 	}
 
+	//TransformVertexArray2D( ( int ) borderVerts.size() , &borderVerts[ 0 ] , 1.f , 0.f , -m_worldPosition );
+	//TransformVertexArray2D( ( int ) borderVerts.size() , &borderVerts[ 0 ] , 1.f , orientationDegrees , Vec2::ZERO );
+	//TransformVertexArray2D( ( int ) borderVerts.size() , &borderVerts[ 0 ] , 1.f , 0.f ,  m_worldPosition );
+
+	//ctx->DrawVertexArray( borderVerts );
+	
 	float m_width = GetRightMostPointFromPointCloud( &m_polygon.m_points[ 0 ] , ( uint ) m_polygon.m_points.size() )->x -
 		GetLeftMostPointFromPointCloud( &m_polygon.m_points[ 0 ] , ( uint ) m_polygon.m_points.size() )->x;
 
-	Vec2 line1 = Vec2::MakeFromPolarDegrees(  45.f , 0.1f * m_width );
-	Vec2 line2 = Vec2::MakeFromPolarDegrees( -45.f , 0.1f * m_width );
+	Vec2 line1 = Vec2::MakeFromPolarDegrees(  45.f + orientationDegrees , 0.1f * m_width );
+	Vec2 line2 = Vec2::MakeFromPolarDegrees( -45.f + orientationDegrees , 0.1f * m_width );
 
 	if ( m_rigidbody->m_isSimulationActive )
 	{

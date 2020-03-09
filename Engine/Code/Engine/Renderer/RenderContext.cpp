@@ -1275,7 +1275,7 @@ Texture* RenderContext::CreateTextureFromColor( Rgba8 color )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::DrawPolygon( const Vec2* points , unsigned int count , const Rgba8& tint )
+void RenderContext::DrawPolygon( const Vec2* points , unsigned int count , const Rgba8& tint , float scale , float orientationDegrees , Vec2 translate )
 {
 	if ( count < 3 )
 	{
@@ -1285,7 +1285,9 @@ void RenderContext::DrawPolygon( const Vec2* points , unsigned int count , const
 	std::vector<Vertex_PCU> polygonVerts;
 
 	AppendVertsForPolygon( polygonVerts , points , count , tint );
-
+	//TransformVertexArray2D( ( int ) polygonVerts.size() , &polygonVerts[ 0 ] , 1.f , 0.f , -translate );
+	//TransformVertexArray2D( ( int ) polygonVerts.size() , &polygonVerts[ 0 ] , 1.f , orientationDegrees , Vec2::ZERO );
+	//TransformVertexArray2D( ( int ) polygonVerts.size() , &polygonVerts[ 0 ] , 1.f , 0.f , translate );
 	DrawVertexArray( ( int ) polygonVerts.size() , &polygonVerts[ 0 ] );
 }
 

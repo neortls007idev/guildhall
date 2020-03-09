@@ -129,7 +129,8 @@ public:
 	void DrawOBB2( const OBB2& box , const Rgba8& tint );
 	void DrawCapsule2D( const Vec2& capsuleMidStart , const Vec2& capsuleMidEnd , const float capsuleRadius, const Rgba8& tint );
  	void DrawDiscFraction(const Disc2D& disc, const float drawFraction, const Rgba8& tint, const float orientationDegrees );
-	void DrawPolygon( const Vec2* points , unsigned int count , const Rgba8& tint );
+	void DrawPolygon( const Vec2* points , unsigned int count , const Rgba8& tint , float scale = 1.f , float orientationDegrees = 0.f , Vec2 translate = Vec2::ZERO );
+	//void DrawUnfilledPolygon( const Vec2* points , unsigned int count , const Rgba8& tint , float scale = 1.f , float orientationDegrees = 0.f , Vec2 translate = Vec2::ZERO );
  	void DrawRegularPolygon(); // TODO :- IMPLEMENT ME
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

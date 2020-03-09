@@ -1,5 +1,6 @@
 #include "Engine/Core/VertexUtils.hpp "
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Primitives/Polygon2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -85,9 +86,8 @@ void AppendVertsForAABB2( std::vector<Vertex_PCU>& vertexArray , const AABB2& bo
 
 void AppendVertsForPolygon( std::vector<Vertex_PCU>& vertexArray , const Vec2* points , const unsigned int count , const Rgba8& tint )
 {
-	// TODO :- FIX ME
-
 	const Vertex_PCU tempVert1 = Vertex_PCU( Vec3( points->x , points->y , 0.f ) , tint , Vec2::ZERO );
+
 	for ( unsigned int pointIndex = 2; pointIndex < count; pointIndex++ )
 	{
 		vertexArray.push_back( tempVert1 );
@@ -98,6 +98,23 @@ void AppendVertsForPolygon( std::vector<Vertex_PCU>& vertexArray , const Vec2* p
 		const Vertex_PCU tempVert3 = Vertex_PCU( Vec3( points->x , points->y , 0.f ) , tint , Vec2::ZERO );
 		vertexArray.push_back( tempVert3 );
 		points = points--;
+	}
+}
+
+void RotateDegreesPolygonAboutPoint( Polygon2D& polygon , Vec2 worldPosition , float orientationDegrees )
+{
+	if ( polygon.m_points.size() < 3 )
+	{
+		return;
+	}
+	
+	for ( size_t index = 0; index < polygon.m_points.size(); index++ )
+	{
+		polygon.m_points[ index ] = TransformPosition3DXY( Vec3( polygon.m_points[ index ] , 0.f ) , 1.f , 0.f , -worldPosition ).GetXYComponents();
+	}
+	for ( size_t index = 0; index < polygon.m_points.size(); index++ )
+	{
+		polygon.m_points[ index ] = TransformPosition3DXY( Vec3( polygon.m_points[ index ] , 0.f ) , 1.f , orientationDegrees , worldPosition ).GetXYComponents();
 	}
 }
 

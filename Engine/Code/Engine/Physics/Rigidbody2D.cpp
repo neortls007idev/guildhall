@@ -33,8 +33,10 @@ void Rigidbody2D::Destroy()
 
 void Rigidbody2D::Update( float deltaSeconds )
 {
+	m_frameRotation		 = m_rotationInRadians;
 	m_angularVelocity	+= m_frameTorque * deltaSeconds;
 	m_rotationInRadians += m_angularVelocity * deltaSeconds;
+	m_frameRotation		 = m_rotationInRadians - m_frameRotation;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

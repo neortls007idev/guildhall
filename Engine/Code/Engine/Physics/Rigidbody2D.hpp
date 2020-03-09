@@ -87,10 +87,11 @@ public:
 	float				m_drag					= 0.f;
 
 	float				m_rotationInRadians		= 0.f;
-	float				m_angularVelocity		= 10.f;												// Radians per Second
+	float				m_angularVelocity		= 1.f;												// Radians per Second
 	float				m_frameTorque			= 0.f;
 	float				m_moment				= 0.f;
-
+	float				m_frameRotation			= 0.f;
+	
 private:
 	~Rigidbody2D();																					// destroys the collider
 };
