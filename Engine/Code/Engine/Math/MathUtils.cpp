@@ -586,6 +586,13 @@ float DotProduct2D( const Vec2& first , const Vec2& second )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+float CrossProduct2D( const Vec2& first , const Vec2& second )
+{
+	return ( ( first.x * second.y ) - ( first.y * second.x ) );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 float DotProduct3D( const Vec3& first , const Vec3& second )
 {
 	return ( ( first.x * second.x ) + ( first.y * second.y ) + ( first.z * second.z ) );

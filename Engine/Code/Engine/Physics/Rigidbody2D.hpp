@@ -55,6 +55,7 @@ public:
 	void			SetVerletVelocity( Vec2 updatedVerletVelocity );
 	void			ApplyImpulse( Vec2 impulse , Vec2 point = Vec2::ZERO );
 	void			ApplyFriction( Vec2 friction , Vec2 point = Vec2::ZERO );
+	void			ApplyTorque( Vec2 torqueImpulse , Vec2 point = Vec2::ZERO );
 	void			ApplyDrag( float deltaSeconds );
 	void			SetCollider( Collider2D* collider );
 	void			SetPosition( Vec2 position );
@@ -88,10 +89,10 @@ public:
 
 	float				m_rotationInRadians		= 0.f;
 	float				m_angularVelocity		= 0.f;												// Radians per Second
-	float				m_angularAcceleration	= 0.f;												// Radians per Second
 	float				m_frameTorque			= 0.f;
 	float				m_moment				= 0.f;
 	float				m_frameRotation			= 0.f;
+	float				m_angularDrag			= 1.f;
 	
 private:
 	~Rigidbody2D();																					// destroys the collider

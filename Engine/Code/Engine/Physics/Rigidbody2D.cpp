@@ -1,6 +1,7 @@
 #include "Engine/Physics/Rigidbody2D.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Physics/Collider2D.hpp"
+#include "DiscCollider2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -34,10 +35,15 @@ void Rigidbody2D::Destroy()
 void Rigidbody2D::Update( float deltaSeconds )
 {
 	m_frameRotation			 = m_rotationInRadians;
-	m_angularAcceleration	+= ( m_frameTorque / m_moment );
-	m_angularVelocity		+= m_angularAcceleration * deltaSeconds;
+	m_angularVelocity		+= ( m_frameTorque / m_moment );
 	m_rotationInRadians		+= m_angularVelocity * deltaSeconds;
 	m_frameRotation			 = m_rotationInRadians - m_frameRotation;
+
+// 	if ( m_collider->GetType() == COLLIDER2D_DISC )
+// 	{
+// 		DiscCollider2D* col = ( DiscCollider2D* ) m_collider;
+// 		m_velocity += Vec2::MakeFromPolarRadians( m_rotationInRadians , m_angularVelocity / ( 2 * PI * col->GetRadius() ) ) ;
+// 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -80,11 +86,8 @@ void Rigidbody2D::SetVerletVelocity( Vec2 updatedVerletVelocity )
 
 void Rigidbody2D::ApplyImpulse( Vec2 impulse , Vec2 point )
 {
-	//UNUSED( point );
+	UNUSED( point );
 	m_velocity += impulse / m_mass;
-
-	Vec2 torqueDistance = ( point - m_collider->GetPosition() );
-	m_frameTorque = DotProduct2D( impulse , torqueDistance.GetRotated90Degrees() );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -93,6 +96,14 @@ void Rigidbody2D::ApplyFriction( Vec2 friction , Vec2 point /*= Vec2::ZERO */ )
 {
 	UNUSED( point );
 	m_velocity += friction / m_mass;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Rigidbody2D::ApplyTorque( Vec2 torqueImpulse , Vec2 point /*= Vec2::ZERO */ )
+{
+	Vec2 torqueDistance = ( point - m_collider->GetPosition() );
+	m_frameTorque = CrossProduct2D( torqueDistance , torqueImpulse );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

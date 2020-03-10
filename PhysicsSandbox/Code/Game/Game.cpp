@@ -913,53 +913,44 @@ void Game::SelectGameObjectFormUserInput()
 
 void Game::UpdateCameraFromUserInput( float deltaSeconds )
 {
+	float speed = 4.f;
+	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) )
+	{
+		speed = 20.f;
+	}
+
 	if ( g_theInput->WasKeyJustPressed( 'O' ) )
 	{
 		m_cameraCurrentPosition = m_cameraDefaultPosition;
+		m_worldCamera.SetPosition( m_cameraDefaultPosition );
 	}
 
 	if ( g_theInput->IsKeyHeldDown( 'D' ) )
 	{
-		m_cameraCurrentPosition += ( Vec3( m_cameraMoveVelocity.x , 0.f , 0.f ) * deltaSeconds );
+		m_cameraCurrentPosition += ( Vec3( m_cameraMoveVelocity.x , 0.f , 0.f ) * speed * deltaSeconds );
+		m_worldCamera.Translate( Vec3( m_cameraMoveVelocity.x , 0.f , 0.f ) * speed * deltaSeconds );
 	}
 
 	if ( g_theInput->IsKeyHeldDown( 'A' ) )
 	{
-		m_cameraCurrentPosition -= ( Vec3( m_cameraMoveVelocity.x , 0.f , 0.f ) * deltaSeconds );
+		m_cameraCurrentPosition -= ( Vec3( m_cameraMoveVelocity.x , 0.f , 0.f ) * speed * deltaSeconds );
+		m_worldCamera.Translate( Vec3( -m_cameraMoveVelocity.x , 0.f , 0.f ) * speed * deltaSeconds );
 	}
 
 	if ( g_theInput->IsKeyHeldDown( 'S' ) )
 	{
-		m_cameraCurrentPosition -= ( Vec3( 0.f , m_cameraMoveVelocity.y , 0.f ) * deltaSeconds );
+		m_cameraCurrentPosition -= ( Vec3( 0.f , m_cameraMoveVelocity.y , 0.f ) * speed * deltaSeconds );
+		m_worldCamera.Translate( Vec3( 0.f , -m_cameraMoveVelocity.y , 0.f ) * speed * deltaSeconds );
 	}
 
-	//Mat44 cameraTransform = m_worldCamera.m_transform.GetAsMatrix();
-	//Vec3 forwardVector = cameraTransform.GetKBasis3D();
-	
 	if ( g_theInput->IsKeyHeldDown( 'W' ) )
 	{
-		//m_cameraCurrentPosition += ( Vec3( 0.f , m_cameraMoveVelocity.y , 0.f ) * deltaSeconds );
-		//m_worldCamera.m_transform.SetPosition( m_worldCamera.m_transform.GetPostion() - forwardVector * deltaSeconds );
+		m_cameraCurrentPosition += ( Vec3( 0.f , m_cameraMoveVelocity.y , 0.f ) * speed * deltaSeconds );
+		m_worldCamera.Translate( Vec3( 0.f , +m_cameraMoveVelocity.y , 0.f ) * speed * deltaSeconds );
 	}
 
 	if ( g_theInput->GetMouseWheelValue() < 0 )
 	{
-// 		m_currentCameraOutputSize = m_worldCamera.GetOutputSize() + ( Vec2( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y ) * deltaSeconds );
-// 		Vec3 orthoMin = m_worldCamera.GetOrthoMin();
-// 		Vec3 orthoMax = m_worldCamera.GetOrthoMax();
-// 		orthoMin -= ( Vec3( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y , 0.f ) * deltaSeconds ) * 0.5f;
-// 		orthoMax += ( Vec3( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y , 0.f ) * deltaSeconds ) * 0.5f;
-// 		orthoMin.x = Clamp( orthoMin.x , 200.f , 20000.f );
-// 		orthoMin.y = Clamp( orthoMin.y , 200.f , 20000.f );
-// 		orthoMax.x = Clamp( orthoMax.x , 200.f , 20000.f );
-// 		orthoMax.y = Clamp( orthoMax.y , 200.f , 20000.f );
-// 
-// 		orthoMin.x = orthoMin.y * CLIENT_ASPECT;
-// 		orthoMax.x = orthoMax.y * CLIENT_ASPECT;
-// 		//m_currentCameraOutputSize.x = Clamp( m_currentCameraOutputSize.x , 200.f , 20000.f );
-// 		//m_currentCameraOutputSize.y = Clamp( m_currentCameraOutputSize.y , 200.f , 20000.f );
-// 		m_worldCamera.SetOrthoView( orthoMin.GetXYComponents() , orthoMax.GetXYComponents() );
-
 		m_gameCameraCurrentHeight += MAX_CAMERA_ZOOM_VELOCITY_Y * deltaSeconds;
 		m_gameCameraCurrentHeight = Clamp( m_gameCameraCurrentHeight , 200.f , 20000.f );
 		m_worldCamera.SetProjectionOrthographic( m_gameCameraCurrentHeight );
@@ -967,22 +958,6 @@ void Game::UpdateCameraFromUserInput( float deltaSeconds )
 
 	if ( g_theInput->GetMouseWheelValue() > 0 )
 	{
-// 		m_currentCameraOutputSize = m_worldCamera.GetOutputSize() - ( Vec2( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y ) * deltaSeconds );
-// 		m_currentCameraOutputSize.x = Clamp( m_currentCameraOutputSize.x , 200.f , 20000.f );
-// 		m_currentCameraOutputSize.y = Clamp( m_currentCameraOutputSize.y , 200.f , 20000.f );
-// 		Vec3 orthoMin = m_worldCamera.GetOrthoMin();
-// 		Vec3 orthoMax = m_worldCamera.GetOrthoMax();
-// 		orthoMin += ( Vec3( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y , 0.f ) * deltaSeconds ) * 0.5f;
-// 		orthoMax -= ( Vec3( MAX_CAMERA_ZOOM_VELOCITY_X , MAX_CAMERA_ZOOM_VELOCITY_Y , 0.f ) * deltaSeconds ) * 0.5f;
-// 		orthoMin.x = Clamp( orthoMin.x , 200.f , 20000.f );
-// 		orthoMin.y = Clamp( orthoMin.y , 200.f , 20000.f );
-// 		orthoMax.x = Clamp( orthoMax.x , 200.f , 20000.f );
-// 		orthoMax.y = Clamp( orthoMax.y , 200.f , 20000.f );
-// 
-// 		orthoMin.x = orthoMin.y * CLIENT_ASPECT;
-// 		orthoMax.x = orthoMax.y * CLIENT_ASPECT;
-// 		m_worldCamera.SetOrthoView( orthoMin.GetXYComponents() , orthoMax.GetXYComponents() );
-
 		m_gameCameraCurrentHeight -= MAX_CAMERA_ZOOM_VELOCITY_Y * deltaSeconds;
 		m_gameCameraCurrentHeight = Clamp( m_gameCameraCurrentHeight , 200.f , 20000.f );
 		m_worldCamera.SetProjectionOrthographic( m_gameCameraCurrentHeight );

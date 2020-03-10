@@ -105,6 +105,7 @@ float GetFractionPart( float value );
 
 float      GetTurnedToward( float currentDegrees, float goalDegrees, float maxDeltaDegrees );
 float      DotProduct2D(const Vec2& first, const Vec2& second);
+float      CrossProduct2D(const Vec2& first, const Vec2& second);
 float      DotProduct3D( const Vec3& first , const Vec3& second );
 float      DotProduct4D( const Vec4& first , const Vec4& second );
 float      GetProjectedLength2D( const Vec2& sourceVector , const Vec2& ontoVector );
