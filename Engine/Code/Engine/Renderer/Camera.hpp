@@ -62,6 +62,7 @@ public:
 	void			SetPitchYawRollRotation( float pitch , float yaw , float roll );
 	void			SetOutputSize( Vec2 size );
 	void			CorrectAspectRatio( float clientAspectRatio );
+	Transform		GetCameraTransform() const																		{ return m_transform;  }
 
 	void			SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
 	void			SetClearMode( unsigned int clearFlags , Rgba8 color , float depth = 0.f , unsigned int stencil = 0 );
@@ -80,8 +81,6 @@ public:
 
 public:
 	RenderBuffer*	m_cameraUBO		= nullptr;
-	Transform			m_transform;
-	Mat44				m_view;
 
 private:
 
@@ -89,6 +88,8 @@ private:
 	Rgba8				m_clearColor			= BLACK;
 
 	Mat44				m_projection;
+	Transform			m_transform;
+	Mat44				m_view;
 	
 	Texture*			m_colorTarget			= nullptr;
 	Texture*			m_depthStencilTarget	= nullptr;

@@ -933,13 +933,13 @@ void Game::UpdateCameraFromUserInput( float deltaSeconds )
 		m_cameraCurrentPosition -= ( Vec3( 0.f , m_cameraMoveVelocity.y , 0.f ) * deltaSeconds );
 	}
 
-	Mat44 cameraTransform = m_worldCamera.m_transform.GetAsMatrix();
-	Vec3 forwardVector = cameraTransform.GetKBasis3D();
+	//Mat44 cameraTransform = m_worldCamera.m_transform.GetAsMatrix();
+	//Vec3 forwardVector = cameraTransform.GetKBasis3D();
 	
 	if ( g_theInput->IsKeyHeldDown( 'W' ) )
 	{
 		//m_cameraCurrentPosition += ( Vec3( 0.f , m_cameraMoveVelocity.y , 0.f ) * deltaSeconds );
-		m_worldCamera.m_transform.SetPosition( m_worldCamera.m_transform.GetPostion() - forwardVector * deltaSeconds );
+		//m_worldCamera.m_transform.SetPosition( m_worldCamera.m_transform.GetPostion() - forwardVector * deltaSeconds );
 	}
 
 	if ( g_theInput->GetMouseWheelValue() < 0 )
