@@ -264,7 +264,7 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	
 	impulse = ( impulse < 0 ) ? 0 : impulse;
 
-	if ( abs( impulse ) > friction* frictionNormal )
+	if ( abs( frictionNormal ) > friction* frictionNormal )
 	{
 		frictionNormal = SignFloat( frictionNormal ) * impulse * friction;
 	}
