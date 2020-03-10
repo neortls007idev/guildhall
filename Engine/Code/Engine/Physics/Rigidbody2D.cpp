@@ -33,10 +33,11 @@ void Rigidbody2D::Destroy()
 
 void Rigidbody2D::Update( float deltaSeconds )
 {
-	m_frameRotation		 = m_rotationInRadians;
-	m_angularVelocity	+= m_frameTorque * deltaSeconds;
-	m_rotationInRadians += m_angularVelocity * deltaSeconds;
-	m_frameRotation		 = m_rotationInRadians - m_frameRotation;
+	m_frameRotation			 = m_rotationInRadians;
+	m_angularAcceleration	+= ( m_frameTorque / m_moment );
+	m_angularVelocity		+= m_angularAcceleration * deltaSeconds;
+	m_rotationInRadians		+= m_angularVelocity * deltaSeconds;
+	m_frameRotation			 = m_rotationInRadians - m_frameRotation;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -79,8 +80,11 @@ void Rigidbody2D::SetVerletVelocity( Vec2 updatedVerletVelocity )
 
 void Rigidbody2D::ApplyImpulse( Vec2 impulse , Vec2 point )
 {
-	UNUSED( point );
+	//UNUSED( point );
 	m_velocity += impulse / m_mass;
+
+	Vec2 torqueDistance = ( point - m_collider->GetPosition() );
+	m_frameTorque = DotProduct2D( impulse , torqueDistance.GetRotated90Degrees() );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -136,9 +140,12 @@ void Rigidbody2D::SetSimulationMode( eSimulationMode simulationMode )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Rigidbody2D::SetMass( float newMass )
+void Rigidbody2D::SetMassAndUpdateMoment( float newMass )
 {
+	float oldMass = m_mass;
 	m_mass = newMass;
+
+	m_moment *= ( newMass / oldMass );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

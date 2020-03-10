@@ -61,7 +61,7 @@ public:
 	void			SetVelocity( Vec2 velocity );
 	void			ReverseVelocityY();
 	void			SetSimulationMode( eSimulationMode simulationMode );
-	void			SetMass( float newMass );
+	void			SetMassAndUpdateMoment( float newMass );
 	void			SetDrag( float newDrag );
 	void			ChangeIsSimulationActive( bool newSimulationStatus );
 	void			Move( Vec2 moveToPosition );
@@ -72,7 +72,7 @@ public:
 	void			SetAngularVelocityInDegrees( float newAngularVelocityDegrees );
 	void			SetframeTorque( float newTorque );
 	void			SetMoment( float newMoment );
-	
+		
 public:
 	Physics2D*			m_system				= nullptr;											// which scene created/owns this object
 	bool				m_isGarbage				= false;
@@ -88,6 +88,7 @@ public:
 
 	float				m_rotationInRadians		= 0.f;
 	float				m_angularVelocity		= 0.f;												// Radians per Second
+	float				m_angularAcceleration	= 0.f;												// Radians per Second
 	float				m_frameTorque			= 0.f;
 	float				m_moment				= 0.f;
 	float				m_frameRotation			= 0.f;

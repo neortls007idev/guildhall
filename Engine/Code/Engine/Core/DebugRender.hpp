@@ -37,8 +37,8 @@ enum eDebugRenderMode
 //  System
 //------------------------------------------------------------------------
 // setup
-void DebugRenderSystemStartup();
-void DebugRenderSystemShutdown();
+void DebugRenderSystemStartup();			// may be used to allocate resources to it
+void DebugRenderSystemShutdown();			// may be used to free the allocated resources to it
 
 // control
 void EnableDebugRendering();
@@ -166,6 +166,3 @@ void DebugAddScreenBasis( Vec2 screen_origin_location , Mat44 basis_to_render , 
 // message log system [extra]
 void DebugAddMessage( float duration , Rgba8 color , char const* format , ... );
 void DebugAddMessage( Rgba8 color , char const* format , ... );
-
-
-// #endif 

@@ -31,6 +31,7 @@ public:
 	const   ID3D11Texture2D* GetHandle() const																			{ return m_handle; }
 
 	Texture* CreateDepthStencil( Vec2 outputDimensions );
+	RenderContext* GetRenderContext() const																				{ return m_owner;  }
 
 private:
 	RenderContext*		m_owner = nullptr;

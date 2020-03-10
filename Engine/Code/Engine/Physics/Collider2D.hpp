@@ -40,6 +40,7 @@ public:
 
 	virtual void			DebugRender( RenderContext* ctx , Rgba8 const& borderColor , Rgba8 const& fillColor ) = 0;
 	virtual Vec2			GetPosition() const = 0;
+	//virtual Vec2			GetPosition() const = 0;
 	virtual float			CalculateMoment( float mass ) const = 0;
 
 	COLLIDER2D_TYPE			GetType() const																{ return m_colliderType; }

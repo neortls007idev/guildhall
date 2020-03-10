@@ -25,12 +25,21 @@ Strings GameObject::GetGameObjectInfo() const
 	std::string trueTextForBoolean = "true";
 	std::string FalseTextForBoolean = "false";
 
-	Vec2 velocity		= m_rigidbody->GetVelocity();
-	Vec2 verletVelocity = m_rigidbody->GetVerletVelocity();
-	Vec2 position		= m_rigidbody->GetPosition();
-	float mass			= m_rigidbody->GetMass();
-	float friction		= m_rigidbody->GetCollider()->GetPhysicsMaterial()->GetFriction();
-	float drag			= m_rigidbody->GetDrag();
+	Vec2 velocity						= m_rigidbody->GetVelocity();
+	Vec2 verletVelocity					= m_rigidbody->GetVerletVelocity();
+	Vec2 position						= m_rigidbody->GetPosition();
+	float mass							= m_rigidbody->GetMass();
+	float friction						= m_rigidbody->GetCollider()->GetPhysicsMaterial()->GetFriction();
+	float drag							= m_rigidbody->GetDrag();
+
+	float Bounce						= m_rigidbody->GetCollider()->GetPhysicsMaterial()->GetBounciness();
+	float angularVelocityDegrees		= m_rigidbody->GetAngularVelocityInDegrees();
+	float rotationDegrees				= m_rigidbody->GetRotationInDegrees();
+	float moment						= m_rigidbody->GetMoment();
+	//float angularAcceleration	= m_rigidbody->GetAngularVelocityInDegrees();
+	//float angularVerletVelocity	= m_rigidbody->GetAngularVelocityInDegrees();
+	
+	
 
 	std::string objectPos = "           Position = ";
 	objectPos += std::to_string( position.x ) + " , " + std::to_string( position.y );
@@ -51,6 +60,18 @@ Strings GameObject::GetGameObjectInfo() const
 
 	std::string objectDrag = " :  ,  \\ : Drag = ";
 	objectDrag += std::to_string( drag );
+
+	std::string objectBounce = "         : Bounciness = ";
+	objectBounce += std::to_string( Bounce );
+
+	std::string objectRotation = " R  ,  F : Rotation In Degrees = ";
+	objectRotation += std::to_string( rotationDegrees );
+
+	std::string objectAngularVelocity = " T , G , V : Angular Velocity In Degrees = ";
+	objectAngularVelocity += std::to_string( angularVelocityDegrees );
+
+	std::string objectMoment = "         : Moment = ";
+	objectMoment += std::to_string( moment );
 	
 	switch ( m_rigidbody->GetSimulationMode() )
 	{
@@ -73,6 +94,11 @@ Strings GameObject::GetGameObjectInfo() const
 	objectDetails.push_back( objectVelocity );
 	objectDetails.push_back( objectVerletVelocity );
 	objectDetails.push_back( objectPos );
+
+	objectDetails.push_back( objectBounce );
+	objectDetails.push_back( objectRotation );
+	objectDetails.push_back( objectAngularVelocity );
+	objectDetails.push_back( objectMoment );
 		
 	return objectDetails;
 }

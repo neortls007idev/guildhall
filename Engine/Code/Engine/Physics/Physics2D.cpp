@@ -62,6 +62,7 @@ void Physics2D::Update()
 			continue;
 		}
 		m_rigidBodies2D[ rigidBodyIndex ]->m_framePosition = m_rigidBodies2D[ rigidBodyIndex ]->GetPosition();
+		m_rigidBodies2D[ rigidBodyIndex ]->Update( ( float ) s_fixedTimeStep );
 	}
 	
 	while ( s_timer->CheckAndDecrement() )
@@ -278,8 +279,8 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC   || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
 		 collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
 	{
-		collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
-		collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
+		collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal , collision.m_collisionManifold.m_contactPoint );
+		collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal , collision.m_collisionManifold.m_contactPoint );
 
 		collision.m_me->GetRigidBody()->ApplyFriction( frictionNormal * collision.m_collisionManifold.m_normal.GetRotated90Degrees() );
 		collision.m_them->GetRigidBody()->ApplyFriction( -frictionNormal * collision.m_collisionManifold.m_normal.GetRotated90Degrees() );
@@ -293,7 +294,7 @@ void Physics2D::ResolveCollision( Collision2D collision )
 
 	if ( collision.CheckCollisionType() == STATIC_VS_KINEMATIC || collision.CheckCollisionType() == STATIC_VS_DYNAMIC )
 	{
-		collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal );
+		collision.m_them->GetRigidBody()->ApplyImpulse( -impulse * collision.m_collisionManifold.m_normal , collision.m_collisionManifold.m_contactPoint );
 		collision.m_them->GetRigidBody()->ApplyFriction( -frictionNormal * collision.m_collisionManifold.m_normal.GetRotated90Degrees() );
 	}
 
@@ -304,7 +305,7 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	
 	if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_STATIC )
 	{
-		collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal );
+		collision.m_me->GetRigidBody()->ApplyImpulse( impulse * collision.m_collisionManifold.m_normal , collision.m_collisionManifold.m_contactPoint );
 		collision.m_me->GetRigidBody()->ApplyFriction( frictionNormal * collision.m_collisionManifold.m_normal.GetRotated90Degrees() );
 	}
 }
@@ -378,6 +379,7 @@ void Physics2D::EndFrame()
 
 		Vec2 verletVelocity = ( -m_rigidBodies2D[ rigidBodyIndex ]->m_framePosition + m_rigidBodies2D[ rigidBodyIndex ]->GetPosition() ) / ( float ) s_fixedTimeStep;
 		m_rigidBodies2D[ rigidBodyIndex ]->SetVerletVelocity( verletVelocity );
+		//m_rigidBodies2D[ rigidBodyIndex ]->m_frameTorque = 0.f;
 	}
 	
 	CleanupDestroyedObjects();

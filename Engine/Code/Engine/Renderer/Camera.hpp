@@ -80,6 +80,8 @@ public:
 
 public:
 	RenderBuffer*	m_cameraUBO		= nullptr;
+	Transform			m_transform;
+	Mat44				m_view;
 
 private:
 
@@ -87,8 +89,6 @@ private:
 	Rgba8				m_clearColor			= BLACK;
 
 	Mat44				m_projection;
-	Mat44				m_view;
-	Transform			m_transform;
 	
 	Texture*			m_colorTarget			= nullptr;
 	Texture*			m_depthStencilTarget	= nullptr;

@@ -193,30 +193,44 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 {
 	Vec3 movement = Vec3::ZERO;
 	Vec3 rotation = Vec3::ZERO;
+	
+	//Vec2 newMovement = Vec2::MakeFromPolarDegrees( m_cameraRotation.y );
+	//Vec3 newMovement = Vec3::MakeFromSpericalCoordinates( m_cameraRotation.y , m_cameraRotation.x , 1 );
 
+	Mat44 cameraTransform = m_gameCamera.m_transform.GetAsMatrix();
+	Vec3 forwardVector = cameraTransform.GetKBasis3D();
+	Vec3 rightVector = cameraTransform.GetIBasis3D();
+	
+	float speed = 4.0f;
+
+	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) )
+	{
+		speed = 20.f;
+	}
+	
 	if ( g_theInput->IsKeyHeldDown( 'A' ) )
 	{
-		movement.x -= 1.f;
+		m_gameCamera.m_transform.SetPosition( m_gameCamera.m_transform.GetPostion() - rightVector * speed * deltaSeconds );
 	}
 	if ( g_theInput->IsKeyHeldDown( 'D' ) )
 	{
-		movement.x += 1.f;
+		m_gameCamera.m_transform.SetPosition( m_gameCamera.m_transform.GetPostion() + rightVector * speed * deltaSeconds );
 	}
 	if ( g_theInput->IsKeyHeldDown( 'W' ) )
 	{
-		movement.y += 1.f;
+		m_gameCamera.m_transform.SetPosition( m_gameCamera.m_transform.GetPostion() - forwardVector * speed * deltaSeconds );
 	}
 	if ( g_theInput->IsKeyHeldDown( 'S' ) )
 	{
-		movement.y -= 1.f;
+		m_gameCamera.m_transform.SetPosition( m_gameCamera.m_transform.GetPostion() + forwardVector * speed * deltaSeconds );
 	}
 	if ( g_theInput->IsKeyHeldDown( 'Q' ) )
 	{
-		movement.z += 1.f;
+		movement.y -= 1.f;
 	}
 	if ( g_theInput->IsKeyHeldDown( 'E' ) )
 	{
-		movement.z -= 1.f;
+		movement.y += 1.f;
 	}
 	if ( g_theInput->IsKeyHeldDown( KEY_UPARROW ) )
 	{
@@ -241,19 +255,8 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 		m_cameraRotation = Vec3::ZERO;
 	}
 
-	float speed = 4.0f;
-
-	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) )
-	{
-		speed = 20.f;
-	}
-
 	Vec2 mousePos = g_theInput->GetRelativeMovement();
 	
-// 	float rotationPitch = RangeMapFloat( 0.f , 1.f , -90.f , 90.f , mousePos.y );
-// 	float rotationYaw = RangeMapFloat( 0.f , 1.f , -180.f , 180.f , mousePos.x );
-
-	m_cameraPosition	+= movement * speed * deltaSeconds;
 	m_cameraRotation.x	-= mousePos.y * speed * deltaSeconds;
 	m_cameraRotation.y	-= mousePos.x * speed * deltaSeconds;
 
@@ -261,7 +264,6 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	float finalYaw	 = Clamp( m_cameraRotation.z, -175.f , 175.f );
 	float finalRoll  = Clamp( m_cameraRotation.y, -85.f , 85.f );
 
-	m_gameCamera.SetPosition( m_cameraPosition );
 	m_gameCamera.SetPitchYawRollRotation( finalPitch , finalRoll, finalYaw  );
 }
 

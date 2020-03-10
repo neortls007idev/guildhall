@@ -66,6 +66,7 @@ private:
 	void SelectGameObjectFormUserInput();
 	void UpdateCameraFromUserInput( float deltaSeconds );
 	void UpdateSelectedGameObjectBouncinessFromUserInput( float deltaSeconds );
+	void UpdateSelectedGameObjectAngularMotionFromUserInput( float deltaSeconds );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

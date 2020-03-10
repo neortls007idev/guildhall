@@ -36,6 +36,10 @@ void Transform::SetPosition( Vec3 pos )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Mat44 Transform::GetAsMatrix() const
 {
 	Mat44 transformBy = Mat44::CreateFromScaleRotationTransformation( m_scale , m_rotationDegrees , m_position );

@@ -142,7 +142,7 @@ void Game::Render() const
 	}
 
 	//DrawMouseCurrentPosition( m_worldCamera );
-	DrawGameObjectToolTip();
+	//DrawGameObjectToolTip();
 	RenderDrawFromPointCloudMode();
 	g_theRenderer->SetBlendMode( SOLID );
 	g_theRenderer->EndCamera( m_worldCamera );
@@ -204,6 +204,7 @@ void Game::RenderUI() const
 	g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea2 , uiArea.GetDimensions().y * 0.13f , physicsClockStatus , CYAN , 0.75f , ALIGN_BOTTOM_LEFT );
 	//g_bitmapFont->AddVertsForTextInBox2D( uiVerts , uiArea2 , uiArea.GetDimensions().y * 0.13f , timerStartTIme , YELLOW , 0.75f , ALIGN_CENTERED_LEFT );
 
+	DrawGameObjectToolTip();
 	g_theRenderer->BindTexture( g_bitmapFont->GetTexture() );
 	g_theRenderer->DrawVertexArray( uiVerts );
 
@@ -557,7 +558,7 @@ void Game::UpdateMass()
 		float mass = m_selectedGameObject->m_rigidbody->GetMass();
 		mass -= DELTA_MASS_CHANGE;
 		mass = Clamp( mass , 0.001f , INFINITY );
-		currentObjectRigidBody->SetMass( mass );
+		currentObjectRigidBody->SetMassAndUpdateMoment( mass );
 	}
 
 	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( KEY_RIGHT_SQ_BRACKET ) )
@@ -566,7 +567,7 @@ void Game::UpdateMass()
 		float mass = m_selectedGameObject->m_rigidbody->GetMass();
 		mass += DELTA_MASS_CHANGE;
 		mass = Clamp( mass , 0.001f , INFINITY );
-		currentObjectRigidBody->SetMass( mass );
+		currentObjectRigidBody->SetMassAndUpdateMoment( mass );
 	}
 }
 
@@ -773,9 +774,14 @@ void Game::DrawGameObjectToolTip() const
 
 	Vec2 PickObjectPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
 
+	
 	AABB2 screenSize = AABB2( m_worldCamera.GetOrthoMin().GetXYComponents() , m_worldCamera.GetOrthoMax().GetXYComponents() );
+	PickObjectPosition.x = RangeMapFloat( screenSize.m_mins.x , screenSize.m_maxs.x , -1.f , 1.f , PickObjectPosition.x );
+	PickObjectPosition.y = RangeMapFloat( screenSize.m_mins.y , screenSize.m_maxs.y , -1.f , 1.f , PickObjectPosition.y );
 
-	AABB2 temp = AABB2( PickObjectPosition , Vec2( PickObjectPosition.x + 600.f , PickObjectPosition.y + 25.f ) );
+	screenSize = AABB2( m_UICamera.GetOrthoMin().GetXYComponents() , m_UICamera.GetOrthoMax().GetXYComponents() );
+
+	AABB2 temp = AABB2( PickObjectPosition , Vec2( PickObjectPosition.x + .9f , PickObjectPosition.y + .055f ) );
 
 	temp.FitWithinBounds( screenSize );
 
@@ -789,7 +795,7 @@ void Game::DrawGameObjectToolTip() const
 
 		for ( int index = 0; index < objectInfo.size(); index++ )
 		{
-			g_bitmapFont->AddVertsForTextInBox2D( actorInfoVerts , objectDetailsAABB2 , 12.f , objectInfo[ index ] , MAGENTA , 1.f , ALIGN_CENTERED_LEFT );
+			g_bitmapFont->AddVertsForTextInBox2D( actorInfoVerts , objectDetailsAABB2 , .028f , objectInfo[ index ] , MAGENTA , 0.6f , ALIGN_CENTERED_LEFT );
 			objectDetailsAABB2 = AABB2( objectDetailsAABB2.m_mins , objectDetailsAABB2.m_maxs + textOffset );
 		}
 		g_theRenderer->SetBlendMode( ALPHA );
@@ -822,6 +828,7 @@ void Game::UpdateFromUserInput( float deltaSeconds )
 
 	SelectGameObjectFormUserInput();
 	UpdateSelectedGameObjectBouncinessFromUserInput( deltaSeconds );
+	UpdateSelectedGameObjectAngularMotionFromUserInput( deltaSeconds );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -926,9 +933,13 @@ void Game::UpdateCameraFromUserInput( float deltaSeconds )
 		m_cameraCurrentPosition -= ( Vec3( 0.f , m_cameraMoveVelocity.y , 0.f ) * deltaSeconds );
 	}
 
+	Mat44 cameraTransform = m_worldCamera.m_transform.GetAsMatrix();
+	Vec3 forwardVector = cameraTransform.GetKBasis3D();
+	
 	if ( g_theInput->IsKeyHeldDown( 'W' ) )
 	{
-		m_cameraCurrentPosition += ( Vec3( 0.f , m_cameraMoveVelocity.y , 0.f ) * deltaSeconds );
+		//m_cameraCurrentPosition += ( Vec3( 0.f , m_cameraMoveVelocity.y , 0.f ) * deltaSeconds );
+		m_worldCamera.m_transform.SetPosition( m_worldCamera.m_transform.GetPostion() - forwardVector * deltaSeconds );
 	}
 
 	if ( g_theInput->GetMouseWheelValue() < 0 )
@@ -998,6 +1009,39 @@ void Game::UpdateSelectedGameObjectBouncinessFromUserInput( float deltaSeconds )
 		bounciness -= DELTA_BOUNCINESS_CHANGE * deltaSeconds;
 		bounciness = ClampZeroToOne( bounciness );
 		currentObjectCollider->GetPhysicsMaterial()->SetBounciness( bounciness );
+	}
+}
+
+void Game::UpdateSelectedGameObjectAngularMotionFromUserInput( float deltaSeconds )
+{
+	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown( 'R' ) )
+	{
+		Rigidbody2D* rb = m_selectedGameObject->m_rigidbody;
+		rb->SetRotationInDegrees( rb->GetRotationInDegrees() + 10.f * deltaSeconds );
+	}
+
+	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown( 'F' ) )
+	{
+		Rigidbody2D* rb = m_selectedGameObject->m_rigidbody;
+		rb->SetRotationInDegrees( rb->GetRotationInDegrees() - 10.f * deltaSeconds );
+	}
+
+	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown( 'T' ) )
+	{
+		Rigidbody2D* rb = m_selectedGameObject->m_rigidbody;
+		rb->SetAngularVelocityInDegrees( rb->GetAngularVelocityInDegrees() + 10.f * deltaSeconds );
+	}
+
+	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown( 'G' ) )
+	{
+		Rigidbody2D* rb = m_selectedGameObject->m_rigidbody;
+		rb->SetAngularVelocityInDegrees( rb->GetAngularVelocityInDegrees() - 10.f * deltaSeconds );
+	}
+
+	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown( 'V' ) )
+	{
+		Rigidbody2D* rb = m_selectedGameObject->m_rigidbody;
+		rb->SetAngularVelocityInDegrees( 0.f );
 	}
 }
 
