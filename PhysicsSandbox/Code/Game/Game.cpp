@@ -906,29 +906,40 @@ void Game::SelectGameObjectFormUserInput()
 
 void Game::UpdateCameraFromUserInput( float deltaSeconds )
 {
+	float speed = 4.f;
+	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) )
+	{
+		speed = 20.f;
+	}
+	
 	if ( g_theInput->WasKeyJustPressed( 'O' ) )
 	{
 		m_cameraCurrentPosition = m_cameraDefaultPosition;
+		m_worldCamera.SetPosition( m_cameraDefaultPosition );
 	}
 
 	if ( g_theInput->IsKeyHeldDown( 'D' ) )
 	{
-		m_cameraCurrentPosition += ( Vec3( m_cameraMoveVelocity.x , 0.f , 0.f ) * deltaSeconds );
+		m_cameraCurrentPosition += ( Vec3( m_cameraMoveVelocity.x , 0.f , 0.f ) * speed * deltaSeconds );
+		m_worldCamera.Translate( Vec3( m_cameraMoveVelocity.x , 0.f , 0.f ) * speed * deltaSeconds );
 	}
 
 	if ( g_theInput->IsKeyHeldDown( 'A' ) )
 	{
-		m_cameraCurrentPosition -= ( Vec3( m_cameraMoveVelocity.x , 0.f , 0.f ) * deltaSeconds );
+		m_cameraCurrentPosition -= ( Vec3( m_cameraMoveVelocity.x , 0.f , 0.f ) * speed * deltaSeconds );
+		m_worldCamera.Translate( Vec3( -m_cameraMoveVelocity.x , 0.f , 0.f ) * speed * deltaSeconds );
 	}
 
 	if ( g_theInput->IsKeyHeldDown( 'S' ) )
 	{
-		m_cameraCurrentPosition -= ( Vec3( 0.f , m_cameraMoveVelocity.y , 0.f ) * deltaSeconds );
+		m_cameraCurrentPosition -= ( Vec3( 0.f , m_cameraMoveVelocity.y , 0.f ) * speed * deltaSeconds );
+		m_worldCamera.Translate( Vec3( 0.f , -m_cameraMoveVelocity.y , 0.f ) * speed * deltaSeconds );
 	}
 
 	if ( g_theInput->IsKeyHeldDown( 'W' ) )
 	{
-		m_cameraCurrentPosition += ( Vec3( 0.f , m_cameraMoveVelocity.y , 0.f ) * deltaSeconds );
+		m_cameraCurrentPosition += ( Vec3( 0.f , m_cameraMoveVelocity.y , 0.f ) * speed * deltaSeconds );
+		m_worldCamera.Translate( Vec3( 0.f , +m_cameraMoveVelocity.y , 0.f ) * speed * deltaSeconds );
 	}
 
 	if ( g_theInput->GetMouseWheelValue() < 0 )
