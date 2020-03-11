@@ -156,6 +156,8 @@ void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderCol
 	Vec2 line1 = Vec2::MakeFromPolarDegrees(  45.f + orientationDegrees , 0.1f * m_width );
 	Vec2 line2 = Vec2::MakeFromPolarDegrees( -45.f + orientationDegrees , 0.1f * m_width );
 
+	Vec2 center = m_polygon.GetCenter();
+
 	if ( m_rigidbody->m_isSimulationActive )
 	{
 		ctx->DrawLine( m_worldPosition - line1 , m_worldPosition + line1 , BLUE , 0.01f * m_width );
@@ -167,7 +169,30 @@ void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderCol
 		ctx->DrawLine( m_worldPosition - line2 , m_worldPosition + line2 , RED , 0.01f * m_width );
 	}
 
-	if ( m_isDrawingCollisions )
+// 	if ( m_rigidbody->m_isSimulationActive )
+// 	{
+// 		ctx->DrawLine( m_boundingDisc.m_center - line1 , m_boundingDisc.m_center + line1 , YELLOW , 0.01f * m_width );
+// 		ctx->DrawLine( m_boundingDisc.m_center - line2 , m_boundingDisc.m_center + line2 , YELLOW , 0.01f * m_width );
+// 	}
+// 	else
+// 	{
+// 		ctx->DrawLine( m_boundingDisc.m_center - line1 , m_boundingDisc.m_center + line1 , GREEN , 0.01f * m_width );
+// 		ctx->DrawLine( m_boundingDisc.m_center - line2 , m_boundingDisc.m_center + line2 , GREEN , 0.01f * m_width );
+// 	}
+// 
+// 	if ( m_rigidbody->m_isSimulationActive )
+// 	{
+// 		ctx->DrawLine( center - line1 , center + line1 , CYAN , 0.01f * m_width );
+// 		ctx->DrawLine( center - line2 , center + line2 , CYAN , 0.01f * m_width );
+// 	}													 
+// 	else												 
+// 	{													 
+// 		ctx->DrawLine( center - line1 , center + line1 , CYAN , 0.01f * m_width );
+// 		ctx->DrawLine( center - line2 , center + line2 , CYAN , 0.01f * m_width );
+// 	}
+
+	
+	//if ( m_isDrawingCollisions )
 	{
 		ctx->DrawRing( m_boundingDisc.m_center , m_boundingDisc.m_radius , WHITE , 5.f );
 		

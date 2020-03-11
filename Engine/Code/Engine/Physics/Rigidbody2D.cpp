@@ -233,7 +233,7 @@ Vec2 Rigidbody2D::CalculateImpactVelocity( Vec2 pos ) const
 {
 	Vec2 distance = pos - m_worldPosition;
 
-	return m_velocity + m_angularVelocity * distance.GetRotated90Degrees();
+	return m_velocity + m_angularVelocity * ( distance.GetRotated90Degrees() ) /*/ distance.GetLength() )*/;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

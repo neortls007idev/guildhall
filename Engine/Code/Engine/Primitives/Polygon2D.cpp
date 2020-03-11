@@ -100,6 +100,13 @@ void Polygon2D::SetCenter()
 	float centerX = ( rightMostPoint.x + leftMostPoint.x ) * 0.5f;
 	float centerY = ( topMostPoint.y + bottomMostPoint.y ) * 0.5f;
 	m_center = Vec2( centerX , centerY );
+
+// 	for ( size_t index = 0; index < m_points.size(); index++ )
+// 	{
+// 		m_center += m_points[ index ];
+// 	}
+// 
+// 	m_center /= m_points.size();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

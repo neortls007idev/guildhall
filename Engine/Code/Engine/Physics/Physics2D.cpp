@@ -126,7 +126,7 @@ void Physics2D::ApplyEffectors( Rigidbody2D* rigidbody , float deltaSeconds )
 
 		switch ( simulationMode )
 		{
-			case SIMULATIONMODE_STATIC:
+			case SIMULATIONMODE_STATIC:		rigidbody->SetVelocity( Vec2::ZERO );
 											break;
 
 			case SIMULATIONMODE_KINEMATIC:	/*m_rigidBodied2D[ index ]->SetVeloity( currentVelocity );*/
@@ -235,11 +235,6 @@ void Physics2D::ResolveCollision( Collision2D collision )
 		return;
 	}
 
-	if ( collision.m_me->GetRigidBody()->m_collider->GetType() == COLLIDER2D_CONVEXGON )
-	{
-		collision.m_collisionManifold.m_normal *= -1;
-	}
-
 	// 8 ways to move the object;
 
 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
@@ -271,7 +266,7 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	
 	//float ImpulseNormal = CalculateImpulse( collision );
 
-	Vec2 impulseT = CalculateImpulse( collision );
+	Vec2 theRealImpulse = CalculateImpulse( collision );
 	
 	if ( abs( frictionNormal ) > friction* frictionNormal )
 	{
@@ -281,14 +276,11 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC   || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
 		 collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
 	{
-		collision.m_me->GetRigidBody()->ApplyImpulse( impulseT , collision.m_collisionManifold.m_contactPoint );
-		collision.m_them->GetRigidBody()->ApplyImpulse( -impulseT , collision.m_collisionManifold.m_contactPoint );
+		collision.m_me->GetRigidBody()->ApplyImpulse( theRealImpulse , collision.m_collisionManifold.m_contactPoint );
+		collision.m_them->GetRigidBody()->ApplyImpulse( -theRealImpulse , collision.m_collisionManifold.m_contactPoint );
 
 		collision.m_me->GetRigidBody()->ApplyFriction( frictionNormal * collision.m_collisionManifold.m_normal.GetRotated90Degrees() , collision.m_collisionManifold.m_contactPoint );
 		collision.m_them->GetRigidBody()->ApplyFriction( -frictionNormal * collision.m_collisionManifold.m_normal.GetRotated90Degrees() , collision.m_collisionManifold.m_contactPoint );
-
-		//collision.m_me->GetRigidBody()->ApplyTorque( ImpulseNormal * collision.m_collisionManifold.m_normal.GetRotated90Degrees() , collision.m_collisionManifold.m_contactPoint );
-		//collision.m_them->GetRigidBody()->ApplyTorque( -ImpulseNormal * collision.m_collisionManifold.m_normal.GetRotated90Degrees() , collision.m_collisionManifold.m_contactPoint );
 		
 		return;
 	}
@@ -300,10 +292,8 @@ void Physics2D::ResolveCollision( Collision2D collision )
 
 	if ( collision.CheckCollisionType() == STATIC_VS_KINEMATIC || collision.CheckCollisionType() == STATIC_VS_DYNAMIC )
 	{
-		collision.m_them->GetRigidBody()->ApplyImpulse( -impulseT , collision.m_collisionManifold.m_contactPoint );
+		collision.m_them->GetRigidBody()->ApplyImpulse( -theRealImpulse , collision.m_collisionManifold.m_contactPoint );
 		collision.m_them->GetRigidBody()->ApplyFriction( -frictionNormal * collision.m_collisionManifold.m_normal.GetRotated90Degrees() , collision.m_collisionManifold.m_contactPoint );
-		//collision.m_them->GetRigidBody()->ApplyTorque( -frictionNormal * collision.m_collisionManifold.m_normal.GetRotated90Degrees() , collision.m_collisionManifold.m_contactPoint );
-		//collision.m_them->GetRigidBody()->ApplyTorque( -ImpulseNormal * collision.m_collisionManifold.m_normal.GetRotated90Degrees() , collision.m_collisionManifold.m_contactPoint );
 	}
 
 	impulse = myMass * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) *
@@ -313,10 +303,8 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	
 	if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_STATIC )
 	{
-		collision.m_me->GetRigidBody()->ApplyImpulse( impulseT , collision.m_collisionManifold.m_contactPoint );
+		collision.m_me->GetRigidBody()->ApplyImpulse( theRealImpulse , collision.m_collisionManifold.m_contactPoint );
 		collision.m_me->GetRigidBody()->ApplyFriction( frictionNormal * collision.m_collisionManifold.m_normal.GetRotated90Degrees() , collision.m_collisionManifold.m_contactPoint );
-		//collision.m_me->GetRigidBody()->ApplyTorque( frictionNormal * collision.m_collisionManifold.m_normal.GetRotated90Degrees() , collision.m_collisionManifold.m_contactPoint );
-		//collision.m_me->GetRigidBody()->ApplyTorque( ImpulseNormal * collision.m_collisionManifold.m_normal.GetRotated90Degrees() , collision.m_collisionManifold.m_contactPoint );
 	}
 }
 
@@ -331,11 +319,14 @@ Vec2 Physics2D::CalculateImpulse( Collision2D& collision )
 	Vec2 meImpactVelocity = collision.m_me->GetRigidBody()->CalculateImpactVelocity( contactPoint );
 	Vec2 themImpactVelocity = collision.m_them->GetRigidBody()->CalculateImpactVelocity( contactPoint );
 	
+
+	float friction = collision.m_me->GetFrictionWith( collision.m_them );
 	
 	float ImpulseNormal = -1 * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) * DotProduct2D( ( meImpactVelocity - themImpactVelocity ) , normal );
 
 	float ImpulseTangent = -1 * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) * DotProduct2D( ( meImpactVelocity - themImpactVelocity ) , tangent );
 
+	
 	float factorMe = DotProduct2D( ( contactPoint - collision.m_me->GetRigidBody()->GetPosition() ).GetRotated90Degrees() , normal );
 	factorMe *= factorMe;
 	factorMe /= collision.m_me->GetRigidBody()->GetMoment();
@@ -403,6 +394,8 @@ Vec2 Physics2D::CalculateImpulse( Collision2D& collision )
 	}
 	
 	ImpulseTangent /= denomCopy;
+
+	ImpulseTangent = Clamp( ImpulseTangent , -friction * ImpulseNormal , friction * ImpulseNormal );
 	   	
 	return ( ImpulseNormal * normal ) + ( ImpulseTangent * tangent );
 }
