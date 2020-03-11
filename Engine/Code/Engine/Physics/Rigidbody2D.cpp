@@ -35,7 +35,6 @@ void Rigidbody2D::Destroy()
 void Rigidbody2D::Update( float deltaSeconds )
 {
 	m_frameRotation			 = m_rotationInRadians;
-	m_angularVelocity		+= ( m_frameTorque / m_moment );
 	m_rotationInRadians		+= m_angularVelocity * deltaSeconds;
 	m_frameRotation			 = m_rotationInRadians - m_frameRotation;
 
@@ -88,6 +87,10 @@ void Rigidbody2D::ApplyImpulse( Vec2 impulse , Vec2 point )
 {
 	UNUSED( point );
 	m_velocity += impulse / m_mass;
+
+ 	Vec2 torqueDistance = ( point - m_collider->GetPosition() );
+ 	m_frameTorque = DotProduct2D( torqueDistance.GetRotated90Degrees() , impulse );
+ 	m_angularVelocity += ( m_frameTorque / m_moment );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -104,6 +107,8 @@ void Rigidbody2D::ApplyTorque( Vec2 torqueImpulse , Vec2 point /*= Vec2::ZERO */
 {
 	Vec2 torqueDistance = ( point - m_collider->GetPosition() );
 	m_frameTorque = CrossProduct2D( torqueDistance , torqueImpulse );
+	m_angularVelocity += ( m_frameTorque / m_moment );
+	//m_velocity = torqueDistance * m_angularVelocity;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -220,6 +225,15 @@ void Rigidbody2D::SetframeTorque( float newTorque )
 void Rigidbody2D::SetMoment( float newMoment )
 {
 	m_moment = newMoment;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec2 Rigidbody2D::CalculateImpactVelocity( Vec2 pos ) const
+{
+	Vec2 distance = pos - m_worldPosition;
+
+	return m_velocity + m_angularVelocity * distance.GetRotated90Degrees();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -73,6 +73,8 @@ public:
 	void			SetAngularVelocityInDegrees( float newAngularVelocityDegrees );
 	void			SetframeTorque( float newTorque );
 	void			SetMoment( float newMoment );
+
+	Vec2			CalculateImpactVelocity( Vec2 pos ) const;
 		
 public:
 	Physics2D*			m_system				= nullptr;											// which scene created/owns this object
