@@ -117,6 +117,8 @@ void Rigidbody2D::ApplyDrag( float deltaSeconds )
 {
 	Vec2 dragDirection = 1.f / m_mass * GetVerletVelocity().GetNormalized().GetRotated90Degrees().GetRotated90Degrees();
 	m_velocity += m_drag * dragDirection * deltaSeconds;
+
+	//m_angularVelocity += m_angularDrag * CrossProduct2D( dragDirection , m_velocity ) * deltaSeconds;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

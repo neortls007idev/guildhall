@@ -44,7 +44,7 @@ Game::Game()
 	m_worldCamera.SetPosition( m_cameraDefaultPosition );
 
 	//m_worldCamera.SetProjectionOrthographic( 800.f );
-	m_worldCamera.SetOrthoView( Vec2(-800.f,-400.f) , Vec2( 800.f , 400.f ) );
+	m_worldCamera.SetOrthoView( Vec2( -800.f , -400.f ) , Vec2( 800.f , 400.f ) );
 
 	m_UICamera.SetOutputSize( m_currentCameraOutputSize );
 	m_UICamera.SetPosition( m_cameraDefaultPosition );
@@ -54,9 +54,22 @@ Game::Game()
 	m_mousePosition = g_theInput->GetMouseNormalizedClientPosition();
 	m_mousePosition = m_worldCamera.ClientToWorld( g_theInput->GetMouseNormalizedClientPosition() , 0 ).GetXYComponents();
 
-	RandomizePointCloud( m_rng );
+	//RandomizePointCloud( m_rng );
 
 	//InitialGameObjectsSpawner();
+
+	m_pointCloud.push_back( Vec2(-50,-50) );
+	m_pointCloud.push_back( Vec2(50,50) );
+	m_pointCloud.push_back( Vec2(-50,50) );
+	m_pointCloud.push_back( Vec2(50,-50) );
+// 	m_pointCloud.push_back( Vec2::ONE_ZERO );
+// 	m_pointCloud.push_back( Vec2::ZERO_ONE );
+
+	m_testPolygon = m_testPolygon.MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , m_pointCloud.size() );
+
+	GameObject* temp = new GameObject( g_thePhysicsSystem , Vec2::ZERO , Vec2::ZERO , m_testPolygon );
+	m_gameObjects.push_back( temp );
+	m_isMouseOnGameObject.push_back( false );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -89,7 +102,7 @@ void Game::Update( float deltaSeconds )
 
 	m_frameDelay++;
 
-	if ( m_frameDelay % 5 == 0 )
+	if ( m_frameDelay % 3 == 0 )
 	{
 		Vec3 temp = m_worldCamera.ClientToWorld( g_theInput->GetMouseNormalizedClientPosition() , 0 );
 		m_MouseDragFrames[ m_frameCount ] = Vec2( temp.x , temp.y );
@@ -606,8 +619,18 @@ Vec2 Game::GetMouseDragVelocity() const
 	}
 
 	temp /= 10.f;
-	// return temp;
-	return m_MouseDragFrames[ 0 ] - m_MouseDragFrames[ m_frameCount ];
+	return temp;
+	//return m_MouseDragFrames[ 0 ] - m_MouseDragFrames[ m_frameCount ];
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::ResetMouseDragVelocity()
+{
+	for ( int index = 0; index < 10; index++ )
+	{
+		m_MouseDragFrames[ index ] = Vec2::ZERO;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -846,7 +869,7 @@ void Game::SelectGameObjectFormUserInput()
 			m_isMouseOnGameObject.push_back( false );
 		}
 
-		if ( g_theInput->WasLeftMouseButtonJustPressed() )
+		if ( g_theInput->IsLeftMouseButtonHeldDown() )
 		{
 			if ( !m_isGameObjectSelected )
 			{
@@ -864,24 +887,25 @@ void Game::SelectGameObjectFormUserInput()
 					m_isGameObjectSelected = true;
 				}
 			}
-			else
+		}
+		else
+		{
+			if ( m_selectedGameObject != nullptr )
 			{
-				if ( m_selectedGameObject != nullptr )
-				{
-					Vec2 newVelocity = GetMouseDragVelocity().GetNormalized() / ( m_dragTime ) * 10.f;
-					//newVelocity = g_theInput->GetMouseDragVelocity();
-					m_selectedGameObject->m_rigidbody->SetVelocity( newVelocity );
-					m_selectedGameObject->m_rigidbody->ChangeIsSimulationActive( true );
-					m_selectedGameObject->m_isSelected = false;
-					m_rigidBodyMouseOffset = Vec2::ZERO;
-					m_isDragOffsetSet = false;
-					m_isGameObjectSelected = false;
-				}
-				m_selectedGameObject = nullptr;
-				for ( size_t gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
-				{
-					m_isMouseOnGameObject[ gameObjectIndex ] = false;
-				}
+				Vec2 newVelocity = GetMouseDragVelocity().GetNormalized() / ( m_dragTime ) * 10.f;
+				//newVelocity = g_theInput->GetMouseDragVelocity();
+				m_selectedGameObject->m_rigidbody->SetVelocity( newVelocity );
+				ResetMouseDragVelocity();
+				m_selectedGameObject->m_rigidbody->ChangeIsSimulationActive( true );
+				m_selectedGameObject->m_isSelected = false;
+				m_rigidBodyMouseOffset = Vec2::ZERO;
+				m_isDragOffsetSet = false;
+				m_isGameObjectSelected = false;
+			}
+			m_selectedGameObject = nullptr;
+			for ( size_t gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
+			{
+				m_isMouseOnGameObject[ gameObjectIndex ] = false;
 			}
 		}
 

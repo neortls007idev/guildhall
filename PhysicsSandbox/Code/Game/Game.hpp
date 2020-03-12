@@ -52,6 +52,7 @@ public:
 	void UpdateMass();
 	void UpdateDrag();
 	Vec2 GetMouseDragVelocity() const;
+	void ResetMouseDragVelocity();
 
 	void RandomizePointCloud( RandomNumberGenerator rng );
 

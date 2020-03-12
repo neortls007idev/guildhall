@@ -262,7 +262,7 @@ float PolygonCollider2D::CalculateMoment( float mass ) const
 {
 	float momentOfPolygon = 0.f;
 	
-	uint totalSidesInPolygon = static_cast< uint >( m_polygon.m_points.size() - 2 );
+	//uint totalSidesInPolygon = static_cast< uint >( m_polygon.m_points.size() - 2 );
 
 	float areaOfPolygon = CalculateAreaOfPolygon( m_polygon );
 
@@ -280,6 +280,10 @@ float PolygonCollider2D::CalculateMoment( float mass ) const
 
 		pointIndex--;
 	}
+
+	momentOfPolygon *= mass;
+	momentOfPolygon /= areaOfPolygon;
+	
 	return momentOfPolygon;
 }
 

@@ -204,7 +204,8 @@ float Collider2D::GetFrictionWith( Collider2D const* other ) const
 	float meFriction = m_physicsMaterial->GetFriction();
 	float otherFriction = other->GetPhysicsMaterial()->GetFriction();
 
-	return sqrtf( ( meFriction * meFriction ) + ( otherFriction * otherFriction ) );
+	return meFriction * otherFriction;
+	//return sqrtf( ( meFriction * meFriction ) + ( otherFriction * otherFriction ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
