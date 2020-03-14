@@ -7,7 +7,7 @@
 float CalculateMomentOfInertiaOfTriangle( const Vec2& vertex0 , const Vec2& vertex1 , const Vec2& vertex2 , const float mass )
 {
 	// TODO :- OPTIMIZE IF FEELS SLOW a can be integrated in h
-	//UNUSED( mass );
+	UNUSED( mass );
 	
 	Vec2 u = vertex1 - vertex0;
 	Vec2 v = vertex2 - vertex0;
@@ -20,5 +20,12 @@ float CalculateMomentOfInertiaOfTriangle( const Vec2& vertex0 , const Vec2& vert
 	Vec2 h = ( v - ( ( DotProduct2D( v , u ) / DotProduct2D(u,u ) ) * u ) );		// height =   |v (V.u) . u  |
 																										//			  |   (u.u)	    |
 
-	return  mass * ( /*area **/ ( 1 / 18.f ) * ( ( ( b * b ) - ( a * b ) + ( ( a * a ) ) + ( DotProduct2D( h , h ) ) ) ) + ( area * center.GetLengthSquared() ) ) ;
+	float inertia = ( b - a + ( ( a * a ) / b ) + ( DotProduct2D( h , h ) ) );
+
+	inertia *= area / 18.f;
+
+	inertia += area * center.GetLengthSquared();
+
+	return inertia;
+	//return  mass * ( area * ( 1.f / 18.f ) * (  ) + ( area * center.GetLengthSquared() ) ) ;
 }

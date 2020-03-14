@@ -55,22 +55,22 @@ void Physics2D::BeginFrame()
 
 void Physics2D::Update()
 {
-	for(int rigidBodyIndex=0; rigidBodyIndex<m_rigidBodies2D.size(); ++rigidBodyIndex )
-	{
-		if(!m_rigidBodies2D[rigidBodyIndex])
-		{
-			continue;
-		}
-		m_rigidBodies2D[ rigidBodyIndex ]->m_framePosition = m_rigidBodies2D[ rigidBodyIndex ]->GetPosition();
-		m_rigidBodies2D[ rigidBodyIndex ]->Update( ( float ) s_fixedTimeStep );
-	}
 	
 	while ( s_timer->CheckAndDecrement() )
 	{
+		for(int rigidBodyIndex=0; rigidBodyIndex<m_rigidBodies2D.size(); ++rigidBodyIndex )
+		{
+			if(!m_rigidBodies2D[rigidBodyIndex])
+			{
+				continue;
+			}
+			m_rigidBodies2D[ rigidBodyIndex ]->m_framePosition = m_rigidBodies2D[ rigidBodyIndex ]->GetPosition();
+		}
+		
 		AdvanceSimulation( ( float ) s_fixedTimeStep );
 		DetectCollisions();
 		ResolveCollisions();
-		
+				
 		for ( size_t colliderIndex = 0; colliderIndex < m_colliders2D.size(); ++colliderIndex )
 		{
 			if ( !m_colliders2D[ colliderIndex ] )
@@ -79,6 +79,7 @@ void Physics2D::Update()
 			}
 			m_colliders2D[ colliderIndex ]->UpdateWorldShape();
 		}
+
  	}
 }
 
@@ -100,6 +101,7 @@ void Physics2D::AdvanceSimulation( float deltaSeconds )
 		ApplyEffectors( m_rigidBodies2D[index] , deltaSeconds );
 		m_rigidBodies2D[ index ]->ApplyDrag( deltaSeconds );
 		MoveRigidbodies( m_rigidBodies2D[ index ] , deltaSeconds );
+		m_rigidBodies2D[ index ]->Update( deltaSeconds );
 	}
 	
 	for ( size_t index = 0; index < m_rigidBodies2D.size(); index++ )
@@ -383,6 +385,9 @@ void Physics2D::ResolveCollisions()
 	{
 		ResolveCollision( m_frameCollisions[index] );
 	}
+	
+	//ResetCollisions();
+	m_frameCollisions.clear();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
