@@ -22,7 +22,7 @@ Physics2D::Physics2D()
 {
 	s_clock			= new Clock();
 	s_timer			= new Timer();
-	s_fixedTimeStep = 1.0 / 60.0;
+	s_fixedTimeStep = 1.0 / 120.0;
 
 	EventArgs physicsStepArgs;
 
@@ -79,8 +79,8 @@ void Physics2D::Update()
 			}
 			m_colliders2D[ colliderIndex ]->UpdateWorldShape();
 		}
-		
 		//ResetCollisions();
+		CleanupDestroyedObjects();
  	}
 }
 
@@ -394,8 +394,7 @@ void Physics2D::ResolveCollisions()
 		ResolveCollision( m_frameCollisions[index] );
 	}
 	
-	//ResetCollisions();
-	//m_frameCollisions.clear();
+	ResetCollisions();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -460,7 +459,6 @@ void Physics2D::EndFrame()
 		m_rigidBodies2D[ rigidBodyIndex ]->m_frameTorque = 0.f;
 	}
 	
-	CleanupDestroyedObjects();
 	ResetCollisions();
 }
 
