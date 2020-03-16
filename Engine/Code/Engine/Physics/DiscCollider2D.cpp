@@ -74,7 +74,6 @@ void DiscCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor 
 
 	
 	Vec2 rotationLine = Vec2::MakeFromPolarDegrees( orientationDegrees , m_radius );
-	ctx->DrawLine( m_worldPosition , m_worldPosition + rotationLine , PURPLE , .1f * m_radius );
 	
 	if ( m_rigidbody->m_isSimulationActive )
 	{
@@ -88,7 +87,10 @@ void DiscCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderColor 
 	}
 
 	ctx->DrawRing( m_worldPosition , m_radius - ( 0.05f * m_radius ) , borderColor , 0.1f * m_radius );
+	ctx->DrawArrow( m_worldPosition , m_worldPosition + rotationLine , PURPLE , .1f * m_radius );
 	
+	//ctx->DrawArrow( m_worldPosition , m_worldPosition + GetRigidBody()->GetVelocity() , CYAN , .1f * m_radius );
+	//ctx->DrawArrow( m_worldPosition , m_worldPosition + GetRigidBody()->GetVerletVelocity() , GREEN , .1f * m_radius );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

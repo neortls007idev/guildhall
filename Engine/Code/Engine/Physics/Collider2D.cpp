@@ -79,7 +79,7 @@ Manifold2D DiscVDiscCollisionManiFold( Collider2D const* me , Collider2D const* 
 		return collision;
 	}
 	collision.m_normal			= ( discColliderMe->GetPosition() - discColliderThem->GetPosition()).GetNormalized();
-	collision.m_contactPoint = discColliderMe->GetPosition() + ( collision.m_normal * ( discColliderMe->GetRadius() - ( collision.m_overlap * 0.5f ) ) );
+	collision.m_contactPoint = discColliderMe->GetPosition() - ( collision.m_normal * discColliderMe->GetRadius() ) + ( collision.m_normal * collision.m_overlap * 0.5f ) ;
 
 	return collision;
 }

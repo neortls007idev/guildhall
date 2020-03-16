@@ -122,6 +122,7 @@ public:
 	void DrawMesh( const GPUMesh* mesh );
 
 	void DrawLine( const Vec2& start , const Vec2& end , const Rgba8& color , float thickness , float scale = 1.f , float orientationDegrees = 0.f , Vec2 translate = Vec2::ZERO );
+	void DrawArrow( const Vec2& start , const Vec2& end , const Rgba8& color , float thickness , float scale = 1.f , float orientationDegrees = 0.f , Vec2 translate = Vec2::ZERO );
 	void DrawRing(const Vec2& center, float radius, const Rgba8& color, float thickness , float scale = 1.f , float orientationDegrees = 0.f , Vec2 translate = Vec2::ZERO );
 	void DrawAABB2( const AABB2& box, const Rgba8& tint);
 	void DrawDisc( const Disc2D& disc, const Rgba8& tint , float scale = 1.f , float orientationDegrees = 0.f , Vec2 translate = Vec2::ZERO );

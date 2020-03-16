@@ -19,6 +19,7 @@
 #include "Engine/Core/StringUtils.hpp"
 #include "Game/Gameobject.hpp"
 #include "Engine/Core/DevConsole.hpp"
+#include "Engine/Physics/DiscCollider2D.hpp"
 //#include "Engine/Physics/Polygon2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -58,18 +59,20 @@ Game::Game()
 
 	//InitialGameObjectsSpawner();
 
-	m_pointCloud.push_back( Vec2(-50,-50) );
-	m_pointCloud.push_back( Vec2(50,50) );
-	m_pointCloud.push_back( Vec2(-50,50) );
-	m_pointCloud.push_back( Vec2(50,-50) );
-// 	m_pointCloud.push_back( Vec2::ONE_ZERO );
-// 	m_pointCloud.push_back( Vec2::ZERO_ONE );
-
-	m_testPolygon = m_testPolygon.MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , m_pointCloud.size() );
-
-	GameObject* temp = new GameObject( g_thePhysicsSystem , Vec2::ZERO , Vec2::ZERO , m_testPolygon );
-	m_gameObjects.push_back( temp );
-	m_isMouseOnGameObject.push_back( false );
+// 	m_pointCloud.push_back( Vec2(-50,-50) );
+// 	m_pointCloud.push_back( Vec2(50,50) );
+// 	m_pointCloud.push_back( Vec2(-50,50) );
+// 	m_pointCloud.push_back( Vec2(50,-50) );
+//  	m_pointCloud.push_back( Vec2::ZERO );
+// 	m_pointCloud.push_back( Vec2( 100 , 100 ) );
+// 	m_pointCloud.push_back( Vec2(0,100) );
+// 	m_pointCloud.push_back( Vec2(100,0) );
+//  	
+// 	m_testPolygon = m_testPolygon.MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , m_pointCloud.size() );
+// 
+// 	GameObject* temp = new GameObject( g_thePhysicsSystem , Vec2::ZERO , Vec2::ZERO , m_testPolygon );
+// 	m_gameObjects.push_back( temp );
+// 	m_isMouseOnGameObject.push_back( false );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -157,6 +160,36 @@ void Game::Render() const
 	//DrawMouseCurrentPosition( m_worldCamera );
 	//DrawGameObjectToolTip();
 	RenderDrawFromPointCloudMode();
+
+	// TODO :- REMOVE PHYSICS DEBUG
+
+// 	static Vec2 cp;
+// 	static Vec2 mePos;
+// 	static Vec2 themPos;
+// 	static Vec2 normal;
+// 	static Vec2 tangent;
+// 	static float meRadius;
+// 	static float themRadius;
+// 	
+// 	for ( size_t index = 0 ; index < g_thePhysicsSystem->m_frameCollisions.size() ; index ++ )
+// 	{
+// 		cp = g_thePhysicsSystem->m_frameCollisions[ index ].m_collisionManifold.m_contactPoint;
+// 		mePos = g_thePhysicsSystem->m_frameCollisions[ index ].m_me->GetPosition();
+// 		themPos = g_thePhysicsSystem->m_frameCollisions[ index ].m_them->GetPosition();
+// 		DiscCollider2D* meCol = ( DiscCollider2D* ) g_thePhysicsSystem->m_frameCollisions[ index ].m_me;
+// 		DiscCollider2D* themCol = ( DiscCollider2D* ) g_thePhysicsSystem->m_frameCollisions[ index ].m_them;
+// 		meRadius = meCol->GetRadius();
+// 		themRadius = themCol->GetRadius();
+// 		normal = g_thePhysicsSystem->m_frameCollisions[ index ].m_collisionManifold.m_normal;
+// 		tangent = normal.GetRotatedMinus90Degrees();
+// 		//g_theApp->m_isPaused = true;
+// 	}
+// 		g_theRenderer->DrawDisc( cp , 3.f , PINK );
+// 		g_theRenderer->DrawArrow( mePos , mePos + ( normal * meRadius ) , MAGENTA , 3.f );
+// 		g_theRenderer->DrawArrow( themPos , themPos - ( normal * themRadius ) , MAGENTA , 3.f );
+// 		g_theRenderer->DrawArrow( mePos + ( normal * meRadius ) , mePos + ( normal * meRadius ) + ( tangent * meRadius ) , MAGENTA , 3.f );
+// 		g_theRenderer->DrawArrow( themPos - ( normal * themRadius ) , themPos - ( normal * themRadius ) - ( tangent * themRadius ) , MAGENTA , 3.f );
+	
 	g_theRenderer->SetBlendMode( SOLID );
 	g_theRenderer->EndCamera( m_worldCamera );
 	RenderUI();
@@ -586,24 +619,42 @@ void Game::UpdateMass()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Game::UpdateDrag()
+void Game::UpdateDrag( float deltaSeconds )
 {
-	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( KEY_COLON ) )
+	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown( KEY_COLON ) )
 	{
 		Rigidbody2D* currentObjectRigidBody = m_selectedGameObject->m_rigidbody;
 		float drag = m_selectedGameObject->m_rigidbody->GetDrag();
-		drag -= DELTA_DRAG_CHANGE;
+		drag -= DELTA_DRAG_CHANGE * deltaSeconds;
 		drag = Clamp( drag , 0.0f , INFINITY );
 		currentObjectRigidBody->SetDrag( drag );
 	}
 
-	if ( m_selectedGameObject && g_theInput->WasKeyJustPressed( KEY_FORWARDSLASH ) )
+	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown( KEY_FORWARDSLASH ) )
 	{
 		Rigidbody2D* currentObjectRigidBody = m_selectedGameObject->m_rigidbody;
 		float drag = m_selectedGameObject->m_rigidbody->GetDrag();
-		drag += DELTA_DRAG_CHANGE;
+		drag += DELTA_DRAG_CHANGE * deltaSeconds;
 		drag = Clamp( drag , 0.0f , INFINITY );
 		currentObjectRigidBody->SetDrag( drag );
+	}
+
+	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown( 'K' ) )
+	{
+		Rigidbody2D* currentObjectRigidBody = m_selectedGameObject->m_rigidbody;
+		float angularDrag = m_selectedGameObject->m_rigidbody->GetAngularDrag();
+		angularDrag -= DELTA_DRAG_CHANGE * deltaSeconds;
+		angularDrag = Clamp( angularDrag , 0.0f , INFINITY );
+		currentObjectRigidBody->SetAngularDrag( angularDrag );
+	}
+
+	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown( 'L' ) )
+	{
+		Rigidbody2D* currentObjectRigidBody = m_selectedGameObject->m_rigidbody;
+		float angularDrag = m_selectedGameObject->m_rigidbody->GetAngularDrag();
+		angularDrag += DELTA_DRAG_CHANGE * deltaSeconds;
+		angularDrag = Clamp( angularDrag , 0.0f , INFINITY );
+		currentObjectRigidBody->SetAngularDrag( angularDrag );
 	}
 }
 
@@ -841,7 +892,7 @@ void Game::UpdateFromUserInput( float deltaSeconds )
 		UpdateGravity();
 		UpdateMass();
 		UpdateFriction();
-		UpdateDrag();
+		UpdateDrag( deltaSeconds );
 	}
 
 	if ( !m_selectedGameObject )
@@ -992,7 +1043,7 @@ void Game::UpdateCameraFromUserInput( float deltaSeconds )
 
 void Game::UpdateSelectedGameObjectBouncinessFromUserInput( float deltaSeconds )
 {
-	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->GetMouseWheelValue() < 0 )
+	if ( m_selectedGameObject && g_theInput->GetMouseWheelValue() < 0 )
 	{
 		Collider2D* currentObjectCollider = m_selectedGameObject->m_rigidbody->GetCollider();
 		float bounciness = m_selectedGameObject->m_rigidbody->GetCollider()->GetPhysicsMaterial()->GetBounciness();
@@ -1001,7 +1052,7 @@ void Game::UpdateSelectedGameObjectBouncinessFromUserInput( float deltaSeconds )
 		currentObjectCollider->GetPhysicsMaterial()->SetBounciness( bounciness );
 	}
 
-	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->GetMouseWheelValue() > 0 )
+	if ( m_selectedGameObject && g_theInput->GetMouseWheelValue() > 0 )
 	{
 		Collider2D* currentObjectCollider = m_selectedGameObject->m_rigidbody->GetCollider();
 		float bounciness = currentObjectCollider->GetPhysicsMaterial()->GetBounciness();
