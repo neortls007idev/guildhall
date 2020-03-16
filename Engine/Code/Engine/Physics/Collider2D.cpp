@@ -42,10 +42,17 @@ bool DiscVPolygonCollisionCheck( Collider2D const* me , Collider2D const* them )
 
 	if ( earlyOut )
 	{
-		Vec2 closetPoint = polyColliderThem->GetClosestPoint( discColliderMe->GetPosition() );
+// 		Vec2 closetPoint = polyColliderThem->GetClosestPoint( discColliderMe->GetPosition() );
+// 
+// 		return ( IsPointOnDisc2D( Disc2D( discColliderMe->GetPosition() , discColliderMe->GetRadius() ) , closetPoint ) 
+// 			|| polyColliderThem->Contains( discColliderMe->GetPosition() ) );
 
-		return ( IsPointOnDisc2D( Disc2D( discColliderMe->GetPosition() , discColliderMe->GetRadius() ) , closetPoint ) 
-			|| polyColliderThem->Contains( discColliderMe->GetPosition() ) );
+		Vec2 nearestPoint = polyColliderThem->GetClosestPoint( discColliderMe->GetPosition() );
+		if ( IsPointOnDisc2D( nearestPoint , discColliderMe->GetPosition() , discColliderMe->GetRadius() ) )
+		{
+			return true;
+		}
+		return false;
 	}
 
 	return false;
@@ -89,31 +96,29 @@ Manifold2D DiscVDiscCollisionManiFold( Collider2D const* me , Collider2D const* 
 Manifold2D DiscVPolygonCollisionFold( Collider2D const* me , Collider2D const* them )
 {
 	Manifold2D collision;
+	DiscCollider2D* discColliderMe = ( DiscCollider2D* ) me;
+	PolygonCollider2D* polyColliderThem = ( PolygonCollider2D* ) them;
+	Vec2 closetPoint = polyColliderThem->GetClosestPoint( discColliderMe->m_worldPosition );
 
-	DiscCollider2D*		discColliderMe		= ( DiscCollider2D* ) me;
-	PolygonCollider2D*	polyColliderThem	= ( PolygonCollider2D* ) them;
+	collision.m_normal = ( discColliderMe->m_worldPosition - closetPoint ).GetNormalized();
+	collision.m_overlap = discColliderMe->m_radius - ( discColliderMe->m_worldPosition - closetPoint ).GetLength();
 
-
-	bool earlyOut = DoDiscsOverlap( discColliderMe->GetPosition() , discColliderMe->GetRadius() ,
-				polyColliderThem->m_boundingDisc.m_center , polyColliderThem->m_boundingDisc.m_radius );
-
-	if ( earlyOut )
+	if ( discColliderMe->Contains( closetPoint ) )
 	{
-		Vec2 closetPoint = polyColliderThem->GetClosestPoint( discColliderMe->GetPosition() );
-
-		collision.m_normal = ( closetPoint - discColliderMe->GetPosition() ).GetNormalized();
-		collision.m_overlap = discColliderMe->GetRadius() - ( discColliderMe->GetPosition() - closetPoint ).GetLength();
-
-		if ( polyColliderThem->Contains( discColliderMe->GetPosition() ) )
-		{
-			collision.m_normal = -collision.m_normal;
-			collision.m_overlap = ( discColliderMe->GetPosition() - closetPoint ).GetLength() +  discColliderMe->GetRadius();/*= discColliderMe->GetRadius() + ( discColliderMe->GetPosition() ).GetLength();*/
-		}
-
-		collision.m_contactPoint = discColliderMe->GetPosition() + ( collision.m_normal * ( discColliderMe->GetRadius() - ( collision.m_overlap * 0.5f ) ) );
+		closetPoint = polyColliderThem->m_polygon.GetClosestPointOnEdges( closetPoint );
+		collision.m_normal = ( closetPoint - discColliderMe->m_worldPosition ).GetNormalized();
+		collision.m_overlap = -( closetPoint - discColliderMe->m_worldPosition ).GetLength() + discColliderMe->m_radius;
+		collision.m_normal = collision.m_normal.GetRotatedDegrees( 180.f );
 	}
 
-	return collision;
+	if ( polyColliderThem->Contains( discColliderMe->m_worldPosition ) )
+	{
+		collision.m_normal = -collision.m_normal;
+		collision.m_overlap = ( discColliderMe->m_worldPosition - closetPoint ).GetLength() + discColliderMe->m_radius;
+	}
+
+	collision.m_contactPoint = discColliderMe->m_worldPosition - 
+								( collision.m_normal * ( discColliderMe->m_radius - ( collision.m_overlap * 0.5f ) ) );	return collision;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -205,7 +210,6 @@ float Collider2D::GetFrictionWith( Collider2D const* other ) const
 	float otherFriction = other->GetPhysicsMaterial()->GetFriction();
 
 	return meFriction * otherFriction;
-	//return sqrtf( ( meFriction * meFriction ) + ( otherFriction * otherFriction ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

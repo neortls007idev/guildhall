@@ -81,6 +81,41 @@ void Polygon2D::GetEdge( int idx , Vec2* outStart , Vec2* outEnd )
 	outEnd = &m_points[ ( idx + 1 ) % totalPoints ];
 }
 
+Vec2 Polygon2D::GetClosestPointOnEdges( const Vec2 point ) const
+{
+	std::vector<Vec2> closestPointsOnEachEdge;
+	Vec2 currentEdgeStart = m_points[ 0 ];
+	Vec2 currentEdgeEnd = m_points[ 1 ];
+	int counter = 0;
+	size_t start = 0;
+	size_t end = 1;
+	while ( counter < m_points.size() )
+	{
+		Vec2 closestPointOnEdge = GetNearestPointOnLineSegment2D( point , currentEdgeStart , currentEdgeEnd );
+		closestPointsOnEachEdge.push_back( closestPointOnEdge );
+		start = ( start + 1 ) % m_points.size();
+		end = ( end + 1 ) % m_points.size();
+		currentEdgeStart = m_points[ start ];
+		currentEdgeEnd = m_points[ end ];
+		counter++;
+	}
+
+	float nearestDistance = ( point - closestPointsOnEachEdge[ 0 ] ).GetLength();
+	Vec2 nearestPoint = closestPointsOnEachEdge[ 0 ];
+
+	for ( int index = 0; index < closestPointsOnEachEdge.size(); index++ )
+	{
+		float distance = ( point - closestPointsOnEachEdge[ index ] ).GetLength();
+		if ( distance < nearestDistance )
+		{
+			nearestDistance = distance;
+			nearestPoint = closestPointsOnEachEdge[ index ];
+		}
+	}
+
+	return nearestPoint;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Polygon2D::SetCenter()
