@@ -1067,25 +1067,25 @@ void Game::UpdateSelectedGameObjectAngularMotionFromUserInput( float deltaSecond
 	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown( 'R' ) )
 	{
 		Rigidbody2D* rb = m_selectedGameObject->m_rigidbody;
-		rb->SetRotationInDegrees( rb->GetRotationInDegrees() + 10.f * deltaSeconds );
+		rb->SetRotationInDegrees( rb->GetRotationInDegrees() + DELTA_ROTATION_CHANGE * deltaSeconds );
 	}
 
 	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown( 'F' ) )
 	{
 		Rigidbody2D* rb = m_selectedGameObject->m_rigidbody;
-		rb->SetRotationInDegrees( rb->GetRotationInDegrees() - 10.f * deltaSeconds );
+		rb->SetRotationInDegrees( rb->GetRotationInDegrees() - DELTA_ROTATION_CHANGE * deltaSeconds );
 	}
 
 	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown( 'T' ) )
 	{
 		Rigidbody2D* rb = m_selectedGameObject->m_rigidbody;
-		rb->SetAngularVelocityInDegrees( rb->GetAngularVelocityInDegrees() + 10.f * deltaSeconds );
+		rb->SetAngularVelocityInDegrees( rb->GetAngularVelocityInDegrees() + DELTA_ROTATION_CHANGE * deltaSeconds );
 	}
 
 	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown( 'G' ) )
 	{
 		Rigidbody2D* rb = m_selectedGameObject->m_rigidbody;
-		rb->SetAngularVelocityInDegrees( rb->GetAngularVelocityInDegrees() - 10.f * deltaSeconds );
+		rb->SetAngularVelocityInDegrees( rb->GetAngularVelocityInDegrees() - DELTA_ROTATION_CHANGE * deltaSeconds );
 	}
 
 	if ( m_selectedGameObject && g_theInput->IsKeyHeldDown( 'V' ) )
