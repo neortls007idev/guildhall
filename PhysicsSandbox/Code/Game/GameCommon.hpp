@@ -31,6 +31,7 @@ constexpr int	MAX_INITIAL_GAME_OBJECTS								=  10;
 constexpr float	DELTA_GRAVITY_CHANGE_ALONGY								= 10.f;
 constexpr float DELTA_BOUNCINESS_CHANGE									= 10.f;
 constexpr float DELTA_FRICTION_CHANGE									= 0.05f;
+constexpr float DELTA_ROTATION_CHANGE									= 10.f;
 constexpr float DELTA_MASS_CHANGE										= 1.f;
 constexpr float DELTA_DRAG_CHANGE										= 0.5f;
 //--------------------------------------------------------------------------------------------------------------------------------------------
