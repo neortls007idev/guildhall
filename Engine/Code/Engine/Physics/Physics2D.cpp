@@ -230,14 +230,17 @@ void Physics2D::DetectCollisions()
 
 void Physics2D::ResolveCollision( Collision2D collision )
 {
-// 	float myMass = collision.m_me->GetRigidBody()->GetMass();
-// 	float theirMass = collision.m_them->GetRigidBody()->GetMass();
 	
 	if ( ( collision.m_me->GetRigidBody() == nullptr ) || ( collision.m_them->GetRigidBody() == nullptr ) )
 	{
 		return;
 	}
 
+	if ( collision.m_me->GetType() == COLLIDER2D_CONVEXGON )
+	{
+		collision.m_collisionManifold.m_normal *= -1;
+	}
+	
 	// 8 ways to move the object;
 	
 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )

@@ -22,6 +22,8 @@ public:
 	void GetEdge( int idx , Vec2* outStart , Vec2* outEnd );
 	Vec2 GetCenter() const																	{ return m_center; }
 
+	Vec2 GetClosestPointOnEdges( const Vec2 point ) const;
+	
 	void SetCenter();
 	void SetNewCenter( Vec2 newCenter );
 
