@@ -812,6 +812,49 @@ void RenderContext::DrawMesh( const GPUMesh* mesh )
 	}
 }
 
+void RenderContext::DrawArrow( const Vec2& start , const Vec2& end , const Rgba8& color , float thickness , float scale /*= 1.f */ , float orientationDegrees /*= 0.f */ , Vec2 translate /*= Vec2::ZERO */ )
+{
+	Vec2 displacement = end - start;
+	Vec2 forward = displacement.GetNormalized();
+	forward.SetLength( thickness / 2.f );
+	Vec2 left = forward.GetRotated90Degrees();
+
+	Vec2 endLeft	= end - forward + left;
+	Vec2 endRight	= end - forward - left;
+	Vec2 startLeft = start - forward + left;
+	Vec2 startRight = start - forward - left;
+
+	Vec3 endLeftVec3( endLeft.x , endLeft.y , 0.f );
+	Vec3 endRightVec3( endRight.x , endRight.y , 0.f );
+	Vec3 startLeftVec3( startLeft.x , startLeft.y , 0.f );
+	Vec3 startRightVec3( startRight.x , startRight.y , 0.f );
+
+	Vertex_PCU lineVerts[ 6 ] = { Vertex_PCU( startRightVec3, color, Vec2( 0.f, 0.f ) ),
+								Vertex_PCU( endRightVec3  , color, Vec2( 0.f, 0.f ) ),
+								Vertex_PCU( endLeftVec3   , color, Vec2( 0.f, 0.f ) ),
+								Vertex_PCU( endLeftVec3   , color, Vec2( 0.f, 0.f ) ),
+								Vertex_PCU( startLeftVec3 , color, Vec2( 0.f, 0.f ) ),
+								Vertex_PCU( startRightVec3, color, Vec2( 0.f, 0.f ) ) };
+
+	TransformVertexArray2D( 6 , lineVerts , scale , orientationDegrees , translate );
+	DrawVertexArray( 6 , lineVerts );
+	
+	float apexOrientationDegrees = ( end - start ).GetAngleDegrees();
+	Vec2 righttVert = Vec2::MakeFromPolarDegrees( apexOrientationDegrees - 30.f ,3* thickness );
+	Vec2 leftVert = Vec2::MakeFromPolarDegrees( apexOrientationDegrees + 30.f , 3*thickness );
+	
+	Vertex_PCU triangle[ 3 ] =
+	{
+		Vertex_PCU( Vec3( end + forward,0.f ),color,Vec2::ZERO ),
+		Vertex_PCU( Vec3( end - leftVert,0.f ),color,Vec2::ZERO ),
+		Vertex_PCU( Vec3( end - righttVert,0.f ),color,Vec2::ZERO ),
+	};
+
+
+	TransformVertexArray2D( 3 , triangle , scale , orientationDegrees , Vec2::ZERO );
+	DrawVertexArray( 3 , triangle );
+}
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void RenderContext::DrawRing(const Vec2& center, float radius, const Rgba8& color, float thickness , float scale , float orientationDegrees , Vec2 translate )

@@ -8,12 +8,12 @@
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Time/Timer.hpp"
 
-
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 STATIC Clock* Physics2D::s_clock;
 STATIC Timer* Physics2D::s_timer;
 STATIC double Physics2D::s_fixedTimeStep;
+
 extern DevConsole* g_theDevConsole;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ Physics2D::Physics2D()
 {
 	s_clock			= new Clock();
 	s_timer			= new Timer();
-	s_fixedTimeStep = 1.0 / 120.0;
+	s_fixedTimeStep = 1.0 / 60.0;
 
 	EventArgs physicsStepArgs;
 
@@ -79,7 +79,8 @@ void Physics2D::Update()
 			}
 			m_colliders2D[ colliderIndex ]->UpdateWorldShape();
 		}
-
+		
+		//ResetCollisions();
  	}
 }
 
@@ -238,7 +239,7 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	}
 
 	// 8 ways to move the object;
-
+	
 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
 	{
 		collision.m_me->GetRigidBody()->Move( collision.m_collisionManifold.m_normal * collision.m_collisionManifold.m_overlap * 0.5f );
@@ -266,6 +267,7 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	{
 		impulseTangent = SignFloat( impulseTangent ) * impulseNormal * friction;
 	}
+
 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC   || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
 		 collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
 	{
@@ -290,7 +292,7 @@ Vec2 Physics2D::CalculateImpulse( Collision2D& collision )
 	Vec2 contactPoint = collision.m_collisionManifold.m_contactPoint;
 
 	Vec2 normal = collision.m_collisionManifold.m_normal;
-	Vec2 tangent = -collision.m_collisionManifold.m_normal.GetRotated90Degrees();
+	Vec2 tangent = -collision.m_collisionManifold.m_normal.GetRotatedMinus90Degrees();
 	
 
 	Vec2 meImpactVelocity = collision.m_me->GetRigidBody()->CalculateImpactVelocity( contactPoint );
@@ -299,16 +301,16 @@ Vec2 Physics2D::CalculateImpulse( Collision2D& collision )
 
 	float friction = collision.m_me->GetFrictionWith( collision.m_them );
 	
-	float ImpulseNormal = -1 * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) * DotProduct2D( ( meImpactVelocity - themImpactVelocity ) , normal );
+	float impulseNormal = -1 * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) * DotProduct2D( ( meImpactVelocity - themImpactVelocity ) , normal );
 
-	float ImpulseTangent = -1 * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) * DotProduct2D( ( meImpactVelocity - themImpactVelocity ) , tangent );
+	float impulseTangent = -1 * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) * DotProduct2D( ( meImpactVelocity - themImpactVelocity ) , tangent );
 
 	
-	float factorMe = DotProduct2D( ( contactPoint - collision.m_me->GetRigidBody()->GetPosition() ).GetRotated90Degrees() , normal );
+	float factorMe = DotProduct2D( ( contactPoint - collision.m_me->GetRigidBody()->GetPosition() ).GetRotatedMinus90Degrees() , normal );
 	factorMe *= factorMe;
 	factorMe /= collision.m_me->GetRigidBody()->GetMoment();
 
-	float factorThem = DotProduct2D( ( contactPoint - collision.m_them->GetRigidBody()->GetPosition() ).GetRotated90Degrees() , normal );
+	float factorThem = DotProduct2D( ( contactPoint - collision.m_them->GetRigidBody()->GetPosition() ).GetRotatedMinus90Degrees() , normal );
 	factorThem *= factorThem;
 	factorThem /= collision.m_them->GetRigidBody()->GetMoment();
 
@@ -345,13 +347,13 @@ Vec2 Physics2D::CalculateImpulse( Collision2D& collision )
 		denominator += factorMe;
 	}
 	
-	ImpulseNormal /= denominator;
+	impulseNormal /= denominator;
 
-	float factorMeTangent = DotProduct2D( ( contactPoint - collision.m_me->GetRigidBody()->GetPosition() ).GetRotated90Degrees() , tangent );
+	float factorMeTangent = DotProduct2D( ( contactPoint - collision.m_me->GetRigidBody()->GetPosition() ).GetRotatedMinus90Degrees() , tangent );
 	factorMeTangent *= factorMeTangent;
 	factorMeTangent /= collision.m_me->GetRigidBody()->GetMoment();
 
-	float factorThemTangent = DotProduct2D( ( contactPoint - collision.m_them->GetRigidBody()->GetPosition() ).GetRotated90Degrees() , tangent );
+	float factorThemTangent = DotProduct2D( ( contactPoint - collision.m_them->GetRigidBody()->GetPosition() ).GetRotatedMinus90Degrees() , tangent );
 	factorThemTangent *= factorThemTangent;
 	factorThemTangent /= collision.m_them->GetRigidBody()->GetMoment();
 	
@@ -370,11 +372,17 @@ Vec2 Physics2D::CalculateImpulse( Collision2D& collision )
 		denomCopy += factorMeTangent;
 	}
 	
-	ImpulseTangent /= denomCopy;
+	impulseTangent /= denomCopy;
 
-	ImpulseTangent = Clamp( ImpulseTangent , -friction * ImpulseNormal , friction * ImpulseNormal );
+	if ( abs( impulseTangent ) > friction* impulseNormal )
+	{
+		impulseTangent = SignFloat( impulseTangent ) * impulseNormal * friction;
+	}
+	
+	impulseTangent = Clamp( impulseTangent , -friction * impulseNormal , friction * impulseNormal );
+	impulseNormal = impulseNormal < 0 ? 0 : impulseNormal;
 	   	
-	return ( ImpulseNormal * normal ) + ( ImpulseTangent * tangent );
+	return ( impulseNormal * normal ) + ( impulseTangent * tangent );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -387,7 +395,7 @@ void Physics2D::ResolveCollisions()
 	}
 	
 	//ResetCollisions();
-	m_frameCollisions.clear();
+	//m_frameCollisions.clear();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

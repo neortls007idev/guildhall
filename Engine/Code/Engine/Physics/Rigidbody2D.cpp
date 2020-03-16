@@ -2,6 +2,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Physics/Collider2D.hpp"
 #include "DiscCollider2D.hpp"
+#include "PolygonCollider2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -37,6 +38,7 @@ void Rigidbody2D::Update( float deltaSeconds )
 	m_frameRotation			 = m_rotationInRadians;
 	m_rotationInRadians		+= m_angularVelocity * deltaSeconds;
 	m_frameRotation			 = m_rotationInRadians - m_frameRotation;
+	m_collider->UpdateWorldShape();
 
 // 	if ( m_collider->GetType() == COLLIDER2D_DISC )
 // 	{
@@ -89,7 +91,14 @@ void Rigidbody2D::ApplyImpulse( Vec2 impulse , Vec2 point )
 	m_velocity += impulse / m_mass;
 
  	Vec2 torqueDistance = ( point - m_collider->GetPosition() );
- 	m_frameTorque = DotProduct2D( torqueDistance.GetRotated90Degrees() , impulse );
+
+	if ( m_collider->GetType() == COLLIDER2D_CONVEXGON )
+	{
+		PolygonCollider2D* polyCol = ( PolygonCollider2D* ) m_collider;
+		torqueDistance = ( point - polyCol->m_polygon.GetCenter() ).GetRotatedMinus90Degrees();
+	}
+
+	m_frameTorque = DotProduct2D( torqueDistance.GetRotated90Degrees() , impulse );
  	m_angularVelocity += ( m_frameTorque / m_moment );
 }
 
@@ -133,6 +142,7 @@ void Rigidbody2D::SetCollider( Collider2D* collider )
 void Rigidbody2D::SetPosition( Vec2 position )
 {
 	m_worldPosition = position;
+	m_collider->UpdateWorldShape();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -185,6 +195,7 @@ void Rigidbody2D::ChangeIsSimulationActive( bool newSimulationStatus )
 void Rigidbody2D::Move( Vec2 moveToPosition )
 {
 	m_worldPosition += moveToPosition;
+	m_collider->UpdateWorldShape();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
