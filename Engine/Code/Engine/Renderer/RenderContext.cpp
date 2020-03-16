@@ -859,6 +859,10 @@ void RenderContext::DrawArrow( const Vec2& start , const Vec2& end , const Rgba8
 
 void RenderContext::DrawRing(const Vec2& center, float radius, const Rgba8& color, float thickness , float scale , float orientationDegrees , Vec2 translate )
 {
+	UNUSED( scale );
+	UNUSED( orientationDegrees );
+	UNUSED( translate );
+	
 	constexpr float degreePerSide = 360.f / 64.f;
 
 	for (int NumberOfLines = 0 ; NumberOfLines <= 64 ; NumberOfLines++ )
@@ -1320,6 +1324,10 @@ Texture* RenderContext::CreateTextureFromColor( Rgba8 color )
 
 void RenderContext::DrawPolygon( const Vec2* points , unsigned int count , const Rgba8& tint , float scale , float orientationDegrees , Vec2 translate )
 {
+	UNUSED( scale );
+	UNUSED( orientationDegrees );
+	UNUSED( translate );
+	
 	if ( count < 3 )
 	{
 		return;

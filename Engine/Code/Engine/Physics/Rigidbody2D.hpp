@@ -42,6 +42,7 @@ public:
 	eSimulationMode GetSimulationMode() const						{ return m_simulationMode; }
 	float			GetMass() const									{ return m_mass; }
 	float			GetDrag() const									{ return m_drag; }
+	float			GetAngularDrag() const							{ return m_angularDrag; }
 
 	float			GetRotationInRadians() const					{ return m_rotationInRadians; }
 	float			GetRotationInDegrees() const					{ return ConvertRadiansToDegrees(m_rotationInRadians); }
@@ -57,6 +58,7 @@ public:
 	void			ApplyFriction( Vec2 friction , Vec2 point = Vec2::ZERO );
 	void			ApplyTorque( Vec2 torqueImpulse , Vec2 point = Vec2::ZERO );
 	void			ApplyDrag( float deltaSeconds );
+	void			ApplyAngularDrag( float deltaSeconds );
 	void			SetCollider( Collider2D* collider );
 	void			SetPosition( Vec2 position );
 	void			SetVelocity( Vec2 velocity );
@@ -64,6 +66,7 @@ public:
 	void			SetSimulationMode( eSimulationMode simulationMode );
 	void			SetMassAndUpdateMoment( float newMass );
 	void			SetDrag( float newDrag );
+	void			SetAngularDrag( float newAngularDrag );
 	void			ChangeIsSimulationActive( bool newSimulationStatus );
 	void			Move( Vec2 moveToPosition );
 
@@ -87,14 +90,14 @@ public:
 	float				m_mass					= 1.0f;
 	eSimulationMode		m_simulationMode		= SIMULATIONMODE_DYNAMIC;
 	bool				m_isSimulationActive	= true;
-	float				m_drag					= 1.f;
+	float				m_drag					= 0.1f;
 
 	float				m_rotationInRadians		= 0.f;
 	float				m_angularVelocity		= 0.f;												// Radians per Second
 	float				m_frameTorque			= 0.f;
 	float				m_moment				= 0.f;
 	float				m_frameRotation			= 0.f;
-	float				m_angularDrag			= 1.f;
+	float				m_angularDrag			= 0.f;
 	
 private:
 	~Rigidbody2D();																					// destroys the collider

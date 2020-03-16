@@ -39,12 +39,6 @@ void Rigidbody2D::Update( float deltaSeconds )
 	m_rotationInRadians		+= m_angularVelocity * deltaSeconds;
 	m_frameRotation			 = m_rotationInRadians - m_frameRotation;
 	m_collider->UpdateWorldShape();
-
-// 	if ( m_collider->GetType() == COLLIDER2D_DISC )
-// 	{
-// 		DiscCollider2D* col = ( DiscCollider2D* ) m_collider;
-// 		m_velocity += Vec2::MakeFromPolarRadians( m_rotationInRadians , m_angularVelocity / ( 2 * PI * col->GetRadius() ) ) ;
-// 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -127,7 +121,25 @@ void Rigidbody2D::ApplyDrag( float deltaSeconds )
 	Vec2 dragDirection = 1.f / m_mass * GetVerletVelocity().GetNormalized().GetRotated90Degrees().GetRotated90Degrees();
 	m_velocity += m_drag * dragDirection * deltaSeconds;
 
-	//m_angularVelocity += m_angularDrag * CrossProduct2D( dragDirection , m_velocity ) * deltaSeconds;
+	ApplyAngularDrag( deltaSeconds );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Rigidbody2D::ApplyAngularDrag( float deltaSeconds )
+{
+	if ( abs( m_angularVelocity ) <= 0.001f )
+	{
+		return;
+	}
+	if ( m_angularVelocity > 0 )
+	{
+		m_angularVelocity -= m_angularDrag * deltaSeconds;
+	}
+	else
+	{
+		m_angularVelocity += m_angularDrag * deltaSeconds;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -181,6 +193,13 @@ void Rigidbody2D::SetMassAndUpdateMoment( float newMass )
 void Rigidbody2D::SetDrag( float newDrag )
 {
 	m_drag = newDrag;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Rigidbody2D::SetAngularDrag( float newAngularDrag )
+{
+	m_angularDrag = newAngularDrag;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

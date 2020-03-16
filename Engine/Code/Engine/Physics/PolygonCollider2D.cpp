@@ -192,7 +192,7 @@ void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderCol
 // 	}
 
 	
-	//if ( m_isDrawingCollisions )
+	if ( m_isDrawingCollisions )
 	{
 		ctx->DrawRing( m_boundingDisc.m_center , m_boundingDisc.m_radius , WHITE , 5.f );
 		
@@ -278,7 +278,7 @@ float PolygonCollider2D::CalculateMoment( float mass ) const
 		vert2 = m_polygon.m_points[ pointIndex ];
 		float areaOfCurrentTriangle = CalculateAreaOfTriangle( vert0 , vert1 , vert2 );
 		float massOfCurrentTraingle = mass * ( areaOfCurrentTriangle / areaOfPolygon );
-		momentOfPolygon += CalculateMomentOfInertiaOfTriangle( vert0 , vert1 , vert2 , massOfCurrentTraingle );
+		momentOfPolygon += CalculateMomentOfInertiaOfTriangle( m_polygon , vert0 , vert1 , vert2 , massOfCurrentTraingle );
 
 		pointIndex--;
 	}

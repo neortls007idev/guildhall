@@ -230,8 +230,8 @@ void Physics2D::DetectCollisions()
 
 void Physics2D::ResolveCollision( Collision2D collision )
 {
-	float myMass = collision.m_me->GetRigidBody()->GetMass();
-	float theirMass = collision.m_them->GetRigidBody()->GetMass();
+// 	float myMass = collision.m_me->GetRigidBody()->GetMass();
+// 	float theirMass = collision.m_them->GetRigidBody()->GetMass();
 	
 	if ( ( collision.m_me->GetRigidBody() == nullptr ) || ( collision.m_them->GetRigidBody() == nullptr ) )
 	{

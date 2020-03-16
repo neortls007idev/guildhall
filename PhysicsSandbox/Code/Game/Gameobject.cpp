@@ -36,11 +36,9 @@ Strings GameObject::GetGameObjectInfo() const
 	float angularVelocityDegrees		= m_rigidbody->GetAngularVelocityInDegrees();
 	float rotationDegrees				= m_rigidbody->GetRotationInDegrees();
 	float moment						= m_rigidbody->GetMoment();
-	//float angularAcceleration	= m_rigidbody->GetAngularVelocityInDegrees();
-	//float angularVerletVelocity	= m_rigidbody->GetAngularVelocityInDegrees();
-	
-	
+	float angularDrag					= m_rigidbody->GetAngularDrag();
 
+	
 	std::string objectPos = "           Position = ";
 	objectPos += std::to_string( position.x ) + " , " + std::to_string( position.y );
 
@@ -70,6 +68,9 @@ Strings GameObject::GetGameObjectInfo() const
 	std::string objectAngularVelocity = " T , G , V : Angular Velocity In Degrees = ";
 	objectAngularVelocity += std::to_string( angularVelocityDegrees );
 
+	std::string objectAngularDrag = " K  ,  L : Angular Drag = ";
+	objectAngularDrag += std::to_string( angularDrag );
+
 	std::string objectMoment = "         : Moment = ";
 	objectMoment += std::to_string( moment );
 	
@@ -96,6 +97,7 @@ Strings GameObject::GetGameObjectInfo() const
 	objectDetails.push_back( objectPos );
 
 	objectDetails.push_back( objectBounce );
+	objectDetails.push_back( objectAngularDrag );
 	objectDetails.push_back( objectRotation );
 	objectDetails.push_back( objectAngularVelocity );
 	objectDetails.push_back( objectMoment );

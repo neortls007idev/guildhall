@@ -50,7 +50,7 @@ public:
 	void UpdateGravity();
 	void UpdateFriction();
 	void UpdateMass();
-	void UpdateDrag();
+	void UpdateDrag( float deltaSeconds );
 	Vec2 GetMouseDragVelocity() const;
 	void ResetMouseDragVelocity();
 
