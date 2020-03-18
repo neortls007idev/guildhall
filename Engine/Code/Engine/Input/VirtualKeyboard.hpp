@@ -28,11 +28,15 @@ const unsigned char KEY_BACKSPACE				= 0x08;
 const unsigned char KEY_PLUS					= 0xBB;
 const unsigned char KEY_MINUS					= 0xBD;
 const unsigned char KEY_SHIFT					= 0x10;
+const unsigned char KEY_CTRL					= 0x11;
 const unsigned char KEY_DELETE					= 0x2E;
 const unsigned char KEY_LEFT_SQ_BRACKET			= 0xDB;
 const unsigned char KEY_RIGHT_SQ_BRACKET		= 0xDD;
 const unsigned char KEY_COLON					= 0xBA;
 const unsigned char KEY_FORWARDSLASH			= 0xDC;
+const unsigned char KEY_END						= 0x23;
+const unsigned char KEY_HOME					= 0x24;
+
 //const unsigned char KEY_LESSTHAN				= 0xDB;
 //const unsigned char KEY_GREATERTHAN				= 0xDB;
 

@@ -24,7 +24,10 @@ STATIC float DevConsole::m_carrotPosX;
 STATIC size_t DevConsole::m_carrotOffset;
 STATIC std::vector<ColoredLine> DevConsole::m_consoleText;
 STATIC std::vector<DevConsoleCommand> DevConsole::m_consoleCommands;
+STATIC std::string DevConsole::m_consoleCommandHistory[10];
 STATIC std::string DevConsole::m_currentText;
+STATIC uint DevConsole::m_indexCurrentSelectedCommandFromHistory;
+STATIC uint DevConsole::m_indexLastEnteredCommandFromHistory;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -260,10 +263,8 @@ void DevConsole::ResetCurrentInput()
 
 void DevConsole::ProcessCommand()
 {
-	//std::string currentCommand( m_currentText );
-	Strings currentCompleteCommand = SplitStringAtGivenDelimiter( m_currentText , ' ' );
+	Strings currentCompleteCommand = SplitStringOnceAtGivenDelimiter( m_currentText , ' ' );
 
-	
 	EventArgs currentCommandArgs;
 
 	for ( size_t index = 0; index < m_consoleCommands.size(); index++ )
@@ -282,12 +283,21 @@ void DevConsole::ProcessCommand()
 		}
 	}
 	
-	m_currentText = "";
+	bool commandFireResult = g_theEventSystem->FireEvent( currentCompleteCommand[ 0 ] , currentCommandArgs );
 
-	if ( !g_theEventSystem->FireEvent( currentCompleteCommand[0] , currentCommandArgs ) )
+	if ( commandFireResult )
+	{
+		m_consoleCommandHistory[ m_indexLastEnteredCommandFromHistory ] = m_currentText;
+		m_indexLastEnteredCommandFromHistory++;
+		m_indexLastEnteredCommandFromHistory %= DEVCONSOLE_MAX_COMMAND_HISTORY;
+	}
+	
+	if ( !commandFireResult )
 	{
 		PrintString( RED , "Invalid Console Command :- Use \"help\" command  ", DEVCONSOLE_ERROR );
 	}
+	
+	m_currentText = "";
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -450,7 +460,7 @@ void DevConsole::ProcessInput()
 
 		curStringLength = m_currentText.length();
 
-		if ( character == EASCII_BACKSPACE && ( curStringLength - m_carrotOffset ) > 0 )
+		if ( character == EASCII_BACKSPACE && ( curStringLength + m_carrotOffset ) > 0 )
 		{
 			m_currentText.erase( curStringLength - m_carrotOffset - 1 , 1 );
 			m_carrotColor.a = 255;
@@ -518,22 +528,114 @@ bool DevConsole::ClearConsoleMessagesOfType( EventArgs& commandArgs , eDevConsol
 
 void DevConsole::HandleInput( unsigned char keycode )
 {
+	if ( g_theInput->IsKeyHeldDown( KEY_CTRL ) && keycode == KEY_LEFTARROW )
+	{
+		uint currOffset = GetReverseStringIndexForCurrentCarrotPos();
+		m_carrotOffset = currOffset;
+		return;
+	}
+
+	if ( g_theInput->IsKeyHeldDown( KEY_CTRL ) && keycode == KEY_RIGHTARROW )
+	{
+		uint currOffset = GetStringIndexForCurrentCarrotPos();
+		m_carrotOffset = m_carrotOffset - currOffset;
+		return;
+	}
+
 	size_t curTextLength = m_currentText.length();
 
-	if ( curTextLength - m_carrotOffset > 0 )
+	if ( curTextLength - m_carrotOffset <= curTextLength )
 	{
 		if ( keycode == KEY_LEFTARROW  )
 		{
 			m_carrotOffset += 1;
 		}
 	}
-	if ( curTextLength - m_carrotOffset < curTextLength )
+
+	if ( curTextLength + m_carrotOffset > curTextLength )
 	{
 		if ( keycode == KEY_RIGHTARROW )
 		{
 			m_carrotOffset -= 1;
 		}
 	}
+		
+	if ( keycode == KEY_END )
+	{
+		m_carrotOffset = 0;
+	}
+
+	if ( keycode == KEY_HOME )
+	{
+		m_carrotOffset = m_currentText.length();
+	}
+	
+// 	if ( keycode == KEY_UPARROW )
+// 	{
+// 		if ( m_indexLastEnteredCommandFromHistory > 0 && m_indexCurrentSelectedCommandFromHistory < DEVCONSOLE_MAX_COMMAND_HISTORY )
+// 		{
+// 			m_indexCurrentSelectedCommandFromHistory = ( m_indexLastEnteredCommandFromHistory - 1) ;
+// 			m_currentText = m_consoleCommandHistory[ m_indexCurrentSelectedCommandFromHistory ];
+// 		}
+// 		
+// 	}
+// 
+// 	if ( keycode == KEY_DOWNARROW )
+// 	{
+// 		if ( m_indexLastEnteredCommandFromHistory > 0 && m_indexCurrentSelectedCommandFromHistory > 0 )
+// 		{
+// 			m_indexCurrentSelectedCommandFromHistory++;
+// 			m_currentText = m_consoleCommandHistory[ m_indexCurrentSelectedCommandFromHistory ];
+// 		}
+// 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+uint DevConsole::GetReverseStringIndexForCurrentCarrotPos() const
+{
+	size_t carrotOffsetCopy = m_carrotOffset + 1;
+	std::string reverseCurrentText = ReverseString( m_currentText );
+	size_t subStringStartIndex = 0;
+
+	carrotOffsetCopy = reverseCurrentText.find( ' ' , carrotOffsetCopy );
+	
+	if ( carrotOffsetCopy == std::string::npos )
+	{
+		carrotOffsetCopy = m_currentText.length();
+	}
+		
+	//uint len = m_currentText.length() - carrotOffsetCopy;
+	return carrotOffsetCopy;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+uint DevConsole::GetStringIndexForCurrentCarrotPos() const
+{
+	size_t carrotOffsetCopy		= m_currentText.length() - m_carrotOffset;
+	size_t subStringStartIndex	= 0;
+	
+	if ( carrotOffsetCopy != 0 )
+	{
+		subStringStartIndex = carrotOffsetCopy/*m_currentText.find( ' ' , carrotOffsetCopy - 1 )*/;
+	}
+
+	carrotOffsetCopy = m_currentText.find( ' ' , carrotOffsetCopy );
+	
+	if ( carrotOffsetCopy == std::string::npos )
+	{
+		carrotOffsetCopy = subStringStartIndex + ( m_currentText.length() - subStringStartIndex ) - 1;
+		//subStringStartIndex = 1;
+	}
+
+	//uint len = m_currentText.length() - carrotOffsetCopy;
+	if ( subStringStartIndex == 0 )
+	{
+		return   carrotOffsetCopy + 1;
+	}
+	
+	return   carrotOffsetCopy - subStringStartIndex + 1;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

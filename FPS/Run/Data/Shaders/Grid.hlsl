@@ -13,6 +13,24 @@
 // The semantic and internal names can be whatever you want,
 // but know that semantics starting with SV_* usually denote special
 // inputs/outputs, so probably best to avoid that naming.
+
+//
+// Grid shader
+//
+
+//Default precision qualifier
+//min16float float;
+
+//This represents the current texture on the mesh
+sampler2D tex;
+
+//The interpolated vertex color for this fragment
+//min16uint float4 vColor;
+
+//The interpolated texture coordinate for this fragment
+//min16float float2 vTexCoord;
+
+
 struct vs_input_t
 {
    // we are not defining our own input data;
@@ -49,6 +67,10 @@ cbuffer camera_constants : register( b1 ) // index 1 is now camera
 	float4x4 VIEW;
 }
 
+cbuffer model_constants : register( b2 ) // index 2 is now model
+{
+	float4x4 MODEL;
+}
 // Texture & Samplers are also a form of constants
 
 Texture2D <float4> tDiffuse : register( t0 );			// Color of surface
@@ -69,19 +91,22 @@ struct v2f_t
 
 //--------------------------------------------------------------------------------------
 // Vertex Shader
-v2f_t VertexFunction( vs_input_t input )
+v2f_t VertexFunction( )
 {
    v2f_t v2f = (v2f_t)0;
 
    // forward vertex input onto the next stage
-   v2f.position = float4( input.position, 1.0f );
-   v2f.color = input.color;
-   v2f.uv = input.uv;
+   // v2f.position = float4( input.position, 1.0f );
+   // v2f.color = input.color;
+   // v2f.uv = input.uv;
 
-   float4 worldPos = float4( input.position , 1 );
+   v2f.position = float4( 0.f, 0.f , 0.f, 1.0f );
+   v2f.color = float4 ( 1.f, 1.f , 1.f , 1.f );
+   v2f.uv = float2( 0.5f , 0.5f );
 
+   float4 worldPos = mul( MODEL , v2f.position );
    float4 cameraPos = mul( VIEW , worldPos );
-   float4 clipPos = mul( CAMERA_TO_CLIP_TRANSFORM , cameraPos );
+   float4 clipPos	= mul( CAMERA_TO_CLIP_TRANSFORM , cameraPos );
 
    v2f.position = clipPos;
    return v2f;
@@ -99,7 +124,34 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	// Very common rendering debugging method is to
 	// use color to portray information;
 
-	float4 color = tDiffuse.Sample( eSampler, input.uv );
-	return float4( 1.0 - color.rgb , color.a );
-	//return color * input.color;
+	//texture2D mytex;
+	/*min16uint*/ //float4 col = mytex.Sample( eSampler , input.uv , 0 ) * input.color;
+
+	float x , y;
+	
+	x = frac( input.uv.x * 25.0 );
+	y = frac( input.uv.y * 25.0 );
+
+	float4 monotone;
+
+	// Draw a black and white grid.
+	if ( x > 0.9 || y > 0.9 )
+	{
+		monotone = float4( 1 , 1 , 1 , 1 );
+	}
+	else
+	{
+		monotone = float4( 0 , 0 , 0 , 0 );
+	}
+
+	float4 color = tDiffuse.Sample( eSampler , float2( x , y ) );
+	return color * monotone ;
+}
+
+
+
+void main()
+{
+	//Sample the texture at the interpolated coordinate
+
 }

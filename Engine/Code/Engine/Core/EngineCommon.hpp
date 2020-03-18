@@ -95,7 +95,10 @@ const Vec2 ALIGN_TOP_RIGHT( 1.0f , 1.0f );
 
 constexpr float DEVCONSOLE_CAMERA_SIZE_Y = 800.f;
 constexpr float DEVCONSOLE_CAMERA_SIZE_X = DEVCONSOLE_CAMERA_SIZE_Y * ( 16.f / 9.f );
+constexpr uint	DEVCONSOLE_MAX_COMMAND_HISTORY = 10;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 constexpr int	TOTAL_MOUSE_DRAG_TRACK_FRAMES = 120;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

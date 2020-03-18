@@ -94,6 +94,9 @@ public:
 
 	Camera* GetDevConsoleCamera() const																{ return m_devConsoleCamera; }
 
+	uint GetReverseStringIndexForCurrentCarrotPos() const;
+	uint GetStringIndexForCurrentCarrotPos() const;
+
 protected:
 
 	static bool								m_isConsoleOpen;
@@ -103,15 +106,19 @@ protected:
 	static size_t							m_carrotOffset;
 	static std::vector<ColoredLine>			m_consoleText;
 	static std::vector<DevConsoleCommand>	m_consoleCommands;
+	static std::string						m_consoleCommandHistory[ DEVCONSOLE_MAX_COMMAND_HISTORY ];
 
 private:
 	static std::string						m_currentText;
-	Vec2 m_animUVMaxs;
-	Vec2 m_animUVMins;
-	float							m_catAnimationDuration		= 4.4f;
-	float							m_currentCatAnimFrame		= 0.f;
-	float							m_phoenixAnimationDuration	= 3.8f;
-	float							m_currentPhoenixAnimFrame	= 0.f;
-	Rgba8							m_devConsoleAnimationColor	= Rgba8( 255 , 255 , 255 , 127 );
-	Camera*							m_devConsoleCamera			= nullptr;
+	static std::string						m_currentSelectedText;
+	static uint								m_indexCurrentSelectedCommandFromHistory;
+	static uint								m_indexLastEnteredCommandFromHistory;
+	Vec2									m_animUVMaxs;
+	Vec2									m_animUVMins;
+	float									m_catAnimationDuration						= 4.4f;
+	float									m_currentCatAnimFrame						= 0.f;
+	float									m_phoenixAnimationDuration					= 3.8f;
+	float									m_currentPhoenixAnimFrame					= 0.f;
+	Rgba8									m_devConsoleAnimationColor					= Rgba8( 255 , 255 , 255 , 127 );
+	Camera*									m_devConsoleCamera							= nullptr;
 };

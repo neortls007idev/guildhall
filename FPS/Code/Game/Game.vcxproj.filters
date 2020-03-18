@@ -56,7 +56,7 @@
     <FxCompile Include="..\..\Run\Data\Shaders\InvertColor.hlsl">
       <Filter>Data\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="..\..\Run\Data\Shaders\error.hlsl">
+    <FxCompile Include="..\..\Run\Data\Shaders\Grid.hlsl">
       <Filter>Data\Shaders</Filter>
     </FxCompile>
   </ItemGroup>

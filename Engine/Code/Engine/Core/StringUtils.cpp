@@ -64,6 +64,53 @@ Strings SplitStringAtGivenDelimiter( const std::string& originalString , const c
 	return splitStrings;
 }
 
+Strings SplitStringOnceAtGivenDelimiter( const std::string& originalString , const char delimiter /*= ',' */ )
+{
+	Strings splitStrings;
+	size_t subStringStartIndex = 0;
+
+	for ( int count = 0; count <= 1; count++ )
+	{
+		size_t splitStringEndIndex = originalString.size();
+		
+		if ( splitStrings.size() == 0 )
+		{
+			splitStringEndIndex = originalString.find( delimiter , subStringStartIndex );
+		}
+		
+		size_t splitLength = splitStringEndIndex - subStringStartIndex;
+		std::string substring( originalString , subStringStartIndex , splitLength );
+		splitStrings.push_back( substring );
+		if ( splitStringEndIndex == std::string::npos )
+		{
+			break;
+		}
+		subStringStartIndex = splitStringEndIndex + 1;
+		
+	}
+
+	return splitStrings;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+std::string ReverseString( const std::string& originalString )
+{
+	std::string reverseString;
+
+	if ( originalString.length() == 0 )
+	{
+		return originalString;
+	}
+	
+	for ( size_t index = originalString.length() - 1 ; index > 0 ; index-- )
+	{
+		reverseString.push_back( originalString[ index ] );
+	}
+	
+	return reverseString;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 bool StringCompare( const char* firstString , std::string secondString )

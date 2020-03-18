@@ -19,6 +19,7 @@ Game::Game()
 	m_uiCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
 	m_color = BLACK;
 	m_invertColorShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/InvertColor.hlsl" );
+	m_invertColorShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Grid.hlsl" );
 	m_imageTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/PlayerTankBase.png" );
 	m_worldMapSphere = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/2kEarthDaymap.png" );
 	m_gameCamera.SetProjectionPerspective( 60.f , CLIENT_ASPECT , -.1f , -100.f );
@@ -94,9 +95,12 @@ void Game::Render() const
 	g_theRenderer->BindShader( nullptr );
 
 	g_theRenderer->DrawMesh( m_meshCube );
+	g_theRenderer->BindShader( nullptr );
 
 	g_theRenderer->SetBlendMode( SOLID );
 	g_theRenderer->BindTexture( m_worldMapSphere );
+	g_theRenderer->BindShader( m_gridShader );
+	g_theRenderer->BindTexture( g_theRenderer->m_textureDefault );
 	Transform sphereRing;
 	float deltaDegrees = 360.f / 30.f;
 	for ( float sphereIndex = 0 ; sphereIndex <= 360 ; sphereIndex += deltaDegrees )
