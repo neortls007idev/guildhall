@@ -91,6 +91,7 @@ public:
 
 	void ChangeOverlayColor( Rgba8 newOverlayColor );
 	void HandleInput( unsigned char keycode );
+	void HandleMouseInput();
 
 	Camera* GetDevConsoleCamera() const																{ return m_devConsoleCamera; }
 
@@ -99,22 +100,24 @@ public:
 
 protected:
 
-	static bool								m_isConsoleOpen;
-	static Rgba8							m_OverlayColor;
-	static Rgba8							m_carrotColor;
-	static float							m_carrotPosX;
-	static size_t							m_carrotOffset;
-	static int								m_carrotMovementDirection;
-	static std::vector<ColoredLine>			m_consoleText;
-	static std::vector<DevConsoleCommand>	m_consoleCommands;
-	static std::string						m_consoleCommandHistory[ DEVCONSOLE_MAX_COMMAND_HISTORY ];
-	
-private:
-	static std::string						m_currentText;
-	static std::string						m_currentSelectionText;
-
-	static uint								m_indexCurrentSelectedCommandFromHistory;
-	static uint								m_indexLastEnteredCommandFromHistory;
+	static  bool							m_isConsoleOpen;
+	static  Rgba8							m_OverlayColor;
+	static  Rgba8							m_carrotColor;
+	static  float							m_carrotPosX;
+	static  size_t							m_carrotOffset;
+	static  int								m_carrotMovementDirection;
+	mutable int								m_textLineHeight;
+	static  bool							m_hasCarrotMovedMouseSelection;
+	static  std::vector<ColoredLine>		m_consoleText;
+	static  std::vector<DevConsoleCommand>	m_consoleCommands;
+	static  std::string						m_consoleCommandHistory[ DEVCONSOLE_MAX_COMMAND_HISTORY ];
+		    
+private:    
+	static  std::string						m_currentText;
+	static  std::string						m_currentSelectionText;
+		    
+	static  uint							m_indexCurrentSelectedCommandFromHistory;
+	static  uint							m_indexLastEnteredCommandFromHistory;
 	Vec2									m_animUVMaxs;
 	Vec2									m_animUVMins;
 	float									m_catAnimationDuration						= 4.4f;

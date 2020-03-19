@@ -25,6 +25,7 @@ STATIC Rgba8							DevConsole::m_carrotColor;
 STATIC float							DevConsole::m_carrotPosX;
 STATIC size_t							DevConsole::m_carrotOffset;
 STATIC int								DevConsole::m_carrotMovementDirection;
+STATIC bool								DevConsole::m_hasCarrotMovedMouseSelection;
 STATIC std::vector<ColoredLine>			DevConsole::m_consoleText;
 STATIC std::vector<DevConsoleCommand>	DevConsole::m_consoleCommands;
 STATIC std::string						DevConsole::m_consoleCommandHistory[10];
@@ -116,6 +117,7 @@ void DevConsole::Update( float deltaSeconds )
 	{
 		m_currentCatAnimFrame = 0.f;
 	}
+	HandleMouseInput();
 	ProcessInput();
 }
 
@@ -159,6 +161,8 @@ void DevConsole::PrintString( const std::string& devConsolePrintString /*= "INVA
 
 void DevConsole::Render( RenderContext& renderer , const Camera& camera , float lineHeight ) const
 {
+	m_textLineHeight = lineHeight;
+	
 	AABB2 consoleArea = AABB2( camera.GetOrthoMin().x , camera.GetOrthoMin().y , camera.GetOrthoMax().x , camera.GetOrthoMax().y );
 	AABB2 typingArea = consoleArea.CarveBoxOffBottom( 0.075f , 0.f );
 	consoleArea = consoleArea.CarveBoxOffTop( 0.925f , 0.f );
@@ -634,7 +638,7 @@ bool DevConsole::ClearConsoleMessagesOfType( EventArgs& commandArgs , eDevConsol
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void DevConsole::HandleInput( unsigned char keycode )
-{
+{	
 	if ( g_theInput->IsKeyHeldDown( KEY_CTRL ) && keycode == KEY_LEFTARROW )
 	{
 		uint currOffset = GetReverseStringIndexForCurrentCarrotPos();
@@ -744,6 +748,100 @@ void DevConsole::HandleInput( unsigned char keycode )
 // 			m_currentText = m_consoleCommandHistory[ m_indexCurrentSelectedCommandFromHistory ];
 // 		}
 // 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DevConsole::HandleMouseInput()
+{
+	size_t carrotOffsetCopy = m_carrotOffset;
+	
+	if ( m_currentText == "" )
+	{
+		m_currentSelectionText = "";
+		m_hasCarrotMovedMouseSelection = false;
+		return;
+	}
+	
+	if ( g_theInput->WasRightMouseButtonJustPressed() )
+	{
+		m_currentSelectionText = "";
+		return;
+	}
+	
+	//Vec2 mousePos = m_devConsoleCamera->ClientToWorld( g_theInput->GetMouseNormalizedClientPosition() , 1.f ).GetXYComponents();
+	Vec2	mousePos		= g_theInput->GetMouseNormalizedClientPosition();
+	AABB2	consoleArea		= AABB2( m_devConsoleCamera->GetOrthoMin().GetXYComponents() , m_devConsoleCamera->GetOrthoMax().GetXYComponents() );
+	AABB2	typingArea		= consoleArea.CarveBoxOffBottom( 0.075f , 0.f );
+	AABB2	typedTextArea	= AABB2( typingArea.m_mins , Vec2( m_currentText.length() * m_textLineHeight , typingArea.m_maxs.y ) );
+
+	float	x = RangeMapFloat( 0.f , 1.f , typingArea.m_mins.x , typingArea.m_maxs.x , mousePos.x );
+			x = Clamp( x , typedTextArea.m_mins.x , typedTextArea.m_maxs.x );
+	
+	if ( typedTextArea.IsPointInside( mousePos ) )
+	{
+		if ( g_theInput->WasLeftMouseButtonJustPressed() )
+		{
+			int result = m_currentText.length() - RoundToNearestInt( x / m_textLineHeight );
+			m_carrotOffset = result;
+			m_currentSelectionText = "";
+			return;
+		}
+		
+		if ( g_theInput->IsLeftMouseButtonHeldDown() )
+		{
+			size_t curTextLength = m_currentText.length();
+			
+			static float lastCharacterX = x;
+
+			int result = m_currentText.length() - RoundToNearestInt( x / m_textLineHeight );
+			m_carrotOffset = Clamp( result , 0 , m_currentText.length() );
+			bool carrotHasMoved = !( m_carrotOffset == carrotOffsetCopy );
+
+			if ( carrotOffsetCopy == m_carrotOffset )
+			{
+				return;
+			}
+			
+			if ( m_currentSelectionText.length() == 0 || ( lastCharacterX - x ) > 0 )
+			{
+				m_carrotMovementDirection = 1;
+			}
+			else if ( m_currentSelectionText.length() > 0 && ( lastCharacterX - x ) < 0 )
+			{
+				m_carrotMovementDirection = -1;
+			}
+			else
+			{
+				m_carrotMovementDirection = 0;
+			}
+
+			if ( m_carrotMovementDirection == 1 )
+			{
+				m_currentSelectionText.insert( m_currentSelectionText.begin() , m_currentText[ curTextLength - m_carrotOffset ] );
+				return;
+			}
+			if ( m_carrotMovementDirection == -1 )
+			{
+				m_currentSelectionText.pop_back();
+				return;
+			}
+			
+
+			lastCharacterX = x;
+			
+// 			if ( ( carrotOffsetCopy - m_carrotOffset ) < 0 )
+// 			{
+// 				m_currentSelectionText.insert( m_currentSelectionText.begin() , m_currentText[ curTextLength - m_carrotOffset ] );
+// 			}
+// 			
+// 			if ( ( carrotOffsetCopy - m_carrotOffset ) > 0 )
+// 			{
+// 				m_currentSelectionText.pop_back();
+// 			}
+			
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
