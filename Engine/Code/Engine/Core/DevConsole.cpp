@@ -17,17 +17,19 @@ extern BitmapFont*	g_bitmapFont;
 extern InputSystem* g_theInput;
 extern Window*		g_theWindow;
 
-STATIC bool DevConsole::m_isConsoleOpen;
-STATIC Rgba8 DevConsole::m_OverlayColor;
-STATIC Rgba8 DevConsole::m_carrotColor;
-STATIC float DevConsole::m_carrotPosX;
-STATIC size_t DevConsole::m_carrotOffset;
-STATIC std::vector<ColoredLine> DevConsole::m_consoleText;
-STATIC std::vector<DevConsoleCommand> DevConsole::m_consoleCommands;
-STATIC std::string DevConsole::m_consoleCommandHistory[10];
-STATIC std::string DevConsole::m_currentText;
-STATIC uint DevConsole::m_indexCurrentSelectedCommandFromHistory;
-STATIC uint DevConsole::m_indexLastEnteredCommandFromHistory;
+STATIC bool								DevConsole::m_isConsoleOpen;
+STATIC Rgba8							DevConsole::m_OverlayColor;
+STATIC Rgba8							DevConsole::m_carrotColor;
+STATIC float							DevConsole::m_carrotPosX;
+STATIC size_t							DevConsole::m_carrotOffset;
+STATIC int								DevConsole::m_carrotMovementDirection;
+STATIC std::vector<ColoredLine>			DevConsole::m_consoleText;
+STATIC std::vector<DevConsoleCommand>	DevConsole::m_consoleCommands;
+STATIC std::string						DevConsole::m_consoleCommandHistory[10];
+STATIC std::string						DevConsole::m_currentText;
+STATIC std::string						DevConsole::m_currentSelectionText;
+STATIC uint								DevConsole::m_indexCurrentSelectedCommandFromHistory;
+STATIC uint								DevConsole::m_indexLastEnteredCommandFromHistory;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -39,6 +41,7 @@ DevConsole::DevConsole()
 	m_carrotPosX = 0.f;
 	m_carrotOffset = 0;
 	m_currentText = "";
+	m_currentSelectionText = "";
 	m_devConsoleCamera = new Camera();
 	m_devConsoleCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( DEVCONSOLE_CAMERA_SIZE_X , DEVCONSOLE_CAMERA_SIZE_Y ) );
 	m_devConsoleCamera->SetClearMode( CLEAR_NONE | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , GRAY );
@@ -218,7 +221,28 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	}
 	std::vector<Vertex_PCU> curretnTextVerts;
 	g_bitmapFont->AddVertsForTextInBox2D( curretnTextVerts , typingArea , lineHeight , m_currentText , WHITE , 1.f , ALIGN_CENTERED_LEFT );
+
+	std::string currentSelectionText = m_currentSelectionText;
+
+	uint selectionOffset = 0;
 	
+	if ( m_carrotMovementDirection == 1 )
+	{
+		selectionOffset = m_currentText.length() - m_carrotOffset;
+	}
+	else if ( m_carrotMovementDirection == -1 )
+	{
+		selectionOffset = m_currentText.length() - m_carrotOffset - m_currentSelectionText.length();
+	}
+	
+	for( uint index = 0 ; index < selectionOffset ; index++ )
+	{
+		currentSelectionText.insert( currentSelectionText.begin() , ' ' );
+	}
+	//m_carrotOffset + m_currentSelectionText.length();
+	
+	g_bitmapFont->AddVertsForTextInBox2D( curretnTextVerts , typingArea , lineHeight , currentSelectionText , GREEN , 1.f , ALIGN_CENTERED_LEFT );
+		
 	renderer.BindTexture( g_bitmapFont->GetTexture() );
 	
 	if ( consoleTextVerts.size() > 0)
@@ -256,6 +280,7 @@ void DevConsole::OnKeyPress( char character )
 void DevConsole::ResetCurrentInput()
 {
 	m_currentText.clear();
+	m_currentSelectionText.clear();
 	m_carrotOffset = 0;
 }
 
@@ -298,6 +323,7 @@ void DevConsole::ProcessCommand()
 	}
 	
 	m_currentText = "";
+	m_currentSelectionText = "";
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -453,6 +479,7 @@ void DevConsole::ProcessInput()
 		{
 			ProcessCommand();
 			m_currentText = "";
+			m_currentSelectionText = "";
 			m_carrotColor.a = 255;
 			m_carrotOffset = 0;
 			break;
@@ -495,6 +522,7 @@ bool DevConsole::ResetConsole( EventArgs& commandArgs )
 	}
 	m_consoleText.clear();
 	m_currentText = "";
+	m_currentSelectionText = "";
 	m_carrotOffset = 0;
 
 	return true;
@@ -519,6 +547,7 @@ bool DevConsole::ClearConsoleMessagesOfType( EventArgs& commandArgs , eDevConsol
 	}
 
 	m_currentText = "";
+	m_currentSelectionText = "";
 	m_carrotOffset = 0;
 
 	return true;
@@ -544,30 +573,91 @@ void DevConsole::HandleInput( unsigned char keycode )
 
 	size_t curTextLength = m_currentText.length();
 
-	if ( curTextLength - m_carrotOffset <= curTextLength )
+	if ( curTextLength - m_carrotOffset > 0 )
 	{
+		if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && keycode == KEY_LEFTARROW )
+		{
+			if ( m_currentSelectionText == "" )
+			{
+				m_carrotMovementDirection = 1;
+			}
+			if ( m_carrotMovementDirection == 1 )
+			{
+				m_carrotOffset += 1;
+				m_currentSelectionText.insert( m_currentSelectionText.begin() , m_currentText[ curTextLength - m_carrotOffset ] );
+				return;
+			}
+			else if ( m_carrotMovementDirection == -1 )
+			{
+				m_carrotOffset += 1;
+				m_currentSelectionText.pop_back();
+				return;
+			}
+		}
+		
 		if ( keycode == KEY_LEFTARROW  )
 		{
-			m_carrotOffset += 1;
+			if ( m_currentSelectionText == "" )
+			{
+				m_carrotOffset += 1;
+			}
+			m_currentSelectionText = "";
 		}
 	}
 
 	if ( curTextLength + m_carrotOffset > curTextLength )
 	{
+		if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && keycode == KEY_RIGHTARROW )
+		{
+			//m_carrotOffset -= 1;
+
+// 			if ( m_currentSelectionText == "" )
+// 			{
+// 				m_currentSelectionText.insert( m_currentSelectionText.end() , m_currentText[ curTextLength - m_carrotOffset - 1 ] );
+// 				//m_currentSelectionText.push_back( m_currentText[ curTextLength + m_carrotOffset ] );
+// 			}
+// 			else
+// 			{
+// 				m_currentSelectionText.erase( m_currentSelectionText.begin() );
+// 			}
+
+			if ( m_currentSelectionText == "" )
+			{
+				m_carrotMovementDirection = -1;
+			}
+			
+			if ( m_carrotMovementDirection == -1 )
+			{
+				m_carrotOffset -= 1;
+				m_currentSelectionText.insert( m_currentSelectionText.end() , m_currentText[ curTextLength - m_carrotOffset - 1 ] );
+				return;
+			}
+			else if ( m_carrotMovementDirection == 1 )
+			{
+				m_carrotOffset -= 1;
+				m_currentSelectionText.erase( m_currentSelectionText.begin() );
+				return;
+			}
+			return;
+		}
+		
 		if ( keycode == KEY_RIGHTARROW )
 		{
 			m_carrotOffset -= 1;
+			m_currentSelectionText = "";
 		}
 	}
 		
 	if ( keycode == KEY_END )
 	{
 		m_carrotOffset = 0;
+		m_currentSelectionText = "";
 	}
 
 	if ( keycode == KEY_HOME )
 	{
 		m_carrotOffset = m_currentText.length();
+		m_currentSelectionText = "";
 	}
 	
 // 	if ( keycode == KEY_UPARROW )

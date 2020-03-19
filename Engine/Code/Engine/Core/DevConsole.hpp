@@ -104,13 +104,15 @@ protected:
 	static Rgba8							m_carrotColor;
 	static float							m_carrotPosX;
 	static size_t							m_carrotOffset;
+	static int								m_carrotMovementDirection;
 	static std::vector<ColoredLine>			m_consoleText;
 	static std::vector<DevConsoleCommand>	m_consoleCommands;
 	static std::string						m_consoleCommandHistory[ DEVCONSOLE_MAX_COMMAND_HISTORY ];
-
+	
 private:
 	static std::string						m_currentText;
-	static std::string						m_currentSelectedText;
+	static std::string						m_currentSelectionText;
+
 	static uint								m_indexCurrentSelectedCommandFromHistory;
 	static uint								m_indexLastEnteredCommandFromHistory;
 	Vec2									m_animUVMaxs;
