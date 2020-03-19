@@ -17,3 +17,6 @@ std::string ReverseString( const std::string& originalString );
 bool StringCompare( const char* firstString , std::string  secondString ); 
 bool StringCompare( std::string firstString , std::string  secondString ); 
 bool StringCompare( const char* firstString , const char* secondString );
+
+std::string GetClipboardDataAsText();
+void		SetClipboardDataAsText( std::string clipboardStringToSet );

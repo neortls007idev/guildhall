@@ -1,5 +1,6 @@
 #include "Engine/Core/StringUtils.hpp"
 #include <stdarg.h>
+#include <windows.h>
 
 
 //-----------------------------------------------------------------------------------------------
@@ -165,3 +166,40 @@ bool StringCompare( const char* firstString , const char* secondString )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+std::string GetClipboardDataAsText()
+{
+	if ( !OpenClipboard( NULL ) )
+		return "";
+
+	if ( IsClipboardFormatAvailable( CF_TEXT ) )
+	{
+		HANDLE handleData = GetClipboardData( CF_TEXT );
+		LPCSTR data = ( LPCSTR ) GlobalLock( handleData );
+		std::string clipboardDataString = data;
+		GlobalUnlock( handleData );
+		CloseClipboard();
+		return clipboardDataString;
+	}
+	else
+	{
+		CloseClipboard();
+		return "";
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void SetClipboardDataAsText( std::string clipboardStringToSet )
+{
+	const char* clipboardInput = clipboardStringToSet.c_str();
+	const size_t len = clipboardStringToSet.length() + 1;/*strlen( clipboardInput ) + 1;*/
+	HGLOBAL hMem = GlobalAlloc( GMEM_MOVEABLE , len );
+	memcpy( GlobalLock( hMem ) , clipboardInput , len );
+	GlobalUnlock( hMem );
+	OpenClipboard( 0 );
+	EmptyClipboard();
+	SetClipboardData( CF_TEXT , hMem );
+	CloseClipboard();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

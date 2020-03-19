@@ -17,6 +17,8 @@ extern BitmapFont*	g_bitmapFont;
 extern InputSystem* g_theInput;
 extern Window*		g_theWindow;
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 STATIC bool								DevConsole::m_isConsoleOpen;
 STATIC Rgba8							DevConsole::m_OverlayColor;
 STATIC Rgba8							DevConsole::m_carrotColor;
@@ -35,14 +37,14 @@ STATIC uint								DevConsole::m_indexLastEnteredCommandFromHistory;
 
 DevConsole::DevConsole()
 {
-	m_isConsoleOpen = false;
-	m_OverlayColor = Rgba8( 100 , 100 , 100 , 100 );
-	m_carrotColor = Rgba8( 255 , 255 , 255 , 255 );
-	m_carrotPosX = 0.f;
-	m_carrotOffset = 0;
-	m_currentText = "";
-	m_currentSelectionText = "";
-	m_devConsoleCamera = new Camera();
+	m_isConsoleOpen				= false;
+	m_OverlayColor				= Rgba8( 100 , 100 , 100 , 100 );
+	m_carrotColor				= Rgba8( 255 , 255 , 255 , 255 );
+	m_carrotPosX				= 0.f;
+	m_carrotOffset				= 0;
+	m_currentText				= "";
+	m_currentSelectionText		= "";
+	m_devConsoleCamera			= new Camera();
 	m_devConsoleCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( DEVCONSOLE_CAMERA_SIZE_X , DEVCONSOLE_CAMERA_SIZE_Y ) );
 	m_devConsoleCamera->SetClearMode( CLEAR_NONE | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , GRAY );
 }
@@ -98,6 +100,8 @@ void DevConsole::Shutdown()
 {
 
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void DevConsole::Update( float deltaSeconds )
 {
@@ -161,25 +165,18 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 
 	Vec2 caratDimensions = typingArea.GetDimensions();
 
-	AABB2 carat = typingArea.GetBoxAtLeft( 0.995f , 0.f );
+	AABB2 carat	= typingArea.GetBoxAtLeft( 0.995f , 0.f );
 	carat.SetDimensions( carat.GetDimensions() * 0.7f );
 	carat.AlignWithinAABB2( typingArea , ALIGN_CENTERED_LEFT );
 
-	float offsetBetweenLines = 0.075f * lineHeight;
+	float offsetBetweenLines		= 0.075f * lineHeight;
 
-	float dimensionOfConsole = camera.GetOrthoMax().y - camera.GetOrthoMin().y;
-	int numberOfLinesToDisplay = RoundDownToInt( dimensionOfConsole / ( lineHeight + offsetBetweenLines ) );
-	Vec2 startMins = Vec2( camera.GetOrthoMin().x , camera.GetOrthoMin().y );
-	int myStringIndex = ( int ) m_consoleText.size() - 1;
-	Vec2 alignment = ALIGN_BOTTOM_LEFT;
-	float alignmentDeltaChange = 0.f;
-	
-// 	float dimensionOfConsole = camera.GetOrthoMax().y - camera.GetOrthoMin().y;
-// 	float offsetBetweenLines = 1.f;
-// 	int numberOfLinesToDisplay = RoundDownToInt( dimensionOfConsole / ( lineHeight + offsetBetweenLines) );
-// 	int myStringIndex = ( int ) m_consoleText.size() - 1;
-// 	Vec2 alignment = ALIGN_BOTTOM_LEFT;
-// 	float alignmentDeltaChange = 0.f;
+	float	dimensionOfConsole		= camera.GetOrthoMax().y - camera.GetOrthoMin().y;
+	int		numberOfLinesToDisplay	= RoundDownToInt( dimensionOfConsole / ( lineHeight + offsetBetweenLines ) );
+	Vec2	startMins				= Vec2( camera.GetOrthoMin().x , camera.GetOrthoMin().y );
+	int		myStringIndex			= ( int ) m_consoleText.size() - 1;
+	Vec2	alignment				= ALIGN_BOTTOM_LEFT;
+	float	alignmentDeltaChange	= 0.f;
 	
 	renderer.BeginCamera( camera );
 	renderer.BindDepthStencil( nullptr );
@@ -196,8 +193,6 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	
 	renderer.DrawAABB2( consoleArea , m_OverlayColor );
 	renderer.DrawAABB2( typingArea , Rgba8( 0 , 0 , 255 , 100 ) );
-
-	/*MoveCarrot( lineHeight );*/
 
 	float translateCaratX = ( m_currentText.length() - m_carrotOffset ) * lineHeight;
 	carat.Translate( Vec2( translateCaratX , 0.f ) );
@@ -239,7 +234,6 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	{
 		currentSelectionText.insert( currentSelectionText.begin() , ' ' );
 	}
-	//m_carrotOffset + m_currentSelectionText.length();
 	
 	g_bitmapFont->AddVertsForTextInBox2D( curretnTextVerts , typingArea , lineHeight , currentSelectionText , GREEN , 1.f , ALIGN_CENTERED_LEFT );
 		
@@ -348,9 +342,9 @@ void DevConsole::CreateCommand( std::string newCommand , std::string commandDesc
 void DevConsole::CreateCommand( std::string newCommand , std::string commandDescription , EventArgs commandArgs )
 {
 	DevConsoleCommand newConsoleCommand;
-	newConsoleCommand.command = newCommand;
-	newConsoleCommand.Description = commandDescription;
-	newConsoleCommand.commandArgs = commandArgs;
+	newConsoleCommand.command		= newCommand;
+	newConsoleCommand.Description	= commandDescription;
+	newConsoleCommand.commandArgs	= commandArgs;
 	m_consoleCommands.push_back( newConsoleCommand );
 }
 
@@ -359,10 +353,10 @@ void DevConsole::CreateCommand( std::string newCommand , std::string commandDesc
 void DevConsole::RenderPhoenixAnimation( RenderContext& renderer , const Camera& camera, const AABB2& animArea ) const
 {
 	UNUSED( camera );
-	Texture* texture = renderer.GetOrCreateTextureFromFile( "Data/DevConsole/devconsolePhoenixSpriteSheet4.png" );
-	SpriteSheet* spriteSheet = new SpriteSheet( *texture , IntVec2( 5 , 8 ) );
-	SpriteAnimDefinition anim = SpriteAnimDefinition( *spriteSheet , 0 , 39 , m_phoenixAnimationDuration , SpriteAnimPlaybackType::LOOP );
-	const SpriteDefinition& devConsoleAnim = anim.GetSpriteDefAtTime( m_currentPhoenixAnimFrame );
+	Texture* texture						= renderer.GetOrCreateTextureFromFile( "Data/DevConsole/devconsolePhoenixSpriteSheet4.png" );
+	SpriteSheet* spriteSheet				= new SpriteSheet( *texture , IntVec2( 5 , 8 ) );
+	SpriteAnimDefinition anim				= SpriteAnimDefinition( *spriteSheet , 0 , 39 , m_phoenixAnimationDuration , SpriteAnimPlaybackType::LOOP );
+	const SpriteDefinition& devConsoleAnim	= anim.GetSpriteDefAtTime( m_currentPhoenixAnimFrame );
 	Vec2 uvMins;
 	Vec2 uvMaxs;
 	devConsoleAnim.GetUVs( uvMins , uvMaxs );
@@ -382,10 +376,10 @@ void DevConsole::RenderPhoenixAnimation( RenderContext& renderer , const Camera&
 void DevConsole::RenderCatAnimation( RenderContext& renderer , const Camera& camera , const AABB2& animArea ) const
 {
 	UNUSED( camera );
-	Texture* texture = renderer.GetOrCreateTextureFromFile( "Data/DevConsole/GamerCatHFlippedSpriteSheet2.png" );
-	SpriteSheet* spriteSheet = new SpriteSheet( *texture , IntVec2( 3 , 11 ) );
-	SpriteAnimDefinition anim = SpriteAnimDefinition( *spriteSheet , 0 , 32 , m_catAnimationDuration , SpriteAnimPlaybackType::LOOP );
-	const SpriteDefinition& devConsoleAnim = anim.GetSpriteDefAtTime( m_currentCatAnimFrame );
+	Texture* texture						= renderer.GetOrCreateTextureFromFile( "Data/DevConsole/GamerCatHFlippedSpriteSheet2.png" );
+	SpriteSheet* spriteSheet				= new SpriteSheet( *texture , IntVec2( 3 , 11 ) );
+	SpriteAnimDefinition anim				= SpriteAnimDefinition( *spriteSheet , 0 , 32 , m_catAnimationDuration , SpriteAnimPlaybackType::LOOP );
+	const SpriteDefinition& devConsoleAnim	= anim.GetSpriteDefAtTime( m_currentCatAnimFrame );
 	Vec2 uvMins;
 	Vec2 uvMaxs;
 	devConsoleAnim.GetUVs( uvMins , uvMaxs );
@@ -460,6 +454,32 @@ void DevConsole::ProcessInput()
 
 	size_t curStringLength = m_currentText.length();
 
+	if ( g_theInput->IsKeyHeldDown( KEY_CTRL ) && g_theInput->WasKeyJustPressed( 'V' ) )
+	{
+		std::string clipboardData = GetClipboardDataAsText();
+		m_currentText.insert( curStringLength - m_carrotOffset , clipboardData );
+		m_currentSelectionText = "";
+		m_carrotColor.a = 255;
+		g_theInput->PopCharacter( &character );
+		return;
+	}
+
+	if ( g_theInput->IsKeyHeldDown( KEY_CTRL ) && g_theInput->WasKeyJustPressed( 'C' ) )
+	{
+		SetClipboardDataAsText( m_currentSelectionText );
+		g_theInput->PopCharacter( &character );
+		return;
+	}
+
+	if ( g_theInput->IsKeyHeldDown( KEY_CTRL ) && g_theInput->WasKeyJustPressed( 'X' ) )
+	{
+		SetClipboardDataAsText( m_currentSelectionText );
+		m_currentText.erase( curStringLength - m_carrotOffset - m_currentSelectionText.length() , m_currentSelectionText.length() );
+		m_currentSelectionText = "";
+		g_theInput->PopCharacter( &character );
+		return;
+	}
+	
 	if ( g_theInput->WasKeyJustPressed( KEY_DELETE ) && m_carrotMovementDirection == 1 && m_currentSelectionText.length() > 0 )
 	{
 		m_currentText.erase( curStringLength - m_carrotOffset , m_currentSelectionText.length() );
@@ -486,7 +506,7 @@ void DevConsole::ProcessInput()
 	}
 
 	while ( g_theInput->PopCharacter( &character ) )
-	{
+	{		
 		if ( character == EASCII_ESCAPE )
 		{
 			return;
@@ -656,18 +676,6 @@ void DevConsole::HandleInput( unsigned char keycode )
 	{
 		if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && keycode == KEY_RIGHTARROW )
 		{
-			//m_carrotOffset -= 1;
-
-// 			if ( m_currentSelectionText == "" )
-// 			{
-// 				m_currentSelectionText.insert( m_currentSelectionText.end() , m_currentText[ curTextLength - m_carrotOffset - 1 ] );
-// 				//m_currentSelectionText.push_back( m_currentText[ curTextLength + m_carrotOffset ] );
-// 			}
-// 			else
-// 			{
-// 				m_currentSelectionText.erase( m_currentSelectionText.begin() );
-// 			}
-
 			if ( m_currentSelectionText == "" )
 			{
 				m_carrotMovementDirection = -1;
@@ -742,7 +750,6 @@ uint DevConsole::GetReverseStringIndexForCurrentCarrotPos() const
 		carrotOffsetCopy = m_currentText.length();
 	}
 		
-	//uint len = m_currentText.length() - carrotOffsetCopy;
 	return carrotOffsetCopy;
 }
 
@@ -755,7 +762,7 @@ uint DevConsole::GetStringIndexForCurrentCarrotPos() const
 	
 	if ( carrotOffsetCopy != 0 )
 	{
-		subStringStartIndex = carrotOffsetCopy/*m_currentText.find( ' ' , carrotOffsetCopy - 1 )*/;
+		subStringStartIndex = carrotOffsetCopy;
 	}
 
 	carrotOffsetCopy = m_currentText.find( ' ' , carrotOffsetCopy );
@@ -763,10 +770,8 @@ uint DevConsole::GetStringIndexForCurrentCarrotPos() const
 	if ( carrotOffsetCopy == std::string::npos )
 	{
 		carrotOffsetCopy = subStringStartIndex + ( m_currentText.length() - subStringStartIndex ) - 1;
-		//subStringStartIndex = 1;
 	}
 
-	//uint len = m_currentText.length() - carrotOffsetCopy;
 	if ( subStringStartIndex == 0 )
 	{
 		return   carrotOffsetCopy + 1;
