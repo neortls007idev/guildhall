@@ -474,7 +474,18 @@ void DevConsole::ProcessInput()
 	if ( g_theInput->IsKeyHeldDown( KEY_CTRL ) && g_theInput->WasKeyJustPressed( 'X' ) )
 	{
 		SetClipboardDataAsText( m_currentSelectionText );
-		m_currentText.erase( curStringLength - m_carrotOffset - m_currentSelectionText.length() , m_currentSelectionText.length() );
+
+		if ( m_carrotMovementDirection == 1 && m_currentSelectionText.length() > 0 )
+		{
+			m_currentText.erase( curStringLength - m_carrotOffset , m_currentSelectionText.length() );
+			m_carrotOffset -= m_currentSelectionText.length();
+		}
+		
+		if ( m_carrotMovementDirection == -1 && m_currentSelectionText.length() > 0 )
+		{
+			m_currentText.erase( curStringLength - m_carrotOffset - m_currentSelectionText.length() , m_currentSelectionText.length() );
+		}
+		
 		m_currentSelectionText = "";
 		g_theInput->PopCharacter( &character );
 		return;
