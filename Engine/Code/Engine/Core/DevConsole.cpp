@@ -460,6 +460,23 @@ void DevConsole::ProcessInput()
 
 	size_t curStringLength = m_currentText.length();
 
+	if ( g_theInput->WasKeyJustPressed( KEY_DELETE ) && m_carrotMovementDirection == 1 && m_currentSelectionText.length() > 0 )
+	{
+		m_currentText.erase( curStringLength - m_carrotOffset , m_currentSelectionText.length() );
+		m_carrotOffset -= m_currentSelectionText.length();
+		m_currentSelectionText = "";
+		m_carrotColor.a = 255;
+		return;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( KEY_DELETE ) && m_carrotMovementDirection == -1 && m_currentSelectionText.length() > 0 )
+	{
+		m_currentText.erase(curStringLength - m_carrotOffset - m_currentSelectionText.length(),m_currentSelectionText.length());
+		m_currentSelectionText = "";
+		m_carrotColor.a = 255;
+		return;
+	}
+
 	if ( g_theInput->WasKeyJustPressed( KEY_DELETE ) && ( curStringLength - m_carrotOffset ) < curStringLength )
 	{
 		m_currentText.erase( ( curStringLength - m_carrotOffset ) , 1 );
@@ -487,6 +504,23 @@ void DevConsole::ProcessInput()
 
 		curStringLength = m_currentText.length();
 
+		if ( character == EASCII_BACKSPACE && m_carrotMovementDirection == 1 && m_currentSelectionText.length() > 0 )
+		{
+			m_currentText.erase( curStringLength - m_carrotOffset , m_currentSelectionText.length() );
+			m_carrotOffset -= m_currentSelectionText.length();
+			m_currentSelectionText = "";
+			m_carrotColor.a = 255;
+			break;
+		}
+
+		if ( character == EASCII_BACKSPACE && m_carrotMovementDirection == -1 && m_currentSelectionText.length() > 0 )
+		{
+			m_currentText.erase( curStringLength - m_carrotOffset - m_currentSelectionText.length() , m_currentSelectionText.length() );
+			m_currentSelectionText = "";
+			m_carrotColor.a = 255;
+			break;
+		}
+		
 		if ( character == EASCII_BACKSPACE && ( curStringLength + m_carrotOffset ) > 0 )
 		{
 			m_currentText.erase( curStringLength - m_carrotOffset - 1 , 1 );
@@ -503,11 +537,24 @@ bool DevConsole::AddCharacterToInput( char character )
 {
 	size_t curStringLength = m_currentText.length();
 
+	if ( m_carrotMovementDirection == 1 && m_currentSelectionText.length() > 0 )
+	{
+		m_currentText.erase( curStringLength - m_carrotOffset , m_currentSelectionText.length() );
+		m_carrotOffset -= m_currentSelectionText.length();
+	}
+
+	if ( m_carrotMovementDirection == -1 && m_currentSelectionText.length() > 0 )
+	{
+		m_currentText.erase( curStringLength - m_carrotOffset - m_currentSelectionText.length() , m_currentSelectionText.length() );
+	}
+	
 	if ( character != 8 && character != 127 )
 	{
-		m_currentText.insert( curStringLength - m_carrotOffset , 1 , character );
+		m_currentText.insert( curStringLength - m_carrotOffset - m_currentSelectionText.length() , 1 , character );
 		m_carrotColor.a = 255;
 	}
+
+	m_currentSelectionText = "";
 	return true;
 }
 
