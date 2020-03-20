@@ -53,6 +53,34 @@ extern char const* g_errorShaderCode;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+D3D11_FILL_MODE GetD3D11FillMode( eRasterState rasterFillMode )
+{
+	switch ( rasterFillMode )
+	{
+		case FILL_SOLID:
+							return D3D11_FILL_SOLID;
+		case WIREFRAME:
+							return D3D11_FILL_WIREFRAME;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+D3D11_CULL_MODE GetD3D11CullMode( eCullMode cullMode )
+{
+	switch ( cullMode )
+	{
+	case CULL_NONE:
+						return D3D11_CULL_NONE;
+	case CULL_FRONT:
+						return D3D11_CULL_FRONT;
+	case CULL_BACK:
+						return D3D11_CULL_BACK;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 RenderContext::~RenderContext()
 {
 
@@ -65,6 +93,8 @@ RenderContext::~RenderContext()
 	{
 		DX_SAFE_RELEASE( m_rasterStates[ index ] );
 	}
+
+	DX_SAFE_RELEASE( m_transientRaterState );
 	
 	delete m_textureDefault;
 	m_textureDefault = nullptr;
@@ -395,6 +425,7 @@ void RenderContext::BeginCamera( const Camera& camera )
 	BindTexture( m_textureDefault );
 	BindSampler( m_defaultSampler );
 	SetBlendMode( eBlendMode::SOLID );
+	SetRasterState( eRasterState::FILL_SOLID );
 	//SetDepthTest( COMPARE_ALWAYS , true );
 	//BindDepthStencil( m_currentCamera->GetDepthStencilTarget() );
 }
@@ -441,6 +472,16 @@ void RenderContext::SetRasterState( eRasterState rasterState )
 		case WIREFRAME :
 							m_context->RSSetState( m_rasterStates[ eRasterState::WIREFRAME ] );
 							break;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::SetTransientRasterStateAsRasterState()
+{
+	if ( m_transientRaterState )
+	{
+		m_context->RSSetState( m_transientRaterState );
 	}
 }
 
@@ -709,6 +750,31 @@ void RenderContext::CreateRasterStates()
  	wireFramedesc.AntialiasedLineEnable = FALSE;
  
  	m_device->CreateRasterizerState( &wireFramedesc , &m_rasterStates[ eRasterState::WIREFRAME ] );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::CreateTransientRasterState( eRasterState rasterFillMode , eCullMode cullMode , eWindingOrder windingOrder )
+{
+	if ( m_transientRaterState )
+	{
+		DX_SAFE_RELEASE( m_transientRaterState );
+	}
+	
+	D3D11_RASTERIZER_DESC desc;
+
+	desc.FillMode = GetD3D11FillMode( rasterFillMode ); // full triangle switch for wireframe
+	desc.CullMode = GetD3D11CullMode( cullMode );
+	desc.FrontCounterClockwise = GetWindingOrder( windingOrder );
+	desc.DepthBias = 0U;
+	desc.DepthBiasClamp = 0.0f;
+	desc.SlopeScaledDepthBias = 0.0f;
+	desc.DepthClipEnable = TRUE;
+	desc.ScissorEnable = FALSE;
+	desc.MultisampleEnable = FALSE;
+	desc.AntialiasedLineEnable = FALSE;
+
+	m_device->CreateRasterizerState( &desc , &m_transientRaterState );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

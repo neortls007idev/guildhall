@@ -1,4 +1,5 @@
 #pragma once
+#include "Engine/Core/CoreUtils.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
@@ -11,6 +12,7 @@
 #include <map>
 #include <string>
 #include <vector>
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				FORWARD DECLARATIONS 
@@ -53,6 +55,14 @@ enum  eRasterState
 	TOTAL_RASTER_STATES
 };
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum  eCullMode
+{
+	CULL_NONE	= 1 ,
+	CULL_FRONT ,
+	CULL_BACK ,
+};
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -128,6 +138,7 @@ public:
 
 	void		SetBlendMode( eBlendMode blendMode );
 	void		SetRasterState( eRasterState rasterState );
+	void		SetTransientRasterStateAsRasterState();
 	
 	void		BindTexture( const Texture* constTexture );
 	bool		BindShader( Shader* shader );
@@ -147,7 +158,10 @@ public:
 	BitmapFont* GetOrCreateBitmapFontFromFile( std::string bitmapFontFilePath );
 	void		CreateBlendStates();
 	void		CreateRasterStates();
-	
+	void		CreateTransientRasterState( eRasterState rasterFillMode , eCullMode cullMode , eWindingOrder windingOrder );
+	void		SetCullMode( eCullMode cullMode );							// TODO :- IMPLEMENT ME
+	void		SetFillMode( eRasterState rasterFillMode );					// TODO :- IMPLEMENT ME
+	void		SetWindingOrder( eWindingOrder windingOrder );				// TODO :- IMPLEMENT ME
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			DRAW METHODS
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -247,6 +261,8 @@ public:
 
 	ID3D11BlendState*					m_blendStates[eBlendMode::TOTAL_BLEND_MODES];
 	ID3D11RasterizerState*				m_rasterStates[eBlendMode::TOTAL_BLEND_MODES];
+	ID3D11RasterizerState*				m_defaultRasterState;
+	ID3D11RasterizerState*				m_transientRaterState;
 
 	RenderBuffer*						m_frameUBO								= nullptr;
 	RenderBuffer*						m_modelMatrixUBO						= nullptr;

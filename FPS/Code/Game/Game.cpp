@@ -93,16 +93,22 @@ void Game::Render() const
 	g_theRenderer->SetModelMatrix( m_cubeTransform.GetAsMatrix() );
 
 	g_theRenderer->BindShader( nullptr );
+	g_theRenderer->SetRasterState( FILL_SOLID );
 
 	g_theRenderer->DrawMesh( m_meshCube );
 	g_theRenderer->BindShader( nullptr );
 
 	g_theRenderer->SetBlendMode( SOLID );
+	g_theRenderer->SetRasterState( FILL_SOLID );
+	
 	g_theRenderer->BindTexture( m_worldMapSphere );
-	g_theRenderer->BindShader( m_gridShader );
-	g_theRenderer->BindTexture( g_theRenderer->m_textureDefault );
+	g_theRenderer->BindShader( nullptr );
+	//g_theRenderer->BindShader( m_gridShader );
+	//g_theRenderer->BindTexture( g_theRenderer->m_textureDefault );
+	
 	Transform sphereRing;
 	float deltaDegrees = 360.f / 30.f;
+
 	for ( float sphereIndex = 0 ; sphereIndex <= 360 ; sphereIndex += deltaDegrees )
 	{
 		Vec3 position = Vec3::MakeFromSpericalCoordinates( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 15.f );
@@ -110,6 +116,7 @@ void Game::Render() const
 		sphereRing.SetPosition( position );
 		sphereRing.SetRotation( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 0.f );
 		g_theRenderer->SetModelMatrix( sphereRing.GetAsMatrix() );
+		g_theRenderer->SetRasterState( WIREFRAME );
 		g_theRenderer->DrawMesh( m_meshSphere );
 	}
 

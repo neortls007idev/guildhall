@@ -169,6 +169,7 @@
   <ItemGroup>
     <ClCompile Include="..\ThirdParty\TinyXML2\tinyxml2.cpp" />
     <ClCompile Include="Audio\AudioSystem.cpp" />
+    <ClCompile Include="Core\CoreUtils.cpp" />
     <ClCompile Include="Core\DebugRender.cpp" />
     <ClCompile Include="Core\DevConsole.cpp" />
     <ClCompile Include="Core\DirectoryWatcher.cpp" />
@@ -253,6 +254,7 @@
     <ClInclude Include="..\ThirdParty\stb\stb_image.h" />
     <ClInclude Include="..\ThirdParty\TinyXML2\tinyxml2.h" />
     <ClInclude Include="Audio\AudioSystem.hpp" />
+    <ClInclude Include="Core\CoreUtils.hpp" />
     <ClInclude Include="Core\DebugRender.hpp" />
     <ClInclude Include="Core\DevConsole.hpp" />
     <ClInclude Include="Core\DirectoryWatcher.hpp" />

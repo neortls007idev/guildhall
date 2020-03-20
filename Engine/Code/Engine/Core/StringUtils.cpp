@@ -2,12 +2,12 @@
 #include <stdarg.h>
 #include <windows.h>
 
-
 //-----------------------------------------------------------------------------------------------
+
 const int STRINGF_STACK_LOCAL_TEMP_LENGTH = 2048;
 
-
 //-----------------------------------------------------------------------------------------------
+
 const std::string Stringf( const char* format, ... )
 {
 	char textLiteral[ STRINGF_STACK_LOCAL_TEMP_LENGTH ];
@@ -20,8 +20,8 @@ const std::string Stringf( const char* format, ... )
 	return std::string( textLiteral );
 }
 
-
 //-----------------------------------------------------------------------------------------------
+
 const std::string Stringf( const int maxLength, const char* format, ... )
 {
 	char textLiteralSmall[ STRINGF_STACK_LOCAL_TEMP_LENGTH ];
@@ -64,6 +64,8 @@ Strings SplitStringAtGivenDelimiter( const std::string& originalString , const c
 	
 	return splitStrings;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 Strings SplitStringOnceAtGivenDelimiter( const std::string& originalString , const char delimiter /*= ',' */ )
 {

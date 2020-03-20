@@ -292,6 +292,9 @@
     <ClCompile Include="Physics\PhysicsUtils.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
+    <ClCompile Include="Core\CoreUtils.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -548,6 +551,9 @@
     </ClInclude>
     <ClInclude Include="Physics\PhysicsUtils.hpp">
       <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CoreUtils.hpp">
+      <Filter>Core\Utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
