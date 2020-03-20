@@ -273,38 +273,61 @@ bool Shader::CreateFromString( RenderContext* ctx , std::string const& stringNam
 
 Shader::~Shader()
 {
-	DX_SAFE_RELEASE( m_rasterState );
-	DX_SAFE_RELEASE( m_defaultRasterState );
+	//DX_SAFE_RELEASE( m_rasterState );
+	//DX_SAFE_RELEASE( m_defaultRasterState );
 	DX_SAFE_RELEASE( m_inputLayout );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+// ID3D11RasterizerState* Shader::SetRasterState( ID3D11RasterizerState* newRasterState )
+// {
+// 	m_defaultRasterState = newRasterState;
+// }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Shader::CreateRasterState()
 {
-	D3D11_RASTERIZER_DESC desc;
+// 	D3D11_RASTERIZER_DESC fillSoliddesc;
+// 
+// 	fillSoliddesc.FillMode = D3D11_FILL_SOLID; // full triangle switch for wireframe
+// 	fillSoliddesc.CullMode = D3D11_CULL_NONE;
+// 	fillSoliddesc.FrontCounterClockwise = TRUE;
+// 	fillSoliddesc.DepthBias = 0U;
+// 	fillSoliddesc.DepthBiasClamp = 0.0f;
+// 	fillSoliddesc.SlopeScaledDepthBias = 0.0f;
+// 	fillSoliddesc.DepthClipEnable = TRUE;
+// 	fillSoliddesc.ScissorEnable = FALSE;
+// 	fillSoliddesc.MultisampleEnable = FALSE;
+// 	fillSoliddesc.AntialiasedLineEnable = FALSE;
+// 
+// 	ID3D11Device* device = m_owner->m_device;
+// 	device->CreateRasterizerState( &fillSoliddesc , &m_rasterState );
 
-	desc.FillMode = D3D11_FILL_SOLID; // full triangle swithc for wireframe
-	desc.CullMode = D3D11_CULL_NONE;
-	desc.FrontCounterClockwise = TRUE;
-	desc.DepthBias = 0U;
-	desc.DepthBiasClamp = 0.0f;
-	desc.SlopeScaledDepthBias = 0.0f;
-	desc.DepthClipEnable = TRUE;
-	desc.ScissorEnable = FALSE;
-	desc.MultisampleEnable = FALSE;
-	desc.AntialiasedLineEnable = FALSE;
-
-	ID3D11Device* device = m_owner->m_device;
-	device->CreateRasterizerState( &desc , &m_rasterState );
+// 	D3D11_RASTERIZER_DESC wireFramedesc;
+// 
+// 	wireFramedesc.FillMode = D3D11_FILL_WIREFRAME; // full triangle switch for wireframe
+// 	wireFramedesc.CullMode = D3D11_CULL_NONE;
+// 	wireFramedesc.FrontCounterClockwise = TRUE;
+// 	wireFramedesc.DepthBias = 0U;
+// 	wireFramedesc.DepthBiasClamp = 0.0f;
+// 	wireFramedesc.SlopeScaledDepthBias = 0.0f;
+// 	wireFramedesc.DepthClipEnable = TRUE;
+// 	wireFramedesc.ScissorEnable = FALSE;
+// 	wireFramedesc.MultisampleEnable = FALSE;
+// 	wireFramedesc.AntialiasedLineEnable = FALSE;
+// 
+// 	ID3D11Device* device = m_owner->m_device;
+// 	device->CreateRasterizerState( &wireFramedesc , &m_rasterState );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Shader::ReleaseShaderResources()
 {
-	DX_SAFE_RELEASE( m_rasterState );
-	DX_SAFE_RELEASE( m_defaultRasterState );
+// 	DX_SAFE_RELEASE( m_rasterState );
+// 	DX_SAFE_RELEASE( m_defaultRasterState );
 	DX_SAFE_RELEASE( m_inputLayout );
 	m_lastBufferAttribute = nullptr;
 }

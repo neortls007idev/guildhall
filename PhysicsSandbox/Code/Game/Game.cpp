@@ -141,6 +141,7 @@ void Game::Render() const
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->SetBlendMode( ALPHA );
+	g_theRenderer->SetRasterState( FILL_SOLID );
 
 	for ( unsigned int index = 0; index < ( unsigned int ) m_gameObjects.size(); index++ )
 	{
@@ -202,6 +203,7 @@ void Game::RenderUI() const
 	g_theRenderer->BeginCamera( m_UICamera );
 	g_theRenderer->BindDepthStencil( nullptr );
 	g_theRenderer->SetBlendMode( ALPHA );
+	g_theRenderer->SetRasterState( FILL_SOLID );
 
 	AABB2 uiArea = AABB2( m_UICamera.GetOrthoMin().GetXYComponents() , m_UICamera.GetOrthoMax().GetXYComponents() );
 

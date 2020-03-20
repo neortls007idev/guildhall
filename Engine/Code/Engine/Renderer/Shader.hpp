@@ -65,13 +65,16 @@ class Shader
 public:
 	Shader( RenderContext* context );
 	~Shader();
+
 	bool CreateFromFile( RenderContext* ctx , std::string const& filename );    
 	bool CreateFromString( RenderContext* ctx , std::string const& stringName );   
 	// for hooking IA (input assembler) to the VS (vertex shader), 
 	// needs to vertex shader and vertex format to make the binding
 	//ID3D11InputLayout* GetOrCreateInputLayout( VertexBuffer* vbo );            
 
-	ID3D11RasterizerState* GetRasterState();                                   
+// 	ID3D11RasterizerState* GetRasterState()													{ return m_defaultRasterState; }
+// 	ID3D11RasterizerState* SetRasterState( ID3D11RasterizerState* newRasterState );
+	
 	void CreateRasterState();
 	void ReleaseShaderResources();
 	bool RecompileShader( std::string const& filename );
@@ -83,13 +86,13 @@ public:
 	std::string					m_user;
 	ShaderStage					m_vertexStage;
 	ShaderStage					m_fragmentStage;
-	ID3D11RasterizerState*		m_rasterState		  = nullptr;
-	buffer_attribute_t const*	m_lastBufferAttribute = nullptr;
+	//ID3D11RasterizerState*		m_rasterState			= nullptr;
+	buffer_attribute_t const*	m_lastBufferAttribute	= nullptr;
 
 	// A02 temp
 	RenderContext*				m_owner;
-	ID3D11InputLayout*			m_inputLayout		 = nullptr; // for now, we'll have 1, but in the future you could have one for each different vertex type you use with this; 
-	ID3D11RasterizerState*		m_defaultRasterState = nullptr;
+	ID3D11InputLayout*			m_inputLayout			= nullptr; // for now, we'll have 1, but in the future you could have one for each different vertex type you use with this; 
+//	ID3D11RasterizerState*		m_defaultRasterState	= nullptr;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

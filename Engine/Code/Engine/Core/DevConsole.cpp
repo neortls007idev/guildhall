@@ -161,7 +161,7 @@ void DevConsole::PrintString( const std::string& devConsolePrintString /*= "INVA
 
 void DevConsole::Render( RenderContext& renderer , const Camera& camera , float lineHeight ) const
 {
-	m_textLineHeight = lineHeight;
+	m_textLineHeight = ( int ) lineHeight;
 	
 	AABB2 consoleArea = AABB2( camera.GetOrthoMin().x , camera.GetOrthoMin().y , camera.GetOrthoMax().x , camera.GetOrthoMax().y );
 	AABB2 typingArea = consoleArea.CarveBoxOffBottom( 0.075f , 0.f );
@@ -186,6 +186,7 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	renderer.BindDepthStencil( nullptr );
 	renderer.SetBlendMode( ALPHA );
 	renderer.BindShader( nullptr );
+	renderer.SetRasterState( FILL_SOLID );
 
 	AABB2 devConsolePhoenixAnimArea = consoleArea.GetBoxAtTop( 0.75f , 0.f ).GetBoxAtRight( 0.25f , 0.f );
 	devConsolePhoenixAnimArea.AlignWithinAABB2( consoleArea , ALIGN_TOP_RIGHT );
@@ -223,7 +224,7 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 
 	std::string currentSelectionText = m_currentSelectionText;
 
-	uint selectionOffset = 0;
+	size_t selectionOffset = 0;
 	
 	if ( m_carrotMovementDirection == 1 )
 	{
@@ -234,7 +235,7 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 		selectionOffset = m_currentText.length() - m_carrotOffset - m_currentSelectionText.length();
 	}
 	
-	for( uint index = 0 ; index < selectionOffset ; index++ )
+	for( size_t index = 0 ; index < selectionOffset ; index++ )
 	{
 		currentSelectionText.insert( currentSelectionText.begin() , ' ' );
 	}
@@ -369,9 +370,9 @@ void DevConsole::RenderPhoenixAnimation( RenderContext& renderer , const Camera&
 	AppendVertsForAABB2( tempDevConsoleAnim , animArea , m_devConsoleAnimationColor , uvMins , uvMaxs );
 
 	renderer.BindTexture( texture );
-	renderer.SetBlendMode( BlendMode::ALPHA );
+	renderer.SetBlendMode( eBlendMode::ALPHA );
 	renderer.DrawVertexArray( tempDevConsoleAnim );
-	renderer.SetBlendMode( BlendMode::ALPHA );
+	renderer.SetBlendMode( eBlendMode::ALPHA );
 	renderer.BindTexture( nullptr );
 }
 
@@ -392,9 +393,9 @@ void DevConsole::RenderCatAnimation( RenderContext& renderer , const Camera& cam
 	AppendVertsForAABB2( tempDevConsoleAnim , animArea , m_devConsoleAnimationColor , uvMins , uvMaxs );
 	
 	renderer.BindTexture( texture );
-	renderer.SetBlendMode( BlendMode::ALPHA );
+	renderer.SetBlendMode( eBlendMode::ALPHA );
 	renderer.DrawVertexArray( tempDevConsoleAnim );
-	renderer.SetBlendMode( BlendMode::ALPHA );
+	renderer.SetBlendMode( eBlendMode::ALPHA );
 	renderer.BindTexture( nullptr );
 }
 
@@ -773,7 +774,7 @@ void DevConsole::HandleMouseInput()
 	Vec2	mousePos		= g_theInput->GetMouseNormalizedClientPosition();
 	AABB2	consoleArea		= AABB2( m_devConsoleCamera->GetOrthoMin().GetXYComponents() , m_devConsoleCamera->GetOrthoMax().GetXYComponents() );
 	AABB2	typingArea		= consoleArea.CarveBoxOffBottom( 0.075f , 0.f );
-	AABB2	typedTextArea	= AABB2( typingArea.m_mins , Vec2( m_currentText.length() * m_textLineHeight , typingArea.m_maxs.y ) );
+	AABB2	typedTextArea = AABB2( typingArea.m_mins , Vec2( ( float ) ( m_currentText.length() * m_textLineHeight ) , typingArea.m_maxs.y ) );
 
 	float	x = RangeMapFloat( 0.f , 1.f , typingArea.m_mins.x , typingArea.m_maxs.x , mousePos.x );
 			x = Clamp( x , typedTextArea.m_mins.x , typedTextArea.m_maxs.x );
@@ -782,7 +783,7 @@ void DevConsole::HandleMouseInput()
 	{
 		if ( g_theInput->WasLeftMouseButtonJustPressed() )
 		{
-			int result = m_currentText.length() - RoundToNearestInt( x / m_textLineHeight );
+			int result = (int)m_currentText.length() - RoundToNearestInt( x / ( float ) m_textLineHeight );
 			m_carrotOffset = result;
 			m_currentSelectionText = "";
 			return;
@@ -794,27 +795,27 @@ void DevConsole::HandleMouseInput()
 			
 			static float lastCharacterX = x;
 
-			int result = m_currentText.length() - RoundToNearestInt( x / m_textLineHeight );
-			m_carrotOffset = Clamp( result , 0 , m_currentText.length() );
-			bool carrotHasMoved = !( m_carrotOffset == carrotOffsetCopy );
+			int result = ( int ) m_currentText.length() - RoundToNearestInt( x / ( float ) m_textLineHeight );
+			m_carrotOffset = static_cast< size_t >( Clamp( ( float ) result , 0.f , ( float ) m_currentText.length() ) );
+			bool carrotHasMoved = m_carrotOffset > carrotOffsetCopy;
 
 			if ( carrotOffsetCopy == m_carrotOffset )
 			{
 				return;
 			}
 			
-			if ( m_currentSelectionText.length() == 0 || ( lastCharacterX - x ) > 0 )
+			if ( m_currentSelectionText.length() == 0 || carrotHasMoved /*( lastCharacterX - x ) > 0*/ )
 			{
 				m_carrotMovementDirection = 1;
 			}
-			else if ( m_currentSelectionText.length() > 0 && ( lastCharacterX - x ) < 0 )
+			else if ( m_currentSelectionText.length() > 0 && !carrotHasMoved )
 			{
 				m_carrotMovementDirection = -1;
 			}
-			else
-			{
-				m_carrotMovementDirection = 0;
-			}
+// 			else
+// 			{
+// 				m_carrotMovementDirection = 0;
+// 			}
 
 			if ( m_carrotMovementDirection == 1 )
 			{
@@ -823,7 +824,8 @@ void DevConsole::HandleMouseInput()
 			}
 			if ( m_carrotMovementDirection == -1 )
 			{
-				m_currentSelectionText.pop_back();
+				m_currentSelectionText.erase( m_currentSelectionText.begin() );
+				//m_currentSelectionText.pop_back();
 				return;
 			}
 			
@@ -850,8 +852,7 @@ uint DevConsole::GetReverseStringIndexForCurrentCarrotPos() const
 {
 	size_t carrotOffsetCopy = m_carrotOffset + 1;
 	std::string reverseCurrentText = ReverseString( m_currentText );
-	size_t subStringStartIndex = 0;
-
+	
 	carrotOffsetCopy = reverseCurrentText.find( ' ' , carrotOffsetCopy );
 	
 	if ( carrotOffsetCopy == std::string::npos )
@@ -859,7 +860,7 @@ uint DevConsole::GetReverseStringIndexForCurrentCarrotPos() const
 		carrotOffsetCopy = m_currentText.length();
 	}
 		
-	return carrotOffsetCopy;
+	return static_cast< uint >( carrotOffsetCopy );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -883,10 +884,10 @@ uint DevConsole::GetStringIndexForCurrentCarrotPos() const
 
 	if ( subStringStartIndex == 0 )
 	{
-		return   carrotOffsetCopy + 1;
+		return   static_cast< uint >( carrotOffsetCopy + 1 );
 	}
 	
-	return   carrotOffsetCopy - subStringStartIndex + 1;
+	return   static_cast< uint >( carrotOffsetCopy - subStringStartIndex + 1 );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -56,14 +56,16 @@ extern char const* g_errorShaderCode;
 RenderContext::~RenderContext()
 {
 
-	// 	delete g_bitmapFont;
-	// 	g_bitmapFont = nullptr;
-
-	for ( int index = 0; index < BlendMode::TOTAL; index++ )
+	for ( int index = 0; index < eBlendMode::TOTAL_BLEND_MODES; index++ )
 	{
 		DX_SAFE_RELEASE( m_blendStates[ index ] );
 	}
 
+	for ( int index = 0; index < eRasterState::TOTAL_RASTER_STATES; index++ )
+	{
+		DX_SAFE_RELEASE( m_rasterStates[ index ] );
+	}
+	
 	delete m_textureDefault;
 	m_textureDefault = nullptr;
 
@@ -204,6 +206,7 @@ void RenderContext::Startup( Window* window )
 	m_textureDefault = CreateTextureFromColor( WHITE );
 
 	CreateBlendStates();
+	CreateRasterStates();
 
 	if ( g_bitmapFont == nullptr )
 	{
@@ -391,7 +394,7 @@ void RenderContext::BeginCamera( const Camera& camera )
 
 	BindTexture( m_textureDefault );
 	BindSampler( m_defaultSampler );
-	SetBlendMode( BlendMode::SOLID );
+	SetBlendMode( eBlendMode::SOLID );
 	//SetDepthTest( COMPARE_ALWAYS , true );
 	//BindDepthStencil( m_currentCamera->GetDepthStencilTarget() );
 }
@@ -406,23 +409,38 @@ void RenderContext::EndCamera( const Camera& camera )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::SetBlendMode( BlendMode blendMode )
+void RenderContext::SetBlendMode( eBlendMode blendMode )
 {
 	float const zeroes[] = { 0 , 0 , 0 , 0 };
 
 	switch ( blendMode )
 	{
-	case BlendMode::ALPHA:
-					m_context->OMSetBlendState( m_blendStates[ BlendMode::ALPHA ] , zeroes , ~0U );
+	case eBlendMode::ALPHA:
+					m_context->OMSetBlendState( m_blendStates[ eBlendMode::ALPHA ] , zeroes , ~0U );
 					break;
-	case BlendMode::ADDITIVE:
-					m_context->OMSetBlendState( m_blendStates[ BlendMode::ADDITIVE ] , zeroes , ~0U );
+	case eBlendMode::ADDITIVE:
+					m_context->OMSetBlendState( m_blendStates[ eBlendMode::ADDITIVE ] , zeroes , ~0U );
 					break;
-	case BlendMode::SOLID:
-					m_context->OMSetBlendState( m_blendStates[ BlendMode::SOLID ] , zeroes , ~0U );
+	case eBlendMode::SOLID:
+					m_context->OMSetBlendState( m_blendStates[ eBlendMode::SOLID ] , zeroes , ~0U );
 					break;
 	default:
 		break;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::SetRasterState( eRasterState rasterState )
+{
+	switch ( rasterState )
+	{
+		case FILL_SOLID :
+							m_context->RSSetState( m_rasterStates[ eRasterState::FILL_SOLID ] );
+							break;
+		case WIREFRAME :
+							m_context->RSSetState( m_rasterStates[ eRasterState::WIREFRAME ] );
+							break;
 	}
 }
 
@@ -621,7 +639,7 @@ void RenderContext::CreateBlendStates()
 	// render all output
 	alphaDesc.RenderTarget[ 0 ].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-	m_device->CreateBlendState( &alphaDesc , &m_blendStates[ BlendMode::ALPHA ] );
+	m_device->CreateBlendState( &alphaDesc , &m_blendStates[ eBlendMode::ALPHA ] );
 
 	D3D11_BLEND_DESC additiveDesc;
 
@@ -638,7 +656,7 @@ void RenderContext::CreateBlendStates()
 
 	// render all output
 	additiveDesc.RenderTarget[ 0 ].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-	m_device->CreateBlendState( &additiveDesc , &m_blendStates[ BlendMode::ADDITIVE ] );
+	m_device->CreateBlendState( &additiveDesc , &m_blendStates[ eBlendMode::ADDITIVE ] );
 
 	D3D11_BLEND_DESC opaqueDesc;
 
@@ -655,7 +673,42 @@ void RenderContext::CreateBlendStates()
 
 	// render all output
 	opaqueDesc.RenderTarget[ 0 ].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-	m_device->CreateBlendState( &opaqueDesc , &m_blendStates[ BlendMode::SOLID ] );
+	m_device->CreateBlendState( &opaqueDesc , &m_blendStates[ eBlendMode::SOLID ] );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::CreateRasterStates()
+{
+	D3D11_RASTERIZER_DESC fillSoliddesc;
+
+	fillSoliddesc.FillMode = D3D11_FILL_SOLID; // full triangle switch for wireframe
+	fillSoliddesc.CullMode = D3D11_CULL_NONE;
+	fillSoliddesc.FrontCounterClockwise = TRUE;
+	fillSoliddesc.DepthBias = 0U;
+	fillSoliddesc.DepthBiasClamp = 0.0f;
+	fillSoliddesc.SlopeScaledDepthBias = 0.0f;
+	fillSoliddesc.DepthClipEnable = TRUE;
+	fillSoliddesc.ScissorEnable = FALSE;
+	fillSoliddesc.MultisampleEnable = FALSE;
+	fillSoliddesc.AntialiasedLineEnable = FALSE;
+
+	m_device->CreateRasterizerState( &fillSoliddesc , &m_rasterStates[ eRasterState::FILL_SOLID ] );
+
+ 	D3D11_RASTERIZER_DESC wireFramedesc;
+ 
+ 	wireFramedesc.FillMode = D3D11_FILL_WIREFRAME; // full triangle switch for wireframe
+ 	wireFramedesc.CullMode = D3D11_CULL_NONE;
+ 	wireFramedesc.FrontCounterClockwise = TRUE;
+ 	wireFramedesc.DepthBias = 0U;
+ 	wireFramedesc.DepthBiasClamp = 0.0f;
+ 	wireFramedesc.SlopeScaledDepthBias = 0.0f;
+ 	wireFramedesc.DepthClipEnable = TRUE;
+ 	wireFramedesc.ScissorEnable = FALSE;
+ 	wireFramedesc.MultisampleEnable = FALSE;
+ 	wireFramedesc.AntialiasedLineEnable = FALSE;
+ 
+ 	m_device->CreateRasterizerState( &wireFramedesc , &m_rasterStates[ eRasterState::WIREFRAME ] );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -663,7 +716,7 @@ void RenderContext::CreateBlendStates()
 void RenderContext::Draw( int numVertexes , int vertexOffset )
 {
 	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
-	m_context->RSSetState( m_currentShader->m_rasterState );
+	//m_context->RSSetState( m_currentShader->m_rasterState );
 	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fragmentShader , nullptr , 0 );
 
 
@@ -737,7 +790,7 @@ void RenderContext::DrawVertexArray( int numVertexes , VertexBuffer* vertices )
 void RenderContext::DrawIndexed( uint indexCount , uint startIndex , uint indexStride )
 {
 	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
-	m_context->RSSetState( m_currentShader->m_rasterState );
+	//m_context->RSSetState( m_currentShader->m_rasterState );
 	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fragmentShader , nullptr , 0 );
 
 	// So at this, I need to describe the vertex format to the shader
