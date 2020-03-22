@@ -171,6 +171,7 @@
     <ClCompile Include="Audio\AudioSystem.cpp" />
     <ClCompile Include="Core\CoreUtils.cpp" />
     <ClCompile Include="Core\DebugRender.cpp" />
+    <ClCompile Include="Core\DebugRenderObject.cpp" />
     <ClCompile Include="Core\DevConsole.cpp" />
     <ClCompile Include="Core\DirectoryWatcher.cpp" />
     <ClCompile Include="Core\EngineCommon.cpp" />
@@ -256,6 +257,7 @@
     <ClInclude Include="Audio\AudioSystem.hpp" />
     <ClInclude Include="Core\CoreUtils.hpp" />
     <ClInclude Include="Core\DebugRender.hpp" />
+    <ClInclude Include="Core\DebugRenderObject.hpp" />
     <ClInclude Include="Core\DevConsole.hpp" />
     <ClInclude Include="Core\DirectoryWatcher.hpp" />
     <ClInclude Include="Core\EngineCommon.hpp" />

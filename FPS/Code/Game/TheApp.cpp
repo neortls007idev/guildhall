@@ -1,39 +1,32 @@
-#include "Engine/Math/MathUtils.hpp"
-#include "Engine/Core/EngineCommon.hpp"
-#include "Game/GameCommon.hpp"
-#include "Engine/Input/VirtualKeyboard.hpp"
-#include "Game/TheApp.hpp"
-#include "Engine/Renderer/RenderContext.hpp"
-#include "Engine/Input/InputSystem.hpp"
-#include "Engine/Time/Time.hpp"
-#include "Engine/Platform/Window.hpp"
-#include "Engine/Core/EventSystem.hpp"
-#include "Engine/Renderer/D3D11Common.hpp"
+#include "Engine/Core/DebugRender.hpp"
 #include "Engine/Core/DevConsole.hpp"
+#include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Core/EventSystem.hpp"
+#include "Engine/Input/InputSystem.hpp"
+#include "Engine/Input/VirtualKeyboard.hpp"
+#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Platform/Window.hpp"
+#include "Engine/Renderer/D3D11Common.hpp"
+#include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Time/Clock.hpp"
+#include "Engine/Time/Time.hpp"
+#include "Game/GameCommon.hpp"
+#include "Game/TheApp.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-RenderContext* g_theRenderer = nullptr;
-TheApp* g_theApp = nullptr;
-InputSystem* g_theInput = nullptr;
-Game* g_theGame = nullptr;
-DevConsole* g_theDevConsole = nullptr;
-extern BitmapFont* g_bitmapFont;
+RenderContext*		g_theRenderer	= nullptr;
+TheApp*				g_theApp		= nullptr;
+InputSystem*		g_theInput		= nullptr;
+DevConsole*			g_theDevConsole = nullptr;
+Game*				g_theGame		= nullptr;
+extern BitmapFont*	g_bitmapFont;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 TheApp::TheApp()
 {
-	if ( g_theEventSystem == nullptr )
-	{
-		g_theEventSystem = new EventSystem();
-	}
-	g_theEventSystem->Startup();
 
-	if ( g_theInput == nullptr )
-	{
-		g_theInput = new InputSystem();
-	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -42,6 +35,24 @@ TheApp::~TheApp()
 {
 	delete g_theGame;
 	g_theGame = nullptr;
+
+	//delete g_theAudioSystem;
+	//g_theAudioSystem = nullptr;
+
+	//delete g_thePhysicsSystem;
+	//g_thePhysicsSystem = nullptr;
+
+	delete g_theDevConsole;
+	g_theDevConsole = nullptr;
+
+	delete g_theRenderer;
+	g_theRenderer = nullptr;
+
+	delete g_theInput;
+	g_theInput = nullptr;
+
+	delete g_theEventSystem;
+	g_theEventSystem = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -49,7 +60,24 @@ TheApp::~TheApp()
 void TheApp::Startup()
 {
 	
-	g_theWindow->SetInputSystem( g_theInput );
+	Clock::Startup();
+
+	if ( g_theEventSystem == nullptr )
+	{
+		g_theEventSystem = new EventSystem();
+	}
+	g_theEventSystem->Startup();
+
+	if ( g_theWindow == nullptr )
+	{
+		g_theWindow = new Window();
+	}
+
+	if ( g_theInput == nullptr )
+	{
+		g_theInput = new InputSystem();
+		g_theWindow->SetInputSystem( g_theInput );
+	}
 	g_theInput->Startup();
 
 	if ( g_theRenderer == nullptr )
@@ -58,11 +86,29 @@ void TheApp::Startup()
 	}
 	g_theRenderer->Startup( g_theWindow );
 
+	if ( g_bitmapFont == nullptr )
+	{
+		g_bitmapFont = g_theRenderer->GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
+	}
+
 	if ( g_theDevConsole == nullptr )
 	{
 		g_theDevConsole = new DevConsole();
 	}
 	g_theDevConsole->Startup();
+
+	s_debugRender.Startup();
+// 	if ( g_thePhysicsSystem == nullptr )
+// 	{
+// 		g_thePhysicsSystem = new Physics2D();
+// 	}
+// 	g_thePhysicsSystem->Startup();
+// 
+// 	if ( g_theAudioSystem == nullptr )
+// 	{
+// 		g_theAudioSystem = new AudioSystem();
+// 	}
+// 	g_theAudioSystem->Startup();
 
 	if ( g_theGame == nullptr )
 	{
@@ -95,6 +141,7 @@ void TheApp::BeginFrame()
 	g_theWindow->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theDevConsole->BeginFrame();
+	s_debugRender.BeginFrame();
 
 	if ( m_taskbarProgress < 100.f  && m_taskbarProgressMode == WND_PROGRESS_VALUE )
 	{
@@ -119,7 +166,7 @@ void TheApp::Update( float deltaSeconds )
 {
 	//g_theInput->Update( deltaSeconds );
 	g_theRenderer->UpdateFrameTime( deltaSeconds );
-
+	s_debugRender.Update( deltaSeconds );
 	UpdateFromKeyboard();
 
 	if ( m_isPaused ) { deltaSeconds = 0; }
@@ -159,6 +206,7 @@ void TheApp::Render() const
 void TheApp::EndFrame()
 {
 	// all engine things that must end at the end of the frame and not the game
+	s_debugRender.EndFrame();
 	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
@@ -174,17 +222,16 @@ void TheApp::EndFrame()
 
 void TheApp::Shutdown()
 {
-	delete g_theGame;
-	g_theGame = nullptr;
+	//g_theAudioSystem->Shutdown();
+	//g_thePhysicsSystem->Shutdown();
+	s_debugRender.Shutdown();
 	g_theDevConsole->Shutdown();
-	delete g_theDevConsole;
-	g_theDevConsole = nullptr;
 	g_theRenderer->Shutdown();
-	delete g_theRenderer;
-	g_theRenderer = nullptr;
 	g_theInput->Shutdown();
-	delete g_theInput;
-	g_theInput = nullptr;
+	// TODO :- write me g_theWindow->Shutdown();
+	g_theEventSystem->Shutdown();
+	Clock::Shutdown();
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

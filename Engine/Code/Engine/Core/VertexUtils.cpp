@@ -206,7 +206,7 @@ uint* GetCubeIndices()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void CreateUVSphere( uint hCuts , uint vCuts , std::vector<Vertex_PCU>& sphereMeshVerts , std::vector<uint>& sphereIndices, float radius , Vec3 center )
+void CreateUVSphere( uint hCuts , uint vCuts , std::vector<Vertex_PCU>& sphereMeshVerts , std::vector<uint>& sphereIndices, float radius , Vec3 center , const Rgba8& tint )
 {
 	float deltaTheta = 360.f / ( float ) hCuts;
 	float deltaPhi = 180.f / ( float ) vCuts;
@@ -219,7 +219,7 @@ void CreateUVSphere( uint hCuts , uint vCuts , std::vector<Vertex_PCU>& sphereMe
 			float u = RangeMapFloat( 0.f , 360.f , 0.f , 1.f , theta );
 			float v = RangeMapFloat( -90.f , 90.f , 0.f , 1.f , phi );
 
-			Vertex_PCU currentCoordVerts = Vertex_PCU( center + currentCoords , WHITE , Vec2( u , v ) );
+			Vertex_PCU currentCoordVerts = Vertex_PCU( center + currentCoords , tint , Vec2( u , v ) );
 
 			sphereMeshVerts.push_back( currentCoordVerts );
 		}

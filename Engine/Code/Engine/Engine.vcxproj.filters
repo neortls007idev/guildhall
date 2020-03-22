@@ -295,6 +295,9 @@
     <ClCompile Include="Core\CoreUtils.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Core\DebugRenderObject.cpp">
+      <Filter>Core\Debug</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -554,6 +557,9 @@
     </ClInclude>
     <ClInclude Include="Core\CoreUtils.hpp">
       <Filter>Core\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DebugRenderObject.hpp">
+      <Filter>Core\Debug</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

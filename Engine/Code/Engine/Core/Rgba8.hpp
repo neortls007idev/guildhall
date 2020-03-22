@@ -10,9 +10,11 @@ struct Rgba8
 
 public:
 	Rgba8();
+	//Rgba8( Rgba8 &copy );
 	~Rgba8() = default;
 	constexpr explicit Rgba8( uchar r, uchar g, uchar b, uchar a=255 );
 	const Rgba8 SetFromText( const char* text );
+	const void	CopyFromRGBA8( Rgba8 &copy );
 	const Rgba8 RollRandomColor( RandomNumberGenerator rng );
 	void ScaleAlpha( float multipler );
 
@@ -25,6 +27,8 @@ public:
 
 	void CycleRGBChannelsClockwise();
 	void CycleRGBChannelsAntiClockwise();
+
+	void LerpColor( Rgba8 startColor , Rgba8 endColor , float lerpDuration );
 
 public:
 	uchar r = 255;

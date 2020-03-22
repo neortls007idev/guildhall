@@ -6,6 +6,8 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Time/Time.hpp"
 #include "Game/Game.hpp"
+
+#include "Engine/Core/DebugRender.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
 
@@ -116,7 +118,7 @@ void Game::Render() const
 		sphereRing.SetPosition( position );
 		sphereRing.SetRotation( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 0.f );
 		g_theRenderer->SetModelMatrix( sphereRing.GetAsMatrix() );
-		g_theRenderer->SetRasterState( WIREFRAME );
+		g_theRenderer->SetRasterState( FILL_SOLID );
 		g_theRenderer->DrawMesh( m_meshSphere );
 	}
 
@@ -125,6 +127,8 @@ void Game::Render() const
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->EndCamera( m_gameCamera );
+
+	DebugRenderWorldToCamera( &m_gameCamera );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -195,6 +199,11 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	if ( g_theInput->WasKeyJustPressed( 'L' ) )
 	{
 		g_theInput->ClipSystemCursor( MOUSE_IS_UNLOCKED );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'U' ) )
+	{
+		DebugAddWorldPoint( m_gameCamera.GetPosition() , 0.1f, GREEN , 5.f , DEBUG_RENDER_ALWAYS );
 	}
 }
 

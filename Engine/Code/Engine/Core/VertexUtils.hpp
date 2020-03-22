@@ -27,5 +27,5 @@ void RotateDegreesPolygonAboutPoint( Polygon2D& polygon , Vec2 worldPosition , f
 void AddCubeVerts( std::vector<Vertex_PCU>& cubeVertexArray , const Rgba8* tint );
 uint* GetCubeIndices();
 
-void CreateUVSphere( uint hCuts , uint vCuts , std::vector<Vertex_PCU>& sphereMeshVerts , std::vector<uint>& sphereIndices, float radius = 1.f , Vec3 center = Vec3::ZERO );
+void CreateUVSphere( uint hCuts , uint vCuts , std::vector<Vertex_PCU>& sphereMeshVerts , std::vector<uint>& sphereIndices, float radius = 1.f , Vec3 center = Vec3::ZERO , const Rgba8& tint = WHITE );
 //--------------------------------------------------------------------------------------------------------------------------------------------

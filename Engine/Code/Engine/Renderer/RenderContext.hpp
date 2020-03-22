@@ -218,6 +218,12 @@ public:
 	// Draw Polygon in WorldSpace and Transform Relative to World Space Origin
 	void DrawRegularPolygon();																						// TODO :- IMPLEMENT ME
 
+	// Draw AABB2 with Z in WorldSpace
+	void DrawAABB2( const AABB2& box , float z , const Rgba8& tint );
+	
+	// Draw AABB3 in WorldSpace
+	//void DrawAABB3( const AABB3& box, const Rgba8& tint);
+	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	bool		IsDrawing() const;
 	void		ReCompileAllShaders();

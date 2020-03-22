@@ -1015,6 +1015,22 @@ void RenderContext::DrawAABB2( const AABB2& box , const Rgba8& tint )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void RenderContext::DrawAABB2( const AABB2& box , float z , const Rgba8& tint )
+{
+	const Vertex_PCU AABB2Verts[ 6 ] = {
+								Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,z ) , tint, Vec2( 0.f, 0.f ) ),
+								Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,z ) , tint, Vec2( 1.f, 0.f ) ),
+								Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,z ) , tint, Vec2( 0.f, 1.f ) ),
+																			
+								Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,z ) , tint, Vec2( 1.f, 0.f ) ),
+								Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,z ) , tint, Vec2( 1.f, 1.f ) ),
+								Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,z ) , tint, Vec2( 0.f, 1.f ) ) };
+
+	DrawVertexArray( 6 , AABB2Verts );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void RenderContext::DrawDisc( const Disc2D& disc , const Rgba8& tint , float scale, float orientationDegrees , Vec2 translate )
 {
 	constexpr int  NUMBER_OF_DISC_VERTS = 120;

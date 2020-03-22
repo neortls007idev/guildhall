@@ -85,6 +85,21 @@ void Rgba8::CycleRGBChannelsAntiClockwise()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Rgba8::LerpColor( Rgba8 startColor , Rgba8 endColor , float lerpDuration )
+{
+	if ( lerpDuration <= 0.f )
+	{
+		r = endColor.r;
+		g = endColor.g;
+		b = endColor.b;
+		a = endColor.a;
+		return;
+	}
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 bool Rgba8::operator==( const Rgba8& compareWith )
 {
 	if ( r == compareWith.r && g == compareWith.g && b == compareWith.b && a == compareWith.a )
@@ -130,6 +145,16 @@ const Rgba8 Rgba8::SetFromText( const char* text )
 	}
 
 	return rgba8FromText;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const void Rgba8::CopyFromRGBA8( Rgba8& copy )
+{
+	r = copy.r;
+	g = copy.g;
+	b = copy.b;
+	a = copy.a;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -1,8 +1,7 @@
 ﻿#pragma once
+#include "Engine/Core/DebugRenderObject.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-#include "Engine/Math/Vec4.hpp"
 #include "Engine/Math/Vec3.hpp"
-#include "Engine/Math/Matrix4x4.hpp"
 #include "Engine/Primitives/AABB2.hpp"
 #include "Engine/Primitives/AABB3.hpp"
 
@@ -14,49 +13,54 @@ class Texture;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-/************************************************************************/
-/*                                                                      */
-/* TYPES                                                                */
-/*                                                                      */
-/************************************************************************/
-
-// Only effects "world" mode stuff; 
-enum eDebugRenderMode
+class DebugRenderObjectsManager
 {
-	DEBUG_RENDER_ALWAYS ,          // what is rendered always shows up
-	DEBUG_RENDER_USE_DEPTH ,       // respect the depth buffer
-	DEBUG_RENDER_XRAY ,            // renders twice - once darker when it shoudl be hidden, and once more saturated when it should appear
-};
+public:
 
-/************************************************************************/
-/*                                                                      */
-/* FUNCTION PROTOTYPES                                                  */
-/*                                                                      */
-/************************************************************************/
-//------------------------------------------------------------------------
-//  System
-//------------------------------------------------------------------------
-// setup
-void DebugRenderSystemStartup();			// may be used to allocate resources to it
-void DebugRenderSystemShutdown();			// may be used to free the allocated resources to it
+	// TODO :- MAKE Contructors and destructors are private for SingleTonObject creation Purposes and Create a factorySystem to createObjects.
+	DebugRenderObjectsManager() {};
+	~DebugRenderObjectsManager() {};
 
-// control
-void EnableDebugRendering();
-void DisableDebugRendering();
+	void Startup();																		// may be used to allocate resources to it
+	void Shutdown();																	// may be used to free the allocated resources to it
+	
+	void BeginFrame();																	// Does nothing, here for completeness.
+	void Update( float deltaSeconds );
+	void Render() const;
 
-// output
-void DebugRenderBeginFrame();                   // Does nothing, here for completeness.
-void DebugRenderWorldToCamera( Camera* cam );   // Draws all world objects to this camera 
-void DebugRenderScreenTo( Texture* output );    // Draws all screen objects onto this texture (screen coordinate system is up to you.  I like a 1080p default)
-void DebugRenderEndFrame();                     // Clean up dead objects
+	void EndFrame();																	// Clean up dead objects
+
+	void CleanupScreenObjects();
+	void CleanupWorldObjects();
+	
+	// control
+	void EnableDebugRendering();
+	void DisableDebugRendering();
+	
+	// output
+	void DebugRenderWorldToCamera( Camera* cam );										// Draws all world objects to this camera 
+	void DebugRenderScreenTo( Texture* output );										// Draws all screen objects onto this texture (screen coordinate system is up to you.  I like a 1080p default)
+	
+public:
+	
+	// Default DebugRenderObject Manager
+	//static DebugRenderObjectsManager				s_debugRender;
+	bool											m_isDebugRenderEnabled			= true;
+	std::vector<DebugRenderObject*>					m_debugRenderWorldObjects;
+	std::vector<DebugRenderObject*>					m_debugRenderScreenObjects;
+}
+static s_debugRender;
+
+void DebugRenderWorldToCamera( Camera* cam );										// Draws all world objects to this camera 
+void DebugRenderScreenTo( Texture* output );										// Draws all screen objects onto this texture (screen coordinate system is up to you.  I like a 1080p default)
 
 //------------------------------------------------------------------------
 // World Rendering
 //------------------------------------------------------------------------
 // points
-void DebugAddWorldPoint( Vec3 pos , float size , Rgba8 start_color , Rgba8 end_color , float duration , eDebugRenderMode mode );
+//void DebugAddWorldPoint( Vec3 pos , float size , Rgba8 start_color , Rgba8 end_color , float duration , eDebugRenderMode mode );
 void DebugAddWorldPoint( Vec3 pos , float size , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
-void DebugAddWorldPoint( Vec3 pos , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+//void DebugAddWorldPoint( Vec3 pos , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
 // lines
 void DebugAddWorldLine( Vec3 p0 , Rgba8 p0_start_color , Rgba8 p0_end_color ,
