@@ -34,7 +34,8 @@ Game::Game()
 
 	std::vector<Vertex_PCU> meshVerts;
 	std::vector<uint>		meshIndices;
-	CreateCylinder( meshVerts , meshIndices , 1.f , Vec3(0.5,0.5,-1) , Vec3( 1 , 1 , -2 ) , RED , BLUE );
+
+	CreateArrow3D( meshVerts , meshIndices , .5f , 0.55f, Vec3(0.5,0.5,-1) , Vec3( 1 , 1 , -2 ) , RED , BLUE );
 	//AddCubeVerts( meshVerts , nullptr );
 
 	m_meshCube->UpdateVertices( meshVerts );
@@ -97,7 +98,7 @@ void Game::Render() const
 	g_theRenderer->SetModelMatrix( m_cubeTransform.GetAsMatrix() );
 
 	g_theRenderer->BindShader( nullptr );
-	g_theRenderer->SetRasterState( WIREFRAME );
+	g_theRenderer->SetRasterState( FILL_SOLID );
 
 	g_theRenderer->DrawMesh( m_meshCube );
 	//g_theRenderer->DrawVertexArray( m_meshCube->GetVertexCount() , m_meshCube->m_vertices );

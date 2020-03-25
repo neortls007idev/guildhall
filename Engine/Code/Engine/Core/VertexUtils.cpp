@@ -113,11 +113,31 @@ void RotateDegreesPolygonAboutPoint( Polygon2D& polygon , Vec2 worldPosition , f
 	
 	for ( size_t index = 0; index < polygon.m_points.size(); index++ )
 	{
-		polygon.m_points[ index ] = TransformPosition3DXY( Vec3( polygon.m_points[ index ] , 0.f ) , 1.f , 0.f , -worldPosition ).GetXYComponents();
+		polygon.m_points[ index ] = TransformPosition3DXY( Vec3( polygon.m_points[ index ] , 0.f ) , 1.f , 0.f ,
+		                                                   -worldPosition ).GetXYComponents();
 	}
 	for ( size_t index = 0; index < polygon.m_points.size(); index++ )
 	{
-		polygon.m_points[ index ] = TransformPosition3DXY( Vec3( polygon.m_points[ index ] , 0.f ) , 1.f , orientationDegrees , worldPosition ).GetXYComponents();
+		polygon.m_points[ index ] = TransformPosition3DXY( Vec3( polygon.m_points[ index ] , 0.f ) , 1.f ,
+		                                                   orientationDegrees , worldPosition ).GetXYComponents();
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void AppendIndexedVerts ( std::vector< Vertex_PCU >& sourceVerts , std::vector< uint >& sourceIndices ,
+                          std::vector< Vertex_PCU >& destinationVerts , std::vector< uint >& destinationIndices )
+{
+	uint destinationVertsEnd = ( uint ) destinationVerts.size();
+	
+	for ( size_t index = 0 ; index < sourceIndices.size() ; index++ )
+	{
+		destinationIndices.push_back( destinationVertsEnd + sourceIndices[ index ] );
+	}
+
+	for ( size_t index = 0; index < sourceVerts.size(); index++ )
+	{
+		destinationVerts.push_back( sourceVerts[ index ] );
 	}
 }
 
@@ -268,8 +288,8 @@ void CreateCylinder( std::vector<Vertex_PCU>& cylinderMeshVerts , std::vector<ui
 //			START DISC
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	
-	constexpr int  NUMBER_OF_DISC_VERTS = 120;
-	constexpr int  NUMBER_OF_TRIANGLES = ( int ) 120 / 3;
+	constexpr uint  NUMBER_OF_DISC_VERTS = 120;
+	constexpr uint  NUMBER_OF_TRIANGLES = ( uint ) NUMBER_OF_DISC_VERTS / 3;
 
 	const float UVRadius = 0.5f;
 
@@ -334,7 +354,7 @@ void CreateCylinder( std::vector<Vertex_PCU>& cylinderMeshVerts , std::vector<ui
 	sintheta = SinDegrees( angleInDegreesBetweenDiscTriangles );
 	jComponent = j * sintheta * radius;
 
-	uint endDiscCenterIndex = cylinderMeshVerts.size();
+	uint endDiscCenterIndex = ( uint ) cylinderMeshVerts.size();
 	cylinderMeshVerts.push_back( Vertex_PCU( end , endTint , Vec2( 0.5f , 0.5f ) ) );
 	cylinderIndices.push_back( endDiscCenterIndex );
 
@@ -375,7 +395,7 @@ void CreateCylinder( std::vector<Vertex_PCU>& cylinderMeshVerts , std::vector<ui
 //					SHAFT
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-	for ( size_t index = 1; index < NUMBER_OF_TRIANGLES ; index++ )
+	for ( uint index = 1; index < NUMBER_OF_TRIANGLES ; index++ )
 	{
 		cylinderIndices.push_back( index );
 		cylinderIndices.push_back( index + 1 );
@@ -389,7 +409,7 @@ void CreateCylinder( std::vector<Vertex_PCU>& cylinderMeshVerts , std::vector<ui
 	cylinderIndices.push_back( 1 );
 	cylinderIndices.push_back( endDiscCenterIndex + 1 );
 	cylinderIndices.push_back( endDiscCenterIndex + 1 );
-	cylinderIndices.push_back( cylinderMeshVerts.size() - 1 );
+	cylinderIndices.push_back( ( uint ) cylinderMeshVerts.size() - 1 );
 	cylinderIndices.push_back( endDiscCenterIndex - 1 );
 }
 
@@ -407,23 +427,24 @@ void CreateCone( std::vector<Vertex_PCU>& coneMeshVerts , std::vector<uint>& con
 	const Vec3& i = ibasis;
 	const Vec3& j = jbasis;
 	const Vec3& s = start;
-	const Vec3& e = end;
+	
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//			START DISC
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-	//--------------------------------------------------------------------------------------------------------------------------------------------
-	//			START DISC
-	//--------------------------------------------------------------------------------------------------------------------------------------------
+	constexpr uint  NUMBER_OF_DISC_VERTS = 120;
+	constexpr uint  NUMBER_OF_TRIANGLES = ( uint ) NUMBER_OF_DISC_VERTS / 3;
 
-	constexpr int  NUMBER_OF_DISC_VERTS = 120;
-
-	Vertex_PCU startDiscVerts[ NUMBER_OF_DISC_VERTS ];
 	const float UVRadius = 0.5f;
 
 	float angleInDegreesBetweenDiscTriangles = 0.f;
 
 	Vec3 secondVertStartDisc = start + ( i * radius ); // COS(0) = 1 , Sin(0) = 0
 
-	startDiscVerts[ 0 ] = Vertex_PCU( start , startTint , Vec2( 0.5f , 0.5f ) );
-	startDiscVerts[ 1 ] = Vertex_PCU( ( secondVertStartDisc ) , startTint , Vec2( 1.f , 0.5f ) );
+	coneMeshVerts.push_back( Vertex_PCU( start , startTint , Vec2( 0.5f , 0.5f ) ) );
+	coneIndices.push_back( 0 );
+	coneMeshVerts.push_back( Vertex_PCU( ( secondVertStartDisc ) , startTint , Vec2( 1.f , 0.5f ) ) );
+	coneIndices.push_back( 1 );
 	angleInDegreesBetweenDiscTriangles = ( 360.f * 3.f ) / static_cast< float >( NUMBER_OF_DISC_VERTS );
 
 	//-----------------------------------------------------------------------------------------------------------------
@@ -433,59 +454,83 @@ void CreateCone( std::vector<Vertex_PCU>& coneMeshVerts , std::vector<uint>& con
 	float sintheta = SinDegrees( angleInDegreesBetweenDiscTriangles );
 	Vec3 jComponent = j * sintheta * radius;
 
-	startDiscVerts[ 2 ] = Vertex_PCU( ( s + iComponent + jComponent ) , startTint , Vec2( UVRadius + UVRadius * costheta , UVRadius + UVRadius * sintheta ) );
+	coneMeshVerts.push_back( Vertex_PCU( ( s + iComponent + jComponent ) , startTint , Vec2( UVRadius + UVRadius * costheta , UVRadius + UVRadius * sintheta ) ) );
+	coneIndices.push_back( 2 );
 
 	//-----------------------------------------------------------------------------------------------------------------
 	int discVertIndex = 3;
-	for ( discVertIndex = 3; discVertIndex < NUMBER_OF_DISC_VERTS; discVertIndex += 3 )
+	for ( discVertIndex = 2; discVertIndex < NUMBER_OF_TRIANGLES; discVertIndex += 1 )
 	{
 		angleInDegreesBetweenDiscTriangles = angleInDegreesBetweenDiscTriangles + ( ( 360.f * 3.f ) / ( NUMBER_OF_DISC_VERTS ) );
-		startDiscVerts[ discVertIndex ] = startDiscVerts[ discVertIndex - 3 ];
-		startDiscVerts[ discVertIndex + 1 ] = startDiscVerts[ discVertIndex - 1 ];
+
+		coneIndices.push_back( 0 );
+		coneIndices.push_back( discVertIndex - 1 );
 
 		costheta = CosDegrees( angleInDegreesBetweenDiscTriangles );
 		sintheta = SinDegrees( angleInDegreesBetweenDiscTriangles );
 		iComponent = i * costheta * radius;
 		jComponent = j * sintheta * radius;
 
-		startDiscVerts[ discVertIndex + 2 ].m_position = s + iComponent + jComponent;
-		startDiscVerts[ discVertIndex + 2 ].m_color = startTint;
-		startDiscVerts[ discVertIndex + 2 ].m_uvTexCoords = Vec2::ZERO;
-	}
-	startDiscVerts[ NUMBER_OF_DISC_VERTS - 1 ] = startDiscVerts[ 1 ];
+		Vertex_PCU temp;
 
-	for ( int index = 0; index < NUMBER_OF_DISC_VERTS; index++ )
-	{
-		coneMeshVerts.push_back( startDiscVerts[ index ] );
-	}
+		temp.m_position = s + iComponent + jComponent;
+		temp.m_color = startTint;
+		temp.m_uvTexCoords = Vec2::ZERO;
 
-	//--------------------------------------------------------------------------------------------------------------------------------------------
-	//				END
-	//--------------------------------------------------------------------------------------------------------------------------------------------
+		coneMeshVerts.push_back( temp );
+		coneIndices.push_back( discVertIndex + 1 );
+	}
+	coneIndices.push_back( 0 );
+	coneIndices.push_back( discVertIndex - 1 );
+	coneIndices.push_back( 1 );
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//				END
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 	Vec3 secondVertEndDisc = end + ( i * radius ); // COS(0) = 1 , Sin(0) = 0
 
 	Vertex_PCU endVert = Vertex_PCU( end , endTint , Vec2( 0.5f , 0.5f ) );
-	
+
+	uint conePeakVertIndex = ( uint ) coneMeshVerts.size();
 	coneMeshVerts.push_back( endVert );
+	
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//					SHAFT
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-	//--------------------------------------------------------------------------------------------------------------------------------------------
-	//					SHAFT
-	//--------------------------------------------------------------------------------------------------------------------------------------------
-
-	std::vector<Vertex_PCU> shaftVerts;
-
-	for ( int index = 1; index < ( NUMBER_OF_DISC_VERTS - 1 ); index++ )
+	for ( uint index = 1; index < NUMBER_OF_TRIANGLES; index++ )
 	{
-		shaftVerts.push_back( startDiscVerts[ index ] );
-		shaftVerts.push_back( startDiscVerts[ index + 1 ] );
-		shaftVerts.push_back( endVert );
+		coneIndices.push_back( index );
+		coneIndices.push_back( index + 1 );
+		coneIndices.push_back( conePeakVertIndex );
 	}
+	coneIndices.push_back( conePeakVertIndex - 1 );
+	coneIndices.push_back( 1 );
+	coneIndices.push_back( conePeakVertIndex );
+}
 
-	for ( size_t index = 0; index < shaftVerts.size(); index++ )
-	{
-		coneMeshVerts.push_back( shaftVerts[ index ] );
-	}
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void CreateArrow3D ( std::vector< Vertex_PCU >& arrowMeshVerts , std::vector< uint >& arrowIndices ,
+                     float shaftRadius /*= 1.f */ , float tipRadius /*= 1.1f */ , const Vec3& start /*= Vec3::ZERO */ ,
+                     const Vec3& end /*= Vec3::ONE */ , const Rgba8& startTint /*= WHITE */ ,
+                     const Rgba8& endTint /*= WHITE */ )
+{
+	std::vector<Vertex_PCU>	arrowShaftMeshVerts;
+	std::vector<uint>		arrowShaftIndices;
+
+	Vec3 shaftLength = end * .7f;								// keeping 70% length as the shaft and 30% for the tip
+
+	CreateCylinder( arrowShaftMeshVerts , arrowShaftIndices , shaftRadius , start , shaftLength , startTint , endTint );
+
+	std::vector<Vertex_PCU>	tipMeshVerts;
+	std::vector<uint>		tipIndices;
+
+	CreateCone( tipMeshVerts , tipIndices , tipRadius , shaftLength , end , endTint , endTint );
+
+	AppendIndexedVerts( arrowShaftMeshVerts , arrowShaftIndices , arrowMeshVerts , arrowIndices );
+	AppendIndexedVerts( tipMeshVerts , tipIndices , arrowMeshVerts , arrowIndices );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

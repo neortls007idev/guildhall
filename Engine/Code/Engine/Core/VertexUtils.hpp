@@ -24,13 +24,30 @@ void AppendVertsForAABB3( std::vector<Vertex_PCU>& vertexArray , const AABB3& bo
 void AppendVertsForPolygon( std::vector<Vertex_PCU>& vertexArray , const Vec2* points , const unsigned int count , const Rgba8& tint );
 void RotateDegreesPolygonAboutPoint( Polygon2D& polygon , Vec2 worldPosition , float orientationDegrees );
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//					MESH UTILITIES
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void AppendIndexedVerts ( std::vector< Vertex_PCU >& sourceVerts , std::vector< uint >& sourceIndices ,
+                          std::vector< Vertex_PCU >& destinationVerts , std::vector< uint >& destinationIndices );
+
 void AddCubeVerts( std::vector<Vertex_PCU>& cubeVertexArray , const Rgba8* tint );
 uint* GetCubeIndices();
 
-void CreateUVSphere( uint hCuts , uint vCuts , std::vector<Vertex_PCU>& sphereMeshVerts , std::vector<uint>& sphereIndices, float radius = 1.f , Vec3 center = Vec3::ZERO , const Rgba8& tint = WHITE );
-void CreateCylinder( std::vector<Vertex_PCU>& cylinderMeshVerts , std::vector<uint>& cylinderIndices, float radius = 1.f , const Vec3& start = Vec3::ZERO , const Vec3& end = Vec3::ONE, const Rgba8& startTint = WHITE , const Rgba8& endTint = WHITE );
-void CreateCone( std::vector<Vertex_PCU>& coneMeshVerts , std::vector<uint>& coneIndices, float radius = 1.f , const Vec3& start = Vec3::ZERO , const Vec3& end = Vec3::ONE, const Rgba8& startTint = WHITE , const Rgba8& endTint = WHITE );
+void CreateUVSphere ( uint hCuts , uint vCuts , std::vector< Vertex_PCU >& sphereMeshVerts ,
+                      std::vector< uint >& sphereIndices , float radius = 1.f , Vec3 center = Vec3::ZERO ,
+                      const Rgba8& tint = WHITE );
 
-void CreateArrow3D( std::vector<Vertex_PCU>& cylinderMeshVerts , std::vector<uint>& cylinderIndices, float radius = 1.f , const Vec3& start = Vec3::ZERO , const Vec3& end = Vec3::ONE, const Rgba8& startTint = WHITE , const Rgba8& endTint = WHITE );
+void CreateCylinder ( std::vector< Vertex_PCU >& cylinderMeshVerts , std::vector< uint >& cylinderIndices ,
+                      float radius = 1.f , const Vec3& start = Vec3::ZERO , const Vec3& end = Vec3::ONE ,
+                      const Rgba8& startTint = WHITE , const Rgba8& endTint = WHITE );
+
+void CreateCone ( std::vector< Vertex_PCU >& coneMeshVerts , std::vector< uint >& coneIndices , float radius = 1.f ,
+                  const Vec3& start = Vec3::ZERO , const Vec3& end = Vec3::ONE , const Rgba8& startTint = WHITE ,
+                  const Rgba8& endTint = WHITE );
+
+void CreateArrow3D ( std::vector< Vertex_PCU >& arrowMeshVerts , std::vector< uint >& arrowIndices ,
+                     float shaftRadius = 1.f , float tipRadius = 1.1f , const Vec3& start = Vec3::ZERO ,
+                     const Vec3& end = Vec3::ONE , const Rgba8& startTint = WHITE , const Rgba8& endTint = WHITE );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
