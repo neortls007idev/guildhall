@@ -33,10 +33,12 @@ Game::Game()
 	m_cubeTransform.SetPosition( 1.f , 0.5f , -12.0f );
 
 	std::vector<Vertex_PCU> meshVerts;
-	AddCubeVerts( meshVerts , nullptr );
+	std::vector<uint>		meshIndices;
+	CreateCylinder( meshVerts , meshIndices , 1.f , Vec3(0.5,0.5,-1) , Vec3( 1 , 1 , -2 ) , RED , BLUE );
+	//AddCubeVerts( meshVerts , nullptr );
 
 	m_meshCube->UpdateVertices( meshVerts );
-	m_meshCube->UpdateIndices( 36 , GetCubeIndices() );
+	m_meshCube->UpdateIndices( meshIndices );
 	
 	std::vector<Vertex_PCU> sphereMeshVerts;
 	std::vector<uint>		sphereIndices;
@@ -95,9 +97,10 @@ void Game::Render() const
 	g_theRenderer->SetModelMatrix( m_cubeTransform.GetAsMatrix() );
 
 	g_theRenderer->BindShader( nullptr );
-	g_theRenderer->SetRasterState( FILL_SOLID );
+	g_theRenderer->SetRasterState( WIREFRAME );
 
 	g_theRenderer->DrawMesh( m_meshCube );
+	//g_theRenderer->DrawVertexArray( m_meshCube->GetVertexCount() , m_meshCube->m_vertices );
 	g_theRenderer->BindShader( nullptr );
 
 	g_theRenderer->SetBlendMode( SOLID );
@@ -111,16 +114,16 @@ void Game::Render() const
 	Transform sphereRing;
 	float deltaDegrees = 360.f / 30.f;
 
-	for ( float sphereIndex = 0 ; sphereIndex <= 360 ; sphereIndex += deltaDegrees )
-	{
-		Vec3 position = Vec3::MakeFromSpericalCoordinates( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 15.f );
-		position.z -= 30.f;
-		sphereRing.SetPosition( position );
-		sphereRing.SetRotation( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 0.f );
-		g_theRenderer->SetModelMatrix( sphereRing.GetAsMatrix() );
-		g_theRenderer->SetRasterState( FILL_SOLID );
-		g_theRenderer->DrawMesh( m_meshSphere );
-	}
+// 	for ( float sphereIndex = 0 ; sphereIndex <= 360 ; sphereIndex += deltaDegrees )
+// 	{
+// 		Vec3 position = Vec3::MakeFromSpericalCoordinates( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 15.f );
+// 		position.z -= 30.f;
+// 		sphereRing.SetPosition( position );
+// 		sphereRing.SetRotation( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 0.f );
+// 		g_theRenderer->SetModelMatrix( sphereRing.GetAsMatrix() );
+// 		g_theRenderer->SetRasterState( FILL_SOLID );
+// 		g_theRenderer->DrawMesh( m_meshSphere );
+// 	}
 
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );

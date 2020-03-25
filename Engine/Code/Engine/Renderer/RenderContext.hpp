@@ -7,6 +7,7 @@
 #include "Engine/Primitives/Disc2D.hpp"
 #include "Engine/Primitives/OBB2.hpp"
 #include "Engine/Renderer/Camera.hpp"
+#include "Engine/Renderer/D3D11Utils.hpp"
 #include "Engine/Renderer/Texture.hpp"
 
 #include <map>
@@ -48,24 +49,6 @@ enum eBlendMode
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-enum  eRasterState
-{
-	FILL_SOLID ,
-	WIREFRAME ,
-	TOTAL_RASTER_STATES
-};
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-enum  eCullMode
-{
-	CULL_NONE	= 1 ,
-	CULL_FRONT ,
-	CULL_BACK ,
-};
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 enum eBufferSlot
 {
 	UBO_FRAME_SLOT	= 0,
@@ -89,7 +72,6 @@ struct ModelDataT
 {
 	Mat44 model;
 };
-
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -115,7 +97,7 @@ public:
 	void		ClearScreen( const Rgba8& clearColor );										// Clear Color
 	void		ClearColor( Texture* colorTarget , Rgba8 color );							// TODO :- IMPLEMENT ME
 	void		ClearDepth( Texture* depthStencilTextureTarget , float depth );				// TODO :- TEST ME
-	void		SetDepthTest( eCompareOp compare , bool writeOnPass );						// TODO :- IMPLEMENT ME
+	void		SetDepthTest( eCompareOp compare  = COMPARE_LESS , bool writeOnPass = true );						// TODO :- IMPLEMENT ME
 	Texture*	GetFrameColorTarget();														// TODO :- IMPLEMENT ME
 	
 	void		BeginCamera( const Camera& camera );
@@ -172,10 +154,13 @@ public:
 	void DrawIndexed( uint indexCount , uint startIndex, uint indexStride );
 	void DrawMesh( const GPUMesh* mesh );
 
-
 	// Draw Line in WorldSpace and Transform Relative to World Space Origin
 	void DrawLine ( const Vec2& start , const Vec2& end , const Rgba8& color , float thickness , float scale = 1.f ,
 	                float orientationDegrees = 0.f , Vec2 translate = Vec2::ZERO );
+	
+	// Draw Gradient Colored Line in WorldSpace and Transform Relative to World Space Origin
+	void DrawLine( const Vec2& start , const Vec2& end , const Rgba8& startTint , const Rgba8& endTint , float thickness , float scale = 1.f ,
+		float orientationDegrees = 0.f , Vec2 translate = Vec2::ZERO );
 
 	// Draw Arrow in WorldSpace and Transform Relative to World Space Origin
 	void DrawArrow ( const Vec2& start , const Vec2& end , const Rgba8& color , float thickness , float scale = 1.f ,

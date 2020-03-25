@@ -53,34 +53,6 @@ extern char const* g_errorShaderCode;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-D3D11_FILL_MODE GetD3D11FillMode( eRasterState rasterFillMode )
-{
-	switch ( rasterFillMode )
-	{
-		case FILL_SOLID:
-							return D3D11_FILL_SOLID;
-		case WIREFRAME:
-							return D3D11_FILL_WIREFRAME;
-	}
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-D3D11_CULL_MODE GetD3D11CullMode( eCullMode cullMode )
-{
-	switch ( cullMode )
-	{
-	case CULL_NONE:
-						return D3D11_CULL_NONE;
-	case CULL_FRONT:
-						return D3D11_CULL_FRONT;
-	case CULL_BACK:
-						return D3D11_CULL_BACK;
-	}
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 RenderContext::~RenderContext()
 {
 
@@ -311,12 +283,7 @@ void RenderContext::SetDepthTest( eCompareOp compare , bool writeOnPass )
 {
 
 	ASSERT_OR_DIE( m_currentCamera != nullptr , "Must Be Used after begin Camera" );
-	
-	UNUSED( compare );
-	UNUSED( writeOnPass );
-
-	// TODO :- UPGRADE ME
-	
+		
 	if ( m_currentDepthStencilState )
 	{
 		DX_SAFE_RELEASE( m_currentDepthStencilState );
@@ -333,8 +300,8 @@ void RenderContext::SetDepthTest( eCompareOp compare , bool writeOnPass )
 	*/
 	// Depth test parameters
 	dsDesc.DepthEnable = true;
-	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	dsDesc.DepthWriteMask = GetD3D11DepthWriteMask( writeOnPass );
+	dsDesc.DepthFunc = GetD3D11ComparisonFunc( compare );
 
 	// Stencil test parameters
 	dsDesc.StencilEnable = true;
@@ -756,6 +723,24 @@ void RenderContext::CreateRasterStates()
 
 void RenderContext::CreateTransientRasterState( eRasterState rasterFillMode , eCullMode cullMode , eWindingOrder windingOrder )
 {
+
+	if ( m_transientRaterState )
+	{
+		D3D11_RASTERIZER_DESC currentRSDesc;
+
+		m_transientRaterState->GetDesc( &currentRSDesc );
+		bool result = false;
+
+		if ( currentRSDesc.FillMode == GetD3D11FillMode( rasterFillMode ) )				{	result = true;	}
+		if ( currentRSDesc.CullMode == GetD3D11CullMode( cullMode ) )					{	result = true;	}
+		if ( currentRSDesc.FrontCounterClockwise == GetWindingOrder( windingOrder ) )	{	result = true;	}
+		
+		if ( result )
+		{
+			return;
+		}
+	}
+
 	if ( m_transientRaterState )
 	{
 		DX_SAFE_RELEASE( m_transientRaterState );
@@ -929,6 +914,34 @@ void RenderContext::DrawMesh( const GPUMesh* mesh )
 	{
 		Draw( mesh->GetVertexCount() , 0 );
 	}
+}
+
+void RenderContext::DrawLine( const Vec2& start , const Vec2& end , const Rgba8& startTint , const Rgba8& endTint , float thickness , float scale /*= 1.f */ , float orientationDegrees /*= 0.f */ , Vec2 translate /*= Vec2::ZERO */ )
+{
+	Vec2 displacement = end - start;
+	Vec2 forward = displacement.GetNormalized();
+	forward.SetLength( thickness / 2.f );
+	Vec2 left = forward.GetRotated90Degrees();
+
+	Vec2 endLeft = end + forward + left;
+	Vec2 endRight = end + forward - left;
+	Vec2 startLeft = start - forward + left;
+	Vec2 startRight = start - forward - left;
+
+	Vec3 endLeftVec3( endLeft.x , endLeft.y , 0.f );
+	Vec3 endRightVec3( endRight.x , endRight.y , 0.f );
+	Vec3 startLeftVec3( startLeft.x , startLeft.y , 0.f );
+	Vec3 startRightVec3( startRight.x , startRight.y , 0.f );
+
+	Vertex_PCU lineVerts[ 6 ] = {	Vertex_PCU( startRightVec3, startTint, Vec2( 0.f, 0.f ) ),
+									Vertex_PCU( endRightVec3  , endTint	 , Vec2( 0.f, 0.f ) ),
+									Vertex_PCU( endLeftVec3   , endTint	 , Vec2( 0.f, 0.f ) ),
+									Vertex_PCU( endLeftVec3   , endTint	 , Vec2( 0.f, 0.f ) ),
+									Vertex_PCU( startLeftVec3 , startTint, Vec2( 0.f, 0.f ) ),
+									Vertex_PCU( startRightVec3, startTint, Vec2( 0.f, 0.f ) ) };
+
+	TransformVertexArray2D( 6 , lineVerts , scale , orientationDegrees , translate );
+	DrawVertexArray( 6 , lineVerts );
 }
 
 void RenderContext::DrawArrow( const Vec2& start , const Vec2& end , const Rgba8& color , float thickness , float scale /*= 1.f */ , float orientationDegrees /*= 0.f */ , Vec2 translate /*= Vec2::ZERO */ )

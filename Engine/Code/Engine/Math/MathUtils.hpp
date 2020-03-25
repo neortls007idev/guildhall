@@ -105,15 +105,15 @@ float GetFractionPart( float value );
 
 float      GetTurnedToward( float currentDegrees, float goalDegrees, float maxDeltaDegrees );
 float      DotProduct2D(const Vec2& first, const Vec2& second);
-float      CrossProduct2D(const Vec2& first, const Vec2& second);
 float      DotProduct3D( const Vec3& first , const Vec3& second );
 float      DotProduct4D( const Vec4& first , const Vec4& second );
+float      CrossProduct2D(const Vec2& first, const Vec2& second);
+Vec3       CrossProduct3D(const Vec3& first, const Vec3& second);
 float      GetProjectedLength2D( const Vec2& sourceVector , const Vec2& ontoVector );
 const Vec2 GetProjectedOnto2D( const Vec2& sourceVector , const Vec2& ontoVector );
 float	   GetAngleDegreesBetweenVectors2D( const Vec2& vectorA , const Vec2& vectorB );
 
 float GetFractionInRange(); // TO DO
-float CrossProduct(); //TO DO
 
 //-----------------------------------------------------------------------------------------------------------------
 //	STEPPING/EASING UTILITIES

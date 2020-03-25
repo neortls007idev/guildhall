@@ -248,3 +248,24 @@ bool IsMatrixOrtonormal( Mat44& mat )
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+const Mat44 LookAtMatrix( const Vec3& sourceLocation , const Vec3& targetLocation , const Vec3& worldUp /*= Vec3( 0 , 1 , 0 ) */ )
+{
+	Vec3 forward	= ( targetLocation - sourceLocation ).GetNormalized();
+	
+	if ( forward.GetLengthSquared() <= 0.001 )
+	{
+		return Mat44::IDENTITY;
+	}
+	
+	Vec3 right		= CrossProduct3D( forward , worldUp ).GetNormalized();
+	Vec3 up			= CrossProduct3D( right , forward );
+
+	Mat44 lookAt;
+
+	lookAt.SetBasisVectors3D( right , up , -forward , sourceLocation );
+
+	return lookAt;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

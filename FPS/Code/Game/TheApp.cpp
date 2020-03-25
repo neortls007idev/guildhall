@@ -15,12 +15,13 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-RenderContext*		g_theRenderer	= nullptr;
-TheApp*				g_theApp		= nullptr;
-InputSystem*		g_theInput		= nullptr;
-DevConsole*			g_theDevConsole = nullptr;
-Game*				g_theGame		= nullptr;
-extern BitmapFont*	g_bitmapFont;
+RenderContext*						g_theRenderer	= nullptr;
+TheApp*								g_theApp		= nullptr;
+InputSystem*						g_theInput		= nullptr;
+DevConsole*							g_theDevConsole = nullptr;
+Game*								g_theGame		= nullptr;
+extern BitmapFont*					g_bitmapFont;
+extern DebugRenderObjectsManager*	g_currentManager;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -97,7 +98,11 @@ void TheApp::Startup()
 	}
 	g_theDevConsole->Startup();
 
-	s_debugRender.Startup();
+	if ( g_currentManager == nullptr )
+	{
+		// instantiating a default DRO_Manager
+		g_currentManager = new DebugRenderObjectsManager();
+	}
 // 	if ( g_thePhysicsSystem == nullptr )
 // 	{
 // 		g_thePhysicsSystem = new Physics2D();
@@ -141,7 +146,7 @@ void TheApp::BeginFrame()
 	g_theWindow->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theDevConsole->BeginFrame();
-	s_debugRender.BeginFrame();
+	g_currentManager->BeginFrame();
 
 	if ( m_taskbarProgress < 100.f  && m_taskbarProgressMode == WND_PROGRESS_VALUE )
 	{
@@ -166,7 +171,7 @@ void TheApp::Update( float deltaSeconds )
 {
 	//g_theInput->Update( deltaSeconds );
 	g_theRenderer->UpdateFrameTime( deltaSeconds );
-	s_debugRender.Update( deltaSeconds );
+	g_currentManager->Update( deltaSeconds );
 	UpdateFromKeyboard();
 
 	if ( m_isPaused ) { deltaSeconds = 0; }
@@ -206,7 +211,7 @@ void TheApp::Render() const
 void TheApp::EndFrame()
 {
 	// all engine things that must end at the end of the frame and not the game
-	s_debugRender.EndFrame();
+	g_currentManager->EndFrame();
 	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
@@ -224,7 +229,7 @@ void TheApp::Shutdown()
 {
 	//g_theAudioSystem->Shutdown();
 	//g_thePhysicsSystem->Shutdown();
-	s_debugRender.Shutdown();
+	g_currentManager->Shutdown();
 	g_theDevConsole->Shutdown();
 	g_theRenderer->Shutdown();
 	g_theInput->Shutdown();

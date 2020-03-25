@@ -2,14 +2,17 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "VertexUtils.hpp"
-#include "../Primitives/GPUMesh.hpp"
+#include "Engine/Primitives/GPUMesh.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 extern RenderContext* g_theRenderer;
 
-STATIC RenderContext* g_debugRenderContext	= nullptr;
-STATIC Camera*		  g_debugCamera			= nullptr;
+	   RenderContext*				g_debugRenderContext	= nullptr;
+	   Camera*						g_debugCamera			= nullptr;
+//static DebugRenderObjectsManager*	g_currentManager		= nullptr;
+	   DebugRenderObjectsManager*	g_currentManager        = nullptr;
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -37,13 +40,13 @@ void DebugRenderWorldToCamera( Camera* cam )
 
 	g_debugRenderContext->BeginCamera( *cam );
 
-	for ( size_t index = 0; index < s_debugRender.m_debugRenderWorldObjects.size(); index++ )
+	for ( size_t index = 0; index < g_currentManager->m_debugRenderWorldObjects.size(); index++ )
 	{
-		if ( s_debugRender.m_debugRenderWorldObjects[ index ] == nullptr )
+		if ( g_currentManager->m_debugRenderWorldObjects[ index ] == nullptr )
 		{
 			continue;
 		}
-		eDebugRenderObjectType objType = s_debugRender.m_debugRenderWorldObjects[ index ]->m_objectType;
+		eDebugRenderObjectType objType = g_currentManager->m_debugRenderWorldObjects[ index ]->m_objectType;
 
 		switch ( objType )
 		{
@@ -54,7 +57,7 @@ void DebugRenderWorldToCamera( Camera* cam )
 
 		case DRO_POINT3D:
 		{
-			DRO_point3D* point3D = ( DRO_point3D* ) s_debugRender.m_debugRenderWorldObjects[ index ];
+			DRO_point3D* point3D = ( DRO_point3D* ) g_currentManager->m_debugRenderWorldObjects[ index ];
 
 			switch ( point3D->m_renderMode )
 			{
@@ -128,13 +131,13 @@ void DebugRenderScreenTo( Texture* output )
 
 	g_debugRenderContext->BeginCamera( camera );
 
-	for ( size_t index = 0 ; index < s_debugRender.m_debugRenderScreenObjects.size() ; index++ )
+	for ( size_t index = 0 ; index < g_currentManager->m_debugRenderScreenObjects.size() ; index++ )
 	{
-		if ( nullptr == s_debugRender.m_debugRenderScreenObjects[index] )
+		if ( nullptr == g_currentManager->m_debugRenderScreenObjects[index] )
 		{
 			continue;
 		}
-		eDebugRenderObjectType objType = s_debugRender.m_debugRenderScreenObjects[ index ]->m_objectType;
+		eDebugRenderObjectType objType = g_currentManager->m_debugRenderScreenObjects[ index ]->m_objectType;
 		
 		switch ( objType )
 		{
@@ -172,14 +175,20 @@ void DebugAddWorldPoint( Vec3 pos , float size , Rgba8 color , float duration /*
 {
 	DRO_point3D* obj = new DRO_point3D( pos , size , color , duration , mode );
 	obj->m_transform.SetPosition( pos );
-	s_debugRender.m_debugRenderWorldObjects.push_back( obj );
+	g_currentManager->m_debugRenderWorldObjects.push_back( obj );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void DebugRenderObjectsManager::Startup()
 {
-
+	if ( g_currentManager == nullptr )
+	{
+		// instantiating a default DRO_Manager
+		g_currentManager = new DebugRenderObjectsManager();
+		return;
+	}
+	g_currentManager = this;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
