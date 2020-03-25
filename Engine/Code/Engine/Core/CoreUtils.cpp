@@ -2,17 +2,29 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-bool GetWindingOrder( const eWindingOrder windingOrder )
+#ifndef FALSE
+#define FALSE               0
+#endif
+
+#ifndef TRUE
+#define TRUE                1
+#endif
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+BOOL GetWindingOrder( const eWindingOrder windingOrder )
 {
 	switch ( windingOrder )
 	{
 		case COUNTERCLOCKWISE:
-								return true;
+								return TRUE;
 		case CLOCKWISE:
-								return false;
+								return FALSE;
 		default:
-								return true;
+								return TRUE;
 	}
 }
 
+#undef TRUE
+#undef FALSE
 //--------------------------------------------------------------------------------------------------------------------------------------------

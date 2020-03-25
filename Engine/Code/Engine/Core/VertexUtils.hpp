@@ -28,4 +28,9 @@ void AddCubeVerts( std::vector<Vertex_PCU>& cubeVertexArray , const Rgba8* tint 
 uint* GetCubeIndices();
 
 void CreateUVSphere( uint hCuts , uint vCuts , std::vector<Vertex_PCU>& sphereMeshVerts , std::vector<uint>& sphereIndices, float radius = 1.f , Vec3 center = Vec3::ZERO , const Rgba8& tint = WHITE );
+void CreateCylinder( std::vector<Vertex_PCU>& cylinderMeshVerts , std::vector<uint>& cylinderIndices, float radius = 1.f , const Vec3& start = Vec3::ZERO , const Vec3& end = Vec3::ONE, const Rgba8& startTint = WHITE , const Rgba8& endTint = WHITE );
+void CreateCone( std::vector<Vertex_PCU>& coneMeshVerts , std::vector<uint>& coneIndices, float radius = 1.f , const Vec3& start = Vec3::ZERO , const Vec3& end = Vec3::ONE, const Rgba8& startTint = WHITE , const Rgba8& endTint = WHITE );
+
+void CreateArrow3D( std::vector<Vertex_PCU>& cylinderMeshVerts , std::vector<uint>& cylinderIndices, float radius = 1.f , const Vec3& start = Vec3::ZERO , const Vec3& end = Vec3::ONE, const Rgba8& startTint = WHITE , const Rgba8& endTint = WHITE );
+
 //--------------------------------------------------------------------------------------------------------------------------------------------

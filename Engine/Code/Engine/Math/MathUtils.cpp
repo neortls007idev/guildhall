@@ -1,4 +1,4 @@
-#include "Engine/Math/MathUtils.hpp"
+﻿#include "Engine/Math/MathUtils.hpp"
 #include <cmath>
 #include "Engine/Math/MathConstants.hpp"
 #include "Engine/Math/Vec2.hpp"
@@ -589,6 +589,21 @@ float DotProduct2D( const Vec2& first , const Vec2& second )
 float CrossProduct2D( const Vec2& first , const Vec2& second )
 {
 	return ( ( first.x * second.y ) - ( first.y * second.x ) );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec3 CrossProduct3D( const Vec3& first , const Vec3& second )
+{
+	// REFERNECE :- https://www.mathsisfun.com/algebra/vectors-cross-product.html 
+	// NOTE :-		3x3 matrix determinant expansion
+
+	Vec3 result;
+	result.x = ( first.y * second.z ) - ( first.z * second.y );
+	result.y = ( first.z * second.x ) - ( first.x * second.z );
+	result.z = ( first.x * second.y ) - ( first.y * second.x );
+	
+	return result;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -2,6 +2,10 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+typedef int                 BOOL;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 enum eWindingOrder
 {
 	COUNTERCLOCKWISE ,
@@ -11,4 +15,4 @@ enum eWindingOrder
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 // By default returns CounterClockWise as Winding Order
-bool GetWindingOrder( const eWindingOrder windingOrder );
+BOOL GetWindingOrder( const eWindingOrder windingOrder );

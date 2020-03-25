@@ -23,7 +23,7 @@ public:
 
 	void Startup();																		// may be used to allocate resources to it
 	void Shutdown();																	// may be used to free the allocated resources to it
-	
+
 	void BeginFrame();																	// Does nothing, here for completeness.
 	void Update( float deltaSeconds );
 	void Render() const;
@@ -32,24 +32,24 @@ public:
 
 	void CleanupScreenObjects();
 	void CleanupWorldObjects();
-	
+
 	// control
 	void EnableDebugRendering();
 	void DisableDebugRendering();
-	
+
 	// output
 	void DebugRenderWorldToCamera( Camera* cam );										// Draws all world objects to this camera 
 	void DebugRenderScreenTo( Texture* output );										// Draws all screen objects onto this texture (screen coordinate system is up to you.  I like a 1080p default)
-	
+
 public:
-	
+
 	// Default DebugRenderObject Manager
 	//static DebugRenderObjectsManager				s_debugRender;
-	bool											m_isDebugRenderEnabled			= true;
+
+	bool											m_isDebugRenderEnabled = true;
 	std::vector<DebugRenderObject*>					m_debugRenderWorldObjects;
 	std::vector<DebugRenderObject*>					m_debugRenderScreenObjects;
-}
-static s_debugRender;
+};
 
 void DebugRenderWorldToCamera( Camera* cam );										// Draws all world objects to this camera 
 void DebugRenderScreenTo( Texture* output );										// Draws all screen objects onto this texture (screen coordinate system is up to you.  I like a 1080p default)

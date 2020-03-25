@@ -10,4 +10,6 @@ const Mat44		CreatePerpsectiveProjectionMatrixD3D( float fovDegrees , float aspe
 	  Mat44		MatrixInvertOrthoNormal( Mat44& mat );
 	  void		MatrixInvert( Mat44& mat );
 	  bool		IsMatrixOrtonormal( Mat44& mat );
+
+const Mat44		LookAtMatrix( const Vec3& sourceLocation , const Vec3& targetLocation , const Vec3& worldUp = Vec3( 0 , 1 , 0 ) );
 //--------------------------------------------------------------------------------------------------------------------------------------------

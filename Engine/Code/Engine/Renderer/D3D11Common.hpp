@@ -17,7 +17,7 @@
 #include <d3d11.h>		// D3D11 specific objects
 #include <dxgi.h>	    // shared library used across multiple dx graphical interfaces
 #include <dxgidebug.h>  // debug utility (mostly used for reporting and analytics)
-#include "RenderBuffer.hpp"
+#include "Engine/Renderer/RenderBuffer.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

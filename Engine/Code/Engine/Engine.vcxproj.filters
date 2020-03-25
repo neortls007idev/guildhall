@@ -298,6 +298,9 @@
     <ClCompile Include="Core\DebugRenderObject.cpp">
       <Filter>Core\Debug</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\D3D11Utils.cpp">
+      <Filter>Renderer\Pipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -560,6 +563,9 @@
     </ClInclude>
     <ClInclude Include="Core\DebugRenderObject.hpp">
       <Filter>Core\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\D3D11Utils.hpp">
+      <Filter>Renderer\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

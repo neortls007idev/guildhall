@@ -1,5 +1,8 @@
 #include "Engine/Core/VertexUtils.hpp "
+
+#include "DebugRender.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Math/MatrixUtils.hpp"
 #include "Engine/Primitives/Polygon2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -242,6 +245,289 @@ void CreateUVSphere( uint hCuts , uint vCuts , std::vector<Vertex_PCU>& sphereMe
 			sphereIndices.push_back( index3 );
 			sphereIndices.push_back( index2 );
 		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void CreateCylinder( std::vector<Vertex_PCU>& cylinderMeshVerts , std::vector<uint>& cylinderIndices , float radius /*= 1.f */ , const Vec3& start /*= Vec3::ZERO */ , const Vec3& end /*= Vec3::ONE*/ , const Rgba8& startTint /*= WHITE */ , const Rgba8& endTint /*= WHITE */ )
+{
+	// TODO :- Update UV mapping if needed ::- CURRENTLY MAPPED INCORRECTLY
+	
+	Mat44 transformation = LookAtMatrix( start , end );
+
+	Vec3 ibasis = transformation.GetIBasis3D();
+	Vec3 jbasis = transformation.GetJBasis3D();
+
+	const Vec3& i = ibasis;
+	const Vec3& j = jbasis;
+	const Vec3& s = start;
+	const Vec3& e = end;
+	
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//			START DISC
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	
+	constexpr int  NUMBER_OF_DISC_VERTS = 120;
+	constexpr int  NUMBER_OF_TRIANGLES = ( int ) 120 / 3;
+
+	//Vertex_PCU startDiscVerts[ NUMBER_OF_DISC_VERTS ];
+	std::vector<Vertex_PCU> startDiscVerts;
+	const float UVRadius = 0.5f;
+
+	float angleInDegreesBetweenDiscTriangles = 0.f;
+
+	Vec3 secondVertStartDisc = start + ( i * radius ); // COS(0) = 1 , Sin(0) = 0
+	
+	startDiscVerts.push_back( Vertex_PCU( start , startTint , Vec2( 0.5f , 0.5f ) ) );
+	cylinderIndices.push_back( 0 );
+	startDiscVerts.push_back( Vertex_PCU( ( secondVertStartDisc ) , startTint , Vec2( 1.f , 0.5f ) ) );
+	cylinderIndices.push_back( 1 );
+	angleInDegreesBetweenDiscTriangles = ( 360.f * 3.f ) / static_cast< float >( NUMBER_OF_DISC_VERTS );
+
+	//-----------------------------------------------------------------------------------------------------------------
+	float costheta = CosDegrees( angleInDegreesBetweenDiscTriangles );
+	Vec3 iComponent = i *  costheta * radius;
+
+	float sintheta = SinDegrees( angleInDegreesBetweenDiscTriangles );
+	Vec3 jComponent = j *  sintheta * radius;
+	
+	startDiscVerts.push_back( Vertex_PCU( ( s + iComponent + jComponent ) , startTint , Vec2( UVRadius + UVRadius * costheta , UVRadius + UVRadius * sintheta ) ) );
+	cylinderIndices.push_back( 2 );
+	
+	//-----------------------------------------------------------------------------------------------------------------
+	int discVertIndex = 3;
+	for ( discVertIndex = 2; discVertIndex < NUMBER_OF_TRIANGLES; discVertIndex += 1 )
+	{
+		angleInDegreesBetweenDiscTriangles = angleInDegreesBetweenDiscTriangles + ( ( 360.f * 3.f ) / ( NUMBER_OF_DISC_VERTS ) );
+		//startDiscVerts[ discVertIndex ] = startDiscVerts[ discVertIndex - 3 ];
+		cylinderIndices.push_back( 0 );
+		//startDiscVerts[ discVertIndex + 1 ] = startDiscVerts[ discVertIndex - 1 ];
+		cylinderIndices.push_back( discVertIndex - 1 );
+		costheta = CosDegrees( angleInDegreesBetweenDiscTriangles );
+		sintheta = SinDegrees( angleInDegreesBetweenDiscTriangles );
+		iComponent = i * costheta * radius;
+		jComponent = j * sintheta * radius;
+
+		Vertex_PCU temp;
+		
+		//startDiscVerts[ discVertIndex + 2 ].m_position = s + iComponent + jComponent;
+		//startDiscVerts[ discVertIndex + 2 ].m_color = startTint;
+		//startDiscVerts[ discVertIndex + 2 ].m_uvTexCoords = Vec2::ZERO;
+		temp.m_position = s + iComponent + jComponent;
+		temp.m_color = startTint;
+		temp.m_uvTexCoords = Vec2::ZERO;
+		startDiscVerts.push_back( temp );
+		cylinderIndices.push_back( discVertIndex + 1 );
+	}
+	cylinderIndices.push_back( 0 );
+	cylinderIndices.push_back( discVertIndex - 1 );
+	cylinderIndices.push_back( 1 );
+	//startDiscVerts[ NUMBER_OF_DISC_VERTS - 1 ] = startDiscVerts[ 1 ];
+
+	for( size_t index = 0 ; index < startDiscVerts.size(); index++ )
+	{
+		cylinderMeshVerts.push_back( startDiscVerts[ index ] );
+	}
+	
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//				END DISC
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	
+	//Vertex_PCU endDiscVerts[ NUMBER_OF_DISC_VERTS ];
+	std::vector<Vertex_PCU> endDiscVerts;
+	Vec3 secondVertEndDisc = end + ( i * radius ); // COS(0) = 1 , Sin(0) = 0
+
+	angleInDegreesBetweenDiscTriangles = ( 360.f * 3.f ) / static_cast< float >( NUMBER_OF_DISC_VERTS );
+
+	costheta = CosDegrees( angleInDegreesBetweenDiscTriangles );
+	iComponent = i * costheta * radius;
+
+	sintheta = SinDegrees( angleInDegreesBetweenDiscTriangles );
+	jComponent = j * sintheta * radius;
+
+	//endDiscVerts[ 0 ] = Vertex_PCU( end , endTint , Vec2( 0.5f , 0.5f ) );
+	endDiscVerts.push_back( Vertex_PCU( end , endTint , Vec2( 0.5f , 0.5f ) ) );
+	uint endDiscCenterIndex = cylinderMeshVerts.size();
+	cylinderIndices.push_back( endDiscCenterIndex );
+	//endDiscVerts[ 1 ] = Vertex_PCU( ( secondVertEndDisc ) , endTint , Vec2( 1.f , 0.5f ) );
+	endDiscVerts.push_back( Vertex_PCU( ( secondVertEndDisc ) , endTint , Vec2( 1.f , 0.5f ) ) );
+	cylinderIndices.push_back( endDiscCenterIndex + 1 );
+	//endDiscVerts[ 2 ] = Vertex_PCU( ( end + iComponent + jComponent ) , endTint , Vec2( UVRadius + UVRadius * costheta , UVRadius + UVRadius * sintheta ) );
+	endDiscVerts.push_back( Vertex_PCU( ( end + iComponent + jComponent ) , endTint , Vec2( UVRadius + UVRadius * costheta , UVRadius + UVRadius * sintheta ) ) );
+	cylinderIndices.push_back( endDiscCenterIndex + 2 );
+
+	//-----------------------------------------------------------------------------------------------------------------
+		
+	for ( discVertIndex = 2; discVertIndex < NUMBER_OF_TRIANGLES; discVertIndex += 1 )
+	{
+		angleInDegreesBetweenDiscTriangles = angleInDegreesBetweenDiscTriangles + ( ( 360.f * 3.f ) / ( NUMBER_OF_DISC_VERTS ) );
+		//endDiscVerts[ discVertIndex ] = endDiscVerts[ discVertIndex - 3 ];
+		cylinderIndices.push_back( endDiscCenterIndex );
+		//endDiscVerts[ discVertIndex + 1 ] = endDiscVerts[ discVertIndex - 1 ];
+		cylinderIndices.push_back( endDiscCenterIndex + discVertIndex - 1 );
+
+		costheta = CosDegrees( angleInDegreesBetweenDiscTriangles );
+		sintheta = SinDegrees( angleInDegreesBetweenDiscTriangles );
+		iComponent = i * costheta * radius;
+		jComponent = j * sintheta * radius;
+
+		Vertex_PCU temp;
+
+		//endDiscVerts[ discVertIndex + 2 ].m_position = e + iComponent + jComponent;
+		//endDiscVerts[ discVertIndex + 2 ].m_color = endTint;
+		//endDiscVerts[ discVertIndex + 2 ].m_uvTexCoords = Vec2::ZERO;
+		temp.m_position = e + iComponent + jComponent;
+		temp.m_color = endTint;
+		temp.m_uvTexCoords = Vec2::ZERO;
+		endDiscVerts.push_back( temp );
+		cylinderIndices.push_back( endDiscCenterIndex + discVertIndex + 1 );
+	}
+	cylinderIndices.push_back( endDiscCenterIndex );
+	cylinderIndices.push_back( endDiscCenterIndex + discVertIndex - 1 );
+	cylinderIndices.push_back( endDiscCenterIndex + 1 );
+	//endDiscVerts[ NUMBER_OF_DISC_VERTS - 1 ] = endDiscVerts[ 1 ];
+
+	for ( size_t index = 0; index < endDiscVerts.size(); index++ )
+	{
+		cylinderMeshVerts.push_back( endDiscVerts[ index ] );
+	}
+	
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//					SHAFT
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+	std::vector<Vertex_PCU> shaftVerts;
+
+	for ( size_t index = 1; index < ( NUMBER_OF_TRIANGLES /*- 1*/ ); index++ )
+	{
+		cylinderIndices.push_back( index );
+		//shaftVerts.push_back( startDiscVerts[ index ] );
+		cylinderIndices.push_back( index + 1 );
+		//shaftVerts.push_back( startDiscVerts[ index + 1 ] );
+		cylinderIndices.push_back( endDiscCenterIndex + index + 1 );
+		//shaftVerts.push_back( endDiscVerts[ index + 1 ] );
+		cylinderIndices.push_back( endDiscCenterIndex + index + 1 );
+		//shaftVerts.push_back( endDiscVerts[ index + 1 ] );
+		cylinderIndices.push_back( endDiscCenterIndex + index );
+		//shaftVerts.push_back( endDiscVerts[ index ] );
+		cylinderIndices.push_back( index );
+		//shaftVerts.push_back( startDiscVerts[ index ] );
+	}
+
+	cylinderIndices.push_back( endDiscCenterIndex - 1 );
+	//shaftVerts.push_back( startDiscVerts[ index ] );
+	cylinderIndices.push_back( 1 );
+	//shaftVerts.push_back( startDiscVerts[ index + 1 ] );
+	cylinderIndices.push_back( endDiscCenterIndex + 1 );
+	//shaftVerts.push_back( endDiscVerts[ index + 1 ] );
+	cylinderIndices.push_back( endDiscCenterIndex + 1 );
+	cylinderIndices.push_back( cylinderMeshVerts.size() - 1 );
+	cylinderIndices.push_back( endDiscCenterIndex - 1 );
+	//shaftVerts.push_back( endDiscVerts[ index + 1 ] );
+	//cylinderIndices.push_back( endDiscCenterIndex + index );
+	//shaftVerts.push_back( endDiscVerts[ index ] );
+	//cylinderIndices.push_back( index );
+	
+// 	for ( size_t index = 0 ; index < shaftVerts.size() ; index++ )
+// 	{
+// 		cylinderMeshVerts.push_back( shaftVerts[ index ] );
+// 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void CreateCone( std::vector<Vertex_PCU>& coneMeshVerts , std::vector<uint>& coneIndices , float radius /*= 1.f */ , const Vec3& start /*= Vec3::ZERO */ , const Vec3& end /*= Vec3::ONE*/ , const Rgba8& startTint /*= WHITE */ , const Rgba8& endTint /*= WHITE */ )
+{
+	// TODO :- Update UV mapping if needed ::- CURRENTLY MAPPED INCORRECTLY
+
+	Mat44 transformation = LookAtMatrix( start , end );
+
+	Vec3 ibasis = transformation.GetIBasis3D();
+	Vec3 jbasis = transformation.GetJBasis3D();
+
+	const Vec3& i = ibasis;
+	const Vec3& j = jbasis;
+	const Vec3& s = start;
+	const Vec3& e = end;
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//			START DISC
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+
+	constexpr int  NUMBER_OF_DISC_VERTS = 120;
+
+	Vertex_PCU startDiscVerts[ NUMBER_OF_DISC_VERTS ];
+	const float UVRadius = 0.5f;
+
+	float angleInDegreesBetweenDiscTriangles = 0.f;
+
+	Vec3 secondVertStartDisc = start + ( i * radius ); // COS(0) = 1 , Sin(0) = 0
+
+	startDiscVerts[ 0 ] = Vertex_PCU( start , startTint , Vec2( 0.5f , 0.5f ) );
+	startDiscVerts[ 1 ] = Vertex_PCU( ( secondVertStartDisc ) , startTint , Vec2( 1.f , 0.5f ) );
+	angleInDegreesBetweenDiscTriangles = ( 360.f * 3.f ) / static_cast< float >( NUMBER_OF_DISC_VERTS );
+
+	//-----------------------------------------------------------------------------------------------------------------
+	float costheta = CosDegrees( angleInDegreesBetweenDiscTriangles );
+	Vec3 iComponent = i * costheta * radius;
+
+	float sintheta = SinDegrees( angleInDegreesBetweenDiscTriangles );
+	Vec3 jComponent = j * sintheta * radius;
+
+	startDiscVerts[ 2 ] = Vertex_PCU( ( s + iComponent + jComponent ) , startTint , Vec2( UVRadius + UVRadius * costheta , UVRadius + UVRadius * sintheta ) );
+
+	//-----------------------------------------------------------------------------------------------------------------
+	int discVertIndex = 3;
+	for ( discVertIndex = 3; discVertIndex < NUMBER_OF_DISC_VERTS; discVertIndex += 3 )
+	{
+		angleInDegreesBetweenDiscTriangles = angleInDegreesBetweenDiscTriangles + ( ( 360.f * 3.f ) / ( NUMBER_OF_DISC_VERTS ) );
+		startDiscVerts[ discVertIndex ] = startDiscVerts[ discVertIndex - 3 ];
+		startDiscVerts[ discVertIndex + 1 ] = startDiscVerts[ discVertIndex - 1 ];
+
+		costheta = CosDegrees( angleInDegreesBetweenDiscTriangles );
+		sintheta = SinDegrees( angleInDegreesBetweenDiscTriangles );
+		iComponent = i * costheta * radius;
+		jComponent = j * sintheta * radius;
+
+		startDiscVerts[ discVertIndex + 2 ].m_position = s + iComponent + jComponent;
+		startDiscVerts[ discVertIndex + 2 ].m_color = startTint;
+		startDiscVerts[ discVertIndex + 2 ].m_uvTexCoords = Vec2::ZERO;
+	}
+	startDiscVerts[ NUMBER_OF_DISC_VERTS - 1 ] = startDiscVerts[ 1 ];
+
+	for ( int index = 0; index < NUMBER_OF_DISC_VERTS; index++ )
+	{
+		coneMeshVerts.push_back( startDiscVerts[ index ] );
+	}
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//				END
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+
+	
+	Vec3 secondVertEndDisc = end + ( i * radius ); // COS(0) = 1 , Sin(0) = 0
+
+	Vertex_PCU endVert = Vertex_PCU( end , endTint , Vec2( 0.5f , 0.5f ) );
+	
+	coneMeshVerts.push_back( endVert );
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//					SHAFT
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+
+	std::vector<Vertex_PCU> shaftVerts;
+
+	for ( int index = 1; index < ( NUMBER_OF_DISC_VERTS - 1 ); index++ )
+	{
+		shaftVerts.push_back( startDiscVerts[ index ] );
+		shaftVerts.push_back( startDiscVerts[ index + 1 ] );
+		shaftVerts.push_back( endVert );
+	}
+
+	for ( size_t index = 0; index < shaftVerts.size(); index++ )
+	{
+		coneMeshVerts.push_back( shaftVerts[ index ] );
 	}
 }
 
