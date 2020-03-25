@@ -1,6 +1,8 @@
+#include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/StringUtils.hpp"
-#include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Time/Timer.hpp"
 #include <cmath>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -85,8 +87,15 @@ void Rgba8::CycleRGBChannelsAntiClockwise()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Rgba8::LerpColor( Rgba8 startColor , Rgba8 endColor , float lerpDuration )
+void Rgba8::LerpColorOverTime( Rgba8 startColor , Rgba8 endColor , float lerpDuration , Timer* timer /*= &Clock::g_theMasterClock */ )
 {
+// 	static float deltaTime		= /*( float ) clock->GetTotalElapsedSeconds() - */( float ) clock->GetLastDeltaSeconds();
+// 	static float fps			= 1.f / deltaTime;
+// 	static float s				= 1.f / lerpDuration;
+// 	static float steps			= ( lerpDuration * fps );
+// 	static float currentStep	= 0;
+// 			float lastStep		= steps - currentStep;
+
 	if ( lerpDuration <= 0.f )
 	{
 		r = endColor.r;
@@ -96,6 +105,52 @@ void Rgba8::LerpColor( Rgba8 startColor , Rgba8 endColor , float lerpDuration )
 		return;
 	}
 
+	if ( *this == endColor )
+	{
+		return;
+	}
+
+	if ( startColor == endColor )
+	{
+		return;
+	}
+	
+
+	
+	//uchar deltaA = static_cast< uchar >( ( float ) ( endColor.a - startColor.a ) * currentStep / lastStep  );
+	//uchar deltaR = static_cast< uchar >( ( float ) ( endColor.r - startColor.r ) * currentStep / lastStep  );
+	//uchar deltaG = static_cast< uchar >( ( float ) ( endColor.g - startColor.g ) * currentStep / lastStep  );
+	//uchar deltaB = static_cast< uchar >( ( float ) ( endColor.b - startColor.b )  * currentStep / lastStep );
+
+	// 0 <= stepNumber <= lastStepNumber
+// 	int interpolate( int startValue , int endValue , int stepNumber , int lastStepNumber )
+// 	{
+// 		return ( endValue - startValue ) * stepNumber / lastStepNumber + startValue;
+// 	}
+// 	
+	float normalizedElapsedTime = ( float ) timer->GetNormalizedElapsedSeconds();
+
+	r = ( uchar ) RangeMapFloat( 0.f , ( float ) timer->GetTimerDuration() , ( float ) startColor.r , ( float ) endColor.r ,
+		( float ) r + static_cast< int >( ( float )( endColor.r - startColor.r ) * ( normalizedElapsedTime ) ) );
+	               
+	g = ( uchar ) RangeMapFloat( 0.f , ( float ) timer->GetTimerDuration() , ( float ) startColor.g , ( float ) endColor.g ,
+		( float ) g + static_cast< int >( ( float ) ( endColor.g - startColor.g ) * ( normalizedElapsedTime ) ) );
+
+	b = ( uchar ) RangeMapFloat( 0.f , ( float ) timer->GetTimerDuration() , ( float ) startColor.b , ( float ) endColor.b ,
+		( float ) b + static_cast< int >( ( float ) ( endColor.b - startColor.b ) * ( normalizedElapsedTime ) ) );
+			
+	a = ( uchar ) RangeMapFloat( 0.f , ( float ) timer->GetTimerDuration() , ( float ) startColor.a , ( float ) endColor.a ,
+		( float ) a + static_cast< int >( ( float ) ( endColor.a - startColor.a ) * ( normalizedElapsedTime ) ) );
+	
+	//r = startColor.r + static_cast< int >( ( float ) ( endColor.r - startColor.r ) * ( ( float ) timer->GetElapsedSeconds() ) );
+	//g = startColor.g + static_cast< int >( ( float ) ( endColor.g - startColor.g ) * ( ( float ) timer->GetElapsedSeconds() ) );
+	//b = startColor.b + static_cast< int >( ( float ) ( endColor.b - startColor.b ) * ( ( float ) timer->GetElapsedSeconds() ) );
+	//a = startColor.a + static_cast< int >( ( float ) ( endColor.a - startColor.a ) * ( ( float ) timer->GetElapsedSeconds() ) );
+
+// 	if ( currentStep <= steps )
+// 	{
+// 		currentStep += 1 ;
+// 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

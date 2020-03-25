@@ -33,6 +33,14 @@ public:
 	void CleanupScreenObjects();
 	void CleanupWorldObjects();
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//				HELPERS
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	void AddDebugObjectTo( eRenderSpace space  , DebugRenderObject* object );
+	void CleanupDebugObjects( std::vector<DebugRenderObject*>& droArray );
+	void UpdateDebugObjects( std::vector<DebugRenderObject*>& droArray , float deltaSeconds );
+	void RenderObjectsAlways( std::vector<DebugRenderObject*>& droArray , Camera* cam );
+	
 	// control
 	void EnableDebugRendering();
 	void DisableDebugRendering();
@@ -47,8 +55,14 @@ public:
 	//static DebugRenderObjectsManager				s_debugRender;
 
 	bool											m_isDebugRenderEnabled = true;
-	std::vector<DebugRenderObject*>					m_debugRenderWorldObjects;
-	std::vector<DebugRenderObject*>					m_debugRenderScreenObjects;
+	
+	std::vector<DebugRenderObject*>					m_debugRenderWorldObjectsAlways;
+	std::vector<DebugRenderObject*>					m_debugRenderWorldObjectsUseDepth;
+	std::vector<DebugRenderObject*>					m_debugRenderWorldObjectsXRay;
+	
+	std::vector<DebugRenderObject*>					m_debugRenderScreenObjectsAlways;
+	std::vector<DebugRenderObject*>					m_debugRenderScreenObjectsUseDepth;
+	std::vector<DebugRenderObject*>					m_debugRenderScreenObjectsXRay;
 };
 
 void DebugRenderWorldToCamera( Camera* cam );										// Draws all world objects to this camera 
@@ -58,16 +72,15 @@ void DebugRenderScreenTo( Texture* output );										// Draws all screen object
 // World Rendering
 //------------------------------------------------------------------------
 // points
-//void DebugAddWorldPoint( Vec3 pos , float size , Rgba8 start_color , Rgba8 end_color , float duration , eDebugRenderMode mode );
+void DebugAddWorldPoint( Vec3 pos , float size , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode );
 void DebugAddWorldPoint( Vec3 pos , float size , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 //void DebugAddWorldPoint( Vec3 pos , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
 // lines
-void DebugAddWorldLine( Vec3 p0 , Rgba8 p0_start_color , Rgba8 p0_end_color ,
-	Vec3 p1 , Rgba8 p1_start_color , Rgba8 p1_end_color ,
-	float duration ,
-	eDebugRenderMode mode );
-void DebugAddWorldLine( Vec3 start , Vec3 end , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+void DebugAddWorldLine ( Vec3 p0 , Rgba8 p0_start_color , Rgba8 p0_end_color , Vec3 p1 , Rgba8 p1_start_color ,
+                         Rgba8 p1_end_color , float duration , eDebugRenderMode mode , float radius = 1.f );
+
+void DebugAddWorldLine( Vec3 start , Vec3 end , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH , float radius = 1.f );
 
 // line strip [extra]
 void DebugAddWorldLineStrip( uint count , Vec3 const* positions ,

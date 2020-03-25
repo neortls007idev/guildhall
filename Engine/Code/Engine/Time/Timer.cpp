@@ -1,4 +1,6 @@
 ﻿#include "Engine/Time/Timer.hpp"
+
+#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Time/Clock.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -50,6 +52,22 @@ double Timer::GetSecondsRemaining() const
 {
 	double currentTime = m_clock->GetTotalElapsedSeconds();
 	return m_startSeconds + m_durationSeconds - currentTime;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+double Timer::GetTimerDuration() const
+{
+	return m_durationSeconds;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+double Timer::GetNormalizedElapsedSeconds() const
+{
+	float result = RangeMapFloat( ( float )m_startSeconds , ( float )( m_startSeconds + m_durationSeconds ) , 0.f ,
+	                              1.f , ( float )GetElapsedSeconds() );
+	return ( double ) result;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

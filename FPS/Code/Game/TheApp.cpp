@@ -142,12 +142,14 @@ void TheApp::BeginFrame()
 {
 
 	// all engine things that must begin at the beginning of each frame and not the game
-	g_theInput->BeginFrame();
+	Clock::BeginFrame();
+	g_theEventSystem->BeginFrame();
 	g_theWindow->BeginFrame();
+	g_theInput->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theDevConsole->BeginFrame();
 	g_currentManager->BeginFrame();
-
+	
 	if ( m_taskbarProgress < 100.f  && m_taskbarProgressMode == WND_PROGRESS_VALUE )
 	{
 		m_taskbarProgress += 0.166f;
@@ -220,6 +222,8 @@ void TheApp::EndFrame()
 	{
 		g_theRenderer->ReCompileAllShaders();
 	}
+
+	Clock::EndFrame();
 }
 
 
@@ -236,7 +240,6 @@ void TheApp::Shutdown()
 	// TODO :- write me g_theWindow->Shutdown();
 	g_theEventSystem->Shutdown();
 	Clock::Shutdown();
-
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

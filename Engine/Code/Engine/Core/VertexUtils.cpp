@@ -146,6 +146,12 @@ void TransformAndAppendIndexedVerts ( std::vector< Vertex_PCU >& destinationVert
                                       std::vector< uint >& sourceIndices , Mat44 transformation /*= Mat44::IDENTITY */ )
 {
 	// TODO :- IMPLEMENT ME
+	UNUSED( destinationVerts );
+	UNUSED( destinationIndices );
+	UNUSED( sourceVerts );
+	UNUSED( sourceIndices );
+	UNUSED( transformation );
+	
 	DEBUGBREAK();
 }
 

@@ -3,7 +3,10 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+class Timer;
 typedef unsigned char uchar;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 struct Rgba8
 {
@@ -28,7 +31,7 @@ public:
 	void CycleRGBChannelsClockwise();
 	void CycleRGBChannelsAntiClockwise();
 
-	void LerpColor( Rgba8 startColor , Rgba8 endColor , float lerpDuration );
+	void LerpColorOverTime( Rgba8 startColor , Rgba8 endColor , float lerpDuration , Timer* timer );
 
 public:
 	uchar r = 255;

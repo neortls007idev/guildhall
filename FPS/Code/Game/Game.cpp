@@ -16,6 +16,8 @@
 extern RenderContext* g_theRenderer;
 extern TheApp* g_theApp;
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Game::Game()
 {
 	m_uiCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
@@ -118,16 +120,16 @@ void Game::Render() const
 	Transform sphereRing;
 	float deltaDegrees = 360.f / 30.f;
 
-// 	for ( float sphereIndex = 0 ; sphereIndex <= 360 ; sphereIndex += deltaDegrees )
-// 	{
-// 		Vec3 position = Vec3::MakeFromSpericalCoordinates( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 15.f );
-// 		position.z -= 30.f;
-// 		sphereRing.SetPosition( position );
-// 		sphereRing.SetRotation( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 0.f );
-// 		g_theRenderer->SetModelMatrix( sphereRing.GetAsMatrix() );
-// 		g_theRenderer->SetRasterState( FILL_SOLID );
-// 		g_theRenderer->DrawMesh( m_meshSphere );
-// 	}
+	for ( float sphereIndex = 0 ; sphereIndex <= 360 ; sphereIndex += deltaDegrees )
+	{
+		Vec3 position = Vec3::MakeFromSpericalCoordinates( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 15.f );
+		position.z -= 30.f;
+		sphereRing.SetPosition( position );
+		sphereRing.SetRotation( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 0.f );
+		g_theRenderer->SetModelMatrix( sphereRing.GetAsMatrix() );
+		g_theRenderer->SetRasterState( FILL_SOLID );
+		g_theRenderer->DrawMesh( m_meshSphere );
+	}
 
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
@@ -210,7 +212,13 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 
 	if ( g_theInput->WasKeyJustPressed( 'U' ) )
 	{
-		DebugAddWorldPoint( m_gameCamera.GetPosition() , 0.1f, GREEN , 5.f , DEBUG_RENDER_ALWAYS );
+		DebugAddWorldPoint( m_gameCamera.GetPosition() , 0.1f, GREEN , RED, 5.f , DEBUG_RENDER_ALWAYS );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'L' ) )
+	{
+		//DebugAddWorldLine( m_gameCamera.GetPosition() , GREEN , RED , m_gameCamera.GetPosition() + Vec3::ONE , PURPLE , ORANGE ,5.f , DEBUG_RENDER_ALWAYS , 0.5f );
+		DebugAddWorldLine( m_gameCamera.GetPosition() , m_gameCamera.GetPosition() + Vec3::ONE , PURPLE ,5.f , DEBUG_RENDER_ALWAYS , 0.5f );
 	}
 }
 
