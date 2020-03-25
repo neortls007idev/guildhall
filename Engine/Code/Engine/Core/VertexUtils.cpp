@@ -1,6 +1,6 @@
+#include "Engine/Core/DebugRender.hpp"
+#include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/VertexUtils.hpp "
-
-#include "DebugRender.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/MatrixUtils.hpp"
 #include "Engine/Primitives/Polygon2D.hpp"
@@ -141,6 +141,14 @@ void AppendIndexedVerts ( std::vector< Vertex_PCU >& sourceVerts , std::vector< 
 	}
 }
 
+void TransformAndAppendIndexedVerts ( std::vector< Vertex_PCU >& destinationVerts ,
+                                      std::vector< uint >& destinationIndices , std::vector< Vertex_PCU >& sourceVerts ,
+                                      std::vector< uint >& sourceIndices , Mat44 transformation /*= Mat44::IDENTITY */ )
+{
+	// TODO :- IMPLEMENT ME
+	DEBUGBREAK();
+}
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void AddCubeVerts( std::vector<Vertex_PCU>& cubeVertexArray , const Rgba8* tint )
@@ -220,11 +228,88 @@ uint* GetCubeIndices()
 		// TOP FACE INDICES
 							16,17,18,
 							18,19,16,
-		// TOP FACE INDICES
+		// BOTTOM FACE INDICES
 							20,21,22,
 							22,23,20,
 							};
 	return &CubeIndices[ 0 ];
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void CreateCuboid( std::vector< Vertex_PCU >& cubeMeshVerts , std::vector< uint >& cubeIndices , const AABB3 box , const Rgba8& tint /*= WHITE */ )
+{
+	Vertex_PCU CubeVerts[ 24 ] = {
+
+		// FRONT FACE VERTS
+						Vertex_PCU( Vec3( -box.m_mins.x,-box.m_mins.z,box.m_maxs.y ) , tint, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3(  box.m_maxs.x,box.m_mins.z,box.m_maxs.y ) , tint, Vec2( 1.f, 0.f ) ),
+
+						Vertex_PCU( Vec3(  box.m_maxs.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 1.f, 0.f ) ),
+		// BACK FACE VERTS
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3(  box.m_maxs.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 1.f, 0.f ) ),
+
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_mins.y )  , tint, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 0.f ) ),
+		// RIGHT FACE VERTS
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_maxs.y ) ,tint, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_mins.y ) ,tint, Vec2( 1.f, 0.f ) ),
+
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_maxs.y ) ,tint, Vec2( 1.f, 0.f ) ),
+		// LEFT FACE VERTS
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_maxs.y ) ,tint, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_mins.y ) ,tint, Vec2( 1.f, 0.f ) ),
+
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_maxs.y ) ,tint, Vec2( 1.f, 0.f ) ),
+		// TOP FACE VERTS
+						Vertex_PCU( Vec3( box.m_mins.x, box.m_maxs.z, box.m_maxs.y ) ,tint, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( box.m_maxs.x, box.m_maxs.z, box.m_maxs.y ) ,tint, Vec2( 1.f, 0.f ) ),
+
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z, box.m_mins.y ) ,tint, Vec2( 1.f, 0.f ) ),
+		
+		// BOTTOM FACE VERTS
+						Vertex_PCU( Vec3( box.m_mins.x, box.m_mins.z, box.m_maxs.y ) ,tint, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( box.m_maxs.x, box.m_mins.z, box.m_maxs.y ) ,tint, Vec2( 1.f, 0.f ) ),
+
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z, box.m_mins.y ) ,tint, Vec2( 1.f, 0.f ) ),
+	};
+
+	for ( uint index = 0 ; index < 24 ; index++ )
+	{
+		cubeMeshVerts.push_back( CubeVerts[ index ] );
+	}
+
+	uint CubeIndices[ 36 ] = {
+		// FRONT FACE INDICES
+			0,1,2,
+			2,3,0,
+		// BACK FACE INDICES
+			4,5,6,
+			6,7,4,
+		// RIGHT FACE INDICES
+			8,9,10,
+			10,11,8,
+		// LEFT FACE INDICES
+			12,13,14,
+			14,15,12,
+		// TOP FACE INDICES
+			16,17,18,
+			18,19,16,
+		// BOTTOM FACE INDICES
+			20,21,22,
+			22,23,20,
+	};
+	
+	for ( uint index = 0; index < 36; index++ )
+	{
+		cubeIndices.push_back( CubeIndices[ index ] );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -534,36 +619,3 @@ void CreateArrow3D ( std::vector< Vertex_PCU >& arrowMeshVerts , std::vector< ui
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-
-void AppendVertsForAABB3( std::vector<Vertex_PCU>& vertexArray , const AABB3& box , const Rgba8& tint )
-{
-	// TODO :- FIX ME
-	UNUSED( box );
-	UNUSED( tint );
-	UNUSED( vertexArray );
-	__debugbreak();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void AppendVertsForAABB3( std::vector<Vertex_PCU>& vertexArray , const AABB3& box , const Rgba8& tint , const Vec2& uvAtMins , const Vec2& uvAtMaxs )
-{
-	// TODO :- FIX ME
-
-	const Vertex_PCU boxVerts[ 6 ] = {
-						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y, 0.f ) , tint, uvAtMins ),
-						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y, 0.f ) , tint, Vec2( uvAtMaxs.x, uvAtMins.y ) ),
-						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y, 0.f ) , tint, Vec2( uvAtMins.x, uvAtMaxs.y ) ),
-
-						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,0.f ) , tint, Vec2( uvAtMaxs.x, uvAtMins.y ) ),
-						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,0.f ) , tint, uvAtMaxs ),
-						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,0.f ) , tint, Vec2( uvAtMins.x, uvAtMaxs.y ) ) };
-
-	for ( int index = 0; index < 6; index++ )
-	{
-		vertexArray.push_back( boxVerts[ index ] );
-	}
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-

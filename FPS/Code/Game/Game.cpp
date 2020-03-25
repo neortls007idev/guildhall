@@ -35,7 +35,10 @@ Game::Game()
 	std::vector<Vertex_PCU> meshVerts;
 	std::vector<uint>		meshIndices;
 
-	CreateArrow3D( meshVerts , meshIndices , .5f , 0.55f, Vec3(0.5,0.5,-1) , Vec3( 1 , 1 , -2 ) , RED , BLUE );
+
+	AABB3 box( Vec3::ZERO , Vec3(1,1,5) );
+	CreateCuboid( meshVerts , meshIndices , box , PURPLE );
+	//CreateArrow3D( meshVerts , meshIndices , .5f , 0.55f, Vec3(0.5,0.5,-1) , Vec3( 1 , 1 , -2 ) , RED , BLUE );
 	//AddCubeVerts( meshVerts , nullptr );
 
 	m_meshCube->UpdateVertices( meshVerts );
@@ -84,7 +87,7 @@ void Game::Update( float deltaSeconds )
 {
 	static float y = 0;
 	y += deltaSeconds;
-	m_cubeTransform.SetRotation( 0.f ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
+	//m_cubeTransform.SetRotation( 0.f ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	UpdateFromKeyBoard( deltaSeconds );
 }
 
