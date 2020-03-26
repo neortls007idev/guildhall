@@ -56,4 +56,9 @@ void CreateArrow3D ( std::vector< Vertex_PCU >& arrowMeshVerts , std::vector< ui
                      float shaftRadius = 1.f , float tipRadius = 1.1f , const Vec3& start = Vec3::ZERO ,
                      const Vec3& end = Vec3::ONE , const Rgba8& startTint = WHITE , const Rgba8& endTint = WHITE );
 
+void CreateArrow3D( std::vector< Vertex_PCU >& arrowMeshVerts , std::vector< uint >& arrowIndices ,
+					float shaftRadius = 1.f , float tipRadius = 1.1f , const Vec3& start = Vec3::ZERO ,
+					const Vec3& end = Vec3::ONE , const Rgba8& shaftStartTint = WHITE , const Rgba8& ShaftEndTint = WHITE ,
+					const Rgba8& tipStartTint = WHITE , const Rgba8& tipEndTint = WHITE );
+
 //--------------------------------------------------------------------------------------------------------------------------------------------

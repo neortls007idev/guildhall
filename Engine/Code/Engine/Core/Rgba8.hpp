@@ -26,7 +26,8 @@ public:
 	bool IsBlueChannelEqual( const Rgba8& compareWith );
 	bool IsAlphaChannelEqual( const Rgba8& compareWith );
 	void		operator=( const Rgba8& copyFrom );				
-	bool		operator==( const Rgba8& copyWith );
+	bool		operator==( const Rgba8& compareWith );
+	bool		operator!=( const Rgba8& compareWith );
 
 	void CycleRGBChannelsClockwise();
 	void CycleRGBChannelsAntiClockwise();

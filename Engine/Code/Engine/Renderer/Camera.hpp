@@ -62,17 +62,23 @@ public:
 	void			SetPitchYawRollRotation( float pitch , float yaw , float roll );
 	void			SetOutputSize( Vec2 size );
 	void			CorrectAspectRatio( float clientAspectRatio );
-	Transform		GetCameraTransform() const																		{ return m_transform;  }
+	Transform		GetCameraTransform() const																			{ return m_transform;  }
 
 	void			SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
 	void			SetClearMode( unsigned int clearFlags , Rgba8 color , float depth = 0.f , unsigned int stencil = 0 );
 	void			SetColorTarget( Texture* texture );
 	void			CreateMatchingDepthStencilTarget();
 	void			SetDepthStencilTarget( Texture* texture );
+	void			SetDepthStencilTargetFromAnotherCamera( Camera* camera );
 
+// USE WITH CAUTION :- USED WHEN 2 CAMERA ARE USING THE SAME DEPTH BUFFERS ONLY !!!
+	void			ResetDepthStencilTarget();
+
+	void			SetCameraTransform( const Transform& newTransform );
 	void			SetProjectionOrthographic( float height , float nearZ = 0.f , float farZ = 1.f );
 //	void			SetProjectionOrthographic( float height , float nearZ = -1.0f , float farZ = 1.0f );
 	void			SetProjectionPerspective( float fov , float aspectRatio , float nearZ , float farZ );
+	void			SetProjectionMatrix( const Mat44& projection );
 
 
 	RenderBuffer*	UpdateUBO( RenderContext* ctx );

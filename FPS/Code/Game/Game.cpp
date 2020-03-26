@@ -38,9 +38,10 @@ Game::Game()
 	std::vector<uint>		meshIndices;
 
 
-	AABB3 box( Vec3::ZERO , Vec3(1,1,5) );
-	CreateCuboid( meshVerts , meshIndices , box , PURPLE );
-	//CreateArrow3D( meshVerts , meshIndices , .5f , 0.55f, Vec3(0.5,0.5,-1) , Vec3( 1 , 1 , -2 ) , RED , BLUE );
+	//AABB3 box( Vec3::ZERO , Vec3(1,1,5) );
+	//CreateCuboid( meshVerts , meshIndices , box , PURPLE );
+	CreateArrow3D( meshVerts , meshIndices , .5f , 0.55f , Vec3( 0.5 , 0.5 , -1 ) , Vec3( 1 , 1 , -2 ) , RED , BLUE ,
+	               RED , BLUE );
 	//AddCubeVerts( meshVerts , nullptr );
 
 	m_meshCube->UpdateVertices( meshVerts );
@@ -66,6 +67,8 @@ Game::Game()
 	boxCopy = m_invertedColorImage;
 	m_invertedColorImage.SetDimensions( m_invertedColorImage.GetDimensions() * 0.75f );
 	m_invertedColorImage.AlignWithinAABB2( boxCopy , ALIGN_CENTERED );
+
+	DebugAddScreenPoint( Vec2( 100 , 100 ) , 100.f , RED , BLUE , 5.f );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -138,6 +141,7 @@ void Game::Render() const
 	g_theRenderer->EndCamera( m_gameCamera );
 
 	DebugRenderWorldToCamera( &m_gameCamera );
+	DebugRenderScreenTo( nullptr );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -210,15 +214,57 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 		g_theInput->ClipSystemCursor( MOUSE_IS_UNLOCKED );
 	}
 
+	static eDebugRenderMode mode = DEBUG_RENDER_XRAY;
+
 	if ( g_theInput->WasKeyJustPressed( 'U' ) )
 	{
-		DebugAddWorldPoint( m_gameCamera.GetPosition() , 0.1f, GREEN , RED, 5.f , DEBUG_RENDER_ALWAYS );
+		mode = DEBUG_RENDER_ALWAYS;
 	}
 
-	if ( g_theInput->WasKeyJustPressed( 'L' ) )
+	if ( g_theInput->WasKeyJustPressed( 'J' ) )
 	{
-		//DebugAddWorldLine( m_gameCamera.GetPosition() , GREEN , RED , m_gameCamera.GetPosition() + Vec3::ONE , PURPLE , ORANGE ,5.f , DEBUG_RENDER_ALWAYS , 0.5f );
-		DebugAddWorldLine( m_gameCamera.GetPosition() , m_gameCamera.GetPosition() + Vec3::ONE , PURPLE ,5.f , DEBUG_RENDER_ALWAYS , 0.5f );
+		mode = DEBUG_RENDER_USE_DEPTH;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'N' ) )
+	{
+		mode = DEBUG_RENDER_XRAY;
+	}
+	
+	if ( g_theInput->WasKeyJustPressed( '1' ) )
+	{
+		DebugAddWorldPoint( m_gameCamera.GetPosition() , 0.1f, GREEN , RED, 5.f , mode );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( '2' ) )
+	{
+		//DebugAddWorldLine( m_gameCamera.GetPosition() , GREEN , RED , m_gameCamera.GetPosition() + Vec3::ONE ,
+		//					PURPLE , ORANGE , 5.f , mode , 0.5f );
+		DebugAddWorldLine( m_gameCamera.GetPosition() , m_gameCamera.GetPosition() + Vec3::ONE , PURPLE ,15.f , DEBUG_RENDER_ALWAYS , 0.5f );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( '3' ) )
+	{
+		DebugAddWorldArrow( m_gameCamera.GetPosition() , GREEN , RED , m_gameCamera.GetPosition() - Vec3::ONE ,
+							PURPLE , ORANGE , 5.f , mode , 0.5f );
+
+		/*DebugAddWorldArrow( m_gameCamera.GetPosition() ,
+		                    m_gameCamera.GetPosition() - m_gameCamera.GetCameraTransform().GetAsMatrix().GetKBasis3D() ,
+		                    GREEN , BLUE , PURPLE , ORANGE ,
+							CYAN , PINK , YELLOW , MAGENTA , 5.f ,
+		                    DEBUG_RENDER_ALWAYS , 0.5f , 0.55f );*/
+		
+		//DebugAddWorldLine( m_gameCamera.GetPosition() , m_gameCamera.GetPosition() + Vec3::ONE , PURPLE ,5.f , DEBUG_RENDER_ALWAYS , 0.5f );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( '4' ) )
+	{
+		DebugAddWorldWireBounds( AABB3( m_gameCamera.GetPosition() , m_gameCamera.GetPosition() + m_gameCamera.GetCameraTransform().GetAsMatrix().GetJBasis3D() ) , WHITE , 5.0f , mode );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( '5' ) )
+	{
+		DebugAddWorldWireSphere( m_gameCamera.GetPosition() , 0.5f , YELLOW , 5.0f , mode );
 	}
 }
 

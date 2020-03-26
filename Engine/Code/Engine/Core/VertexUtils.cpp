@@ -248,7 +248,7 @@ void CreateCuboid( std::vector< Vertex_PCU >& cubeMeshVerts , std::vector< uint 
 	Vertex_PCU CubeVerts[ 24 ] = {
 
 		// FRONT FACE VERTS
-						Vertex_PCU( Vec3( -box.m_mins.x,-box.m_mins.z,box.m_maxs.y ) , tint, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_maxs.y ) , tint, Vec2( 0.f, 0.f ) ),
 						Vertex_PCU( Vec3(  box.m_maxs.x,box.m_mins.z,box.m_maxs.y ) , tint, Vec2( 1.f, 0.f ) ),
 
 						Vertex_PCU( Vec3(  box.m_maxs.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 1.f, 1.f ) ),
@@ -611,7 +611,7 @@ void CreateArrow3D ( std::vector< Vertex_PCU >& arrowMeshVerts , std::vector< ui
 	std::vector<Vertex_PCU>	arrowShaftMeshVerts;
 	std::vector<uint>		arrowShaftIndices;
 
-	Vec3 shaftLength = end * .7f;								// keeping 70% length as the shaft and 30% for the tip
+	Vec3 shaftLength = end + ( start - end ) * .3f;								// keeping 70% length as the shaft and 30% for the tip
 
 	CreateCylinder( arrowShaftMeshVerts , arrowShaftIndices , shaftRadius , start , shaftLength , startTint , endTint );
 
@@ -619,6 +619,30 @@ void CreateArrow3D ( std::vector< Vertex_PCU >& arrowMeshVerts , std::vector< ui
 	std::vector<uint>		tipIndices;
 
 	CreateCone( tipMeshVerts , tipIndices , tipRadius , shaftLength , end , endTint , endTint );
+
+	AppendIndexedVerts( arrowShaftMeshVerts , arrowShaftIndices , arrowMeshVerts , arrowIndices );
+	AppendIndexedVerts( tipMeshVerts , tipIndices , arrowMeshVerts , arrowIndices );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void CreateArrow3D ( std::vector< Vertex_PCU >& arrowMeshVerts , std::vector< uint >& arrowIndices ,
+                     float shaftRadius /*= 1.f */ , float tipRadius /*= 1.1f */ , const Vec3& start /*= Vec3::ZERO */ ,
+                     const Vec3& end /*= Vec3::ONE */ , const Rgba8& shaftStartTint /*= WHITE */ ,
+                     const Rgba8& ShaftEndTint /*= WHITE */ , const Rgba8& tipStartTint /*= WHITE */ ,
+                     const Rgba8& tipEndTint /*= WHITE */ )
+{
+	std::vector<Vertex_PCU>	arrowShaftMeshVerts;
+	std::vector<uint>		arrowShaftIndices;
+
+	Vec3 shaftLength = end + (start - end) * .3f;								// keeping 70% length as the shaft and 30% for the tip
+
+	CreateCylinder( arrowShaftMeshVerts , arrowShaftIndices , shaftRadius , start , shaftLength , shaftStartTint , ShaftEndTint );
+
+	std::vector<Vertex_PCU>	tipMeshVerts;
+	std::vector<uint>		tipIndices;
+
+	CreateCone( tipMeshVerts , tipIndices , tipRadius , shaftLength , end , tipStartTint , tipEndTint );
 
 	AppendIndexedVerts( arrowShaftMeshVerts , arrowShaftIndices , arrowMeshVerts , arrowIndices );
 	AppendIndexedVerts( tipMeshVerts , tipIndices , arrowMeshVerts , arrowIndices );

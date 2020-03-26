@@ -4,6 +4,7 @@
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Primitives/AABB2.hpp"
 #include "Engine/Primitives/AABB3.hpp"
+#include "Engine/Renderer/RenderContext.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -39,7 +40,13 @@ public:
 	void AddDebugObjectTo( eRenderSpace space  , DebugRenderObject* object );
 	void CleanupDebugObjects( std::vector<DebugRenderObject*>& droArray );
 	void UpdateDebugObjects( std::vector<DebugRenderObject*>& droArray , float deltaSeconds );
-	void RenderObjectsAlways( std::vector<DebugRenderObject*>& droArray , Camera* cam );
+
+	void RenderObjectsAlways(	std::vector<DebugRenderObject*>& droArray , Camera* cam , eBlendMode blendMode );
+	void RenderObjectsUseDepth( std::vector<DebugRenderObject*>& droArray , Camera* cam , eBlendMode blendMode );
+	void RenderObjectsXRAY(		std::vector<DebugRenderObject*>& droArray , Camera* cam , eBlendMode blendMode );
+
+	void RenderObjectArray( std::vector<DebugRenderObject*>& droArray , Camera* cam );
+	void RenderObjectArrayXRAYPass2( std::vector<DebugRenderObject*>& droArray , Camera* cam );
 	
 	// control
 	void EnableDebugRendering();
@@ -60,9 +67,7 @@ public:
 	std::vector<DebugRenderObject*>					m_debugRenderWorldObjectsUseDepth;
 	std::vector<DebugRenderObject*>					m_debugRenderWorldObjectsXRay;
 	
-	std::vector<DebugRenderObject*>					m_debugRenderScreenObjectsAlways;
-	std::vector<DebugRenderObject*>					m_debugRenderScreenObjectsUseDepth;
-	std::vector<DebugRenderObject*>					m_debugRenderScreenObjectsXRay;
+	std::vector<DebugRenderObject*>					m_debugRenderScreenObjects;
 };
 
 void DebugRenderWorldToCamera( Camera* cam );										// Draws all world objects to this camera 
@@ -71,16 +76,22 @@ void DebugRenderScreenTo( Texture* output );										// Draws all screen object
 //------------------------------------------------------------------------
 // World Rendering
 //------------------------------------------------------------------------
+
 // points
 void DebugAddWorldPoint( Vec3 pos , float size , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode );
 void DebugAddWorldPoint( Vec3 pos , float size , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 //void DebugAddWorldPoint( Vec3 pos , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
-// lines
-void DebugAddWorldLine ( Vec3 p0 , Rgba8 p0_start_color , Rgba8 p0_end_color , Vec3 p1 , Rgba8 p1_start_color ,
-                         Rgba8 p1_end_color , float duration , eDebugRenderMode mode , float radius = 1.f );
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		3D LINES
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-void DebugAddWorldLine( Vec3 start , Vec3 end , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH , float radius = 1.f );
+void DebugAddWorldLine ( Vec3 startPos , Rgba8 startPosStartColor , Rgba8 startPosEndColor , Vec3 endPos ,
+                         Rgba8 endPosStartColor , Rgba8 endPosEndColor , float duration , eDebugRenderMode mode ,
+                         float radius = 1.f );
+
+void DebugAddWorldLine ( Vec3 start , Vec3 end , Rgba8 color , float duration = 0.0f ,
+                         eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH , float radius = 1.f );
 
 // line strip [extra]
 void DebugAddWorldLineStrip( uint count , Vec3 const* positions ,
@@ -89,26 +100,40 @@ void DebugAddWorldLineStrip( uint count , Vec3 const* positions ,
 	float duration ,
 	eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
-// arrows
-void DebugAddWorldArrow( Vec3 p0 , Rgba8 p0_start_color , Rgba8 p0_end_color ,
-	Vec3 p1 , Rgba8 p1_start_color , Rgba8 p1_end_color ,
-	float duration ,
-	eDebugRenderMode mode );
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		3D ARROWS
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+// Draws 3D Arrow in worldSpace of defined radius from Start to End - TIP shares SHAFT'S end color
+void DebugAddWorldArrow ( Vec3 startPos , Rgba8 startPosStartColor , Rgba8 startPosEndColor , Vec3 endPos ,
+                          Rgba8 endPosStartColor , Rgba8 endPosEndColor , float duration = 0.f ,
+                          eDebugRenderMode mode = DEBUG_RENDER_ALWAYS , float radius = 1.f );
+
+// Draws 3D Arrow in worldSpace of defined shaft radius , tip radius from Start to End - SHAFT & TIP end can separately LERP between different colors
+void DebugAddWorldArrow( Vec3 startPos , Vec3 endPos ,
+						 Rgba8 shaftStartPosStartColor , Rgba8 shaftStartPosEndColor , Rgba8 shaftEndPosStartColor , Rgba8 shaftEndPosEndColor ,
+						 Rgba8 tipStartPosStartColor , Rgba8 tipStartPosEndColor , Rgba8 tipEndPosStartColor , Rgba8 tipEndPosEndColor ,
+						 float duration = 0.f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS , float shaftRadius = 0.9f , float tipRadius = 1.f );
+
+// Draws 3D Arrow in worldSpace of Unit Length from Start to End
 void DebugAddWorldArrow( Vec3 start , Vec3 end , Rgba8 color , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 // Quads
-void DebugAddWorldQuad( Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p4 , AABB2 uvs , Rgba8 start_color , Rgba8 end_color , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+void DebugAddWorldQuad ( Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p4 , AABB2 uvs , Rgba8 startColor , Rgba8 endColor ,
+                         float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
 // bounds
 //void DebugAddWorldWireBounds( obb3 bounds , Rgba8 start_color , Rgba8 end_color , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 //void DebugAddWorldWireBounds( obb3 bounds , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 void DebugAddWorldWireBounds( AABB3 bounds , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
-void DebugAddWorldWireSphere( Vec3 pos , float radius , Rgba8 start_color , Rgba8 end_color , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+void DebugAddWorldWireSphere( Vec3 pos , float radius , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 void DebugAddWorldWireSphere( Vec3 pos , float radius , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
 // basis
-void DebugAddWorldBasis( Mat44 basis , Rgba8 start_tint , Rgba8 end_tint , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+void DebugAddWorldBasis( Mat44 basis , Rgba8 startTint , Rgba8 endTint , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 void DebugAddWorldBasis( Mat44 basis , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
 // text
@@ -142,24 +167,44 @@ void DebugAddWireMeshToWorld( Mat44 transform , GPUMesh* mesh , float duration =
 void DebugRenderSetScreenHeight( float height ); // default to 1080.0f when system starts up.  Meaning (0,0) should always be bottom left, (aspect * height, height) is top right
 AABB2 DebugGetScreenBounds();                    // useful if you want to align to top right for something
 
-// points
-void DebugAddScreenPoint( Vec2 pos , float size , Rgba8 start_color , Rgba8 end_color , float duration );
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		2D POINT
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddScreenPoint( Vec2 pos , float size , Rgba8 startColor , Rgba8 endColor , float duration );
 void DebugAddScreenPoint( Vec2 pos , float size , Rgba8 color , float duration = 0.0f );
-void DebugAddScreenPoint( Vec2 pos , Rgba8 color ); // assumed size;
 
-// lines
-void DebugAddScreenLine( Vec2 p0 , Rgba8 p0_start_color , Rgba8 p0_end_color ,
-	Vec2 p1 , Rgba8 p1_start_color , Rgba8 p1_end_color ,
-	float duration );
-void DebugAddScreenLine( Vec2 p0 , Vec2 p1 , Rgba8 color , float duration = 0.0f );
+// ASSUMED SIZE = 10 and duration = 5 seconds
+void DebugAddScreenPoint( Vec2 pos , Rgba8 color );
 
-// arrows
-void DebugAddScreenArrow( Vec2 p0 , Rgba8 p0_start_color , Rgba8 p0_end_color ,
-	Vec2 p1 , Rgba8 p1_start_color , Rgba8 p1_end_color ,
-	float duration );
-void DebugAddScreenArrow( Vec2 p0 , Vec2 p1 , Rgba8 color , float duration = 0.0f );
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		2D LINE
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-// quad
+void DebugAddScreenLine( Vec2 startPos , Rgba8 startPosStartColor , Rgba8 startPosEndColor , Vec2 endPos ,
+						Rgba8 endPosStartColor , Rgba8 endPosEndColor ,	float duration );
+
+void DebugAddScreenLine( Vec2 startPos , Vec2 endPos , Rgba8 color , float duration = 0.0f );
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		2D ARROWS
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddScreenArrow( Vec2 startPos , Vec2 endPos ,
+						  Rgba8 shaftStartPosStartColor , Rgba8 shaftStartPosEndColor , Rgba8 shaftEndPosStartColor , Rgba8 shaftEndPosEndColor ,
+						  Rgba8 tipStartPosStartColor , Rgba8 tipStartPosEndColor , Rgba8 tipEndPosStartColor , Rgba8 tipEndPosEndColor ,
+						  float duration = 0.f , float thickness = 10.f );
+
+void DebugAddScreenArrow( Vec2 startPos , Rgba8 startPosStartColor , Rgba8 startPosEndColor , Vec2 endPos ,
+						  Rgba8 endPosStartColor , Rgba8 endPosEndColor , float duration = 0.f , float thickness = 10.f );
+
+
+void DebugAddScreenArrow( Vec2 startPos , Vec2 endPos , Rgba8 color , float duration = 0.0f , float thickness = 10.f );
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		2D QUADS
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void DebugAddScreenQuad( AABB2 bounds , Rgba8 start_color , Rgba8 end_color , float duration );
 void DebugAddScreenQuad( AABB2 bounds , Rgba8 color , float duration = 0.0f );
 

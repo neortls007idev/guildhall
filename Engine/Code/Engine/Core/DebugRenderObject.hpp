@@ -5,8 +5,12 @@
 
 #include <vector>
 
+#include "Engine/Primitives/AABB3.hpp"
+#include "Engine/Renderer/D3D11Utils.hpp"
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+struct AABB3;
 class Timer;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -21,12 +25,19 @@ enum eDebugRenderObjectType
 	DRO_LINE2D,
 	DRO_LINE3D,
 
-	DRO_ARROW2D ,
-	DRO_ARROW3D ,
+	DRO_ARROW2D,
+	DRO_ARROW3D,
 
-	DRO_SPHERE,
-	DRO_SPHERE_WIREFRAME,
+	DRO_AABB3,
 	
+	DRO_OBB3,
+	
+	DRO_UVSPHERE,
+	
+	DRO_BASIS,
+
+	DRO_WORLDTEXT,
+	DRO_WORLDBILLBOARDTEXT,
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -78,17 +89,90 @@ public:
 struct DRO_point2D : public DebugRenderObject
 {
 public:
-	DRO_point2D( eDebugRenderMode mode , Vec2 pos , float size , Rgba8 startColor , Rgba8 endColor, float duration , bool isBillboarded = false );
+	DRO_point2D( Vec2 pos , float size , Rgba8 startColor , Rgba8 endColor, float duration , bool isBillboarded = false );
 
 	void UpdateColor() override;
 	
 public:
 	Vec2	m_position;
 	float	m_size;
+	
 	Rgba8	m_startColor;
 	Rgba8	m_endColor;
 	Rgba8	m_currrentColor;
 };
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct DRO_line2D : public DebugRenderObject
+{
+
+public:
+	DRO_line2D( Vec2 startPos , Rgba8 startPosStartColor , Rgba8 startPosEndColor , Vec2 endPos ,
+		Rgba8 endPosStartColor , Rgba8 endPosEndColor , float duration = 0.f , float thickness = 1.f );
+
+	DRO_line2D( Vec2 startPos , Vec2 endPos , Rgba8 color , float duration = 0.0f , float thickness = 1.f );
+
+	void UpdateColor() override;
+
+public:
+	Vec2	m_startPos;
+	Vec2	m_endPos;
+
+	Rgba8	m_startPosStartColor;
+	Rgba8	m_startPosEndColor;
+	Rgba8	m_startPosCurrentColor;
+
+	Rgba8	m_endPosStartColor;
+	Rgba8	m_endPosEndColor;
+	Rgba8	m_endPosCurrentColor;
+
+	float	m_thickness;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct DRO_arrow2D : public DebugRenderObject
+{
+
+public:
+	DRO_arrow2D( Vec2 startPos , Rgba8 startPosStartColor , Rgba8 startPosEndColor ,
+		Vec2 endPos , Rgba8 endPosStartColor , Rgba8 endPosEndColor ,
+		float duration = 0.f , float thickness = 1.f );
+
+	DRO_arrow2D( Vec2 startPos , Vec2 endPos ,
+		Rgba8 shaftStartPosStartColor , Rgba8 shaftStartPosEndColor , Rgba8 shaftEndPosStartColor , Rgba8 shaftEndPosEndColor ,
+		Rgba8 tipStartPosStartColor , Rgba8 tipStartPosEndColor , Rgba8 tipEndPosStartColor , Rgba8 tipEndPosEndColor ,
+		float duration = 0.f , float thickness = 1.f );
+
+	DRO_arrow2D( Vec2 startPos , Vec2 endPos , Rgba8 color , float duration = 0.0f , float thickness = 1.f );
+
+	void UpdateColor() override;
+
+public:
+	Vec2	m_startPos;
+	Vec2	m_endPos;
+
+	Rgba8	m_shaftStartPosStartColor;
+	Rgba8	m_shaftStartPosEndColor;
+	Rgba8	m_shaftStartPosCurrentColor;
+
+	Rgba8	m_shaftEndPosStartColor;
+	Rgba8	m_shaftEndPosEndColor;
+	Rgba8	m_shaftEndPosCurrentColor;
+
+	Rgba8	m_tipStartPosStartColor;
+	Rgba8	m_tipStartPosEndColor;
+	Rgba8	m_tipStartPosCurrentColor;
+
+	Rgba8	m_tipEndPosStartColor;
+	Rgba8	m_tipEndPosEndColor;
+	Rgba8	m_tipEndPosCurrentColor;
+
+	float	m_thickness					= 1.f;
+
+};
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -139,3 +223,102 @@ public:
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct DRO_arrow3D : public DebugRenderObject
+{
+
+public:
+	DRO_arrow3D( Vec3 startPos , Rgba8 startPosStartColor , Rgba8 startPosEndColor ,
+				 Vec3 endPos   , Rgba8 endPosStartColor   , Rgba8 endPosEndColor ,
+				 float duration = 0.f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS , float radius = 1.f );
+
+	DRO_arrow3D ( Vec3 startPos , Vec3 endPos ,
+				  Rgba8 shaftStartPosStartColor , Rgba8 shaftStartPosEndColor , Rgba8 shaftEndPosStartColor , Rgba8 shaftEndPosEndColor ,
+				  Rgba8 tipStartPosStartColor	, Rgba8 tipStartPosEndColor	  , Rgba8 tipEndPosStartColor   , Rgba8 tipEndPosEndColor   ,
+	              float duration = 0.f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS , float shaftRadius = 0.9f , float tipRadius = 1.f );
+	
+	DRO_arrow3D( Vec3 startPos , Vec3 endPos , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH , float radius = 1.f );
+
+	void UpdateColor() override;
+
+public:
+	Vec3	m_startPos;
+	Vec3	m_endPos;
+
+	Rgba8 m_shaftStartPosStartColor;
+	Rgba8 m_shaftStartPosEndColor;
+	Rgba8 m_shaftStartPosCurrentColor;
+
+	Rgba8 m_shaftEndPosStartColor;
+	Rgba8 m_shaftEndPosEndColor;
+	Rgba8 m_shaftEndPosCurrentColor;
+
+	Rgba8 m_tipStartPosStartColor;
+	Rgba8 m_tipStartPosEndColor;
+	Rgba8 m_tipStartPosCurrentColor;
+
+	Rgba8 m_tipEndPosStartColor;
+	Rgba8 m_tipEndPosEndColor;
+	Rgba8 m_tipEndPosCurrentColor;
+	
+	float	m_shaftRadius			= 1.f;
+	float	m_tipRadius				= 1.1f * m_shaftRadius; 
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct DRO_aabb3 : public DebugRenderObject
+{
+
+public:
+	DRO_aabb3 ( AABB3 bounds , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH ,
+	            eRasterState rasterState = FILL_SOLID );
+	
+	DRO_aabb3 ( AABB3 bounds , Rgba8 startColor , Rgba8 endColor , float duration = 0.0f ,
+	            eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH , eRasterState rasterState = FILL_SOLID );
+
+	void UpdateColor() override;
+
+public:
+
+	AABB3			m_AABB3;
+	eRasterState	m_rasterState;
+	Rgba8			m_startColor;
+	Rgba8			m_endColor;
+	Rgba8			m_currrentColor;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct DRO_uvSphere : public DebugRenderObject
+{
+
+public:
+	DRO_uvSphere( Vec3 pos , float radius , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH ,
+		eRasterState rasterState = FILL_SOLID );
+
+	DRO_uvSphere( Vec3 pos , float radius , Rgba8 startColor , Rgba8 endColor , float duration = 0.0f ,
+		eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH , eRasterState rasterState = FILL_SOLID );
+
+	DRO_uvSphere( Vec3 pos , float radius , uint hCuts , uint vCuts , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH ,
+		eRasterState rasterState = FILL_SOLID );
+
+	DRO_uvSphere( Vec3 pos , float radius , uint hCuts , uint vCuts , Rgba8 startColor , Rgba8 endColor , float duration = 0.0f ,
+		eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH , eRasterState rasterState = FILL_SOLID );
+
+		
+	void UpdateColor() override;
+
+public:
+
+	Vec3			m_position;
+	float			m_radius;
+	eRasterState	m_rasterState;
+
+	uint			m_hCuts		= 16;
+	uint			m_vCuts		= 8;
+	
+	Rgba8			m_startColor;
+	Rgba8			m_endColor;
+	Rgba8			m_currrentColor;
+};

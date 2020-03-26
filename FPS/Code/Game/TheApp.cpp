@@ -103,6 +103,7 @@ void TheApp::Startup()
 		// instantiating a default DRO_Manager
 		g_currentManager = new DebugRenderObjectsManager();
 	}
+	g_currentManager->Startup();
 // 	if ( g_thePhysicsSystem == nullptr )
 // 	{
 // 		g_thePhysicsSystem = new Physics2D();

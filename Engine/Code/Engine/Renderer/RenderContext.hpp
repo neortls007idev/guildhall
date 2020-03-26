@@ -77,6 +77,8 @@ struct ModelDataT
 
 typedef unsigned uint;
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 class RenderContext
 {
 
@@ -94,11 +96,11 @@ public:
 //			CAMERA METHODS
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	
-	void		ClearScreen( const Rgba8& clearColor );										// Clear Color
-	void		ClearColor( Texture* colorTarget , Rgba8 color );							// TODO :- IMPLEMENT ME
-	void		ClearDepth( Texture* depthStencilTextureTarget , float depth );				// TODO :- TEST ME
-	void		SetDepthTest( eCompareOp compare  = COMPARE_LESS , bool writeOnPass = true );						// TODO :- IMPLEMENT ME
-	Texture*	GetFrameColorTarget();														// TODO :- IMPLEMENT ME
+	void		ClearScreen( const Rgba8& clearColor );											// Clear Color
+	void		ClearColor( Texture* colorTarget , Rgba8 color );								// TODO :- IMPLEMENT ME
+	void		ClearDepth( Texture* depthStencilTextureTarget , float depth );					// TODO :- TEST ME
+	void		SetDepthTest( eCompareOp compare  = COMPARE_LESS , bool writeOnPass = true );						
+	Texture*	GetFrameColorTarget();															// TODO :- IMPLEMENT ME
 	
 	void		BeginCamera( const Camera& camera );
 	void		EndCamera( const Camera& camera);
@@ -159,13 +161,16 @@ public:
 	                float orientationDegrees = 0.f , Vec2 translate = Vec2::ZERO );
 	
 	// Draw Gradient Colored Line in WorldSpace and Transform Relative to World Space Origin
-	void DrawLine( const Vec2& start , const Vec2& end , const Rgba8& startTint , const Rgba8& endTint , float thickness , float scale = 1.f ,
-		float orientationDegrees = 0.f , Vec2 translate = Vec2::ZERO );
+	void DrawLine ( const Vec2& start , const Vec2& end , const Rgba8& startTint , const Rgba8& endTint , float thickness , float scale = 1.f ,
+				   float orientationDegrees = 0.f , Vec2 translate = Vec2::ZERO );
 
 	// Draw Arrow in WorldSpace and Transform Relative to World Space Origin
-	void DrawArrow ( const Vec2& start , const Vec2& end , const Rgba8& color , float thickness , float scale = 1.f ,
-	                 float orientationDegrees = 0.f , Vec2 translate = Vec2::ZERO );
+	void DrawArrow2D ( const Vec2& start , const Vec2& end , const Rgba8& color , float thickness , float scale = 1.f ,
+					   float orientationDegrees = 0.f , Vec2 translate = Vec2::ZERO );
 
+	void DrawArrow2D ( const Vec2&  start , const Vec2& end , const Rgba8& shaftStartColor ,
+	                   const Rgba8& shaftEndColor , const Rgba8& tipStartColor , const Rgba8& tipEndColor , float thickness = 10.f );
+	
 	// Draw Ring in WorldSpace around Center and Transform Relative to World Space Origin
 	void DrawRing ( const Vec2& center , float radius , const Rgba8& color , float thickness , float scale = 1.f ,
 	                float orientationDegrees = 0.f , Vec2 translate = Vec2::ZERO );

@@ -204,6 +204,13 @@ void Camera::SetProjectionPerspective( float fov , float aspectRatio , float nea
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Camera::SetProjectionMatrix( const Mat44& projection )
+{
+	m_projection = projection;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Camera::SetColorTarget( Texture* texture )
 {
 	m_colorTarget = texture;
@@ -226,6 +233,13 @@ void Camera::CreateMatchingDepthStencilTarget()
 void Camera::SetDepthStencilTarget( Texture* texture )
 {
 	m_depthStencilTarget = texture;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Camera::SetCameraTransform( const Transform& newTransform )
+{
+	m_transform = newTransform;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -268,6 +282,19 @@ Vec2 Camera::GetColorTargetSize() const // is needed for depth buffers
 	}
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Camera::SetDepthStencilTargetFromAnotherCamera( Camera* camera )
+{
+	m_depthStencilTarget = camera->GetDepthStencilTarget();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Camera::ResetDepthStencilTarget()
+{
+	m_depthStencilTarget = nullptr;
+}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

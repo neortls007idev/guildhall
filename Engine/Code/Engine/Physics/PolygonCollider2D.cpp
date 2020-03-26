@@ -206,7 +206,7 @@ void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderCol
 		ctx->DrawDisc( bottomMostPoint , 5.f , PURPLE );
 		ctx->DrawDisc( topMostPoint , 5.f , PURPLE );
 
-		ctx->DrawArrow( m_worldPosition , m_worldPosition + GetRigidBody()->GetVelocity() , CYAN , 0.1f * m_width );
+		ctx->DrawArrow2D( m_worldPosition , m_worldPosition + GetRigidBody()->GetVelocity() , CYAN , 0.1f * m_width );
 	}
 
 }
