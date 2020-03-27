@@ -143,9 +143,10 @@ public:
 	void		CreateBlendStates();
 	void		CreateRasterStates();
 	void		CreateTransientRasterState( eRasterState rasterFillMode , eCullMode cullMode , eWindingOrder windingOrder );
-	void		SetCullMode( eCullMode cullMode );							// TODO :- IMPLEMENT ME
-	void		SetFillMode( eRasterState rasterFillMode );					// TODO :- IMPLEMENT ME
-	void		SetWindingOrder( eWindingOrder windingOrder );				// TODO :- IMPLEMENT ME
+	void		SetCullMode( eCullMode cullMode );							
+	void		SetFillMode( eRasterState rasterFillMode );					
+	void		SetWindingOrder( eWindingOrder windingOrder );
+	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			DRAW METHODS
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -190,6 +191,15 @@ public:
 	// Draw AABB2 in WorldSpace
 	void DrawAABB2( const AABB2& box, const Rgba8& tint);
 
+	// Draw AABB2 in WorldSpace with UVs
+	void DrawAABB2( const AABB2& box , const Rgba8& tint , const Vec2& uvAtMins , const Vec2& uvAtMaxs );
+	
+	// Draw Vertically Gradiented AABB2 in WorldSpace
+	void DrawAABB2( const AABB2& box, const Rgba8& startTint , const Rgba8& endTint );
+
+	// Draw Vertically Gradiented AABB2 in WorldSpace with UVs
+	void DrawAABB2( const AABB2& box , const Rgba8& startTint , const Rgba8& endTint , const Vec2& uvAtMins , const Vec2& uvAtMaxs );
+	
 	// Draw OBB2 in WorldSpace
 	void DrawOBB2( const OBB2& box , const Rgba8& tint );
 
@@ -210,6 +220,10 @@ public:
 
 	// Draw AABB2 with Z in WorldSpace
 	void DrawAABB2( const AABB2& box , float z , const Rgba8& tint );
+
+
+	// Draw Textured Quadrilateral in 3D WorldSpace 
+	void DrawQuad3D( Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p3 , AABB2 UVs , Rgba8 startColor , Rgba8 endColor );
 	
 	// Draw AABB3 in WorldSpace
 	//void DrawAABB3( const AABB3& box, const Rgba8& tint);
@@ -257,7 +271,7 @@ public:
 
 	ID3D11BlendState*					m_blendStates[eBlendMode::TOTAL_BLEND_MODES];
 	ID3D11RasterizerState*				m_rasterStates[eBlendMode::TOTAL_BLEND_MODES];
-	ID3D11RasterizerState*				m_defaultRasterState;
+	ID3D11RasterizerState*				m_currentRasterState;
 	ID3D11RasterizerState*				m_transientRaterState;
 
 	RenderBuffer*						m_frameUBO								= nullptr;

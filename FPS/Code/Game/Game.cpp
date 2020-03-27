@@ -68,7 +68,34 @@ Game::Game()
 	m_invertedColorImage.SetDimensions( m_invertedColorImage.GetDimensions() * 0.75f );
 	m_invertedColorImage.AlignWithinAABB2( boxCopy , ALIGN_CENTERED );
 
+
+	std::vector<Vec3> lineStripTest;
+	 
+	lineStripTest.push_back( Vec3( 2 , 2 , -4 ) );
+	lineStripTest.push_back( Vec3( 4 , 4 , -8 ) );
+	lineStripTest.push_back( Vec3( 4 , 10 , -8 ) );
+	lineStripTest.push_back( Vec3( 4 , 10 , -13 ) );
+
+	//DebugAddWorldLine( Vec3(0,0,0 ) ,  Vec3(0,-1,0) , PURPLE , 15.f , DEBUG_RENDER_ALWAYS , 0.5f );
+	
+	//DebugAddWorldLineStrip( ( uint ) lineStripTest.size() , &lineStripTest[0] , GREEN , WHITE , PINK , BLUE , 20.f );
+
+	DebugAddWorldQuad( lineStripTest[ 0 ] , lineStripTest[ 1 ] , lineStripTest[ 2 ] , lineStripTest[ 3 ] ,
+	                   AABB2::ZERO_TO_ONE , WHITE , RED , 10.f , DEBUG_RENDER_USE_DEPTH , m_imageTex );
+	
 	DebugAddScreenPoint( Vec2( 100 , 100 ) , 100.f , RED , BLUE , 5.f );
+
+	DebugAddScreenLine( Vec2( 600 , 400 ) , GREEN , BLUE ,
+						Vec2( 700 , 900 ) , CYAN , YELLOW , 10.f );
+	
+	DebugAddScreenArrow( Vec2( 500 , 300 ) , Vec2( 100 , 100 ) ,
+				GREEN , BLUE , PURPLE , ORANGE ,
+								CYAN , PINK , MAGENTA , YELLOW ,
+	                     5.f , 10.f );
+
+	DebugAddWorldBasis( m_gameCamera.GetCameraTransform().GetAsMatrix() , 10.f );
+	DebugAddScreenTextf( Vec4( -100.f , -100.f , .5f , .5f ) , Vec2::ZERO , 20.f , ORANGE , GREEN ,
+					10.f , " Hello %d %f" , 5 , 22.f );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -233,7 +260,7 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	
 	if ( g_theInput->WasKeyJustPressed( '1' ) )
 	{
-		DebugAddWorldPoint( m_gameCamera.GetPosition() , 1.f, GREEN , CYAN, 5.f , mode );
+		DebugAddWorldPoint( m_gameCamera.GetPosition() , 1.f , Rgba8( 0 , 255 , 0 , 127 ) , Rgba8( 0 , 255 , 0 , 127 ), 5.f , mode );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( '2' ) )

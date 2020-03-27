@@ -27,8 +27,7 @@ public:
 
 	void BeginFrame();																	// Does nothing, here for completeness.
 	void Update( float deltaSeconds );
-	void Render() const;
-
+	
 	void EndFrame();																	// Clean up dead objects
 
 	void CleanupScreenObjects();
@@ -48,17 +47,19 @@ public:
 	void RenderObjectArray( std::vector<DebugRenderObject*>& droArray , Camera* cam );
 	void RenderObjectArrayXRAYPass2( std::vector<DebugRenderObject*>& droArray , Camera* cam );
 	
-	// control
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//				CONTROL
+//--------------------------------------------------------------------------------------------------------------------------------------------
 	void EnableDebugRendering();
 	void DisableDebugRendering();
-
-	// output
+	
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//				OUTPUT
+//--------------------------------------------------------------------------------------------------------------------------------------------
 	void DebugRenderWorldToCamera( Camera* cam );										// Draws all world objects to this camera 
 	void DebugRenderScreenTo( Texture* output );										// Draws all screen objects onto this texture (screen coordinate system is up to you.  I like a 1080p default)
 
 public:
-
-	// Default DebugRenderObject Manager
 	//static DebugRenderObjectsManager				s_debugRender;
 
 	bool											m_isDebugRenderEnabled = true;
@@ -73,14 +74,19 @@ public:
 void DebugRenderWorldToCamera( Camera* cam );										// Draws all world objects to this camera 
 void DebugRenderScreenTo( Texture* output );										// Draws all screen objects onto this texture (screen coordinate system is up to you.  I like a 1080p default)
 
-//------------------------------------------------------------------------
-// World Rendering
-//------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//
+//		WORLD RENDERING
+//		
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-// points
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		3D POINTS
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void DebugAddWorldPoint( Vec3 pos , float size , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode );
 void DebugAddWorldPoint( Vec3 pos , float size , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
-//void DebugAddWorldPoint( Vec3 pos , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+void DebugAddWorldPoint( Vec3 pos , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //		3D LINES
@@ -93,10 +99,19 @@ void DebugAddWorldLine ( Vec3 startPos , Rgba8 startPosStartColor , Rgba8 startP
 void DebugAddWorldLine ( Vec3 start , Vec3 end , Rgba8 color , float duration = 0.0f ,
                          eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH , float radius = 1.f );
 
-// line strip [extra]
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		3D LINESTRIP
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void DebugAddWorldLineStrip( uint count , Vec3 const* positions ,
-	Rgba8 start_p0_color , Rgba8 start_pf_color ,    // color of first/end point at the beginning of duration
-	Rgba8 end_p0_color , Rgba8 end_pf_color ,        // color of first/end point at the end of duration
+	Rgba8 stripStartStartColor , Rgba8 stripStartEndColor ,    // color of first/end point at the beginning of duration
+	Rgba8 stripEndStartColor , Rgba8 stripEndEndColor ,        // color of first/end point at the end of duration
+	float duration ,
+	eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+
+void DebugAddWorldLineStrip( uint count , std::vector<Vec3> positions ,
+	Rgba8 stripStartStartColor , Rgba8 stripStartEndColor ,    // color of first/end point at the beginning of duration
+	Rgba8 stripEndStartColor , Rgba8 stripEndEndColor ,        // color of first/end point at the end of duration
 	float duration ,
 	eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
@@ -119,26 +134,36 @@ void DebugAddWorldArrow( Vec3 startPos , Vec3 endPos ,
 void DebugAddWorldArrow( Vec3 start , Vec3 end , Rgba8 color , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+//		2D QUADS / PLANES in 3D SPACE
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-// Quads
-void DebugAddWorldQuad ( Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p4 , AABB2 uvs , Rgba8 startColor , Rgba8 endColor ,
-                         float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+void DebugAddWorldQuad ( Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p3 , AABB2 UVs , Rgba8 startColor , Rgba8 endColor ,
+                         float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH , Texture* tex = nullptr );
 
-// bounds
-//void DebugAddWorldWireBounds( obb3 bounds , Rgba8 start_color , Rgba8 end_color , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
-//void DebugAddWorldWireBounds( obb3 bounds , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		CUBOIDS / BOUNDS / ORIENTED CUBOIDS / ORIENTED BOUNDS
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+//void DebugAddWorldWireBounds( OBB3 bounds , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+//void DebugAddWorldWireBounds( OBB3 bounds , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 void DebugAddWorldWireBounds( AABB3 bounds , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
 void DebugAddWorldWireSphere( Vec3 pos , float radius , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 void DebugAddWorldWireSphere( Vec3 pos , float radius , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
-// basis
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		3D BASIS
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void DebugAddWorldBasis( Mat44 basis , Rgba8 startTint , Rgba8 endTint , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 void DebugAddWorldBasis( Mat44 basis , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
-// text
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		2D TEXT IN 3D SPACE
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 // non-billboarded will be oriented in the world based on the passed in basis matrix 
-void DebugAddWorldText( Mat44 basis , Vec2 pivot , Rgba8 start_color , Rgba8 end_color , float duration , eDebugRenderMode mode , char const* text );
+void DebugAddWorldText( Mat44 basis , Vec2 pivot , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode , char const* text );
 void DebugAddWorldTextf( Mat44 basis , Vec2 pivot , Rgba8 color , float duration , eDebugRenderMode mode , char const* text , ... );
 void DebugAddWorldTextf( Mat44 basis , Vec2 pivot , Rgba8 color , char const* text , ... ); // assume DEBUG_RENDER_USE_DEPTH
 
@@ -147,7 +172,9 @@ void DebugAddWorldBillboardText( Vec3 origin , Vec2 pivot , Rgba8 start_color , 
 void DebugAddWorldBillboardTextf( Vec3 origin , Vec2 pivot , Rgba8 color , float duration , eDebugRenderMode mode , char const* format , ... );
 void DebugAddWorldBillboardTextf( Vec3 origin , Vec2 pivot , Rgba8 color , char const* format , ... );
 
-// grid [extra] 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		WORLD GRID [ EXTRA ] // TODO :- IMPLEMENT ME
+//--------------------------------------------------------------------------------------------------------------------------------------------
 void DebugAddWorldGrid( Vec3 origin ,
 	Vec3 i , float iMin , float iMax , float iMinorSegment , float iMajorSegment , Rgba8 iMinorColor , Rgba8 iMajorColor , Rgba8 iOriginColor ,
 	Vec3 j , float jMin , float jMax , float jMinorSegment , float jMajorSegment , Rgba8 jMinorcolor , Rgba8 jMajorColor , Rgba8 jOriginColor ,
@@ -156,15 +183,20 @@ void DebugAddWorldXYGrid();
 void DebugAddWorldXZGrid();
 void DebugAddWorldYZGrid();
 
-// mesh [extra]
-void DebugAddWireMeshToWorld( Mat44 transform , GPUMesh* mesh , Rgba8 start_tint , Rgba8 end_tint , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		WIRE MESH [ EXTRA ] // TODO :- IMPLEMENT ME
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddWireMeshToWorld( Mat44 transform , GPUMesh* mesh , Rgba8 startTint , Rgba8 endTint , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 void DebugAddWireMeshToWorld( Mat44 transform , GPUMesh* mesh , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//
+//		SCREEN RENDERING
+//		
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------
-// Screen Rendering
-//------------------------------------------------------------------------
-void DebugRenderSetScreenHeight( float height ); // default to 1080.0f when system starts up.  Meaning (0,0) should always be bottom left, (aspect * height, height) is top right
+void  DebugRenderSetScreenHeight( float height ); // default to 1080.0f when system starts up.  Meaning (0,0) should always be bottom left, (aspect * height, height) is top right
 AABB2 DebugGetScreenBounds();                    // useful if you want to align to top right for something
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -205,26 +237,45 @@ void DebugAddScreenArrow( Vec2 startPos , Vec2 endPos , Rgba8 color , float dura
 //		2D QUADS
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void DebugAddScreenQuad( AABB2 bounds , Rgba8 start_color , Rgba8 end_color , float duration );
+void DebugAddScreenQuad( AABB2 bounds , Rgba8 startColor , Rgba8 endColor , float duration );
 void DebugAddScreenQuad( AABB2 bounds , Rgba8 color , float duration = 0.0f );
 
-// texture
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		2D TEXTURED QUADS
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-void DebugAddScreenTexturedQuad( AABB2 bounds , Texture* tex , AABB2 uvs , Rgba8 start_tint , Rgba8 end_tint , float duration = 0.0f );
-void DebugAddScreenTexturedQuad( AABB2 bounds , Texture* tex , AABB2 uvs , Rgba8 tint , float duration = 0.0f );
-void DebugAddScreenTexturedQuad( AABB2 bounds , Texture* tex , Rgba8 tint = WHITE , float duration = 0.0f ); // assume UVs are full texture
+void DebugAddScreenTexturedQuad( AABB2 bounds , Texture* tex , AABB2 UVs , Rgba8 startTint , Rgba8 endTint , float duration = 0.0f );
+void DebugAddScreenTexturedQuad( AABB2 bounds , Texture* tex , AABB2 UVs , Rgba8 tint , float duration = 0.0f );
+// assumed UVs are full texture
+void DebugAddScreenTexturedQuad( AABB2 bounds , Texture* tex , Rgba8 tint = WHITE , float duration = 0.0f ); 
 
-// text
-void DebugAddScreenText( Vec4 pos , Vec2 pivot , float size , Rgba8 start_color , Rgba8 end_color , float duration , char const* text );
-void DebugAddScreenTextf( Vec4 pos , Vec2 pivot , float size , Rgba8 start_color , Rgba8 end_color , float duration , char const* format , ... );
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		2D TEXT
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+// NOTE VEC4 POS - denotes Vec2 Padding and Vec2 Alignment
+void DebugAddScreenText(  Vec4 pos , Vec2 pivot , float size , Rgba8 startColor , Rgba8 endColor , float duration , char const* text );
+
+// NOTE VEC4 POS - denotes Vec2 Padding and Vec2 Alignment and the Variatic form also printf like typing syntax
+void DebugAddScreenTextf( Vec4 pos , Vec2 pivot , float size , Rgba8 startColor , Rgba8 endColor , float duration , char const* format , ... );
+
+// NOTE VEC4 POS - denotes Vec2 Padding and Vec2 Alignment and the Variatic form also printf like typing syntax
 void DebugAddScreenTextf( Vec4 pos , Vec2 pivot , float size , Rgba8 color , float duration , char const* format , ... );
+
+// Defaults to duration of 5 seconds & NOTE VEC4 POS - denotes Vec2 Padding and Vec2 Alignment and the Variatic form also printf like typing syntax
 void DebugAddScreenTextf( Vec4 pos , Vec2 pivot , float size , Rgba8 color , char const* format , ... );
+
+// Defaults to duration of 5 seconds and size 14 units & NOTE VEC4 POS - denotes Vec2 Padding and Vec2 Alignment and the Variatic form also printf like typing syntax
 void DebugAddScreenTextf( Vec4 pos , Vec2 pivot , Rgba8 color , char const* format , ... );
 
-// screen basis [extra]
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		2D SCREEN BASIS [ EXTRA ]					//		TODO :- IMPLEMENT ME
+//--------------------------------------------------------------------------------------------------------------------------------------------
 void DebugAddScreenBasis( Vec2 screen_origin_location , Mat44 basis_to_render , Rgba8 start_tint , Rgba8 end_tint , float duration );
 void DebugAddScreenBasis( Vec2 screen_origin_location , Mat44 basis_to_render , Rgba8 tint = WHITE , float duration = 0.0f );
 
-// message log system [extra]
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		2D MESSAGE LOG SYSTEM [ EXTRA ]					//		TODO :- IMPLEMENT ME
+//--------------------------------------------------------------------------------------------------------------------------------------------
 void DebugAddMessage( float duration , Rgba8 color , char const* format , ... );
 void DebugAddMessage( Rgba8 color , char const* format , ... );

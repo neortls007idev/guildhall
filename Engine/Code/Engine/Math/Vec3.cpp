@@ -260,6 +260,12 @@ const Vec3 Vec3::GetNormalized() const
 	Vec3 Copy = *this;
 
 	float length = GetLength();
+
+	if ( length <= 0.0001f )
+	{
+		return Copy;
+	}
+	
 	Copy = Copy * ( 1.f / length );
 
 	return Copy;

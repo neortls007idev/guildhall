@@ -28,6 +28,8 @@ public:
 	void		operator=( const Rgba8& copyFrom );				
 	bool		operator==( const Rgba8& compareWith );
 	bool		operator!=( const Rgba8& compareWith );
+	void		operator*=( const float multiplier );
+	void		operator*=( const Rgba8& multipleWith );
 
 	void CycleRGBChannelsClockwise();
 	void CycleRGBChannelsAntiClockwise();

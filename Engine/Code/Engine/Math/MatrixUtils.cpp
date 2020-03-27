@@ -259,6 +259,12 @@ const Mat44 LookAtMatrix( const Vec3& sourceLocation , const Vec3& targetLocatio
 	}
 	
 	Vec3 right		= CrossProduct3D( forward , worldUp ).GetNormalized();
+
+	if ( right.GetLengthSquared() <= 0.001 )
+	{
+		right = CrossProduct3D( forward , Vec3( 0 , 0 , -1 ) );
+	}
+	
 	Vec3 up			= CrossProduct3D( right , forward );
 
 	Mat44 lookAt;

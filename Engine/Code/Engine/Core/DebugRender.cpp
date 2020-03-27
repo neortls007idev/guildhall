@@ -5,10 +5,14 @@
 #include "Engine/Primitives/GPUMesh.hpp"
 #include "Engine/Core/DebugRenderObject.hpp"
 #include "Engine/Time/Timer.hpp"
+#include "StringUtils.hpp"
+#include "Engine/Math/Vec4.hpp"
+#include "Engine/Renderer/BitmapFont.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 extern RenderContext*				g_theRenderer;
+extern BitmapFont*					g_bitmapFont;
 
 	   RenderContext*				g_debugRenderContext	= nullptr;
 	   Camera*						g_debugCamera			= nullptr;
@@ -90,6 +94,7 @@ void DebugRenderScreenTo( Texture* output )
 	g_currentManager->RenderObjectsUseDepth( g_currentManager->m_debugRenderWorldObjectsUseDepth , &camera , eBlendMode::ALPHA );
 	g_currentManager->RenderObjectsXRAY( g_currentManager->m_debugRenderWorldObjectsXRay			, &camera , eBlendMode::ALPHA );
 	g_currentManager->RenderObjectsAlways( g_currentManager->m_debugRenderWorldObjectsAlways		, &camera , eBlendMode::ALPHA );
+
 	g_currentManager->RenderObjectsAlways( g_currentManager->m_debugRenderScreenObjects			, &camera , eBlendMode::ALPHA );
 
 	//g_debugRenderContext->DrawVertexArray( vertices );
@@ -133,6 +138,16 @@ void DebugAddWorldPoint( Vec3 pos , float size , Rgba8 startColor , Rgba8 endCol
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void DebugAddWorldPoint( Vec3 pos , Rgba8 color , float duration /*= 0.0f */ , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DRO_point3D* obj = new DRO_point3D( pos , 1.f , color , color , duration , mode );
+	obj->m_transform.SetPosition( pos );
+
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void DebugAddWorldLine ( Vec3 startPos , Rgba8 startPosStartColor , Rgba8 startPosEndColor , Vec3 endPos ,
                          Rgba8 endPosStartColor , Rgba8 endPosEndColor , float duration , eDebugRenderMode mode ,
                          float radius /*= 1.f */ )
@@ -151,6 +166,58 @@ void DebugAddWorldLine( Vec3 start , Vec3 end , Rgba8 color , float duration /*=
 	DRO_line3D* obj = new DRO_line3D( start , end , color , duration , mode , radius );
 	//obj->m_transform.SetPosition( p0 );
 	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddWorldLineStrip ( uint count , std::vector< Vec3 > positions , Rgba8 stripStartStartColor ,
+                              Rgba8 stripStartEndColor , /* color of first/end point at the beginning of duration */
+                              Rgba8 stripEndStartColor , Rgba8 stripEndEndColor ,
+                              /* color of first/end point at the end of duration */ float duration ,
+                              eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	if ( positions.size() < 2 || count < 2 )
+	{
+		// TODO:- display ext/ message on screen
+		return;
+	}
+	
+	for ( uint index = 1; index < ( count - 1 ); index++ )
+	{
+		DRO_line3D* stripSegmentObj = new DRO_line3D( positions[ index - 1 ] , stripStartStartColor ,
+		                                              stripStartEndColor , positions[ index ] , stripStartStartColor ,
+		                                              stripStartEndColor , duration , mode );
+		g_currentManager->AddDebugObjectTo( WORLDSPACE , stripSegmentObj );
+	}
+	
+	DRO_line3D* stripSegmentObj = new DRO_line3D( positions[ ( positions.size() - 2 ) ] , stripStartStartColor ,
+		stripStartEndColor , positions[ ( positions.size() - 1 ) ] , stripEndStartColor ,
+		stripEndEndColor , duration , mode );
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , stripSegmentObj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddWorldLineStrip( uint count , Vec3 const* positions , Rgba8 stripStartStartColor , Rgba8 stripStartEndColor , /* color of first/end point at the beginning of duration */ Rgba8 stripEndStartColor , Rgba8 stripEndEndColor , /* color of first/end point at the end of duration */ float duration , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	if ( !positions || count < 2 )
+	{
+		// TODO:- display ext/ message on screen
+		return;
+	}
+
+	for ( uint index = 1; index < ( count - 1 ); index++ )
+	{
+		DRO_line3D* stripSegmentObj = new DRO_line3D( positions[ index - 1 ] , stripStartStartColor ,
+			stripStartEndColor , positions[ index ] , stripStartStartColor ,
+			stripStartEndColor , duration , mode );
+		g_currentManager->AddDebugObjectTo( WORLDSPACE , stripSegmentObj );
+	}
+
+	DRO_line3D* stripSegmentObj = new DRO_line3D( positions[ count - 2 ] , stripStartStartColor ,
+		stripStartEndColor , positions[ count - 1 ] , stripEndStartColor ,
+		stripEndEndColor , duration , mode );
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , stripSegmentObj );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -192,6 +259,17 @@ void DebugAddWorldArrow ( Vec3 startPos , Rgba8 startPosStartColor , Rgba8 start
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void DebugAddWorldQuad ( Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p3 , AABB2 UVs , Rgba8 startColor , Rgba8 endColor ,
+                         float duration , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ ,
+                         Texture* tex /*= nullptr */ )
+{
+	DRO_quad3D* obj = new DRO_quad3D( p0 , p1 , p2 , p3 , startColor , endColor , duration , mode , tex , UVs );
+
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void DebugAddWorldWireBounds( AABB3 bounds , Rgba8 color , float duration /*= 0.0f */ , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
 {
 	DRO_aabb3* obj = new DRO_aabb3( bounds , color , duration , mode , eRasterState::WIREFRAME );
@@ -227,7 +305,13 @@ void DebugAddWorldBasis( Mat44 basis , Rgba8 startTint , Rgba8 endTint , float d
 
 void DebugAddWorldBasis( Mat44 basis , float duration /*= 0.0f */ , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
 {
-
+	DRO_arrow3D* iBasis = new DRO_arrow3D( Vec3::ZERO , basis.GetIBasis3D() , RED , duration , mode , 0.1f );
+	DRO_arrow3D* jBasis = new DRO_arrow3D( Vec3::ZERO , basis.GetJBasis3D() , GREEN , duration , mode , 0.1f );
+	DRO_arrow3D* kBasis = new DRO_arrow3D( Vec3::ZERO , basis.GetKBasis3D() , BLUE , duration , mode , 0.1f );
+	
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , iBasis );
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , jBasis );
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , kBasis );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -303,6 +387,108 @@ void DebugAddScreenArrow ( Vec2 startPos , Rgba8 startPosStartColor , Rgba8 star
 void DebugAddScreenArrow( Vec2 startPos , Vec2 endPos , Rgba8 color , float duration /*= 0.0f */ , float thickness /*= 10.f */ )
 {
 	DRO_arrow2D* obj = new DRO_arrow2D( startPos , endPos , color , duration , thickness );
+	g_currentManager->AddDebugObjectTo( SCREENSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddScreenQuad( AABB2 bounds , Rgba8 startColor , Rgba8 endColor , float duration )
+{
+	DRO_quad2D* obj = new DRO_quad2D( bounds , startColor , endColor , startColor , endColor ,
+									  duration , nullptr , AABB2::ZERO_TO_ONE );
+	g_currentManager->AddDebugObjectTo( SCREENSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddScreenQuad( AABB2 bounds , Rgba8 color , float duration /*= 0.0f */ )
+{
+	DRO_quad2D* obj = new DRO_quad2D( bounds , color , color , color , color , duration , nullptr , AABB2::ZERO_TO_ONE );
+	g_currentManager->AddDebugObjectTo( SCREENSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddScreenTexturedQuad( AABB2 bounds , Texture* tex , AABB2 UVs , Rgba8 startTint , Rgba8 endTint , float duration /*= 0.0f */ )
+{
+	DRO_quad2D* obj = new DRO_quad2D( bounds , startTint , endTint , startTint , endTint ,
+									  duration , tex , UVs );
+	g_currentManager->AddDebugObjectTo( SCREENSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddScreenTexturedQuad( AABB2 bounds , Texture* tex , AABB2 UVs , Rgba8 tint , float duration /*= 0.0f */ )
+{
+	DRO_quad2D* obj = new DRO_quad2D( bounds , tint , tint , tint , tint ,
+									  duration , tex , UVs );
+	g_currentManager->AddDebugObjectTo( SCREENSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddScreenTexturedQuad( AABB2 bounds , Texture* tex , Rgba8 tint /*= WHITE */ , float duration /*= 0.0f */ )
+{
+	DRO_quad2D* obj = new DRO_quad2D( bounds , tint , tint , tint , tint ,
+									  duration , tex , AABB2::ZERO_TO_ONE );
+	g_currentManager->AddDebugObjectTo( SCREENSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddScreenText( Vec4 pos , Vec2 pivot , float size , Rgba8 startColor , Rgba8 endColor , float duration , char const* text )
+{
+	std::string str = text;
+
+	DRO_text2D* obj = new DRO_text2D( str , pos , pivot , startColor , endColor , size , duration );
+	g_currentManager->AddDebugObjectTo( SCREENSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddScreenTextf( Vec4 pos , Vec2 pivot , float size , Rgba8 color , float duration , char const* format , ... )
+{
+	va_list args;
+	va_start( args , format );
+	std::string str = Stringv( format , args );
+
+	DRO_text2D* obj = new DRO_text2D( str , pos , pivot , color , size , duration );
+	g_currentManager->AddDebugObjectTo( SCREENSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddScreenTextf( Vec4 pos , Vec2 pivot , float size , Rgba8 startColor , Rgba8 endColor , float duration , char const* format , ... )
+{
+	va_list args;
+	va_start( args , format );
+	std::string str = Stringv( format , args );
+
+	DRO_text2D* obj = new DRO_text2D( str , pos , pivot , startColor , endColor , size , duration );
+	g_currentManager->AddDebugObjectTo( SCREENSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddScreenTextf( Vec4 pos , Vec2 pivot , float size , Rgba8 color , char const* format , ... )
+{
+	va_list args;
+	va_start( args , format );
+	std::string str = Stringv( format , args );
+
+	DRO_text2D* obj = new DRO_text2D( str , pos , pivot , color , size , 5.f );
+	g_currentManager->AddDebugObjectTo( SCREENSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddScreenTextf( Vec4 pos , Vec2 pivot , Rgba8 color , char const* format , ... )
+{
+	va_list args;
+	va_start( args , format );
+	std::string str = Stringv( format , args );
+
+	DRO_text2D* obj = new DRO_text2D( str , pos , pivot , color , 14.f , 5.f );
 	g_currentManager->AddDebugObjectTo( SCREENSPACE , obj );
 }
 
@@ -394,6 +580,8 @@ void DebugRenderObjectsManager::DisableDebugRendering()
 void DebugRenderObjectsManager::DebugRenderWorldToCamera( Camera* cam )
 {
 	UNUSED( cam );
+	// TODO :- Implemement me
+	DEBUGBREAK();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -417,54 +605,9 @@ void DebugRenderObjectsManager::DebugRenderScreenTo( Texture* output )
 
 	g_debugRenderContext->BeginCamera( camera );
 
-	// 	foreach( object )
-	// 	{
-	// 		AppendObjectToVertexArray( vertices , indices , obj );
-	// 		if ( obj->IsOld() )
-	// 		{
-	// 			obj->MarkForGarbage();
-	// 		}
-	// 	}
-
-// 	for ( size_t index = 0 ; index < m_debugRenderScreenObjects.size() ; index++ )
-// 	{
-// 		if ( m_debugRenderScreenObjects[ index ] != nullptr )
-// 		{
-// 			eDebugRenderObjectType objType = m_debugRenderScreenObjects[ index ]->m_objectType;
-// 
-// 			switch ( objType )
-// 			{
-// 			case DRO_INVALID:
-// 			{
-// 				ASSERT_OR_DIE( true ," INCORRECT DEBUG OBJECT TYPE " );
-// 			}break;
-// 
-// 			case DRO_POINT2D:
-// 			{
-// 							
-// 			}
-// 				break;
-// 			case DRO_POINT3D:
-// 				break;
-// 			case DRO_LINE2D:
-// 				break;
-// 			case DRO_LINE3D:
-// 				break;
-// 			case DRO_ARROW2D:
-// 				break;
-// 			case DRO_ARROW3D:
-// 				break;
-// 			case DRO_SPHERE:
-// 				break;
-// 			case DRO_SPHERE_WIREFRAME:
-// 				break;
-// 			default:
-// 				break;
-// 			}
-// 		}
-// 	}
-
-	//g_debugRenderContext->DrawVertexArray( vertices );
+	// TODO :- Implemement me
+	DEBUGBREAK();
+	
 	g_debugRenderContext->EndCamera( camera );
 }
 
@@ -623,7 +766,6 @@ void DebugRenderObjectsManager::RenderObjectsXRAY( std::vector<DebugRenderObject
 
 void DebugRenderObjectsManager::RenderObjectArray( std::vector<DebugRenderObject*>& droArray , Camera* cam )
 {
-	
 	for ( size_t index = 0; index < droArray.size(); index++ )
 	{
 		if ( droArray[ index ] == nullptr )
@@ -631,128 +773,205 @@ void DebugRenderObjectsManager::RenderObjectArray( std::vector<DebugRenderObject
 			continue;
 		}
 		g_debugRenderContext->BindShader( nullptr );
-		g_debugRenderContext->SetRasterState( FILL_SOLID );
+		//g_debugRenderContext->SetRasterState( FILL_SOLID );
 		g_debugRenderContext->BindTexture( nullptr );
 		
 		eDebugRenderObjectType objType = droArray[ index ]->m_objectType;
 
 		switch ( objType )
 		{
-		case DRO_INVALID:
-		{
-			ASSERT_OR_DIE( true , "INVALID DEBUG OBJECT TYPE" );
-		}	break;
+			case DRO_INVALID:
+			{
+				ASSERT_OR_DIE( true , "INVALID DEBUG OBJECT TYPE" );
+			}	break;
 
-		case DRO_POINT2D:
-		{
-			DRO_point2D* point2D = ( DRO_point2D* ) droArray[ index ];
+			case DRO_POINT2D:
+			{
+				DRO_point2D* point2D = ( DRO_point2D* ) droArray[ index ];
 
-			g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
-			g_debugRenderContext->SetModelMatrix( point2D->m_transform.GetAsMatrix() );
-			g_debugRenderContext->DrawDisc( point2D->m_position , point2D->m_size , point2D->m_currrentColor );
+				g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
+				g_debugRenderContext->SetModelMatrix( point2D->m_transform.GetAsMatrix() );
+				g_debugRenderContext->DrawDisc( point2D->m_position , point2D->m_size , point2D->m_currrentColor );
 
-		}break;
+			}break;
+
+			case DRO_LINE2D:
+			{
+				DRO_line2D* line2D = ( DRO_line2D* ) droArray[ index ];
+
+				g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
+				g_debugRenderContext->SetModelMatrix( line2D->m_transform.GetAsMatrix() );
+				g_debugRenderContext->DrawLine( line2D->m_startPos , line2D->m_endPos , line2D->m_startPosCurrentColor ,
+				                                line2D->m_endPosCurrentColor , line2D->m_thickness );
+
+			}break;
+
+			case DRO_ARROW2D:
+			{
+				DRO_arrow2D* arrow2D = ( DRO_arrow2D* ) droArray[ index ];
+
+				g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
+				g_debugRenderContext->SetModelMatrix( arrow2D->m_transform.GetAsMatrix() );
+				g_debugRenderContext->DrawArrow2D( arrow2D->m_startPos , arrow2D->m_endPos ,
+				                                   arrow2D->m_shaftStartPosCurrentColor ,
+				                                   arrow2D->m_shaftEndPosCurrentColor , arrow2D->m_tipStartPosCurrentColor ,
+				                                   arrow2D->m_tipEndPosCurrentColor , arrow2D->m_thickness );
+
+			}break;
+
+			case DRO_QUAD2D:
+			{
+				DRO_quad2D* quad2D = ( DRO_quad2D* ) droArray[ index ];
+
+				g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
+				g_debugRenderContext->SetModelMatrix( quad2D->m_transform.GetAsMatrix() );
+				g_debugRenderContext->BindTexture( quad2D->m_texture );
+				g_debugRenderContext->DrawAABB2( quad2D->m_bounds , quad2D->m_startPosCurrentColor ,
+				                                 quad2D->m_endPosCurrentColor , quad2D->m_texUVs.m_mins ,
+				                                 quad2D->m_texUVs.m_maxs );
+				g_debugRenderContext->BindTexture( nullptr );
+
+			}break;
+
+			case DRO_TEXT2D:
+			{
+				DRO_text2D* text2D = ( DRO_text2D* ) droArray[ index ];
+
+				g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
+				g_debugRenderContext->SetModelMatrix( text2D->m_transform.GetAsMatrix() );
+				g_debugRenderContext->BindTexture( g_bitmapFont->GetTexture() );
+
+				std::vector<Vertex_PCU> textVerts;
+				AABB2 screenArea( cam->GetOrthoMin().GetXYComponents() , cam->GetOrthoMax().GetXYComponents() );
+				Vec2 textPos( text2D->m_screenPositionOffsetRatio.x , text2D->m_screenPositionOffsetRatio.y );
+
+				screenArea.m_mins += textPos;
+				screenArea.m_maxs += textPos;
+									
+				Vec2 alignment( text2D->m_screenPositionOffsetRatio.z , text2D->m_screenPositionOffsetRatio.w );
+					
+				g_bitmapFont->AddVertsForTextInBox2D( textVerts , screenArea , text2D->m_size , text2D->m_text , text2D->m_currrentColor , 1.67f , alignment );
+				g_debugRenderContext->DrawVertexArray( textVerts );
+				g_debugRenderContext->BindTexture( nullptr );
+
+			}break;
 			
-		case DRO_POINT3D:
-		{
-			DRO_point3D* point3D = ( DRO_point3D* ) droArray[ index ];
+			case DRO_POINT3D:
+			{
+				DRO_point3D* point3D = ( DRO_point3D* ) droArray[ index ];
 
-			g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
-			std::vector<Vertex_PCU> pointMeshVerts;
-			std::vector<uint>		pointIndices;
-			CreateUVSphere( 16 , 8 , pointMeshVerts , pointIndices , point3D->m_size , Vec3::ZERO , point3D->m_currrentColor );
-			GPUMesh pointMesh( g_debugRenderContext );
-			pointMesh.UpdateVertices( pointMeshVerts );
-			pointMesh.UpdateIndices( pointIndices );
+				g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
+				std::vector<Vertex_PCU> pointMeshVerts;
+				std::vector<uint>		pointIndices;
+				CreateUVSphere( 16 , 8 , pointMeshVerts , pointIndices , point3D->m_size , Vec3::ZERO , point3D->m_currrentColor );
+				GPUMesh pointMesh( g_debugRenderContext );
+				pointMesh.UpdateVertices( pointMeshVerts );
+				pointMesh.UpdateIndices( pointIndices );
 
-			g_debugRenderContext->SetModelMatrix( point3D->m_transform.GetAsMatrix() );
-			g_debugRenderContext->DrawMesh( &pointMesh );
+				g_debugRenderContext->SetModelMatrix( point3D->m_transform.GetAsMatrix() );
+				g_debugRenderContext->DrawMesh( &pointMesh );
 
-		}break;
+			}break;
 
-		case DRO_LINE3D:
-		{
-			DRO_line3D* line3D = ( DRO_line3D* ) droArray[ index ];
+			case DRO_LINE3D:
+			{
+				DRO_line3D* line3D = ( DRO_line3D* ) droArray[ index ];
 
-			g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
-			std::vector<Vertex_PCU> line3DMeshVerts;
-			std::vector<uint>		line3DIndices;
-			CreateCylinder( line3DMeshVerts , line3DIndices , line3D->m_radius , line3D->m_startPos ,
-				line3D->m_endPos , line3D->m_startPosCurrentColor , line3D->m_endPosCurrentColor );
+				g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
+				std::vector<Vertex_PCU> line3DMeshVerts;
+				std::vector<uint>		line3DIndices;
+				CreateCylinder( line3DMeshVerts , line3DIndices , line3D->m_radius , line3D->m_startPos ,
+					line3D->m_endPos , line3D->m_startPosCurrentColor , line3D->m_endPosCurrentColor );
 
-			GPUMesh line3DMesh( g_debugRenderContext );
-			line3DMesh.UpdateVertices( line3DMeshVerts );
-			line3DMesh.UpdateIndices( line3DIndices );
+				GPUMesh line3DMesh( g_debugRenderContext );
+				line3DMesh.UpdateVertices( line3DMeshVerts );
+				line3DMesh.UpdateIndices( line3DIndices );
 
-			g_debugRenderContext->SetModelMatrix( line3D->m_transform.GetAsMatrix() );
-			g_debugRenderContext->DrawMesh( &line3DMesh );
+				g_debugRenderContext->SetModelMatrix( line3D->m_transform.GetAsMatrix() );
+				g_debugRenderContext->DrawMesh( &line3DMesh );
 
-		}break;
+			}break;
 
-		case DRO_ARROW3D:
-		{
-			DRO_arrow3D* arrow3D = ( DRO_arrow3D* ) droArray[ index ];
+			case DRO_ARROW3D:
+			{
+				DRO_arrow3D* arrow3D = ( DRO_arrow3D* ) droArray[ index ];
 
-			g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
-			std::vector<Vertex_PCU> arrow3DMeshVerts;
-			std::vector<uint>		arrow3DIndices;
-			CreateArrow3D( arrow3DMeshVerts , arrow3DIndices , arrow3D->m_shaftRadius , arrow3D->m_tipRadius ,
-				arrow3D->m_startPos , arrow3D->m_endPos ,
-				arrow3D->m_shaftStartPosCurrentColor , arrow3D->m_shaftEndPosCurrentColor ,
-				arrow3D->m_tipStartPosCurrentColor , arrow3D->m_tipEndPosCurrentColor );
+				g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
+				std::vector<Vertex_PCU> arrow3DMeshVerts;
+				std::vector<uint>		arrow3DIndices;
+				CreateArrow3D( arrow3DMeshVerts , arrow3DIndices , arrow3D->m_shaftRadius , arrow3D->m_tipRadius ,
+					arrow3D->m_startPos , arrow3D->m_endPos ,
+					arrow3D->m_shaftStartPosCurrentColor , arrow3D->m_shaftEndPosCurrentColor ,
+					arrow3D->m_tipStartPosCurrentColor , arrow3D->m_tipEndPosCurrentColor );
 
-			GPUMesh arrow3DMesh( g_debugRenderContext );
-			arrow3DMesh.UpdateVertices( arrow3DMeshVerts );
-			arrow3DMesh.UpdateIndices( arrow3DIndices );
+				GPUMesh arrow3DMesh( g_debugRenderContext );
+				arrow3DMesh.UpdateVertices( arrow3DMeshVerts );
+				arrow3DMesh.UpdateIndices( arrow3DIndices );
 
-			g_debugRenderContext->SetModelMatrix( arrow3D->m_transform.GetAsMatrix() );
-			g_debugRenderContext->DrawMesh( &arrow3DMesh );
+				g_debugRenderContext->SetModelMatrix( arrow3D->m_transform.GetAsMatrix() );
+				g_debugRenderContext->DrawMesh( &arrow3DMesh );
+					
+			}break;
+
+			case DRO_AABB3:
+			{
+				DRO_aabb3* box = ( DRO_aabb3* ) droArray[ index ];
+
+				g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
+				std::vector<Vertex_PCU> boxMeshVerts;
+				std::vector<uint>		boxIndices;
+				CreateCuboid( boxMeshVerts , boxIndices , box->m_AABB3 , box->m_currrentColor );
+
+				GPUMesh boxMesh( g_debugRenderContext );
+				boxMesh.UpdateVertices( boxMeshVerts );
+				boxMesh.UpdateIndices( boxIndices );
+
+				g_debugRenderContext->SetRasterState( box->m_rasterState );
+				g_debugRenderContext->SetModelMatrix( box->m_transform.GetAsMatrix() );
+				g_debugRenderContext->DrawMesh( &boxMesh );
+					
+			}break;
+
+
+			case DRO_QUAD3D:
+			{
+				DRO_quad3D* quad = ( DRO_quad3D* ) droArray[ index ];
+
+				g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
+	
+				g_debugRenderContext->SetModelMatrix( quad->m_transform.GetAsMatrix() );
+				g_debugRenderContext->BindTexture( quad->m_texture );
+				g_debugRenderContext->DrawQuad3D( quad->m_vert0 , quad->m_vert1 , quad->m_vert2 , quad->m_vert3 ,
+				                                  quad->m_texUVs , quad->m_startPosCurrentColor ,
+				                                  quad->m_startPosCurrentColor );
+				g_debugRenderContext->BindTexture( nullptr );
+
+			}break;
+
+			case DRO_UVSPHERE:
+			{
+				DRO_uvSphere* uvSphere = ( DRO_uvSphere* ) droArray[ index ];
+
+				g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
+				std::vector<Vertex_PCU> uvSphereMeshVerts;
+				std::vector<uint>		uvSphereIndices;
+				CreateUVSphere( 8,4 , uvSphereMeshVerts , uvSphereIndices , uvSphere->m_radius , uvSphere->m_position , uvSphere->m_currrentColor );
 				
-		}break;
+				GPUMesh uvSphereMesh( g_debugRenderContext );
+				uvSphereMesh.UpdateVertices( uvSphereMeshVerts );
+				uvSphereMesh.UpdateIndices( uvSphereIndices );
 
-		case DRO_AABB3:
-		{
-			DRO_aabb3* box = ( DRO_aabb3* ) droArray[ index ];
+				g_debugRenderContext->SetRasterState( uvSphere->m_rasterState );
+				g_debugRenderContext->SetModelMatrix( uvSphere->m_transform.GetAsMatrix() );
+				g_debugRenderContext->DrawMesh( &uvSphereMesh );
 
-			g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
-			std::vector<Vertex_PCU> boxMeshVerts;
-			std::vector<uint>		boxIndices;
-			CreateCuboid( boxMeshVerts , boxIndices , box->m_AABB3 , box->m_currrentColor );
-
-			GPUMesh boxMesh( g_debugRenderContext );
-			boxMesh.UpdateVertices( boxMeshVerts );
-			boxMesh.UpdateIndices( boxIndices );
-
-			g_debugRenderContext->SetRasterState( box->m_rasterState );
-			g_debugRenderContext->SetModelMatrix( box->m_transform.GetAsMatrix() );
-			g_debugRenderContext->DrawMesh( &boxMesh );
+			}break;
 				
-		}break;
-
-		case DRO_UVSPHERE:
-		{
-			DRO_uvSphere* uvSphere = ( DRO_uvSphere* ) droArray[ index ];
-
-			g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
-			std::vector<Vertex_PCU> uvSphereMeshVerts;
-			std::vector<uint>		uvSphereIndices;
-			CreateUVSphere( 8,4 , uvSphereMeshVerts , uvSphereIndices , uvSphere->m_radius , uvSphere->m_position , uvSphere->m_currrentColor );
-			
-			GPUMesh uvSphereMesh( g_debugRenderContext );
-			uvSphereMesh.UpdateVertices( uvSphereMeshVerts );
-			uvSphereMesh.UpdateIndices( uvSphereIndices );
-
-			g_debugRenderContext->SetRasterState( uvSphere->m_rasterState );
-			g_debugRenderContext->SetModelMatrix( uvSphere->m_transform.GetAsMatrix() );
-			g_debugRenderContext->DrawMesh( &uvSphereMesh );
-
-		}break;
-			
-		default:
-		{
-			ASSERT_RECOVERABLE( true , "ARE YOU SURE YOU WANT TO RENDER A 2D OBJECT IN A PROJECTIVE CAMERA" );
-		}
-		break;
+			default:
+			{
+				ASSERT_RECOVERABLE( true , "ARE YOU SURE YOU WANT TO RENDER A 2D OBJECT IN A PROJECTIVE CAMERA" );
+			}
+			break;
 		}
 	}
 }
@@ -782,10 +1001,7 @@ void DebugRenderObjectsManager::RenderObjectArrayXRAYPass2( std::vector<DebugRen
 			DRO_point3D* point3D = ( DRO_point3D* ) droArray[ index ];
 			Rgba8 pointColorCopy = point3D->m_currrentColor;
 
-			pointColorCopy.r *= 0.5f;
-			pointColorCopy.g *= 0.5f;
-			pointColorCopy.b *= 0.5f;
-			pointColorCopy.a *= 0.5f;
+			pointColorCopy *= 0.5f;
 				
 			g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
 			std::vector<Vertex_PCU> pointMeshVerts;
@@ -808,10 +1024,10 @@ void DebugRenderObjectsManager::RenderObjectArrayXRAYPass2( std::vector<DebugRen
 		{
 			DRO_line3D* line3D = ( DRO_line3D* ) droArray[ index ];
 			Rgba8 lineStartColorCopy = line3D->m_startPosCurrentColor;
-			lineStartColorCopy.a *= 0.5f;
+			lineStartColorCopy *= 0.5f;
 
 			Rgba8 lineEndColorCopy = line3D->m_endPosCurrentColor;
-			lineEndColorCopy.a *= 0.5f;
+			lineEndColorCopy *= 0.5f;
 				
 			g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
 			std::vector<Vertex_PCU> line3DMeshVerts;
@@ -837,16 +1053,16 @@ void DebugRenderObjectsManager::RenderObjectArrayXRAYPass2( std::vector<DebugRen
 		{
 			DRO_arrow3D* arrow3D = ( DRO_arrow3D* ) droArray[ index ];
 			Rgba8 shaftStartColorCopy = arrow3D->m_shaftStartPosCurrentColor;
-			shaftStartColorCopy.a *= 0.5f;
+			shaftStartColorCopy *= 0.5f;
 
 			Rgba8 shaftEndColorCopy = arrow3D->m_shaftEndPosCurrentColor;
-			shaftEndColorCopy.a *= 0.5f;
+			shaftEndColorCopy *= 0.5f;
 
 			Rgba8 tipStartColorCopy = arrow3D->m_tipStartPosCurrentColor;
-			tipStartColorCopy.a *= 0.5f;
+			tipStartColorCopy *= 0.5f;
 
 			Rgba8 tipEndColorCopy = arrow3D->m_tipEndPosCurrentColor;
-			tipEndColorCopy.a *= 0.5f;
+			tipEndColorCopy *= 0.5f;
 				
 			g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
 			std::vector<Vertex_PCU> arrow3DMeshVerts;

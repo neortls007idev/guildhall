@@ -223,6 +223,8 @@ void RenderContext::BeginFrame()
 
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void RenderContext::UpdateFrameTime( float deltaSeconds )
 {
 	FrameDataT frameData;
@@ -435,9 +437,11 @@ void RenderContext::SetRasterState( eRasterState rasterState )
 	{
 		case FILL_SOLID :
 							m_context->RSSetState( m_rasterStates[ eRasterState::FILL_SOLID ] );
+							m_currentRasterState = m_rasterStates[ eRasterState::FILL_SOLID ];
 							break;
 		case WIREFRAME :
 							m_context->RSSetState( m_rasterStates[ eRasterState::WIREFRAME ] );
+							m_currentRasterState = m_rasterStates[ eRasterState::WIREFRAME ];
 							break;
 	}
 }
@@ -449,6 +453,7 @@ void RenderContext::SetTransientRasterStateAsRasterState()
 	if ( m_transientRaterState )
 	{
 		m_context->RSSetState( m_transientRaterState );
+		m_currentRasterState = m_transientRaterState;
 	}
 }
 
@@ -723,7 +728,6 @@ void RenderContext::CreateRasterStates()
 
 void RenderContext::CreateTransientRasterState( eRasterState rasterFillMode , eCullMode cullMode , eWindingOrder windingOrder )
 {
-
 	if ( m_transientRaterState )
 	{
 		D3D11_RASTERIZER_DESC currentRSDesc;
@@ -760,6 +764,66 @@ void RenderContext::CreateTransientRasterState( eRasterState rasterFillMode , eC
 	desc.AntialiasedLineEnable = FALSE;
 
 	m_device->CreateRasterizerState( &desc , &m_transientRaterState );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::SetCullMode( eCullMode cullMode )
+{
+	D3D11_RASTERIZER_DESC currentRasterStateDesc;
+	m_currentRasterState->GetDesc( &currentRasterStateDesc );
+
+	if ( currentRasterStateDesc.CullMode != GetD3D11CullMode( cullMode ) )
+	{
+		CreateTransientRasterState( GetFillModeForD3D11RasterState( currentRasterStateDesc.FillMode ) , cullMode ,
+									GetWindingOrderForD3D11WindingOrder( currentRasterStateDesc.FrontCounterClockwise ) );
+
+		SetTransientRasterStateAsRasterState();
+	}
+	else
+	{
+		m_context->RSSetState( m_currentRasterState );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::SetFillMode( eRasterState rasterFillMode )
+{
+	D3D11_RASTERIZER_DESC currentRasterStateDesc;
+	m_currentRasterState->GetDesc( &currentRasterStateDesc );
+	
+	if ( currentRasterStateDesc.FillMode != GetD3D11FillMode( rasterFillMode ) )
+	{
+		CreateTransientRasterState( rasterFillMode , GetCullModeForD3D11CullMode( currentRasterStateDesc.CullMode ) ,
+									GetWindingOrderForD3D11WindingOrder( currentRasterStateDesc.FrontCounterClockwise ) );
+
+		SetTransientRasterStateAsRasterState();
+	}
+	else
+	{
+		m_context->RSSetState( m_currentRasterState );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::SetWindingOrder( eWindingOrder windingOrder )
+{
+	D3D11_RASTERIZER_DESC currentRasterStateDesc;
+	m_currentRasterState->GetDesc( &currentRasterStateDesc );
+
+	if ( currentRasterStateDesc.FrontCounterClockwise != GetWindingOrder( windingOrder ) )
+	{
+		CreateTransientRasterState( GetFillModeForD3D11RasterState( currentRasterStateDesc.FillMode ) ,
+		                            GetCullModeForD3D11CullMode( currentRasterStateDesc.CullMode ) , windingOrder );
+
+		SetTransientRasterStateAsRasterState();
+	}
+	else
+	{
+		m_context->RSSetState( m_currentRasterState );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -888,20 +952,6 @@ void RenderContext::DrawMesh( const GPUMesh* mesh )
 {
 	
 	BindVertexBuffer( mesh->GetVertexBuffer() );
-// 	UpdateLayoutIfNeeded(); // based on currentVertex buffer & CurrentShader
-// 	{
-// 		 buffer_attribute_t const* m_currentLayout;
-// 		 buffer_attribute_t const* m_prevoiuslyBoundLayout;
-// 
-// 		if( m_currentlyBoundLayout != m_currentLayout = m_immediateVBO->GetLayout() )
-// 		|| ( m_hasShaderChanged )
-// 		{
-// 			ID3D11InputLayout* layout = m_currentShader->GetOrCreateInputLayout( m_currentLayout );
-// 			m_context->IASetInputLayput ( layout );
-// 			m_previouslyBoundLayout = m_currentlLayout;
-// 			m_chaderHasChanged = false;
-// 		}
-// 	}
 
 	bool hasIndices = mesh->GetIndexCount();
 
@@ -915,6 +965,8 @@ void RenderContext::DrawMesh( const GPUMesh* mesh )
 		Draw( mesh->GetVertexCount() , 0 );
 	}
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void RenderContext::DrawLine( const Vec2& start , const Vec2& end , const Rgba8& startTint , const Rgba8& endTint , float thickness , float scale /*= 1.f */ , float orientationDegrees /*= 0.f */ , Vec2 translate /*= Vec2::ZERO */ )
 {
@@ -944,7 +996,11 @@ void RenderContext::DrawLine( const Vec2& start , const Vec2& end , const Rgba8&
 	DrawVertexArray( 6 , lineVerts );
 }
 
-void RenderContext::DrawArrow2D( const Vec2& start , const Vec2& end , const Rgba8& color , float thickness , float scale /*= 1.f */ , float orientationDegrees /*= 0.f */ , Vec2 translate /*= Vec2::ZERO */ )
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::DrawArrow2D ( const Vec2& start , const Vec2& end , const Rgba8& color , float thickness ,
+                                  float scale /*= 1.f */ , float orientationDegrees /*= 0.f */ ,
+                                  Vec2 translate /*= Vec2::ZERO */ )
 {
 	Vec2 displacement = end - start;
 	Vec2 forward = displacement.GetNormalized();
@@ -1023,9 +1079,9 @@ void RenderContext::DrawArrow2D ( const Vec2& start , const Vec2& end , const Rg
 
 	Vertex_PCU triangle[ 3 ] =
 	{
-		Vertex_PCU( Vec3( end + forward,0.f ),tipStartColor,Vec2::ZERO ),
+		Vertex_PCU( Vec3( end + forward,0.f ),tipEndColor,Vec2::ZERO ),
 		Vertex_PCU( Vec3( end - leftVert,0.f ),tipStartColor,Vec2::ZERO ),
-		Vertex_PCU( Vec3( end - righttVert,0.f ),tipEndColor,Vec2::ZERO ),
+		Vertex_PCU( Vec3( end - righttVert,0.f ),tipStartColor,Vec2::ZERO ),
 	};
 
 	DrawVertexArray( 3 , triangle );
@@ -1084,6 +1140,71 @@ void RenderContext::DrawAABB2( const AABB2& box , float z , const Rgba8& tint )
 								Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,z ) , tint, Vec2( 0.f, 1.f ) ) };
 
 	DrawVertexArray( 6 , AABB2Verts );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::DrawAABB2( const AABB2& box , const Rgba8& startTint , const Rgba8& endTint )
+{
+	
+	const Vertex_PCU AABB2Verts[ 6 ] = {
+								Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y, 0.f ) , startTint, Vec2( 0.f, 0.f ) ),
+								Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y, 0.f ) , endTint, Vec2( 1.f, 0.f ) ),
+								Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y, 0.f ) , endTint, Vec2( 0.f, 1.f ) ),
+																			 
+								Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y, 0.f ) , endTint, Vec2( 1.f, 0.f ) ),
+								Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y, 0.f ) , startTint, Vec2( 1.f, 1.f ) ),
+								Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y, 0.f ) , startTint, Vec2( 0.f, 1.f ) ) };
+
+	DrawVertexArray( 6 , AABB2Verts );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::DrawAABB2( const AABB2& box , const Rgba8& tint , const Vec2& uvAtMins , const Vec2& uvAtMaxs )
+{
+	const Vertex_PCU AABB2Verts[ 6 ] = {
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,0.f ) , tint, uvAtMins ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,0.f ) , tint, Vec2( uvAtMaxs.x, uvAtMins.y ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,0.f ) , tint, Vec2( uvAtMins.x, uvAtMaxs.y ) ),
+
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,0.f ) , tint, Vec2( uvAtMaxs.x, uvAtMins.y ) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,0.f ) , tint, uvAtMaxs ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,0.f ) , tint, Vec2( uvAtMins.x, uvAtMaxs.y ) ) };
+
+	DrawVertexArray( 6 , AABB2Verts );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::DrawAABB2( const AABB2& box , const Rgba8& startTint , const Rgba8& endTint , const Vec2& uvAtMins , const Vec2& uvAtMaxs )
+{
+	const Vertex_PCU AABB2Verts[ 6 ] = {
+							Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y, 0.f ) , startTint, uvAtMins ),
+							Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y, 0.f ) , endTint  , Vec2( uvAtMins.x, uvAtMaxs.y ) ),
+							Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y, 0.f ) , endTint  , Vec2( uvAtMaxs.x, uvAtMins.y ) ),
+
+							Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y, 0.f ) , endTint  , Vec2( uvAtMaxs.x, uvAtMins.y ) ),
+							Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y, 0.f ) , startTint, uvAtMaxs ),
+							Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y, 0.f ) , startTint, Vec2( uvAtMins.x, uvAtMaxs.y ) ) };
+
+	DrawVertexArray( 6 , AABB2Verts );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::DrawQuad3D( Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p3 , AABB2 UVs , Rgba8 startColor , Rgba8 endColor )
+{
+	const Vertex_PCU quadVerts[ 6 ] = {
+						Vertex_PCU( p0 , startColor, UVs.m_mins ),
+						Vertex_PCU( p1 , endColor  , Vec2( UVs.m_maxs.x, UVs.m_mins.y ) ),
+						Vertex_PCU( p3 , endColor  , Vec2( UVs.m_mins.x, UVs.m_maxs.y ) ),
+
+						Vertex_PCU( p1 , endColor  , Vec2( UVs.m_maxs.x, UVs.m_mins.y ) ),
+						Vertex_PCU( p2 , startColor, UVs.m_maxs ),
+						Vertex_PCU( p3 , startColor, Vec2( UVs.m_mins.x, UVs.m_maxs.y ) ) };
+
+	DrawVertexArray( 6 , quadVerts );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

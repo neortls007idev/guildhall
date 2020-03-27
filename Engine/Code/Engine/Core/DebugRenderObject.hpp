@@ -1,17 +1,19 @@
 ﻿#pragma once
 
 #include "Engine/Math/Transform.hpp"
+#include "Engine/Math/Vec4.hpp"
+#include "Engine/Primitives/AABB2.hpp"
+#include "Engine/Primitives/AABB3.hpp"
 #include "Engine/Renderer/Camera.hpp"
+#include "Engine/Renderer/D3D11Utils.hpp"
 
 #include <vector>
 
-#include "Engine/Primitives/AABB3.hpp"
-#include "Engine/Renderer/D3D11Utils.hpp"
-
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-struct AABB3;
-class Timer;
+struct	AABB3;
+class	Timer;
+class	Texture;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -28,6 +30,9 @@ enum eDebugRenderObjectType
 	DRO_ARROW2D,
 	DRO_ARROW3D,
 
+	DRO_QUAD2D,
+	DRO_QUAD3D,
+	
 	DRO_AABB3,
 	
 	DRO_OBB3,
@@ -36,8 +41,8 @@ enum eDebugRenderObjectType
 	
 	DRO_BASIS,
 
-	DRO_WORLDTEXT,
-	DRO_WORLDBILLBOARDTEXT,
+	DRO_TEXT2D,
+	DRO_TEXT3D,
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -173,6 +178,64 @@ public:
 
 };
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct DRO_quad2D : public DebugRenderObject
+{
+
+public:
+	DRO_quad2D ( AABB2 bounds , Rgba8 startPosStartColor , Rgba8 startPosEndColor , Rgba8 endPosStartColor ,
+	             Rgba8 endPosEndColor , float duration = 0.f , Texture* tex = nullptr );
+
+	DRO_quad2D( AABB2 bounds , Rgba8 color , float duration = 0.0f , Texture* tex = nullptr );
+
+	DRO_quad2D( AABB2 bounds , Rgba8 startPosStartColor , Rgba8 startPosEndColor , Rgba8 endPosStartColor ,
+		Rgba8 endPosEndColor , float duration = 0.f , Texture* tex = nullptr , AABB2 UVs = AABB2::ZERO_TO_ONE );
+	
+	DRO_quad2D( AABB2 bounds , Rgba8 color , float duration = 0.0f , Texture* tex = nullptr , AABB2 UVs = AABB2::ZERO_TO_ONE );
+	
+	void UpdateColor() override;
+
+public:
+	AABB2		m_bounds;
+
+	Rgba8		m_startPosStartColor;
+	Rgba8		m_startPosEndColor;
+	Rgba8		m_startPosCurrentColor;
+
+	Rgba8		m_endPosStartColor;
+	Rgba8		m_endPosEndColor;
+	Rgba8		m_endPosCurrentColor;
+
+	Texture*	m_texture;
+	AABB2		m_texUVs				= AABB2::ZERO_TO_ONE;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct DRO_text2D : public DebugRenderObject
+{
+
+public:	
+	DRO_text2D ( std::string text , Vec4 PositionOffsetRatio , Vec2 pivot , Rgba8 startColor , Rgba8 endColor ,
+	             float size = 1.f , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS );
+
+	DRO_text2D ( std::string text , Vec4 PositionOffsetRatio , Vec2 pivot , Rgba8 color , float size = 1.f ,
+	             float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS );
+
+	void UpdateColor() override;
+
+public:
+	Vec4		m_screenPositionOffsetRatio;
+	Vec2		m_pivot;
+
+	Rgba8		m_startColor;
+	Rgba8		m_endColor;
+	Rgba8		m_currrentColor;
+
+	float		m_size;
+	std::string m_text;
+};
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -263,6 +326,35 @@ public:
 	
 	float	m_shaftRadius			= 1.f;
 	float	m_tipRadius				= 1.1f * m_shaftRadius; 
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct DRO_quad3D : public DebugRenderObject
+{
+
+public:
+	DRO_quad3D( Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p3 , Rgba8 startColor , Rgba8 endColor ,
+				float duration = 0.f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH , Texture* tex = nullptr , AABB2 UVs = AABB2::ZERO_TO_ONE );
+
+	void UpdateColor() override;
+
+public:
+	Vec3		m_vert0;
+	Vec3		m_vert1;
+	Vec3		m_vert2;
+	Vec3		m_vert3;
+	
+	Rgba8		m_startPosStartColor;
+	Rgba8		m_startPosEndColor;
+	Rgba8		m_startPosCurrentColor;
+
+	Rgba8		m_endPosStartColor;
+	Rgba8		m_endPosEndColor;
+	Rgba8		m_endPosCurrentColor;
+
+	Texture*	m_texture;
+	AABB2		m_texUVs					= AABB2::ZERO_TO_ONE;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

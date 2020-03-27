@@ -65,6 +65,26 @@ bool Rgba8::IsAlphaChannelEqual( const Rgba8& compareWith )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Rgba8::operator*=( const float multiplier )
+{
+	r = ( uchar ) ( ( float ) r * ( float ) multiplier ) % 255;
+	g = ( uchar ) ( ( float ) g * ( float ) multiplier ) % 255;
+	b = ( uchar ) ( ( float ) b * ( float ) multiplier ) % 255;
+	a = ( uchar ) ( ( float ) a * ( float ) multiplier ) % 255;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Rgba8::operator*=( const Rgba8& multipleWith )
+{
+	r = ( uchar ) ( ( float ) r * ( float ) multipleWith.r ) % 255;
+	g = ( uchar ) ( ( float ) g * ( float ) multipleWith.g ) % 255;
+	b = ( uchar ) ( ( float ) b * ( float ) multipleWith.b ) % 255;
+	a = ( uchar ) ( ( float ) a * ( float ) multipleWith.a ) % 255;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Rgba8::CycleRGBChannelsClockwise()
 {
 	Rgba8 tempCopy = *this;

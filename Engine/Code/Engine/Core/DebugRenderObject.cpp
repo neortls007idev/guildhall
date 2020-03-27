@@ -1,6 +1,7 @@
 ﻿#include "Engine/Core/DebugRenderObject.hpp"
 #include "Engine/Time/Timer.hpp"
 #include "Engine/Time/Clock.hpp"
+#include "../Renderer/Texture.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -414,18 +415,18 @@ DRO_line2D::DRO_line2D ( Vec2 startPos , Rgba8 startPosStartColor , Rgba8 startP
                          float thickness /*= 1.f */ ) :
 														DebugRenderObject( DRO_LINE2D , DEBUG_RENDER_ALWAYS , duration )
 {
-	m_startPos = startPos;
-	m_endPos = endPos;
+	m_startPos				= startPos;
+	m_endPos				= endPos;
 
-	m_startPosStartColor = startPosStartColor;
-	m_startPosEndColor = startPosEndColor;
-	m_startPosCurrentColor = m_startPosStartColor;
+	m_startPosStartColor	= startPosStartColor;
+	m_startPosEndColor		= startPosEndColor;
+	m_startPosCurrentColor	= m_startPosStartColor;
 
-	m_endPosStartColor = endPosStartColor;
-	m_endPosEndColor = endPosEndColor;
-	m_endPosCurrentColor = m_endPosStartColor;
+	m_endPosStartColor		= endPosStartColor;
+	m_endPosEndColor		= endPosEndColor;
+	m_endPosCurrentColor	= m_endPosStartColor;
 
-	m_thickness = thickness;
+	m_thickness				= thickness;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -572,4 +573,183 @@ void DRO_arrow2D::UpdateColor()
 	{
 		m_tipEndPosCurrentColor.LerpColorOverTime( m_tipEndPosStartColor , m_tipEndPosEndColor , m_duration , m_timer );
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+DRO_quad2D::DRO_quad2D ( AABB2 bounds , Rgba8 startPosStartColor , Rgba8 startPosEndColor , Rgba8 endPosStartColor ,
+                         Rgba8 endPosEndColor , float duration /*= 0.f */ , Texture* tex /*= nullptr*/ ) :
+																					DebugRenderObject( DRO_QUAD2D , DEBUG_RENDER_ALWAYS , duration )
+{
+	m_bounds				= bounds;
+	
+	m_startPosStartColor	= startPosStartColor;
+	m_startPosEndColor		= startPosEndColor;
+	m_startPosCurrentColor	= m_startPosStartColor;
+
+	m_endPosStartColor		= endPosStartColor;
+	m_endPosEndColor		= endPosEndColor;
+	m_endPosCurrentColor	= m_endPosStartColor;
+
+	m_texture				= tex;
+	m_texUVs				= AABB2::ZERO_TO_ONE;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+DRO_quad2D::DRO_quad2D( AABB2 bounds , Rgba8 color , float duration /*= 0.0f */ , Texture* tex /*= nullptr*/ ) :
+																					DebugRenderObject( DRO_QUAD2D , DEBUG_RENDER_ALWAYS , duration )
+{
+	m_bounds				= bounds;
+	
+	m_startPosStartColor	= color;
+	m_startPosEndColor		= color;
+	m_startPosCurrentColor	= m_startPosStartColor;
+
+	m_endPosStartColor		= color;
+	m_endPosEndColor		= color;
+	m_endPosCurrentColor	= m_endPosStartColor;
+
+	m_texture				= tex;
+	m_texUVs				= AABB2::ZERO_TO_ONE;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+DRO_quad2D::DRO_quad2D ( AABB2 bounds , Rgba8 startPosStartColor , Rgba8 startPosEndColor , Rgba8 endPosStartColor ,
+                         Rgba8 endPosEndColor , float duration /*= 0.f */ , Texture* tex /*= nullptr */ ,
+                         AABB2 UVs /*= AABB2::ZERO_TO_ONE */ ) :
+	DebugRenderObject( DRO_QUAD2D , DEBUG_RENDER_ALWAYS , duration )
+{
+	m_bounds					= bounds;
+
+	m_startPosStartColor		= startPosStartColor;
+	m_startPosEndColor			= startPosEndColor;
+	m_startPosCurrentColor		= m_startPosStartColor;
+
+	m_endPosStartColor			= endPosStartColor;
+	m_endPosEndColor			= endPosEndColor;
+	m_endPosCurrentColor		= m_endPosStartColor;
+
+	m_texture					= tex;
+	m_texUVs					= UVs;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+DRO_quad2D::DRO_quad2D( AABB2 bounds , Rgba8 color , float duration /*= 0.0f */ , Texture* tex /*= nullptr */ , AABB2 UVs /*= AABB2::ZERO_TO_ONE */ ) :
+	DebugRenderObject( DRO_QUAD2D , DEBUG_RENDER_ALWAYS , duration )
+{
+	m_bounds					= bounds;
+
+	m_startPosStartColor		= color;
+	m_startPosEndColor			= color;
+	m_startPosCurrentColor		= m_startPosStartColor;
+
+	m_endPosStartColor			= color;
+	m_endPosEndColor			= color;
+	m_endPosCurrentColor		= m_endPosStartColor;
+
+	m_texture					= tex;
+	m_texUVs					= UVs;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DRO_quad2D::UpdateColor()
+{
+	if ( m_startPosCurrentColor != m_startPosEndColor )
+	{
+		m_startPosCurrentColor.LerpColorOverTime( m_startPosStartColor , m_startPosEndColor , m_duration , m_timer );
+	}
+
+	if ( m_endPosCurrentColor != m_endPosEndColor )
+	{
+		m_endPosCurrentColor.LerpColorOverTime( m_endPosStartColor , m_endPosEndColor , m_duration , m_timer );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+DRO_quad3D::DRO_quad3D ( Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p3 , Rgba8 startColor , Rgba8 endColor ,
+                         float duration /*= 0.f */ , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ ,
+                         Texture* tex /*= nullptr */ , AABB2 UVs /*= AABB2::ZERO_TO_ONE */ ) :
+																							DebugRenderObject( DRO_QUAD3D , mode , duration )
+{
+	m_vert0					= p0;
+	m_vert1					= p1;
+	m_vert2					= p2;
+	m_vert3					= p3;
+	
+	m_startPosStartColor	= startColor;
+	m_startPosEndColor		= endColor;
+	m_startPosCurrentColor	= m_startPosStartColor;
+
+	m_endPosStartColor		= startColor;
+	m_endPosEndColor		= endColor;
+	m_endPosCurrentColor	= m_endPosStartColor;
+
+	m_texture				= tex;
+	m_texUVs				= UVs;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DRO_quad3D::UpdateColor()
+{
+	if ( m_startPosCurrentColor != m_startPosEndColor )
+	{
+		m_startPosCurrentColor.LerpColorOverTime( m_startPosStartColor , m_startPosEndColor , m_duration , m_timer );
+	}
+
+	if ( m_endPosCurrentColor != m_endPosEndColor )
+	{
+		m_endPosCurrentColor.LerpColorOverTime( m_endPosStartColor , m_endPosEndColor , m_duration , m_timer );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+DRO_text2D::DRO_text2D ( std::string text , Vec4 PositionOffsetRatio , Vec2 pivot , Rgba8 color ,
+                         float size /*= 1.f */ , float duration /*= 0.0f */ ,
+                         eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ ) :
+																				DebugRenderObject( DRO_TEXT2D , mode , duration )
+{
+	m_text						= text;
+	m_screenPositionOffsetRatio = PositionOffsetRatio;
+	m_pivot						= pivot;
+	m_size						= size;
+
+	m_startColor				= color;
+	m_endColor					= color;
+	m_currrentColor				= color;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+DRO_text2D::DRO_text2D ( std::string text , Vec4 PositionOffsetRatio , Vec2 pivot , Rgba8 startColor , Rgba8 endColor ,
+                         float size /*= 1.f */ , float duration /*= 0.0f */ ,
+                         eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ ) :
+																				DebugRenderObject( DRO_TEXT2D , mode , duration )
+{
+	m_text						= text;
+	m_screenPositionOffsetRatio = PositionOffsetRatio;
+	m_pivot						= pivot;
+	m_size						= size;
+
+	m_startColor				= startColor;
+	m_endColor					= endColor;
+	m_currrentColor				= startColor;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DRO_text2D::UpdateColor()
+{
+	if ( m_currrentColor == m_endColor )
+	{
+		return;
+	}
+
+	m_currrentColor.LerpColorOverTime( m_startColor , m_endColor , m_duration , m_timer );
 }

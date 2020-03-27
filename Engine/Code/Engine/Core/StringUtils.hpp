@@ -12,6 +12,9 @@ typedef std::vector< std::string > Strings;
 const std::string	Stringf( const char* format , ... );
 const std::string	Stringf( int maxLength , const char* format , ... );
 
+const std::string	Stringv( char const* format , va_list args );
+const std::string	StringfV2( char const* format , ... );
+
 Strings				SplitStringAtGivenDelimiter( const std::string& originalString , char delimiter = ',' );
 Strings				SplitStringOnceAtGivenDelimiter( const std::string& originalString , char delimiter = ',' );
 

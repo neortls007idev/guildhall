@@ -1,6 +1,7 @@
 #include "Engine/Core/StringUtils.hpp"
 #include <stdarg.h>
 #include <windows.h>
+#include <vadefs.h>
 
 //-----------------------------------------------------------------------------------------------
 
@@ -40,6 +41,26 @@ const std::string Stringf( const int maxLength, const char* format, ... )
 		delete[] textLiteral;
 
 	return returnValue;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const std::string Stringv( char const* format , va_list args )
+{
+	char buffer[ 1024 ];
+	vsnprintf_s( buffer , 1024 , format , args );
+	return buffer;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const std::string StringfV2( char const* format , ... )
+{
+	va_list args;
+	va_start( args, format );
+	std::string s = Stringv( format , args );
+	va_end( args );
+	return s;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
