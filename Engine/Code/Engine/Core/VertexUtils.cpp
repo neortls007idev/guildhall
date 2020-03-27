@@ -325,14 +325,14 @@ void CreateUVSphere( uint hCuts , uint vCuts , std::vector<Vertex_PCU>& sphereMe
 	float deltaTheta = 360.f / ( float ) hCuts;
 	float deltaPhi = 180.f / ( float ) vCuts;
 
-	for ( float theta = 0.f; theta <= 360.0; theta += deltaTheta )
+	for ( float phi = -90.f; phi <= 90.0; phi += deltaPhi )
 	{
-		for ( float phi = -90.f; phi <= 90.0; phi += deltaPhi )
+		for ( float theta = 0.f; theta <= 360.0; theta += deltaTheta )
 		{
 			Vec3 currentCoords = Vec3::MakeFromSpericalCoordinates( theta , phi , radius );
 			float u = RangeMapFloat( 0.f , 360.f , 0.f , 1.f , theta );
 			float v = RangeMapFloat( -90.f , 90.f , 0.f , 1.f , phi );
-
+		
 			Vertex_PCU currentCoordVerts = Vertex_PCU( center + currentCoords , tint , Vec2( u , v ) );
 
 			sphereMeshVerts.push_back( currentCoordVerts );

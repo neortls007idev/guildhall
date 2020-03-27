@@ -1010,9 +1010,9 @@ void RenderContext::DrawArrow2D ( const Vec2& start , const Vec2& end , const Rg
 
 	Vertex_PCU lineVerts[ 6 ] = { Vertex_PCU( startRightVec3, shaftStartColor, Vec2( 0.f, 0.f ) ),
 								  Vertex_PCU( endRightVec3  , shaftEndColor, Vec2( 0.f, 0.f ) ),
-								  Vertex_PCU( endLeftVec3   , color, Vec2( 0.f, 0.f ) ),
-								  Vertex_PCU( endLeftVec3   , color, Vec2( 0.f, 0.f ) ),
-								  Vertex_PCU( startLeftVec3 , color, Vec2( 0.f, 0.f ) ),
+								  Vertex_PCU( endLeftVec3   , shaftEndColor, Vec2( 0.f, 0.f ) ),
+								  Vertex_PCU( endLeftVec3   , shaftEndColor, Vec2( 0.f, 0.f ) ),
+								  Vertex_PCU( startLeftVec3 , shaftStartColor, Vec2( 0.f, 0.f ) ),
 								  Vertex_PCU( startRightVec3, shaftStartColor, Vec2( 0.f, 0.f ) ) };
 
 	DrawVertexArray( 6 , lineVerts );

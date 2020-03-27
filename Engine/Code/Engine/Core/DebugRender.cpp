@@ -736,7 +736,7 @@ void DebugRenderObjectsManager::RenderObjectArray( std::vector<DebugRenderObject
 			g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
 			std::vector<Vertex_PCU> uvSphereMeshVerts;
 			std::vector<uint>		uvSphereIndices;
-			CreateUVSphere( uvSphere->m_hCuts , uvSphere->m_vCuts , uvSphereMeshVerts , uvSphereIndices , uvSphere->m_radius , uvSphere->m_position , uvSphere->m_currrentColor );
+			CreateUVSphere( 8,4 , uvSphereMeshVerts , uvSphereIndices , uvSphere->m_radius , uvSphere->m_position , uvSphere->m_currrentColor );
 			
 			GPUMesh uvSphereMesh( g_debugRenderContext );
 			uvSphereMesh.UpdateVertices( uvSphereMeshVerts );
@@ -781,6 +781,10 @@ void DebugRenderObjectsManager::RenderObjectArrayXRAYPass2( std::vector<DebugRen
 		{
 			DRO_point3D* point3D = ( DRO_point3D* ) droArray[ index ];
 			Rgba8 pointColorCopy = point3D->m_currrentColor;
+
+			pointColorCopy.r *= 0.5f;
+			pointColorCopy.g *= 0.5f;
+			pointColorCopy.b *= 0.5f;
 			pointColorCopy.a *= 0.5f;
 				
 			g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );

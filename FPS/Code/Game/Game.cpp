@@ -233,7 +233,7 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	
 	if ( g_theInput->WasKeyJustPressed( '1' ) )
 	{
-		DebugAddWorldPoint( m_gameCamera.GetPosition() , 0.1f, GREEN , RED, 5.f , mode );
+		DebugAddWorldPoint( m_gameCamera.GetPosition() , 1.f, GREEN , CYAN, 5.f , mode );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( '2' ) )

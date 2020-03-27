@@ -53,8 +53,8 @@ public:
 	Texture*	m_imageTex				= nullptr;
 	Texture*	m_worldMapSphere		= nullptr;
 
-	uint		m_hCuts					= 16;		// slices
-	uint		m_vCuts					= 8;		// stacks
+	uint		m_hCuts					= 32;		// slices
+	uint		m_vCuts					= 16;		// stacks
 
 	mutable Camera		m_gameCamera;
 	Camera				m_uiCamera;
