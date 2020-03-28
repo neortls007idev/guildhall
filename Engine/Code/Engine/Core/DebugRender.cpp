@@ -4,6 +4,7 @@
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Primitives/GPUMesh.hpp"
 #include "Engine/Core/DebugRenderObject.hpp"
+#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Time/Timer.hpp"
 #include "StringUtils.hpp"
 #include "Engine/Math/Vec4.hpp"
@@ -298,20 +299,64 @@ void DebugAddWorldWireSphere( Vec3 pos , float radius , Rgba8 color , float dura
 
 void DebugAddWorldBasis( Mat44 basis , Rgba8 startTint , Rgba8 endTint , float duration , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
 {
+	Vec3 position = basis.GetTranslation3D();
 
+	Rgba8 ibasisStartColor = RED;
+	Rgba8 jbasisStartColor = GREEN;
+	Rgba8 kbasisStartColor = BLUE;
+
+	ibasisStartColor += startTint;
+	jbasisStartColor += startTint;
+	kbasisStartColor += startTint;
+
+	Rgba8 ibasisEndColor = RED;
+	Rgba8 jbasisEndColor = GREEN;
+	Rgba8 kbasisEndColor = BLUE;
+
+	ibasisEndColor += endTint;
+	jbasisEndColor += endTint;
+	kbasisEndColor += endTint;
+	
+	DRO_arrow3D* iBasis = new DRO_arrow3D( position , ibasisStartColor , ibasisEndColor ,
+	                                       position + basis.GetIBasis3D() , ibasisStartColor , ibasisEndColor , duration ,
+	                                       mode , 0.1f );
+	DRO_arrow3D* jBasis = new DRO_arrow3D( position , jbasisStartColor , jbasisEndColor ,
+	                                       position + basis.GetJBasis3D() , jbasisStartColor , jbasisEndColor , duration ,
+	                                       mode , 0.1f );
+	DRO_arrow3D* kBasis = new DRO_arrow3D( position , kbasisStartColor , kbasisEndColor ,
+	                                       position + basis.GetKBasis3D() , kbasisStartColor , kbasisEndColor , duration ,
+	                                       mode , 0.1f );
+
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , iBasis );
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , jBasis );
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , kBasis );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void DebugAddWorldBasis( Mat44 basis , float duration /*= 0.0f */ , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
 {
-	DRO_arrow3D* iBasis = new DRO_arrow3D( Vec3::ZERO , basis.GetIBasis3D() , RED , duration , mode , 0.1f );
-	DRO_arrow3D* jBasis = new DRO_arrow3D( Vec3::ZERO , basis.GetJBasis3D() , GREEN , duration , mode , 0.1f );
-	DRO_arrow3D* kBasis = new DRO_arrow3D( Vec3::ZERO , basis.GetKBasis3D() , BLUE , duration , mode , 0.1f );
+	Vec3 position = basis.GetTranslation3D();
+	
+	DRO_arrow3D* iBasis = new DRO_arrow3D( position , position + basis.GetIBasis3D() , RED , duration , mode , 0.1f );
+	DRO_arrow3D* jBasis = new DRO_arrow3D( position , position + basis.GetJBasis3D() , GREEN , duration , mode , 0.1f );
+	DRO_arrow3D* kBasis = new DRO_arrow3D( position , position + basis.GetKBasis3D() , BLUE , duration , mode , 0.1f );
 	
 	g_currentManager->AddDebugObjectTo( WORLDSPACE , iBasis );
 	g_currentManager->AddDebugObjectTo( WORLDSPACE , jBasis );
 	g_currentManager->AddDebugObjectTo( WORLDSPACE , kBasis );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddWorldTextf( Mat44 basis , Vec2 pivot , Rgba8 color , float duration , eDebugRenderMode mode , char const* format , ... )
+{
+	va_list args;
+	va_start( args , format );
+	std::string str = Stringv( format , args );
+	
+ 	DRO_text3D* obj = new DRO_text3D( str , basis , pivot , color , 0.14f , duration );
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -843,14 +888,20 @@ void DebugRenderObjectsManager::RenderObjectArray( std::vector<DebugRenderObject
 
 				std::vector<Vertex_PCU> textVerts;
 				AABB2 screenArea( cam->GetOrthoMin().GetXYComponents() , cam->GetOrthoMax().GetXYComponents() );
-				Vec2 textPos( text2D->m_screenPositionOffsetRatio.x , text2D->m_screenPositionOffsetRatio.y );
-
-				screenArea.m_mins += textPos;
-				screenArea.m_maxs += textPos;
-									
-				Vec2 alignment( text2D->m_screenPositionOffsetRatio.z , text2D->m_screenPositionOffsetRatio.w );
+				AABB2 textArea( screenArea.m_mins , Vec2( text2D->m_text.size() * text2D->m_size * 1.f , text2D->m_size ) );
 					
-				g_bitmapFont->AddVertsForTextInBox2D( textVerts , screenArea , text2D->m_size , text2D->m_text , text2D->m_currrentColor , 1.67f , alignment );
+				float ratioX = RangeMapFloat( 0.f , 1.f , screenArea.m_mins.x , screenArea.m_maxs.x , text2D->m_screenPositionOffsetRatio.z );
+				float ratioY = RangeMapFloat( 0.f , 1.f , screenArea.m_mins.y , screenArea.m_maxs.y , text2D->m_screenPositionOffsetRatio.w );
+				textArea.Translate( Vec2( ratioX , ratioY ) );
+				
+				textArea.Translate( Vec2( text2D->m_screenPositionOffsetRatio.x , text2D->m_screenPositionOffsetRatio.y ) );
+
+				float pivotX = ( textArea.m_maxs.x - textArea.m_mins.x ) * text2D->m_pivot.x ;
+				float pivotY = ( textArea.m_maxs.y - textArea.m_mins.y ) * text2D->m_pivot.y; 
+				textArea.Translate( Vec2( -pivotX , -pivotY ) );
+					
+				g_bitmapFont->AddVertsForTextInBox2D( textVerts , textArea , text2D->m_size , text2D->m_text ,
+				                                      text2D->m_currrentColor , 1.f , text2D->m_pivot );
 				g_debugRenderContext->DrawVertexArray( textVerts );
 				g_debugRenderContext->BindTexture( nullptr );
 
@@ -966,7 +1017,26 @@ void DebugRenderObjectsManager::RenderObjectArray( std::vector<DebugRenderObject
 				g_debugRenderContext->DrawMesh( &uvSphereMesh );
 
 			}break;
+
+			case DRO_TEXT3D:
+			{
+				DRO_text3D* text3D = ( DRO_text3D* ) droArray[ index ];
+
+				g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
+				g_debugRenderContext->SetModelMatrix( text3D->m_model );
+				g_debugRenderContext->BindTexture( g_bitmapFont->GetTexture() );
+				//g_debugRenderContext->BindTexture( g_debugRenderContext->GetOrCreateTextureFromFile( "Data/Images/PlayerTankBase.png" ) );
+
+				std::vector<Vertex_PCU> textVerts;
+				AABB2 textArea( Vec2::ZERO , Vec2( textVerts.size()* text3D->m_size* text3D->m_textCellAspectRatio , text3D->m_size ) );
+				//AABB2 textArea( -0.5f ,-0.5f , 0.5f , 0.5f );
 				
+				g_bitmapFont->AddVertsForTextInBox2D( textVerts , textArea , text3D->m_size , text3D->m_text , text3D->m_currrentColor , 1.f , text3D->m_pivot );
+				g_debugRenderContext->DrawVertexArray( textVerts );
+				g_debugRenderContext->BindTexture( nullptr );
+
+			}break;
+			
 			default:
 			{
 				ASSERT_RECOVERABLE( true , "ARE YOU SURE YOU WANT TO RENDER A 2D OBJECT IN A PROJECTIVE CAMERA" );

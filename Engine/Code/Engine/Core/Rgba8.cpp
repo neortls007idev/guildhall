@@ -85,6 +85,26 @@ void Rgba8::operator*=( const Rgba8& multipleWith )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Rgba8::operator+=( const Rgba8& addWith )
+{
+	r = ( uchar ) ( ( float ) r + ( float ) addWith.r ) % 255;
+	g = ( uchar ) ( ( float ) g + ( float ) addWith.g ) % 255;
+	b = ( uchar ) ( ( float ) b + ( float ) addWith.b ) % 255;
+	a = ( uchar ) ( ( float ) a + ( float ) addWith.a ) % 255;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Rgba8::operator+=( const float addition )
+{
+	r = ( uchar ) ( ( float ) r + ( float ) addition ) % 255;
+	g = ( uchar ) ( ( float ) g + ( float ) addition ) % 255;
+	b = ( uchar ) ( ( float ) b + ( float ) addition ) % 255;
+	a = ( uchar ) ( ( float ) a + ( float ) addition ) % 255;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Rgba8::CycleRGBChannelsClockwise()
 {
 	Rgba8 tempCopy = *this;

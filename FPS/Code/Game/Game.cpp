@@ -78,11 +78,11 @@ Game::Game()
 
 	//DebugAddWorldLine( Vec3(0,0,0 ) ,  Vec3(0,-1,0) , PURPLE , 15.f , DEBUG_RENDER_ALWAYS , 0.5f );
 	
-	//DebugAddWorldLineStrip( ( uint ) lineStripTest.size() , &lineStripTest[0] , GREEN , WHITE , PINK , BLUE , 20.f );
+//	DebugAddWorldLineStrip( ( uint ) lineStripTest.size() , &lineStripTest[0] , GREEN , WHITE , PINK , BLUE , 20.f );
 
-	DebugAddWorldQuad( lineStripTest[ 0 ] , lineStripTest[ 1 ] , lineStripTest[ 2 ] , lineStripTest[ 3 ] ,
-	                   AABB2::ZERO_TO_ONE , WHITE , RED , 10.f , DEBUG_RENDER_USE_DEPTH , m_imageTex );
-	
+// 	DebugAddWorldQuad( lineStripTest[ 0 ] , lineStripTest[ 1 ] , lineStripTest[ 2 ] , lineStripTest[ 3 ] ,
+// 	                   AABB2::ZERO_TO_ONE , WHITE , RED , 10.f , DEBUG_RENDER_USE_DEPTH , m_imageTex );
+// 	
 	DebugAddScreenPoint( Vec2( 100 , 100 ) , 100.f , RED , BLUE , 5.f );
 
 	DebugAddScreenLine( Vec2( 600 , 400 ) , GREEN , BLUE ,
@@ -92,10 +92,17 @@ Game::Game()
 				GREEN , BLUE , PURPLE , ORANGE ,
 								CYAN , PINK , MAGENTA , YELLOW ,
 	                     5.f , 10.f );
+// 
+// 	DebugAddWorldBasis( m_gameCamera.GetCameraTransform().GetAsMatrix() , 10.f );
+ 	DebugAddScreenTextf( Vec4( 00.f , -000.f , 1.f , 1.f ) , Vec2(1.f,0.5f) , 20.f , ORANGE , GREEN ,
+ 					10.f , "Hello %d %f" , 5 , 22.f );
 
-	DebugAddWorldBasis( m_gameCamera.GetCameraTransform().GetAsMatrix() , 10.f );
-	DebugAddScreenTextf( Vec4( -100.f , -100.f , .5f , .5f ) , Vec2::ZERO , 20.f , ORANGE , GREEN ,
-					10.f , " Hello %d %f" , 5 , 22.f );
+	DebugAddWorldPoint( m_cubeTransform.GetPostion() , 0.25 , Rgba8( 0 , 255 , 0 , 127 ) , Rgba8( 0 , 255 , 0 , 127 ) , 50.f , DEBUG_RENDER_USE_DEPTH );
+	
+//	DebugAddWorldTextf( m_cubeTransform.GetAsMatrix() , Vec2(0.5f,0.5f) , ORANGE ,
+//		10000.f , DEBUG_RENDER_USE_DEPTH , " Hello %d %f" , 5 , 22.f );
+
+	//m_cubeTransform.SetPosition( 1.f , 0.5f , -12.0f );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -135,31 +142,31 @@ void Game::Render() const
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->SetRasterState( FILL_SOLID );
 
-	g_theRenderer->DrawMesh( m_meshCube );
-	//g_theRenderer->DrawVertexArray( m_meshCube->GetVertexCount() , m_meshCube->m_vertices );
-	g_theRenderer->BindShader( nullptr );
-
-	g_theRenderer->SetBlendMode( SOLID );
-	g_theRenderer->SetRasterState( FILL_SOLID );
-	
+// 	g_theRenderer->DrawMesh( m_meshCube );
+// 	//g_theRenderer->DrawVertexArray( m_meshCube->GetVertexCount() , m_meshCube->m_vertices );
+// 	g_theRenderer->BindShader( nullptr );
+// 
+// 	g_theRenderer->SetBlendMode( SOLID );
+// 	g_theRenderer->SetRasterState( FILL_SOLID );
+// 	
 	g_theRenderer->BindTexture( m_worldMapSphere );
-	g_theRenderer->BindShader( nullptr );
-	//g_theRenderer->BindShader( m_gridShader );
-	//g_theRenderer->BindTexture( g_theRenderer->m_textureDefault );
+		g_theRenderer->BindShader( nullptr );
+		//g_theRenderer->BindShader( m_gridShader );
+		//g_theRenderer->BindTexture( g_theRenderer->m_textureDefault );
 	
 	Transform sphereRing;
 	float deltaDegrees = 360.f / 30.f;
 
-	for ( float sphereIndex = 0 ; sphereIndex <= 360 ; sphereIndex += deltaDegrees )
-	{
-		Vec3 position = Vec3::MakeFromSpericalCoordinates( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 15.f );
-		position.z -= 30.f;
-		sphereRing.SetPosition( position );
-		sphereRing.SetRotation( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 0.f );
-		g_theRenderer->SetModelMatrix( sphereRing.GetAsMatrix() );
-		g_theRenderer->SetRasterState( FILL_SOLID );
-		g_theRenderer->DrawMesh( m_meshSphere );
-	}
+// 	for ( float sphereIndex = 0 ; sphereIndex <= 360 ; sphereIndex += deltaDegrees )
+// 	{
+// 		Vec3 position = Vec3::MakeFromSpericalCoordinates( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 15.f );
+// 		position.z -= 30.f;
+// 		sphereRing.SetPosition( position );
+// 		sphereRing.SetRotation( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 0.f );
+// 		g_theRenderer->SetModelMatrix( sphereRing.GetAsMatrix() );
+// 		g_theRenderer->SetRasterState( FILL_SOLID );
+// 	}
+	//g_theRenderer->DrawMesh( m_meshSphere );
 
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
@@ -167,7 +174,7 @@ void Game::Render() const
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->EndCamera( m_gameCamera );
 
-	DebugRenderWorldToCamera( &m_gameCamera );
+	//DebugRenderWorldToCamera( &m_gameCamera );
 	DebugRenderScreenTo( nullptr );
 }
 
@@ -292,6 +299,19 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	if ( g_theInput->WasKeyJustPressed( '5' ) )
 	{
 		DebugAddWorldWireSphere( m_gameCamera.GetPosition() , 0.5f , YELLOW , 5.0f , mode );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( '6' ) )
+	{
+		//DebugAddWorldBasis( m_gameCamera.GetCameraTransform().GetAsMatrix() , 10.f );
+		DebugAddWorldBasis( m_gameCamera.GetCameraTransform().GetAsMatrix() , CYAN , PINK , 10.f );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( '7' ) )
+	{
+		//DebugAddWorldBasis( m_gameCamera.GetCameraTransform().GetAsMatrix() , 10.f );
+		DebugAddWorldTextf( m_gameCamera.GetCameraTransform().GetAsMatrix() , Vec2::ZERO , ORANGE ,
+			10000.f, DEBUG_RENDER_USE_DEPTH , " Hello %d %f" , 5 , 22.f );
 	}
 }
 

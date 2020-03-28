@@ -414,3 +414,39 @@ public:
 	Rgba8			m_endColor;
 	Rgba8			m_currrentColor;
 };
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct DRO_text3D : public DebugRenderObject
+{
+
+public:
+	DRO_text3D( std::string text , Mat44 basis , Vec2 pivot , Rgba8 startColor , Rgba8 endColor ,
+		float size = 1.f , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS );
+
+	DRO_text3D( std::string text , Mat44 basis , Vec2 pivot , Rgba8 color , float size = 1.f ,
+		float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS );
+
+	DRO_text3D( std::string text , Vec3 position , Vec2 pivot , Rgba8 startColor , Rgba8 endColor ,
+		float size = 1.f , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS );
+
+	DRO_text3D( std::string text , Vec3 position , Vec2 pivot , Rgba8 color , float size = 1.f ,
+		float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS );
+
+	void UpdateColor() override;
+
+public:
+	
+	Vec3		m_position;
+	Vec2		m_pivot;
+
+	Rgba8		m_startColor;
+	Rgba8		m_endColor;
+	Rgba8		m_currrentColor;
+
+	Mat44		m_model;
+	
+	float		m_size;
+	float		m_textCellAspectRatio;
+	std::string m_text;
+};

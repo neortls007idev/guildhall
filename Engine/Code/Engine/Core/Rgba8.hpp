@@ -30,7 +30,9 @@ public:
 	bool		operator!=( const Rgba8& compareWith );
 	void		operator*=( const float multiplier );
 	void		operator*=( const Rgba8& multipleWith );
-
+	void		operator+=( const float addition );
+	void		operator+=( const Rgba8& addWith );
+		
 	void CycleRGBChannelsClockwise();
 	void CycleRGBChannelsAntiClockwise();
 

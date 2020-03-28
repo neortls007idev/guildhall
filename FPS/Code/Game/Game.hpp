@@ -40,28 +40,28 @@ private:
 
 private:
 
-	int			m_controllerID			= -1;
-	float		m_screenShakeIntensity	= 0.f;
+	int					m_controllerID			= -1;
+	float				m_screenShakeIntensity	= 0.f;
 
 public:
 
-	AABB2		m_normalImage;
-	AABB2		m_invertedColorImage;
-	GPUMesh*	m_meshCube;
-	GPUMesh*	m_meshSphere;
-	Transform	m_cubeTransform;
-	Texture*	m_imageTex				= nullptr;
-	Texture*	m_worldMapSphere		= nullptr;
+	AABB2				m_normalImage;
+	AABB2				m_invertedColorImage;
+	GPUMesh*			m_meshCube;
+	GPUMesh*			m_meshSphere;
+	mutable Transform			m_cubeTransform;
+	Texture*			m_imageTex				= nullptr;
+	Texture*			m_worldMapSphere		= nullptr;
 
-	uint		m_hCuts					= 32;		// slices
-	uint		m_vCuts					= 16;		// stacks
+	uint				m_hCuts					= 32;		// slices
+	uint				m_vCuts					= 16;		// stacks
 
 	mutable Camera		m_gameCamera;
 	Camera				m_uiCamera;
 
-	Rgba8		m_color;
-	Vec3		m_cameraPosition = Vec3::ZERO;
-	Vec3		m_cameraRotation = Vec3::ZERO;
-	Shader* 	m_invertColorShader;
-	Shader* 	m_gridShader;
+	Rgba8				m_color;
+	Vec3				m_cameraPosition		= Vec3::ZERO;
+	Vec3				m_cameraRotation		= Vec3::ZERO;
+	Shader* 			m_invertColorShader;
+	Shader* 			m_gridShader;
 };

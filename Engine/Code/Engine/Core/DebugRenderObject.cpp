@@ -753,3 +753,35 @@ void DRO_text2D::UpdateColor()
 
 	m_currrentColor.LerpColorOverTime( m_startColor , m_endColor , m_duration , m_timer );
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+DRO_text3D::DRO_text3D ( std::string text , Mat44 basis , Vec2 pivot , Rgba8 color , float size /*= 1.f */ ,
+                         float duration /*= 0.0f */ ,
+                         eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ ) :
+																				DebugRenderObject(DRO_TEXT3D , mode , duration  )
+{
+	m_position				= Vec3::ZERO;
+	
+	m_text					= text;
+	m_model					= basis;
+	m_pivot					= pivot;
+	m_size					= size;
+	m_textCellAspectRatio	= 1.f;
+	
+	m_startColor			= color;
+	m_endColor				= color;
+	m_currrentColor			= color;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DRO_text3D::UpdateColor()
+{
+	if ( m_currrentColor == m_endColor )
+	{
+		return;
+	}
+
+	m_currrentColor.LerpColorOverTime( m_startColor , m_endColor , m_duration , m_timer );
+}
