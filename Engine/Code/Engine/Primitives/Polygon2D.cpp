@@ -81,6 +81,63 @@ void Polygon2D::GetEdge( int idx , Vec2* outStart , Vec2* outEnd )
 	outEnd = &m_points[ ( idx + 1 ) % totalPoints ];
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec2 Polygon2D::GetCenter() const 
+{
+	Vec2 centre = Vec2( 0.f , 0.f );
+	
+	for ( int index = 0; index < m_points.size(); index++ )
+	{
+		centre += m_points[ index ];
+	}
+
+	centre = centre / ( float ) m_points.size();
+	return centre;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Polygon2D::Contains( const Vec2 pos ) const
+{
+	if ( 3 > m_points.size() )
+	{
+		return false;
+	}
+	else
+	{
+		Vec2 edge = Vec2::ZERO;
+		Vec2 edgeNormal;
+		Vec2 pointRelativePos;
+		size_t index = 1;
+		for ( ; index < m_points.size(); index++ )
+		{
+			edge = m_points[ index ] - m_points[ index - 1 ];
+			edgeNormal = edge.GetRotated90Degrees().GetNormalized();
+			//edgeNormal.Normalize();
+			pointRelativePos = pos - m_points[ index - 1 ];
+
+			if ( DotProduct2D( edgeNormal , pointRelativePos ) <= 0 )
+			{
+				return false;
+			}
+		}
+
+		edge = m_points[ 0 ] - m_points[ index - 1 ];
+		edgeNormal = edge.GetRotated90Degrees().GetNormalized();
+		pointRelativePos = pos - m_points[ 0 ];
+
+		if ( DotProduct2D( edgeNormal , pointRelativePos ) <= 0 )
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Vec2 Polygon2D::GetClosestPointOnEdges( const Vec2 point ) const
 {
 	std::vector<Vec2> closestPointsOnEachEdge;
@@ -196,7 +253,6 @@ Polygon2D Polygon2D::MakeFromLineLoop( Vec2 const* points , uint pointCount )
 
 Polygon2D Polygon2D::MakeConvexFromPointCloud( Vec2 const* points , uint pointCount )
 {
-
 	const int start = GetIndexOfLeftMostPointFromPointCloud( points , pointCount );
 	int point = start , nextPoint;
 
@@ -228,13 +284,26 @@ Polygon2D Polygon2D::MakeConvexFromPointCloud( Vec2 const* points , uint pointCo
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Polygon2D::Polygon2D( Polygon2D& copy )
+// Polygon2D::Polygon2D( Polygon2D& copy )
+// {
+// 	for ( size_t index = 0; index < copy.m_points.size(); index++ )
+// 	{
+// 		m_points.push_back( copy.m_points[ index ] );
+// 	}
+// 
+// 	m_center = copy.GetCenter();
+// }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Polygon2D::Polygon2D( const Polygon2D& copy )
 {
 	for ( size_t index = 0; index < copy.m_points.size(); index++ )
 	{
 		m_points.push_back( copy.m_points[ index ] );
 	}
-	SetCenter();
+
+	m_center = copy.GetCenter();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -242,6 +311,13 @@ Polygon2D::Polygon2D( Polygon2D& copy )
 Polygon2D::Polygon2D()
 {
 	SetCenter();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Polygon2D::~Polygon2D()
+{
+	m_points.clear();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

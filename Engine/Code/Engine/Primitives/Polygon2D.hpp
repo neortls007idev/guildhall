@@ -8,9 +8,10 @@ class Polygon2D
 {
 public:
 	Polygon2D();
-	Polygon2D( Polygon2D &copy );
+	//Polygon2D( Polygon2D &copy );
+	Polygon2D( const Polygon2D &copy );
 
-	~Polygon2D() {};
+	~Polygon2D();
 
 	bool  IsValid() const; // must have at least 3 points to be considered a polygon
 	bool  IsConvex() const;
@@ -20,7 +21,8 @@ public:
 	int  GetVertexCount() const;
 	int	 GetEdgeCount() const;
 	void GetEdge( int idx , Vec2* outStart , Vec2* outEnd );
-	Vec2 GetCenter() const																	{ return m_center; }
+	Vec2 GetCenter() const;																	/*{ return m_center; }*/
+	bool Contains( const Vec2 pos ) const;
 
 	Vec2 GetClosestPointOnEdges( const Vec2 point ) const;
 	

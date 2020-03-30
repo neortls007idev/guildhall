@@ -55,7 +55,7 @@ void DebugRenderWorldToCamera( Camera* cam )
 	g_currentManager->RenderObjectsUseDepth( g_currentManager->m_debugRenderWorldObjectsUseDepth ,g_debugCamera , eBlendMode::SOLID );
 	g_currentManager->RenderObjectsXRAY( g_currentManager->m_debugRenderWorldObjectsXRay , g_debugCamera , eBlendMode::SOLID );
 	g_currentManager->RenderObjectsAlways( g_currentManager->m_debugRenderWorldObjectsAlways , g_debugCamera , eBlendMode::SOLID );
-	g_currentManager->RenderObjectsAlways( g_currentManager->m_debugRenderScreenObjects		, g_debugCamera , eBlendMode::ALPHA );
+	//g_currentManager->RenderObjectsAlways( g_currentManager->m_debugRenderScreenObjects		, g_debugCamera , eBlendMode::ALPHA );
 
 	//g_debugRenderContext->DrawVertexArray( vertices );
 	//g_debugRenderContext->EndCamera( *cam );
@@ -76,11 +76,14 @@ void DebugRenderScreenTo( Texture* output )
 		g_debugRenderContext = ctx;
 		camera.SetColorTarget( output );
 		camera.SetOrthoView( Vec2::ZERO , Vec2( output->GetDimensions() ) );
+		//camera.SetOrthoView( Vec2( -0.5f * ( 16.f / 9.f ) * 1080.f , -0.5 * 1080.f ), Vec2( 0.5f * ( 16.f / 9.f ) * 1080.f , 0.5 * 1080.f ) );
+		//camera.SetOrthoView( Vec2( -800.f , -400.f ) , Vec2( 800.f , 400.f ) );
 	}
 	else
 	{
 		g_debugRenderContext = g_theRenderer;
-		camera.SetOrthoView( Vec2::ZERO , Vec2( ( 16.f / 9.f ) * 1080.f , 1080.f ) );
+		//camera.SetOrthoView( Vec2( -800.f , -400.f ) , Vec2( 800.f , 400.f ) );
+		camera.SetOrthoView( Vec2::ZERO, Vec2( ( 16.f / 9.f ) * 1080.f , 1080.f ) );
 	}
 
 /*camera.SetProjectionOrthographic()*/
@@ -355,7 +358,7 @@ void DebugAddWorldTextf( Mat44 basis , Vec2 pivot , Rgba8 color , float duration
 	va_start( args , format );
 	std::string str = Stringv( format , args );
 	
- 	DRO_text3D* obj = new DRO_text3D( str , basis , pivot , color , 0.14f , duration );
+ 	DRO_text3D* obj = new DRO_text3D( str , basis , pivot , color , 0.14f , duration , mode );
 	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
 }
 

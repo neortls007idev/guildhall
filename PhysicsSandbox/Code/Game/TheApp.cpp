@@ -12,6 +12,8 @@
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
 
+
+#include "Engine/Core/DebugRender.hpp"
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Time/Timer.hpp"
 
@@ -19,15 +21,16 @@
 //			GLOBAL VARIABLES
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-InputSystem*					g_theInput			= nullptr;
-RenderContext*					g_theRenderer		= nullptr;
-AudioSystem*					g_theAudioSystem	= nullptr;
-TheApp*							g_theApp			= nullptr;
-Game*							g_theGame			= nullptr;
-DevConsole*						g_theDevConsole		= nullptr;
-Physics2D*						g_thePhysicsSystem	= nullptr;
-extern BitmapFont*				g_bitmapFont;
-extern NamedStrings				g_gameConfigBlackboard;
+InputSystem*						g_theInput			= nullptr;
+RenderContext*						g_theRenderer		= nullptr;
+AudioSystem*						g_theAudioSystem	= nullptr;
+TheApp*								g_theApp			= nullptr;
+Game*								g_theGame			= nullptr;
+DevConsole*							g_theDevConsole		= nullptr;
+Physics2D*							g_thePhysicsSystem	= nullptr;
+extern BitmapFont*					g_bitmapFont;
+extern DebugRenderObjectsManager*	g_currentManager;
+extern NamedStrings					g_gameConfigBlackboard;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -43,6 +46,8 @@ TheApp::~TheApp()
 	delete g_theGame;
 	g_theGame = nullptr;
 
+	
+	
 	delete g_theAudioSystem;
 	g_theAudioSystem = nullptr;
 
@@ -103,6 +108,13 @@ void TheApp::Startup()
 	}
 	g_theDevConsole->Startup();
 
+	if ( g_currentManager == nullptr )
+	{
+		// instantiating a default DRO_Manager
+		g_currentManager = new DebugRenderObjectsManager();
+	}
+	g_currentManager->Startup();
+	
 	if ( g_thePhysicsSystem == nullptr )
 	{
 		g_thePhysicsSystem = new Physics2D();
@@ -149,6 +161,8 @@ void TheApp::BeginFrame()
 	g_theInput->SetCursorMode( ABSOLUTE_MODE );
 	g_theRenderer->BeginFrame();
 	g_theDevConsole->BeginFrame();
+	g_currentManager->BeginFrame();
+	
 	if ( m_isPaused )
 	{
 		g_thePhysicsSystem->s_clock->Pause();
@@ -170,6 +184,7 @@ void TheApp::Update( float deltaSeconds )
 	g_theInput->Update( deltaSeconds );
 	UpdateFromKeyboard();
 
+	g_currentManager->Update( deltaSeconds );
 	g_thePhysicsSystem->Update();
 
 	if ( g_theDevConsole->IsOpen() )
@@ -206,6 +221,7 @@ void TheApp::EndFrame()
 	
 	g_theAudioSystem->EndFrame();
 	g_thePhysicsSystem->EndFrame();
+	g_currentManager->EndFrame();
 	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
@@ -220,6 +236,7 @@ void TheApp::Shutdown()
 {
 	g_theAudioSystem->Shutdown();
 	g_thePhysicsSystem->Shutdown();
+	g_currentManager->Shutdown();
 	g_theDevConsole->Shutdown();
 	g_theRenderer->Shutdown();
 	g_theInput->Shutdown();
@@ -252,15 +269,6 @@ void TheApp::UpdateFromKeyboard()
 	if ( g_theInput->GetButtonState( 'P' ).WasJustPressed() ) 
 	{ m_isPaused = !m_isPaused; }
 	
-	if ( g_theInput->GetButtonState( KEY_F4 ).WasJustPressed() )
-	{
-		m_debugCamera = !m_debugCamera;
-		if (m_debugCamera)
-		{
-			
-		}
-	}
-
 	if ( g_theInput->WasKeyJustPressed('8') )
 	{
 		double currentTimeScale = g_thePhysicsSystem->s_clock->GetScale();

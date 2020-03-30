@@ -16,6 +16,8 @@
 #include "Game/TheApp.hpp"
 #include "Game/Game.hpp"
 
+
+#include "Engine/Core/DebugRender.hpp"
 #include "Engine/Core/StringUtils.hpp"
 #include "Game/Gameobject.hpp"
 #include "Engine/Core/DevConsole.hpp"
@@ -63,15 +65,34 @@ Game::Game()
 // 	m_pointCloud.push_back( Vec2(50,50) );
 // 	m_pointCloud.push_back( Vec2(-50,50) );
 // 	m_pointCloud.push_back( Vec2(50,-50) );
-//  	m_pointCloud.push_back( Vec2::ZERO );
-// 	m_pointCloud.push_back( Vec2( 100 , 100 ) );
-// 	m_pointCloud.push_back( Vec2(0,100) );
-// 	m_pointCloud.push_back( Vec2(100,0) );
-//  	
-// 	m_testPolygon = m_testPolygon.MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , m_pointCloud.size() );
-// 
-// 	GameObject* temp = new GameObject( g_thePhysicsSystem , Vec2::ZERO , Vec2::ZERO , m_testPolygon );
-// 	m_gameObjects.push_back( temp );
+ 	
+	m_pointCloud.push_back( Vec2( 400 , 400 ) );
+	m_pointCloud.push_back( Vec2(300,300) );
+	m_pointCloud.push_back( Vec2(600,300) );
+  	
+ 	m_testPolygon = m_testPolygon.MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , m_pointCloud.size() );
+ 
+	GameObject* temp = new GameObject( g_thePhysicsSystem , m_testPolygon.GetCenter() , Vec2::ZERO , m_testPolygon );
+	m_gameObjects.push_back( temp );
+ 	m_isMouseOnGameObject.push_back( false );
+
+	m_pointCloud.clear();
+
+	m_pointCloud.push_back( Vec2( -300 , -300 ) );
+	m_pointCloud.push_back( Vec2( -300 , -200 ) );
+	m_pointCloud.push_back( Vec2( -200 , -300 ) );
+	m_pointCloud.push_back( Vec2( -200 , -200 ) );
+
+	m_testPolygon1 = m_testPolygon1.MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , m_pointCloud.size() );
+	
+	GameObject* temp2 = new GameObject( g_thePhysicsSystem , m_testPolygon1.GetCenter() , Vec2::ZERO , m_testPolygon1 );
+	m_gameObjects.push_back( temp2 );
+	m_isMouseOnGameObject.push_back( false );
+
+// 	m_minksTestPolygon = GenerateMinkowskiDifferencePolygon( &m_testPolygon , &m_testPolygon1 );
+// 	m_minksTestPolygon = m_minksTestPolygon.MakeConvexFromPointCloud( &m_minksTestPolygon.m_points[ 0 ] , m_minksTestPolygon.m_points.size() );
+// 	GameObject* temp3 = new GameObject( g_thePhysicsSystem , m_minksTestPolygon.GetCenter() , Vec2::ZERO , m_minksTestPolygon );
+// 	m_gameObjects.push_back( temp3 );
 // 	m_isMouseOnGameObject.push_back( false );
 }
 
@@ -162,37 +183,16 @@ void Game::Render() const
 	//DrawGameObjectToolTip();
 	RenderDrawFromPointCloudMode();
 
-	// TODO :- REMOVE PHYSICS DEBUG
-
-// 	static Vec2 cp;
-// 	static Vec2 mePos;
-// 	static Vec2 themPos;
-// 	static Vec2 normal;
-// 	static Vec2 tangent;
-// 	static float meRadius;
-// 	static float themRadius;
-// 	
-// 	for ( size_t index = 0 ; index < g_thePhysicsSystem->m_frameCollisions.size() ; index ++ )
-// 	{
-// 		cp = g_thePhysicsSystem->m_frameCollisions[ index ].m_collisionManifold.m_contactPoint;
-// 		mePos = g_thePhysicsSystem->m_frameCollisions[ index ].m_me->GetPosition();
-// 		themPos = g_thePhysicsSystem->m_frameCollisions[ index ].m_them->GetPosition();
-// 		DiscCollider2D* meCol = ( DiscCollider2D* ) g_thePhysicsSystem->m_frameCollisions[ index ].m_me;
-// 		DiscCollider2D* themCol = ( DiscCollider2D* ) g_thePhysicsSystem->m_frameCollisions[ index ].m_them;
-// 		meRadius = meCol->GetRadius();
-// 		themRadius = themCol->GetRadius();
-// 		normal = g_thePhysicsSystem->m_frameCollisions[ index ].m_collisionManifold.m_normal;
-// 		tangent = normal.GetRotatedMinus90Degrees();
-// 		//g_theApp->m_isPaused = true;
-// 	}
-// 		g_theRenderer->DrawDisc( cp , 3.f , PINK );
-// 		g_theRenderer->DrawArrow( mePos , mePos + ( normal * meRadius ) , MAGENTA , 3.f );
-// 		g_theRenderer->DrawArrow( themPos , themPos - ( normal * themRadius ) , MAGENTA , 3.f );
-// 		g_theRenderer->DrawArrow( mePos + ( normal * meRadius ) , mePos + ( normal * meRadius ) + ( tangent * meRadius ) , MAGENTA , 3.f );
-// 		g_theRenderer->DrawArrow( themPos - ( normal * themRadius ) , themPos - ( normal * themRadius ) - ( tangent * themRadius ) , MAGENTA , 3.f );
+	if ( g_thePhysicsSystem->minsk.m_points.size()  > 0 )
+	{
+		g_theRenderer->DrawPolygon( &g_thePhysicsSystem->minsk.m_points[ 0 ] , g_thePhysicsSystem->minsk.m_points.size() , WHITE );
+	}
+	
 	
 	g_theRenderer->SetBlendMode( SOLID );
 	g_theRenderer->EndCamera( m_worldCamera );
+	DebugRenderScreenTo( m_worldCamera.GetColorTarget() );
+	g_theRenderer->DrawDisc( Vec2::ZERO , 5.f , PINK );
 	RenderUI();
 }
 
@@ -693,7 +693,7 @@ void Game::UpdateGameObjects()
 	IsMouseInsideGameObject();
 	ResetCollisions();
 	AreObjectsColliding();
-	//ChangeColorOnCollision();
+	ChangeColorOnCollision();
 	ChangeAlphaByBounciness();
 }
 
@@ -780,7 +780,10 @@ void Game::ChangeColorOnCollision()
 	{
 		if ( m_gameObjects[ index ] && m_gameObjects[ index ]->m_isColliding )
 		{
-			m_gameObjects[ index ]->m_fillColor = m_overlapColor;
+			if ( m_gameObjects[index]->m_rigidbody->m_collider->GetType() == COLLIDER2D_CONVEXGON )
+			{
+				m_gameObjects[ index ]->m_fillColor = m_overlapColor;
+			}
 		}
 	}
 }

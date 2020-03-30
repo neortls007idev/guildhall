@@ -174,7 +174,7 @@ void Game::Render() const
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->EndCamera( m_gameCamera );
 
-	//DebugRenderWorldToCamera( &m_gameCamera );
+	DebugRenderWorldToCamera( &m_gameCamera );
 	DebugRenderScreenTo( nullptr );
 }
 

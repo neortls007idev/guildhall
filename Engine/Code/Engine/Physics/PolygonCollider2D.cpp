@@ -30,6 +30,7 @@ void PolygonCollider2D::UpdateWorldShape()
 {
 	m_worldPosition = m_rigidbody->m_worldPosition + m_localPosition;
 	m_polygon.SetPosition( m_worldPosition );
+	
 	m_boundingDisc.m_center = m_worldPosition;
 
 	float orientationDegrees = ConvertRadiansToDegrees( m_rigidbody->m_frameRotation );
@@ -158,6 +159,10 @@ void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderCol
 
 	Vec2 center = m_polygon.GetCenter();
 
+	Vec2 mousedir = g_theInput->GetMouseNormalizedClientPosition();
+	//size_t furthesetPoint = GetIndexOfFurthestPoint( &m_polygon.m_points[ 0 ] , m_polygon.m_points.size() , mousedir );
+	//ctx->DrawDisc( m_polygon.m_points[ furthesetPoint ] , 5.f , PINK );
+	
 	if ( m_rigidbody->m_isSimulationActive )
 	{
 		ctx->DrawLine( m_worldPosition - line1 , m_worldPosition + line1 , BLUE , 0.01f * m_width );
@@ -168,7 +173,7 @@ void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderCol
 		ctx->DrawLine( m_worldPosition - line1 , m_worldPosition + line1 , RED , 0.01f * m_width );
 		ctx->DrawLine( m_worldPosition - line2 , m_worldPosition + line2 , RED , 0.01f * m_width );
 	}
-
+	
 // 	if ( m_rigidbody->m_isSimulationActive )
 // 	{
 // 		ctx->DrawLine( m_boundingDisc.m_center - line1 , m_boundingDisc.m_center + line1 , YELLOW , 0.01f * m_width );
@@ -261,7 +266,7 @@ void PolygonCollider2D::CreateBoundingDisc()
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 float PolygonCollider2D::CalculateMoment( float mass ) const
-{
+{	
 	float momentOfPolygon = 0.f;
 	
 	//uint totalSidesInPolygon = static_cast< uint >( m_polygon.m_points.size() - 2 );

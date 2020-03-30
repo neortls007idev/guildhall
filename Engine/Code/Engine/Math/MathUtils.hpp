@@ -113,7 +113,10 @@ float      GetProjectedLength2D( const Vec2& sourceVector , const Vec2& ontoVect
 const Vec2 GetProjectedOnto2D( const Vec2& sourceVector , const Vec2& ontoVector );
 float	   GetAngleDegreesBetweenVectors2D( const Vec2& vectorA , const Vec2& vectorB );
 
-float GetFractionInRange(); // TO DO
+// Triple Product = ( b * a Dot C )- ( a * b Dot C ) or a Cross ( B cross C ) = ( a Dot c ) * b - ( a Dot b ) c
+const Vec2 TripleProduct( const Vec2& a , const Vec2& b , const Vec2& c );
+const Vec2 AveragePoint( const Vec2* vertices , size_t count );
+float	   GetFractionInRange(); // TO DO
 
 //-----------------------------------------------------------------------------------------------------------------
 //	STEPPING/EASING UTILITIES
@@ -142,9 +145,20 @@ const uint	GetIndexOfRightMostPointFromPointCloud( Vec2 const* points , uint poi
 const Vec2* GetTopMostPointFromPointCloud( Vec2 const* points , uint pointCount );
 const uint	GetIndexOfTopMostPointFromPointCloud( Vec2 const* points , uint pointCount );
 
+// Get furthest vertex along a certain direction
+size_t GetIndexOfFurthestPoint( const Vec2* vertices , size_t count , Vec2 direction );
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 float SignFloat( float val );
 
 float CalculateAreaOfTriangle( const Vec2& vertex0 , const Vec2& vertex1 , const Vec2& vertex2 );
 float CalculateAreaOfPolygon( const Polygon2D&  polygon );
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+// Minkowski sum support function for GJK
+
+const Vec2 MinkowskiSumSupport( const Vec2* vertices1 , const size_t count1 , const Vec2* vertices2 , const size_t count2 , const Vec2 direction );
+const bool GJKPolygonPolygonIntersectionTest( const Vec2* vertices1 , const size_t count1 , const Vec2* vertices2 , const size_t count2 );
+const bool GJKPolygonPolygonIntersectionTest( const Polygon2D polygon1 , const Polygon2D polygon2 );
+const Polygon2D GenerateMinkowskiDifferencePolygon( const Polygon2D* poly1 , const Polygon2D* poly2 );

@@ -50,7 +50,7 @@ void Rigidbody2D::TakeCollider( Collider2D* collider )
 		m_collider->Destroy();
 	}
 	m_collider = collider;
-
+	
 	m_moment = m_collider->CalculateMoment( m_mass );
 	
 	SetSimulationModeBasedOnCollider( collider );

@@ -72,6 +72,8 @@ public:
 	static Clock*				s_clock;
 	static Timer*				s_timer;
 	static double				s_fixedTimeStep;
+
+	Polygon2D minsk;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

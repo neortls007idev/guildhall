@@ -200,10 +200,10 @@ void Physics2D::DetectCollisions()
 			if ( firstRigidBody && secondRigidBody )
 			{
 				//g_theDevConsole->PrintString( RED , "Collider has no rigid body attached." );
-				if ( firstRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC && secondRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC )
-				{
-					continue;
-				}
+// 				if ( firstRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC && secondRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC )
+// 				{
+// 					continue;
+// 				}
 			}
 
 			if ( !firstRigidBody->m_isSimulationActive || !secondRigidBody->m_isSimulationActive )
@@ -216,6 +216,16 @@ void Physics2D::DetectCollisions()
 				m_colliders2D[ firstColliderIndex ]->m_isColliding	= true;
 				m_colliders2D[ secondColliderIndex ]->m_isColliding = true;
 
+				if ( m_colliders2D[firstColliderIndex]->GetType() == COLLIDER2D_CONVEXGON && m_colliders2D[secondColliderIndex]->GetType() == COLLIDER2D_CONVEXGON )
+				{
+					PolygonCollider2D* me = ( PolygonCollider2D* ) m_colliders2D[ firstColliderIndex ];
+					PolygonCollider2D* them = ( PolygonCollider2D* ) m_colliders2D[ secondColliderIndex ];
+					
+					Polygon2D minkowskiDiff = GenerateMinkowskiDifferencePolygon( &me->m_polygon , &them->m_polygon );
+					minsk = minkowskiDiff.MakeConvexFromPointCloud( &minkowskiDiff.m_points[ 0 ] , minkowskiDiff.m_points.size() );
+					//continue;
+				}
+				
 				Collision2D newCollision;
  				newCollision.m_me	= m_colliders2D[ firstColliderIndex ];
  				newCollision.m_them = m_colliders2D[ secondColliderIndex ];
@@ -235,7 +245,10 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	{
 		return;
 	}
-
+	if ( collision.m_me->GetType() == COLLIDER2D_CONVEXGON && collision.m_them->GetType() == COLLIDER2D_CONVEXGON )
+	{
+		return;
+	}
 	if ( collision.m_me->GetType() == COLLIDER2D_CONVEXGON )
 	{
 		collision.m_collisionManifold.m_normal *= -1;

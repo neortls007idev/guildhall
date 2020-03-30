@@ -57,9 +57,9 @@ public:
 	bool				m_isGarbage			= false;
 	PhysicsMaterial*	m_physicsMaterial;
 	bool				m_isDrawingCollisions	= false;
+	bool				m_isColliding			= false;
 
 private:
-	bool				m_isColliding			= false;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

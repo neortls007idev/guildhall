@@ -108,6 +108,8 @@ public:
 		   float					m_maxColliderRadius			= MAX_COLLIDER_RADIUS;
 		   float					m_currentColliderRadius;
 		   Polygon2D				m_testPolygon;
+		   Polygon2D				m_testPolygon1;
+		   Polygon2D				m_minksTestPolygon;
 
 		   std::vector<GameObject*>	m_gameObjects;
 		   std::vector<bool>		m_isMouseOnGameObject;

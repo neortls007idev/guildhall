@@ -1,5 +1,7 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Physics/Collider2D.hpp"
+
+#include "Engine/Core/DebugRender.hpp"
 #include "Engine/Physics/DiscCollider2D.hpp"
 #include "Engine/Physics/PolygonCollider2D.hpp"
 
@@ -62,9 +64,9 @@ bool DiscVPolygonCollisionCheck( Collider2D const* me , Collider2D const* them )
 
 bool PolygonVPolygonCollisionCheck( Collider2D const* me , Collider2D const* them )
 {
-	UNUSED( me );
-	UNUSED( them );
-	return false;
+	PolygonCollider2D* mePoly = ( PolygonCollider2D* ) me;
+	PolygonCollider2D* themPoly = ( PolygonCollider2D* ) them;
+	return GJKPolygonPolygonIntersectionTest( mePoly->m_polygon , themPoly->m_polygon );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -125,9 +127,37 @@ Manifold2D DiscVPolygonCollisionFold( Collider2D const* me , Collider2D const* t
 
 Manifold2D PolygonVPolygonCollisionFold( Collider2D const* me , Collider2D const* them )
 {
-	UNUSED( me );
-	UNUSED( them );
+	PolygonCollider2D* mePoly = ( PolygonCollider2D* ) me;
+	PolygonCollider2D* themPoly = ( PolygonCollider2D* ) them;
+
+	Polygon2D minkowskiDiff = GenerateMinkowskiDifferencePolygon( &mePoly->m_polygon , &themPoly->m_polygon );
+	minkowskiDiff = minkowskiDiff.MakeConvexFromPointCloud( &minkowskiDiff.m_points[ 0 ] , minkowskiDiff.m_points.size() );
+	Vec2 contactPointInMinjowskiSpace = minkowskiDiff.GetClosestPointOnEdges( Vec2::ZERO );
+
 	Manifold2D collisionManifold;
+	Vec2 mePolyCenter = mePoly->m_polygon.GetCenter(); /*AveragePoint( &mePoly->m_polygon.m_points[ 0 ] , mePoly->m_polygon.m_points.size() );*/
+						
+	Vec2 themPolyCenter = themPoly->m_polygon.GetCenter(); /*AveragePoint( &themPoly->m_polygon.m_points[ 0 ] , themPoly->m_polygon.m_points.size() );*/
+
+	collisionManifold.m_overlap = contactPointInMinjowskiSpace.GetLength();
+	collisionManifold.m_normal = contactPointInMinjowskiSpace.GetNormalized();
+
+	size_t index = GetIndexOfFurthestPoint( &mePoly->m_polygon.m_points[ 0 ] , mePoly->m_polygon.m_points.size() , -collisionManifold.m_normal );
+
+	
+	//Vec2 contactPoint = themPoly->m_polygon.GetClosestPointOnEdges( themPolyCenter - collisionManifold.m_normal * collisionManifold.m_overlap );
+	Vec2 contactPoint = themPoly->m_polygon.GetClosestPointOnEdges( mePoly->m_polygon.m_points[ index ] );
+	//Vec2 contactPoint = mePoly->m_polygon.GetClosestPointOnEdges( themPolyCenter - collisionManifold.m_normal * collisionManifold.m_overlap );
+	
+	collisionManifold.m_contactPoint = contactPoint;/*themPolyCenter + contactPointInMinjowskiSpace;*//*collisionManifold.m_normal * collisionManifold.m_overlap*/;
+	
+	DebugAddScreenPoint( collisionManifold.m_contactPoint , 5.f , CYAN );
+	DebugAddScreenPoint( contactPointInMinjowskiSpace , 5.f , MAGENTA );
+	//DebugAddScreenPoint(  , 5.f , CYAN );
+// 	DebugAddScreenArrow( mePolyCenter , BLUE , GREEN , mePolyCenter + collisionManifold.m_normal * 50.f ,
+// 					BLUE , GREEN ,5.f );
+// 	DebugAddScreenArrow( mePolyCenter , BLUE , GREEN , contactPoint ,
+// 		BLUE , GREEN , 5.f );
 	return collisionManifold;
 }
 

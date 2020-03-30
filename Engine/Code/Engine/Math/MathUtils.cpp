@@ -1,5 +1,7 @@
 ﻿#include "Engine/Math/MathUtils.hpp"
 #include <cmath>
+
+#include "Engine/Core/DebugRender.hpp"
 #include "Engine/Math/MathConstants.hpp"
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Math/Vec3.hpp"
@@ -643,6 +645,37 @@ float GetAngleDegreesBetweenVectors2D( const Vec2& vectorA , const Vec2& vectorB
 	return abs( vectorA.GetAngleDegrees() - vectorB.GetAngleDegrees() );
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const Vec2 TripleProduct( const Vec2& a , const Vec2& b , const Vec2& c )
+{
+	
+	Vec2 result;
+
+	float ac = DotProduct2D( a , c ); // perform a.dot(c)
+	float bc = DotProduct2D( b , c ); // perform b.dot(c)
+
+	// perform b * a.dot(c) - a * b.dot(c)
+	result = ( b * ac ) - ( a * bc );
+	return result;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const Vec2 AveragePoint( const Vec2* vertices , size_t count )
+{
+	Vec2 avg = Vec2::ZERO;
+
+	for ( size_t index = 0; index < count; index++ )
+	{
+		avg.x += vertices[ index ].x;
+		avg.y += vertices[ index ].y;
+	}
+	
+	avg.x /= count;
+	avg.y /= count;
+	return avg;
+}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1146,6 +1179,26 @@ const uint GetIndexOfTopMostPointFromPointCloud( Vec2 const* points , uint point
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+size_t GetIndexOfFurthestPoint( const Vec2* vertices , size_t count , Vec2 direction )
+{
+	float maxProduct = DotProduct2D( direction , vertices[ 0 ] );
+	size_t index = 0;
+	
+	for ( size_t i = 1; i < count; i++ )
+	{
+		float product = DotProduct2D( direction , vertices[ i ] );
+		
+		if ( product > maxProduct )
+		{
+			maxProduct = product;
+			index = i;
+		}
+	}
+	return index;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 float SignFloat( float val )
 {
 	return ( val >= 0.0f ) ? 1.0f : -1.0f;
@@ -1190,6 +1243,151 @@ float CalculateAreaOfPolygon( const Polygon2D& polygon )
 	}
 
 	return areaOfPolygon;
+}
+
+const Vec2 MinkowskiSumSupport( const Vec2* vertices1 , const size_t count1 , const Vec2* vertices2 , const size_t count2 , const Vec2 direction )
+{
+
+	// get furthest point of first body along an arbitrary direction
+	size_t i = GetIndexOfFurthestPoint( vertices1 , count1 , direction );
+	//DebugAddScreenPoint( vertices1[ i ] , 5.f , PINK , 10.f );
+	
+	// get furthest point of second body along the opposite direction
+	size_t j = GetIndexOfFurthestPoint( vertices2 , count2 , -direction );
+	//DebugAddScreenPoint( vertices2[ j ] , 5.f , PINK , 10.f );
+
+	// subtract (Minkowski sum) the two points to see if bodies 'overlap'
+	return vertices1[ i ] - vertices2[ j ];
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const bool GJKPolygonPolygonIntersectionTest( const Vec2* vertices1 , const size_t count1 , const Vec2* vertices2 , const size_t count2 )
+{
+	if ( count1 < 3 || count2 < 3 )
+	{
+		return false;
+	}
+	
+	int iterCount = 0;
+	
+	size_t index = 0; // index of current vertex of simplex
+	Vec2 a , b , c , d , ao , ab , ac , abperp , acperp , simplex[ 3 ];
+
+	Vec2 position1 = AveragePoint( vertices1 , count1 ); // not a CoG but
+	Vec2 position2 = AveragePoint( vertices2 , count2 ); // it's ok for GJK )
+
+	// initial direction from the center of 1st body to the center of 2nd body
+	d = position1 - position2;
+
+	// if initial direction is zero – set it to any arbitrary axis (we choose X)
+	if ( ( d.x == 0 ) && ( d.y == 0 ) )
+	{
+		d.y = 1.f;
+	}
+	// set the first support as initial point of the new simplex
+	simplex[ 0 ] = MinkowskiSumSupport( vertices1 , count1 , vertices2 , count2 , d );
+	a = simplex[ 0 ];
+
+	if ( DotProduct2D( a , d ) <= 0 )
+	{
+		return false; // no collision
+	}
+
+	d =  -a ; // The next search direction is always towards the origin, so the next search direction is negate(a)
+
+	while ( true )
+	{
+		iterCount++;
+
+		simplex[ ++index ] = MinkowskiSumSupport( vertices1 , count1 , vertices2 , count2 , d );
+		a = simplex[ ++index ];
+
+		if ( DotProduct2D( a , d ) <= 0 )
+		{
+			return false; // no collision
+		}
+		ao = -a; // from point A to Origin is just negative A
+
+		// simplex has 2 points (a line segment, not a triangle yet)
+		if ( index < 2 )
+		{
+			b = simplex[ 0 ];
+			ab = b - a; // from point A to B
+			d = TripleProduct( ab , ao , ab ); // normal to AB towards Origin
+			if ( d.GetLengthSquared() == 0 )
+			{
+				d = ab.GetRotated90Degrees();
+			}
+			continue; // skip to next iteration
+		}
+
+		b = simplex[ 1 ];
+		c = simplex[ 0 ];
+		ab = b - a;							// from point A to B
+		ac = c - a;							// from point A to C
+
+		acperp = TripleProduct( ab , ac , ac );
+
+		if ( DotProduct2D( acperp , ao ) >= 0 )
+		{
+
+			d = acperp; // new direction is normal to AC towards Origin
+
+		}
+		else
+		{
+
+			abperp = TripleProduct( ac , ab , ab );
+
+			if ( DotProduct2D( abperp , ao ) < 0 )
+			{
+				iterCount = 0;
+				return true; // collision
+			}
+			
+			simplex[ 0 ] = simplex[ 1 ]; // swap first element (point C)
+
+			d = abperp; // new direction is normal to AB towards Origin
+		}
+
+		simplex[ 1 ] = simplex[ 2 ]; // swap element in the middle (point B)
+		--index;
+	}
+
+	return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const bool GJKPolygonPolygonIntersectionTest( const Polygon2D polygon1 , const Polygon2D polygon2 )
+{
+	if ( polygon1.m_points.size() < 3 || polygon2.m_points.size() < 3 )
+	{
+		return false;
+	}
+
+	Polygon2D minkowskiDiff = GenerateMinkowskiDifferencePolygon( &polygon1 , &polygon2 );
+	minkowskiDiff = minkowskiDiff.MakeConvexFromPointCloud( &minkowskiDiff.m_points[ 0 ] , minkowskiDiff.m_points.size() );
+
+	return minkowskiDiff.Contains( Vec2::ZERO );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const Polygon2D GenerateMinkowskiDifferencePolygon( const Polygon2D* poly1 , const Polygon2D* poly2 )
+{
+	Polygon2D resultPoly;
+
+	for ( size_t index1 = 0 ; index1 < poly1->m_points.size() ; index1++ )
+	{
+		for ( size_t index2 = 0 ; index2 < poly2->m_points.size(); index2++ )
+		{
+			resultPoly.m_points.push_back( poly1->m_points[ index1 ] - poly2->m_points[ index2 ] );
+		}
+	}
+
+	return resultPoly;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
