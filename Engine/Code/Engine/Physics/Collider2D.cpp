@@ -66,7 +66,8 @@ bool PolygonVPolygonCollisionCheck( Collider2D const* me , Collider2D const* the
 {
 	PolygonCollider2D* mePoly = ( PolygonCollider2D* ) me;
 	PolygonCollider2D* themPoly = ( PolygonCollider2D* ) them;
-	return GJKPolygonPolygonIntersectionTest( mePoly->m_polygon , themPoly->m_polygon );
+	return DetectPolygonvPolygonIntersections( mePoly->m_polygon , themPoly->m_polygon );
+	//return GJKPolygonPolygonIntersectionTest( mePoly->m_polygon , themPoly->m_polygon );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -131,7 +132,7 @@ Manifold2D PolygonVPolygonCollisionFold( Collider2D const* me , Collider2D const
 	PolygonCollider2D* themPoly = ( PolygonCollider2D* ) them;
 
 	Polygon2D minkowskiDiff = GenerateMinkowskiDifferencePolygon( &mePoly->m_polygon , &themPoly->m_polygon );
-	minkowskiDiff = minkowskiDiff.MakeConvexFromPointCloud( &minkowskiDiff.m_points[ 0 ] , minkowskiDiff.m_points.size() );
+	minkowskiDiff = minkowskiDiff.MakeConvexFromPointCloud( &minkowskiDiff.m_points[ 0 ] , ( uint ) minkowskiDiff.m_points.size() );
 	Vec2 contactPointInMinjowskiSpace = minkowskiDiff.GetClosestPointOnEdges( Vec2::ZERO );
 
 	Manifold2D collisionManifold;

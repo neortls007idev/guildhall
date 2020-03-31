@@ -218,12 +218,12 @@ void Physics2D::DetectCollisions()
 
 				if ( m_colliders2D[firstColliderIndex]->GetType() == COLLIDER2D_CONVEXGON && m_colliders2D[secondColliderIndex]->GetType() == COLLIDER2D_CONVEXGON )
 				{
-					PolygonCollider2D* me = ( PolygonCollider2D* ) m_colliders2D[ firstColliderIndex ];
-					PolygonCollider2D* them = ( PolygonCollider2D* ) m_colliders2D[ secondColliderIndex ];
-					
-					Polygon2D minkowskiDiff = GenerateMinkowskiDifferencePolygon( &me->m_polygon , &them->m_polygon );
-					minsk = minkowskiDiff.MakeConvexFromPointCloud( &minkowskiDiff.m_points[ 0 ] , minkowskiDiff.m_points.size() );
-					//continue;
+// 					PolygonCollider2D* me = ( PolygonCollider2D* ) m_colliders2D[ firstColliderIndex ];
+// 					PolygonCollider2D* them = ( PolygonCollider2D* ) m_colliders2D[ secondColliderIndex ];
+// 					
+// 					Polygon2D minkowskiDiff = GenerateMinkowskiDifferencePolygon( &me->m_polygon , &them->m_polygon );
+// 					minsk = minkowskiDiff.MakeConvexFromPointCloud( &minkowskiDiff.m_points[ 0 ] , ( uint ) minkowskiDiff.m_points.size() );
+					continue;
 				}
 				
 				Collision2D newCollision;

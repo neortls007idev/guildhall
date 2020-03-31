@@ -164,11 +164,11 @@ void DebugAddWorldBasis( Mat44 basis , float duration = 0.0f , eDebugRenderMode 
 
 // non-billboarded will be oriented in the world based on the passed in basis matrix 
 void DebugAddWorldText( Mat44 basis , Vec2 pivot , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode , char const* text );
-void DebugAddWorldTextf( Mat44 basis , Vec2 pivot , Rgba8 color , float duration , eDebugRenderMode mode , char const* text , ... );
-void DebugAddWorldTextf( Mat44 basis , Vec2 pivot , Rgba8 color , char const* text , ... ); // assume DEBUG_RENDER_USE_DEPTH
+void DebugAddWorldTextf( Mat44 basis , Vec2 pivot , Rgba8 color , float duration , eDebugRenderMode mode , char const* format , ... );
+void DebugAddWorldTextf( Mat44 basis , Vec2 pivot , Rgba8 color , char const* format , ... ); // assume DEBUG_RENDER_USE_DEPTH
 
 // this text will always orient itself to the current camera
-void DebugAddWorldBillboardText( Vec3 origin , Vec2 pivot , Rgba8 start_color , Rgba8 end_color , float duration , eDebugRenderMode mode , char const* text );
+void DebugAddWorldBillboardText( Vec3 origin , Vec2 pivot , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode , char const* text );
 void DebugAddWorldBillboardTextf( Vec3 origin , Vec2 pivot , Rgba8 color , float duration , eDebugRenderMode mode , char const* format , ... );
 void DebugAddWorldBillboardTextf( Vec3 origin , Vec2 pivot , Rgba8 color , char const* format , ... );
 

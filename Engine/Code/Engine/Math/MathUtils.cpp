@@ -9,9 +9,11 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Primitives/Polygon2D.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Game/Game.hpp"
 
 
-
+extern RenderContext* g_theRenderer;
+extern Game* g_theGame;
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // ANGLE UTILITIES
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1283,7 +1285,7 @@ const bool GJKPolygonPolygonIntersectionTest( const Vec2* vertices1 , const size
 	// if initial direction is zero – set it to any arbitrary axis (we choose X)
 	if ( ( d.x == 0 ) && ( d.y == 0 ) )
 	{
-		d.y = 1.f;
+		d.x = 1.f;
 	}
 	// set the first support as initial point of the new simplex
 	simplex[ 0 ] = MinkowskiSumSupport( vertices1 , count1 , vertices2 , count2 , d );
@@ -1368,7 +1370,7 @@ const bool GJKPolygonPolygonIntersectionTest( const Polygon2D polygon1 , const P
 	}
 
 	Polygon2D minkowskiDiff = GenerateMinkowskiDifferencePolygon( &polygon1 , &polygon2 );
-	minkowskiDiff = minkowskiDiff.MakeConvexFromPointCloud( &minkowskiDiff.m_points[ 0 ] , minkowskiDiff.m_points.size() );
+	minkowskiDiff = minkowskiDiff.MakeConvexFromPointCloud( &minkowskiDiff.m_points[ 0 ] , ( uint ) minkowskiDiff.m_points.size() );
 
 	return minkowskiDiff.Contains( Vec2::ZERO );
 }
@@ -1391,3 +1393,167 @@ const Polygon2D GenerateMinkowskiDifferencePolygon( const Polygon2D* poly1 , con
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec2 GetSupportPoint( const Vec2* vertices , size_t count , Vec2 direction )
+{
+	float maxProduct = DotProduct2D( direction , vertices[ 0 ] );
+	int index = 0;
+	for ( int i = 1; i < count; i++ )
+	{
+		float product = DotProduct2D( direction , vertices[ i ] );
+		if ( product > maxProduct )
+		{
+			maxProduct = product;
+			index = i;
+		}
+	}
+	return vertices[ index ];
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool DetectPolygonvPolygonIntersections( Polygon2D poly1 , Polygon2D poly2 )
+{
+	Vec2 dir1 = Vec2( 0.f , 1.f );
+	Vec2 dir2 = Vec2( 1.f , 0.f );
+	Vec2 sp1 = GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , dir1 ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -dir1 );
+	Vec2 sp2 = GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , dir2 ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -dir2 );
+	Vec2 directionTowardsOrigin = -sp1.GetNormalized();
+	Vec2 sp3 = GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , directionTowardsOrigin ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -directionTowardsOrigin );
+	bool simplexFound = false;
+	Vec2 currentSp1 = sp1;
+	Vec2 currentSp2 = sp2;
+	Vec2 currentSp3 = sp3;
+	
+	if ( DoesSimplexContainOrigin( sp1 , sp2 , sp3 ) )
+	{
+		//DebugAddScreenLine( Vec2( 0.f , 0.f ) , Vec2( 10.f , 10.f ) , Rgba8( 255 , 0 , 0 , 255 ) , 5.f , 5.f );
+		simplexFound = true;
+		return true;
+	}
+	
+	GetNextSimplex( sp1 , sp2 , sp3 , poly1 , poly2 );
+
+	int index = ( poly1.m_points.size() * poly2.m_points.size() ) - 1;
+
+	while ( index > 0 )
+	{
+		if ( DoesSimplexContainOrigin( sp1 , sp2 , sp3 ) )
+		{
+			simplexFound = true;
+			return true;
+		}
+		currentSp1 = sp1;
+		currentSp2 = sp2;
+		currentSp3 = sp3;
+		GetNextSimplex( sp1 , sp2 , sp3 , poly1 , poly2 );
+		index--;
+	}
+	return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void GetNextSimplex( Vec2& outS1 , Vec2& outS2 , Vec2& outS3 , Polygon2D poly1 , Polygon2D poly2 )
+{
+	Vec2 pointOnEdgeS1S2 = GetNearestPointOnLineSegment2D( Vec2( 0.f , 0.f ) , outS1 , outS2 );
+	Vec2 pointOnEdgeS1S3 = GetNearestPointOnLineSegment2D( Vec2( 0.f , 0.f ) , outS1 , outS3 );
+	Vec2 pointOnEdgeS2S3 = GetNearestPointOnLineSegment2D( Vec2( 0.f , 0.f ) , outS2 , outS3 );
+	Vec2 minPoint;
+	Vec2 s1;
+	Vec2 s2;
+	Vec2 s3;
+	float minLength = pointOnEdgeS1S2.GetLength();
+	s1 = outS1;
+	s2 = outS2;
+	minPoint = pointOnEdgeS1S2;
+	if ( pointOnEdgeS1S3.GetLength() < minLength )
+	{
+		minLength = pointOnEdgeS1S3.GetLength();
+		minPoint = pointOnEdgeS1S3;
+		s1 = outS1;
+		s2 = outS3;
+	}
+	if ( pointOnEdgeS2S3.GetLength() < minLength )
+	{
+		minLength = pointOnEdgeS2S3.GetLength();
+		minPoint = pointOnEdgeS2S3;
+		s1 = outS2;
+		s2 = outS3;
+	}
+	Vec2 dir = -minPoint.GetNormalized();
+	s3 = GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , dir ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -dir );
+	outS1 = s1;
+	outS2 = s2;
+	outS3 = s3;
+}
+bool DoesSimplexContainOrigin( Vec2 p1 , Vec2 p2 , Vec2 p3 )
+{
+	Polygon2D temp = Polygon2D();
+
+	Vec2 leftmostPoint = p1;
+
+	if ( CrossProduct2D( p2 - p1 , p3 - p1 ) > 0 )
+	{
+		temp.m_points.push_back( p1 );
+		temp.m_points.push_back( p2 );
+		temp.m_points.push_back( p3 );
+	}
+	else if ( CrossProduct2D( p3 - p1 , p2 - p1 ) > 0 )
+	{
+		temp.m_points.push_back( p1 );
+		temp.m_points.push_back( p3 );
+		temp.m_points.push_back( p2 );
+	}
+	else
+	{
+		temp.m_points.push_back( p2 );
+		temp.m_points.push_back( p3 );
+		temp.m_points.push_back( p1 );
+	}
+
+	//temp = temp.MakeConvexFromPointCloud( &temp.m_points[ 0 ] , 3 );
+	
+	g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
+	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
+	g_theRenderer->BindDepthStencil( nullptr );
+	g_theRenderer->BindShader( nullptr );
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->SetBlendMode( ALPHA );
+	g_theRenderer->SetRasterState( FILL_SOLID );
+	g_theRenderer->DrawPolygon( &temp.m_points[ 0 ] , temp.m_points.size() , GREEN );
+	g_theRenderer->DrawDisc( Vec2::ZERO , 5.f , ORANGE );
+	//g_theRenderer->EndCamera( g_theGame->m_worldCamera );
+	
+	return temp.Contains( Vec2::ZERO );
+}
+bool IsBothSimplexSame( Vec2 simplex1P1 , Vec2 simplex1P2 , Vec2 simplex1P3 , Vec2 simplex2P1 , Vec2 simplex2P2 , Vec2 simplex2P3 )
+{
+	//6 possible combinations
+	float nearZero = 0.000001f;
+	if ( ( simplex1P1 - simplex2P1 ).GetLength() <= nearZero && ( simplex1P2 - simplex2P2 ).GetLength() <= nearZero && ( simplex1P3 - simplex2P3 ).GetLength() <= nearZero )
+	{
+		return true;
+	}
+	if ( ( simplex1P1 - simplex2P1 ).GetLength() <= nearZero && ( simplex1P2 - simplex2P3 ).GetLength() <= nearZero && ( simplex1P3 - simplex2P2 ).GetLength() <= nearZero )
+	{
+		return true;
+	}
+	if ( ( simplex1P1 - simplex2P2 ).GetLength() <= nearZero && ( simplex1P2 - simplex2P1 ).GetLength() <= nearZero && ( simplex1P3 - simplex2P3 ).GetLength() <= nearZero )
+	{
+		return true;
+	}
+	if ( ( simplex1P1 - simplex2P2 ).GetLength() <= nearZero && ( simplex1P2 - simplex2P3 ).GetLength() <= nearZero && ( simplex1P3 - simplex2P1 ).GetLength() <= nearZero )
+	{
+		return true;
+	}
+	if ( ( simplex1P1 - simplex2P3 ).GetLength() <= nearZero && ( simplex1P2 - simplex2P2 ).GetLength() <= nearZero && ( simplex1P3 - simplex2P1 ).GetLength() <= nearZero )
+	{
+		return true;
+	}
+	if ( ( simplex1P1 - simplex2P3 ).GetLength() <= nearZero && ( simplex1P2 - simplex2P1 ).GetLength() <= nearZero && ( simplex1P3 - simplex2P2 ).GetLength() <= nearZero )
+	{
+		return true;
+	}
+	return false;
+}

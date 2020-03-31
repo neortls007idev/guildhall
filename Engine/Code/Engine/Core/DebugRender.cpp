@@ -5,6 +5,7 @@
 #include "Engine/Primitives/GPUMesh.hpp"
 #include "Engine/Core/DebugRenderObject.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Math/MatrixUtils.hpp"
 #include "Engine/Time/Timer.hpp"
 #include "StringUtils.hpp"
 #include "Engine/Math/Vec4.hpp"
@@ -352,6 +353,17 @@ void DebugAddWorldBasis( Mat44 basis , float duration /*= 0.0f */ , eDebugRender
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void DebugAddWorldText( Mat44 basis , Vec2 pivot , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode , char const* text )
+{
+	
+	std::string str = text;
+
+	DRO_text3D* obj = new DRO_text3D( str , basis , pivot , startColor , endColor , 0.14f , duration , mode );
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void DebugAddWorldTextf( Mat44 basis , Vec2 pivot , Rgba8 color , float duration , eDebugRenderMode mode , char const* format , ... )
 {
 	va_list args;
@@ -359,6 +371,54 @@ void DebugAddWorldTextf( Mat44 basis , Vec2 pivot , Rgba8 color , float duration
 	std::string str = Stringv( format , args );
 	
  	DRO_text3D* obj = new DRO_text3D( str , basis , pivot , color , 0.14f , duration , mode );
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddWorldTextf( Mat44 basis , Vec2 pivot , Rgba8 color , char const* format , ... )
+{
+	va_list args;
+	va_start( args , format );
+	std::string str = Stringv( format , args );
+
+	DRO_text3D* obj = new DRO_text3D( str , basis , pivot , color , 0.14f , 2.f , DEBUG_RENDER_ALWAYS );
+	
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddWorldBillboardText( Vec3 origin , Vec2 pivot , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode , char const* text )
+{
+	std::string str = text;
+
+	DRO_text3D* obj = new DRO_text3D( str , origin , pivot , startColor , endColor , 0.14f , duration , mode );
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddWorldBillboardTextf( Vec3 origin , Vec2 pivot , Rgba8 color , float duration , eDebugRenderMode mode , char const* format , ... )
+{
+	va_list args;
+	va_start( args , format );
+	std::string str = Stringv( format , args );
+
+	DRO_text3D* obj = new DRO_text3D( str , origin , pivot , color , 0.14f , duration , mode );
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddWorldBillboardTextf( Vec3 origin , Vec2 pivot , Rgba8 color , char const* format , ... )
+{
+	va_list args;
+	va_start( args , format );
+	std::string str = Stringv( format , args );
+
+	DRO_text3D* obj = new DRO_text3D( str , origin , pivot , color , 0.14f , 2.f , DEBUG_RENDER_ALWAYS );
+	//obj->m_model	= LookAtMatrix( origin , g_debugCamera )
 	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
 }
 

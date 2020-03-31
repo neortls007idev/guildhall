@@ -156,7 +156,7 @@ void Game::Update( float deltaSeconds )
 
 void Game::Render() const
 {
-	g_theRenderer->BeginCamera( m_worldCamera );
+	//g_theRenderer->BeginCamera( m_worldCamera );
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 	g_theRenderer->BindDepthStencil( nullptr );
 	g_theRenderer->BindShader( nullptr );
