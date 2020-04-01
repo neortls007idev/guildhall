@@ -27,8 +27,13 @@ public:
 	OBB3() {}
 	~OBB3() {}
 	OBB3( const OBB3& copyFrom );
+	
+	// OrientationDegrees is in order - Pitch , Yaw and Roll
 	explicit OBB3( const Vec3& mins , const Vec3& maxs , const Vec3& orientationDegrees );
+	
+	// OrientationDegrees is in order - Pitch , Yaw and Roll
 	explicit OBB3( const AABB3 bounds , const Vec3& orientationDegrees );
+	
 	explicit OBB3( float minX , float minY , float minZ , float maxX , float maxY , float maxZ , float pitch , float yaw , float roll );
 
 	explicit OBB3( int minX , int minY , int minZ , int maxX , int maxY , int maxZ , int pitch , int yaw , int roll );
