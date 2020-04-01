@@ -39,7 +39,7 @@ Some example code for how the system will be used in this assignment;
     - [x] Wire Box
     - [x] Wire Sphere
     - [x] Text
-    - [-] Billboarded Text ( Works but Text is horizontally inverted as if looking from the backside )
+    - [x] Billboarded Text
     - [x] All world commands support all rendering modes;
 
 - [x] Screen Rendering
@@ -60,7 +60,7 @@ Some example code for how the system will be used in this assignment;
     - [x] Console command: `debug_add_world_point position=vec3 duration=float`
     - [x] Console command: `debug_add_world_wire_sphere position=vec3 radius=float duration=float`
     - [x] Console command: `debug_add_world_wire_bounds min=vec3 max=vec3 duration=float`
-    - [x] Console command: `debug_add_world_billboard_text position=vec3 pivot=vec2 text=string` ( Works but Text is horizontally inverted as if looking from the backside fault lies in Rendering )
+    - [x] Console command: `debug_add_world_billboard_text position=vec3 pivot=vec2 text=string`
     - [x] Console command: `debug_add_screen_point position=vec2 duration=float`
     - [x] Console command: `debug_add_screen_quad min=vec2 max=vec2 duration=float`
     - [x] Console command: `debug_add_screen_text position=vec2 pivot=vec2 text=string`
