@@ -142,6 +142,24 @@ bool DebugAddWorldWireBounds( EventArgs& args )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void DebugAddWorldWireBounds( OBB3 bounds , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DRO_aabb3* obj = new DRO_aabb3( AABB3( bounds.m_mins , bounds.m_maxs ) , startColor, endColor , duration , mode , eRasterStateFillMode::WIREFRAME );
+	obj->m_transform.SetRotation( bounds.m_orientationDegrees.x , bounds.m_orientationDegrees.z , bounds.m_orientationDegrees.y );
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddWorldWireBounds( OBB3 bounds , Rgba8 color , float duration /*= 0.0f */ , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DRO_aabb3* obj = new DRO_aabb3( AABB3( bounds.m_mins , bounds.m_maxs ) , color , duration , mode , eRasterStateFillMode::WIREFRAME );
+	obj->m_transform.SetRotation( bounds.m_orientationDegrees.x , bounds.m_orientationDegrees.z , bounds.m_orientationDegrees.y );
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 bool DebugAddWorldBillboardText( EventArgs& args )
 {
 
@@ -593,7 +611,8 @@ void DebugAddWorldBillboardText( Vec3 origin , Vec2 pivot , Rgba8 startColor , R
 	std::string str = text;
 
 	DRO_text3D* obj = new DRO_text3D( str , origin , pivot , startColor , endColor , 0.14f , duration , mode , true );
-	obj->m_model = LookAtMatrix( origin , g_debugCamera->GetPosition() );
+	Mat44 lookAt = LookAtMatrix( origin , g_debugCamera->GetPosition() );
+	obj->m_model.SetBasisVectors4D( -lookAt.GetIBasis4D() , lookAt.GetJBasis4D() , lookAt.GetKBasis4D() , lookAt.GetTranslation4D() );
 	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
 }
 
@@ -606,7 +625,8 @@ void DebugAddWorldBillboardTextf( Vec3 origin , Vec2 pivot , Rgba8 color , float
 	std::string str = Stringv( format , args );
 
 	DRO_text3D* obj = new DRO_text3D( str , origin , pivot , color , 0.14f , duration , mode , true );
-	obj->m_model = LookAtMatrix( origin , g_debugCamera->GetPosition() );
+	Mat44 lookAt = LookAtMatrix( origin , g_debugCamera->GetPosition() );
+	obj->m_model.SetBasisVectors4D( -lookAt.GetIBasis4D() , lookAt.GetJBasis4D() , lookAt.GetKBasis4D() , lookAt.GetTranslation4D() );
 	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
 }
 
@@ -619,7 +639,8 @@ void DebugAddWorldBillboardTextf( Vec3 origin , Vec2 pivot , Rgba8 color , char 
 	std::string str = Stringv( format , args );
 
 	DRO_text3D* obj = new DRO_text3D( str , origin , pivot , color , 0.14f , 2.f , DEBUG_RENDER_ALWAYS , true );
-	obj->m_model = LookAtMatrix( origin , g_debugCamera->GetPosition() );
+	Mat44 lookAt = LookAtMatrix( origin , g_debugCamera->GetPosition() );
+	obj->m_model.SetBasisVectors4D( -lookAt.GetIBasis4D() , lookAt.GetJBasis4D() , lookAt.GetKBasis4D() , lookAt.GetTranslation4D() );
 	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
 }
 
@@ -1340,7 +1361,7 @@ void DebugRenderObjectsManager::RenderObjectArray( std::vector<DebugRenderObject
 				g_debugRenderContext->BindTexture( g_bitmapFont->GetTexture() );
 				
 				std::vector<Vertex_PCU> textVerts;
-				AABB2 textArea( Vec2::ZERO , Vec2( textVerts.size()* text3D->m_size* text3D->m_textCellAspectRatio , text3D->m_size ) );
+				AABB2 textArea( Vec2::ZERO , Vec2( text3D->m_text.length() * text3D->m_size* text3D->m_textCellAspectRatio , text3D->m_size ) );
 								
 				g_bitmapFont->AddVertsForTextInBox2D( textVerts , textArea , text3D->m_size , text3D->m_text , text3D->m_currrentColor , 1.f , text3D->m_pivot );
 				g_debugRenderContext->SetModelMatrix( text3D->m_model );

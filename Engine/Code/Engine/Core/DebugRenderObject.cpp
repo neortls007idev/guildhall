@@ -842,10 +842,11 @@ DRO_text3D::DRO_text3D ( std::string text , Vec3 position , Vec2 pivot , Rgba8 c
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void DRO_text3D::Update()
-{
+{	
 	if ( m_isBillboarded && g_debugCamera )
 	{
-		m_model = LookAtMatrix( m_position , g_debugCamera->GetPosition() );
+		Mat44 lookAt = LookAtMatrix( m_position , g_debugCamera->GetPosition() );
+		m_model.SetBasisVectors4D( -lookAt.GetIBasis4D() , lookAt.GetJBasis4D() , lookAt.GetKBasis4D() , lookAt.GetTranslation4D() );
 	}
 
 	UpdateColor();
