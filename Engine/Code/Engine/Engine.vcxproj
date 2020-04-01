@@ -221,6 +221,7 @@
     <ClCompile Include="Primitives\GPUMesh.cpp" />
     <ClCompile Include="Primitives\LineSegment2D.cpp" />
     <ClCompile Include="Primitives\OBB2.cpp" />
+    <ClCompile Include="Primitives\OBB3.cpp" />
     <ClCompile Include="Primitives\Plane.cpp" />
     <ClCompile Include="Primitives\Polygon2D.cpp" />
     <ClCompile Include="Renderer\D3D11Common.cpp" />
@@ -310,6 +311,7 @@
     <ClInclude Include="Primitives\GPUMesh.hpp" />
     <ClInclude Include="Primitives\LineSegment2D.hpp" />
     <ClInclude Include="Primitives\OBB2.hpp" />
+    <ClInclude Include="Primitives\OBB3.hpp" />
     <ClInclude Include="Primitives\Plane.hpp" />
     <ClInclude Include="Primitives\Polygon2D.hpp" />
     <ClInclude Include="Renderer\BitmapFont.hpp" />

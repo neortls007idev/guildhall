@@ -4,6 +4,7 @@
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Primitives/AABB2.hpp"
 #include "Engine/Primitives/AABB3.hpp"
+#include "Engine/Primitives/OBB3.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -173,8 +174,8 @@ void DebugAddWorldQuad ( Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p3 , AABB2 UVs , Rgb
 //		CUBOIDS / BOUNDS / ORIENTED CUBOIDS / ORIENTED BOUNDS
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-//void DebugAddWorldWireBounds( OBB3 bounds , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
-//void DebugAddWorldWireBounds( OBB3 bounds , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+void DebugAddWorldWireBounds( OBB3 bounds , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+void DebugAddWorldWireBounds( OBB3 bounds , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 void DebugAddWorldWireBounds( AABB3 bounds , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
 void DebugAddWorldWireSphere( Vec3 pos , float radius , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );

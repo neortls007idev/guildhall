@@ -142,6 +142,24 @@ bool DebugAddWorldWireBounds( EventArgs& args )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void DebugAddWorldWireBounds( OBB3 bounds , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DRO_aabb3* obj = new DRO_aabb3( AABB3( bounds.m_mins , bounds.m_maxs ) , startColor, endColor , duration , mode , eRasterStateFillMode::WIREFRAME );
+	obj->m_transform.SetRotation( bounds.m_orientationDegrees.x , bounds.m_orientationDegrees.z , bounds.m_orientationDegrees.y );
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddWorldWireBounds( OBB3 bounds , Rgba8 color , float duration /*= 0.0f */ , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DRO_aabb3* obj = new DRO_aabb3( AABB3( bounds.m_mins , bounds.m_maxs ) , color , duration , mode , eRasterStateFillMode::WIREFRAME );
+	obj->m_transform.SetRotation( bounds.m_orientationDegrees.x , bounds.m_orientationDegrees.z , bounds.m_orientationDegrees.y );
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 bool DebugAddWorldBillboardText( EventArgs& args )
 {
 
