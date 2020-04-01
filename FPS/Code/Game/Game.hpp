@@ -1,3 +1,4 @@
+#include "Engine/Core/DebugRenderObject.hpp"
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Primitives/AABB2.hpp"
 #include "Engine/Renderer/Camera.hpp"
@@ -36,6 +37,8 @@ public:
 private:
 
 	void UpdateFromKeyBoard( float deltaSeconds );
+
+	void DebugLineStripDrawModeTest();
 	void CameraPositionUpdateOnInput( float deltaSeconds );
 
 private:
@@ -47,9 +50,9 @@ public:
 
 	AABB2				m_normalImage;
 	AABB2				m_invertedColorImage;
-	GPUMesh*			m_meshCube;
+	GPUMesh*			m_meshTest;
 	GPUMesh*			m_meshSphere;
-	mutable Transform			m_cubeTransform;
+	mutable Transform			m_testMeshTransform;
 	Texture*			m_imageTex				= nullptr;
 	Texture*			m_worldMapSphere		= nullptr;
 
@@ -64,4 +67,9 @@ public:
 	Vec3				m_cameraRotation		= Vec3::ZERO;
 	Shader* 			m_invertColorShader;
 	Shader* 			m_gridShader;
+
+	bool				m_lineStripMode			= false;
+	std::vector<Vec3>	m_lineStripPoints;
+	eDebugRenderMode	m_debugRenderMode		= DEBUG_RENDER_ALWAYS;
+	
 };

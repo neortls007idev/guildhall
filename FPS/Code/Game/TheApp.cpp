@@ -97,6 +97,7 @@ void TheApp::Startup()
 		g_theDevConsole = new DevConsole();
 	}
 	g_theDevConsole->Startup();
+	AddDebugRenderDevConsoleCommands( g_theDevConsole );
 
 	if ( g_currentManager == nullptr )
 	{
@@ -205,7 +206,7 @@ void TheApp::Render() const
 		//g_theRenderer->BeginCamera( g_theDevConsole->GetDevConsoleCamera() )
 		if ( g_theDevConsole->IsOpen() )
 		{
-			g_theDevConsole->Render( *g_theRenderer , *g_theDevConsole->GetDevConsoleCamera() , 20.f );
+			g_theDevConsole->Render( *g_theRenderer , *g_theDevConsole->GetDevConsoleCamera() , 14.f );
 		}
 }
 
@@ -219,10 +220,10 @@ void TheApp::EndFrame()
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
 
-	if ( g_theRenderer->HasAnyShaderChangedAtPath( L"\\Data\\Shaders\\" , 3.f ) )
-	{
-		g_theRenderer->ReCompileAllShaders();
-	}
+// 	if ( g_theRenderer->HasAnyShaderChangedAtPath( L"\\Data\\Shaders\\" , 3.f ) )
+// 	{
+// 		g_theRenderer->ReCompileAllShaders();
+// 	}
 
 	Clock::EndFrame();
 }

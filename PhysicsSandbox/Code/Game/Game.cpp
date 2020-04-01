@@ -156,7 +156,7 @@ void Game::Update( float deltaSeconds )
 
 void Game::Render() const
 {
-	//g_theRenderer->BeginCamera( m_worldCamera );
+	g_theRenderer->BeginCamera( m_worldCamera );
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 	g_theRenderer->BindDepthStencil( nullptr );
 	g_theRenderer->BindShader( nullptr );
@@ -191,8 +191,8 @@ void Game::Render() const
 	
 	g_theRenderer->SetBlendMode( SOLID );
 	g_theRenderer->EndCamera( m_worldCamera );
-	DebugRenderScreenTo( m_worldCamera.GetColorTarget() );
-	g_theRenderer->DrawDisc( Vec2::ZERO , 5.f , PINK );
+	//DebugRenderScreenTo( m_worldCamera.GetColorTarget() );
+	
 	RenderUI();
 }
 

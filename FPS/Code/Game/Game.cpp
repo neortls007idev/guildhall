@@ -1,3 +1,5 @@
+#include "Engine/Core/DebugRender.hpp"
+#include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Input/VirtualKeyboard.hpp"
@@ -5,16 +7,16 @@
 #include "Engine/Primitives/GPUMesh.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Time/Time.hpp"
-#include "Game/Game.hpp"
 
-#include "Engine/Core/DebugRender.hpp"
+#include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-extern RenderContext* g_theRenderer;
-extern TheApp* g_theApp;
+extern RenderContext*	g_theRenderer;
+extern TheApp*			g_theApp;
+extern DevConsole*		g_theDevConsole;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -31,8 +33,8 @@ Game::Game()
 
 	m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT, BLACK , 1.f , 0 );
 	
-	m_meshCube = new GPUMesh( g_theRenderer );
-	m_cubeTransform.SetPosition( 1.f , 0.5f , -12.0f );
+	m_meshTest = new GPUMesh( g_theRenderer );
+	m_testMeshTransform.SetPosition( 1.f , 0.5f , -12.0f );
 
 	std::vector<Vertex_PCU> meshVerts;
 	std::vector<uint>		meshIndices;
@@ -41,11 +43,11 @@ Game::Game()
 	//AABB3 box( Vec3::ZERO , Vec3(1,1,5) );
 	//CreateCuboid( meshVerts , meshIndices , box , PURPLE );
 	CreateArrow3D( meshVerts , meshIndices , .5f , 0.55f , Vec3( 0.5 , 0.5 , -1 ) , Vec3( 1 , 1 , -2 ) , RED , BLUE ,
-	               RED , BLUE );
+	               GREEN , PINK );
 	//AddCubeVerts( meshVerts , nullptr );
 
-	m_meshCube->UpdateVertices( meshVerts );
-	m_meshCube->UpdateIndices( meshIndices );
+	m_meshTest->UpdateVertices( meshVerts );
+	m_meshTest->UpdateIndices( meshIndices );
 	
 	std::vector<Vertex_PCU> sphereMeshVerts;
 	std::vector<uint>		sphereIndices;
@@ -76,9 +78,9 @@ Game::Game()
 	lineStripTest.push_back( Vec3( 4 , 10 , -8 ) );
 	lineStripTest.push_back( Vec3( 4 , 10 , -13 ) );
 
-	//DebugAddWorldLine( Vec3(0,0,0 ) ,  Vec3(0,-1,0) , PURPLE , 15.f , DEBUG_RENDER_ALWAYS , 0.5f );
+	DebugAddWorldLine( Vec3(0,0,0 ) ,  Vec3(0,-1,0) , PURPLE , 15.f , DEBUG_RENDER_ALWAYS , 0.5f );
 	
-//	DebugAddWorldLineStrip( ( uint ) lineStripTest.size() , &lineStripTest[0] , GREEN , WHITE , PINK , BLUE , 20.f );
+	DebugAddWorldLineStrip( ( uint ) lineStripTest.size() , &lineStripTest[0] , GREEN , WHITE , PINK , BLUE , 20.f );
 
 // 	DebugAddWorldQuad( lineStripTest[ 0 ] , lineStripTest[ 1 ] , lineStripTest[ 2 ] , lineStripTest[ 3 ] ,
 // 	                   AABB2::ZERO_TO_ONE , WHITE , RED , 10.f , DEBUG_RENDER_USE_DEPTH , m_imageTex );
@@ -97,10 +99,10 @@ Game::Game()
  	DebugAddScreenTextf( Vec4( 00.f , -000.f , 1.f , 1.f ) , Vec2(1.f,0.5f) , 20.f , ORANGE , GREEN ,
  					10.f , "Hello %d %f" , 5 , 22.f );
 
-	DebugAddWorldPoint( m_cubeTransform.GetPostion() , 0.25 , Rgba8( 0 , 255 , 0 , 127 ) , Rgba8( 0 , 255 , 0 , 127 ) , 50.f , DEBUG_RENDER_USE_DEPTH );
+//	DebugAddWorldPoint( m_cubeTransform.GetPostion() , 0.25 , Rgba8( 0 , 255 , 0 , 127 ) , Rgba8( 0 , 255 , 0 , 127 ) , 50.f , DEBUG_RENDER_USE_DEPTH );
 	
-//	DebugAddWorldTextf( m_cubeTransform.GetAsMatrix() , Vec2(0.5f,0.5f) , ORANGE ,
-//		10000.f , DEBUG_RENDER_USE_DEPTH , " Hello %d %f" , 5 , 22.f );
+	DebugAddWorldTextf( m_testMeshTransform.GetAsMatrix() , Vec2(0.5f,0.5f) , ORANGE ,
+		10000.f , DEBUG_RENDER_USE_DEPTH , " Hello %d %f" , 5 , 22.f );
 
 	//m_cubeTransform.SetPosition( 1.f , 0.5f , -12.0f );
 }
@@ -109,8 +111,8 @@ Game::Game()
 
 Game::~Game()
 {
-	delete m_meshCube;
-	m_meshCube			= nullptr;
+	delete m_meshTest;
+	m_meshTest			= nullptr;
 
 	delete m_meshSphere;
 	m_meshSphere		= nullptr;
@@ -126,7 +128,7 @@ void Game::Update( float deltaSeconds )
 {
 	static float y = 0;
 	y += deltaSeconds;
-	//m_cubeTransform.SetRotation( 0.f ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
+	m_testMeshTransform.SetRotation( 0.f ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	UpdateFromKeyBoard( deltaSeconds );
 }
 
@@ -137,36 +139,36 @@ void Game::Render() const
 	g_theRenderer->BeginCamera( m_gameCamera );
 	m_gameCamera.CreateMatchingDepthStencilTarget(); 
 	g_theRenderer->BindDepthStencil( m_gameCamera.GetDepthStencilTarget() );
-	g_theRenderer->SetModelMatrix( m_cubeTransform.GetAsMatrix() );
+	g_theRenderer->SetModelMatrix( m_testMeshTransform.GetAsMatrix() );
 
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->SetRasterState( FILL_SOLID );
 
-// 	g_theRenderer->DrawMesh( m_meshCube );
-// 	//g_theRenderer->DrawVertexArray( m_meshCube->GetVertexCount() , m_meshCube->m_vertices );
-// 	g_theRenderer->BindShader( nullptr );
-// 
-// 	g_theRenderer->SetBlendMode( SOLID );
-// 	g_theRenderer->SetRasterState( FILL_SOLID );
-// 	
+	g_theRenderer->DrawMesh( m_meshTest );
+	g_theRenderer->DrawVertexArray( m_meshTest->GetVertexCount() , m_meshTest->m_vertices );
+	g_theRenderer->BindShader( nullptr );
+
+	g_theRenderer->SetBlendMode( SOLID );
+	g_theRenderer->SetRasterState( FILL_SOLID );
+	
 	g_theRenderer->BindTexture( m_worldMapSphere );
-		g_theRenderer->BindShader( nullptr );
-		//g_theRenderer->BindShader( m_gridShader );
-		//g_theRenderer->BindTexture( g_theRenderer->m_textureDefault );
+	
+	//g_theRenderer->BindShader( m_gridShader );
+	//g_theRenderer->BindTexture( g_theRenderer->m_textureDefault );
 	
 	Transform sphereRing;
 	float deltaDegrees = 360.f / 30.f;
 
-// 	for ( float sphereIndex = 0 ; sphereIndex <= 360 ; sphereIndex += deltaDegrees )
-// 	{
-// 		Vec3 position = Vec3::MakeFromSpericalCoordinates( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 15.f );
-// 		position.z -= 30.f;
-// 		sphereRing.SetPosition( position );
-// 		sphereRing.SetRotation( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 0.f );
-// 		g_theRenderer->SetModelMatrix( sphereRing.GetAsMatrix() );
-// 		g_theRenderer->SetRasterState( FILL_SOLID );
-// 	}
-	//g_theRenderer->DrawMesh( m_meshSphere );
+	for ( float sphereIndex = 0 ; sphereIndex <= 360 ; sphereIndex += deltaDegrees )
+		{
+			Vec3 position = Vec3::MakeFromSpericalCoordinates( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 15.f );
+			position.z -= 30.f;
+			sphereRing.SetPosition( position );
+			sphereRing.SetRotation( 0.f , 20.f * ( float ) GetCurrentTimeSeconds() + sphereIndex , 0.f );
+			g_theRenderer->SetModelMatrix( sphereRing.GetAsMatrix() );
+			g_theRenderer->SetRasterState( FILL_SOLID );
+			g_theRenderer->DrawMesh( m_meshSphere );
+		}
 
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
@@ -226,6 +228,11 @@ void Game::Die()
 
 void Game::UpdateFromKeyBoard( float deltaSeconds )
 {
+	if ( g_theDevConsole->IsOpen() )
+	{
+		return;
+	}
+	DebugLineStripDrawModeTest();
 	CameraPositionUpdateOnInput( deltaSeconds );
 
 	if ( g_theInput->WasKeyJustPressed( 'I' ) )
@@ -248,70 +255,111 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 		g_theInput->ClipSystemCursor( MOUSE_IS_UNLOCKED );
 	}
 
-	static eDebugRenderMode mode = DEBUG_RENDER_XRAY;
-
 	if ( g_theInput->WasKeyJustPressed( 'U' ) )
 	{
-		mode = DEBUG_RENDER_ALWAYS;
+		m_debugRenderMode = DEBUG_RENDER_ALWAYS;
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 'J' ) )
 	{
-		mode = DEBUG_RENDER_USE_DEPTH;
+		m_debugRenderMode = DEBUG_RENDER_USE_DEPTH;
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 'N' ) )
 	{
-		mode = DEBUG_RENDER_XRAY;
+		m_debugRenderMode = DEBUG_RENDER_XRAY;
+	}
+
+	if( m_lineStripMode )
+	{
+		return;
 	}
 	
 	if ( g_theInput->WasKeyJustPressed( '1' ) )
 	{
-		DebugAddWorldPoint( m_gameCamera.GetPosition() , 1.f , Rgba8( 0 , 255 , 0 , 127 ) , Rgba8( 0 , 255 , 0 , 127 ), 5.f , mode );
+		DebugAddWorldPoint( m_gameCamera.GetPosition() , 1.f , Rgba8( 0 , 255 , 0 , 127 ) , Rgba8( 0 , 255 , 0 , 127 ) ,
+		                    5.f , m_debugRenderMode );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( '2' ) )
 	{
-		//DebugAddWorldLine( m_gameCamera.GetPosition() , GREEN , RED , m_gameCamera.GetPosition() + Vec3::ONE ,
-		//					PURPLE , ORANGE , 5.f , mode , 0.5f );
-		DebugAddWorldLine( m_gameCamera.GetPosition() , m_gameCamera.GetPosition() + Vec3::ONE , PURPLE ,15.f , DEBUG_RENDER_ALWAYS , 0.5f );
+		DebugAddWorldLine( m_gameCamera.GetPosition() , GREEN , PINK , m_gameCamera.GetPosition() + Vec3::ONE ,
+									PURPLE , ORANGE , 5.f , m_debugRenderMode , 0.5f );
+		//DebugAddWorldLine( m_gameCamera.GetPosition() , m_gameCamera.GetPosition() + Vec3::ONE , PURPLE ,15.f , DEBUG_RENDER_ALWAYS , 0.5f );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( '3' ) )
 	{
-		DebugAddWorldArrow( m_gameCamera.GetPosition() , GREEN , RED , m_gameCamera.GetPosition() - Vec3::ONE ,
-							PURPLE , ORANGE , 5.f , mode , 0.5f );
+		//DebugAddWorldArrow( m_gameCamera.GetPosition() , GREEN , RED , m_gameCamera.GetPosition() - Vec3::ONE ,
+		//					PURPLE , ORANGE , 5.f , m_debugRenderMode , 0.5f );
 
-		/*DebugAddWorldArrow( m_gameCamera.GetPosition() ,
+		DebugAddWorldArrow( m_gameCamera.GetPosition() ,
 		                    m_gameCamera.GetPosition() - m_gameCamera.GetCameraTransform().GetAsMatrix().GetKBasis3D() ,
 		                    GREEN , BLUE , PURPLE , ORANGE ,
 							CYAN , PINK , YELLOW , MAGENTA , 5.f ,
-		                    DEBUG_RENDER_ALWAYS , 0.5f , 0.55f );*/
+							m_debugRenderMode , 0.5f , 0.55f );
 		
 		//DebugAddWorldLine( m_gameCamera.GetPosition() , m_gameCamera.GetPosition() + Vec3::ONE , PURPLE ,5.f , DEBUG_RENDER_ALWAYS , 0.5f );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( '4' ) )
 	{
-		DebugAddWorldWireBounds( AABB3( m_gameCamera.GetPosition() , m_gameCamera.GetPosition() + m_gameCamera.GetCameraTransform().GetAsMatrix().GetJBasis3D() ) , WHITE , 5.0f , mode );
+		DebugAddWorldWireBounds(
+			AABB3( m_gameCamera.GetPosition() ,
+			       m_gameCamera.GetPosition() + m_gameCamera.GetCameraTransform().GetAsMatrix().GetJBasis3D() ) ,
+			WHITE , 5.0f , m_debugRenderMode );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( '5' ) )
 	{
-		DebugAddWorldWireSphere( m_gameCamera.GetPosition() , 0.5f , YELLOW , 5.0f , mode );
+		DebugAddWorldWireSphere( m_gameCamera.GetPosition() , 0.5f , YELLOW , 5.0f , m_debugRenderMode );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( '6' ) )
 	{
-		//DebugAddWorldBasis( m_gameCamera.GetCameraTransform().GetAsMatrix() , 10.f );
-		DebugAddWorldBasis( m_gameCamera.GetCameraTransform().GetAsMatrix() , CYAN , PINK , 10.f );
+		DebugAddWorldBasis( m_gameCamera.GetCameraTransform().GetAsMatrix() , 5.f , m_debugRenderMode );
+		//DebugAddWorldBasis( m_gameCamera.GetCameraTransform().GetAsMatrix() , CYAN , PINK , 10.f );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( '7' ) )
 	{
 		//DebugAddWorldBasis( m_gameCamera.GetCameraTransform().GetAsMatrix() , 10.f );
 		DebugAddWorldTextf( m_gameCamera.GetCameraTransform().GetAsMatrix() , Vec2::ZERO , ORANGE ,
-			10000.f, DEBUG_RENDER_USE_DEPTH , " Hello %d %f" , 5 , 22.f );
+			10.f, m_debugRenderMode , " Hello %d %f" , 5 , 22.f );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::DebugLineStripDrawModeTest()
+{
+	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasLeftMouseButtonJustPressed() )
+	{
+		m_lineStripMode = true;
+	}
+
+	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasRightMouseButtonJustPressed() )
+	{
+		if ( m_lineStripPoints.size() > 0 )
+		{
+			DebugAddWorldLineStrip( ( uint ) m_lineStripPoints.size() , &m_lineStripPoints[ 0 ] , GREEN , WHITE , PINK ,
+				BLUE , 20.f , m_debugRenderMode );
+		}
+		m_lineStripPoints.clear();
+		m_lineStripMode = false;
+	}
+
+	if ( m_lineStripMode && g_theInput->WasLeftMouseButtonJustPressed() )
+	{
+		DebugAddWorldPoint( m_gameCamera.GetPosition() , 0.25 , ORANGE ,
+			YELLOW , 10.f , m_debugRenderMode );
+		m_lineStripPoints.push_back( m_gameCamera.GetPosition() );
+	}
+
+	if ( m_lineStripMode && g_theInput->WasKeyJustPressed( KEY_ESC ) )
+	{
+		m_lineStripMode = false;
+		m_lineStripPoints.clear();
 	}
 }
 
@@ -360,23 +408,23 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	{
 		movement.y += 1.f;
 	}
-	if ( g_theInput->IsKeyHeldDown( KEY_UPARROW ) )
-	{
-		rotation.x += 1.f;
-	}
-	if ( g_theInput->IsKeyHeldDown( KEY_DOWNARROW ) )
-	{
-		rotation.x -= 1.f;
-	}
-
-	if ( g_theInput->IsKeyHeldDown( KEY_RIGHTARROW ) )
-	{
-		rotation.z -= 1.f;
-	}
-	if ( g_theInput->IsKeyHeldDown( KEY_LEFTARROW ) )
-	{
-		rotation.z += 1.f;
-	}
+// 	if ( g_theInput->IsKeyHeldDown( KEY_UPARROW ) )
+// 	{
+// 		rotation.x += 1.f;
+// 	}
+// 	if ( g_theInput->IsKeyHeldDown( KEY_DOWNARROW ) )
+// 	{
+// 		rotation.x -= 1.f;
+// 	}
+// 
+// 	if ( g_theInput->IsKeyHeldDown( KEY_RIGHTARROW ) )
+// 	{
+// 		rotation.z -= 1.f;
+// 	}
+// 	if ( g_theInput->IsKeyHeldDown( KEY_LEFTARROW ) )
+// 	{
+// 		rotation.z += 1.f;
+// 	}
 	if ( g_theInput->WasKeyJustPressed( 'O' ) )
 	{
 		m_cameraPosition = Vec3::ZERO;

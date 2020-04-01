@@ -1,5 +1,6 @@
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "StringUtils.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -131,7 +132,7 @@ std::string NamedStrings::GetValue( const std::string& keyName , const char* def
 	}
 	else
 	{
-		std::string valueAsString = m_keyValuePairs.at( keyName );
+		value = m_keyValuePairs.at( keyName );
 	}
 
 	return value;
@@ -151,6 +152,93 @@ std::string NamedStrings::GetValue( const std::string& keyName , std::string def
 	else
 	{
 		std::string valueAsString = m_keyValuePairs.at( keyName );		
+	}
+
+	return value;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Rgba8 NamedStrings::GetValue( const std::string& keyName , const Rgba8& defaultValue ) const
+{
+	Rgba8 value = WHITE;
+	
+	if ( m_keyValuePairs.find( keyName ) == m_keyValuePairs.end() )
+	{
+		value = defaultValue;
+		return value;
+	}
+	else
+	{
+		std::string valueAsString = m_keyValuePairs.at( keyName );
+		Strings values = SplitStringAtGivenDelimiter( valueAsString );
+
+		if ( values.size() == 4 )
+		{
+			const char* valueAsChar0 = values[ 0 ].c_str();
+			const char* valueAsChar1 = values[ 1 ].c_str();
+			const char* valueAsChar2 = values[ 2 ].c_str();
+			const char* valueAsChar3 = values[ 3 ].c_str();
+
+			value.r = static_cast< uchar >( atoi( valueAsChar0 ) );
+			value.g = static_cast< uchar >( atoi( valueAsChar1 ) );
+			value.b = static_cast< uchar >( atoi( valueAsChar2 ) );
+			value.a = static_cast< uchar >( atoi( valueAsChar3 ) );
+		}
+	}
+
+	return value;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec2 NamedStrings::GetValue( const std::string& keyName , const Vec2& defaultValue ) const
+{
+	Vec2 value = Vec2::ZERO;
+
+	if ( m_keyValuePairs.find( keyName ) == m_keyValuePairs.end() )
+	{
+		value = defaultValue;
+		return value;
+	}
+	else
+	{
+		std::string valueAsString = m_keyValuePairs.at( keyName );
+		Strings values = SplitStringAtGivenDelimiter( valueAsString );
+
+		const char* valueAsChar0 = values[ 0 ].c_str();
+		const char* valueAsChar1 = values[ 1 ].c_str();
+		
+		value.x = static_cast< float >( atof( valueAsChar0 ) );
+		value.y = static_cast< float >( atof( valueAsChar1 ) );
+	}
+
+	return value;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec3 NamedStrings::GetValue( const std::string& keyName , const Vec3& defaultValue ) const
+{
+	Vec3 value = Vec3::ZERO;
+
+	if ( m_keyValuePairs.find( keyName ) == m_keyValuePairs.end() )
+	{
+		value = defaultValue;
+		return value;
+	}
+	else
+	{
+		std::string valueAsString = m_keyValuePairs.at( keyName );
+		Strings values = SplitStringAtGivenDelimiter( valueAsString );
+		
+		const char* valueAsChar0 = values[0].c_str();
+		const char* valueAsChar1 = values[1].c_str();
+		const char* valueAsChar2 = values[2].c_str();
+		
+		value.x = static_cast< float >( atof( valueAsChar0 ) );
+		value.y = static_cast< float >( atof( valueAsChar1 ) );
+		value.z = static_cast< float >( atof( valueAsChar2 ) );
 	}
 
 	return value;

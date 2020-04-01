@@ -61,7 +61,7 @@ RenderContext::~RenderContext()
 		DX_SAFE_RELEASE( m_blendStates[ index ] );
 	}
 
-	for ( int index = 0; index < eRasterState::TOTAL_RASTER_STATES; index++ )
+	for ( int index = 0; index < eRasterStateFillMode::TOTAL_RASTER_STATES; index++ )
 	{
 		DX_SAFE_RELEASE( m_rasterStates[ index ] );
 	}
@@ -394,7 +394,7 @@ void RenderContext::BeginCamera( const Camera& camera )
 	BindTexture( m_textureDefault );
 	BindSampler( m_defaultSampler );
 	SetBlendMode( eBlendMode::SOLID );
-	SetRasterState( eRasterState::FILL_SOLID );
+	SetRasterState( eRasterStateFillMode::FILL_SOLID );
 	//SetDepthTest( COMPARE_ALWAYS , true );
 	//BindDepthStencil( m_currentCamera->GetDepthStencilTarget() );
 }
@@ -431,17 +431,17 @@ void RenderContext::SetBlendMode( eBlendMode blendMode )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::SetRasterState( eRasterState rasterState )
+void RenderContext::SetRasterState( eRasterStateFillMode rasterState )
 {
 	switch ( rasterState )
 	{
 		case FILL_SOLID :
-							m_context->RSSetState( m_rasterStates[ eRasterState::FILL_SOLID ] );
-							m_currentRasterState = m_rasterStates[ eRasterState::FILL_SOLID ];
+							m_context->RSSetState( m_rasterStates[ eRasterStateFillMode::FILL_SOLID ] );
+							m_currentRasterState = m_rasterStates[ eRasterStateFillMode::FILL_SOLID ];
 							break;
 		case WIREFRAME :
-							m_context->RSSetState( m_rasterStates[ eRasterState::WIREFRAME ] );
-							m_currentRasterState = m_rasterStates[ eRasterState::WIREFRAME ];
+							m_context->RSSetState( m_rasterStates[ eRasterStateFillMode::WIREFRAME ] );
+							m_currentRasterState = m_rasterStates[ eRasterStateFillMode::WIREFRAME ];
 							break;
 	}
 }
@@ -706,7 +706,7 @@ void RenderContext::CreateRasterStates()
 	fillSoliddesc.MultisampleEnable = FALSE;
 	fillSoliddesc.AntialiasedLineEnable = FALSE;
 
-	m_device->CreateRasterizerState( &fillSoliddesc , &m_rasterStates[ eRasterState::FILL_SOLID ] );
+	m_device->CreateRasterizerState( &fillSoliddesc , &m_rasterStates[ eRasterStateFillMode::FILL_SOLID ] );
 
  	D3D11_RASTERIZER_DESC wireFramedesc;
  
@@ -721,12 +721,12 @@ void RenderContext::CreateRasterStates()
  	wireFramedesc.MultisampleEnable = FALSE;
  	wireFramedesc.AntialiasedLineEnable = FALSE;
  
- 	m_device->CreateRasterizerState( &wireFramedesc , &m_rasterStates[ eRasterState::WIREFRAME ] );
+ 	m_device->CreateRasterizerState( &wireFramedesc , &m_rasterStates[ eRasterStateFillMode::WIREFRAME ] );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::CreateTransientRasterState( eRasterState rasterFillMode , eCullMode cullMode , eWindingOrder windingOrder )
+void RenderContext::CreateTransientRasterState( eRasterStateFillMode rasterFillMode , eCullMode cullMode , eWindingOrder windingOrder )
 {
 	if ( m_transientRaterState )
 	{
@@ -737,7 +737,7 @@ void RenderContext::CreateTransientRasterState( eRasterState rasterFillMode , eC
 
 		if ( currentRSDesc.FillMode == GetD3D11FillMode( rasterFillMode ) )				{	result = true;	}
 		if ( currentRSDesc.CullMode == GetD3D11CullMode( cullMode ) )					{	result = true;	}
-		if ( currentRSDesc.FrontCounterClockwise == GetWindingOrder( windingOrder ) )	{	result = true;	}
+		if ( currentRSDesc.FrontCounterClockwise == ::GetWindingOrder( windingOrder ) )	{	result = true;	}
 		
 		if ( result )
 		{
@@ -754,7 +754,7 @@ void RenderContext::CreateTransientRasterState( eRasterState rasterFillMode , eC
 
 	desc.FillMode = GetD3D11FillMode( rasterFillMode ); // full triangle switch for wireframe
 	desc.CullMode = GetD3D11CullMode( cullMode );
-	desc.FrontCounterClockwise = GetWindingOrder( windingOrder );
+	desc.FrontCounterClockwise = ::GetWindingOrder( windingOrder );
 	desc.DepthBias = 0U;
 	desc.DepthBiasClamp = 0.0f;
 	desc.SlopeScaledDepthBias = 0.0f;
@@ -788,7 +788,7 @@ void RenderContext::SetCullMode( eCullMode cullMode )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::SetFillMode( eRasterState rasterFillMode )
+void RenderContext::SetFillMode( eRasterStateFillMode rasterFillMode )
 {
 	D3D11_RASTERIZER_DESC currentRasterStateDesc;
 	m_currentRasterState->GetDesc( &currentRasterStateDesc );
@@ -813,7 +813,7 @@ void RenderContext::SetWindingOrder( eWindingOrder windingOrder )
 	D3D11_RASTERIZER_DESC currentRasterStateDesc;
 	m_currentRasterState->GetDesc( &currentRasterStateDesc );
 
-	if ( currentRasterStateDesc.FrontCounterClockwise != GetWindingOrder( windingOrder ) )
+	if ( currentRasterStateDesc.FrontCounterClockwise != ::GetWindingOrder( windingOrder ) )
 	{
 		CreateTransientRasterState( GetFillModeForD3D11RasterState( currentRasterStateDesc.FillMode ) ,
 		                            GetCullModeForD3D11CullMode( currentRasterStateDesc.CullMode ) , windingOrder );
@@ -824,6 +824,36 @@ void RenderContext::SetWindingOrder( eWindingOrder windingOrder )
 	{
 		m_context->RSSetState( m_currentRasterState );
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+eCullMode RenderContext::GetCullMode() const
+{
+	D3D11_RASTERIZER_DESC currentRasterStateDesc;
+	m_currentRasterState->GetDesc( &currentRasterStateDesc );
+
+	return GetCullModeForD3D11CullMode( currentRasterStateDesc.CullMode );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+eRasterStateFillMode RenderContext::GetFillMode() const
+{
+	D3D11_RASTERIZER_DESC currentRasterStateDesc;
+	m_currentRasterState->GetDesc( &currentRasterStateDesc );
+
+	return GetFillModeForD3D11RasterState( currentRasterStateDesc.FillMode );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+eWindingOrder RenderContext::GetWindingOrder() const
+{
+	D3D11_RASTERIZER_DESC currentRasterStateDesc;
+	m_currentRasterState->GetDesc( &currentRasterStateDesc );
+
+	return GetWindingOrderForD3D11WindingOrder( currentRasterStateDesc.FrontCounterClockwise );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

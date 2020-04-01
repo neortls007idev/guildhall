@@ -1,7 +1,13 @@
 ﻿#include "Engine/Core/DebugRenderObject.hpp"
+
+#include "Engine/Math/MatrixUtils.hpp"
 #include "Engine/Time/Timer.hpp"
 #include "Engine/Time/Clock.hpp"
-#include "../Renderer/Texture.hpp"
+#include "Engine/Renderer/Texture.hpp"
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+extern Camera* g_debugCamera;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -19,7 +25,7 @@ DebugRenderObject::DebugRenderObject( eDebugRenderObjectType type , eDebugRender
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void DebugRenderObject::Update()
-{
+{	
 	UpdateColor();
 	
 	if ( m_timer != nullptr && m_timer->HasElapsed() )
@@ -283,7 +289,7 @@ void DRO_arrow3D::UpdateColor()
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 DRO_aabb3::DRO_aabb3 ( AABB3 bounds , Rgba8 color , float duration /*= 0.0f */ ,
-                       eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ , eRasterState rasterState /*= FILL_SOLID */ ) :
+                       eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ , eRasterStateFillMode rasterState /*= FILL_SOLID */ ) :
 																								DebugRenderObject( DRO_AABB3 , mode , duration )
 {
 	m_AABB3			= bounds;
@@ -298,7 +304,7 @@ DRO_aabb3::DRO_aabb3 ( AABB3 bounds , Rgba8 color , float duration /*= 0.0f */ ,
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 DRO_aabb3::DRO_aabb3 ( AABB3 bounds , Rgba8 startColor , Rgba8 endColor , float duration /*= 0.0f */ ,
-                       eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ , eRasterState rasterState /*= FILL_SOLID */ ) :
+                       eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ , eRasterStateFillMode rasterState /*= FILL_SOLID */ ) :
 																								DebugRenderObject( DRO_AABB3 , mode , duration )
 {
 	m_AABB3			= bounds;
@@ -326,7 +332,7 @@ void DRO_aabb3::UpdateColor()
 
 DRO_uvSphere::DRO_uvSphere ( Vec3 pos , float radius , Rgba8 color , float duration /*= 0.0f */ ,
                              eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ ,
-                             eRasterState rasterState /*= FILL_SOLID */ ) :
+                             eRasterStateFillMode rasterState /*= FILL_SOLID */ ) :
 																			DebugRenderObject( DRO_UVSPHERE , mode , duration )
 {
 	m_position		= pos;
@@ -343,7 +349,7 @@ DRO_uvSphere::DRO_uvSphere ( Vec3 pos , float radius , Rgba8 color , float durat
 
 DRO_uvSphere::DRO_uvSphere ( Vec3 pos , float radius , Rgba8 startColor , Rgba8 endColor , float duration /*= 0.0f */ ,
                              eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ ,
-                             eRasterState rasterState /*= FILL_SOLID */ ) :
+                             eRasterStateFillMode rasterState /*= FILL_SOLID */ ) :
 																			DebugRenderObject( DRO_UVSPHERE , mode , duration )
 {
 	m_position		= pos;
@@ -360,7 +366,7 @@ DRO_uvSphere::DRO_uvSphere ( Vec3 pos , float radius , Rgba8 startColor , Rgba8 
 
 DRO_uvSphere::DRO_uvSphere ( Vec3 pos , float radius , uint hCuts , uint vCuts , Rgba8 color ,
                              float duration /*= 0.0f */ , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ ,
-                             eRasterState rasterState /*= FILL_SOLID */ ) :
+                             eRasterStateFillMode rasterState /*= FILL_SOLID */ ) :
 																			DebugRenderObject( DRO_UVSPHERE , mode , duration )
 {
 	m_position		= pos;
@@ -380,7 +386,7 @@ DRO_uvSphere::DRO_uvSphere ( Vec3 pos , float radius , uint hCuts , uint vCuts ,
 
 DRO_uvSphere::DRO_uvSphere ( Vec3 pos , float radius , uint hCuts , uint vCuts , Rgba8 startColor , Rgba8 endColor ,
                              float duration /*= 0.0f */ , eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ ,
-                             eRasterState rasterState /*= FILL_SOLID */ ) :
+                             eRasterStateFillMode rasterState /*= FILL_SOLID */ ) :
 																			DebugRenderObject( DRO_UVSPHERE , mode , duration )
 {
 	m_position		= pos;
@@ -758,8 +764,8 @@ void DRO_text2D::UpdateColor()
 
 DRO_text3D::DRO_text3D ( std::string text , Mat44 basis , Vec2 pivot , Rgba8 color , float size /*= 1.f */ ,
                          float duration /*= 0.0f */ ,
-                         eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ ) :
-																				DebugRenderObject(DRO_TEXT3D , mode , duration  )
+                         eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ , bool isBillBoarded /*= false*/ ) :
+																				DebugRenderObject(DRO_TEXT3D , mode , duration , isBillBoarded )
 {
 	m_position				= Vec3::ZERO;
 	
@@ -778,8 +784,8 @@ DRO_text3D::DRO_text3D ( std::string text , Mat44 basis , Vec2 pivot , Rgba8 col
 
 DRO_text3D::DRO_text3D ( std::string text , Mat44 basis , Vec2 pivot , Rgba8 startColor , Rgba8 endColor ,
                          float size /*= 1.f */ , float duration /*= 0.0f */ ,
-                         eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ ) :
-																								DebugRenderObject( DRO_TEXT3D , mode , duration )
+                         eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ , bool isBillBoarded /*= false*/ ) :
+																								DebugRenderObject( DRO_TEXT3D , mode , duration , isBillBoarded )
 {
 	m_position = Vec3::ZERO;
 
@@ -798,8 +804,8 @@ DRO_text3D::DRO_text3D ( std::string text , Mat44 basis , Vec2 pivot , Rgba8 sta
 
 DRO_text3D::DRO_text3D ( std::string text , Vec3 position , Vec2 pivot , Rgba8 startColor , Rgba8 endColor ,
                          float size /*= 1.f */ , float duration /*= 0.0f */ ,
-                         eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ ) :
-																								DebugRenderObject( DRO_TEXT3D , mode , duration )
+                         eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ , bool isBillBoarded /*= false*/ ) :
+																								DebugRenderObject( DRO_TEXT3D , mode , duration , isBillBoarded )
 {
 	m_position = Vec3::ZERO;
 
@@ -817,8 +823,8 @@ DRO_text3D::DRO_text3D ( std::string text , Vec3 position , Vec2 pivot , Rgba8 s
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 DRO_text3D::DRO_text3D ( std::string text , Vec3 position , Vec2 pivot , Rgba8 color , float size /*= 1.f */ ,
-                         float duration /*= 0.0f */ , eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ ) :
-																								DebugRenderObject( DRO_TEXT3D , mode , duration )
+                         float duration /*= 0.0f */ , eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ , bool isBillBoarded /*= false*/ ) :
+																								DebugRenderObject( DRO_TEXT3D , mode , duration , isBillBoarded )
 {
 	m_position = Vec3::ZERO;
 
@@ -831,6 +837,24 @@ DRO_text3D::DRO_text3D ( std::string text , Vec3 position , Vec2 pivot , Rgba8 c
 	m_startColor			= color;
 	m_endColor				= color;
 	m_currrentColor			= color;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DRO_text3D::Update()
+{
+	if ( m_isBillboarded && g_debugCamera )
+	{
+		m_model = LookAtMatrix( m_position , g_debugCamera->GetPosition() );
+	}
+
+	UpdateColor();
+
+	if ( m_timer != nullptr && m_timer->HasElapsed() )
+	{
+		MarkForDestroy();
+	}
+	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -11,6 +11,7 @@
 class GPUMesh;
 class Camera;
 class Texture;
+class Devconsole;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -37,6 +38,7 @@ public:
 //				HELPERS
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	void AddDebugObjectTo( eRenderSpace space  , DebugRenderObject* object );
+	size_t FindSpaceInDebugObjectArray( std::vector<DebugRenderObject*>& droArray );
 	void CleanupDebugObjects( std::vector<DebugRenderObject*>& droArray );
 	void UpdateDebugObjects( std::vector<DebugRenderObject*>& droArray , float deltaSeconds );
 
@@ -70,6 +72,33 @@ public:
 	
 	std::vector<DebugRenderObject*>					m_debugRenderScreenObjects;
 };
+
+
+void AddDebugRenderDevConsoleCommands( DevConsole* devConsole );
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//
+//				DEVCONSOLE DEBUG RENDER COMMANDS
+//
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+static bool ToggleDebugRendering( EventArgs& args );
+static bool DebugRender( EventArgs& args );
+static bool DebugAddWorldPoint( EventArgs& args );
+static bool DebugAddWorldWireSphere( EventArgs& args );
+static bool DebugAddWorldWireBounds( EventArgs& args );
+static bool DebugAddWorldBillboardText( EventArgs& args );
+
+static bool DebugAddScreenPoint( EventArgs& args );	
+static bool DebugAddScreenQuad( EventArgs & args );	
+static bool DebugAddScreenText( EventArgs & args ); 
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//
+//		RENDERING FUNCTIONS CALLED BY ANY GAME OR ENGINE SYSTEM
+//		
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void DebugRenderWorldToCamera( Camera* cam );										// Draws all world objects to this camera 
 void DebugRenderScreenTo( Texture* output );										// Draws all screen objects onto this texture (screen coordinate system is up to you.  I like a 1080p default)
@@ -196,6 +225,8 @@ void DebugAddWireMeshToWorld( Mat44 transform , GPUMesh* mesh , float duration =
 //		
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+
+// TODO : IMPLEMENT THESE
 void  DebugRenderSetScreenHeight( float height ); // default to 1080.0f when system starts up.  Meaning (0,0) should always be bottom left, (aspect * height, height) is top right
 AABB2 DebugGetScreenBounds();                    // useful if you want to align to top right for something
 

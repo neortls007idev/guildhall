@@ -5,6 +5,7 @@
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Math/IntVec2.hpp"
 #include "Engine/Math/Vec2.hpp"
+#include "Engine/Math/Vec3.hpp"
 
 #include "ThirdParty/TinyXML2/tinyxml2.h"
 
@@ -31,6 +32,7 @@ public:
 	std::string		GetValue( const std::string& keyName , const char* defaultValue ) const;
 	Rgba8			GetValue( const std::string& keyName , const Rgba8& defaultValue ) const;
 	Vec2			GetValue( const std::string& keyName , const Vec2& defaultValue ) const;
+	Vec3			GetValue( const std::string& keyName , const Vec3& defaultValue ) const;
 	IntVec2			GetValue( const std::string& keyName , const IntVec2& defaultValue ) const;
 	//FloatRange		GetValue( const std::string& keyName , const FloatRange& defaultValue ) const;
 	//IntRange		GetValue( const std::string& keyName , const IntRange& defaultValue ) const;

@@ -42,7 +42,7 @@ D3D11_DEPTH_WRITE_MASK GetD3D11DepthWriteMask( bool writeOnPass )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-D3D11_FILL_MODE GetD3D11FillMode( eRasterState rasterFillMode )
+D3D11_FILL_MODE GetD3D11FillMode( eRasterStateFillMode rasterFillMode )
 {
 	switch ( rasterFillMode )
 	{
@@ -74,7 +74,7 @@ eCullMode GetCullModeForD3D11CullMode( D3D11_CULL_MODE D3D11CullMode )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-eRasterState GetFillModeForD3D11RasterState( D3D11_FILL_MODE D3D11RasterFillMode )
+eRasterStateFillMode GetFillModeForD3D11RasterState( D3D11_FILL_MODE D3D11RasterFillMode )
 {
 	switch ( D3D11RasterFillMode )
 	{

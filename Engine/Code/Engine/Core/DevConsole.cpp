@@ -289,8 +289,9 @@ void DevConsole::ProcessCommand()
 {
 	Strings currentCompleteCommand = SplitStringOnceAtGivenDelimiter( m_currentText , ' ' );
 
+	Strings args;
 	EventArgs currentCommandArgs;
-
+	
 	for ( size_t index = 0; index < m_consoleCommands.size(); index++ )
 	{
 		if ( StringCompare( currentCompleteCommand[ 0 ] , m_consoleCommands[ index ].command ) )
@@ -299,11 +300,18 @@ void DevConsole::ProcessCommand()
 		}
 	}
 
-	if ( currentCompleteCommand.size() % 2 == 1 )
+	if ( currentCompleteCommand.size() == 2 )
 	{
-		for ( size_t index = 1 ; index < currentCompleteCommand.size() ; index += 2 )
+		args = SplitStringAtGivenDelimiter( currentCompleteCommand[ 1 ] , '|' );
+	}
+
+	for ( size_t argsIndex = 0 ; argsIndex < args.size() ; argsIndex++ )
+	{
+		Strings argValuePair = SplitStringOnceAtGivenDelimiter( args[ argsIndex ] , '=' );
+		
+		if ( argValuePair.size() == 2 )
 		{
-			currentCommandArgs.SetValue( currentCompleteCommand[ index ] , currentCompleteCommand[ index + 1 ] );
+			currentCommandArgs.SetValue( argValuePair[ 0 ] , argValuePair[ 1 ] );
 		}
 	}
 	

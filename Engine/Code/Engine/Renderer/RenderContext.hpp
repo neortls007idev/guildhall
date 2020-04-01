@@ -121,7 +121,7 @@ public:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 	void		SetBlendMode( eBlendMode blendMode );
-	void		SetRasterState( eRasterState rasterState );
+	void		SetRasterState( eRasterStateFillMode rasterState );
 	void		SetTransientRasterStateAsRasterState();
 	
 	void		BindTexture( const Texture* constTexture );
@@ -137,15 +137,18 @@ public:
 //			RENDERING PIPELINE CREATION METHODS
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-	Shader*		GetOrCreateShader( char const* shaderFilename );
-	Texture*	GetOrCreateTextureFromFile( const char* imageFilePath );
-	BitmapFont* GetOrCreateBitmapFontFromFile( std::string bitmapFontFilePath );
-	void		CreateBlendStates();
-	void		CreateRasterStates();
-	void		CreateTransientRasterState( eRasterState rasterFillMode , eCullMode cullMode , eWindingOrder windingOrder );
-	void		SetCullMode( eCullMode cullMode );							
-	void		SetFillMode( eRasterState rasterFillMode );					
-	void		SetWindingOrder( eWindingOrder windingOrder );
+	Shader*					GetOrCreateShader( char const* shaderFilename );
+	Texture*				GetOrCreateTextureFromFile( const char* imageFilePath );
+	BitmapFont*				GetOrCreateBitmapFontFromFile( std::string bitmapFontFilePath );
+	void					CreateBlendStates();
+	void					CreateRasterStates();
+	void					CreateTransientRasterState( eRasterStateFillMode rasterFillMode , eCullMode cullMode , eWindingOrder windingOrder );
+	void					SetCullMode( eCullMode cullMode );							
+	void					SetFillMode( eRasterStateFillMode rasterFillMode );					
+	void					SetWindingOrder( eWindingOrder windingOrder );
+	eCullMode				GetCullMode() const;
+	eRasterStateFillMode	GetFillMode() const;
+	eWindingOrder			GetWindingOrder() const;
 	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			DRAW METHODS

@@ -72,7 +72,7 @@ public:
 	DebugRenderObject( eDebugRenderObjectType type , eDebugRenderMode mode , float duration , bool isBillboarded = false );
 	~DebugRenderObject() {};
 
-	void Update();
+	virtual void Update();
 	virtual void UpdateColor() = 0;
 	
 	void MarkForDestroy();
@@ -364,17 +364,17 @@ struct DRO_aabb3 : public DebugRenderObject
 
 public:
 	DRO_aabb3 ( AABB3 bounds , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH ,
-	            eRasterState rasterState = FILL_SOLID );
+	            eRasterStateFillMode rasterState = FILL_SOLID );
 	
 	DRO_aabb3 ( AABB3 bounds , Rgba8 startColor , Rgba8 endColor , float duration = 0.0f ,
-	            eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH , eRasterState rasterState = FILL_SOLID );
+	            eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH , eRasterStateFillMode rasterState = FILL_SOLID );
 
 	void UpdateColor() override;
 
 public:
 
 	AABB3			m_AABB3;
-	eRasterState	m_rasterState;
+	eRasterStateFillMode	m_rasterState;
 	Rgba8			m_startColor;
 	Rgba8			m_endColor;
 	Rgba8			m_currrentColor;
@@ -387,16 +387,16 @@ struct DRO_uvSphere : public DebugRenderObject
 
 public:
 	DRO_uvSphere( Vec3 pos , float radius , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH ,
-		eRasterState rasterState = FILL_SOLID );
+		eRasterStateFillMode rasterState = FILL_SOLID );
 
 	DRO_uvSphere( Vec3 pos , float radius , Rgba8 startColor , Rgba8 endColor , float duration = 0.0f ,
-		eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH , eRasterState rasterState = FILL_SOLID );
+		eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH , eRasterStateFillMode rasterState = FILL_SOLID );
 
 	DRO_uvSphere( Vec3 pos , float radius , uint hCuts , uint vCuts , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH ,
-		eRasterState rasterState = FILL_SOLID );
+		eRasterStateFillMode rasterState = FILL_SOLID );
 
 	DRO_uvSphere( Vec3 pos , float radius , uint hCuts , uint vCuts , Rgba8 startColor , Rgba8 endColor , float duration = 0.0f ,
-		eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH , eRasterState rasterState = FILL_SOLID );
+		eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH , eRasterStateFillMode rasterState = FILL_SOLID );
 
 		
 	void UpdateColor() override;
@@ -405,7 +405,7 @@ public:
 
 	Vec3			m_position;
 	float			m_radius;
-	eRasterState	m_rasterState;
+	eRasterStateFillMode	m_rasterState;
 
 	uint			m_hCuts		= 16;
 	uint			m_vCuts		= 8;
@@ -422,17 +422,18 @@ struct DRO_text3D : public DebugRenderObject
 
 public:
 	DRO_text3D( std::string text , Mat44 basis , Vec2 pivot , Rgba8 startColor , Rgba8 endColor ,
-		float size = 1.f , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS );
+		float size = 1.f , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS , bool isBillBoarded = false );
 
 	DRO_text3D( std::string text , Mat44 basis , Vec2 pivot , Rgba8 color , float size = 1.f ,
-		float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS );
+		float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS , bool isBillBoarded = false );
 
 	DRO_text3D( std::string text , Vec3 position , Vec2 pivot , Rgba8 startColor , Rgba8 endColor ,
-		float size = 1.f , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS );
+		float size = 1.f , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS , bool isBillBoarded = false );
 
 	DRO_text3D( std::string text , Vec3 position , Vec2 pivot , Rgba8 color , float size = 1.f ,
-		float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS );
+		float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS , bool isBillBoarded = false );
 
+	void Update() override;
 	void UpdateColor() override;
 
 public:

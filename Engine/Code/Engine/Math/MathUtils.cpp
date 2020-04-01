@@ -1252,11 +1252,11 @@ const Vec2 MinkowskiSumSupport( const Vec2* vertices1 , const size_t count1 , co
 
 	// get furthest point of first body along an arbitrary direction
 	size_t i = GetIndexOfFurthestPoint( vertices1 , count1 , direction );
-	//DebugAddScreenPoint( vertices1[ i ] , 5.f , PINK , 10.f );
+	
 	
 	// get furthest point of second body along the opposite direction
 	size_t j = GetIndexOfFurthestPoint( vertices2 , count2 , -direction );
-	//DebugAddScreenPoint( vertices2[ j ] , 5.f , PINK , 10.f );
+	
 
 	// subtract (Minkowski sum) the two points to see if bodies 'overlap'
 	return vertices1[ i ] - vertices2[ j ];
@@ -1427,14 +1427,13 @@ bool DetectPolygonvPolygonIntersections( Polygon2D poly1 , Polygon2D poly2 )
 	
 	if ( DoesSimplexContainOrigin( sp1 , sp2 , sp3 ) )
 	{
-		//DebugAddScreenLine( Vec2( 0.f , 0.f ) , Vec2( 10.f , 10.f ) , Rgba8( 255 , 0 , 0 , 255 ) , 5.f , 5.f );
 		simplexFound = true;
 		return true;
 	}
 	
 	GetNextSimplex( sp1 , sp2 , sp3 , poly1 , poly2 );
 
-	int index = ( poly1.m_points.size() * poly2.m_points.size() ) - 1;
+	int index = ( int ) ( poly1.m_points.size() * poly2.m_points.size() ) - 1;
 
 	while ( index > 0 )
 	{
@@ -1513,16 +1512,18 @@ bool DoesSimplexContainOrigin( Vec2 p1 , Vec2 p2 , Vec2 p3 )
 	}
 
 	//temp = temp.MakeConvexFromPointCloud( &temp.m_points[ 0 ] , 3 );
+
+// TEMP HACK - DO NOT DO THIS WILL TANK FRAME RATE
 	
-	g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
-	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
-	g_theRenderer->BindDepthStencil( nullptr );
-	g_theRenderer->BindShader( nullptr );
-	g_theRenderer->BindTexture( nullptr );
-	g_theRenderer->SetBlendMode( ALPHA );
-	g_theRenderer->SetRasterState( FILL_SOLID );
-	g_theRenderer->DrawPolygon( &temp.m_points[ 0 ] , temp.m_points.size() , GREEN );
-	g_theRenderer->DrawDisc( Vec2::ZERO , 5.f , ORANGE );
+// 	g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
+// 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
+// 	g_theRenderer->BindDepthStencil( nullptr );
+// 	g_theRenderer->BindShader( nullptr );
+// 	g_theRenderer->BindTexture( nullptr );
+// 	g_theRenderer->SetBlendMode( ALPHA );
+// 	g_theRenderer->SetRasterState( FILL_SOLID );
+// 	g_theRenderer->DrawPolygon( &temp.m_points[ 0 ] , temp.m_points.size() , GREEN );
+// 	g_theRenderer->DrawDisc( Vec2::ZERO , 5.f , ORANGE );
 	//g_theRenderer->EndCamera( g_theGame->m_worldCamera );
 	
 	return temp.Contains( Vec2::ZERO );
