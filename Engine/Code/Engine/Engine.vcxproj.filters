@@ -301,6 +301,9 @@
     <ClCompile Include="Renderer\D3D11Utils.cpp">
       <Filter>Renderer\Pipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Primitives\OBB3.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -566,6 +569,9 @@
     </ClInclude>
     <ClInclude Include="Renderer\D3D11Utils.hpp">
       <Filter>Renderer\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Primitives\OBB3.hpp">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
