@@ -275,15 +275,15 @@ void DebugRenderScreenTo( Texture* output )
 		RenderContext* ctx = output->GetRenderContext();
 		g_debugRenderContext = ctx;
 		camera.SetColorTarget( output );
-		camera.SetOrthoView( Vec2::ZERO , Vec2( output->GetDimensions() ) );
+		//camera.SetOrthoView( Vec2::ZERO , Vec2( output->GetDimensions() ) );
 		//camera.SetOrthoView( Vec2( -0.5f * ( 16.f / 9.f ) * 1080.f , -0.5 * 1080.f ), Vec2( 0.5f * ( 16.f / 9.f ) * 1080.f , 0.5 * 1080.f ) );
-		//camera.SetOrthoView( Vec2( -800.f , -400.f ) , Vec2( 800.f , 400.f ) );
+		camera.SetOrthoView( Vec2( -800.f , -400.f ) , Vec2( 800.f , 400.f ) );
 	}
 	else
 	{
 		g_debugRenderContext = g_theRenderer;
-		//camera.SetOrthoView( Vec2( -800.f , -400.f ) , Vec2( 800.f , 400.f ) );
-		camera.SetOrthoView( Vec2::ZERO, Vec2( ( 16.f / 9.f ) * 1080.f , 1080.f ) );
+		camera.SetOrthoView( Vec2( -800.f , -400.f ) , Vec2( 800.f , 400.f ) );
+		//camera.SetOrthoView( Vec2::ZERO, Vec2( ( 16.f / 9.f ) * 1080.f , 1080.f ) );
 	}
 
 /*camera.SetProjectionOrthographic()*/
@@ -748,6 +748,22 @@ void DebugAddScreenTexturedQuad( AABB2 bounds , Texture* tex , Rgba8 tint /*= WH
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void DebugAddScreenConvexgon( Polygon2D poly , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ )
+{
+	DRO_convexgon2D* obj = new DRO_convexgon2D( poly , startColor , endColor , duration , mode );
+	g_currentManager->AddDebugObjectTo( SCREENSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddScreenConvexgon( Polygon2D poly , Rgba8 color , float duration /*= 0.0f */ , eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ )
+{
+	DRO_convexgon2D* obj = new DRO_convexgon2D( poly , color , duration , mode );
+	g_currentManager->AddDebugObjectTo( SCREENSPACE , obj );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void DebugAddScreenText( Vec4 pos , Vec2 pivot , float size , Rgba8 startColor , Rgba8 endColor , float duration , char const* text )
 {
 	std::string str = text;
@@ -1192,6 +1208,23 @@ void DebugRenderObjectsManager::RenderObjectArray( std::vector<DebugRenderObject
 
 			}break;
 
+			case DRO_CONVEXGON2D:
+			{
+				DRO_convexgon2D* convexgon2D = ( DRO_convexgon2D* ) droArray[ index ];
+
+				if ( convexgon2D->m_poly.m_points.size() < 3 )
+				{
+					return;
+				}
+					
+				g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
+				g_debugRenderContext->SetModelMatrix( convexgon2D->m_transform.GetAsMatrix() );
+				g_debugRenderContext->DrawPolygon( &convexgon2D->m_poly.m_points[ 0 ] ,
+										  ( uint ) convexgon2D->m_poly.m_points.size() , convexgon2D->m_currentColor );
+				g_debugRenderContext->BindTexture( nullptr );
+
+			}break;
+			
 			case DRO_TEXT2D:
 			{
 				DRO_text2D* text2D = ( DRO_text2D* ) droArray[ index ];
@@ -1453,6 +1486,25 @@ void DebugRenderObjectsManager::RenderObjectArrayXRAYPass2( std::vector<DebugRen
 				g_debugRenderContext->DrawAABB2( quad2D->m_bounds , quadStartColorCopy ,
 												 quadEndColorCopy , quad2D->m_texUVs.m_mins ,
 				                                 quad2D->m_texUVs.m_maxs );
+				g_debugRenderContext->BindTexture( nullptr );
+
+			}break;
+
+			case DRO_CONVEXGON2D:
+			{
+				DRO_convexgon2D* convexgon2D = ( DRO_convexgon2D* ) droArray[ index ];
+				if ( convexgon2D->m_poly.m_points.size() < 3 )
+				{
+					return;
+				}
+
+				Rgba8 convexgonColorCopy = convexgon2D->m_currentColor;
+				convexgonColorCopy.a *= ( uchar ) ( ( float ) convexgonColorCopy.a * 0.5f );
+
+				g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
+				g_debugRenderContext->SetModelMatrix( convexgon2D->m_transform.GetAsMatrix() );
+				g_debugRenderContext->DrawPolygon( &convexgon2D->m_poly.m_points[ 0 ] ,
+													( uint ) convexgon2D->m_poly.m_points.size() , convexgonColorCopy );
 				g_debugRenderContext->BindTexture( nullptr );
 
 			}break;

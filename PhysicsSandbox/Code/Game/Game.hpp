@@ -103,6 +103,8 @@ public:
 		   Vec3						m_cameraCurrentPosition		= Vec3::ZERO;
 		   Vec3						m_cameraMoveVelocity		= Vec3( MAX_CAMERA_MOVE_VELOCITY_X , MAX_CAMERA_MOVE_VELOCITY_Y , 0.f );
 		   Vec2						m_currentCameraOutputSize	= Vec2( 1600.f , 800.f );
+		   Vec2						m_worldBoundsOffset			= Vec2( 47.5f , 47.5f );
+		   float					m_worldBoundsThickness		= 5.f;
 
 		   float					m_minColliderRadius			= MIN_COLLIDER_RADIUS;
 		   float					m_maxColliderRadius			= MAX_COLLIDER_RADIUS;

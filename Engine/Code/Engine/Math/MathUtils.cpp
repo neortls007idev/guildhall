@@ -9,6 +9,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Primitives/Polygon2D.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Primitives/Plane.hpp"
 #include "Game/Game.hpp"
 
 
@@ -1247,122 +1248,36 @@ float CalculateAreaOfPolygon( const Polygon2D& polygon )
 	return areaOfPolygon;
 }
 
-const Vec2 MinkowskiSumSupport( const Vec2* vertices1 , const size_t count1 , const Vec2* vertices2 , const size_t count2 , const Vec2 direction )
-{
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
+const Vec2 MinkowskiSumSupportPoint( const Vec2* vertices1 , const size_t count1 , const Vec2* vertices2 , const size_t count2 , const Vec2 direction )
+{
 	// get furthest point of first body along an arbitrary direction
 	size_t i = GetIndexOfFurthestPoint( vertices1 , count1 , direction );
-	
 	
 	// get furthest point of second body along the opposite direction
 	size_t j = GetIndexOfFurthestPoint( vertices2 , count2 , -direction );
 	
-
 	// subtract (Minkowski sum) the two points to see if bodies 'overlap'
 	return vertices1[ i ] - vertices2[ j ];
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-const bool GJKPolygonPolygonIntersectionTest( const Vec2* vertices1 , const size_t count1 , const Vec2* vertices2 , const size_t count2 )
+const Vec2 MinkowskiSumSupportPoint( Polygon2D poly1 , Polygon2D poly2 , const Vec2 direction )
 {
-	if ( count1 < 3 || count2 < 3 )
+	if ( poly1.m_points.size() < 3 || poly2.m_points.size() < 3 )
 	{
-		return false;
+		return Vec2::ZERO;
 	}
 	
-	int iterCount = 0;
-	
-	size_t index = 0; // index of current vertex of simplex
-	Vec2 a , b , c , d , ao , ab , ac , abperp , acperp , simplex[ 3 ];
-
-	Vec2 position1 = AveragePoint( vertices1 , count1 ); // not a CoG but
-	Vec2 position2 = AveragePoint( vertices2 , count2 ); // it's ok for GJK )
-
-	// initial direction from the center of 1st body to the center of 2nd body
-	d = position1 - position2;
-
-	// if initial direction is zero – set it to any arbitrary axis (we choose X)
-	if ( ( d.x == 0 ) && ( d.y == 0 ) )
-	{
-		d.x = 1.f;
-	}
-	// set the first support as initial point of the new simplex
-	simplex[ 0 ] = MinkowskiSumSupport( vertices1 , count1 , vertices2 , count2 , d );
-	a = simplex[ 0 ];
-
-	if ( DotProduct2D( a , d ) <= 0 )
-	{
-		return false; // no collision
-	}
-
-	d =  -a ; // The next search direction is always towards the origin, so the next search direction is negate(a)
-
-	while ( true )
-	{
-		iterCount++;
-
-		simplex[ ++index ] = MinkowskiSumSupport( vertices1 , count1 , vertices2 , count2 , d );
-		a = simplex[ ++index ];
-
-		if ( DotProduct2D( a , d ) <= 0 )
-		{
-			return false; // no collision
-		}
-		ao = -a; // from point A to Origin is just negative A
-
-		// simplex has 2 points (a line segment, not a triangle yet)
-		if ( index < 2 )
-		{
-			b = simplex[ 0 ];
-			ab = b - a; // from point A to B
-			d = TripleProduct( ab , ao , ab ); // normal to AB towards Origin
-			if ( d.GetLengthSquared() == 0 )
-			{
-				d = ab.GetRotated90Degrees();
-			}
-			continue; // skip to next iteration
-		}
-
-		b = simplex[ 1 ];
-		c = simplex[ 0 ];
-		ab = b - a;							// from point A to B
-		ac = c - a;							// from point A to C
-
-		acperp = TripleProduct( ab , ac , ac );
-
-		if ( DotProduct2D( acperp , ao ) >= 0 )
-		{
-
-			d = acperp; // new direction is normal to AC towards Origin
-
-		}
-		else
-		{
-
-			abperp = TripleProduct( ac , ab , ab );
-
-			if ( DotProduct2D( abperp , ao ) < 0 )
-			{
-				iterCount = 0;
-				return true; // collision
-			}
-			
-			simplex[ 0 ] = simplex[ 1 ]; // swap first element (point C)
-
-			d = abperp; // new direction is normal to AB towards Origin
-		}
-
-		simplex[ 1 ] = simplex[ 2 ]; // swap element in the middle (point B)
-		--index;
-	}
-
-	return false;
+	return MinkowskiSumSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , &poly2.m_points[ 0 ] ,
+	                                 poly2.m_points.size() , direction );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-const bool GJKPolygonPolygonIntersectionTest( const Polygon2D polygon1 , const Polygon2D polygon2 )
+const bool MinskowskiDifferencePolygonPolygonIntersectionTest( const Polygon2D polygon1 , const Polygon2D polygon2 )
 {
 	if ( polygon1.m_points.size() < 3 || polygon2.m_points.size() < 3 )
 	{
@@ -1393,7 +1308,7 @@ const Polygon2D GenerateMinkowskiDifferencePolygon( const Polygon2D* poly1 , con
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-
+ 
 Vec2 GetSupportPoint( const Vec2* vertices , size_t count , Vec2 direction )
 {
 	float maxProduct = DotProduct2D( direction , vertices[ 0 ] );
@@ -1412,41 +1327,42 @@ Vec2 GetSupportPoint( const Vec2* vertices , size_t count , Vec2 direction )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-bool DetectPolygonvPolygonIntersections( Polygon2D poly1 , Polygon2D poly2 )
+bool GJKDetectPolygonvPolygonIntersections( Polygon2D poly1 , Polygon2D poly2 , Vec2* outSimplex )
 {
 	Vec2 dir1 = Vec2( 0.f , 1.f );
 	Vec2 dir2 = Vec2( 1.f , 0.f );
-	Vec2 sp1 = GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , dir1 ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -dir1 );
-	Vec2 sp2 = GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , dir2 ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -dir2 );
+	
+	Vec2 sp1 = MinkowskiSumSupportPoint( poly1 , poly2 , dir1 );
+	Vec2 sp2 = MinkowskiSumSupportPoint( poly1 , poly2 , dir2 );
 	Vec2 directionTowardsOrigin = -sp1.GetNormalized();
-	Vec2 sp3 = GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , directionTowardsOrigin ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -directionTowardsOrigin );
-	bool simplexFound = false;
+	Vec2 sp3 = MinkowskiSumSupportPoint( poly1 , poly2 , directionTowardsOrigin );
+	
 	Vec2 currentSp1 = sp1;
 	Vec2 currentSp2 = sp2;
 	Vec2 currentSp3 = sp3;
 	
 	if ( DoesSimplexContainOrigin( sp1 , sp2 , sp3 ) )
 	{
-		simplexFound = true;
+		outSimplex[ 0 ] = sp1;
+		outSimplex[ 1 ] = sp2;
+		outSimplex[ 2 ] = sp3;
+
 		return true;
 	}
-	
 	GetNextSimplex( sp1 , sp2 , sp3 , poly1 , poly2 );
-
-	int index = ( int ) ( poly1.m_points.size() * poly2.m_points.size() ) - 1;
-
-	while ( index > 0 )
+	while ( !AreBothSimplexSame( sp1 , sp2 , sp3 , currentSp1 , currentSp2 , currentSp3 ) )
 	{
 		if ( DoesSimplexContainOrigin( sp1 , sp2 , sp3 ) )
 		{
-			simplexFound = true;
+			outSimplex[ 0 ] = sp1;
+			outSimplex[ 1 ] = sp2;
+			outSimplex[ 2 ] = sp3;
 			return true;
 		}
 		currentSp1 = sp1;
 		currentSp2 = sp2;
 		currentSp3 = sp3;
 		GetNextSimplex( sp1 , sp2 , sp3 , poly1 , poly2 );
-		index--;
 	}
 	return false;
 }
@@ -1481,11 +1397,15 @@ void GetNextSimplex( Vec2& outS1 , Vec2& outS2 , Vec2& outS3 , Polygon2D poly1 ,
 		s2 = outS3;
 	}
 	Vec2 dir = -minPoint.GetNormalized();
-	s3 = GetSupportPoint( &poly1.m_points[ 0 ] , poly1.m_points.size() , dir ) - GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , -dir );
+	s3 = MinkowskiSumSupportPoint( poly1 , poly2 , dir );
+
 	outS1 = s1;
 	outS2 = s2;
 	outS3 = s3;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 bool DoesSimplexContainOrigin( Vec2 p1 , Vec2 p2 , Vec2 p3 )
 {
 	Polygon2D temp = Polygon2D();
@@ -1510,25 +1430,13 @@ bool DoesSimplexContainOrigin( Vec2 p1 , Vec2 p2 , Vec2 p3 )
 		temp.m_points.push_back( p3 );
 		temp.m_points.push_back( p1 );
 	}
-
-	//temp = temp.MakeConvexFromPointCloud( &temp.m_points[ 0 ] , 3 );
-
-// TEMP HACK - DO NOT DO THIS WILL TANK FRAME RATE
-	
-// 	g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
-// 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
-// 	g_theRenderer->BindDepthStencil( nullptr );
-// 	g_theRenderer->BindShader( nullptr );
-// 	g_theRenderer->BindTexture( nullptr );
-// 	g_theRenderer->SetBlendMode( ALPHA );
-// 	g_theRenderer->SetRasterState( FILL_SOLID );
-// 	g_theRenderer->DrawPolygon( &temp.m_points[ 0 ] , temp.m_points.size() , GREEN );
-// 	g_theRenderer->DrawDisc( Vec2::ZERO , 5.f , ORANGE );
-	//g_theRenderer->EndCamera( g_theGame->m_worldCamera );
 	
 	return temp.Contains( Vec2::ZERO );
 }
-bool IsBothSimplexSame( Vec2 simplex1P1 , Vec2 simplex1P2 , Vec2 simplex1P3 , Vec2 simplex2P1 , Vec2 simplex2P2 , Vec2 simplex2P3 )
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool AreBothSimplexSame( Vec2 simplex1P1 , Vec2 simplex1P2 , Vec2 simplex1P3 , Vec2 simplex2P1 , Vec2 simplex2P2 , Vec2 simplex2P3 )
 {
 	//6 possible combinations
 	float nearZero = 0.000001f;
@@ -1558,3 +1466,62 @@ bool IsBothSimplexSame( Vec2 simplex1P1 , Vec2 simplex1P2 , Vec2 simplex1P3 , Ve
 	}
 	return false;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Polygon2D GenerateEPAMinkowskiPolygonIfPolygonsIntersect( Polygon2D& poly1 , Polygon2D& poly2 )
+{
+	Polygon2D toReturn;
+	Vec2 simplex[ 3 ];
+	GJKDetectPolygonvPolygonIntersections( poly1 , poly2 , simplex );
+	std::vector<Vec2> EPAPolyPoints;
+	EPAPolyPoints.push_back( simplex[ 0 ] );
+	EPAPolyPoints.push_back( simplex[ 1 ] );
+	EPAPolyPoints.push_back( simplex[ 2 ] );
+	toReturn = Polygon2D::MakeConvexFromPointCloud( &EPAPolyPoints[ 0 ] , 3 );
+	
+	Vec2 nearestPoint = toReturn.GetClosestPointOnEdges( Vec2::ZERO );
+	Vec2 dir = nearestPoint.GetNormalized();
+	Plane2D currentPlane = Plane2D( dir , nearestPoint );
+	const float nearZero = 0.0001f;
+	Vec2 supportPoint = MinkowskiSumSupportPoint( poly1 , poly2 , dir );
+	if ( currentPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero )
+	{
+		return toReturn;
+	}
+	EPAPolyPoints.push_back( supportPoint );
+	toReturn = Polygon2D::MakeConvexFromPointCloud( &EPAPolyPoints[ 0 ] , ( int ) EPAPolyPoints.size() );
+	
+	nearestPoint = toReturn.GetClosestPointOnEdges( Vec2::ZERO  );
+	dir = nearestPoint.GetNormalized();
+	Plane2D nextPlane = Plane2D( dir , nearestPoint );
+
+	supportPoint = MinkowskiSumSupportPoint( poly1 , poly2 , dir );
+	if ( nextPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero )
+	{
+		return toReturn;
+	}
+
+	EPAPolyPoints.push_back( supportPoint );
+	toReturn = Polygon2D::MakeConvexFromPointCloud( &EPAPolyPoints[ 0 ] , ( int ) EPAPolyPoints.size() );
+	
+	while ( nextPlane != currentPlane )
+	{
+		currentPlane = nextPlane;
+		nearestPoint = toReturn.GetClosestPointOnEdges( Vec2::ZERO );
+		dir = nearestPoint.GetNormalized();
+		nextPlane = Plane2D( dir , nearestPoint );
+		supportPoint = MinkowskiSumSupportPoint( poly1 , poly2 , dir );
+
+		if ( nextPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero )
+		{
+			return toReturn;
+		}
+
+		EPAPolyPoints.push_back( supportPoint );
+		toReturn = Polygon2D::MakeConvexFromPointCloud( &EPAPolyPoints[ 0 ] , ( int ) EPAPolyPoints.size() );
+	}
+	return toReturn;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

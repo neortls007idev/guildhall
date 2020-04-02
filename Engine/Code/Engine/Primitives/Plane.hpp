@@ -1,10 +1,21 @@
 #pragma once
 #include "Engine/Math/Vec2.hpp"
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 struct Plane2D
 {
-	Vec2 normal;
-	float distanceFromOriginAlongNormal; // distance; 
+	Vec2  m_normal;
+	float m_distance; // distanceFromOriginAlongNormal; 
 
-	float GetDistance( Vec2 position ) const;
+	Plane2D();
+	Plane2D( Vec2 normal , const Vec2 pointOnPlane );
+	
+	float	GetDistance( const Vec2 position ) const;
+	bool	IsPointInFrontOfPlane( const Vec2 point ) const;
+	float	GetSignedDistanceFromPlane( const Vec2 point );
+	bool	operator==( const Plane2D& compare ) const;
+	bool	operator!=( const Plane2D& compare ) const;
 };
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

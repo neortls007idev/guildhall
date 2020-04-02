@@ -1183,8 +1183,8 @@ void RenderContext::DrawAABB2( const AABB2& box , const Rgba8& startTint , const
 								Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y, 0.f ) , endTint, Vec2( 0.f, 1.f ) ),
 																			 
 								Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y, 0.f ) , endTint, Vec2( 1.f, 0.f ) ),
-								Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y, 0.f ) , startTint, Vec2( 1.f, 1.f ) ),
-								Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y, 0.f ) , startTint, Vec2( 0.f, 1.f ) ) };
+								Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y, 0.f ) , endTint, Vec2( 1.f, 1.f ) ),
+								Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y, 0.f ) , endTint, Vec2( 0.f, 1.f ) ) };
 
 	DrawVertexArray( 6 , AABB2Verts );
 }

@@ -869,3 +869,39 @@ void DRO_text3D::UpdateColor()
 
 	m_currrentColor.LerpColorOverTime( m_startColor , m_endColor , m_duration , m_timer );
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+DRO_convexgon2D::DRO_convexgon2D ( Polygon2D poly , Rgba8 startColor , Rgba8 endColor , float duration /*= 0.f */ ,
+                                   eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ ) :
+																								DebugRenderObject( DRO_CONVEXGON2D , mode , duration )
+{
+	m_poly					= poly;
+	m_startColor			= startColor;
+	m_endColor				= endColor;
+	m_currentColor			= m_startColor;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+DRO_convexgon2D::DRO_convexgon2D ( Polygon2D poly , Rgba8 color , float duration /*= 0.0f */ ,
+                                   eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ ) :
+																								DebugRenderObject( DRO_CONVEXGON2D , mode , duration )
+{
+	m_poly					= poly;
+	m_startColor			= color;
+	m_endColor				= color;
+	m_currentColor			= m_startColor;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DRO_convexgon2D::UpdateColor()
+{
+	if ( m_currentColor == m_endColor )
+	{
+		return;
+	}
+
+	m_currentColor.LerpColorOverTime( m_startColor , m_endColor , m_duration , m_timer );
+}

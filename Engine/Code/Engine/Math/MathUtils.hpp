@@ -156,14 +156,16 @@ float CalculateAreaOfTriangle( const Vec2& vertex0 , const Vec2& vertex1 , const
 float CalculateAreaOfPolygon( const Polygon2D&  polygon );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-// Minkowski sum support function for GJK
+// POLYGON INTERSECTION FUNCTIONS
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-const Vec2 MinkowskiSumSupport( const Vec2* vertices1 , const size_t count1 , const Vec2* vertices2 , const size_t count2 , const Vec2 direction );
-const bool GJKPolygonPolygonIntersectionTest( const Vec2* vertices1 , const size_t count1 , const Vec2* vertices2 , const size_t count2 );
-const bool GJKPolygonPolygonIntersectionTest( const Polygon2D polygon1 , const Polygon2D polygon2 );
-const Polygon2D GenerateMinkowskiDifferencePolygon( const Polygon2D* poly1 , const Polygon2D* poly2 );
+const	Polygon2D	GenerateMinkowskiDifferencePolygon( const Polygon2D* poly1 , const Polygon2D* poly2 );
+const	bool		MinskowskiDifferencePolygonPolygonIntersectionTest( const Polygon2D polygon1 , const Polygon2D polygon2 );
 
-bool DetectPolygonvPolygonIntersections( Polygon2D poly1 , Polygon2D poly2 );
-void GetNextSimplex( Vec2& outS1 , Vec2& outS2 , Vec2& outS3 , Polygon2D poly1 , Polygon2D poly2 );
-bool DoesSimplexContainOrigin( Vec2 p1 , Vec2 p2 , Vec2 p3 );
-bool IsBothSimplexSame( Vec2 simplex1P1 , Vec2 simplex1P2 , Vec2 simplex1P3 , Vec2 simplex2P1 , Vec2 simplex2P2 , Vec2 simplex2P3 );
+		bool		GJKDetectPolygonvPolygonIntersections( Polygon2D poly1 , Polygon2D poly2 , Vec2* outSimplex );
+const	Vec2		MinkowskiSumSupportPoint( const Vec2* vertices1 , const size_t count1 , const Vec2* vertices2 , const size_t count2 , const Vec2 direction );
+const	Vec2		MinkowskiSumSupportPoint( Polygon2D poly1 , Polygon2D poly2 , const Vec2 direction );
+		void		GetNextSimplex( Vec2& outS1 , Vec2& outS2 , Vec2& outS3 , Polygon2D poly1 , Polygon2D poly2 );
+		bool		AreBothSimplexSame( Vec2 simplex1P1 , Vec2 simplex1P2 , Vec2 simplex1P3 , Vec2 simplex2P1 , Vec2 simplex2P2 , Vec2 simplex2P3 );
+		bool		DoesSimplexContainOrigin( Vec2 p1 , Vec2 p2 , Vec2 p3 );
+		Polygon2D	GenerateEPAMinkowskiPolygonIfPolygonsIntersect( Polygon2D& poly1 , Polygon2D& poly2 );

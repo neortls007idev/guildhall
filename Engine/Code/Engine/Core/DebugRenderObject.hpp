@@ -9,6 +9,8 @@
 
 #include <vector>
 
+#include "Engine/Primitives/Polygon2D.hpp"
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 struct	AABB3;
@@ -32,6 +34,8 @@ enum eDebugRenderObjectType
 
 	DRO_QUAD2D,
 	DRO_QUAD3D,
+
+	DRO_CONVEXGON2D,
 	
 	DRO_AABB3,
 	
@@ -209,6 +213,26 @@ public:
 
 	Texture*	m_texture;
 	AABB2		m_texUVs				= AABB2::ZERO_TO_ONE;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct DRO_convexgon2D : public DebugRenderObject
+{
+
+public:
+	DRO_convexgon2D( Polygon2D poly , Rgba8 startColor , Rgba8 endColor , float duration = 0.f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS );
+					 
+	DRO_convexgon2D( Polygon2D poly , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS );
+
+	void UpdateColor() override;
+
+public:
+	Polygon2D	m_poly;
+
+	Rgba8		m_startColor;
+	Rgba8		m_endColor;
+	Rgba8		m_currentColor;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

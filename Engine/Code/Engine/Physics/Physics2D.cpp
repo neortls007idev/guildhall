@@ -1,4 +1,6 @@
 #include "Engine/Physics/Physics2D.hpp"
+
+#include "Engine/Core/DebugRender.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Physics/Rigidbody2D.hpp"
 #include "Engine/Physics/Collider2D.hpp"
@@ -218,11 +220,22 @@ void Physics2D::DetectCollisions()
 
 				if ( m_colliders2D[firstColliderIndex]->GetType() == COLLIDER2D_CONVEXGON && m_colliders2D[secondColliderIndex]->GetType() == COLLIDER2D_CONVEXGON )
 				{
-// 					PolygonCollider2D* me = ( PolygonCollider2D* ) m_colliders2D[ firstColliderIndex ];
-// 					PolygonCollider2D* them = ( PolygonCollider2D* ) m_colliders2D[ secondColliderIndex ];
-// 					
-// 					Polygon2D minkowskiDiff = GenerateMinkowskiDifferencePolygon( &me->m_polygon , &them->m_polygon );
-// 					minsk = minkowskiDiff.MakeConvexFromPointCloud( &minkowskiDiff.m_points[ 0 ] , ( uint ) minkowskiDiff.m_points.size() );
+ 					PolygonCollider2D* me = ( PolygonCollider2D* ) m_colliders2D[ firstColliderIndex ];
+ 					PolygonCollider2D* them = ( PolygonCollider2D* ) m_colliders2D[ secondColliderIndex ];
+					EPAminskowski = GenerateEPAMinkowskiPolygonIfPolygonsIntersect( me->m_polygon , them->m_polygon );
+ 					
+ 					Polygon2D minkowskiDiff = GenerateMinkowskiDifferencePolygon( &me->m_polygon , &them->m_polygon );
+ 					minskowskiDifference = minkowskiDiff.MakeConvexFromPointCloud( &minkowskiDiff.m_points[ 0 ] , ( uint ) minkowskiDiff.m_points.size() );
+					DebugAddScreenConvexgon( minskowskiDifference , WHITE , 3.f , DEBUG_RENDER_USE_DEPTH );
+					DebugAddScreenConvexgon( EPAminskowski , GREEN , RED , 3.f , DEBUG_RENDER_XRAY );
+					DebugAddScreenPoint( Vec2::ZERO , 5.f , BLUE , CYAN , 3.f );
+
+					Vec2 npm = EPAminskowski.GetClosestPointOnEdges( Vec2::ZERO );
+					DebugAddScreenLine( Vec2::ZERO , npm , YELLOW , 5.f );
+
+					Vec2 npm2 = minskowskiDifference.GetClosestPointOnEdges( Vec2::ZERO );
+					DebugAddScreenLine( Vec2::ZERO , npm2 , ORANGE , 5.f );
+					
 					continue;
 				}
 				

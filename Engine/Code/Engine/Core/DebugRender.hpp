@@ -5,6 +5,7 @@
 #include "Engine/Primitives/AABB2.hpp"
 #include "Engine/Primitives/AABB3.hpp"
 #include "Engine/Primitives/OBB3.hpp"
+#include "Engine/Primitives/Polygon2D.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -280,6 +281,13 @@ void DebugAddScreenTexturedQuad( AABB2 bounds , Texture* tex , AABB2 UVs , Rgba8
 void DebugAddScreenTexturedQuad( AABB2 bounds , Texture* tex , AABB2 UVs , Rgba8 tint , float duration = 0.0f );
 // assumed UVs are full texture
 void DebugAddScreenTexturedQuad( AABB2 bounds , Texture* tex , Rgba8 tint = WHITE , float duration = 0.0f ); 
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		2D CONVEXGONS
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void DebugAddScreenConvexgon( Polygon2D poly , Rgba8 startColor , Rgba8 endColor , float duration , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS );
+void DebugAddScreenConvexgon( Polygon2D poly , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //		2D TEXT

@@ -73,7 +73,8 @@ public:
 	static Timer*				s_timer;
 	static double				s_fixedTimeStep;
 
-	Polygon2D minsk;
+	Polygon2D minskowskiDifference;
+	Polygon2D EPAminskowski;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -66,7 +66,10 @@ bool PolygonVPolygonCollisionCheck( Collider2D const* me , Collider2D const* the
 {
 	PolygonCollider2D* mePoly = ( PolygonCollider2D* ) me;
 	PolygonCollider2D* themPoly = ( PolygonCollider2D* ) them;
-	return DetectPolygonvPolygonIntersections( mePoly->m_polygon , themPoly->m_polygon );
+	Vec2 simplex[ 3 ];
+
+	return GJKDetectPolygonvPolygonIntersections( mePoly->m_polygon , themPoly->m_polygon , &simplex[ 0 ] );
+	
 	//return GJKPolygonPolygonIntersectionTest( mePoly->m_polygon , themPoly->m_polygon );
 }
 

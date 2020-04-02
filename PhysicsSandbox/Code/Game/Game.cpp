@@ -70,7 +70,7 @@ Game::Game()
 	m_pointCloud.push_back( Vec2(300,300) );
 	m_pointCloud.push_back( Vec2(600,300) );
   	
- 	m_testPolygon = m_testPolygon.MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , m_pointCloud.size() );
+	m_testPolygon = m_testPolygon.MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
  
 	GameObject* temp = new GameObject( g_thePhysicsSystem , m_testPolygon.GetCenter() , Vec2::ZERO , m_testPolygon );
 	m_gameObjects.push_back( temp );
@@ -83,7 +83,7 @@ Game::Game()
 	m_pointCloud.push_back( Vec2( -200 , -300 ) );
 	m_pointCloud.push_back( Vec2( -200 , -200 ) );
 
-	m_testPolygon1 = m_testPolygon1.MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , m_pointCloud.size() );
+	m_testPolygon1 = m_testPolygon1.MakeConvexFromPointCloud( &m_pointCloud[ 0 ] , ( uint ) m_pointCloud.size() );
 	
 	GameObject* temp2 = new GameObject( g_thePhysicsSystem , m_testPolygon1.GetCenter() , Vec2::ZERO , m_testPolygon1 );
 	m_gameObjects.push_back( temp2 );
@@ -164,6 +164,27 @@ void Game::Render() const
 	g_theRenderer->SetBlendMode( ALPHA );
 	g_theRenderer->SetRasterState( FILL_SOLID );
 
+	Vec2 cameraMins = m_worldCamera.GetOrthoMin().GetXYComponents();
+	Vec2 cameraMaxs = m_worldCamera.GetOrthoMax().GetXYComponents();
+
+	AABB2 worldBounds( cameraMins + Vec2( m_worldBoundsOffset.x , 0.f ) , cameraMaxs - Vec2( m_worldBoundsOffset.x , 0.f ) );
+	AABB2 worldBoundsInterior( cameraMins + Vec2( m_worldBoundsOffset.x + m_worldBoundsThickness * .5f , m_worldBoundsThickness * .5f ) ,
+	                           cameraMaxs - Vec2( m_worldBoundsOffset.x + m_worldBoundsThickness * .5f , 0.f ) );
+
+	g_theRenderer->DrawAABB2( worldBounds , MAGENTA , PINK );
+	g_theRenderer->DrawAABB2( worldBoundsInterior , BLACK );
+	
+// 	g_theRenderer->DrawLine( cameraMins + Vec2( m_worldBoundsOffset.x , 0.f ) ,
+// 	                         Vec2( cameraMins.x , cameraMaxs.y ) + Vec2( m_worldBoundsOffset.x , 0.f ) ,
+// 	                         MAGENTA , PINK , m_worldBoundsThickness );
+// 	
+// 	g_theRenderer->DrawLine( Vec2( cameraMaxs.x , cameraMins.y ) - Vec2( m_worldBoundsOffset.x , 0.f ) ,
+// 	                               cameraMaxs - Vec2( m_worldBoundsOffset.x , 0.f ) , MAGENTA , PINK , m_worldBoundsThickness );
+// 
+// 	g_theRenderer->DrawLine( cameraMins + Vec2( m_worldBoundsOffset.x , 0.f ) ,
+// 	                         Vec2( cameraMaxs.x , cameraMins.y ) - Vec2( m_worldBoundsOffset.x , 0.f ) , MAGENTA ,
+// 	                         MAGENTA , m_worldBoundsThickness );
+	
 	for ( unsigned int index = 0; index < ( unsigned int ) m_gameObjects.size(); index++ )
 	{
 		if ( m_gameObjects[ index ] == nullptr )
@@ -183,15 +204,10 @@ void Game::Render() const
 	//DrawGameObjectToolTip();
 	RenderDrawFromPointCloudMode();
 
-	if ( g_thePhysicsSystem->minsk.m_points.size()  > 0 )
-	{
-		g_theRenderer->DrawPolygon( &g_thePhysicsSystem->minsk.m_points[ 0 ] , g_thePhysicsSystem->minsk.m_points.size() , WHITE );
-	}
-	
-	
 	g_theRenderer->SetBlendMode( SOLID );
 	g_theRenderer->EndCamera( m_worldCamera );
-	//DebugRenderScreenTo( m_worldCamera.GetColorTarget() );
+
+	DebugRenderScreenTo( m_worldCamera.GetColorTarget() );
 	
 	RenderUI();
 }
@@ -1032,15 +1048,19 @@ void Game::UpdateCameraFromUserInput( float deltaSeconds )
 	if ( g_theInput->GetMouseWheelValue() < 0 )
 	{
 		m_gameCameraCurrentHeight += MAX_CAMERA_ZOOM_VELOCITY_Y * deltaSeconds;
-		m_gameCameraCurrentHeight = Clamp( m_gameCameraCurrentHeight , 200.f , 20000.f );
+		m_gameCameraCurrentHeight = Clamp( m_gameCameraCurrentHeight , 200.f , 5000.f );
 		m_worldCamera.SetProjectionOrthographic( m_gameCameraCurrentHeight );
+		m_worldBoundsThickness += CLIENT_ASPECT /** deltaSeconds*/;
+		m_worldBoundsThickness = Clamp( m_worldBoundsThickness , 2.5 , 25.f );
 	}
 
 	if ( g_theInput->GetMouseWheelValue() > 0 )
 	{
 		m_gameCameraCurrentHeight -= MAX_CAMERA_ZOOM_VELOCITY_Y * deltaSeconds;
-		m_gameCameraCurrentHeight = Clamp( m_gameCameraCurrentHeight , 200.f , 20000.f );
+		m_gameCameraCurrentHeight = Clamp( m_gameCameraCurrentHeight , 200.f , 5000.f );
 		m_worldCamera.SetProjectionOrthographic( m_gameCameraCurrentHeight );
+		m_worldBoundsThickness -= CLIENT_ASPECT /** deltaSeconds*/;
+		m_worldBoundsThickness = Clamp( m_worldBoundsThickness , 2.5 , 25.f );
 	}
 }
 
