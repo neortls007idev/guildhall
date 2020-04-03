@@ -210,8 +210,8 @@ void Game::Render() const
 	g_theRenderer->SetBlendMode( SOLID );
 	g_theRenderer->EndCamera( m_worldCamera );
 
-	DebugRenderScreenTo( m_worldCamera.GetColorTarget() );
-	
+	//DebugRenderScreenTo( m_worldCamera.GetColorTarget() );
+	DebugRenderWorldToCamera( &m_worldCamera );
 	RenderUI();
 }
 

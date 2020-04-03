@@ -92,6 +92,10 @@ const Vec3 TransformPosition3DXY( const Vec3& position , const Vec2& iBasisXY , 
 
 float Interpolate( float inBegin, float inEnd, float fractionOfInEnd );
 float RangeMapFloat( float inBegin , float inEnd , float outBegin , float outEnd , float inValue );
+float RangeMapFloatNormalizedInput( float outBegin , float outEnd , float inValue );
+float RangeMapFloatNormalizedOutput( float inBegin , float inEnd , float inValue );
+Vec2  RangeMapFloatToVec2( float inBegin , float inEnd , Vec2 outBegin , Vec2 outEnd , float inValue );
+Vec3  RangeMapFloatToVec3( float inBegin , float inEnd , Vec3 outBegin , Vec3 outEnd , float inValue );
 float Clamp( float value , float min , float max );
 float ClampZeroToOne( float value );
 float Round( float value );
@@ -169,3 +173,5 @@ const	Vec2		MinkowskiSumSupportPoint( Polygon2D poly1 , Polygon2D poly2 , const 
 		bool		AreBothSimplexSame( Vec2 simplex1P1 , Vec2 simplex1P2 , Vec2 simplex1P3 , Vec2 simplex2P1 , Vec2 simplex2P2 , Vec2 simplex2P3 );
 		bool		DoesSimplexContainOrigin( Vec2 p1 , Vec2 p2 , Vec2 p3 );
 		Polygon2D	GenerateEPAMinkowskiPolygonIfPolygonsIntersect( Polygon2D& poly1 , Polygon2D& poly2 );
+		void		GetContactPoints( Polygon2D minkowskiPoly , Polygon2D poly1 , Polygon2D poly2 , Vec2& cp1 , Vec2& cp2 );
+		void		GetContactEdges( Polygon2D me , Polygon2D them , Vec2* contactPointsOnThem,Vec2* edgesOnMe );

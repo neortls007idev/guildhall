@@ -218,26 +218,34 @@ void Physics2D::DetectCollisions()
 				m_colliders2D[ firstColliderIndex ]->m_isColliding	= true;
 				m_colliders2D[ secondColliderIndex ]->m_isColliding = true;
 
-				if ( m_colliders2D[firstColliderIndex]->GetType() == COLLIDER2D_CONVEXGON && m_colliders2D[secondColliderIndex]->GetType() == COLLIDER2D_CONVEXGON )
-				{
+// 				if ( m_colliders2D[firstColliderIndex]->GetType() == COLLIDER2D_CONVEXGON && m_colliders2D[secondColliderIndex]->GetType() == COLLIDER2D_CONVEXGON )
+// 				{
 //  					PolygonCollider2D* me = ( PolygonCollider2D* ) m_colliders2D[ firstColliderIndex ];
 //  					PolygonCollider2D* them = ( PolygonCollider2D* ) m_colliders2D[ secondColliderIndex ];
 // 					EPAminskowski = GenerateEPAMinkowskiPolygonIfPolygonsIntersect( me->m_polygon , them->m_polygon );
 //  					
 //  					Polygon2D minkowskiDiff = GenerateMinkowskiDifferencePolygon( &me->m_polygon , &them->m_polygon );
 //  					minskowskiDifference = minkowskiDiff.MakeConvexFromPointCloud( &minkowskiDiff.m_points[ 0 ] , ( uint ) minkowskiDiff.m_points.size() );
-// 					DebugAddScreenConvexgon( minskowskiDifference , WHITE , 3.f , DEBUG_RENDER_USE_DEPTH );
-// 					DebugAddScreenConvexgon( EPAminskowski , GREEN , RED , 3.f , DEBUG_RENDER_XRAY );
-// 					DebugAddScreenPoint( Vec2::ZERO , 5.f , BLUE , CYAN , 3.f );
+// 					DebugAddScreenConvexgon( minskowskiDifference , WHITE , 0.2f , DEBUG_RENDER_USE_DEPTH );
+// 					DebugAddScreenConvexgon( EPAminskowski , GREEN , RED , 0.2f , DEBUG_RENDER_XRAY );
+// 					DebugAddScreenPoint( Vec2::ZERO , 5.f , BLUE , CYAN , 0.2f );
 // 
-// 					Vec2 npm = EPAminskowski.GetClosestPointOnEdges( Vec2::ZERO );
+// 					//Vec2 npm = EPAminskowski.GetClosestPointOnEdges( Vec2::ZERO );
 // 					//DebugAddScreenLine( Vec2::ZERO , npm , YELLOW , 5.f );
 // 
-// 					Vec2 npm2 = minskowskiDifference.GetClosestPointOnEdges( Vec2::ZERO );
-// 					//DebugAddScreenLine( Vec2::ZERO , npm2 , ORANGE , 5.f );
-					
-					continue;
-				}
+// 					//Vec2 npm2 = minskowskiDifference.GetClosestPointOnEdges( Vec2::ZERO );
+// 
+// 					Vec2 cp1 = Vec2::ZERO;
+// 					Vec2 cp2 = Vec2::ZERO;
+// 					
+// 					GetContactPoints( EPAminskowski , me->m_polygon , them->m_polygon , cp1 , cp2 );
+// 					
+// 					//DebugAddScreenLine( Vec2::ZERO , cp1 , ORANGE , 3.f );
+// 					//DebugAddScreenLine( Vec2::ZERO , cp2 , YELLOW , 3.f );
+// 					DebugAddScreenPoint( cp1 , 5.f , ORANGE , 0.2f );
+// 					DebugAddScreenPoint( cp2 , 5.f , YELLOW , 0.2f );
+// 					continue;
+// 				}
 				
 				Collision2D newCollision;
  				newCollision.m_me	= m_colliders2D[ firstColliderIndex ];
@@ -258,10 +266,7 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	{
 		return;
 	}
-	if ( collision.m_me->GetType() == COLLIDER2D_CONVEXGON && collision.m_them->GetType() == COLLIDER2D_CONVEXGON )
-	{
-		return;
-	}
+	
 	if ( collision.m_me->GetType() == COLLIDER2D_CONVEXGON )
 	{
 		collision.m_collisionManifold.m_normal *= -1;
@@ -291,7 +296,7 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	Vec2 theRealImpulse = CalculateImpulse( collision );
 	float impulseNormal = DotProduct2D( theRealImpulse , collision.m_collisionManifold.m_normal );
 	float impulseTangent = DotProduct2D( theRealImpulse , collision.m_collisionManifold.m_normal.GetRotated90Degrees() );
-		
+
 	if ( abs( impulseTangent ) > friction* impulseNormal )
 	{
 		impulseTangent = SignFloat( impulseTangent ) * impulseNormal * friction;
@@ -314,6 +319,7 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	{
 		collision.m_me->GetRigidBody()->ApplyImpulse( theRealImpulse , collision.m_collisionManifold.m_contactPoint );
 	}
+	
 }
 
 Vec2 Physics2D::CalculateImpulse( Collision2D& collision )

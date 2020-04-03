@@ -250,7 +250,7 @@ void DebugRenderWorldToCamera( Camera* cam )
 	g_currentManager->RenderObjectsUseDepth( g_currentManager->m_debugRenderWorldObjectsUseDepth ,g_debugCamera , eBlendMode::SOLID );
 	g_currentManager->RenderObjectsXRAY( g_currentManager->m_debugRenderWorldObjectsXRay , g_debugCamera , eBlendMode::SOLID );
 	g_currentManager->RenderObjectsAlways( g_currentManager->m_debugRenderWorldObjectsAlways , g_debugCamera , eBlendMode::SOLID );
-	//g_currentManager->RenderObjectsAlways( g_currentManager->m_debugRenderScreenObjects		, g_debugCamera , eBlendMode::ALPHA );
+	g_currentManager->RenderObjectsAlways( g_currentManager->m_debugRenderScreenObjects		, g_debugCamera , eBlendMode::ALPHA );
 
 	//g_debugRenderContext->DrawVertexArray( vertices );
 	//g_debugRenderContext->EndCamera( *cam );
@@ -275,15 +275,12 @@ void DebugRenderScreenTo( Texture* output )
 		RenderContext* ctx = output->GetRenderContext();
 		g_debugRenderContext = ctx;
 		camera.SetColorTarget( output );
-		//camera.SetOrthoView( Vec2::ZERO , Vec2( output->GetDimensions() ) );
-		//camera.SetOrthoView( Vec2( -0.5f * ( 16.f / 9.f ) * 1080.f , -0.5 * 1080.f ), Vec2( 0.5f * ( 16.f / 9.f ) * 1080.f , 0.5 * 1080.f ) );
-		camera.SetOrthoView( Vec2( -800.f , -400.f ) , Vec2( 800.f , 400.f ) );
+		camera.SetOrthoView( Vec2::ZERO , Vec2( output->GetDimensions() ) );
 	}
 	else
 	{
-		g_debugRenderContext = g_theRenderer;
-		camera.SetOrthoView( Vec2( -800.f , -400.f ) , Vec2( 800.f , 400.f ) );
-		//camera.SetOrthoView( Vec2::ZERO, Vec2( ( 16.f / 9.f ) * 1080.f , 1080.f ) );
+		g_debugRenderContext = g_theRenderer;		
+		camera.SetOrthoView( Vec2::ZERO, Vec2( ( 16.f / 9.f ) * 1080.f , 1080.f ) );
 	}
 
 /*camera.SetProjectionOrthographic()*/
@@ -295,10 +292,9 @@ void DebugRenderScreenTo( Texture* output )
 		// should I clear?
 	camera.SetClearMode( CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK );
 
-	//g_currentManager->RenderObjectsUseDepth( g_currentManager->m_debugRenderWorldObjectsUseDepth , &camera , eBlendMode::ALPHA );
-	//g_currentManager->RenderObjectsXRAY( g_currentManager->m_debugRenderWorldObjectsXRay			, &camera , eBlendMode::ALPHA );
-	//g_currentManager->RenderObjectsAlways( g_currentManager->m_debugRenderWorldObjectsAlways		, &camera , eBlendMode::ALPHA );
-
+	g_currentManager->RenderObjectsUseDepth( g_currentManager->m_debugRenderWorldObjectsUseDepth , &camera , eBlendMode::ALPHA );
+	g_currentManager->RenderObjectsXRAY( g_currentManager->m_debugRenderWorldObjectsXRay			, &camera , eBlendMode::ALPHA );
+	g_currentManager->RenderObjectsAlways( g_currentManager->m_debugRenderWorldObjectsAlways		, &camera , eBlendMode::ALPHA );
 	g_currentManager->RenderObjectsAlways( g_currentManager->m_debugRenderScreenObjects			, &camera , eBlendMode::ALPHA );
 
 	//g_debugRenderContext->DrawVertexArray( vertices );

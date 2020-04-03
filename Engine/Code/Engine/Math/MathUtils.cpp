@@ -491,6 +491,56 @@ float RangeMapFloat(float inBegin, float inEnd, float outBegin, float outEnd, fl
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+float RangeMapFloatNormalizedInput( float outBegin , float outEnd , float inValue )
+{
+	float outRange = outEnd - outBegin;
+	float outDisplacement = inValue * outRange;
+	float outValue = outBegin + outDisplacement;
+
+	return outValue;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+float RangeMapFloatNormalizedOutput( float inBegin , float inEnd , float inValue )
+{
+	float inDisplacement = inValue - inBegin;
+	float inRange = inEnd - inBegin;
+	float fraction = inDisplacement / inRange;
+	
+	return fraction;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec2 RangeMapFloatToVec2( float inBegin , float inEnd , Vec2 outBegin , Vec2 outEnd , float inValue )
+{
+	float inDisplacement = inValue - inBegin;
+	float inRange = inEnd - inBegin;
+	float fraction = inDisplacement / inRange;
+	Vec2  outRange = outEnd - outBegin;
+	Vec2  outDisplacement = fraction * outRange;
+	Vec2  outValue = outBegin + outDisplacement;
+
+	return outValue;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec3 RangeMapFloatToVec3( float inBegin , float inEnd , Vec3 outBegin , Vec3 outEnd , float inValue )
+{
+	float inDisplacement = inValue - inBegin;
+	float inRange = inEnd - inBegin;
+	float fraction = inDisplacement / inRange;
+	Vec3  outRange = outEnd - outBegin;
+	Vec3  outDisplacement = fraction * outRange;
+	Vec3  outValue = outBegin + outDisplacement;
+
+	return outValue;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 float Clamp( float value, float min, float max )
 {
 	if ( value < min )
@@ -1525,3 +1575,74 @@ Polygon2D GenerateEPAMinkowskiPolygonIfPolygonsIntersect( Polygon2D& poly1 , Pol
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+void GetContactPoints( Polygon2D minkowskiPoly , Polygon2D poly1 , Polygon2D poly2 , Vec2& cp1 , Vec2& cp2 )
+{
+	Vec2 nearestPoint = minkowskiPoly.GetClosestPointOnEdges( Vec2::ZERO );
+	Vec2 normal = -nearestPoint.GetNormalized();
+	Vec2 supportPoint = GetSupportPoint( &poly2.m_points[ 0 ] , poly2.m_points.size() , normal );
+	Plane2D referencePlane = Plane2D( normal , supportPoint );
+	const float eps = 0.001f;
+
+	struct Temp
+	{
+		Vec2 point;
+		float distace;
+	};
+
+	std::vector<Temp> pointsAndDistance;
+	
+	for ( int i = 0; i < poly2.m_points.size(); i++ )
+	{
+		float distaceFromPlane = referencePlane.GetSignedDistanceFromPlane( poly2.m_points[ i ] );
+		if ( abs( distaceFromPlane ) <= eps )
+		{
+			Temp temp;
+			temp.point = poly2.m_points[ i ];
+			temp.distace = distaceFromPlane;
+			pointsAndDistance.push_back( temp );
+		}
+	}
+
+	if ( pointsAndDistance.size() == 1 )
+	{
+		cp1 = pointsAndDistance[ 0 ].point;
+		cp2 = pointsAndDistance[ 0 ].point;
+		return;
+	}
+	if ( pointsAndDistance.size() == 2 )
+	{
+		cp1 = pointsAndDistance[ 0 ].point;
+		cp2 = pointsAndDistance[ 1 ].point;
+		return;
+	}
+
+	Vec2 tangent = normal.GetRotatedMinus90Degrees();
+
+	for ( int i = 0; i < pointsAndDistance.size(); i++ )
+	{
+		pointsAndDistance[ i ].distace = DotProduct2D( tangent , pointsAndDistance[ i ].point );
+	}
+	//Get min and max in this range
+
+	Vec2 minPoint = pointsAndDistance[ 0 ].point;
+	Vec2 maxPoint = pointsAndDistance[ 1 ].point;
+	float mindistance = INFINITY;
+	float maxDistance = pointsAndDistance[ 0 ].distace;
+
+	for ( int i = 0; i < pointsAndDistance.size(); i++ )
+	{
+		if ( pointsAndDistance[ i ].distace < mindistance )
+		{
+			mindistance = pointsAndDistance[ i ].distace;
+			minPoint = pointsAndDistance[ i ].point;
+		}
+		if ( pointsAndDistance[ i ].distace > maxDistance )
+		{
+			maxDistance = pointsAndDistance[ i ].distace;
+			maxPoint = pointsAndDistance[ i ].point;
+		}
+	}
+	cp1 = minPoint;
+	cp2 = maxPoint;
+}
