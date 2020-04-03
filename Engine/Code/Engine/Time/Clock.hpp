@@ -53,10 +53,6 @@ private:
 	std::vector<Clock*>			m_children;
 };
 
-
-	
-
-
 // Example Usage
 // void Game::Startup()
 // {

@@ -45,10 +45,10 @@ Game::Game()
 {
 	m_worldCamera.SetOutputSize( m_currentCameraOutputSize );
 	m_worldCamera.SetPosition( m_cameraDefaultPosition );
-
+	m_worldCamera.SetClearMode( CLEAR_COLOR_BIT , Rgba8( 77 , 174 , 186 , 255 ) );
 	//m_worldCamera.SetProjectionOrthographic( 800.f );
 	m_worldCamera.SetOrthoView( Vec2( -800.f , -400.f ) , Vec2( 800.f , 400.f ) );
-
+	
 	m_UICamera.SetOutputSize( m_currentCameraOutputSize );
 	m_UICamera.SetPosition( m_cameraDefaultPosition );
 	m_UICamera.SetClearMode( CLEAR_NONE , WHITE , 0.f , 0 );
@@ -57,6 +57,12 @@ Game::Game()
 	m_mousePosition = g_theInput->GetMouseNormalizedClientPosition();
 	m_mousePosition = m_worldCamera.ClientToWorld( g_theInput->GetMouseNormalizedClientPosition() , 0 ).GetXYComponents();
 
+	Polygon2D floor;
+	floor.m_points.push_back( Vec2( -1600.f , -350.f ) );
+	floor.m_points.push_back( Vec2( 1600.f , -350.f ) );
+	floor.m_points.push_back( Vec2( 1600.f , -550.f ) );
+	floor.m_points.push_back( Vec2( -1600.f , -550.f ) );
+	m_floorObject = new GameObject( g_thePhysicsSystem , floor.GetCenter() , Vec2::ZERO , floor );
 	//RandomizePointCloud( m_rng );
 
 	//InitialGameObjectsSpawner();
@@ -89,11 +95,6 @@ Game::Game()
 	m_gameObjects.push_back( temp2 );
 	m_isMouseOnGameObject.push_back( false );
 
-// 	m_minksTestPolygon = GenerateMinkowskiDifferencePolygon( &m_testPolygon , &m_testPolygon1 );
-// 	m_minksTestPolygon = m_minksTestPolygon.MakeConvexFromPointCloud( &m_minksTestPolygon.m_points[ 0 ] , m_minksTestPolygon.m_points.size() );
-// 	GameObject* temp3 = new GameObject( g_thePhysicsSystem , m_minksTestPolygon.GetCenter() , Vec2::ZERO , m_minksTestPolygon );
-// 	m_gameObjects.push_back( temp3 );
-// 	m_isMouseOnGameObject.push_back( false );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -136,6 +137,8 @@ void Game::Update( float deltaSeconds )
 		m_dragTime += deltaSeconds;
 	}
 	//UpdateCamera();
+	UpdateWorldBounds();
+	DestroyGameObjectsOutOfHorizontalSpace();
 	UpdateGameObject( deltaSeconds );
 	UpdateGameObjects();
 	UpdateFromUserInput( deltaSeconds );
@@ -164,15 +167,9 @@ void Game::Render() const
 	g_theRenderer->SetBlendMode( ALPHA );
 	g_theRenderer->SetRasterState( FILL_SOLID );
 
-	Vec2 cameraMins = m_worldCamera.GetOrthoMin().GetXYComponents();
-	Vec2 cameraMaxs = m_worldCamera.GetOrthoMax().GetXYComponents();
-
-	AABB2 worldBounds( cameraMins + Vec2( m_worldBoundsOffset.x , 0.f ) , cameraMaxs - Vec2( m_worldBoundsOffset.x , 0.f ) );
-	AABB2 worldBoundsInterior( cameraMins + Vec2( m_worldBoundsOffset.x + m_worldBoundsThickness * .5f , m_worldBoundsThickness * .5f ) ,
-	                           cameraMaxs - Vec2( m_worldBoundsOffset.x + m_worldBoundsThickness * .5f , 0.f ) );
-
-	g_theRenderer->DrawAABB2( worldBounds , MAGENTA , PINK );
-	g_theRenderer->DrawAABB2( worldBoundsInterior , BLACK );
+	g_theRenderer->DrawAABB2( m_worldBounds , MAGENTA , PINK );
+	g_theRenderer->DrawAABB2( m_worldBoundsInterior , Rgba8( 3 , 66 , 67 , 255 ) );
+	//g_theRenderer->DrawAABB2( m_worldBoundsInterior , Rgba8( 9 , 36 , 37 , 255 ) );
 	
 // 	g_theRenderer->DrawLine( cameraMins + Vec2( m_worldBoundsOffset.x , 0.f ) ,
 // 	                         Vec2( cameraMins.x , cameraMaxs.y ) + Vec2( m_worldBoundsOffset.x , 0.f ) ,
@@ -184,6 +181,10 @@ void Game::Render() const
 // 	g_theRenderer->DrawLine( cameraMins + Vec2( m_worldBoundsOffset.x , 0.f ) ,
 // 	                         Vec2( cameraMaxs.x , cameraMins.y ) - Vec2( m_worldBoundsOffset.x , 0.f ) , MAGENTA ,
 // 	                         MAGENTA , m_worldBoundsThickness );
+	
+	PolygonCollider2D* floorCollider = ( PolygonCollider2D* ) m_floorObject->m_rigidbody->GetCollider();
+	g_theRenderer->DrawPolygon( &floorCollider->m_polygon.m_points[ 0 ] , floorCollider->m_polygon.m_points.size() , ORANGE );
+	//floorCollider->DebugRender( g_theRenderer , YELLOW , ORANGE );
 	
 	for ( unsigned int index = 0; index < ( unsigned int ) m_gameObjects.size(); index++ )
 	{
@@ -200,6 +201,8 @@ void Game::Render() const
 		}
 	}
 
+
+	
 	//DrawMouseCurrentPosition( m_worldCamera );
 	//DrawGameObjectToolTip();
 	RenderDrawFromPointCloudMode();
@@ -521,6 +524,19 @@ void Game::UpdateCamera()
 	m_UICamera.SetOutputSize( m_currentCameraOutputSize );
 	m_UICamera.CorrectAspectRatio( CLIENT_ASPECT );
 	m_UICamera.SetProjectionOrthographic( m_currentCameraOutputSize.y );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateWorldBounds()
+{
+	Vec2 cameraMins = m_worldCamera.GetOrthoMin().GetXYComponents();
+	Vec2 cameraMaxs = m_worldCamera.GetOrthoMax().GetXYComponents();
+
+	m_worldBounds = AABB2( cameraMins + Vec2( m_worldBoundsOffset.x , 0.f ) , cameraMaxs - Vec2( m_worldBoundsOffset.x , 0.f ) );
+
+	m_worldBoundsInterior = AABB2( cameraMins + Vec2( m_worldBoundsOffset.x + m_worldBoundsThickness * .5f , m_worldBoundsThickness * .5f ) ,
+		cameraMaxs - Vec2( m_worldBoundsOffset.x + m_worldBoundsThickness * .5f , 0.f ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -905,6 +921,80 @@ void Game::DrawGameObjectToolTip() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Game::DestroyGameObjectsOutOfHorizontalSpace()
+{
+	float ScreenMinX = m_worldBounds.m_mins.x;
+	float ScreenMinY = m_worldBounds.m_mins.y;
+	float ScreenMaxX = m_worldBounds.m_maxs.x;
+	
+	for ( size_t index = 0; index < m_gameObjects.size() ; index++ )
+	{
+		if ( m_gameObjects[index] )
+		{
+			Rigidbody2D* rigidBody = m_gameObjects[ index ]->m_rigidbody;
+			Vec2  rbCurrentPos = rigidBody->GetPosition();
+
+			Collider2D* collider = rigidBody->GetCollider();
+
+			if ( collider->GetType() == COLLIDER2D_DISC )
+			{
+				DiscCollider2D* discCollider = ( DiscCollider2D* ) collider;
+				if ( ( rigidBody->GetPosition().x + discCollider->m_radius ) < ScreenMinX )
+				{
+					delete m_gameObjects[ index ];
+					m_gameObjects[ index ] = nullptr;
+					m_isMouseOnGameObject[ index ] = false;
+				}
+				else if ( ( rigidBody->GetPosition().x - discCollider->m_radius ) > ScreenMaxX )
+				{
+					delete m_gameObjects[ index ];
+					m_gameObjects[ index ] = nullptr;
+					m_isMouseOnGameObject[ index ] = false;
+				}
+
+				if ( ( rigidBody->GetPosition().y + discCollider->m_radius ) < ScreenMinY )
+				{
+					delete m_gameObjects[ index ];
+					m_gameObjects[ index ] = nullptr;
+					m_isMouseOnGameObject[ index ] = false;
+				}
+			}
+			else if ( collider->GetType() == COLLIDER2D_CONVEXGON )
+			{
+				PolygonCollider2D* polyCollider = ( PolygonCollider2D* ) collider;
+				Vec2 leftMostPoint	= *GetLeftMostPointFromPointCloud( &polyCollider->m_polygon.m_points[ 0 ] , ( int ) polyCollider->m_polygon.m_points.size() );
+				Vec2 rightMostPoint = *GetRightMostPointFromPointCloud( &polyCollider->m_polygon.m_points[ 0 ] , ( int ) polyCollider->m_polygon.m_points.size() );
+				Vec2 topMostPoint	= *GetTopMostPointFromPointCloud( &polyCollider->m_polygon.m_points[ 0 ] , ( int ) polyCollider->m_polygon.m_points.size() );
+
+				if ( rightMostPoint.x < ScreenMinX )
+				{
+					//Vec2 offset =  /*rigidBody->m_worldPosition*/ polyCollider->m_worldPosition - leftMostPoint;
+					delete m_gameObjects[ index ];
+					m_gameObjects[ index ] = nullptr;
+					m_isMouseOnGameObject[ index ] = false;
+				}
+
+				if ( leftMostPoint.x > ScreenMaxX )
+				{
+					//Vec2 offset = rightMostPoint - polyCollider->m_worldPosition;
+					delete m_gameObjects[ index ];
+					m_gameObjects[ index ] = nullptr;
+					m_isMouseOnGameObject[ index ] = false;
+				}
+
+				if ( topMostPoint.y < ScreenMinY )
+				{
+					delete m_gameObjects[ index ];
+					m_gameObjects[ index ] = nullptr;
+					m_isMouseOnGameObject[ index ] = false;
+				}
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Game::UpdateFromUserInput( float deltaSeconds )
 {
 
@@ -1048,7 +1138,7 @@ void Game::UpdateCameraFromUserInput( float deltaSeconds )
 	if ( g_theInput->GetMouseWheelValue() < 0 )
 	{
 		m_gameCameraCurrentHeight += MAX_CAMERA_ZOOM_VELOCITY_Y * deltaSeconds;
-		m_gameCameraCurrentHeight = Clamp( m_gameCameraCurrentHeight , 200.f , 5000.f );
+		m_gameCameraCurrentHeight = Clamp( m_gameCameraCurrentHeight , 400.f , 2000.f );
 		m_worldCamera.SetProjectionOrthographic( m_gameCameraCurrentHeight );
 		m_worldBoundsThickness += CLIENT_ASPECT /** deltaSeconds*/;
 		m_worldBoundsThickness = Clamp( m_worldBoundsThickness , 2.5 , 25.f );
@@ -1057,7 +1147,7 @@ void Game::UpdateCameraFromUserInput( float deltaSeconds )
 	if ( g_theInput->GetMouseWheelValue() > 0 )
 	{
 		m_gameCameraCurrentHeight -= MAX_CAMERA_ZOOM_VELOCITY_Y * deltaSeconds;
-		m_gameCameraCurrentHeight = Clamp( m_gameCameraCurrentHeight , 200.f , 5000.f );
+		m_gameCameraCurrentHeight = Clamp( m_gameCameraCurrentHeight , 400.f , 2000.f );
 		m_worldCamera.SetProjectionOrthographic( m_gameCameraCurrentHeight );
 		m_worldBoundsThickness -= CLIENT_ASPECT /** deltaSeconds*/;
 		m_worldBoundsThickness = Clamp( m_worldBoundsThickness , 2.5 , 25.f );

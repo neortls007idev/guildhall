@@ -37,6 +37,7 @@ public:
 	bool IsPolygonPotentiallyConvex( Vec2 latestPoint );
 
 	void UpdateCamera();
+	void UpdateWorldBounds();
 	void UpdateGameObject( float deltaSeconds );
 	void UpdateGameObjects();
 
@@ -62,13 +63,14 @@ public:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 private:
+	void DestroyGameObjectsOutOfHorizontalSpace();
 
 	void UpdateFromUserInput( float deltaSeconds );
 	void SelectGameObjectFormUserInput();
 	void UpdateCameraFromUserInput( float deltaSeconds );
 	void UpdateSelectedGameObjectBouncinessFromUserInput( float deltaSeconds );
 	void UpdateSelectedGameObjectAngularMotionFromUserInput( float deltaSeconds );
-
+	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 private:
@@ -103,16 +105,19 @@ public:
 		   Vec3						m_cameraCurrentPosition		= Vec3::ZERO;
 		   Vec3						m_cameraMoveVelocity		= Vec3( MAX_CAMERA_MOVE_VELOCITY_X , MAX_CAMERA_MOVE_VELOCITY_Y , 0.f );
 		   Vec2						m_currentCameraOutputSize	= Vec2( 1600.f , 800.f );
+
+		   AABB2					m_worldBounds				= AABB2::ZERO_TO_ONE;
+		   AABB2					m_worldBoundsInterior		= AABB2::ZERO_TO_ONE;
 		   Vec2						m_worldBoundsOffset			= Vec2( 47.5f , 47.5f );
 		   float					m_worldBoundsThickness		= 5.f;
+		   GameObject*				m_floorObject				= nullptr;
 
 		   float					m_minColliderRadius			= MIN_COLLIDER_RADIUS;
 		   float					m_maxColliderRadius			= MAX_COLLIDER_RADIUS;
 		   float					m_currentColliderRadius;
 		   Polygon2D				m_testPolygon;
 		   Polygon2D				m_testPolygon1;
-		   Polygon2D				m_minksTestPolygon;
-
+		   
 		   std::vector<GameObject*>	m_gameObjects;
 		   std::vector<bool>		m_isMouseOnGameObject;
 		   std::vector<Vec2>		m_pointCloud;
