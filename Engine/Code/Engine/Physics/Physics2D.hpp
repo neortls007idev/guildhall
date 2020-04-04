@@ -37,7 +37,8 @@ public:
 	void ResolveCollisions();
 	void ResolveCollision( Collision2D collision );
 
-	Vec2 CalculateImpulse( Collision2D& collision );
+	Vec2 CalculateImpulseNormal( Collision2D& collision );
+	Vec2 CalculateImpulseTangent( Collision2D& collision );
 
 	void CleanupDestroyedObjects();
 	void CleanupDestroyedColliders();

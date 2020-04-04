@@ -93,7 +93,6 @@ Manifold2D DiscVDiscCollisionManiFold( Collider2D const* me , Collider2D const* 
 	}
 	collision.m_normal			= ( discColliderMe->GetPosition() - discColliderThem->GetPosition()).GetNormalized();
 	collision.m_contactPoint = discColliderMe->GetPosition() - ( collision.m_normal * discColliderMe->GetRadius() ) + ( collision.m_normal * collision.m_overlap * 0.5f ) ;
-
 	return collision;
 }
 
@@ -114,7 +113,7 @@ Manifold2D DiscVPolygonCollisionFold( Collider2D const* me , Collider2D const* t
 		closetPoint = polyColliderThem->m_polygon.GetClosestPointOnEdges( closetPoint );
 		collision.m_normal = ( closetPoint - discColliderMe->m_worldPosition ).GetNormalized();
 		collision.m_overlap = -( closetPoint - discColliderMe->m_worldPosition ).GetLength() + discColliderMe->m_radius;
-		collision.m_normal = collision.m_normal.GetRotatedDegrees( 180.f );
+		collision.m_normal = -collision.m_normal;
 	}
 
 	if ( polyColliderThem->Contains( discColliderMe->m_worldPosition ) )
@@ -124,7 +123,8 @@ Manifold2D DiscVPolygonCollisionFold( Collider2D const* me , Collider2D const* t
 	}
 
 	collision.m_contactPoint = discColliderMe->m_worldPosition - 
-								( collision.m_normal * ( discColliderMe->m_radius - ( collision.m_overlap * 0.5f ) ) );	return collision;
+								( collision.m_normal * ( discColliderMe->m_radius - ( collision.m_overlap * 0.5f ) ) );
+	return collision;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -134,26 +134,25 @@ Manifold2D PolygonVPolygonCollisionFold( Collider2D const* me , Collider2D const
 	PolygonCollider2D* mePoly = ( PolygonCollider2D* ) me;
 	PolygonCollider2D* themPoly = ( PolygonCollider2D* ) them;
 
-
 	Manifold2D collisionManifold;
 
-	//Polygon2D EPAminskowski = GenerateEPAMinkowskiPolygonIfPolygonsIntersect( mePoly->m_polygon , themPoly->m_polygon );
-	//Vec2 contactPointInEPAMinsowskiSpace = EPAminskowski.GetClosestPointOnEdges( Vec2::ZERO );
+//  	Polygon2D EPAminskowski = GenerateEPAMinkowskiPolygonIfPolygonsIntersect( mePoly->m_polygon , themPoly->m_polygon );
+//  	Vec2 contactPointInEPAMinsowskiSpace = EPAminskowski.GetClosestPointOnEdges( Vec2::ZERO );
 
 	Polygon2D minkowskiDiff = GenerateMinkowskiDifferencePolygon( &mePoly->m_polygon , &themPoly->m_polygon );
 	minkowskiDiff = minkowskiDiff.MakeConvexFromPointCloud( &minkowskiDiff.m_points[ 0 ] , ( uint ) minkowskiDiff.m_points.size() );
 	Vec2 contactPointInEPAMinsowskiSpace = minkowskiDiff.GetClosestPointOnEdges( Vec2::ZERO );
-	
+//	DebugAddScreenConvexgon( EPAminskowski , GREEN , RED , 0.2f , DEBUG_RENDER_XRAY );
 	Vec2 closestPointFirst  = Vec2::ZERO;
 	Vec2 closestPointTwo	= Vec2::ZERO;
 
 	GetContactPoints( minkowskiDiff , mePoly->m_polygon , themPoly->m_polygon , closestPointFirst , closestPointTwo );
 
 	collisionManifold.m_contactPoint = ( closestPointFirst + closestPointTwo ) * .5f;
-	collisionManifold.m_normal		 = contactPointInEPAMinsowskiSpace.GetNormalized();
+	collisionManifold.m_normal		 = -contactPointInEPAMinsowskiSpace.GetNormalized();
 	collisionManifold.m_overlap		 = contactPointInEPAMinsowskiSpace.GetLength();
 	
-	return collisionManifold;
+	return collisionManifold;	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -213,7 +212,9 @@ Manifold2D Collider2D::GenrateManifold( Collider2D const* other )
 		// flip the types when looking into the index.
 		int idx = myType * NUM_COLLIDER_TYPES + otherType;
 		collisionManifoldCB manifold = g_collisionManifold[ idx ];
-		return manifold( other , this );
+		Manifold2D colManifold =  manifold( other , this );
+		colManifold.m_normal *= -1;
+		return colManifold;
 	}
 }
 

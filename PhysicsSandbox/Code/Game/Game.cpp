@@ -169,23 +169,10 @@ void Game::Render() const
 
 	g_theRenderer->DrawAABB2( m_worldBounds , MAGENTA , PINK );
 	g_theRenderer->DrawAABB2( m_worldBoundsInterior , Rgba8( 3 , 66 , 67 , 255 ) );
-	//g_theRenderer->DrawAABB2( m_worldBoundsInterior , Rgba8( 9 , 36 , 37 , 255 ) );
-	
-// 	g_theRenderer->DrawLine( cameraMins + Vec2( m_worldBoundsOffset.x , 0.f ) ,
-// 	                         Vec2( cameraMins.x , cameraMaxs.y ) + Vec2( m_worldBoundsOffset.x , 0.f ) ,
-// 	                         MAGENTA , PINK , m_worldBoundsThickness );
-// 	
-// 	g_theRenderer->DrawLine( Vec2( cameraMaxs.x , cameraMins.y ) - Vec2( m_worldBoundsOffset.x , 0.f ) ,
-// 	                               cameraMaxs - Vec2( m_worldBoundsOffset.x , 0.f ) , MAGENTA , PINK , m_worldBoundsThickness );
-// 
-// 	g_theRenderer->DrawLine( cameraMins + Vec2( m_worldBoundsOffset.x , 0.f ) ,
-// 	                         Vec2( cameraMaxs.x , cameraMins.y ) - Vec2( m_worldBoundsOffset.x , 0.f ) , MAGENTA ,
-// 	                         MAGENTA , m_worldBoundsThickness );
-	
+
 	PolygonCollider2D* floorCollider = ( PolygonCollider2D* ) m_floorObject->m_rigidbody->GetCollider();
-	g_theRenderer->DrawPolygon( &floorCollider->m_polygon.m_points[ 0 ] , floorCollider->m_polygon.m_points.size() , ORANGE );
-	//floorCollider->DebugRender( g_theRenderer , YELLOW , ORANGE );
-	
+	g_theRenderer->DrawPolygon( &floorCollider->m_polygon.m_points[ 0 ] , ( uint ) floorCollider->m_polygon.m_points.size() , ORANGE );
+		
 	for ( unsigned int index = 0; index < ( unsigned int ) m_gameObjects.size(); index++ )
 	{
 		if ( m_gameObjects[ index ] == nullptr )
@@ -201,16 +188,11 @@ void Game::Render() const
 		}
 	}
 
-
-	
-	//DrawMouseCurrentPosition( m_worldCamera );
-	//DrawGameObjectToolTip();
 	RenderDrawFromPointCloudMode();
 
 	g_theRenderer->SetBlendMode( SOLID );
 	g_theRenderer->EndCamera( m_worldCamera );
 
-	//DebugRenderScreenTo( m_worldCamera.GetColorTarget() );
 	DebugRenderWorldToCamera( &m_worldCamera );
 	RenderUI();
 }

@@ -143,7 +143,7 @@ void Physics2D::ApplyEffectors( Rigidbody2D* rigidbody , float deltaSeconds )
 			default:
 				break;
 		}
-	//GravityBounce( m_sceneCamera    , rigidbody );
+	GravityBounce( m_sceneCamera    , rigidbody );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -153,7 +153,7 @@ void Physics2D::MoveRigidbodies( Rigidbody2D* rigidbody , float deltaSeconds )
 	if ( rigidbody->GetSimulationMode() != SIMULATIONMODE_STATIC )
 	{
 		rigidbody->SetPosition( rigidbody->GetPosition() + ( rigidbody->GetVelocity() * deltaSeconds ) );
-		//ScreenWrapAround( m_sceneCamera , rigidbody );
+		ScreenWrapAround( m_sceneCamera , rigidbody );
 	}
 }
 
@@ -201,11 +201,10 @@ void Physics2D::DetectCollisions()
 
 			if ( firstRigidBody && secondRigidBody )
 			{
-				//g_theDevConsole->PrintString( RED , "Collider has no rigid body attached." );
-// 				if ( firstRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC && secondRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC )
-// 				{
-// 					continue;
-// 				}
+				if ( firstRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC && secondRigidBody->GetSimulationMode() == SIMULATIONMODE_STATIC )
+				{
+					continue;
+				}
 			}
 
 			if ( !firstRigidBody->m_isSimulationActive || !secondRigidBody->m_isSimulationActive )
@@ -217,35 +216,6 @@ void Physics2D::DetectCollisions()
 			{
 				m_colliders2D[ firstColliderIndex ]->m_isColliding	= true;
 				m_colliders2D[ secondColliderIndex ]->m_isColliding = true;
-
-// 				if ( m_colliders2D[firstColliderIndex]->GetType() == COLLIDER2D_CONVEXGON && m_colliders2D[secondColliderIndex]->GetType() == COLLIDER2D_CONVEXGON )
-// 				{
-//  					PolygonCollider2D* me = ( PolygonCollider2D* ) m_colliders2D[ firstColliderIndex ];
-//  					PolygonCollider2D* them = ( PolygonCollider2D* ) m_colliders2D[ secondColliderIndex ];
-// 					EPAminskowski = GenerateEPAMinkowskiPolygonIfPolygonsIntersect( me->m_polygon , them->m_polygon );
-//  					
-//  					Polygon2D minkowskiDiff = GenerateMinkowskiDifferencePolygon( &me->m_polygon , &them->m_polygon );
-//  					minskowskiDifference = minkowskiDiff.MakeConvexFromPointCloud( &minkowskiDiff.m_points[ 0 ] , ( uint ) minkowskiDiff.m_points.size() );
-// 					DebugAddScreenConvexgon( minskowskiDifference , WHITE , 0.2f , DEBUG_RENDER_USE_DEPTH );
-// 					DebugAddScreenConvexgon( EPAminskowski , GREEN , RED , 0.2f , DEBUG_RENDER_XRAY );
-// 					DebugAddScreenPoint( Vec2::ZERO , 5.f , BLUE , CYAN , 0.2f );
-// 
-// 					//Vec2 npm = EPAminskowski.GetClosestPointOnEdges( Vec2::ZERO );
-// 					//DebugAddScreenLine( Vec2::ZERO , npm , YELLOW , 5.f );
-// 
-// 					//Vec2 npm2 = minskowskiDifference.GetClosestPointOnEdges( Vec2::ZERO );
-// 
-// 					Vec2 cp1 = Vec2::ZERO;
-// 					Vec2 cp2 = Vec2::ZERO;
-// 					
-// 					GetContactPoints( EPAminskowski , me->m_polygon , them->m_polygon , cp1 , cp2 );
-// 					
-// 					//DebugAddScreenLine( Vec2::ZERO , cp1 , ORANGE , 3.f );
-// 					//DebugAddScreenLine( Vec2::ZERO , cp2 , YELLOW , 3.f );
-// 					DebugAddScreenPoint( cp1 , 5.f , ORANGE , 0.2f );
-// 					DebugAddScreenPoint( cp2 , 5.f , YELLOW , 0.2f );
-// 					continue;
-// 				}
 				
 				Collision2D newCollision;
  				newCollision.m_me	= m_colliders2D[ firstColliderIndex ];
@@ -266,11 +236,11 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	{
 		return;
 	}
-	
-	if ( collision.m_me->GetType() == COLLIDER2D_CONVEXGON )
-	{
-		collision.m_collisionManifold.m_normal *= -1;
-	}
+
+// 	if ( collision.m_me->GetType() == COLLIDER2D_CONVEXGON && collision.m_them->GetType() == COLLIDER2D_CONVEXGON )
+// 	{
+// 		return;
+// 	}
 	
 	// 8 ways to move the object;
 	
@@ -291,56 +261,125 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	}
 
 	// 8 ways to apply impulse
-	float friction = collision.m_me->GetFrictionWith( collision.m_them );
+		
+	Vec2 impulseNormal = CalculateImpulseTangent( collision );
+	/*Vec2 impulseTangent = Vec2::ZERO;*/
 	
-	Vec2 theRealImpulse = CalculateImpulse( collision );
-	float impulseNormal = DotProduct2D( theRealImpulse , collision.m_collisionManifold.m_normal );
-	float impulseTangent = DotProduct2D( theRealImpulse , collision.m_collisionManifold.m_normal.GetRotated90Degrees() );
-
-	if ( abs( impulseTangent ) > friction* impulseNormal )
-	{
-		impulseTangent = SignFloat( impulseTangent ) * impulseNormal * friction;
-	}
-
 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC   || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
 		 collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
 	{
-		collision.m_me->GetRigidBody()->ApplyImpulse( theRealImpulse , collision.m_collisionManifold.m_contactPoint );
-		collision.m_them->GetRigidBody()->ApplyImpulse( -theRealImpulse , collision.m_collisionManifold.m_contactPoint );		
+		collision.m_me->GetRigidBody()->ApplyImpulse( impulseNormal , collision.m_collisionManifold.m_contactPoint );
+		collision.m_them->GetRigidBody()->ApplyImpulse( -impulseNormal , collision.m_collisionManifold.m_contactPoint );		
+
+// 		impulseTangent = CalculateImpulseTangent( collision );
+// 
+// 		collision.m_me->GetRigidBody()->ApplyImpulse( impulseTangent , collision.m_collisionManifold.m_contactPoint );
+// 		collision.m_them->GetRigidBody()->ApplyImpulse( -impulseTangent , collision.m_collisionManifold.m_contactPoint );
+		
 		return;
 	}
 
 	if ( collision.CheckCollisionType() == STATIC_VS_KINEMATIC || collision.CheckCollisionType() == STATIC_VS_DYNAMIC )
 	{
-		collision.m_them->GetRigidBody()->ApplyImpulse( -theRealImpulse , collision.m_collisionManifold.m_contactPoint );
+		collision.m_them->GetRigidBody()->ApplyImpulse( -impulseNormal , collision.m_collisionManifold.m_contactPoint );
+
+// 		impulseTangent = CalculateImpulseTangent( collision );
+// 
+// 		collision.m_them->GetRigidBody()->ApplyImpulse( -impulseTangent , collision.m_collisionManifold.m_contactPoint );
 	}
 	
 	if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_STATIC )
 	{
-		collision.m_me->GetRigidBody()->ApplyImpulse( theRealImpulse , collision.m_collisionManifold.m_contactPoint );
+		collision.m_me->GetRigidBody()->ApplyImpulse( impulseNormal , collision.m_collisionManifold.m_contactPoint );
+
+// 		impulseTangent = CalculateImpulseTangent( collision );
+// 		
+// 		collision.m_me->GetRigidBody()->ApplyImpulse( impulseTangent , collision.m_collisionManifold.m_contactPoint );
 	}
 	
 }
 
-Vec2 Physics2D::CalculateImpulse( Collision2D& collision )
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec2 Physics2D::CalculateImpulseNormal( Collision2D& collision )
+{
+	Vec2 contactPoint = collision.m_collisionManifold.m_contactPoint;
+
+	Vec2 normal = collision.m_collisionManifold.m_normal;
+	
+	Vec2 meImpactVelocity = collision.m_me->GetRigidBody()->CalculateImpactVelocity( contactPoint );
+	Vec2 themImpactVelocity = collision.m_them->GetRigidBody()->CalculateImpactVelocity( contactPoint );
+		
+	float impulseNormal = -1 * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) * DotProduct2D( ( meImpactVelocity - themImpactVelocity ) , normal );
+
+	float factorMe = DotProduct2D( ( contactPoint - collision.m_me->GetRigidBody()->GetPosition() ).GetRotatedMinus90Degrees() , normal );
+	factorMe *= factorMe;
+	factorMe /= collision.m_me->GetRigidBody()->GetMoment();
+
+	float factorThem = DotProduct2D( ( contactPoint - collision.m_them->GetRigidBody()->GetPosition() ).GetRotatedMinus90Degrees() , normal );
+	factorThem *= factorThem;
+	factorThem /= collision.m_them->GetRigidBody()->GetMoment();
+
+	float denominator = 0.f;
+
+	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
+		collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
+	{
+		denominator = ( 1.f / collision.m_me->GetRigidBody()->GetMass() ) + ( 1.f / collision.m_them->GetRigidBody()->GetMass() );
+	}
+	else if ( collision.CheckCollisionType() == STATIC_VS_KINEMATIC || collision.CheckCollisionType() == STATIC_VS_DYNAMIC )
+	{
+		denominator = ( 1.f / collision.m_them->GetRigidBody()->GetMass() );
+	}
+	else if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_STATIC )
+	{
+		denominator = ( 1.f / collision.m_me->GetRigidBody()->GetMass() );
+	}
+		
+	denominator *= DotProduct2D( normal , normal );
+
+	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
+		collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
+	{
+		denominator += factorMe + factorThem;
+	}
+	else if ( collision.CheckCollisionType() == STATIC_VS_KINEMATIC || collision.CheckCollisionType() == STATIC_VS_DYNAMIC )
+	{
+		denominator += factorThem;
+	}
+	else if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_STATIC )
+	{
+		denominator += factorMe;
+	}
+	
+	impulseNormal /= denominator;
+
+	impulseNormal = impulseNormal < 0 ? 0 : impulseNormal;
+	   	
+	return ( impulseNormal * normal );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec2 Physics2D::CalculateImpulseTangent( Collision2D& collision )
 {
 	Vec2 contactPoint = collision.m_collisionManifold.m_contactPoint;
 
 	Vec2 normal = collision.m_collisionManifold.m_normal;
 	Vec2 tangent = -collision.m_collisionManifold.m_normal.GetRotatedMinus90Degrees();
-	
+
 
 	Vec2 meImpactVelocity = collision.m_me->GetRigidBody()->CalculateImpactVelocity( contactPoint );
 	Vec2 themImpactVelocity = collision.m_them->GetRigidBody()->CalculateImpactVelocity( contactPoint );
-	
+
 
 	float friction = collision.m_me->GetFrictionWith( collision.m_them );
-	
+
 	float impulseNormal = -1 * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) * DotProduct2D( ( meImpactVelocity - themImpactVelocity ) , normal );
 
 	float impulseTangent = -1 * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) * DotProduct2D( ( meImpactVelocity - themImpactVelocity ) , tangent );
 
-	
+
 	float factorMe = DotProduct2D( ( contactPoint - collision.m_me->GetRigidBody()->GetPosition() ).GetRotatedMinus90Degrees() , normal );
 	factorMe *= factorMe;
 	factorMe /= collision.m_me->GetRigidBody()->GetMoment();
@@ -365,7 +404,7 @@ Vec2 Physics2D::CalculateImpulse( Collision2D& collision )
 		denominator = ( 1.f / collision.m_me->GetRigidBody()->GetMass() );
 	}
 	float denomCopy = denominator;
-	
+
 	denominator *= DotProduct2D( normal , normal );
 
 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
@@ -381,7 +420,7 @@ Vec2 Physics2D::CalculateImpulse( Collision2D& collision )
 	{
 		denominator += factorMe;
 	}
-	
+
 	impulseNormal /= denominator;
 
 	float factorMeTangent = DotProduct2D( ( contactPoint - collision.m_me->GetRigidBody()->GetPosition() ).GetRotatedMinus90Degrees() , tangent );
@@ -391,8 +430,8 @@ Vec2 Physics2D::CalculateImpulse( Collision2D& collision )
 	float factorThemTangent = DotProduct2D( ( contactPoint - collision.m_them->GetRigidBody()->GetPosition() ).GetRotatedMinus90Degrees() , tangent );
 	factorThemTangent *= factorThemTangent;
 	factorThemTangent /= collision.m_them->GetRigidBody()->GetMoment();
-	
-	denomCopy   *= DotProduct2D( tangent , tangent );
+
+	denomCopy *= DotProduct2D( tangent , tangent );
 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
 		collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
 	{
@@ -406,17 +445,17 @@ Vec2 Physics2D::CalculateImpulse( Collision2D& collision )
 	{
 		denomCopy += factorMeTangent;
 	}
-	
+
 	impulseTangent /= denomCopy;
 
 	if ( abs( impulseTangent ) > friction* impulseNormal )
 	{
 		impulseTangent = SignFloat( impulseTangent ) * impulseNormal * friction;
 	}
-	
+
 	impulseTangent = Clamp( impulseTangent , -friction * impulseNormal , friction * impulseNormal );
 	impulseNormal = impulseNormal < 0 ? 0 : impulseNormal;
-	   	
+
 	return ( impulseNormal * normal ) + ( impulseTangent * tangent );
 }
 
