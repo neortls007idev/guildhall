@@ -21,15 +21,17 @@ public:
 	int  GetVertexCount() const;
 	int	 GetEdgeCount() const;
 	void GetEdge( int idx , Vec2* outStart , Vec2* outEnd );
-	Vec2 GetCenter() const;																	/*{ return m_center; }*/
+	Vec2 GetCenter() const { return m_center; }
 	bool Contains( const Vec2 pos ) const;
 
 	Vec2 GetClosestPointOnEdges( const Vec2 point ) const;
+	Vec2 GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2 point , size_t& outIndex1 , size_t& outIndex2 );
 	
 	void SetCenter();
 	void SetNewCenter( Vec2 newCenter );
-
 	void SetPosition( Vec2 newPos );
+	
+	void InsertNewPointBetweenIndices( Vec2 point , size_t index1 , size_t index2 );
 
 public: // static constructors (feel free to just use a constructor - I just like descriptive names)
 		// in this case, these two take the same parameters but behave differently

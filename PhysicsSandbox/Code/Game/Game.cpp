@@ -183,7 +183,7 @@ void Game::Render() const
 // 	                         MAGENTA , m_worldBoundsThickness );
 	
 	PolygonCollider2D* floorCollider = ( PolygonCollider2D* ) m_floorObject->m_rigidbody->GetCollider();
-	g_theRenderer->DrawPolygon( &floorCollider->m_polygon.m_points[ 0 ] , floorCollider->m_polygon.m_points.size() , ORANGE );
+	g_theRenderer->DrawPolygon( &floorCollider->m_polygon.m_points[ 0 ] , ( uint ) floorCollider->m_polygon.m_points.size() , ORANGE );
 	//floorCollider->DebugRender( g_theRenderer , YELLOW , ORANGE );
 	
 	for ( unsigned int index = 0; index < ( unsigned int ) m_gameObjects.size(); index++ )

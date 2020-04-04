@@ -83,18 +83,18 @@ void Polygon2D::GetEdge( int idx , Vec2* outStart , Vec2* outEnd )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Vec2 Polygon2D::GetCenter() const 
-{
-	Vec2 centre = Vec2( 0.f , 0.f );
-	
-	for ( int index = 0; index < m_points.size(); index++ )
-	{
-		centre += m_points[ index ];
-	}
-
-	centre = centre / ( float ) m_points.size();
-	return centre;
-}
+// Vec2 Polygon2D::GetCenter() const 
+// {
+// 	Vec2 centre = Vec2( 0.f , 0.f );
+// 	
+// 	for ( int index = 0; index < m_points.size(); index++ )
+// 	{
+// 		centre += m_points[ index ];
+// 	}
+// 
+// 	centre = centre / ( float ) m_points.size();
+// 	return centre;
+// }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -176,29 +176,29 @@ Vec2 Polygon2D::GetClosestPointOnEdges( const Vec2 point ) const
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Polygon2D::SetCenter()
-{
+{	
 	if ( m_points.size() == 0 )
 	{
 		return;
 	}
-
-
+	
+	
 	m_center = Vec2::ZERO;
-
-	Vec2 leftMostPoint = *GetLeftMostPointFromPointCloud( &m_points[ 0 ] , ( int ) m_points.size() );
-	Vec2 rightMostPoint = *GetRightMostPointFromPointCloud( &m_points[ 0 ] , ( int ) m_points.size() );
-	Vec2 topMostPoint = *GetTopMostPointFromPointCloud( &m_points[ 0 ] , ( int ) m_points.size() );
-	Vec2 bottomMostPoint = *GetBottomMostPointFromPointCloud( &m_points[ 0 ] , ( int ) m_points.size() );
-	float centerX = ( rightMostPoint.x + leftMostPoint.x ) * 0.5f;
-	float centerY = ( topMostPoint.y + bottomMostPoint.y ) * 0.5f;
-	m_center = Vec2( centerX , centerY );
-
-// 	for ( size_t index = 0; index < m_points.size(); index++ )
-// 	{
-// 		m_center += m_points[ index ];
-// 	}
-// 
-// 	m_center /= m_points.size();
+	
+// 	Vec2 leftMostPoint = *GetLeftMostPointFromPointCloud( &m_points[ 0 ] , ( int ) m_points.size() );
+// 	Vec2 rightMostPoint = *GetRightMostPointFromPointCloud( &m_points[ 0 ] , ( int ) m_points.size() );
+// 	Vec2 topMostPoint = *GetTopMostPointFromPointCloud( &m_points[ 0 ] , ( int ) m_points.size() );
+// 	Vec2 bottomMostPoint = *GetBottomMostPointFromPointCloud( &m_points[ 0 ] , ( int ) m_points.size() );
+// 	float centerX = ( rightMostPoint.x + leftMostPoint.x ) * 0.5f;
+// 	float centerY = ( topMostPoint.y + bottomMostPoint.y ) * 0.5f;
+// 	m_center = Vec2( centerX , centerY );
+	
+	for ( size_t index = 0; index < m_points.size(); index++ )
+	{
+		m_center += m_points[ index ];
+	}
+	
+	m_center /= ( float ) m_points.size();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -206,6 +206,13 @@ void Polygon2D::SetCenter()
 void Polygon2D::SetNewCenter( Vec2 newCenter )
 {
 	m_center = newCenter;
+
+	Vec2 centre = GetCenter();
+	Vec2 moveVec = newCenter - centre;
+	for ( int i = 0; i < m_points.size(); i++ )
+	{
+		m_points[ i ] += moveVec;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -219,6 +226,30 @@ void Polygon2D::SetPosition( Vec2 newPos )
 
 	m_localPos = newPos;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Polygon2D::InsertNewPointBetweenIndices( Vec2 point , size_t index1 , size_t index2 )
+{
+	if ( index1 == 0 && index2 == ( m_points.size() - 1 ) )
+	{
+		m_points.push_back( point );
+		return;
+	}
+	m_points.insert( m_points.begin() + index1 , point );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+// void Polygon2D::SetPosition( Vec2 newPos )
+// {
+// 	for ( size_t index = 0 ; index < m_points.size() ; index++ )
+// 	{
+// 		m_points[ index ] += newPos;
+// 	}
+// 
+// 	m_localPos = newPos;
+// }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -284,6 +315,42 @@ Polygon2D Polygon2D::MakeConvexFromPointCloud( Vec2 const* points , uint pointCo
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Vec2 Polygon2D::GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2 point , size_t& outIndex1 , size_t& outIndex2 )
+{
+	std::vector<Vec2> closestPointsOnEachEdge;
+	Vec2 currentEdgeStart	= m_points[ 0 ];
+	Vec2 currentEdgeEnd		= m_points[ 1 ];
+	int counter				= 0;
+	size_t start			= 0;
+	size_t end				= 1;
+
+	float minDistance		= INFINITY;
+	Vec2 nearestPoint;
+
+	while ( counter < m_points.size() )
+	{
+		Vec2 closestPointOnEdge = GetNearestPointOnLineSegment2D( point , currentEdgeStart , currentEdgeEnd );
+		closestPointsOnEachEdge.push_back( closestPointOnEdge );
+		float distance = ( point - closestPointOnEdge ).GetLength();
+
+		if ( distance < minDistance )
+		{
+			minDistance = distance;
+			outIndex1 = ( int ) start;
+			outIndex2 = ( int ) end;
+			nearestPoint = closestPointOnEdge;
+		}
+
+		start = ( start + 1 ) % m_points.size();
+		end = ( end + 1 ) % m_points.size();
+		currentEdgeStart = m_points[ start ];
+		currentEdgeEnd = m_points[ end ];
+		counter++;
+	}
+	return nearestPoint;
+}
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 // Polygon2D::Polygon2D( Polygon2D& copy )
 // {
 // 	for ( size_t index = 0; index < copy.m_points.size(); index++ )
@@ -310,7 +377,7 @@ Polygon2D::Polygon2D( const Polygon2D& copy )
 
 Polygon2D::Polygon2D()
 {
-	SetCenter();
+	//SetCenter();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
