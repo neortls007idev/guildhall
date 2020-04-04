@@ -20,6 +20,7 @@ PolygonCollider2D::PolygonCollider2D( Physics2D* system , Rigidbody2D* rigidbody
 {
 	m_polygon = convexgon;
 	m_worldPosition = m_rigidbody->m_worldPosition + localPosition;
+	//m_polygon.SetNewCenter( Vec2::ZERO );
 	m_polygon.m_localPos = m_worldPosition;
 	CreateBoundingDisc();
 }
@@ -34,6 +35,7 @@ void PolygonCollider2D::UpdateWorldShape()
 	m_boundingDisc.m_center = m_worldPosition;
 
 	float orientationDegrees = ConvertRadiansToDegrees( m_rigidbody->m_frameRotation );
+	//RotateDegreesPolygonAboutPoint( m_polygon , m_polygon.GetCenter() , orientationDegrees );
 	RotateDegreesPolygonAboutPoint( m_polygon , m_worldPosition , orientationDegrees );
 }
 
@@ -160,9 +162,7 @@ void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderCol
 	Vec2 center = m_polygon.GetCenter();
 
 	Vec2 mousedir = g_theInput->GetMouseNormalizedClientPosition();
-	//size_t furthesetPoint = GetIndexOfFurthestPoint( &m_polygon.m_points[ 0 ] , m_polygon.m_points.size() , mousedir );
-	//ctx->DrawDisc( m_polygon.m_points[ furthesetPoint ] , 5.f , PINK );
-	
+		
 	if ( m_rigidbody->m_isSimulationActive )
 	{
 		ctx->DrawLine( m_worldPosition - line1 , m_worldPosition + line1 , BLUE , 0.01f * m_width );
@@ -173,29 +173,6 @@ void PolygonCollider2D::DebugRender( RenderContext* ctx , Rgba8 const& borderCol
 		ctx->DrawLine( m_worldPosition - line1 , m_worldPosition + line1 , RED , 0.01f * m_width );
 		ctx->DrawLine( m_worldPosition - line2 , m_worldPosition + line2 , RED , 0.01f * m_width );
 	}
-	
-// 	if ( m_rigidbody->m_isSimulationActive )
-// 	{
-// 		ctx->DrawLine( m_boundingDisc.m_center - line1 , m_boundingDisc.m_center + line1 , YELLOW , 0.01f * m_width );
-// 		ctx->DrawLine( m_boundingDisc.m_center - line2 , m_boundingDisc.m_center + line2 , YELLOW , 0.01f * m_width );
-// 	}
-// 	else
-// 	{
-// 		ctx->DrawLine( m_boundingDisc.m_center - line1 , m_boundingDisc.m_center + line1 , GREEN , 0.01f * m_width );
-// 		ctx->DrawLine( m_boundingDisc.m_center - line2 , m_boundingDisc.m_center + line2 , GREEN , 0.01f * m_width );
-// 	}
-// 
-// 	if ( m_rigidbody->m_isSimulationActive )
-// 	{
-// 		ctx->DrawLine( center - line1 , center + line1 , CYAN , 0.01f * m_width );
-// 		ctx->DrawLine( center - line2 , center + line2 , CYAN , 0.01f * m_width );
-// 	}													 
-// 	else												 
-// 	{													 
-// 		ctx->DrawLine( center - line1 , center + line1 , CYAN , 0.01f * m_width );
-// 		ctx->DrawLine( center - line2 , center + line2 , CYAN , 0.01f * m_width );
-// 	}
-
 	
 	if ( m_isDrawingCollisions )
 	{

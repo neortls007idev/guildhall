@@ -138,7 +138,7 @@ void Game::Update( float deltaSeconds )
 	}
 	//UpdateCamera();
 	UpdateWorldBounds();
-	DestroyGameObjectsOutOfHorizontalSpace();
+	//DestroyGameObjectsOutOfHorizontalSpace();
 	UpdateGameObject( deltaSeconds );
 	UpdateGameObjects();
 	UpdateFromUserInput( deltaSeconds );

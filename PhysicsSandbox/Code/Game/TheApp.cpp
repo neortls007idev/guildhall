@@ -107,6 +107,7 @@ void TheApp::Startup()
 		g_theDevConsole = new DevConsole();
 	}
 	g_theDevConsole->Startup();
+	AddDebugRenderDevConsoleCommands( g_theDevConsole );
 
 	if ( g_currentManager == nullptr )
 	{

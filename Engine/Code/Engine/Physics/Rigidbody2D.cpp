@@ -2,6 +2,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Physics/Collider2D.hpp"
 #include "DiscCollider2D.hpp"
+#include "Engine/Core/DebugRender.hpp"
 #include "PolygonCollider2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -85,12 +86,6 @@ void Rigidbody2D::ApplyImpulse( Vec2 impulse , Vec2 point )
 	m_velocity += impulse / m_mass;
 
  	Vec2 torqueDistance = ( point - m_collider->GetPosition() );
-
-	if ( m_collider->GetType() == COLLIDER2D_CONVEXGON )
-	{
-		PolygonCollider2D* polyCol = ( PolygonCollider2D* ) m_collider;
-		torqueDistance = ( point - polyCol->m_polygon.GetCenter() ).GetRotatedMinus90Degrees();
-	}
 
 	m_frameTorque = DotProduct2D( torqueDistance.GetRotated90Degrees() , impulse );
  	m_angularVelocity += ( m_frameTorque / m_moment );

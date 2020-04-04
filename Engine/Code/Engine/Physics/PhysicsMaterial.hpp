@@ -12,5 +12,5 @@ struct PhysicsMaterial
 	inline const float	GetFriction() const															{ return m_friction; }
 public:
 	float m_bounciness = 0.8f;
-	float m_friction   = 0.8f;
+	float m_friction   = 1.0f;
 };

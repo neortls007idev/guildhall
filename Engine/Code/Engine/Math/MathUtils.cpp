@@ -1393,10 +1393,9 @@ bool GJKDetectPolygonvPolygonIntersections( Polygon2D poly1 , Polygon2D poly2 , 
 	
 	if ( DoesSimplexContainOrigin( sp1 , sp2 , sp3 ) )
 	{
-		outSimplex[ 0 ] = sp1;
-		outSimplex[ 1 ] = sp2;
-		outSimplex[ 2 ] = sp3;
-
+ 		outSimplex[ 0 ] = sp1;
+ 		outSimplex[ 1 ] = sp2;
+ 		outSimplex[ 2 ] = sp3;
 		return true;
 	}
 	GetNextSimplex( sp1 , sp2 , sp3 , poly1 , poly2 );
@@ -1407,6 +1406,7 @@ bool GJKDetectPolygonvPolygonIntersections( Polygon2D poly1 , Polygon2D poly2 , 
 			outSimplex[ 0 ] = sp1;
 			outSimplex[ 1 ] = sp2;
 			outSimplex[ 2 ] = sp3;
+
 			return true;
 		}
 		currentSp1 = sp1;
@@ -1521,57 +1521,71 @@ bool AreBothSimplexSame( Vec2 simplex1P1 , Vec2 simplex1P2 , Vec2 simplex1P3 , V
 
 Polygon2D GenerateEPAMinkowskiPolygonIfPolygonsIntersect( Polygon2D& poly1 , Polygon2D& poly2 )
 {
-	Polygon2D toReturn;
+	Polygon2D EPAPoly;
 	Vec2 simplex[ 3 ];
+
 	GJKDetectPolygonvPolygonIntersections( poly1 , poly2 , simplex );
+
 	std::vector<Vec2> EPAPolyPoints;
-	EPAPolyPoints.push_back( simplex[ 0 ] );
-	EPAPolyPoints.push_back( simplex[ 1 ] );
-	EPAPolyPoints.push_back( simplex[ 2 ] );
-	toReturn = Polygon2D::MakeConvexFromPointCloud( &EPAPolyPoints[ 0 ] , 3 );
+ 	EPAPolyPoints.push_back( simplex[ 0 ] );
+ 	EPAPolyPoints.push_back( simplex[ 1 ] );
+ 	EPAPolyPoints.push_back( simplex[ 2 ] );
+
+	EPAPoly.m_points.push_back( simplex[ 0 ] );
+	EPAPoly.m_points.push_back( simplex[ 1 ] );
+	EPAPoly.m_points.push_back( simplex[ 2 ] );
 	
-	Vec2 nearestPoint = toReturn.GetClosestPointOnEdges( Vec2::ZERO );
+	//EPAPoly = Polygon2D::MakeConvexFromPointCloud( &EPAPolyPoints[ 0 ] , 3 );
+
+	size_t index1 = 0;
+	size_t index2 = 0;
+		
+	Vec2 nearestPoint = EPAPoly.GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2::ZERO , index1 , index2 );
 	Vec2 dir = nearestPoint.GetNormalized();
 	Plane2D currentPlane = Plane2D( dir , nearestPoint );
 	const float nearZero = 0.0001f;
 	Vec2 supportPoint = MinkowskiSumSupportPoint( poly1 , poly2 , dir );
+
 	if ( currentPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero )
 	{
-		return toReturn;
-	}
-	EPAPolyPoints.push_back( supportPoint );
-	toReturn = Polygon2D::MakeConvexFromPointCloud( &EPAPolyPoints[ 0 ] , ( int ) EPAPolyPoints.size() );
-	
-	nearestPoint = toReturn.GetClosestPointOnEdges( Vec2::ZERO  );
-	dir = nearestPoint.GetNormalized();
-	Plane2D nextPlane = Plane2D( dir , nearestPoint );
-
-	supportPoint = MinkowskiSumSupportPoint( poly1 , poly2 , dir );
-	if ( nextPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero )
-	{
-		return toReturn;
+		return EPAPoly;
 	}
 
 	EPAPolyPoints.push_back( supportPoint );
-	toReturn = Polygon2D::MakeConvexFromPointCloud( &EPAPolyPoints[ 0 ] , ( int ) EPAPolyPoints.size() );
-	
+	EPAPoly.InsertNewPointBetweenIndices( supportPoint , index1 , index2 );
+		
+// 	nearestPoint = EPAPoly.GetClosestPointOnEdges( Vec2::ZERO  );
+// 	dir = nearestPoint.GetNormalized();
+// 	Plane2D nextPlane = Plane2D( dir , nearestPoint );
+// 
+// 	supportPoint = MinkowskiSumSupportPoint( poly1 , poly2 , dir );
+// 	if ( nextPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero )
+// 	{
+// 		return EPAPoly;
+// 	}
+
+// 	EPAPolyPoints.push_back( supportPoint );
+// 	EPAPoly.InsertNewPointBetweenIndices( supportPoint , index1 , index2 );
+
+	Plane2D nextPlane;
 	while ( nextPlane != currentPlane )
 	{
-		currentPlane = nextPlane;
-		nearestPoint = toReturn.GetClosestPointOnEdges( Vec2::ZERO );
+		nearestPoint = EPAPoly.GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2::ZERO , index1 , index2 );
 		dir = nearestPoint.GetNormalized();
 		nextPlane = Plane2D( dir , nearestPoint );
 		supportPoint = MinkowskiSumSupportPoint( poly1 , poly2 , dir );
 
 		if ( nextPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero )
 		{
-			return toReturn;
+			return EPAPoly;
 		}
 
-		EPAPolyPoints.push_back( supportPoint );
-		toReturn = Polygon2D::MakeConvexFromPointCloud( &EPAPolyPoints[ 0 ] , ( int ) EPAPolyPoints.size() );
+		//EPAPolyPoints.push_back( supportPoint );
+		EPAPoly.InsertNewPointBetweenIndices( supportPoint , index1 , index2 );
+		//EPAPoly = Polygon2D::MakeConvexFromPointCloud( &EPAPolyPoints[ 0 ] , ( int ) EPAPolyPoints.size() );
+		currentPlane = nextPlane;
 	}
-	return toReturn;
+	return EPAPoly;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1604,6 +1618,11 @@ void GetContactPoints( Polygon2D minkowskiPoly , Polygon2D poly1 , Polygon2D pol
 		}
 	}
 
+	if ( pointsAndDistance.size() == 0 )
+	{
+		return;
+	}
+	
 	if ( pointsAndDistance.size() == 1 )
 	{
 		cp1 = pointsAndDistance[ 0 ].point;

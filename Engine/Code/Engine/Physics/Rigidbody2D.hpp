@@ -90,7 +90,7 @@ public:
 	float				m_mass					= 1.0f;
 	eSimulationMode		m_simulationMode		= SIMULATIONMODE_DYNAMIC;
 	bool				m_isSimulationActive	= true;
-	float				m_drag					= 0.1f;
+	float				m_drag					= 0.0f;
 
 	float				m_rotationInRadians		= 0.f;
 	float				m_angularVelocity		= 0.f;												// Radians per Second
