@@ -136,17 +136,17 @@ Manifold2D PolygonVPolygonCollisionFold( Collider2D const* me , Collider2D const
 
 	Manifold2D collisionManifold;
 
-//  	Polygon2D EPAminskowski = GenerateEPAMinkowskiPolygonIfPolygonsIntersect( mePoly->m_polygon , themPoly->m_polygon );
-//  	Vec2 contactPointInEPAMinsowskiSpace = EPAminskowski.GetClosestPointOnEdges( Vec2::ZERO );
+ 	Polygon2D EPAminskowski = GenerateEPAMinkowskiPolygonIfPolygonsIntersect( mePoly->m_polygon , themPoly->m_polygon );
+ 	Vec2 contactPointInEPAMinsowskiSpace = EPAminskowski.GetClosestPointOnEdges( Vec2::ZERO );
 
-	Polygon2D minkowskiDiff = GenerateMinkowskiDifferencePolygon( &mePoly->m_polygon , &themPoly->m_polygon );
-	minkowskiDiff = minkowskiDiff.MakeConvexFromPointCloud( &minkowskiDiff.m_points[ 0 ] , ( uint ) minkowskiDiff.m_points.size() );
-	Vec2 contactPointInEPAMinsowskiSpace = minkowskiDiff.GetClosestPointOnEdges( Vec2::ZERO );
+// 	Polygon2D minkowskiDiff = GenerateMinkowskiDifferencePolygon( &mePoly->m_polygon , &themPoly->m_polygon );
+// 	minkowskiDiff = minkowskiDiff.MakeConvexFromPointCloud( &minkowskiDiff.m_points[ 0 ] , ( uint ) minkowskiDiff.m_points.size() );
+// 	Vec2 contactPointInEPAMinsowskiSpace = minkowskiDiff.GetClosestPointOnEdges( Vec2::ZERO );
 //	DebugAddScreenConvexgon( EPAminskowski , GREEN , RED , 0.2f , DEBUG_RENDER_XRAY );
 	Vec2 closestPointFirst  = Vec2::ZERO;
 	Vec2 closestPointTwo	= Vec2::ZERO;
 
-	GetContactPoints( minkowskiDiff , mePoly->m_polygon , themPoly->m_polygon , closestPointFirst , closestPointTwo );
+	GetContactPoints( EPAminskowski , mePoly->m_polygon , themPoly->m_polygon , closestPointFirst , closestPointTwo );
 
 	collisionManifold.m_contactPoint = ( closestPointFirst + closestPointTwo ) * .5f;
 	collisionManifold.m_normal		 = -contactPointInEPAMinsowskiSpace.GetNormalized();

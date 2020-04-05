@@ -325,7 +325,7 @@ Vec2 Polygon2D::GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2 point , size_t& o
 	size_t end				= 1;
 
 	float minDistance		= INFINITY;
-	Vec2 nearestPoint;
+	Vec2 nearestPoint		= Vec2::ZERO ;
 
 	while ( counter < m_points.size() )
 	{

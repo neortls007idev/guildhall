@@ -5,8 +5,8 @@
 
 struct Plane2D
 {
-	Vec2  m_normal;
-	float m_distance; // distanceFromOriginAlongNormal; 
+	Vec2  m_normal			= Vec2::ZERO;
+	float m_distance		= 0.f; // distanceFromOriginAlongNormal; 
 
 	Plane2D();
 	Plane2D( Vec2 normal , const Vec2 pointOnPlane );

@@ -48,6 +48,7 @@ Game::Game()
 	m_worldCamera.SetClearMode( CLEAR_COLOR_BIT , Rgba8( 77 , 174 , 186 , 255 ) );
 	//m_worldCamera.SetProjectionOrthographic( 800.f );
 	m_worldCamera.SetOrthoView( Vec2( -800.f , -400.f ) , Vec2( 800.f , 400.f ) );
+	//m_worldCamera.SetOrthoView( Vec2( -GAME_CAMERA_WIDTH * .5f , -GAME_CAMERA_HEIGHT * .5f ) , Vec2( GAME_CAMERA_WIDTH * .5f , GAME_CAMERA_HEIGHT * .5f ) );
 	
 	m_UICamera.SetOutputSize( m_currentCameraOutputSize );
 	m_UICamera.SetPosition( m_cameraDefaultPosition );
@@ -58,10 +59,10 @@ Game::Game()
 	m_mousePosition = m_worldCamera.ClientToWorld( g_theInput->GetMouseNormalizedClientPosition() , 0 ).GetXYComponents();
 
 	Polygon2D floor;
-	floor.m_points.push_back( Vec2( -1600.f , -350.f ) );
-	floor.m_points.push_back( Vec2( 1600.f , -350.f ) );
-	floor.m_points.push_back( Vec2( 1600.f , -550.f ) );
 	floor.m_points.push_back( Vec2( -1600.f , -550.f ) );
+	floor.m_points.push_back( Vec2( 1600.f , -550.f ) );
+	floor.m_points.push_back( Vec2( 1600.f , -350.f ) );
+	floor.m_points.push_back( Vec2( -1600.f , -350.f ) );
 	m_floorObject = new GameObject( g_thePhysicsSystem , floor.GetCenter() , Vec2::ZERO , floor );
 	//RandomizePointCloud( m_rng );
 

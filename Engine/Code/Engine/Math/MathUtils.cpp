@@ -974,26 +974,45 @@ const Vec2 GetNearestPointOnInfiniteLine2D( const Vec2& referencePoint , const V
 
 const Vec2 GetNearestPointOnLineSegment2D( const Vec2& referencePoint , const Vec2& startPoint , const Vec2& endPoint )
 {
-	Vec2 displacementFromStartToReference = referencePoint - startPoint; // AP
-	Vec2 displacementFromStartToEnd = endPoint - startPoint; // AB
+// 	Vec2 displacementFromStartToReference = referencePoint - startPoint; // AP
+// 	Vec2 displacementFromStartToEnd = endPoint - startPoint; // AB
+// 
+// 	float magnitudeAB = displacementFromStartToEnd.GetLengthSquared();
+// 	float ABAPproduct = DotProduct2D( displacementFromStartToReference , displacementFromStartToEnd );
+// 	float distance = ABAPproduct / magnitudeAB; //The normalized "distance" from start to closest point
+// 
+// 	if ( distance <= 0 )     //Check if projection is over the line
+// 	{
+// 		return startPoint;
+// 
+// 	}
+// 	else if ( distance >= 1 )
+// 	{
+// 		return endPoint;
+// 	}
+// 	else
+// 	{
+// 		return startPoint + ( displacementFromStartToEnd * distance );
+// 	}
 
-	float magnitudeAB = displacementFromStartToEnd.GetLengthSquared();
-	float ABAPproduct = DotProduct2D( displacementFromStartToReference , displacementFromStartToEnd );
-	float distance = ABAPproduct / magnitudeAB; //The normalized "distance" from start to closest point
-
-	if ( distance <= 0 )     //Check if projection is over the line
+	Vec2 direction = endPoint - startPoint;
+	direction.Normalize();
+	if ( DotProduct2D( direction , referencePoint - startPoint ) <= 0 )
 	{
 		return startPoint;
-
 	}
-	else if ( distance >= 1 )
+	else if ( DotProduct2D( -direction , referencePoint - endPoint ) <= 0 )
 	{
 		return endPoint;
 	}
 	else
 	{
-		return startPoint + ( displacementFromStartToEnd * distance );
+		Vec2 tempVec = referencePoint - startPoint;
+		Vec2 result = GetProjectedOnto2D( tempVec , direction );
+		result = result + startPoint;
+		return result;
 	}
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1527,26 +1546,40 @@ Polygon2D GenerateEPAMinkowskiPolygonIfPolygonsIntersect( Polygon2D& poly1 , Pol
 	GJKDetectPolygonvPolygonIntersections( poly1 , poly2 , simplex );
 
 	std::vector<Vec2> EPAPolyPoints;
- 	EPAPolyPoints.push_back( simplex[ 0 ] );
- 	EPAPolyPoints.push_back( simplex[ 1 ] );
- 	EPAPolyPoints.push_back( simplex[ 2 ] );
 
-	EPAPoly.m_points.push_back( simplex[ 0 ] );
-	EPAPoly.m_points.push_back( simplex[ 1 ] );
-	EPAPoly.m_points.push_back( simplex[ 2 ] );
-	
-	//EPAPoly = Polygon2D::MakeConvexFromPointCloud( &EPAPolyPoints[ 0 ] , 3 );
+	if ( CrossProduct2D( simplex[ 1 ] - simplex[ 0 ] , simplex[ 2 ] - simplex[ 0 ] ) > 0 )
+	{
+		EPAPolyPoints.push_back( simplex[ 0 ] );
+		EPAPolyPoints.push_back( simplex[ 1 ] );
+		EPAPolyPoints.push_back( simplex[ 2 ] );
+	}
+	else if ( CrossProduct2D( simplex[ 2 ] - simplex[ 1 ] , simplex[ 1 ] - simplex[ 0 ] ) > 0 )
+	{
+		EPAPolyPoints.push_back( simplex[ 0 ] );
+		EPAPolyPoints.push_back( simplex[ 2 ] );
+		EPAPolyPoints.push_back( simplex[ 1 ] );
+	}
+	else
+	{
+		EPAPolyPoints.push_back( simplex[ 1 ] );
+		EPAPolyPoints.push_back( simplex[ 2 ] );
+		EPAPolyPoints.push_back( simplex[ 0 ] );
+	}
 
-	size_t index1 = 0;
-	size_t index2 = 0;
+	EPAPoly.m_points.push_back( EPAPolyPoints[ 0 ] );
+	EPAPoly.m_points.push_back( EPAPolyPoints[ 1 ] );
+	EPAPoly.m_points.push_back( EPAPolyPoints[ 2 ] );
+
+	size_t index1;
+	size_t index2;
 		
-	Vec2 nearestPoint = EPAPoly.GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2::ZERO , index1 , index2 );
-	Vec2 dir = nearestPoint.GetNormalized();
-	Plane2D currentPlane = Plane2D( dir , nearestPoint );
-	const float nearZero = 0.0001f;
-	Vec2 supportPoint = MinkowskiSumSupportPoint( poly1 , poly2 , dir );
+	Vec2 nearestPoint		= EPAPoly.GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2::ZERO , index1 , index2 );
+	Vec2 dir				= nearestPoint.GetNormalized();
+	Plane2D currentPlane	= Plane2D( dir , nearestPoint );
+	float nearZero			= 0.001f;
+	Vec2 supportPoint		= MinkowskiSumSupportPoint( poly1 , poly2 , dir );
 
-	if ( currentPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero )
+	if ( abs( currentPlane.GetSignedDistanceFromPlane( supportPoint ) ) <= nearZero )
 	{
 		return EPAPoly;
 	}
@@ -1554,35 +1587,23 @@ Polygon2D GenerateEPAMinkowskiPolygonIfPolygonsIntersect( Polygon2D& poly1 , Pol
 	EPAPolyPoints.push_back( supportPoint );
 	EPAPoly.InsertNewPointBetweenIndices( supportPoint , index1 , index2 );
 		
-// 	nearestPoint = EPAPoly.GetClosestPointOnEdges( Vec2::ZERO  );
-// 	dir = nearestPoint.GetNormalized();
-// 	Plane2D nextPlane = Plane2D( dir , nearestPoint );
-// 
-// 	supportPoint = MinkowskiSumSupportPoint( poly1 , poly2 , dir );
-// 	if ( nextPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero )
-// 	{
-// 		return EPAPoly;
-// 	}
-
-// 	EPAPolyPoints.push_back( supportPoint );
-// 	EPAPoly.InsertNewPointBetweenIndices( supportPoint , index1 , index2 );
-
 	Plane2D nextPlane;
-	while ( nextPlane != currentPlane )
+	
+	while ( !( nextPlane == currentPlane ) )
 	{
 		nearestPoint = EPAPoly.GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2::ZERO , index1 , index2 );
 		dir = nearestPoint.GetNormalized();
 		nextPlane = Plane2D( dir , nearestPoint );
 		supportPoint = MinkowskiSumSupportPoint( poly1 , poly2 , dir );
 
-		if ( nextPlane.GetSignedDistanceFromPlane( supportPoint ) <= nearZero )
+		if ( abs( nextPlane.GetSignedDistanceFromPlane( supportPoint ) ) <= nearZero )
 		{
 			return EPAPoly;
 		}
 
 		//EPAPolyPoints.push_back( supportPoint );
 		EPAPoly.InsertNewPointBetweenIndices( supportPoint , index1 , index2 );
-		//EPAPoly = Polygon2D::MakeConvexFromPointCloud( &EPAPolyPoints[ 0 ] , ( int ) EPAPolyPoints.size() );
+		
 		currentPlane = nextPlane;
 	}
 	return EPAPoly;

@@ -14,7 +14,16 @@ extern Window* g_theWindow;
 //  GENERAL GAME CONSTANTS
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-constexpr float CLIENT_ASPECT											=  16.f / 8.f; // We are requesting a 2:1 aspect (square) window area
+constexpr float CLIENT_ASPECT											=  16.f / 9.f; // We are requesting a 2:1 aspect (square) window area
+constexpr float	UI_CAMERA_HEIGHT										= 800.f;
+constexpr float	UI_CAMERA_WIDTH											= 1600.f;
+constexpr float	GAME_CAMERA_HEIGHT										= 100.f;
+constexpr float	GAME_CAMERA_WIDTH										= GAME_CAMERA_HEIGHT * CLIENT_ASPECT;
+constexpr float	FLOOR_CAMERA_HEIGHT										= 2.f * GAME_CAMERA_HEIGHT;
+constexpr float	FLOOR_CAMERA_WIDTH										= 3.f * GAME_CAMERA_WIDTH;
+constexpr float	GAME_CAMERA_MIN_HEIGHT									= 100.f;
+constexpr float	GAME_CAMERA_MAX_HEIGHT									= 500.f;
+
 constexpr float MAX_CAMERA_MOVE_VELOCITY_X								=  70.f;
 constexpr float MAX_CAMERA_MOVE_VELOCITY_Y								=  70.f;
 constexpr float MAX_CAMERA_ZOOM_VELOCITY_X								=  15000.f;

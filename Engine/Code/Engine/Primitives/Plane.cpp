@@ -53,7 +53,7 @@ bool Plane2D::operator!=( const Plane2D& compare ) const
 
 bool Plane2D::operator==( const Plane2D& compare ) const
 {
-	float nearZero = 0.00001f;
+	float nearZero = 0.001f;
 	if ( ( m_normal - compare.m_normal ).GetLength() <= nearZero && m_distance - compare.m_distance <= nearZero )
 	{
 		return true;

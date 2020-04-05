@@ -81,7 +81,7 @@ void Physics2D::Update()
 			}
 			m_colliders2D[ colliderIndex ]->UpdateWorldShape();
 		}
-		//ResetCollisions();
+		ResetCollisions();
 		CleanupDestroyedObjects();
  	}
 }
@@ -143,7 +143,7 @@ void Physics2D::ApplyEffectors( Rigidbody2D* rigidbody , float deltaSeconds )
 			default:
 				break;
 		}
-	GravityBounce( m_sceneCamera    , rigidbody );
+	//GravityBounce( m_sceneCamera    , rigidbody );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -153,7 +153,7 @@ void Physics2D::MoveRigidbodies( Rigidbody2D* rigidbody , float deltaSeconds )
 	if ( rigidbody->GetSimulationMode() != SIMULATIONMODE_STATIC )
 	{
 		rigidbody->SetPosition( rigidbody->GetPosition() + ( rigidbody->GetVelocity() * deltaSeconds ) );
-		ScreenWrapAround( m_sceneCamera , rigidbody );
+		//ScreenWrapAround( m_sceneCamera , rigidbody );
 	}
 }
 
@@ -262,8 +262,8 @@ void Physics2D::ResolveCollision( Collision2D collision )
 
 	// 8 ways to apply impulse
 		
-	Vec2 impulseNormal = CalculateImpulseTangent( collision );
-	/*Vec2 impulseTangent = Vec2::ZERO;*/
+	Vec2 impulseNormal = CalculateImpulseNormal( collision );
+	Vec2 impulseTangent = Vec2::ZERO;
 	
 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC   || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
 		 collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
@@ -271,10 +271,10 @@ void Physics2D::ResolveCollision( Collision2D collision )
 		collision.m_me->GetRigidBody()->ApplyImpulse( impulseNormal , collision.m_collisionManifold.m_contactPoint );
 		collision.m_them->GetRigidBody()->ApplyImpulse( -impulseNormal , collision.m_collisionManifold.m_contactPoint );		
 
-// 		impulseTangent = CalculateImpulseTangent( collision );
-// 
-// 		collision.m_me->GetRigidBody()->ApplyImpulse( impulseTangent , collision.m_collisionManifold.m_contactPoint );
-// 		collision.m_them->GetRigidBody()->ApplyImpulse( -impulseTangent , collision.m_collisionManifold.m_contactPoint );
+		impulseTangent = CalculateImpulseTangent( collision );
+
+		collision.m_me->GetRigidBody()->ApplyImpulse( impulseTangent , collision.m_collisionManifold.m_contactPoint );
+		collision.m_them->GetRigidBody()->ApplyImpulse( -impulseTangent , collision.m_collisionManifold.m_contactPoint );
 		
 		return;
 	}
@@ -283,18 +283,18 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	{
 		collision.m_them->GetRigidBody()->ApplyImpulse( -impulseNormal , collision.m_collisionManifold.m_contactPoint );
 
-// 		impulseTangent = CalculateImpulseTangent( collision );
-// 
-// 		collision.m_them->GetRigidBody()->ApplyImpulse( -impulseTangent , collision.m_collisionManifold.m_contactPoint );
+		impulseTangent = CalculateImpulseTangent( collision );
+
+		collision.m_them->GetRigidBody()->ApplyImpulse( -impulseTangent , collision.m_collisionManifold.m_contactPoint );
 	}
 	
 	if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_STATIC )
 	{
 		collision.m_me->GetRigidBody()->ApplyImpulse( impulseNormal , collision.m_collisionManifold.m_contactPoint );
 
-// 		impulseTangent = CalculateImpulseTangent( collision );
-// 		
-// 		collision.m_me->GetRigidBody()->ApplyImpulse( impulseTangent , collision.m_collisionManifold.m_contactPoint );
+		impulseTangent = CalculateImpulseTangent( collision );
+		
+		collision.m_me->GetRigidBody()->ApplyImpulse( impulseTangent , collision.m_collisionManifold.m_contactPoint );
 	}
 	
 }
@@ -456,7 +456,7 @@ Vec2 Physics2D::CalculateImpulseTangent( Collision2D& collision )
 	impulseTangent = Clamp( impulseTangent , -friction * impulseNormal , friction * impulseNormal );
 	impulseNormal = impulseNormal < 0 ? 0 : impulseNormal;
 
-	return ( impulseNormal * normal ) + ( impulseTangent * tangent );
+	return /*( impulseNormal * normal ) +*/ ( impulseTangent * tangent );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

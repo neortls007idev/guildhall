@@ -36,10 +36,13 @@ void Rigidbody2D::Destroy()
 
 void Rigidbody2D::Update( float deltaSeconds )
 {
-	m_frameRotation			 = m_rotationInRadians;
-	m_rotationInRadians		+= m_angularVelocity * deltaSeconds;
-	m_frameRotation			 = m_rotationInRadians - m_frameRotation;
-	m_collider->UpdateWorldShape();
+	if ( m_simulationMode != SIMULATIONMODE_STATIC )
+	{		
+		m_frameRotation			 = m_rotationInRadians;
+		m_rotationInRadians		+= m_angularVelocity * deltaSeconds;
+		m_frameRotation			 = m_rotationInRadians - m_frameRotation;
+		m_collider->UpdateWorldShape();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
