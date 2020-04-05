@@ -69,7 +69,7 @@ void Rigidbody2D::SetSimulationModeBasedOnCollider( Collider2D* collider )
 	{
 	case COLLIDER2D_DISC:		SetSimulationMode( SIMULATIONMODE_DYNAMIC );
 		break;
-	case COLLIDER2D_CONVEXGON:	SetSimulationMode( SIMULATIONMODE_STATIC );
+	case COLLIDER2D_CONVEXGON:	SetSimulationMode( SIMULATIONMODE_DYNAMIC );
 		break;
 	}
 }
@@ -270,6 +270,7 @@ Vec2 Rigidbody2D::CalculateImpactVelocity( Vec2 pos ) const
 
 Rigidbody2D::~Rigidbody2D()
 {
+	m_collider = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

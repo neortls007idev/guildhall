@@ -64,6 +64,7 @@ Game::Game()
 	floor.m_points.push_back( Vec2( 1600.f , -350.f ) );
 	floor.m_points.push_back( Vec2( -1600.f , -350.f ) );
 	m_floorObject = new GameObject( g_thePhysicsSystem , floor.GetCenter() , Vec2::ZERO , floor );
+	m_floorObject->m_rigidbody->SetSimulationMode( SIMULATIONMODE_STATIC );
 	//RandomizePointCloud( m_rng );
 
 	//InitialGameObjectsSpawner();
@@ -139,7 +140,6 @@ void Game::Update( float deltaSeconds )
 	}
 	//UpdateCamera();
 	UpdateWorldBounds();
-	DestroyGameObjectsOutOfWorldBounds();
 	UpdateGameObject( deltaSeconds );
 	UpdateGameObjects();
 	UpdateFromUserInput( deltaSeconds );
@@ -154,6 +154,14 @@ void Game::Update( float deltaSeconds )
  	{
  		m_tooltipObject = m_selectedGameObject;
  	}
+	//DestroyGameObjectsOutOfWorldBounds();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::EndFrame()
+{
+	DestroyGameObjectsOutOfWorldBounds();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -534,21 +542,22 @@ void Game::UpdateGameObject( float deltaSeconds )
 	{
 		return;
 	}
-	else
-	{
-		UpdateSimulationType( &m_simMode );
-		Vec2 colliderPos = m_selectedGameObject->m_rigidbody->GetPosition();
-		Vec2 newWorldPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
+	
+	UpdateSimulationType( &m_simMode );
+	Vec2 colliderPos = m_selectedGameObject->m_rigidbody->GetPosition();
+	Vec2 newWorldPosition = m_worldCamera.GetWorldNormalizedToClientPosition( g_theInput->GetMouseNormalizedClientPosition() );
 
-		if ( !m_isDragOffsetSet )
-		{
-			m_rigidBodyMouseOffset = newWorldPosition - colliderPos;
-			m_isDragOffsetSet = true;
-			originalPosition = newWorldPosition;
-		}
-		m_selectedGameObject->m_rigidbody->SetPosition( newWorldPosition - m_rigidBodyMouseOffset );
+	if ( !m_isDragOffsetSet )
+	{
+		m_rigidBodyMouseOffset = newWorldPosition - colliderPos;
+		m_isDragOffsetSet = true;
+		originalPosition = newWorldPosition;
 	}
+	m_selectedGameObject->m_rigidbody->SetPosition( newWorldPosition - m_rigidBodyMouseOffset );
+	
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Game::UpdateSimulationType( eSimulationMode* simMode )
 {
@@ -708,7 +717,7 @@ void Game::UpdateGameObjects()
 	IsMouseInsideGameObject();
 	ResetCollisions();
 	AreObjectsColliding();
-	ChangeColorOnCollision();
+	//ChangeColorOnCollision();
 	ChangeAlphaByBounciness();
 }
 
@@ -924,12 +933,32 @@ void Game::DestroyGameObjectsOutOfWorldBounds()
 				DiscCollider2D* discCollider = ( DiscCollider2D* ) collider;
 				if ( ( rigidBody->GetPosition().x + discCollider->m_radius ) < ScreenMinX )
 				{
+					if ( m_selectedGameObject == m_gameObjects[ index ] )
+					{
+						m_selectedGameObject->m_isSelected = false;
+						m_isGameObjectSelected = false;
+						m_selectedGameObject = nullptr;
+					}
+					if ( m_tooltipObject == m_gameObjects[ index ] )
+					{
+						m_tooltipObject = nullptr;
+					}
 					delete m_gameObjects[ index ];
 					m_gameObjects[ index ] = nullptr;
 					m_isMouseOnGameObject[ index ] = false;
 				}
 				else if ( ( rigidBody->GetPosition().x - discCollider->m_radius ) > ScreenMaxX )
 				{
+					if ( m_selectedGameObject == m_gameObjects[ index ] )
+					{
+						m_selectedGameObject->m_isSelected = false;
+						m_isGameObjectSelected = false;
+						m_selectedGameObject = nullptr;
+					}
+					if ( m_tooltipObject == m_gameObjects[ index ] )
+					{
+						m_tooltipObject = nullptr;
+					}
 					delete m_gameObjects[ index ];
 					m_gameObjects[ index ] = nullptr;
 					m_isMouseOnGameObject[ index ] = false;
@@ -937,6 +966,16 @@ void Game::DestroyGameObjectsOutOfWorldBounds()
 
 				if ( ( rigidBody->GetPosition().y + discCollider->m_radius ) < ScreenMinY )
 				{
+					if ( m_selectedGameObject == m_gameObjects[ index ] )
+					{
+						m_selectedGameObject->m_isSelected = false;
+						m_isGameObjectSelected = false;
+						m_selectedGameObject = nullptr;
+					}
+					if ( m_tooltipObject == m_gameObjects[ index ] )
+					{
+						m_tooltipObject = nullptr;
+					}
 					delete m_gameObjects[ index ];
 					m_gameObjects[ index ] = nullptr;
 					m_isMouseOnGameObject[ index ] = false;
@@ -952,6 +991,16 @@ void Game::DestroyGameObjectsOutOfWorldBounds()
 				if ( rightMostPoint.x < ScreenMinX )
 				{
 					//Vec2 offset =  /*rigidBody->m_worldPosition*/ polyCollider->m_worldPosition - leftMostPoint;
+					if ( m_selectedGameObject == m_gameObjects[ index ] )
+					{
+						m_selectedGameObject->m_isSelected = false;
+						m_isGameObjectSelected = false;
+						m_selectedGameObject = nullptr;
+					}
+					if ( m_tooltipObject == m_gameObjects[ index ] )
+					{
+						m_tooltipObject = nullptr;
+					}
 					delete m_gameObjects[ index ];
 					m_gameObjects[ index ] = nullptr;
 					m_isMouseOnGameObject[ index ] = false;
@@ -960,6 +1009,16 @@ void Game::DestroyGameObjectsOutOfWorldBounds()
 				if ( leftMostPoint.x > ScreenMaxX )
 				{
 					//Vec2 offset = rightMostPoint - polyCollider->m_worldPosition;
+					if ( m_selectedGameObject == m_gameObjects[ index ] )
+					{
+						m_selectedGameObject->m_isSelected = false;
+						m_isGameObjectSelected = false;
+						m_selectedGameObject = nullptr;
+					}
+					if ( m_tooltipObject == m_gameObjects[ index ] )
+					{
+						m_tooltipObject = nullptr;
+					}
 					delete m_gameObjects[ index ];
 					m_gameObjects[ index ] = nullptr;
 					m_isMouseOnGameObject[ index ] = false;
@@ -967,6 +1026,16 @@ void Game::DestroyGameObjectsOutOfWorldBounds()
 
 				if ( topMostPoint.y < ScreenMinY )
 				{
+					if ( m_selectedGameObject == m_gameObjects[ index ] )
+					{
+						m_selectedGameObject->m_isSelected = false;
+						m_isGameObjectSelected = false;
+						m_selectedGameObject = nullptr;
+					}
+					if ( m_tooltipObject == m_gameObjects[ index ] )
+					{
+						m_tooltipObject = nullptr;
+					}
 					delete m_gameObjects[ index ];
 					m_gameObjects[ index ] = nullptr;
 					m_isMouseOnGameObject[ index ] = false;
