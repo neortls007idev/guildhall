@@ -139,7 +139,7 @@ void Game::Update( float deltaSeconds )
 	}
 	//UpdateCamera();
 	UpdateWorldBounds();
-	//DestroyGameObjectsOutOfHorizontalSpace();
+	DestroyGameObjectsOutOfWorldBounds();
 	UpdateGameObject( deltaSeconds );
 	UpdateGameObjects();
 	UpdateFromUserInput( deltaSeconds );
@@ -904,7 +904,7 @@ void Game::DrawGameObjectToolTip() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Game::DestroyGameObjectsOutOfHorizontalSpace()
+void Game::DestroyGameObjectsOutOfWorldBounds()
 {
 	float ScreenMinX = m_worldBounds.m_mins.x;
 	float ScreenMinY = m_worldBounds.m_mins.y;

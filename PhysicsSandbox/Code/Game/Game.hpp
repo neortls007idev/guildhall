@@ -63,7 +63,7 @@ public:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 private:
-	void DestroyGameObjectsOutOfHorizontalSpace();
+	void DestroyGameObjectsOutOfWorldBounds();
 
 	void UpdateFromUserInput( float deltaSeconds );
 	void SelectGameObjectFormUserInput();

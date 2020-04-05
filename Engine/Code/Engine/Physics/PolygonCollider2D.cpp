@@ -34,9 +34,12 @@ void PolygonCollider2D::UpdateWorldShape()
 	
 	m_boundingDisc.m_center = m_worldPosition;
 
-	float orientationDegrees = ConvertRadiansToDegrees( m_rigidbody->m_frameRotation );
-	//RotateDegreesPolygonAboutPoint( m_polygon , m_polygon.GetCenter() , orientationDegrees );
-	RotateDegreesPolygonAboutPoint( m_polygon , m_worldPosition , orientationDegrees );
+	if ( m_rigidbody->m_simulationMode != SIMULATIONMODE_STATIC )
+	{
+		float orientationDegrees = ConvertRadiansToDegrees( m_rigidbody->m_frameRotation );
+		//RotateDegreesPolygonAboutPoint( m_polygon , m_polygon.GetCenter() , orientationDegrees );
+		RotateDegreesPolygonAboutPoint( m_polygon , m_worldPosition , orientationDegrees );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

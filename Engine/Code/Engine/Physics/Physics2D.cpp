@@ -116,7 +116,7 @@ void Physics2D::AdvanceSimulation( float deltaSeconds )
 
 		Vec2 currentRigidBodyNewPos = m_rigidBodies2D[ index ]->GetPosition();
 		Vec2 rbVerletVelocity = ( currentRigidBodyNewPos - currentRigidBodyPos ) / deltaSeconds;
-		//m_rigidBodies2D[ index ]->SetVerletVelocity( rbVerletVelocity );
+		m_rigidBodies2D[ index ]->SetVerletVelocity( rbVerletVelocity );
 	}
 }
 
