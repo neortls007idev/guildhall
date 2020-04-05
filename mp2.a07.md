@@ -1,53 +1,40 @@
 
 
-### A02 Checklist
-**( NOTE :- Controls Listed at the Bottom after the Checklist )**
-------
-
-```markdown
-MP2.A06 Rotation
-======
-
-## Overview
-Add in rotation.
-
-**Turn-In Branch Name: `mp2/turnin/a06`**
-
-**Due Date: Mar 12, 2020**
-
-### Goal
-
+### A07 Checklist
+**( NOTE :- Controls And Known bugs Listed at the Bottom after the Checklist )**
 ------
 
 ## Checklist
-- [x] Angular Update - Add members to `Rigidbody2D`
-    - [x] Add `float m_rotationInRadians`
-    - [x] Add `float m_angularVelocity`
-    - [x] Add `float m_frameTorque`
-    - [x] Add `float m_moment`
-    - [x] Add appropriate getter/setter methods
-- [x] `Rigidbody2D::CalculateMoment` to calculate moment based on attached collider and mass
-    - [x] `virtual float Collider2D::CalculateMoment( float mass )`
-    - [x] Implement `DiscCollider::CalculateMoment`
-    - [x] Implement `PolygonCollider::CalculateMoment`
-    - [x] When setting **mass** or **collider** on a rigidbody - recalculate your moment.
-        - *Note: When setting mass, you can do less work by taking advantage of the ratio of new mass to old mass should match the ratios of the moments*.
-- [x] Rotating a `Rigidbody2D` properly updates the **world shape** of the collider.
-    - [x] Add controls to rotate a selected object
-        - Suggest **R** and **F**
-    - [x] Add controls to update the rotational velocity of an object
-        - Suggest **T**, **G**, and **V** to increase, decrease, and reset
-- [x] `Rigidbody2D` now do angular calculations during their update.
-    - [x] Use torque to compute an angular acceleration
-    - [x] Apply angular acceleration to update angular velocity
-    - [x] Apply angular velocity to update rotation
-- [x] Update `Rigidbody2D::GetImpactVelocity` to take into account rotational velocity.
-- [x] Update `ApplyImpulseAt` to apply impulse to torque based on positions.
-- [x] Update impulse calculations to take into account rotational forces, see PDF in lnks
-- [x] Update tooltip to show...
-    - [x] Moment of Inertia
-    - [x] Current Rotation (degrees)
-    - [x] Current Angular Velocity
+- [x] Remove screen wrap and bottom of screen bounce.
+    - [x] Add some static world geometry (at least a floor) to catch falling objects.
+    - [x] Destroy objects that fall out of world bounds
+        - [ ] Option A: Define a world bounds and draw it so users can see where objects should destroy at.
+        - [x] Option B: Destroy objects that leave screen either left/right/bottom, but NOT top.
+- [x] Polygon-v-Polygon Intersection Check (using GJK)
+- [x] Polygon-v-Polygon Manifold (normal/penetration) - object push out correctly
+- [x] Polygon-v-Polygon Contacts - Objects generate one or two contact points.
+    - [x] Manifold now returns a contact edge (two points) instead of just a single contact point.  For cases where only one contact exists,
+          return an edge with the start and end point being the same.
+- [x] *Optional*: Apply Impulse using contact points
+    - [x] *Optional*: Calculate impulse using the center of the contact edge.
+    - [ ] *Optional*: When applying impulse, use the point on the edge closest to each body's center of mass.
+- [x] *Optional*: To make friction/bounce more stable - calculate normal impulse first, apply it, and then generate tangent impulse, and apply it.
+
+------
+
+##General Notes
+
+-[1] Floor Object is now present and does not move with the camera and cannot to destroyed.( drawn in orange. )
+-[2] All objects other than the floor object now spawn in dynamic mode.
+-[3] Initial friction is set to 1.0 , Initial Bounciness is set to 0.8, Initial Linear drag is set to 0.1.
+
+------
+### Known Errors/ Bugs
+
+- [1] contact points are imperfect and at time polygons may intersect.
+- [2] might be just me but non - uniformly dense polygon rotations seem weird.
+- [3] Using a temp hack in polygon collider update as a fix - but even with 0 rotation polygons seem to be having a sheering effect on them - to be discussed with forseth.
+- [4] static disc vs polygon collision seem to be having a sticky effect. - to be discussed with forseth.
 
 ------
 

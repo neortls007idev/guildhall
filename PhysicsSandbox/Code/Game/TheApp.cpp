@@ -218,7 +218,7 @@ void TheApp::Render() const
 
 void TheApp::EndFrame()
 {
-	// all engine things that must end at the end of the frame and not the game
+	g_theGame->EndFrame();
 	
 	g_theAudioSystem->EndFrame();
 	g_thePhysicsSystem->EndFrame();

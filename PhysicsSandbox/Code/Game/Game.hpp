@@ -22,7 +22,7 @@ public:
 	void InitialGameObjectsSpawner();
 
 	void Update( float deltaSeconds );
-
+	void EndFrame();
 	void Render() const;
 	void RenderUI() const;
 	void RenderGravityUI() const;
