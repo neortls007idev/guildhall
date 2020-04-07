@@ -264,6 +264,8 @@ void Physics2D::ResolveCollision( Collision2D collision )
 		
 	Vec2 impulseNormal = CalculateImpulseNormal( collision );
 	Vec2 impulseTangent = Vec2::ZERO;
+
+	//DebugAddScreenArrow( collision.m_collisionManifold.m_contactPoint , collision.m_collisionManifold.m_contactPoint + impulseNormal , WHITE , 5.f );
 	
 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC   || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
 		 collision.CheckCollisionType() == KINEMATIC_VS_DYNAMIC || collision.CheckCollisionType() == KINEMATIC_VS_KINEMATIC )
@@ -271,10 +273,13 @@ void Physics2D::ResolveCollision( Collision2D collision )
 		collision.m_me->GetRigidBody()->ApplyImpulse( impulseNormal , collision.m_collisionManifold.m_contactPoint );
 		collision.m_them->GetRigidBody()->ApplyImpulse( -impulseNormal , collision.m_collisionManifold.m_contactPoint );		
 
-		impulseTangent = CalculateImpulseTangent( collision );
+		impulseTangent = CalculateImpulseTangent( collision , impulseNormal );
 
 		collision.m_me->GetRigidBody()->ApplyImpulse( impulseTangent , collision.m_collisionManifold.m_contactPoint );
 		collision.m_them->GetRigidBody()->ApplyImpulse( -impulseTangent , collision.m_collisionManifold.m_contactPoint );
+// 		DebugAddScreenArrow( collision.m_collisionManifold.m_contactPoint ,
+// 		                     impulseTangent ,
+// 		                     GREEN , 0.5f );
 		
 		return;
 	}
@@ -283,18 +288,24 @@ void Physics2D::ResolveCollision( Collision2D collision )
 	{
 		collision.m_them->GetRigidBody()->ApplyImpulse( -impulseNormal , collision.m_collisionManifold.m_contactPoint );
 
-		impulseTangent = CalculateImpulseTangent( collision );
+		impulseTangent = CalculateImpulseTangent( collision , impulseNormal );
 
 		collision.m_them->GetRigidBody()->ApplyImpulse( -impulseTangent , collision.m_collisionManifold.m_contactPoint );
+// 		DebugAddScreenArrow( collision.m_collisionManifold.m_contactPoint ,
+// 			collision.m_collisionManifold.m_contactPoint + impulseTangent ,
+// 			GREEN , 5.f );
 	}
 	
 	if ( collision.CheckCollisionType() == KINEMATIC_VS_STATIC || collision.CheckCollisionType() == DYNAMIC_VS_STATIC )
 	{
 		collision.m_me->GetRigidBody()->ApplyImpulse( impulseNormal , collision.m_collisionManifold.m_contactPoint );
 
-		impulseTangent = CalculateImpulseTangent( collision );
+		impulseTangent = CalculateImpulseTangent( collision , impulseNormal );
 		
 		collision.m_me->GetRigidBody()->ApplyImpulse( impulseTangent , collision.m_collisionManifold.m_contactPoint );
+// 		DebugAddScreenArrow( collision.m_collisionManifold.m_contactPoint ,
+// 			collision.m_collisionManifold.m_contactPoint+ impulseTangent ,
+// 			GREEN , 5.f );
 	}
 	
 }
@@ -319,7 +330,7 @@ Vec2 Physics2D::CalculateImpulseNormal( Collision2D& collision )
 	float factorThem = DotProduct2D( ( contactPoint - collision.m_them->GetRigidBody()->GetPosition() ).GetRotatedMinus90Degrees() , normal );
 	factorThem *= factorThem;
 	factorThem /= collision.m_them->GetRigidBody()->GetMoment();
-
+	
 	float denominator = 0.f;
 
 	if ( collision.CheckCollisionType() == DYNAMIC_VS_DYNAMIC || collision.CheckCollisionType() == DYNAMIC_VS_KINEMATIC ||
@@ -361,12 +372,12 @@ Vec2 Physics2D::CalculateImpulseNormal( Collision2D& collision )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Vec2 Physics2D::CalculateImpulseTangent( Collision2D& collision )
+Vec2 Physics2D::CalculateImpulseTangent( Collision2D& collision , const Vec2& originalImpulseNormal )
 {
 	Vec2 contactPoint = collision.m_collisionManifold.m_contactPoint;
 
 	Vec2 normal = collision.m_collisionManifold.m_normal;
-	Vec2 tangent = -collision.m_collisionManifold.m_normal.GetRotatedMinus90Degrees();
+	Vec2 tangent = collision.m_collisionManifold.m_normal.GetRotated90Degrees();
 
 
 	Vec2 meImpactVelocity = collision.m_me->GetRigidBody()->CalculateImpactVelocity( contactPoint );
@@ -380,11 +391,11 @@ Vec2 Physics2D::CalculateImpulseTangent( Collision2D& collision )
 	float impulseTangent = -1 * ( 1 + collision.m_me->GetBounceWith( collision.m_them ) ) * DotProduct2D( ( meImpactVelocity - themImpactVelocity ) , tangent );
 
 
-	float factorMe = DotProduct2D( ( contactPoint - collision.m_me->GetRigidBody()->GetPosition() ).GetRotatedMinus90Degrees() , normal );
+	float factorMe = DotProduct2D( ( contactPoint - collision.m_me->GetRigidBody()->GetPosition() ).GetRotated90Degrees() , normal );
 	factorMe *= factorMe;
 	factorMe /= collision.m_me->GetRigidBody()->GetMoment();
 
-	float factorThem = DotProduct2D( ( contactPoint - collision.m_them->GetRigidBody()->GetPosition() ).GetRotatedMinus90Degrees() , normal );
+	float factorThem = DotProduct2D( ( contactPoint - collision.m_them->GetRigidBody()->GetPosition() ).GetRotated90Degrees() , normal );
 	factorThem *= factorThem;
 	factorThem /= collision.m_them->GetRigidBody()->GetMoment();
 
@@ -448,13 +459,16 @@ Vec2 Physics2D::CalculateImpulseTangent( Collision2D& collision )
 
 	impulseTangent /= denomCopy;
 
+	
+	impulseNormal = ( originalImpulseNormal ).GetLength();
+
+	
 	if ( abs( impulseTangent ) > friction* impulseNormal )
 	{
 		impulseTangent = SignFloat( impulseTangent ) * impulseNormal * friction;
 	}
 
 	impulseTangent = Clamp( impulseTangent , -friction * impulseNormal , friction * impulseNormal );
-	impulseNormal = impulseNormal < 0 ? 0 : impulseNormal;
 
 	return /*( impulseNormal * normal ) +*/ ( impulseTangent * tangent );
 }

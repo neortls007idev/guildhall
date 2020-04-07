@@ -51,9 +51,10 @@ struct buffer_attribute_t
 	// uint location; 			// used to link to a GL/Vulkan shader 
 	eBufferFormatType type;		// what data are we describing
 	uint offset; 				// where is it relative to the start of a vertex
-
+	//uint count;
 	buffer_attribute_t( char const* n , eBufferFormatType t , uint offset_o );
 	buffer_attribute_t();
+	uint GetAttributeCount;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

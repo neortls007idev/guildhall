@@ -12,6 +12,9 @@ public: // NOTE: this is one of the few cases where we break both the "m_" namin
 
 	static Vec3 ZERO;
 	static Vec3 ONE;
+	static Vec3 UNIT_VECTOR_ALONG_I_BASIS;
+	static Vec3 UNIT_VECTOR_ALONG_J_BASIS;
+	static Vec3 UNIT_VECTOR_ALONG_K_BASIS;
 
 public:
 

@@ -348,24 +348,36 @@ bool Shader::RecompileShader( std::string const& filename )
 
 ID3D11InputLayout* Shader::GetOrCreateInputLayout( buffer_attribute_t const* attribs )
 {
-	D3D11_INPUT_ELEMENT_DESC vertexDescription[ 3 ];
 	if ( m_inputLayout != nullptr )
 	{
 		return m_inputLayout;
 	}
 
+	buffer_attribute_t const* attribsCopy = attribs;
+	int count = 0;
+
+	while ( attribsCopy->type != BUFFER_FORMAT_INVALID )
+	{
+		count++;
+		attribsCopy++;
+	}
+	
+	//D3D11_INPUT_ELEMENT_DESC vertexDescription[ 3 ];
+	D3D11_INPUT_ELEMENT_DESC* vertexDescription = new D3D11_INPUT_ELEMENT_DESC[ count ];
+
 	if ( m_lastBufferAttribute != attribs )
 	{
-		ConvertBufferAttributeToID3DX11Attribute( vertexDescription , attribs );
+		ConvertBufferAttributeToID3DX11Attribute( &vertexDescription[0] , attribs );
 		m_lastBufferAttribute = attribs;
 	}
 
 	ID3D11Device* device = m_owner->m_device;
 	device->CreateInputLayout(
-		vertexDescription , 3 ,
+		&vertexDescription[0] , count ,
 		m_vertexStage.GetByteCode() , m_vertexStage.GetByteCodeLength() ,
 		&m_inputLayout );
 	SetDebugName( m_inputLayout , &m_user );																		// describe the Vertex PCU
+	//delete vertexDescription;
 	return m_inputLayout;
 }
 

@@ -53,9 +53,6 @@
     <Filter Include="Core\Utilities\XML">
       <UniqueIdentifier>{c9d1a282-294a-4809-8b66-da177c16295a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Utilities\Vertex">
-      <UniqueIdentifier>{9a4821b9-349c-4de6-9fde-10e6f5dcc0b4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Debug">
       <UniqueIdentifier>{22b8fa54-f986-48e8-b877-66bd94785c23}</UniqueIdentifier>
     </Filter>
@@ -71,12 +68,12 @@
     <Filter Include="Core\Experimental">
       <UniqueIdentifier>{a29428e4-41a5-489e-8888-b412c27b8578}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Vertex">
+      <UniqueIdentifier>{ff942c79-2e5d-4c35-80f4-0867d2c9f9fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Rgba8.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Vertex_PCU.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\Camera.cpp">
@@ -244,9 +241,6 @@
     <ClCompile Include="Core\XmlUtils.cpp">
       <Filter>Core\Utilities\XML</Filter>
     </ClCompile>
-    <ClCompile Include="Core\VertexUtils.cpp">
-      <Filter>Core\Utilities\Vertex</Filter>
-    </ClCompile>
     <ClCompile Include="Core\ErrorWarningAssert.cpp">
       <Filter>Core\Debug</Filter>
     </ClCompile>
@@ -304,12 +298,24 @@
     <ClCompile Include="Primitives\OBB3.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="Core\Vertex_PCU.cpp">
+      <Filter>Core\Vertex</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\VertexMaster.cpp">
+      <Filter>Core\Vertex</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\StdExtensions.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\VertexLit.cpp">
+      <Filter>Core\Vertex</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\VertexUtils.cpp">
+      <Filter>Core\Vertex</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Vertex_PCU.hpp">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\Camera.hpp">
@@ -510,9 +516,6 @@
     <ClInclude Include="Core\XmlUtils.hpp">
       <Filter>Core\Utilities\XML</Filter>
     </ClInclude>
-    <ClInclude Include="Core\VertexUtils.hpp">
-      <Filter>Core\Utilities\Vertex</Filter>
-    </ClInclude>
     <ClInclude Include="Core\ErrorWarningAssert.hpp">
       <Filter>Core\Debug</Filter>
     </ClInclude>
@@ -572,6 +575,21 @@
     </ClInclude>
     <ClInclude Include="Primitives\OBB3.hpp">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Vertex_PCU.hpp">
+      <Filter>Core\Vertex</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\VertexMaster.hpp">
+      <Filter>Core\Vertex</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\StdExtensions.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\VertexLit.hpp">
+      <Filter>Core\Vertex</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\VertexUtils.hpp">
+      <Filter>Core\Vertex</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

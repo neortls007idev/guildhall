@@ -182,9 +182,12 @@
     <ClCompile Include="Core\NamedStrings.cpp" />
     <ClCompile Include="Core\Rgba8.cpp" />
     <ClCompile Include="Core\SimpleTriangleFont.cpp" />
+    <ClCompile Include="Core\StdExtensions.cpp" />
     <ClCompile Include="Core\StringUtils.cpp" />
     <ClCompile Include="Core\Tags.cpp" />
     <ClCompile Include="Core\VertexUtils.cpp" />
+    <ClCompile Include="Core\VertexLit.cpp" />
+    <ClCompile Include="Core\VertexMaster.cpp" />
     <ClCompile Include="Core\Vertex_PCU.cpp" />
     <ClCompile Include="Core\XmlUtils.cpp" />
     <ClCompile Include="Input\AnalogJoystick.cpp" />
@@ -270,9 +273,12 @@
     <ClInclude Include="Core\NamedStrings.hpp" />
     <ClInclude Include="Core\Rgba8.hpp" />
     <ClInclude Include="Core\SimpleTriangleFont.hpp" />
+    <ClInclude Include="Core\StdExtensions.hpp" />
     <ClInclude Include="Core\StringUtils.hpp" />
     <ClInclude Include="Core\Tags.hpp" />
     <ClInclude Include="Core\VertexUtils.hpp" />
+    <ClInclude Include="Core\VertexLit.hpp" />
+    <ClInclude Include="Core\VertexMaster.hpp" />
     <ClInclude Include="Core\Vertex_PCU.hpp" />
     <ClInclude Include="Core\XmlUtils.hpp" />
     <ClInclude Include="Input\AnalogJoystick.hpp" />

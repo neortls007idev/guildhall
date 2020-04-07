@@ -5,6 +5,7 @@
 
 void GPUMesh::UpdateVertices( uint vcount , void const* vertexData , uint vertexStride , buffer_attribute_t const* layout )
 {
+	m_buffer_attribute = layout;
 	m_vertices->Update( vertexData , /*sizeof( layout ) * vcount*/ vcount * vertexStride , sizeof( layout )/*vertexStride*/ );
 	m_vertexCount = vcount;
 }

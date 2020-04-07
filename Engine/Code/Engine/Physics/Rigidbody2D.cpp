@@ -69,7 +69,7 @@ void Rigidbody2D::SetSimulationModeBasedOnCollider( Collider2D* collider )
 	{
 	case COLLIDER2D_DISC:		SetSimulationMode( SIMULATIONMODE_DYNAMIC );
 		break;
-	case COLLIDER2D_CONVEXGON:	SetSimulationMode( SIMULATIONMODE_DYNAMIC );
+	case COLLIDER2D_CONVEXGON:	SetSimulationMode( SIMULATIONMODE_STATIC );
 		break;
 	}
 }
@@ -85,7 +85,7 @@ void Rigidbody2D::SetVerletVelocity( Vec2 updatedVerletVelocity )
 
 void Rigidbody2D::ApplyImpulse( Vec2 impulse , Vec2 point )
 {
-	UNUSED( point );
+	DebugAddScreenArrow( point , point + impulse , MAGENTA , 3.f );
 	m_velocity += impulse / m_mass;
 
  	Vec2 torqueDistance = ( point - m_collider->GetPosition() );

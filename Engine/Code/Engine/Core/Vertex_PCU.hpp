@@ -6,6 +6,7 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+struct VertexMaster;
 struct buffer_attribute_t;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -17,6 +18,7 @@ public:
 	Vertex_PCU();
 	~Vertex_PCU();
 	explicit Vertex_PCU( const Vec3& position, const Rgba8& tint, const Vec2& uvTexCoords );
+	explicit Vertex_PCU( const VertexMaster& vert );
 
 public:
 	Vec3 m_position;

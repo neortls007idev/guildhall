@@ -717,7 +717,7 @@ void Game::UpdateGameObjects()
 	IsMouseInsideGameObject();
 	ResetCollisions();
 	AreObjectsColliding();
-	//ChangeColorOnCollision();
+	ChangeColorOnCollision();
 	ChangeAlphaByBounciness();
 }
 
