@@ -203,10 +203,10 @@ void RenderContext::Startup( Window* window )
 
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/default.hlsl" );
 
-	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
-	m_frameUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
-	m_modelMatrixUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
-	m_lightDataUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	m_immediateVBO		= new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
+	m_frameUBO			= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	m_modelMatrixUBO	= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	m_lightDataUBO		= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 	
 	m_defaultSampler = new Sampler( this , SAMPLER_POINT );
 	m_textureDefault = CreateTextureFromColor( WHITE );
@@ -917,7 +917,7 @@ void RenderContext::DisableLight( uint idx )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::Draw( int numVertexes , int vertexOffset )
+void RenderContext::Draw( int numVertexes , int vertexOffset , UINT stride )
 {
 	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
 	//m_context->RSSetState( m_currentShader->m_rasterState );
@@ -970,7 +970,7 @@ void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes
 	// Index Buffers - to be covered later
 
 	// Draw
-	Draw( numVertexes , 0 );
+	Draw( numVertexes , 0 , ( UINT )sizeof( Vertex_PCU ) );
 
 }
 
@@ -986,19 +986,20 @@ void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU>& vertexArray 
 void RenderContext::DrawVertexArray( int numVertexes , VertexBuffer* vertices )
 {
 	BindVertexBuffer( vertices );
-	Draw( numVertexes , 0 );
+	Draw( numVertexes , 0 , vertices->GetVBOStride() );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::DrawIndexed( uint indexCount , uint startIndex , uint indexStride )
+void RenderContext::DrawIndexed( uint indexCount , uint startIndex , uint indexStride , buffer_attribute_t const* attribs )
 {
 	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
 	//m_context->RSSetState( m_currentShader->m_rasterState );
 	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fragmentShader , nullptr , 0 );
 
 	// So at this, I need to describe the vertex format to the shader
-	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
+	//ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
+	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( attribs );
 	// do similar to last bound VBO
 	m_context->IASetInputLayout( inputLayout );
 
@@ -1047,11 +1048,11 @@ void RenderContext::DrawMesh( const GPUMesh* mesh )
 	if ( hasIndices )
 	{
 		BindIndexBuffer( mesh->GetIndexBuffer() );
-		DrawIndexed( mesh->GetIndexCount() , 0 , 0 );
+		DrawIndexed( mesh->GetIndexCount() , 0 , 0 , mesh->m_buffer_attribute );
 	}
 	else
 	{
-		Draw( mesh->GetVertexCount() , 0 );
+		Draw( mesh->GetVertexCount() , 0 , mesh->m_vertices->GetVBOStride() );
 	}
 }
 
@@ -1592,7 +1593,8 @@ bool RenderContext::HasAnyShaderChangedAtPath( const wchar_t* relativePath , flo
 void RenderContext::BindVertexBuffer( VertexBuffer* vbo )
 {
 	ID3D11Buffer* vboHandle = vbo->m_handle;
-	UINT stride = ( UINT ) sizeof( Vertex_PCU );	//	how far from one vertex to next
+	//UINT stride = ( UINT ) sizeof( Vertex_PCU );	//	how far from one vertex to next
+	UINT stride = ( UINT ) vbo->GetVBOStride();	//	how far from one vertex to next
 	UINT offset = 0;								//  how far into buffer we start
 
 	if (m_lastBoundVBO != vboHandle )

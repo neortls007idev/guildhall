@@ -1,5 +1,6 @@
 #include "Engine/Core/DebugRender.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Core/VertexMaster.hpp"
 #include "Engine/Core/VertexUtils.hpp "
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/MatrixUtils.hpp"
@@ -104,6 +105,8 @@ void AppendVertsForPolygon( std::vector<Vertex_PCU>& vertexArray , const Vec2* p
 	}
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void RotateDegreesPolygonAboutPoint( Polygon2D& polygon , Vec2 worldPosition , float orientationDegrees )
 {
 	if ( polygon.m_points.size() < 3 )
@@ -140,6 +143,8 @@ void AppendIndexedVerts ( std::vector< Vertex_PCU >& sourceVerts , std::vector< 
 		destinationVerts.push_back( sourceVerts[ index ] );
 	}
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TransformAndAppendIndexedVerts ( std::vector< Vertex_PCU >& destinationVerts ,
                                       std::vector< uint >& destinationIndices , std::vector< Vertex_PCU >& sourceVerts ,
@@ -329,11 +334,53 @@ void CreateUVSphere( uint hCuts , uint vCuts , std::vector<Vertex_PCU>& sphereMe
 	{
 		for ( float theta = 0.f; theta <= 360.0; theta += deltaTheta )
 		{
-			Vec3 currentCoords = Vec3::MakeFromSpericalCoordinates( theta , phi , radius );
+			Vec3 currentCoordsNormal = Vec3::MakeFromSpericalCoordinates( theta , phi , radius );
 			float u = RangeMapFloat( 0.f , 360.f , 0.f , 1.f , theta );
 			float v = RangeMapFloat( -90.f , 90.f , 0.f , 1.f , phi );
 		
-			Vertex_PCU currentCoordVerts = Vertex_PCU( center + currentCoords , tint , Vec2( u , v ) );
+			Vertex_PCU currentCoordVerts = Vertex_PCU( center + currentCoordsNormal , tint , Vec2( u , v ) );
+			sphereMeshVerts.push_back( currentCoordVerts );
+		}
+	}
+
+	for ( uint hcutIndex = 0; hcutIndex < hCuts; hcutIndex++ )
+	{
+		for ( uint vCutIndex = 0; vCutIndex < vCuts; vCutIndex++ )
+		{
+			uint index0 = hcutIndex + ( ( hCuts + 1 ) * vCutIndex );
+			uint index1 = index0 + 1;
+			uint index2 = index0 + hCuts + 1;
+			uint index3 = index2 + 1;
+
+			sphereIndices.push_back( index0 );
+			sphereIndices.push_back( index1 );
+			sphereIndices.push_back( index3 );
+
+			sphereIndices.push_back( index0 );
+			sphereIndices.push_back( index3 );
+			sphereIndices.push_back( index2 );
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void CreateUVSphere( uint hCuts , uint vCuts , std::vector<VertexMaster>& sphereMeshVerts , std::vector<uint>& sphereIndices , float radius , Vec3 center , const Rgba8& tint )
+{
+	float deltaTheta = 360.f / ( float ) hCuts;
+	float deltaPhi = 180.f / ( float ) vCuts;
+
+	for ( float phi = -90.f; phi <= 90.0; phi += deltaPhi )
+	{
+		for ( float theta = 0.f; theta <= 360.0; theta += deltaTheta )
+		{
+			Vec3 currentCoordsNormal = Vec3::MakeFromSpericalCoordinates( theta , phi , 1.f );
+			float u = RangeMapFloat( 0.f , 360.f , 0.f , 1.f , theta );
+			float v = RangeMapFloat( -90.f , 90.f , 0.f , 1.f , phi );
+
+			VertexMaster currentCoordVerts = VertexMaster(
+				Vertex_PCU( center + ( currentCoordsNormal * radius ) , tint , Vec2( u , v ) ) , currentCoordsNormal );
+			//currentCoordVerts.m_normal = currentCoordsNormal;
 
 			sphereMeshVerts.push_back( currentCoordVerts );
 		}

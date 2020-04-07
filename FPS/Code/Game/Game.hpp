@@ -66,7 +66,7 @@ public:
 	Vec3				m_cameraPosition		= Vec3::ZERO;
 	Vec3				m_cameraRotation		= Vec3::ZERO;
 	Shader* 			m_invertColorShader;
-	Shader* 			m_gridShader;
+	Shader* 			m_litShader;
 
 	bool				m_lineStripMode			= false;
 	std::vector<Vec3>	m_lineStripPoints;

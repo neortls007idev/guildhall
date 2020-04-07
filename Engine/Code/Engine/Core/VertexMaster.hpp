@@ -23,6 +23,8 @@ public:
 	VertexMaster();
 	~VertexMaster();
 	explicit VertexMaster( const Vec3& position, const Rgba8& tint, const Vec2& uvTexCoords , const Vec3& normal );
+	explicit VertexMaster( const Vertex_PCU& vert );
+	explicit VertexMaster( const Vertex_PCU& vert , const Vec3& vertNormal );
 
 	static void ConvertVertexMasterToVertexPCU( std::vector<Vertex_PCU>& output , std::vector<VertexMaster> const& input );
 	
@@ -31,25 +33,25 @@ public:
 	Rgba8	m_color				= WHITE;
 	Vec2	m_uvTexCoords		= Vec2::ZERO;
 	Vec3	m_normal			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
-	
+	Vec4	m_normalizedColor	= Vec4::ONE;
 	static buffer_attribute_t const LAYOUT[];
 
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void AppendQuadToArray( std::vector<VertexMaster>& out , ... )
-{
-	// lots of code
-}
+void AppendQuadToArray( std::vector<VertexMaster>& out , ... );
+// {
+// 	// lots of code
+// }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void AppendQuadToArray( std::vector<Vertex_PCU>& out , ... )
-{
-// 	AppendQuadToArray( master_verts );
-// 	ConvertMasterToPCU( quad , master_verts );
-}
+void AppendQuadToArray( std::vector<Vertex_PCU>& out , ... );
+// {
+// // 	AppendQuadToArray( master_verts );
+// // 	ConvertMasterToPCU( quad , master_verts );
+// }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

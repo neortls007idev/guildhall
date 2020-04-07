@@ -29,6 +29,8 @@ void ConvertBufferAttributeToID3DX11Attribute( D3D11_INPUT_ELEMENT_DESC* d3d11Ve
 												  break;
 			case BUFFER_FORMAT_VEC3				: d3d11VertxDescription[ index ].Format = DXGI_FORMAT_R32G32B32_FLOAT; 
 												  break;
+			case  BUFFER_FORMAT_VEC4			: d3d11VertxDescription[ index ].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+												  break;
 			case BUFFER_FORMAT_R8G8B8A8_UNORM	: d3d11VertxDescription[ index ].Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 												  break;
 		default:

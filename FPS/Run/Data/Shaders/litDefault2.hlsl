@@ -15,7 +15,6 @@ struct vs_input_t
     float4 color : COLOR;
     float2 uv : TEXCOORD;
 
-    float3 world_position : WORLD_POSITION;
     float3 normal : NORMAL;
 };
 
@@ -27,15 +26,6 @@ struct vs_input_t
 // It can't be changed from the shader, but can be
 // changed in-between draw calls on the CPU
 //--------------------------------------------------------------------------------------
-struct light_t
-{
-    float3 world_position;
-    //float pad00; // this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
-
-    float4 color;
-    float intensity; // rgb and an intensity
-    //float attenuation; // intensity falloff
-};
 
 // buffer holding time information from our game
 cbuffer frame_constants : register(b0) // constant buffer slot 0
@@ -53,19 +43,22 @@ cbuffer camera_constants : register(b1) // constant buffer slot 1
     float4x4 PROJECTION; // aka, CameraToClipTransform
 };
 
+
 // information that might change per model/object
-cbuffer model_constants : register(b2) // constant buffer slot 2
+cbuffer model_constants : register(b2) // constant buffer slot 1
 {
     float4x4 MODEL;
-    float4 TINT;
+    //float4 TINT;
 };
 
-//cbuffer light_constant : register(b3)
-//{
-//    float4  ambient;
-//    light_t lght;
-//}
+struct light_t
+{
+    float3 world_position;
+    float pad00; // this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
 
+    float3 color;
+    float intensity; // rgb and an intensity
+};
 
 /*
 // cpu side
@@ -79,10 +72,10 @@ struct light_t
 */
 
 // buffer telling us information about our camera
-cbuffer light_constants : register(b3) // constant buffer slot 3
+cbuffer light_constants : register(b3) // constant buffer slot 1
 {
-    float4 AMBIENT;
     light_t LIGHT;
+    float4 AMBIENT;
 };
 
 
@@ -116,10 +109,10 @@ v2f_t VertexFunction(vs_input_t input)
     v2f_t v2f = (v2f_t) 0;
 
    // move the vertex through the spaces
-    float4 local_pos    = float4(input.position, 1.0f); // passed in position is usually inferred to be "local position", ie, local to the object
-    float4 world_pos    = mul(MODEL, local_pos); // world pos is the object moved to its place int he world by the model, not used yet
-    float4 camera_pos   = mul(VIEW, world_pos);
-    float4 clip_pos     = mul(PROJECTION, camera_pos);
+    float4 local_pos = float4(input.position, 1.0f); // passed in position is usually inferred to be "local position", ie, local to the object
+    float4 world_pos = mul(MODEL, local_pos); // world pos is the object moved to its place int he world by the model, not used yet
+    float4 camera_pos = mul(VIEW, world_pos);
+    float4 clip_pos = mul(PROJECTION, camera_pos);
 
    // normal is currently in model/local space
     float4 local_normal = float4(input.normal, 0.0f);
@@ -128,7 +121,7 @@ v2f_t VertexFunction(vs_input_t input)
    // tangent & bitangent
 
     v2f.position = clip_pos; // we want to output the clip position to raster (a perspective point)
-    v2f.color = input.color * TINT;
+    v2f.color = input.color /* TINT*/;
     v2f.uv = input.uv;
     v2f.world_position = world_pos.xyz;
     v2f.world_normal = world_normal.xyz;
@@ -146,7 +139,7 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
    // use the uv to sample the texture
     float4 texture_color = tDiffuse.Sample(sSampler, input.uv);
     float3 surface_color = (input.color * texture_color).xyz; // multiply our tint with our texture color to get our final color; 
-    float3 surface_alpha = (input.color.a * texture_color.a);
+    float surface_alpha = (input.color.a * texture_color.a);
 
     float3 diffuse = AMBIENT.xyz * AMBIENT.w; // ambient color * ambient intensity
 
@@ -164,7 +157,7 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
    // just diffuse lighting
     diffuse = min(float3(1, 1, 1), diffuse);
     diffuse = saturate(diffuse); // saturate is clamp01(v)
-    float final_color = diffuse * surface_color;
+    float3 final_color = diffuse * surface_color;
 
    
     return float4(final_color, surface_alpha);

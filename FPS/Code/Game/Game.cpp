@@ -11,6 +11,7 @@
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
+#include "Engine/Core/VertexMaster.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +26,7 @@ Game::Game()
 	m_uiCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
 	m_color = BLACK;
 	m_invertColorShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/InvertColor.hlsl" );
-	m_invertColorShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Grid.hlsl" );
+	m_litShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/litDefault2.hlsl" );
 	m_imageTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/PlayerTankBase.png" );
 	m_worldMapSphere = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/2kEarthDaymap.png" );
 	m_gameCamera.SetProjectionPerspective( 60.f , CLIENT_ASPECT , -.1f , -100.f );
@@ -49,13 +50,14 @@ Game::Game()
 	m_meshTest->UpdateVertices( meshVerts );
 	m_meshTest->UpdateIndices( meshIndices );
 	
-	std::vector<Vertex_PCU> sphereMeshVerts;
+	//std::vector<Vertex_PCU> sphereMeshVerts;
+	std::vector<VertexMaster> sphereMeshVerts;
 	std::vector<uint>		sphereIndices;
 	
 	CreateUVSphere( m_hCuts , m_vCuts , sphereMeshVerts , sphereIndices , 1.f );
 
 	m_meshSphere = new GPUMesh( g_theRenderer );
-	m_meshSphere->UpdateVertices( sphereMeshVerts );
+	m_meshSphere->UpdateVertices( sphereMeshVerts.size() , &sphereMeshVerts[ 0 ] );
 	m_meshSphere->UpdateIndices( sphereIndices );
 	
 	m_normalImage = AABB2( -WORLD_CAMERA_SIZE_X , -WORLD_CAMERA_SIZE_Y , WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y );
@@ -146,16 +148,18 @@ void Game::Render() const
 
 	g_theRenderer->DrawMesh( m_meshTest );
 	g_theRenderer->DrawVertexArray( m_meshTest->GetVertexCount() , m_meshTest->m_vertices );
-	g_theRenderer->BindShader( nullptr );
+
+	g_theRenderer->SetCullMode( CULL_BACK );
+	g_theRenderer->SetDepthTest( COMPARE_GEQUAL , true );
+	lightDataT lightData;
+	g_theRenderer->EnableLight( 0 , lightData );
 
 	g_theRenderer->SetBlendMode( SOLID );
 	g_theRenderer->SetRasterState( FILL_SOLID );
 	
+	g_theRenderer->BindShader( m_litShader );
 	g_theRenderer->BindTexture( m_worldMapSphere );
-	
-	//g_theRenderer->BindShader( m_gridShader );
-	//g_theRenderer->BindTexture( g_theRenderer->m_textureDefault );
-	
+		
 	Transform sphereRing;
 	float deltaDegrees = 360.f / 30.f;
 
@@ -176,8 +180,8 @@ void Game::Render() const
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->EndCamera( m_gameCamera );
 
-	DebugRenderWorldToCamera( &m_gameCamera );
-	DebugRenderScreenTo( nullptr );
+// 	DebugRenderWorldToCamera( &m_gameCamera );
+// 	DebugRenderScreenTo( nullptr );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

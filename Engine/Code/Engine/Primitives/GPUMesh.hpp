@@ -29,15 +29,15 @@ public:
 	template <typename VERTEX_TYPE>
 	void UpdateVertices( uint vcount , VERTEX_TYPE const* vertices )
 	{
-		m_buffer_attribute = &VERTEX_TYPE::LAYOUT;
+		m_buffer_attribute = &VERTEX_TYPE::LAYOUT[0];
 		UpdateVertices( vcount , vertices , sizeof( VERTEX_TYPE ) , VERTEX_TYPE::LAYOUT );
 	}
 
 public:
-	VertexBuffer*		m_vertices		= nullptr;
-	IndexBuffer*		m_indices		= nullptr;
-	uint				m_vertexCount	= 0;
-	uint				m_indexCount	= 0;
+	VertexBuffer*				m_vertices				= nullptr;
+	IndexBuffer*				m_indices				= nullptr;
+	uint						m_vertexCount			= 0;
+	uint						m_indexCount			= 0;
 	buffer_attribute_t const*	m_buffer_attribute;
 };
 
