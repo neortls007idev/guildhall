@@ -53,7 +53,6 @@ cbuffer camera_constants : register(b1) // constant buffer slot 1
     float4x4 PROJECTION; // aka, CameraToClipTransform
 };
 
-
 // information that might change per model/object
 cbuffer model_constants : register(b2) // constant buffer slot 2
 {
@@ -131,7 +130,7 @@ v2f_t VertexFunction(vs_input_t input)
     v2f.position = clip_pos; // we want to output the clip position to raster (a perspective point)
     v2f.color = input.color * TINT;
     v2f.uv = input.uv;
-    v2f.world_position = world_position.xyz;
+    v2f.world_position = world_pos.xyz;
     v2f.world_normal = world_normal.xyz;
 
     return v2f;

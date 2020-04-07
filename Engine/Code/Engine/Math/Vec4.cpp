@@ -6,6 +6,15 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+STATIC Vec4 Vec4::ZERO						= Vec4( 0.f , 0.f , 0.f , 0.f );
+STATIC Vec4 Vec4::ONE						= Vec4( 1.f , 1.f , 1.f , 1.f );
+STATIC Vec4 Vec4::UNIT_VECTOR_ALONG_I_BASIS = Vec4( 1.f , 0.f , 0.f , 0.f );
+STATIC Vec4 Vec4::UNIT_VECTOR_ALONG_J_BASIS = Vec4( 0.f , 1.f , 0.f , 0.f );
+STATIC Vec4 Vec4::UNIT_VECTOR_ALONG_K_BASIS = Vec4( 0.f , 0.f , 1.f , 0.f );
+STATIC Vec4 Vec4::UNIT_VECTOR_ALONG_W_BASIS = Vec4( 0.f , 0.f , 1.f , 0.f );
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Vec4::Vec4( const Vec4& copy ) : x( copy.x ) , y( copy.y ) , z( copy.z ) , w( copy.w )
 {
 

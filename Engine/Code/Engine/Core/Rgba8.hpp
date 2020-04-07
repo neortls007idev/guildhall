@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Math/RandomNumberGenerator.hpp"
+#include "Engine/Math/Vec4.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -37,6 +38,7 @@ public:
 	void CycleRGBChannelsAntiClockwise();
 
 	void LerpColorOverTime( Rgba8 startColor , Rgba8 endColor , float lerpDuration , Timer* timer );
+	Vec4 GetAsNormalizedFloat4();
 
 public:
 	uchar r = 255;
