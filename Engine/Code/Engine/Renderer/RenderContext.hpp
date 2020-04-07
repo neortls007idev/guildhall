@@ -3,6 +3,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
+#include "Engine/Math/Vec4.hpp"
 #include "Engine/Primitives/AABB2.hpp"
 #include "Engine/Primitives/Disc2D.hpp"
 #include "Engine/Primitives/OBB2.hpp"
@@ -54,6 +55,7 @@ enum eBufferSlot
 	UBO_FRAME_SLOT	= 0,
 	UBO_CAMERA_SLOT = 1,
 	UBO_MODEL_SLOT	= 2,
+	UBO_LIGHT_SLOT	= 3,
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -71,6 +73,18 @@ struct FrameDataT
 struct ModelDataT
 {
 	Mat44 model;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct lightDataT
+{
+	Vec3	world_position	= Vec3::ZERO;
+	float	pad00			= 0.f;									// this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
+
+	Vec4	color			= Vec4::ONE;
+	float	intensity		= 0.f;									// rgb and an intensity
+	float	attenuation		= 0.f;									// intensity falloff
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -149,6 +163,28 @@ public:
 	eCullMode				GetCullMode() const;
 	eRasterStateFillMode	GetFillMode() const;
 	eWindingOrder			GetWindingOrder() const;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//			LIGHTING METHODS
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+	void SetAmbientColor( Rgba8 color );
+
+	// Takes in color as RGB8 converted to normalized float4
+	void SetAmbientColor( Vec4 color );
+	
+	void SetAmbientIntensity( float intensity );
+
+	void SetAmbientLight( Rgba8 color = WHITE, float intensity = 1.f );
+	// Takes in color as RGB8 converted to normalized float4
+	void SetAmbientLight( Vec4 color , float intensity );
+	// disabling Ambient is the same as doing...  SetAmbient( WHITE, 1.0f ); 
+
+	// for now, assume idx is 0, we only have one light
+	void EnableLight( uint idx , lightDataT const& lightInfo );
+	// void EnablePointLight( uint idx, vec3 position, rgba color, float intensity, vec3 attenuation ); 
+	void DisableLight( uint idx );
+	// disabling a light is the same as just saying the light has 0 intensity
 	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			DRAW METHODS
@@ -279,6 +315,7 @@ public:
 
 	RenderBuffer*						m_frameUBO								= nullptr;
 	RenderBuffer*						m_modelMatrixUBO						= nullptr;
+	RenderBuffer*						m_lightDataUBO							= nullptr;
 	Sampler*							m_defaultSampler						= nullptr;
 	Texture*							m_textureDefault						= nullptr;
 

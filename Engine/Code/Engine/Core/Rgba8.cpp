@@ -165,6 +165,18 @@ void Rgba8::LerpColorOverTime( Rgba8 startColor , Rgba8 endColor , float lerpDur
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Vec4 Rgba8::GetAsNormalizedFloat4()
+{
+	Vec4 normalizedColor;
+	normalizedColor.x = static_cast< float >( r % 256 );
+	normalizedColor.y = static_cast< float >( g % 256 );
+	normalizedColor.z = static_cast< float >( b % 256 );
+	normalizedColor.w = static_cast< float >( a % 256 );
+	return normalizedColor;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 bool Rgba8::operator==( const Rgba8& compareWith )
 {
 	if ( r == compareWith.r && g == compareWith.g && b == compareWith.b && a == compareWith.a )

@@ -59,5 +59,8 @@
     <FxCompile Include="..\..\Run\Data\Shaders\Grid.hlsl">
       <Filter>Data\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\litDefault.hlsl">
+      <Filter>Data\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

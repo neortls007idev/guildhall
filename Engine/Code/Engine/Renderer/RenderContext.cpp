@@ -106,6 +106,9 @@ RenderContext::~RenderContext()
 	delete m_immediateVBO;
 	m_immediateVBO = nullptr;
 
+	delete m_lightDataUBO;
+	m_lightDataUBO = nullptr;
+	
 	delete m_modelMatrixUBO;
 	m_modelMatrixUBO = nullptr;
 
@@ -203,7 +206,8 @@ void RenderContext::Startup( Window* window )
 	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
 	m_frameUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 	m_modelMatrixUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
-
+	m_lightDataUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	
 	m_defaultSampler = new Sampler( this , SAMPLER_POINT );
 	m_textureDefault = CreateTextureFromColor( WHITE );
 
@@ -854,6 +858,61 @@ eWindingOrder RenderContext::GetWindingOrder() const
 	m_currentRasterState->GetDesc( &currentRasterStateDesc );
 
 	return GetWindingOrderForD3D11WindingOrder( currentRasterStateDesc.FrontCounterClockwise );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::SetAmbientColor( Vec4 color )
+{
+	
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::SetAmbientColor( Rgba8 color )
+{
+	Vec4 normalizedColor = color.GetAsNormalizedFloat4();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::SetAmbientIntensity( float intensity )
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::SetAmbientLight( Rgba8 color /*= WHITE*/ , float intensity /*= 1.f */ )
+{
+	Vec4 normalizedColor = color.GetAsNormalizedFloat4();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::SetAmbientLight( Vec4 color , float intensity )
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::EnableLight( uint idx , lightDataT const& lightInfo )
+{
+	UNUSED( idx );
+	m_lightDataUBO->Update( &lightInfo , sizeof( lightDataT ) , sizeof( lightDataT ) );
+	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::DisableLight( uint idx )
+{
+	UNUSED( idx );
+	lightDataT lightData;
+	lightData.intensity = 0.f;
+	m_lightDataUBO->Update( &lightData , sizeof( lightData ) , sizeof( lightData ) );
+	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

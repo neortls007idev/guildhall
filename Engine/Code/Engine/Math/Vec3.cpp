@@ -5,15 +5,11 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Vec3 Vec3::ZERO							= Vec3( 0.f , 0.f , 0.f );
-
-Vec3 Vec3::ONE							= Vec3( 1.f , 1.f , 1.f );
-
-Vec3 Vec3::UNIT_VECTOR_ALONG_I_BASIS	= Vec3( 1.f , 0.f , 0.f );;
-
-Vec3 Vec3::UNIT_VECTOR_ALONG_J_BASIS	= Vec3( 0.f , 1.f , 0.f );;
-
-Vec3 Vec3::UNIT_VECTOR_ALONG_K_BASIS	= Vec3( 0.f , 0.f , 1.f );;
+STATIC Vec3 Vec3::ZERO						= Vec3( 0.f , 0.f , 0.f );
+STATIC Vec3 Vec3::ONE						= Vec3( 1.f , 1.f , 1.f );
+STATIC Vec3 Vec3::UNIT_VECTOR_ALONG_I_BASIS	= Vec3( 1.f , 0.f , 0.f );
+STATIC Vec3 Vec3::UNIT_VECTOR_ALONG_J_BASIS	= Vec3( 0.f , 1.f , 0.f );
+STATIC Vec3 Vec3::UNIT_VECTOR_ALONG_K_BASIS	= Vec3( 0.f , 0.f , 1.f );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
