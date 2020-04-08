@@ -65,5 +65,8 @@
     <FxCompile Include="..\..\Run\Data\Shaders\litDefault2.hlsl">
       <Filter>Data\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\normalLit.hlsl">
+      <Filter>Data\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

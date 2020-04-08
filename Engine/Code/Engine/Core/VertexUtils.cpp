@@ -325,6 +325,87 @@ void CreateCuboid( std::vector< Vertex_PCU >& cubeMeshVerts , std::vector< uint 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void CreateCuboid( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uint >& cubeIndices , const AABB3 box , const Rgba8& tint /*= WHITE */ )
+{
+	Vertex_PCU CubeVerts[ 24 ] = {
+
+		// FRONT FACE VERTS
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_maxs.y ) , tint, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_maxs.y ) , tint, Vec2( 1.f, 0.f ) ),
+
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 1.f, 0.f ) ),
+		// BACK FACE VERTS
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 1.f, 0.f ) ),
+
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 0.f ) ),
+		// RIGHT FACE VERTS
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_maxs.y ) , tint, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 1.f, 0.f ) ),
+
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 1.f, 0.f ) ),
+		// LEFT FACE VERTS
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_maxs.y ) , tint, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 1.f, 0.f ) ),
+
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 1.f, 0.f ) ),
+		// TOP FACE VERTS
+						Vertex_PCU( Vec3( box.m_mins.x, box.m_maxs.z, box.m_maxs.y ) , tint, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( box.m_maxs.x, box.m_maxs.z, box.m_maxs.y ) , tint, Vec2( 1.f, 0.f ) ),
+
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z, box.m_mins.y ) ,tint, Vec2( 1.f, 0.f ) ),
+
+		// BOTTOM FACE VERTS
+						Vertex_PCU( Vec3( box.m_mins.x, box.m_mins.z, box.m_maxs.y ) ,tint, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( box.m_maxs.x, box.m_mins.z, box.m_maxs.y ) ,tint, Vec2( 1.f, 0.f ) ),
+
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z, box.m_mins.y ) ,tint, Vec2( 1.f, 0.f ) ),
+	};
+
+	std::vector<Vertex_PCU> cubeVertPCUS;
+	
+	for ( uint index = 0; index < 24; index++ )
+	{
+		cubeVertPCUS.push_back( CubeVerts[ index ] );
+	}
+
+	Vertex_PCU::ConvertVertexPCUToVertexMaster( cubeMeshVerts , cubeVertPCUS );
+	
+	uint CubeIndices[ 36 ] = {
+		// FRONT FACE INDICES
+			0,1,2,
+			2,3,0,
+		// BACK FACE INDICES
+			4,5,6,
+			6,7,4,
+		// RIGHT FACE INDICES
+			8,9,10,
+			10,11,8,
+		// LEFT FACE INDICES
+			12,13,14,
+			14,15,12,
+		// TOP FACE INDICES
+			16,17,18,
+			18,19,16,
+		// BOTTOM FACE INDICES
+			20,21,22,
+			22,23,20,
+	};
+
+	for ( uint index = 0; index < 36; index++ )
+	{
+		cubeIndices.push_back( CubeIndices[ index ] );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void CreateUVSphere( uint hCuts , uint vCuts , std::vector<Vertex_PCU>& sphereMeshVerts , std::vector<uint>& sphereIndices, float radius , Vec3 center , const Rgba8& tint )
 {
 	float deltaTheta = 360.f / ( float ) hCuts;
@@ -378,10 +459,13 @@ void CreateUVSphere( uint hCuts , uint vCuts , std::vector<VertexMaster>& sphere
 			float u = RangeMapFloat( 0.f , 360.f , 0.f , 1.f , theta );
 			float v = RangeMapFloat( -90.f , 90.f , 0.f , 1.f , phi );
 
+			//Rgba8 vertColor;
+			//vertColor.SetColorFromNormalizedFloat( Vec4( currentCoordsNormal , 1.f ) );
+			
 			VertexMaster currentCoordVerts = VertexMaster(
-				Vertex_PCU( center + ( currentCoordsNormal * radius ) , tint , Vec2( u , v ) ) , currentCoordsNormal );
-			//currentCoordVerts.m_normal = currentCoordsNormal;
-
+															Vertex_PCU( center + ( currentCoordsNormal * radius ) , tint  , Vec2( u , v ) ) ,
+															currentCoordsNormal.GetNormalized() );
+			
 			sphereMeshVerts.push_back( currentCoordVerts );
 		}
 	}

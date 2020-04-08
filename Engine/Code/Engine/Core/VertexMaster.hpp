@@ -25,13 +25,17 @@ public:
 	explicit VertexMaster( const Vec3& position, const Rgba8& tint, const Vec2& uvTexCoords , const Vec3& normal );
 	explicit VertexMaster( const Vertex_PCU& vert );
 	explicit VertexMaster( const Vertex_PCU& vert , const Vec3& vertNormal );
+	explicit VertexMaster( const VertexLit& vert );
 
 	static void ConvertVertexMasterToVertexPCU( std::vector<Vertex_PCU>& output , std::vector<VertexMaster> const& input );
+	static void ConvertVertexMasterToVertexLit( std::vector<VertexLit>& output , std::vector<VertexMaster> const& input );
 	
 public:
 	Vec3	m_position			= Vec3::ZERO;
 	Rgba8	m_color				= WHITE;
 	Vec2	m_uvTexCoords		= Vec2::ZERO;
+//	Vec3	m_tangent			= Vec3::UNIT_VECTOR_ALONG_I_BASIS;
+//	Vec3	m_biTangent			= Vec3::UNIT_VECTOR_ALONG_J_BASIS;
 	Vec3	m_normal			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
 	Vec4	m_normalizedColor	= Vec4::ONE;
 	static buffer_attribute_t const LAYOUT[];

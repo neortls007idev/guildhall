@@ -21,6 +21,10 @@ public:
 
 	Game();
 	~Game();
+
+	void InitializeCameras();
+	void intializeGameObjects();
+	
 	void Update( float deltaSeconds );
 
 
@@ -37,7 +41,7 @@ public:
 private:
 
 	void UpdateFromKeyBoard( float deltaSeconds );
-
+	void CreateDebugObjectsFromUserInput();
 	void DebugLineStripDrawModeTest();
 	void CameraPositionUpdateOnInput( float deltaSeconds );
 
@@ -50,10 +54,12 @@ public:
 
 	AABB2				m_normalImage;
 	AABB2				m_invertedColorImage;
-	GPUMesh*			m_meshTest;
+	GPUMesh*			m_cubeMesh;
 	GPUMesh*			m_meshSphere;
-	mutable Transform			m_testMeshTransform;
-	Texture*			m_imageTex				= nullptr;
+	Transform			m_cubeMeshTransform;
+	Transform			m_sphereMeshTransform;
+	Texture*			m_meshTex_D				= nullptr;
+	Texture*			m_meshTex_N				= nullptr;
 	Texture*			m_worldMapSphere		= nullptr;
 
 	uint				m_hCuts					= 32;		// slices
@@ -62,11 +68,11 @@ public:
 	mutable Camera		m_gameCamera;
 	Camera				m_uiCamera;
 
-	Rgba8				m_color;
 	Vec3				m_cameraPosition		= Vec3::ZERO;
 	Vec3				m_cameraRotation		= Vec3::ZERO;
-	Shader* 			m_invertColorShader;
+	
 	Shader* 			m_litShader;
+	shaderLightDataT	m_lights;
 
 	bool				m_lineStripMode			= false;
 	std::vector<Vec3>	m_lineStripPoints;

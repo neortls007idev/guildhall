@@ -60,17 +60,6 @@ struct light_t
     float intensity; // rgb and an intensity
 };
 
-/*
-// cpu side
-struct light_t
-{
-   Vec3 worldPosition; 
-   float pad00; 
-   Vec3 color; 
-   float intesity; // RGBA will not work - is not the same size;  
-};
-*/
-
 // buffer telling us information about our camera
 cbuffer light_constants : register(b3) // constant buffer slot 1
 {
@@ -78,13 +67,10 @@ cbuffer light_constants : register(b3) // constant buffer slot 1
     light_t LIGHT;
 };
 
-
 // Textures & Samplers are also a form of constant
 // data - uniform/constant across the entire call
 Texture2D<float4> tDiffuse : register(t0); // color of the surface
 SamplerState sSampler : register(s0); // sampler are rules on how to sample (read) from the texture.
-
-
 
 //--------------------------------------------------------------------------------------
 // Programmable Shader Stages
@@ -117,7 +103,7 @@ v2f_t VertexFunction(vs_input_t input)
    // normal is currently in model/local space
     float4 local_normal = float4(input.normal, 0.0f);
     float4 world_normal = mul(MODEL, local_normal);
-
+    
    // tangent & bitangent
 
     v2f.position        = clip_pos; // we want to output the clip position to raster (a perspective point)
@@ -134,34 +120,20 @@ v2f_t VertexFunction(vs_input_t input)
 // 
 // SV_Target0 at the end means the float4 being returned
 // is being drawn to the first bound color target.
+
+float4 ConvertVectorToColor( float3 vec )
+{
+    float4 color;
+    color.xyz = (float3(1, 1, 1 ) + vec) * 0.5f;
+    color.w = 1;
+    return color;
+}
+
 float4 FragmentFunction(v2f_t input) : SV_Target0
 {
 
-   // use the uv to sample the texture
-    float4 texture_color = tDiffuse.Sample(sSampler, input.uv);
-    //return texture_color;
-    
-    float3 surface_color = (input.color * texture_color).xyz; // multiply our tint with our texture color to get our final color; 
-    float surface_alpha = (input.color.a * texture_color.a);
+    float4 color = ConvertVectorToColor(input.world_normal);
+    color = normalize(color);
+    return color;
 
-    float3 diffuse = AMBIENT.xyz * AMBIENT.w; // ambient color * ambient intensity
-
-   // get my surface normal - this comes from the vertex format
-   // We now have a NEW vertex format
-    float3 surface_normal = normalize(input.world_normal);
-
-   // for each light, we going to add in dot3 factor it
-    float3 light_position = LIGHT.world_position;
-    float3 dir_to_light = normalize(light_position - input.world_position);
-    float dot3 = max(0.0f, dot(dir_to_light, surface_normal));
-
-    diffuse += dot3;
-
-   // just diffuse lighting
-    diffuse = min(float3(1, 1, 1), diffuse);
-    diffuse = saturate(diffuse); // saturate is clamp01(v)
-    float3 final_color = diffuse * surface_color;
-
-   
-    return float4(final_color, surface_alpha);
 }

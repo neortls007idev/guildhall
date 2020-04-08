@@ -40,6 +40,10 @@ struct	ID3D11DepthStencilState;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+constexpr uint TOTAL_LIGHTS = 1;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 enum eBlendMode
 {
 	ALPHA ,
@@ -73,6 +77,7 @@ struct FrameDataT
 struct ModelDataT
 {
 	Mat44 model;
+	Vec4  normalizedModelColor;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -84,10 +89,15 @@ struct lightDataT
 
 	Vec3	color			= Vec3::ONE;
 	float	intensity		= 0.f;									// rgb and an intensity
-	Vec4	ambient			= Vec4::ONE;							// rgb and an intensity
 	//float	attenuation		= 0.f;									// intensity falloff
 };
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+struct shaderLightDataT
+{
+	Vec4		ambientLight;										// rgb and an intensity
+	lightDataT	lights[ TOTAL_LIGHTS ];
+};
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 typedef unsigned uint;
@@ -120,7 +130,7 @@ public:
 	void		BeginCamera( const Camera& camera );
 	void		EndCamera( const Camera& camera);
 
-	void		SetModelMatrix( Mat44 modelmat );
+	void		SetModelMatrix( Mat44 modelmat , Rgba8 color = WHITE );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			D3D11 DEBUG MODULE 
@@ -134,7 +144,7 @@ public:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			RENDERING PIPELINE BINDING METHODS
 //--------------------------------------------------------------------------------------------------------------------------------------------
-
+	
 	void		SetBlendMode( eBlendMode blendMode );
 	void		SetRasterState( eRasterStateFillMode rasterState );
 	void		SetTransientRasterStateAsRasterState();
@@ -190,7 +200,7 @@ public:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			DRAW METHODS
 //--------------------------------------------------------------------------------------------------------------------------------------------
-	void Draw( int numVertexes , int vertexOffset , UINT stride );
+	void Draw( int numVertexes , int vertexOffset , buffer_attribute_t const* attribs );
 	void DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes );
 	void DrawVertexArray( const std::vector<Vertex_PCU>& vertexArray );
 	void DrawVertexArray( int numVertexes , VertexBuffer* vertices );
@@ -278,6 +288,8 @@ public:
 
 private:
 
+	void SetInputLayoutForIA( buffer_attribute_t const* attribs );
+	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			RENDERING PIPELINE CREATION METHODS ( TO BE ACCESSED BY THE RENDERER ONLY )
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -319,6 +331,7 @@ public:
 	RenderBuffer*						m_lightDataUBO							= nullptr;
 	Sampler*							m_defaultSampler						= nullptr;
 	Texture*							m_textureDefault						= nullptr;
+	shaderLightDataT					m_lights;
 
 private:
 

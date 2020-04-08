@@ -52,6 +52,7 @@ cbuffer camera_constants : register( b1 ) // index 1 is now camera
 cbuffer model_constants : register( b2 ) // index 2 is now model
 {
 	float4x4 MODEL;
+    float4 TINT;
 }
 // Texture & Samplers are also a form of constants
 
@@ -105,5 +106,5 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	// use color to portray information;
 
 	float4 color = tDiffuse.Sample( eSampler, input.uv );
-	return color * input.color;
+	return color * input.color * TINT;
 }

@@ -16,3 +16,17 @@ void VertexBuffer::SetVBOStide( const uint stride )
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+buffer_attribute_t const* VertexBuffer::GetVertexBufferLayout() const
+{
+	return m_buffer_attribute;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void VertexBuffer::SetVertexBufferLayout( buffer_attribute_t const* vertexBufferLayout )
+{
+	m_buffer_attribute = vertexBufferLayout;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

@@ -32,7 +32,7 @@ VertexMaster::VertexMaster( const Vec3& position , const Rgba8& tint , const Vec
 																														m_normal( normal )
 
 {
-	m_normalizedColor = m_color.GetAsNormalizedFloat4();
+	m_normalizedColor = tint.GetAsNormalizedFloat4();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ VertexMaster::VertexMaster( const Vertex_PCU& vert ) :
 														m_uvTexCoords( vert.m_uvTexCoords )
 {
 	m_normal = Vec3::UNIT_VECTOR_ALONG_K_BASIS;
-	m_normalizedColor = m_color.GetAsNormalizedFloat4();
+	m_normalizedColor = vert.m_color.GetAsNormalizedFloat4();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -54,7 +54,17 @@ VertexMaster::VertexMaster( const Vertex_PCU& vert , const Vec3& vertNormal ) : 
 																				m_normal( vertNormal )
 
 {
-	m_normalizedColor = m_color.GetAsNormalizedFloat4();
+	m_normalizedColor = vert.m_color.GetAsNormalizedFloat4();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+VertexMaster::VertexMaster( const VertexLit& vert ) : m_position( vert.m_position ) ,
+													  m_normalizedColor( vert.m_normalizedColor ) ,
+													  m_uvTexCoords( vert.m_uvTexCoords ) ,
+													  m_normal( vert.m_normal )
+{
+	m_color.SetColorFromNormalizedFloat( vert.m_normalizedColor );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -64,6 +74,16 @@ STATIC void VertexMaster::ConvertVertexMasterToVertexPCU( std::vector<Vertex_PCU
 	for ( VertexMaster const& vert : input )
 	{
 		output.push_back( Vertex_PCU( vert ) );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void VertexMaster::ConvertVertexMasterToVertexLit( std::vector<VertexLit>& output , std::vector<VertexMaster> const& input )
+{
+	for ( VertexMaster const& vert : input )
+	{
+		output.push_back( VertexLit( vert ) );
 	}
 }
 

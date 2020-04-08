@@ -38,12 +38,17 @@ void AddCubeVerts( std::vector<Vertex_PCU>& cubeVertexArray , const Rgba8* tint 
 uint* GetCubeIndices();
 
 // MAY LOOK WEIRD INTERNALLY WITH Y AND Z REPLACED DUE TO THE ENGINE BASIS BUT WORKS THE SAME AS CARTESIAN CO-ORDINATES
-void CreateCuboid ( std::vector< Vertex_PCU >& cubeMeshVerts , std::vector< uint >& cubeIndices , const AABB3 box ,
+void CreateCuboid ( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uint >& cubeIndices , const AABB3 box ,
                   const Rgba8& tint = WHITE );
 
 void CreateUVSphere ( uint hCuts , uint vCuts , std::vector< VertexMaster >& sphereMeshVerts ,
                       std::vector< uint >& sphereIndices , float radius = 1.f , Vec3 center = Vec3::ZERO ,
                       const Rgba8& tint = WHITE );
+
+// MAY LOOK WEIRD INTERNALLY WITH Y AND Z REPLACED DUE TO THE ENGINE BASIS BUT WORKS THE SAME AS CARTESIAN CO-ORDINATES
+void CreateCuboid ( std::vector< Vertex_PCU >& cubeMeshVerts , std::vector< uint >& cubeIndices , const AABB3 box ,
+                  const Rgba8& tint = WHITE );
+
 
 void CreateUVSphere( uint hCuts , uint vCuts , std::vector< Vertex_PCU >& sphereMeshVerts ,
 					 std::vector< uint >& sphereIndices , float radius = 1.f , Vec3 center = Vec3::ZERO ,
