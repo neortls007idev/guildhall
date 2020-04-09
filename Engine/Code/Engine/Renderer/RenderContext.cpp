@@ -981,17 +981,15 @@ BitmapFont* RenderContext::GetOrCreateBitmapFontFromFile( std::string bitmapFont
 
 void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes )
 {
-
 	// Update a vertex buffer
 	// RenderBUffer* m_immediateVBO // VBO - vertex buffer object - a buffer of memomry on the GPU.
 	// void* cpuBuffer = ( void* ) vertexes;
 	// stride - the number of bytes we need to move in an array or buffer of a memory
 
-
 	size_t  bufferTotalByteSize	= numVertexes * sizeof( Vertex_PCU );
 	size_t	elementSize			= sizeof( Vertex_PCU );
+	m_immediateVBO->SetVBOStide( sizeof( Vertex_PCU ) );
 	m_immediateVBO->Update( vertexes , bufferTotalByteSize , elementSize );
-
 
 	// Bind the Shader
 
@@ -1001,7 +999,6 @@ void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes
 
 	// Draw
 	Draw( numVertexes , 0 , Vertex_PCU::LAYOUT );
-
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

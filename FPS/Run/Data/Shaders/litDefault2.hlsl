@@ -138,30 +138,34 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
 {
 
    // use the uv to sample the texture
+    
+    //return float4(AMBIENT.xyz * AMBIENT.w, 1);
+    return float4(input.uv , 0, 1);
+    
     float4 texture_color = tDiffuse.Sample(sSampler, input.uv);
     //return texture_color;
     
     float3 surface_color = (input.color * texture_color).xyz; // multiply our tint with our texture color to get our final color; 
     float surface_alpha = (input.color.a * texture_color.a);
-
+ 
     float3 diffuse = AMBIENT.xyz * AMBIENT.w; // ambient color * ambient intensity
-
+ 
    // get my surface normal - this comes from the vertex format
    // We now have a NEW vertex format
     float3 surface_normal = normalize(input.world_normal);
-
+    //return float4(surface_normal , 1);
    // for each light, we going to add in dot3 factor it
     float3 light_position = LIGHT.world_position;
     float3 dir_to_light = normalize(light_position - input.world_position);
     float dot3 = max(0.0f, dot(dir_to_light, surface_normal));
-
+    return float4(dot3.xxx, 1);
     diffuse += dot3;
-
+ 
    // just diffuse lighting
     diffuse = min(float3(1, 1, 1), diffuse);
     diffuse = saturate(diffuse); // saturate is clamp01(v)
     float3 final_color = diffuse * surface_color;
-
+ 
    
-    return float4(final_color, surface_alpha);
+    return float4(diffuse, 1);
 }
