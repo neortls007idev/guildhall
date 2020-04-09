@@ -39,7 +39,7 @@ Game::Game()
 	m_sphereMeshTransform.SetPosition( -7.f , 0.0f , -10.0f );
 	m_quadTransform.SetPosition( 0.f , 0.0f , -10.0f );
 
-	m_lights.ambientLight = Vec4( 1.f , 1.f , 1.f , 0.f );
+	m_lights.ambientLight = Vec4( 1.f , 1.f , 1.f , 1.f );
 	m_ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
 	m_lights.lights[ 0 ].color = Vec3( 1.f , 0.f , 0.f );
 	//m_lights.lights[ 0 ].intensity = 0.0001f;

@@ -308,10 +308,10 @@ void CreateCuboid( std::vector< Vertex_PCU >& cubeMeshVerts , std::vector< uint 
 				Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 0.f, 1.f ) ),
 		// BACK FACE VERTS
 				Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 0.f, 0.f ) ),
-				Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 0.f ) ),
+				Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 0.f, 1.f ) ),
 
 				Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 1.f ) ),
-				Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 0.f, 1.f ) ),
+				Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 1.f, 0.f ) ),
 		// RIGHT FACE VERTS
 				Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_maxs.y ) , tint, Vec2( 0.f, 0.f ) ),
 				Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 1.f, 0.f ) ),
@@ -320,10 +320,10 @@ void CreateCuboid( std::vector< Vertex_PCU >& cubeMeshVerts , std::vector< uint 
 				Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 0.f, 1.f ) ),
 		// LEFT FACE VERTS
 				Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_maxs.y ) , tint, Vec2( 0.f, 0.f ) ),
-				Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 1.f, 0.f ) ),
+				Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 0.f, 1.f ) ),
 
 				Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 1.f ) ),
-				Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 0.f, 1.f ) ),
+				Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 1.f, 0.f ) ),
 		// TOP FACE VERTS
 				Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 0.f, 0.f ) ),
 				Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 1.f, 0.f ) ),
@@ -385,10 +385,10 @@ void CreateCuboid( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uin
 						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 0.f, 1.f ) ),
 		// BACK FACE VERTS
 						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 0.f, 0.f ) ),
-						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 0.f ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 0.f, 1.f ) ),
 
 						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 1.f ) ),
-						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 0.f, 1.f ) ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 1.f, 0.f ) ),
 		// RIGHT FACE VERTS
 						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_maxs.y ) , tint, Vec2( 0.f, 0.f ) ),
 						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 1.f, 0.f ) ),
@@ -397,10 +397,10 @@ void CreateCuboid( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uin
 						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 0.f, 1.f ) ),
 		// LEFT FACE VERTS
 						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_maxs.y ) , tint, Vec2( 0.f, 0.f ) ),
-						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 1.f, 0.f ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 0.f, 1.f ) ),
 
 						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_mins.y ) , tint, Vec2( 1.f, 1.f ) ),
-						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 0.f, 1.f ) ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.z,box.m_mins.y ) , tint, Vec2( 1.f, 0.f ) ),
 		// TOP FACE VERTS
 						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 0.f, 0.f ) ),
 						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.z,box.m_maxs.y ) , tint, Vec2( 1.f, 0.f ) ),
