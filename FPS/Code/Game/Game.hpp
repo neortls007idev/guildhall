@@ -58,6 +58,7 @@ public:
 	GPUMesh*			m_meshSphere;
 	Transform			m_cubeMeshTransform;
 	Transform			m_sphereMeshTransform;
+	Transform			m_quadTransform;
 	Texture*			m_meshTex_D				= nullptr;
 	Texture*			m_meshTex_N				= nullptr;
 	Texture*			m_worldMapSphere		= nullptr;

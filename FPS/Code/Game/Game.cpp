@@ -33,6 +33,7 @@ Game::Game()
 		
 	m_cubeMeshTransform.SetPosition( 1.f , 0.0f , -20.0f );
 	m_sphereMeshTransform.SetPosition( 7.f , 0.0f , -20.0f );
+	m_sphereMeshTransform.SetPosition( -7.f , 0.0f , -20.0f );
 
 	m_lights.ambientLight = Vec4( 1.f , 0.f , 0.f , 1.f );
 	m_lights.lights[ 0 ].color = Vec3( 1.f , 1.f , 1.f );
@@ -136,6 +137,10 @@ void Game::Render() const
 
  	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_meshSphere );
+
+	g_theRenderer->BindShader( nullptr );
+ 	g_theRenderer->SetModelMatrix( m_quadTransform.GetAsMatrix() );
+	g_theRenderer->DrawAABB2( AABB2::ZERO_TO_ONE , WHITE );
 
 	g_theRenderer->SetRasterState( FILL_SOLID );
 
