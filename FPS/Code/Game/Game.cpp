@@ -38,7 +38,7 @@ Game::Game()
 	m_lights.ambientLight = Vec4( 1.f , 0.f , 0.f , 1.f );
 	m_lights.lights[ 0 ].color = Vec3( 1.f , 1.f , 1.f );
 	m_lights.lights[ 0 ].intensity = 1.f;
-	m_lights.lights[ 0 ].world_position = Vec3( 0.f , 0.f , 0.f );
+	m_lights.lights[ 0 ].world_position = Vec3::ONE;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ void Game::InitializeCameras()
 		m_uiCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
 		m_gameCamera.SetProjectionPerspective( 60.f , CLIENT_ASPECT , -.1f , -100.f );
 		m_gameCamera.SetPosition( Vec3( 0.f , 0.f , 0.f ) );
-		m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 37 , 127 , 139 , 255 ) , 1.f , 0 );
+		m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 37 , 70 , 87 , 127 ) , 1.f , 0 );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -122,7 +122,7 @@ void Game::Render() const
 	g_theRenderer->SetCullMode( CULL_BACK );
 	g_theRenderer->SetDepthTest( COMPARE_LEQUAL , true );
 	//lightDataT lightData;
-	g_theRenderer->SetAmbientLight( WHITE , 1.f );
+	g_theRenderer->SetAmbientLight( RED , m_lights.ambientLight.w );
 	g_theRenderer->EnableLight( 0 , m_lights.lights[ 0 ] );
 
 	//g_theRenderer->SetBlendMode( SOLID );
@@ -132,8 +132,6 @@ void Game::Render() const
 		
 	g_theRenderer->SetModelMatrix( m_cubeMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_cubeMesh );
-
-	g_theRenderer->BindTexture( m_worldMapSphere );
 
  	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_meshSphere );
@@ -145,9 +143,9 @@ void Game::Render() const
 	g_theRenderer->SetRasterState( FILL_SOLID );
 
 	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 	g_theRenderer->BindTexture( nullptr );
-	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->SetDepthTest( COMPARE_ALWAYS , true );
 	g_theRenderer->SetCullMode( CULL_NONE );
 	g_theRenderer->DisableLight( 0 );
@@ -209,7 +207,8 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	}
 	//DebugLineStripDrawModeTest();
 	CameraPositionUpdateOnInput( deltaSeconds );
-
+	UpdateLightsFromKeyBoard( deltaSeconds );
+	
 	if ( g_theInput->WasKeyJustPressed( 'I' ) )
 	{
 		g_theInput->ShowSystemCursor();
@@ -231,6 +230,21 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	}
 
 	//CreateDebugObjectsFromUserInput();
+}
+
+void Game::UpdateLightsFromKeyBoard( float deltaSeconds )
+{
+	if ( g_theInput->IsKeyHeldDown( '0' ) )
+	{
+		m_lights.ambientLight.w += deltaSeconds;
+		m_lights.ambientLight.w = ClampZeroToOne( m_lights.ambientLight.w );
+	}
+
+	if ( g_theInput->IsKeyHeldDown( '9' ) )
+	{
+		m_lights.ambientLight.w -= deltaSeconds;
+		m_lights.ambientLight.w = ClampZeroToOne( m_lights.ambientLight.w );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

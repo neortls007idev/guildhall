@@ -27,7 +27,6 @@ public:
 	
 	void Update( float deltaSeconds );
 
-
 	void Render() const;
 	void UpdateCamera();
 	void RenderUI() const;
@@ -41,6 +40,7 @@ public:
 private:
 
 	void UpdateFromKeyBoard( float deltaSeconds );
+	void UpdateLightsFromKeyBoard( float deltaSeconds );
 	void CreateDebugObjectsFromUserInput();
 	void DebugLineStripDrawModeTest();
 	void CameraPositionUpdateOnInput( float deltaSeconds );
