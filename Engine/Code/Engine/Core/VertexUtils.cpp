@@ -423,7 +423,26 @@ void CreateCuboid( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uin
 		cubeVertPCUS.push_back( CubeVerts[ index ] );
 	}
 
+	Vec3 frontNormal = -CrossProduct3D( CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position , CubeVerts[ 3 ].m_position - CubeVerts[ 0 ].m_position );
+	Vec3 backNormal = -frontNormal;
+
+	Vec3 leftNormal = -CrossProduct3D( CubeVerts[ 13 ].m_position - CubeVerts[ 12 ].m_position , CubeVerts[ 15 ].m_position - CubeVerts[ 12 ].m_position );
+	Vec3 rightNormal = -leftNormal;
+
+	Vec3 topNormal	= -CrossProduct3D( CubeVerts[ 17 ].m_position - CubeVerts[ 16 ].m_position , CubeVerts[ 19 ].m_position - CubeVerts[ 16 ].m_position );
+	Vec3 bottomNormal = -topNormal;
+
+	Vec3 faceNormals[ 6 ] = { frontNormal , backNormal, rightNormal,leftNormal,topNormal,bottomNormal };
+	
 	Vertex_PCU::ConvertVertexPCUToVertexMaster( cubeMeshVerts , cubeVertPCUS );
+
+	for ( uint faces = 0 ; faces < 6 ; faces++ )
+	{
+		for ( uint vert = 0 ; vert < 4 ; vert++ )
+		{
+			cubeMeshVerts[ ( faces * 4 ) + vert ].m_normal = faceNormals[ faces ];
+		}
+	}
 	
 	uint CubeIndices[ 36 ] = {
 		// FRONT FACE INDICES
