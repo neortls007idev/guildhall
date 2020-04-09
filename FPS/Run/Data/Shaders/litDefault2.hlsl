@@ -159,14 +159,16 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
    // for each light, we going to add in dot3 factor it
     float3 light_position = LIGHT.world_position;
     float3 dir_to_light = normalize(light_position - input.world_position);
-    float dot3 = max(0.0f, dot(dir_to_light, surface_normal));
-    //return float4(dot3.xxxx );
-   // diffuse += dot3;
+    //return float4(dir_to_light, 1); 
+    float dot3 = max(0.0f, dot(dir_to_light, -surface_normal));
+   
+   // return float4(dot3.xxxx );
+    diffuse += dot3;
  
    // just diffuse lighting
+   // return float4(diffuse, 1);
     diffuse = min(float3(1, 1, 1), diffuse.xyz);
     diffuse = saturate(diffuse); // saturate is clamp01(v)
-    //return float4(diffuse.yyy, surface_alpha);
     //return float4(surface_color, 1);
     
     float3 final_color = diffuse * surface_color;

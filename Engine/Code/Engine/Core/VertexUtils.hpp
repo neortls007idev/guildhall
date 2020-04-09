@@ -37,6 +37,13 @@ void TransformAndAppendIndexedVerts ( std::vector< Vertex_PCU >& destinationVert
 void AddCubeVerts( std::vector<Vertex_PCU>& cubeVertexArray , const Rgba8* tint );
 uint* GetCubeIndices();
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void CreateQuad( std::vector< VertexMaster >& quadMeshVerts , std::vector< uint >& quadIndices , const AABB2 quad ,
+	const Rgba8& tint = WHITE );
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 // MAY LOOK WEIRD INTERNALLY WITH Y AND Z REPLACED DUE TO THE ENGINE BASIS BUT WORKS THE SAME AS CARTESIAN CO-ORDINATES
 void CreateCuboid ( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uint >& cubeIndices , const AABB3 box ,
                   const Rgba8& tint = WHITE );
