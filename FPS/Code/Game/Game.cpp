@@ -39,7 +39,7 @@ Game::Game()
 	m_sphereMeshTransform.SetPosition( -7.f , 0.0f , -10.0f );
 	m_quadTransform.SetPosition( 0.f , 0.0f , -10.0f );
 
-	m_lights.ambientLight = Vec4( 1.f , 1.f , 1.f , 0.f );
+	m_lights.ambientLight = Vec4( 1.f , 1.f , 1.f , 1.f );
 	m_ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
 	m_lights.lights[ 0 ].color = Vec3( 1.f , 0.f , 0.f );
 	//m_lights.lights[ 0 ].intensity = 0.0001f;
@@ -123,7 +123,7 @@ void Game::Update( float deltaSeconds )
 {
 	static float y = 0;
 	y += deltaSeconds;
-	m_cubeMeshTransform.SetRotation( /*10.f * ( float ) GetCurrentTimeSeconds()*/ 0.f ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
+	m_cubeMeshTransform.SetRotation( 15.f * ( float ) GetCurrentTimeSeconds()/* 0.f*/ ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	m_sphereMeshTransform.SetRotation( /*20.f * ( float ) GetCurrentTimeSeconds()*/ 0.f,  50.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	UpdateFromKeyBoard( deltaSeconds );
 }
@@ -150,20 +150,20 @@ void Game::Render() const
 	g_theRenderer->BindShader( m_currentShader );
 	g_theRenderer->BindTexture( m_worldMapSphere );
 		
-	g_theRenderer->SetModelMatrix( m_cubeMeshTransform.GetAsMatrix() );
-	g_theRenderer->DrawMesh( m_cubeMesh );
-
  	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_meshSphere );
 
-//	g_theRenderer->BindShader( m_lightShaders[ LitShaderTypes::NORMAL ] );
  	g_theRenderer->SetModelMatrix( m_quadTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_quadMesh );
 	//g_theRenderer->DrawAABB2( AABB2::ZERO_TO_ONE , WHITE );
 
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->BindShader( m_lightShaders[ LitShaderTypes::NORMAL ] );
+	g_theRenderer->SetModelMatrix( m_cubeMeshTransform.GetAsMatrix() );
+	g_theRenderer->DrawMesh( m_cubeMesh );
+
 	g_theRenderer->SetRasterState( FILL_SOLID );
 
-	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 	g_theRenderer->BindTexture( nullptr );
