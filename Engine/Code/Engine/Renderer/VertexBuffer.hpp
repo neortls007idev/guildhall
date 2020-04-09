@@ -15,6 +15,12 @@ public:
 	VertexBuffer( RenderContext* ctx , eRenderMemoryHint hint);
 	~VertexBuffer() {};
 
-private:
+	uint GetVBOStride() const { return m_stride; }
+	void SetVBOStide( const uint stride );
 
+	buffer_attribute_t const* GetVertexBufferLayout() const;
+						void  SetVertexBufferLayout( buffer_attribute_t const* vertexBufferLayout );
+private:
+	uint m_stride = 0;
+	buffer_attribute_t const* m_buffer_attribute;
 };

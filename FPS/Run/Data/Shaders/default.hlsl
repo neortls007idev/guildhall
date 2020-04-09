@@ -1,3 +1,5 @@
+
+#include "ShaderMathUtils.hlsl"
 //--------------------------------------------------------------------------------------
 // Stream Input
 // ------
@@ -23,15 +25,6 @@ struct vs_input_t
    float2 uv            : TEXCOORD;
 };
 
-//----------------------------------------------------------------------------------------------------------------------------------------------------
-
-float RangeMap( float val , float inMin , float inMax , float outMin , float outMax )
-{
-	float domain = inMax - inMin;
-	float range = outMax - outMin;
-	return ( ( val - inMin ) / domain ) * range + outMin;
-}
-
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 // constant built into the shader
 static float SHIFT = 5.0f;
@@ -52,6 +45,7 @@ cbuffer camera_constants : register( b1 ) // index 1 is now camera
 cbuffer model_constants : register( b2 ) // index 2 is now model
 {
 	float4x4 MODEL;
+    float4 TINT;
 }
 // Texture & Samplers are also a form of constants
 
@@ -105,5 +99,5 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	// use color to portray information;
 
 	float4 color = tDiffuse.Sample( eSampler, input.uv );
-	return color * input.color;
+	return color * input.color * TINT;
 }

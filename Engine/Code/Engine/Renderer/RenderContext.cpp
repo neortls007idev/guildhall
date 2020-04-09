@@ -203,10 +203,10 @@ void RenderContext::Startup( Window* window )
 
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/default.hlsl" );
 
-	m_immediateVBO = new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
-	m_frameUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
-	m_modelMatrixUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
-	m_lightDataUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	m_immediateVBO		= new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
+	m_frameUBO			= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	m_modelMatrixUBO	= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	m_lightDataUBO		= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 	
 	m_defaultSampler = new Sampler( this , SAMPLER_POINT );
 	m_textureDefault = CreateTextureFromColor( WHITE );
@@ -520,6 +520,21 @@ Shader* RenderContext::GetOrCreateShader( char const* filename )
 	}
 
 	return Temp;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::SetInputLayoutForIA( buffer_attribute_t const* attribs )
+{
+	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
+	//m_context->RSSetState( m_currentShader->m_rasterState );
+	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fragmentShader , nullptr , 0 );
+
+	// So at this, I need to describe the vertex format to the shader
+	//ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
+	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( attribs );
+	// do similar to last bound VBO
+	m_context->IASetInputLayout( inputLayout );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -864,7 +879,9 @@ eWindingOrder RenderContext::GetWindingOrder() const
 
 void RenderContext::SetAmbientColor( Vec4 color )
 {
-	
+	m_lights.ambientLight.x = color.x;
+	m_lights.ambientLight.y = color.y;
+	m_lights.ambientLight.z = color.z;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -872,35 +889,58 @@ void RenderContext::SetAmbientColor( Vec4 color )
 void RenderContext::SetAmbientColor( Rgba8 color )
 {
 	Vec4 normalizedColor = color.GetAsNormalizedFloat4();
+	m_lights.ambientLight.x = normalizedColor.x;
+	m_lights.ambientLight.y = normalizedColor.y;
+	m_lights.ambientLight.z = normalizedColor.z;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void RenderContext::SetAmbientIntensity( float intensity )
 {
-
+	m_lights.ambientLight.w = intensity;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void RenderContext::SetAmbientLight( Rgba8 color /*= WHITE*/ , float intensity /*= 1.f */ )
 {
-	Vec4 normalizedColor = color.GetAsNormalizedFloat4();
+// 	Vec4 normalizedColor;
+// 	normalizedColor.x = static_cast< float >( color.r % 256 );
+// 	normalizedColor.x = RangeMapFloat( 0.f , 255.f , 0.f , 1.f , normalizedColor.x );
+// 	normalizedColor.y = static_cast< float >( color.g % 256 );
+// 	normalizedColor.y = RangeMapFloat( 0.f , 255.f , 0.f , 1.f , normalizedColor.y );
+// 	normalizedColor.z = static_cast< float >( color.b % 256 );
+// 	normalizedColor.z = RangeMapFloat( 0.f , 255.f , 0.f , 1.f , normalizedColor.z );	
+// 	normalizedColor.w = intensity;
+
+	Vec4 normalizedColor;
+	normalizedColor.x = RangeMapFloat( 0.f , 255.f , 0.f , 1.f , ( float ) color.r );
+	normalizedColor.y = RangeMapFloat( 0.f , 255.f , 0.f , 1.f , ( float ) color.g );
+	normalizedColor.z = RangeMapFloat( 0.f , 255.f , 0.f , 1.f , ( float ) color.b );
+	normalizedColor.w = intensity;								 
+
+	m_lights.ambientLight = normalizedColor;
+	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
+	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void RenderContext::SetAmbientLight( Vec4 color , float intensity )
 {
-
+	m_lights.ambientLight.x = color.x;
+	m_lights.ambientLight.y = color.y;
+	m_lights.ambientLight.z = color.z;
+	m_lights.ambientLight.w = intensity;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void RenderContext::EnableLight( uint idx , lightDataT const& lightInfo )
 {
-	UNUSED( idx );
-	m_lightDataUBO->Update( &lightInfo , sizeof( lightDataT ) , sizeof( lightDataT ) );
+	m_lights.lights[ idx ] = lightInfo;
+	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
 	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
 }
 
@@ -908,26 +948,16 @@ void RenderContext::EnableLight( uint idx , lightDataT const& lightInfo )
 
 void RenderContext::DisableLight( uint idx )
 {
-	UNUSED( idx );
-	lightDataT lightData;
-	lightData.intensity = 0.f;
-	m_lightDataUBO->Update( &lightData , sizeof( lightData ) , sizeof( lightData ) );
+	m_lights.lights[ idx ].intensity = 0.f;
+	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
 	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::Draw( int numVertexes , int vertexOffset )
+void RenderContext::Draw( int numVertexes , int vertexOffset , buffer_attribute_t const* attribs )
 {
-	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
-	//m_context->RSSetState( m_currentShader->m_rasterState );
-	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fragmentShader , nullptr , 0 );
-
-
-	// So at this, I need to describe the vertex format to the shader
-	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
-	// do similar to last bound VBO
-	m_context->IASetInputLayout( inputLayout );
+	SetInputLayoutForIA( attribs );
 	m_context->Draw( numVertexes , vertexOffset );
 }
 
@@ -951,17 +981,15 @@ BitmapFont* RenderContext::GetOrCreateBitmapFontFromFile( std::string bitmapFont
 
 void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes )
 {
-
 	// Update a vertex buffer
 	// RenderBUffer* m_immediateVBO // VBO - vertex buffer object - a buffer of memomry on the GPU.
 	// void* cpuBuffer = ( void* ) vertexes;
 	// stride - the number of bytes we need to move in an array or buffer of a memory
 
-
 	size_t  bufferTotalByteSize	= numVertexes * sizeof( Vertex_PCU );
 	size_t	elementSize			= sizeof( Vertex_PCU );
+	m_immediateVBO->SetVBOStide( sizeof( Vertex_PCU ) );
 	m_immediateVBO->Update( vertexes , bufferTotalByteSize , elementSize );
-
 
 	// Bind the Shader
 
@@ -970,8 +998,7 @@ void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes
 	// Index Buffers - to be covered later
 
 	// Draw
-	Draw( numVertexes , 0 );
-
+	Draw( numVertexes , 0 , Vertex_PCU::LAYOUT );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -986,21 +1013,14 @@ void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU>& vertexArray 
 void RenderContext::DrawVertexArray( int numVertexes , VertexBuffer* vertices )
 {
 	BindVertexBuffer( vertices );
-	Draw( numVertexes , 0 );
+	Draw( numVertexes , 0 , vertices->GetVertexBufferLayout() );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::DrawIndexed( uint indexCount , uint startIndex , uint indexStride )
+void RenderContext::DrawIndexed( uint indexCount , uint startIndex , uint indexStride , buffer_attribute_t const* attribs )
 {
-	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
-	//m_context->RSSetState( m_currentShader->m_rasterState );
-	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fragmentShader , nullptr , 0 );
-
-	// So at this, I need to describe the vertex format to the shader
-	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
-	// do similar to last bound VBO
-	m_context->IASetInputLayout( inputLayout );
+	SetInputLayoutForIA( attribs );
 
 	m_context->DrawIndexed( indexCount , startIndex , indexStride );
 }
@@ -1047,11 +1067,11 @@ void RenderContext::DrawMesh( const GPUMesh* mesh )
 	if ( hasIndices )
 	{
 		BindIndexBuffer( mesh->GetIndexBuffer() );
-		DrawIndexed( mesh->GetIndexCount() , 0 , 0 );
+		DrawIndexed( mesh->GetIndexCount() , 0 , 0 , mesh->GetVertexBuffer()->GetVertexBufferLayout() );
 	}
 	else
 	{
-		Draw( mesh->GetVertexCount() , 0 );
+		Draw( mesh->GetVertexCount() , 0 , mesh->GetVertexBuffer()->GetVertexBufferLayout() );
 	}
 }
 
@@ -1592,7 +1612,8 @@ bool RenderContext::HasAnyShaderChangedAtPath( const wchar_t* relativePath , flo
 void RenderContext::BindVertexBuffer( VertexBuffer* vbo )
 {
 	ID3D11Buffer* vboHandle = vbo->m_handle;
-	UINT stride = ( UINT ) sizeof( Vertex_PCU );	//	how far from one vertex to next
+	//UINT stride = ( UINT ) sizeof( Vertex_PCU );	//	how far from one vertex to next
+	UINT stride = ( UINT ) vbo->GetVBOStride();	//	how far from one vertex to next
 	UINT offset = 0;								//  how far into buffer we start
 
 	if (m_lastBoundVBO != vboHandle )
@@ -1635,10 +1656,12 @@ void RenderContext::BindUniformBuffer( unsigned int slot , RenderBuffer* ubo )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::SetModelMatrix( Mat44 modelMat )
+void RenderContext::SetModelMatrix( Mat44 modelMat , Rgba8 color /* = WHITE */  )
 {
+	Vec4 normalizedModelColor = color.GetAsNormalizedFloat4();
 	ModelDataT modelData;
 	modelData.model = modelMat;
+	modelData.normalizedModelColor = normalizedModelColor;
 	m_modelMatrixUBO->Update( &modelData , sizeof( modelData ) , sizeof( modelData ) );
 	BindUniformBuffer( UBO_MODEL_SLOT , m_modelMatrixUBO );
 }

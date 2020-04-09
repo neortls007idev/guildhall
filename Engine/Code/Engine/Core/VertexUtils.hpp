@@ -1,11 +1,12 @@
 #pragma once
-#include "Engine/Core/Vertex_PCU.hpp"
-#include "Engine/Primitives/AABB2.hpp"
-#include <vector>
-#include "Engine/Primitives/AABB3.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-#include "Engine/Primitives/Polygon2D.hpp"
+#include "Engine/Core/Vertex_PCU.hpp"
+#include "Engine/Core/VertexMaster.hpp"
 #include "Engine/Math/Matrix4x4.hpp"
+#include "Engine/Primitives/AABB2.hpp"
+#include "Engine/Primitives/AABB3.hpp"
+#include "Engine/Primitives/Polygon2D.hpp"
+#include <vector>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -37,12 +38,21 @@ void AddCubeVerts( std::vector<Vertex_PCU>& cubeVertexArray , const Rgba8* tint 
 uint* GetCubeIndices();
 
 // MAY LOOK WEIRD INTERNALLY WITH Y AND Z REPLACED DUE TO THE ENGINE BASIS BUT WORKS THE SAME AS CARTESIAN CO-ORDINATES
+void CreateCuboid ( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uint >& cubeIndices , const AABB3 box ,
+                  const Rgba8& tint = WHITE );
+
+void CreateUVSphere ( uint hCuts , uint vCuts , std::vector< VertexMaster >& sphereMeshVerts ,
+                      std::vector< uint >& sphereIndices , float radius = 1.f , Vec3 center = Vec3::ZERO ,
+                      const Rgba8& tint = WHITE );
+
+// MAY LOOK WEIRD INTERNALLY WITH Y AND Z REPLACED DUE TO THE ENGINE BASIS BUT WORKS THE SAME AS CARTESIAN CO-ORDINATES
 void CreateCuboid ( std::vector< Vertex_PCU >& cubeMeshVerts , std::vector< uint >& cubeIndices , const AABB3 box ,
                   const Rgba8& tint = WHITE );
 
-void CreateUVSphere ( uint hCuts , uint vCuts , std::vector< Vertex_PCU >& sphereMeshVerts ,
-                      std::vector< uint >& sphereIndices , float radius = 1.f , Vec3 center = Vec3::ZERO ,
-                      const Rgba8& tint = WHITE );
+
+void CreateUVSphere( uint hCuts , uint vCuts , std::vector< Vertex_PCU >& sphereMeshVerts ,
+					 std::vector< uint >& sphereIndices , float radius = 1.f , Vec3 center = Vec3::ZERO ,
+					 const Rgba8& tint = WHITE );
 
 void CreateCylinder ( std::vector< Vertex_PCU >& cylinderMeshVerts , std::vector< uint >& cylinderIndices ,
                       float radius = 1.f , const Vec3& start = Vec3::ZERO , const Vec3& end = Vec3::ONE ,

@@ -36,10 +36,19 @@ Vertex_PCU::Vertex_PCU( const Vec3& position , const Rgba8& tint , const Vec2& u
 
 Vertex_PCU::Vertex_PCU( const VertexMaster& vert ) :
 														m_position( vert.m_position ) ,
-														m_color( vert.m_color ) ,
 														m_uvTexCoords( vert.m_uvTexCoords )
 {
-	
+	m_color.SetColorFromNormalizedFloat( vert.m_normalizedColor );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC void Vertex_PCU::ConvertVertexPCUToVertexMaster( std::vector<VertexMaster>& output , std::vector<Vertex_PCU> const& input )
+{
+	for ( Vertex_PCU const& vert : input )
+	{
+		output.push_back( VertexMaster( vert ) );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
