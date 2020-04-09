@@ -14,6 +14,17 @@ class GPUMesh;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+enum LitShaderTypes
+{
+	LIT,
+	NORMAL,
+	TANGENT,
+	BITANGENT,
+	TOTAL,
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 class Game
 {
 
@@ -56,6 +67,7 @@ public:
 	AABB2				m_invertedColorImage;
 	GPUMesh*			m_cubeMesh;
 	GPUMesh*			m_meshSphere;
+	GPUMesh*			m_quadMesh;
 	Transform			m_cubeMeshTransform;
 	Transform			m_sphereMeshTransform;
 	Transform			m_quadTransform;
@@ -72,8 +84,11 @@ public:
 	Vec3				m_cameraPosition		= Vec3::ZERO;
 	Vec3				m_cameraRotation		= Vec3::ZERO;
 	
-	Shader* 			m_litShader;
+	Shader*				m_lightShaders[ LitShaderTypes::TOTAL ];
+	Shader* 			m_currentShader;
+	
 	shaderLightDataT	m_lights;
+	Rgba8				m_ambientLightColor;
 
 	bool				m_lineStripMode			= false;
 	std::vector<Vec3>	m_lineStripPoints;

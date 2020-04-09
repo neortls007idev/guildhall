@@ -23,22 +23,28 @@ extern DevConsole*		g_theDevConsole;
 
 Game::Game()
 {
-	
-	m_litShader		 = g_theRenderer->GetOrCreateShader( "Data/Shaders/litDefault2.hlsl" );
-	//m_litShader		 = g_theRenderer->GetOrCreateShader( "Data/Shaders/normalLit.hlsl" );
-	m_worldMapSphere = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/2kEarthDaymap.png" );
+	m_lightShaders[ LitShaderTypes::LIT ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/litDefault2.hlsl" );
+	m_lightShaders[ LitShaderTypes::NORMAL ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/normalLit.hlsl" );
+	m_lightShaders[ LitShaderTypes::TANGENT ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/tangentLit.hlsl" );
+	m_lightShaders[ LitShaderTypes::BITANGENT ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/bitangentLit.hlsl" );
 
+	m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
+	
+	m_worldMapSphere = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/2kEarthDaymap.png" );
+	   	
 	InitializeCameras();
 	intializeGameObjects();
 		
-	m_cubeMeshTransform.SetPosition( 1.f , 0.0f , -20.0f );
-	m_sphereMeshTransform.SetPosition( 7.f , 0.0f , -20.0f );
-	m_sphereMeshTransform.SetPosition( -7.f , 0.0f , -20.0f );
+	m_cubeMeshTransform.SetPosition( 7.f , 0.0f , -10.0f );
+	m_sphereMeshTransform.SetPosition( -7.f , 0.0f , -10.0f );
+	m_quadTransform.SetPosition( 0.f , 0.0f , -10.0f );
 
-	m_lights.ambientLight = Vec4( 1.f , 0.f , 0.f , 1.f );
-	m_lights.lights[ 0 ].color = Vec3( 1.f , 1.f , 1.f );
-	m_lights.lights[ 0 ].intensity = 1.f;
-	m_lights.lights[ 0 ].world_position = Vec3::ONE;
+	m_lights.ambientLight = Vec4( 1.f , 1.f , 1.f , 0.f );
+	m_ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
+	m_lights.lights[ 0 ].color = Vec3( 1.f , 0.f , 0.f );
+	//m_lights.lights[ 0 ].intensity = 0.0001f;
+	m_lights.lights[ 0 ].intensity = 0.0f;
+	m_lights.lights[ 0 ].world_position = Vec3( 100.f , 0.f , -5.f );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -50,7 +56,7 @@ void Game::intializeGameObjects()
 	std::vector<VertexLit>		cubeMeshLitVerts;
 	std::vector<uint>			cubeMeshIndices;
 
-	AABB3 box( Vec3::ZERO , Vec3( 1 , 1 , 5 ) );
+	AABB3 box( Vec3::ZERO , Vec3( 1 , 1 , 1 ) );
 	CreateCuboid( cubeMeshVerts , cubeMeshIndices , box , WHITE );
 	VertexMaster::ConvertVertexMasterToVertexLit( cubeMeshLitVerts , cubeMeshVerts );
 
@@ -70,6 +76,17 @@ void Game::intializeGameObjects()
 	//m_meshSphere->UpdateVertices( ( uint ) sphereMeshLitVerts.size() , sphereMeshLitVerts.data() );
 	m_meshSphere->UpdateVertices( ( uint ) sphereMeshVerts.size() , sphereMeshVerts.data() );
 	m_meshSphere->UpdateIndices( sphereIndices );
+
+	std::vector<VertexMaster>	quadMeshVerts;
+	std::vector<VertexLit>		quadMeshLitVerts;
+	std::vector<uint>			quadIndices;
+
+	CreateQuad( quadMeshVerts , quadIndices , AABB2::ZERO_TO_ONE );
+	m_quadMesh = new GPUMesh( g_theRenderer );
+//	m_quadMesh->UpdateVertices( ( uint ) sphereMeshLitVerts.size() , sphereMeshLitVerts.data() );
+	m_quadMesh->UpdateVertices( ( uint ) quadMeshVerts.size() , quadMeshVerts.data() );
+	m_quadMesh->UpdateIndices( quadIndices );
+	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -81,6 +98,9 @@ Game::~Game()
 
 	delete m_meshSphere;
 	m_meshSphere		= nullptr;
+
+	delete m_quadMesh;
+	m_quadMesh			= nullptr;
 
 	m_meshTex_D			= nullptr;
 	m_meshTex_N			= nullptr;
@@ -122,12 +142,12 @@ void Game::Render() const
 	g_theRenderer->SetCullMode( CULL_BACK );
 	g_theRenderer->SetDepthTest( COMPARE_LEQUAL , true );
 	//lightDataT lightData;
-	g_theRenderer->SetAmbientLight( RED , m_lights.ambientLight.w );
+	g_theRenderer->SetAmbientLight( m_ambientLightColor , m_lights.ambientLight.w );
 	g_theRenderer->EnableLight( 0 , m_lights.lights[ 0 ] );
 
 	//g_theRenderer->SetBlendMode( SOLID );
 	
-	g_theRenderer->BindShader( m_litShader );
+	g_theRenderer->BindShader( m_currentShader );
 	g_theRenderer->BindTexture( m_worldMapSphere );
 		
 	g_theRenderer->SetModelMatrix( m_cubeMeshTransform.GetAsMatrix() );
@@ -136,9 +156,10 @@ void Game::Render() const
  	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_meshSphere );
 
-	g_theRenderer->BindShader( nullptr );
+//	g_theRenderer->BindShader( m_lightShaders[ LitShaderTypes::NORMAL ] );
  	g_theRenderer->SetModelMatrix( m_quadTransform.GetAsMatrix() );
-	g_theRenderer->DrawAABB2( AABB2::ZERO_TO_ONE , WHITE );
+	g_theRenderer->DrawMesh( m_quadMesh );
+	//g_theRenderer->DrawAABB2( AABB2::ZERO_TO_ONE , WHITE );
 
 	g_theRenderer->SetRasterState( FILL_SOLID );
 

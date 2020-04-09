@@ -248,6 +248,55 @@ uint* GetCubeIndices()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void CreateQuad( std::vector< VertexMaster >& quadMeshVerts , std::vector< uint >& quadIndices , const AABB2 quad , const Rgba8& tint /*= WHITE */ )
+{
+	Vertex_PCU CubeVerts[ 4 ] = {
+
+		// FRONT FACE VERTS
+						Vertex_PCU( Vec3( quad.m_mins.x, quad.m_mins.y , -1.f ) , tint, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( quad.m_maxs.x, quad.m_mins.y , -1.f ) , tint, Vec2( 1.f, 0.f ) ),
+																 			   
+						Vertex_PCU( Vec3( quad.m_maxs.x, quad.m_maxs.y , -1.f ) , tint, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( quad.m_mins.x, quad.m_maxs.y , -1.f ) , tint, Vec2( 0.f, 1.f ) ),
+
+						//Vertex_PCU( Vec3( -1.f,-1.f, 0.f ) , WHITE, Vec2( 0.f, 0.f ) ),
+						//Vertex_PCU( Vec3(  1.f,-1.f, 0.f ) , WHITE, Vec2( 1.f, 0.f ) ),
+						//
+						//Vertex_PCU( Vec3(  1.f,1.f, 0.f ) , WHITE, Vec2( 1.f, 1.f ) ),
+						//Vertex_PCU( Vec3( -1.f,1.f, 0.f ) , WHITE, Vec2( 1.f, 0.f ) ),
+
+						};
+
+	Vec3 quadNormal = -CrossProduct3D( CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position , CubeVerts[ 3 ].m_position - CubeVerts[ 0 ].m_position );
+
+	std::vector<Vertex_PCU> quadVertPCUS;
+
+	for ( uint index = 0; index < 4; index++ )
+	{
+		quadVertPCUS.push_back( CubeVerts[ index ] );
+	}
+
+	Vertex_PCU::ConvertVertexPCUToVertexMaster( quadMeshVerts , quadVertPCUS );
+
+	for ( VertexMaster& element : quadMeshVerts )
+	{
+		element.m_normal = quadNormal;
+	}
+		
+	uint QuadIndices[ 6 ] = {
+		// FRONT FACE INDICES
+			0,1,2,
+			2,3,0,
+	};
+
+	for ( uint index = 0; index < 6; index++ )
+	{
+		quadIndices.push_back( QuadIndices[ index ] );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void CreateCuboid( std::vector< Vertex_PCU >& cubeMeshVerts , std::vector< uint >& cubeIndices , const AABB3 box , const Rgba8& tint /*= WHITE */ )
 {
 	Vertex_PCU CubeVerts[ 24 ] = {
