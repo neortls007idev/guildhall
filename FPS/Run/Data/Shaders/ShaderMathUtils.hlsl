@@ -21,3 +21,8 @@ float4 ConvertNormalizedVector3ToColor( float3 vec3 )
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+float3 NormalColorToVector3( float3 color )
+{
+    return normalize( color * float3( 2.0f , 2.0f , 1.0f ) - float3( 1.0f , 1.0f , 0.0f ) );
+}

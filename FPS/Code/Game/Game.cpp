@@ -67,7 +67,7 @@ void Game::intializeGameObjects()
 	std::vector<VertexLit>		cubeMeshLitVerts;
 	std::vector<uint>			cubeMeshIndices;
 
-	AABB3 box( Vec3::ZERO , Vec3( 1 , 1 , 1 ) );
+	AABB3 box( Vec3( -1 , -1 , -1 ) , Vec3( 1 , 1 , 1 ) );
 	CreateCuboid( cubeMeshVerts , cubeMeshIndices , box , WHITE );
 	VertexMaster::ConvertVertexMasterToVertexLit( cubeMeshLitVerts , cubeMeshVerts );
 
@@ -140,8 +140,8 @@ void Game::Update( float deltaSeconds )
 	
 	static float y = 0;
 	y += deltaSeconds;
-	//m_cubeMeshTransform.SetRotation( 15.f * ( float ) GetCurrentTimeSeconds()/* 0.f*/ ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
-	m_sphereMeshTransform.SetRotation( /*20.f * ( float ) GetCurrentTimeSeconds()*/ 0.f,  50.f * ( float ) GetCurrentTimeSeconds() , 0.f );
+	m_cubeMeshTransform.SetRotation( 15.f * ( float ) GetCurrentTimeSeconds()/* 0.f*/ ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
+	m_sphereMeshTransform.SetRotation( 20.f * ( float ) GetCurrentTimeSeconds() /*0.f*/,  50.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	UpdateFromKeyBoard( deltaSeconds );
 }
 

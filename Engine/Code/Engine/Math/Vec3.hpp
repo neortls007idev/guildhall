@@ -84,6 +84,8 @@ public:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 	const Vec3 SetFromText( const char* text );
+
+	//  YToXZPlaneDegrees = Θ (theta) -> Horizontal Angle |  XToZYPlaneDegrees = Φ (phi) -> Vertical Angle
 	static Vec3 MakeFromSpericalCoordinates( float YToXZPlaneDegrees /* Θ (theta) */ , float XToZYPlaneDegrees /* Φ (phi) */  , float radius );
 };
 

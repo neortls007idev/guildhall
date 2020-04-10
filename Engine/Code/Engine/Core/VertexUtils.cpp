@@ -542,14 +542,29 @@ void CreateUVSphere( uint hCuts , uint vCuts , std::vector<VertexMaster>& sphere
 	{
 		for ( float theta = -360.f; theta <= 0.0; theta += deltaTheta )
 		{
-			Vec3 currentCoordsNormal = Vec3::MakeFromSpericalCoordinates( theta , phi , 1.f );
+			float cosTheta	= CosDegrees( theta );
+			float sinTheta	= SinDegrees( theta );
+			float cosPhi	= CosDegrees( phi );
+			float sinPhi	= SinDegrees( phi );
+
+			Vec3 currentCoordsNormal;
+			currentCoordsNormal.x = cosPhi * cosTheta;
+			currentCoordsNormal.y = sinPhi;
+			currentCoordsNormal.z = -cosPhi * sinTheta;
+
+			Vec4 currentCoordsTangent;
+			currentCoordsTangent.x = cosPhi * -sinTheta;
+			currentCoordsTangent.y = 0.f;
+			currentCoordsTangent.z = -cosPhi * cosTheta;
+			currentCoordsTangent.w = 1.f;
+			
 			float u = RangeMapFloat( -360.f , 0.f , 0.f , 1.f , theta );
 			float v = RangeMapFloat( -90.f , 90.f , 0.f , 1.f , phi );
 			
 			VertexMaster currentCoordVerts = VertexMaster(
-															Vertex_PCU( center - ( currentCoordsNormal * radius ) , tint  ,
+															Vertex_PCU( center + ( currentCoordsNormal * radius ) , tint  ,
 																Vec2::ONE - Vec2( u , v ) ) ,
-															-currentCoordsNormal.GetNormalized() );
+															currentCoordsNormal.GetNormalized() , -currentCoordsTangent );
 			
 			sphereMeshVerts.push_back( currentCoordVerts );
 		}
