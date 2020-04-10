@@ -19,8 +19,8 @@ enum LitShaderTypes
 	LIT,
 	UV,
 	NORMAL,
-	//TANGENT,
-	//BITANGENT,
+	TANGENT,
+	BITANGENT,
 	SURFACE_NORMAL,
 	TOTAL,
 };
@@ -33,6 +33,9 @@ class Game
 public:
 
 	Game();
+
+	void LoadShaders();
+
 	~Game();
 
 	void InitializeCameras();

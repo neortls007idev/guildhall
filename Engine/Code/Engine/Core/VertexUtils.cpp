@@ -428,28 +428,28 @@ void CreateCuboid( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uin
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			CUBOID NORMALS
 //--------------------------------------------------------------------------------------------------------------------------------------------
-	Vec3 frontNormal = CrossProduct3D( CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position , CubeVerts[ 3 ].m_position - CubeVerts[ 0 ].m_position );
-	Vec3 backNormal = -frontNormal;
+	Vec3 frontNormal		= CrossProduct3D( CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position , CubeVerts[ 3 ].m_position - CubeVerts[ 0 ].m_position );
+	Vec3 backNormal			= -frontNormal;
 
-	Vec3 leftNormal = CrossProduct3D( CubeVerts[ 13 ].m_position - CubeVerts[ 12 ].m_position , CubeVerts[ 15 ].m_position - CubeVerts[ 12 ].m_position );
-	Vec3 rightNormal = -leftNormal;
+	Vec3 leftNormal			= CrossProduct3D( CubeVerts[ 13 ].m_position - CubeVerts[ 12 ].m_position , CubeVerts[ 15 ].m_position - CubeVerts[ 12 ].m_position );
+	Vec3 rightNormal		= -leftNormal;
 
-	Vec3 topNormal	= CrossProduct3D( CubeVerts[ 17 ].m_position - CubeVerts[ 16 ].m_position , CubeVerts[ 19 ].m_position - CubeVerts[ 16 ].m_position );
-	Vec3 bottomNormal = -topNormal;
+	Vec3 topNormal			= CrossProduct3D( CubeVerts[ 17 ].m_position - CubeVerts[ 16 ].m_position , CubeVerts[ 19 ].m_position - CubeVerts[ 16 ].m_position );
+	Vec3 bottomNormal		= -topNormal;
 
-	Vec3 faceNormals[ 6 ] = { frontNormal , backNormal, rightNormal,leftNormal,topNormal,bottomNormal };
+	Vec3 faceNormals[ 6 ]	= { frontNormal , backNormal , rightNormal , leftNormal , topNormal , bottomNormal };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			CUBOID TANGENTS
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 	Vec3 frontTangent		= CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position;
-	Vec3 backTangent		= CubeVerts[ 5 ].m_position - CubeVerts[ 4 ].m_position;
+	Vec3 backTangent		= -frontTangent;
 	Vec3 leftTangent		= CubeVerts[ 12 ].m_position - CubeVerts[ 15 ].m_position;
-	Vec3 rightTangent		= CubeVerts[ 11 ].m_position - CubeVerts[ 8 ].m_position;
-	Vec3 topTangent			= -frontTangent;
+	Vec3 rightTangent		= -leftTangent;
+	Vec3 topTangent			= frontTangent;
 	Vec3 bottomTangent		= frontTangent;
-	Vec3 faceTangents[ 6 ] = { frontTangent , backTangent, rightTangent,leftTangent,topTangent,bottomTangent };
+	Vec3 faceTangents[ 6 ]	= { frontTangent , backTangent , rightTangent , leftTangent , topTangent , bottomTangent };
 	
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

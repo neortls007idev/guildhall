@@ -23,16 +23,8 @@ extern DevConsole*		g_theDevConsole;
 
 Game::Game()
 {
-	m_lightShaders[ LitShaderTypes::LIT ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/litDefault2.hlsl" );
-	m_lightShaders[ LitShaderTypes::UV ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/uvDebugger.hlsl" );
-	m_lightShaders[ LitShaderTypes::NORMAL ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/normalLit.hlsl" );
-	m_lightShaders[ LitShaderTypes::SURFACE_NORMAL ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/surfaceNormalLit.hlsl" );
-//	m_lightShaders[ LitShaderTypes::TANGENT ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/tangentLit.hlsl" );
-//	m_lightShaders[ LitShaderTypes::BITANGENT ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/bitangentLit.hlsl" );
+	LoadShaders();
 
-	m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
-	m_currentShaderIndex = LitShaderTypes::LIT;
-	
 	m_tileDiffuse	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/tile_diffuse.png" );
 	m_tileNormal	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/tile_normal.png" );
 	   	
@@ -49,6 +41,21 @@ Game::Game()
 	//m_lights.lights[ 0 ].intensity = 0.0001f;
 	m_lights.lights[ 0 ].intensity = 0.0f;
 	m_lights.lights[ 0 ].world_position = Vec3( 100.f , 0.f , -5.f );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::LoadShaders()
+{
+	m_lightShaders[ LitShaderTypes::LIT ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/litDefault2.hlsl" );
+	m_lightShaders[ LitShaderTypes::UV ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/uvDebugger.hlsl" );
+	m_lightShaders[ LitShaderTypes::NORMAL ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/normalLit.hlsl" );
+	m_lightShaders[ LitShaderTypes::TANGENT ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/tangentLit.hlsl" );
+	m_lightShaders[ LitShaderTypes::BITANGENT ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/bitangentLit.hlsl" );
+	m_lightShaders[ LitShaderTypes::SURFACE_NORMAL ]			= g_theRenderer->GetOrCreateShader( "Data/Shaders/surfaceNormalLit.hlsl" );
+
+	m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
+	m_currentShaderIndex = LitShaderTypes::LIT;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
