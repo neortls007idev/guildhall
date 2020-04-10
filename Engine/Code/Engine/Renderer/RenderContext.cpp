@@ -562,7 +562,13 @@ Texture* RenderContext::CreateTextureFromFile( const char* imageFilePath )
 
 		// Check if the load was successful
 		GUARANTEE_OR_DIE( imageData , Stringf( "Failed to load image \"%s\"" , imageFilePath ));
-		GUARANTEE_OR_DIE( numComponents == 4 && imageTexelSizeX > 0 && imageTexelSizeY > 0 , Stringf( "ERROR loading image \"%s\" (Bpp=%i, size=%i,%i)" , imageFilePath , numComponents , imageTexelSizeX , imageTexelSizeY ) );
+
+// 		if ( numComponents == 4 && imageTexelSizeX > 0 && imageTexelSizeY > 0 )
+// 		{
+// 			
+// 		}
+	
+//		GUARANTEE_OR_DIE( numComponents == 4 && imageTexelSizeX > 0 && imageTexelSizeY > 0 , Stringf( "ERROR loading image \"%s\" (Bpp=%i, size=%i,%i)" , imageFilePath , numComponents , imageTexelSizeX , imageTexelSizeY ) );
 
 		// describe the texture
 		D3D11_TEXTURE2D_DESC desc;
@@ -635,20 +641,20 @@ Texture* RenderContext::GetOrCreateTextureFromFile( const char* imageFilePath )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::BindTexture( const Texture* constTexture )
+void RenderContext::BindTexture( const Texture* constTexture , UINT textureType /*= eTextureType::DIFFUSE*/ )
 {
 	if ( nullptr == constTexture )
 	{
 		TextureView* shaderResourceView = m_textureDefault->GetOrCreateShaderResourceView();
 		ID3D11ShaderResourceView* shaderResourceViewHandle = shaderResourceView->GetSRVHandle();
-		m_context->PSSetShaderResources( 0 , 1 , &shaderResourceViewHandle );
+		m_context->PSSetShaderResources( textureType , 1 , &shaderResourceViewHandle );
 		return;
 	}
 
 	Texture* texture = const_cast< Texture* >( constTexture );
 	TextureView* shaderResourceView =  texture->GetOrCreateShaderResourceView();
 	ID3D11ShaderResourceView* shaderResourceViewHandle = shaderResourceView->GetSRVHandle();
-	m_context->PSSetShaderResources( 0 , 1 , &shaderResourceViewHandle );
+	m_context->PSSetShaderResources( textureType , 1 , &shaderResourceViewHandle );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

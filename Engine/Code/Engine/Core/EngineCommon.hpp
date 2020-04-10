@@ -79,7 +79,6 @@ extern NamedStrings		      g_gameConfigBlackboard; // declared in EngineCommon.h
 extern DevConsole*			  g_theDevConsole;
 extern EventSystem*			  g_theEventSystem;
 
-
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 const Vec2 ALIGN_BOTTOM_LEFT( 0.0f , 0.0f );

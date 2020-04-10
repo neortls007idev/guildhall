@@ -74,7 +74,8 @@ public:
 	Transform			m_quadTransform;
 	Texture*			m_meshTex_D					= nullptr;
 	Texture*			m_meshTex_N					= nullptr;
-	Texture*			m_worldMapSphere			= nullptr;
+	Texture*			m_tileDiffuse				= nullptr;
+	Texture*			m_tileNormal				= nullptr;
 
 	uint				m_hCuts						= 32;		// slices
 	uint				m_vCuts						= 16;		// stacks
@@ -96,6 +97,6 @@ public:
 
 	bool				m_lineStripMode				= false;
 	std::vector<Vec3>	m_lineStripPoints;
-	eDebugRenderMode	m_debugRenderMode		= DEBUG_RENDER_ALWAYS;
+	eDebugRenderMode	m_debugRenderMode			= DEBUG_RENDER_ALWAYS;
 	
 };

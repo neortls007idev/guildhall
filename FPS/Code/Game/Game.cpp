@@ -30,10 +30,10 @@ Game::Game()
 //	m_lightShaders[ LitShaderTypes::BITANGENT ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/bitangentLit.hlsl" );
 
 	m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
-
 	m_currentShaderIndex = LitShaderTypes::LIT;
 	
-	m_worldMapSphere = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/2kEarthDaymap.png" );
+	m_tileDiffuse	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/tile_diffuse.png" );
+	m_tileNormal	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/tile_normal.png" );
 	   	
 	InitializeCameras();
 	intializeGameObjects();
@@ -48,7 +48,6 @@ Game::Game()
 	//m_lights.lights[ 0 ].intensity = 0.0001f;
 	m_lights.lights[ 0 ].intensity = 0.0f;
 	m_lights.lights[ 0 ].world_position = Vec3( 100.f , 0.f , -5.f );
-	m_gameCamera.SetPosition( Vec3( -7.f , 0.f , -10.f ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -108,7 +107,8 @@ Game::~Game()
 
 	m_meshTex_D			= nullptr;
 	m_meshTex_N			= nullptr;
-	m_worldMapSphere	= nullptr;
+	m_tileDiffuse		= nullptr;
+	m_tileNormal		= nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -125,6 +125,11 @@ void Game::InitializeCameras()
 
 void Game::Update( float deltaSeconds )
 {
+	if ( m_isLightFollowingTheCamera )
+	{
+		m_lights.lights[ m_currentLightIndex ].world_position = m_gameCamera.GetPosition();
+	}
+	
 	static float y = 0;
 	y += deltaSeconds;
 	m_cubeMeshTransform.SetRotation( 15.f * ( float ) GetCurrentTimeSeconds()/* 0.f*/ ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
@@ -152,7 +157,8 @@ void Game::Render() const
 	//g_theRenderer->SetBlendMode( SOLID );
 	
 	g_theRenderer->BindShader( m_currentShader );
-	g_theRenderer->BindTexture( m_worldMapSphere );
+	//g_theRenderer->BindTexture( m_tileDiffuse );
+	g_theRenderer->BindTexture( m_tileNormal , eTextureType::TEX_NORMAL );
 		
  	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_meshSphere );
@@ -294,6 +300,12 @@ void Game::UpdateLightsFromKeyBoard( float deltaSeconds )
 		m_currentShaderIndex %= LitShaderTypes::TOTAL;
 		m_currentShader = m_lightShaders[ m_currentShaderIndex ];
 	}
+
+	if ( g_theInput->IsKeyHeldDown( '9' ) )
+	{
+		m_lights.ambientLight.w -= deltaSeconds;
+		m_lights.ambientLight.w = ClampZeroToOne( m_lights.ambientLight.w );
+	}
 	
 	if ( g_theInput->IsKeyHeldDown( '0' ) )
 	{
@@ -301,11 +313,18 @@ void Game::UpdateLightsFromKeyBoard( float deltaSeconds )
 		m_lights.ambientLight.w = ClampZeroToOne( m_lights.ambientLight.w );
 	}
 
-	if ( g_theInput->IsKeyHeldDown( '9' ) )
+	if ( g_theInput->IsKeyHeldDown( KEY_MINUS ) )
 	{
-		m_lights.ambientLight.w -= deltaSeconds;
-		m_lights.ambientLight.w = ClampZeroToOne( m_lights.ambientLight.w );
+		m_lights.lights[ m_currentLightIndex ].intensity -= deltaSeconds;
+		//m_lights.ambientLight.w = ClampZeroToOne( m_lights.ambientLight.w );
 	}
+
+	if ( g_theInput->IsKeyHeldDown( KEY_PLUS ) )
+	{
+		m_lights.lights[ m_currentLightIndex ].intensity += deltaSeconds;
+		//m_lights.ambientLight.w = ClampZeroToOne( m_lights.ambientLight.w );
+	}
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
