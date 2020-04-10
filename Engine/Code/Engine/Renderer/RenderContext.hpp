@@ -64,6 +64,15 @@ enum eBufferSlot
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+enum eTextureType
+{
+	TEX_DIFFUSE		= 0 ,
+	TEX_NORMAL		= 1 ,
+	TEX_ALBEDO		= 2 ,
+	TEX_SPECULAR	= 3 ,
+};
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 struct FrameDataT
 {
 	float m_systemTime;
@@ -149,7 +158,7 @@ public:
 	void		SetRasterState( eRasterStateFillMode rasterState );
 	void		SetTransientRasterStateAsRasterState();
 	
-	void		BindTexture( const Texture* constTexture );
+	void		BindTexture( const Texture* constTexture , UINT textureType = eTextureType::TEX_DIFFUSE );
 	bool		BindShader( Shader* shader );
 	void		BindShader( std::string shaderFileName );
 	void		BindVertexBuffer( VertexBuffer* vbo );
