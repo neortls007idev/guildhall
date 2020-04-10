@@ -1,4 +1,3 @@
-
 //--------------------------------------------------------------------------------------
 // Stream Input
 // ------
@@ -8,7 +7,13 @@
 // we be processing a different element. 
 //--------------------------------------------------------------------------------------
 
-// Input from Vertex Buffers
+//--------------------------------------------------------------------------------------
+//                      PROGRAMMABLE SHADER STAGES STRUCTS
+//--------------------------------------------------------------------------------------
+//
+// INPUT FROM VERTEX BUFFERS
+//
+//--------------------------------------------------------------------------------------
 struct vs_input_t
 {
    // we are not defining our own input data; 
@@ -20,12 +25,13 @@ struct vs_input_t
     float4 tangent          : TANGENT;
 };
 
-//--------------------------------------------------------------------------------------
-// Programmable Shader Stages
-//--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
-// for passing data from vertex to fragment (v-2-f)
+//
+// INPUT FOR PASSING DATA FROM VERTEX STAGE TO FRAGMENT STAGE (V-2-F)
+// 
+//--------------------------------------------------------------------------------------
+
 struct v2f_t
 {
     float4 position         : SV_POSITION;
@@ -35,5 +41,6 @@ struct v2f_t
     float3 world_position   : WORLD_POSITION;
     float3 world_normal     : WORLD_NORMAL;
     float4 world_tangent    : WORLD_TANGENT;
-//    float3 world_bitangent  : WORLD_BITANGENT;
 };
+
+//--------------------------------------------------------------------------------------
