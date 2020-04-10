@@ -12,6 +12,7 @@ STATIC buffer_attribute_t const	VertexLit::LAYOUT[] = {
    buffer_attribute_t( "COLOR",     BUFFER_FORMAT_VEC4, 			offsetof( VertexLit, m_normalizedColor ) ),
    buffer_attribute_t( "TEXCOORD",  BUFFER_FORMAT_VEC2,      		offsetof( VertexLit, m_uvTexCoords ) ),
    buffer_attribute_t( "NORMAL",	  BUFFER_FORMAT_VEC3,      		offsetof( VertexLit, m_normal ) ),
+   //buffer_attribute_t( "TANGENT",   BUFFER_FORMAT_VEC4, 			offsetof( VertexLit, m_tangent ) ),
    buffer_attribute_t() // end - terminator element; 
 };
 

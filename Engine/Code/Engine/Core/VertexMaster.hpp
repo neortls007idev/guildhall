@@ -34,7 +34,7 @@ public:
 	Vec3	m_position			= Vec3::ZERO;
 	Rgba8	m_color				= WHITE;
 	Vec2	m_uvTexCoords		= Vec2::ZERO;
-//	Vec3	m_tangent			= Vec3::UNIT_VECTOR_ALONG_I_BASIS;
+	Vec4	m_tangent			= Vec4(1.f,0.f,0.f,1.f);
 //	Vec3	m_biTangent			= Vec3::UNIT_VECTOR_ALONG_J_BASIS;
 	Vec3	m_normal			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
 	Vec4	m_normalizedColor	= Vec4::ONE;
