@@ -39,9 +39,9 @@ VertexMaster::VertexMaster( const Vec3& position , const Rgba8& tint , const Vec
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 VertexMaster::VertexMaster( const Vertex_PCU& vert ) :
-														m_position( vert.m_position ) ,
-														m_color( vert.m_color ) ,
-														m_uvTexCoords( vert.m_uvTexCoords )
+																														m_position( vert.m_position ) ,
+																														m_color( vert.m_color ) ,
+																														m_uvTexCoords( vert.m_uvTexCoords )
 {
 	m_normal = Vec3::UNIT_VECTOR_ALONG_K_BASIS;
 	m_normalizedColor = vert.m_color.GetAsNormalizedFloat4();
@@ -49,10 +49,11 @@ VertexMaster::VertexMaster( const Vertex_PCU& vert ) :
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-VertexMaster::VertexMaster( const Vertex_PCU& vert , const Vec3& vertNormal ) : m_position( vert.m_position ) ,
-																				m_color( vert.m_color ) ,
-																				m_uvTexCoords( vert.m_uvTexCoords ),
-																				m_normal( vertNormal )
+VertexMaster::VertexMaster( const Vertex_PCU& vert , const Vec3& vertNormal ) :
+																														m_position( vert.m_position ) ,
+																														m_color( vert.m_color ) ,
+																														m_uvTexCoords( vert.m_uvTexCoords ),
+																														m_normal( vertNormal )
 
 {
 	m_normalizedColor = vert.m_color.GetAsNormalizedFloat4();
@@ -60,12 +61,39 @@ VertexMaster::VertexMaster( const Vertex_PCU& vert , const Vec3& vertNormal ) : 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-VertexMaster::VertexMaster( const VertexLit& vert ) : m_position( vert.m_position ) ,
-													  m_normalizedColor( vert.m_normalizedColor ) ,
-													  m_uvTexCoords( vert.m_uvTexCoords ) ,
-													  m_normal( vert.m_normal )
+VertexMaster::VertexMaster( const VertexLit& vert ) :
+																														m_position( vert.m_position ) ,
+																														m_uvTexCoords( vert.m_uvTexCoords ) ,
+																														m_normal( vert.m_normal ),
+																														m_normalizedColor( vert.m_normalizedColor )
 {
 	m_color.SetColorFromNormalizedFloat( vert.m_normalizedColor );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+VertexMaster::VertexMaster( const Vec3& position , const Rgba8& tint , const Vec2& uvTexCoords , const Vec3& normal , const Vec4& tangent ) :
+																														m_position( position ) ,
+																														m_color( tint ) ,
+																														m_uvTexCoords( uvTexCoords ) ,
+																														m_normal( normal ) ,
+																														m_tangent( tangent )
+
+{
+	m_normalizedColor = tint.GetAsNormalizedFloat4();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+VertexMaster::VertexMaster( const Vertex_PCU& vert , const Vec3& vertNormal , const Vec4& tangent ) :
+																														m_position( vert.m_position ) ,
+																														m_color( vert.m_color ) ,
+																														m_uvTexCoords( vert.m_uvTexCoords ) ,
+																														m_normal( vertNormal ) ,
+																														m_tangent( tangent )
+
+{
+	m_normalizedColor = vert.m_color.GetAsNormalizedFloat4();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

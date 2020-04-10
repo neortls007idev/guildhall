@@ -57,10 +57,10 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
     float3x3 TBN            = float3x3( tangent, bitangent, normal );
     
     float3 normal_color     = tNormal.Sample( sSampler , input.uv );
-    float3 surface_normal   = ConvertNormalizedVector3ToColor( normal_color );
+    float3 surface_normal   = NormalColorToVector3( normal_color );
     float3 world_normal     = mul( surface_normal , TBN );
     
-    return float4(world_normal, 1.f);
+    return ConvertNormalizedVector3ToColor( world_normal );
 }
 
 //--------------------------------------------------------------------------------------
