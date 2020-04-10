@@ -1,4 +1,5 @@
 #include "ShaderMathUtils.hlsl"
+#include "ConstantBuffers.hlsl"
 
 //--------------------------------------------------------------------------------------
 // Stream Input
@@ -20,75 +21,6 @@ struct vs_input_t
     float3 normal : NORMAL;
 };
 
-
-//--------------------------------------------------------------------------------------
-// Constant Input
-// ------
-// Constant Input are buffers bound that all shaders share/read.
-// It can't be changed from the shader, but can be
-// changed in-between draw calls on the CPU
-//--------------------------------------------------------------------------------------
-
-// buffer holding time information from our game
-cbuffer frame_constants : register(b0) // constant buffer slot 0
-{
-    float SYSTEM_TIME;
-    float SYSTEM_FRAME_TIME;
-    float GAME_TIME;
-    float GAME_DELTA_TIME;
-};
-
-// buffer telling us information about our camera
-cbuffer camera_constants : register(b1) // constant buffer slot 1
-{
-    float4x4 PROJECTION; // aka, CameraToClipTransform
-    float4x4 VIEW; // aka, WorldToCameraTransform
-};
-
-
-// information that might change per model/object
-cbuffer model_constants : register(b2) // constant buffer slot 1
-{
-    float4x4 MODEL;
-    float4 TINT;
-};
-
-struct light_t
-{
-    float3 world_position;
-    float pad00; // this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
-
-    float3 color;
-    float intensity; // rgb and an intensity
-};
-
-/*
-// cpu side
-struct light_t
-{
-   Vec3 worldPosition; 
-   float pad00; 
-   Vec3 color; 
-   float intesity; // RGBA will not work - is not the same size;  
-};
-*/
-
-// buffer telling us information about our camera
-cbuffer light_constants : register(b3) // constant buffer slot 1
-{
-    float4 AMBIENT;
-    light_t LIGHT;
-};
-
-
-// Textures & Samplers are also a form of constant
-// data - uniform/constant across the entire call
-Texture2D<float4> tDiffuse : register(t0); // color of the surface
-Texture2D<float4> tNormal : register(t1); // normal Map of the surface
-SamplerState sSampler : register(s0); // sampler are rules on how to sample (read) from the texture.
-
-
-
 //--------------------------------------------------------------------------------------
 // Programmable Shader Stages
 //--------------------------------------------------------------------------------------
@@ -106,16 +38,18 @@ struct v2f_t
 };
 
 //--------------------------------------------------------------------------------------
-// Vertex Shader
+//                          VERTEX SHADER
+//--------------------------------------------------------------------------------------
+
 v2f_t VertexFunction(vs_input_t input)
 {
     v2f_t v2f = (v2f_t) 0;
 
    // move the vertex through the spaces
-    float4 local_pos    = float4(input.position, 1.0f); // passed in position is usually inferred to be "local position", ie, local to the object
-    float4 world_pos    = mul(MODEL, local_pos); // world pos is the object moved to its place int he world by the model, not used yet
-    float4 camera_pos   = mul(VIEW, world_pos);
-    float4 clip_pos     = mul(PROJECTION, camera_pos);
+    float4 local_pos = float4(input.position, 1.0f); // passed in position is usually inferred to be "local position", ie, local to the object
+    float4 world_pos = mul(MODEL, local_pos); // world pos is the object moved to its place int he world by the model, not used yet
+    float4 camera_pos = mul(VIEW, world_pos);
+    float4 clip_pos = mul(PROJECTION, camera_pos);
 
    // normal is currently in model/local space
     float4 local_normal = float4(input.normal, 0.0f);
@@ -123,14 +57,16 @@ v2f_t VertexFunction(vs_input_t input)
 
    // tangent & bitangent
 
-    v2f.position        = clip_pos; // we want to output the clip position to raster (a perspective point)
-    v2f.color           = input.color * TINT;
-    v2f.uv              = input.uv;
-    v2f.world_position  = world_pos.xyz;
-    v2f.world_normal    = world_normal.xyz;
+    v2f.position = clip_pos; // we want to output the clip position to raster (a perspective point)
+    v2f.color = input.color * TINT;
+    v2f.uv = input.uv;
+    v2f.world_position = world_pos.xyz;
+    v2f.world_normal = world_normal.xyz;
 
     return v2f;
 }
+
+//--------------------------------------------------------------------------------------
 
 float3 ConvertVectorToColor(float3 vec)
 {
@@ -142,10 +78,12 @@ float3 ConvertVectorToColor(float3 vec)
 }
 
 //--------------------------------------------------------------------------------------
-// Fragment Shader
-// 
+//                  FRAGMENT SHADER
+//--------------------------------------------------------------------------------------
 // SV_Target0 at the end means the float4 being returned
 // is being drawn to the first bound color target.
+//--------------------------------------------------------------------------------------
+
 float4 FragmentFunction(v2f_t input) : SV_Target0
 {
 
@@ -180,7 +118,7 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
     //return float4(dir_to_light, 1); 
     float dot3 = max(0.0f, dot(dir_to_light, surface_normal));
    
-    return float4(dot3.xxxx );
+    //return float4(dot3.xxxx );
     diffuse += dot3;
  
    // just diffuse lighting
@@ -190,7 +128,9 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
     //return float4(surface_color, 1);
     
     float3 final_color = diffuse * surface_color;
-    return float4(final_color, surface_alpha );
+    return float4(final_color, surface_alpha);
    
    //return float4(diffuse, 1);
 }
+
+//--------------------------------------------------------------------------------------

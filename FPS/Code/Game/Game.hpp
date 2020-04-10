@@ -21,6 +21,7 @@ enum LitShaderTypes
 	NORMAL,
 	//TANGENT,
 	//BITANGENT,
+	SURFACE_NORMAL,
 	TOTAL,
 };
 

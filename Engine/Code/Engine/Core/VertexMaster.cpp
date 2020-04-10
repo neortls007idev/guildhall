@@ -1,8 +1,8 @@
 #include "Engine/Core/VertexMaster.hpp"
-
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Math/Vec3.hpp"
+#include "Engine/Math/Vec4.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -13,6 +13,7 @@ STATIC buffer_attribute_t const	VertexMaster::LAYOUT[] = {
    buffer_attribute_t( "TEXCOORD",		BUFFER_FORMAT_VEC2,      			offsetof( VertexMaster, m_uvTexCoords ) ),
    //buffer_attribute_t( "WORLD_POSITION",  BUFFER_FORMAT_VEC3,      			offsetof( VertexMaster, m_position ) ),
    buffer_attribute_t( "NORMAL",			BUFFER_FORMAT_VEC3,      			offsetof( VertexMaster, m_normal ) ),
+   buffer_attribute_t( "TANGENT",			BUFFER_FORMAT_VEC4, 				offsetof( VertexMaster, m_tangent ) ),
    buffer_attribute_t() // end - terminator element; 
 };
 

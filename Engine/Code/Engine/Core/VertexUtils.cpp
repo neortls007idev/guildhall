@@ -268,6 +268,7 @@ void CreateQuad( std::vector< VertexMaster >& quadMeshVerts , std::vector< uint 
 						};
 
 	Vec3 quadNormal = CrossProduct3D( CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position , CubeVerts[ 3 ].m_position - CubeVerts[ 0 ].m_position );
+	Vec4 quadTangent = Vec4( CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position , 1.f );
 
 	std::vector<Vertex_PCU> quadVertPCUS;
 
@@ -281,6 +282,7 @@ void CreateQuad( std::vector< VertexMaster >& quadMeshVerts , std::vector< uint 
 	for ( VertexMaster& element : quadMeshVerts )
 	{
 		element.m_normal = quadNormal;
+		element.m_tangent = quadTangent;
 	}
 		
 	uint QuadIndices[ 6 ] = {
@@ -423,6 +425,9 @@ void CreateCuboid( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uin
 		cubeVertPCUS.push_back( CubeVerts[ index ] );
 	}
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//			CUBOID NORMALS
+//--------------------------------------------------------------------------------------------------------------------------------------------
 	Vec3 frontNormal = CrossProduct3D( CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position , CubeVerts[ 3 ].m_position - CubeVerts[ 0 ].m_position );
 	Vec3 backNormal = -frontNormal;
 
@@ -433,7 +438,21 @@ void CreateCuboid( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uin
 	Vec3 bottomNormal = -topNormal;
 
 	Vec3 faceNormals[ 6 ] = { frontNormal , backNormal, rightNormal,leftNormal,topNormal,bottomNormal };
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//			CUBOID TANGENTS
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+	Vec3 frontTangent		= CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position;
+	Vec3 backTangent		= CubeVerts[ 5 ].m_position - CubeVerts[ 4 ].m_position;
+	Vec3 leftTangent		= CubeVerts[ 12 ].m_position - CubeVerts[ 15 ].m_position;
+	Vec3 rightTangent		= CubeVerts[ 11 ].m_position - CubeVerts[ 8 ].m_position;
+	Vec3 topTangent			= -frontTangent;
+	Vec3 bottomTangent		= frontTangent;
+	Vec3 faceTangents[ 6 ] = { frontTangent , backTangent, rightTangent,leftTangent,topTangent,bottomTangent };
 	
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 	Vertex_PCU::ConvertVertexPCUToVertexMaster( cubeMeshVerts , cubeVertPCUS );
 
 	for ( uint faces = 0 ; faces < 6 ; faces++ )
@@ -441,6 +460,7 @@ void CreateCuboid( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uin
 		for ( uint vert = 0 ; vert < 4 ; vert++ )
 		{
 			cubeMeshVerts[ ( faces * 4 ) + vert ].m_normal = faceNormals[ faces ];
+			cubeMeshVerts[ ( faces * 4 ) + vert ].m_tangent = Vec4( faceTangents[ faces ] , 1.f );
 		}
 	}
 	

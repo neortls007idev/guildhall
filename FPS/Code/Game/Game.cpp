@@ -26,6 +26,7 @@ Game::Game()
 	m_lightShaders[ LitShaderTypes::LIT ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/litDefault2.hlsl" );
 	m_lightShaders[ LitShaderTypes::UV ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/uvDebugger.hlsl" );
 	m_lightShaders[ LitShaderTypes::NORMAL ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/normalLit.hlsl" );
+	m_lightShaders[ LitShaderTypes::SURFACE_NORMAL ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/surfaceNormalLit.hlsl" );
 //	m_lightShaders[ LitShaderTypes::TANGENT ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/tangentLit.hlsl" );
 //	m_lightShaders[ LitShaderTypes::BITANGENT ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/bitangentLit.hlsl" );
 
@@ -132,7 +133,7 @@ void Game::Update( float deltaSeconds )
 	
 	static float y = 0;
 	y += deltaSeconds;
-	m_cubeMeshTransform.SetRotation( 15.f * ( float ) GetCurrentTimeSeconds()/* 0.f*/ ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
+	//m_cubeMeshTransform.SetRotation( 15.f * ( float ) GetCurrentTimeSeconds()/* 0.f*/ ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	m_sphereMeshTransform.SetRotation( /*20.f * ( float ) GetCurrentTimeSeconds()*/ 0.f,  50.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	UpdateFromKeyBoard( deltaSeconds );
 }
@@ -157,16 +158,18 @@ void Game::Render() const
 	//g_theRenderer->SetBlendMode( SOLID );
 	
 	g_theRenderer->BindShader( m_currentShader );
-	//g_theRenderer->BindTexture( m_tileDiffuse );
+	g_theRenderer->BindTexture( m_tileDiffuse );
 	g_theRenderer->BindTexture( m_tileNormal , eTextureType::TEX_NORMAL );
 		
  	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_meshSphere );
 
+	//g_theRenderer->BindShader( m_lightShaders[ NORMAL ] );
  	g_theRenderer->SetModelMatrix( m_quadTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_quadMesh );
 	//g_theRenderer->DrawAABB2( AABB2::ZERO_TO_ONE , WHITE );
 
+	//g_theRenderer->BindShader( m_currentShader );
 	//g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->SetModelMatrix( m_cubeMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_cubeMesh );

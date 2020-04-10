@@ -3,25 +3,6 @@
 #include "defaultLitStageStructs.hlsl"
 
 //--------------------------------------------------------------------------------------
-
-//--------------------------------------------------------------------------------------
-// Programmable Shader Stages
-//--------------------------------------------------------------------------------------
-
-//--------------------------------------------------------------------------------------
-// for passing data from vertex to fragment (v-2-f)
-struct v2f_t
-{
-    float4 position : SV_POSITION;
-    float4 color : COLOR;
-    float2 uv : UV;
-
-    float3 world_position : WORLD_POSITION;
-    float3 world_normal : WORLD_NORMAL;
-    float3 world_tangent : WORLD_TANGENT;
-};
-
-//--------------------------------------------------------------------------------------
 // Vertex Shader
 v2f_t VertexFunction(vs_input_t input)
 {
@@ -34,17 +15,20 @@ v2f_t VertexFunction(vs_input_t input)
     float4 clip_pos     = mul(PROJECTION, camera_pos);
 
    // normal is currently in model/local space
-    float4 local_tangent = float4(input.tangent, 0.0f);
-    float4 world_tangent = mul(MODEL, local_tangent);
+    float4 local_normal = float4(input.normal, 0.0f);
+    float4 world_normal = mul(MODEL, local_normal);
     
    // tangent & bitangent
-
+    
+    float4 local_tangent = float4(input.tangent.xyz, 0.0f);
+    float4 world_tangent = mul(MODEL, local_tangent);
+        
     v2f.position        = clip_pos; // we want to output the clip position to raster (a perspective point)
     v2f.color           = input.color * TINT;
     v2f.uv              = input.uv;
     v2f.world_position  = world_pos.xyz;
-    v2f.world_tangent   = world_tangent.xyz;
-
+    v2f.world_normal    = world_normal.xyz;
+    v2f.world_tangent   = float4(world_tangent.xyz, input.tangent.w);
     return v2f;
 }
 
@@ -59,20 +43,22 @@ float4 ConvertVectorToColor( float3 vec )
     float4 color;
     color.x = RangeMap(vec.x, -1.f, 1.f, 0.f, 1.f);
     color.y = RangeMap(vec.y, -1.f, 1.f, 0.f, 1.f);
-    color.z = RangeMap(vec.z, -1.f, 1.f, 0.f, 1.f);
+    color.z = RangeMap(vec.z, 0.f, 1.f, 0.f, 1.f);
     color.w = 1;
     return color;
 }
 
-//--------------------------------------------------------------------------------------
-
 float4 FragmentFunction(v2f_t input) : SV_Target0
 {
-
-    float4 color = ConvertVectorToColor(input.world_tangent);
-    color = normalize(color);
-    return color;
+    float3 tangent      = normalize(input.world_tangent.xyz);
+    float3 normal       = normalize(input.world_normal);
+    float3 bitangent    = normalize(cross(normal, tangent)) * input.world_tangent.w;
+    float3x3 TBN        = float3x3( tangent, bitangent, normal );
+    
+    float3 normal_color     = tNormal.Sample(sSampler, input.uv);
+    float3 surface_normal   = ConvertVectorToColor(normal_color);
+    float3 world_normal     = mul(surface_normal, TBN);
+    
+    return float4(world_normal, 1.f);
 
 }
-
-//--------------------------------------------------------------------------------------
