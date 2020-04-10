@@ -754,9 +754,9 @@ void RenderContext::CreateTransientRasterState( eRasterStateFillMode rasterFillM
 		m_transientRaterState->GetDesc( &currentRSDesc );
 		bool result = false;
 
-		if ( currentRSDesc.FillMode == GetD3D11FillMode( rasterFillMode ) )				{	result = result && true;	}
-		if ( currentRSDesc.CullMode == GetD3D11CullMode( cullMode ) )					{	result = result && true;	}
-		if ( currentRSDesc.FrontCounterClockwise == ::GetWindingOrder( windingOrder ) )	{	result = result && true;	}
+		if ( currentRSDesc.FillMode == GetD3D11FillMode( rasterFillMode ) )				{	result = result | true;	}
+		if ( currentRSDesc.CullMode == GetD3D11CullMode( cullMode ) )					{	result = result | true;	}
+		if ( currentRSDesc.FrontCounterClockwise == ::GetWindingOrder( windingOrder ) )	{	result = result | true;	}
 		
 		if ( result )
 		{

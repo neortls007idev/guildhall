@@ -10,7 +10,7 @@
 //--------------------------------------------------------------------------------------
 
 // Input from Vertex Buffers
-struct vs_input_t
+struct vs_/input_t
 {
    // we are not defining our own input data; 
     float3 position : POSITION;
