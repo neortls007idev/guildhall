@@ -17,9 +17,10 @@ class GPUMesh;
 enum LitShaderTypes
 {
 	LIT,
+	UV,
 	NORMAL,
-	TANGENT,
-	BITANGENT,
+	//TANGENT,
+	//BITANGENT,
 	TOTAL,
 };
 
@@ -71,26 +72,29 @@ public:
 	Transform			m_cubeMeshTransform;
 	Transform			m_sphereMeshTransform;
 	Transform			m_quadTransform;
-	Texture*			m_meshTex_D				= nullptr;
-	Texture*			m_meshTex_N				= nullptr;
-	Texture*			m_worldMapSphere		= nullptr;
+	Texture*			m_meshTex_D					= nullptr;
+	Texture*			m_meshTex_N					= nullptr;
+	Texture*			m_worldMapSphere			= nullptr;
 
-	uint				m_hCuts					= 32;		// slices
-	uint				m_vCuts					= 16;		// stacks
+	uint				m_hCuts						= 32;		// slices
+	uint				m_vCuts						= 16;		// stacks
 
 	mutable Camera		m_gameCamera;
 	Camera				m_uiCamera;
 
-	Vec3				m_cameraPosition		= Vec3::ZERO;
-	Vec3				m_cameraRotation		= Vec3::ZERO;
+	Vec3				m_cameraPosition			= Vec3::ZERO;
+	Vec3				m_cameraRotation			= Vec3::ZERO;
 	
 	Shader*				m_lightShaders[ LitShaderTypes::TOTAL ];
 	Shader* 			m_currentShader;
+	int					m_currentShaderIndex;
 	
 	shaderLightDataT	m_lights;
 	Rgba8				m_ambientLightColor;
+	bool				m_isLightFollowingTheCamera = false;
+	uint				m_currentLightIndex			= 0;
 
-	bool				m_lineStripMode			= false;
+	bool				m_lineStripMode				= false;
 	std::vector<Vec3>	m_lineStripPoints;
 	eDebugRenderMode	m_debugRenderMode		= DEBUG_RENDER_ALWAYS;
 	

@@ -267,7 +267,7 @@ void CreateQuad( std::vector< VertexMaster >& quadMeshVerts , std::vector< uint 
 
 						};
 
-	Vec3 quadNormal = -CrossProduct3D( CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position , CubeVerts[ 3 ].m_position - CubeVerts[ 0 ].m_position );
+	Vec3 quadNormal = CrossProduct3D( CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position , CubeVerts[ 3 ].m_position - CubeVerts[ 0 ].m_position );
 
 	std::vector<Vertex_PCU> quadVertPCUS;
 
@@ -423,13 +423,13 @@ void CreateCuboid( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uin
 		cubeVertPCUS.push_back( CubeVerts[ index ] );
 	}
 
-	Vec3 frontNormal = -CrossProduct3D( CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position , CubeVerts[ 3 ].m_position - CubeVerts[ 0 ].m_position );
+	Vec3 frontNormal = CrossProduct3D( CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position , CubeVerts[ 3 ].m_position - CubeVerts[ 0 ].m_position );
 	Vec3 backNormal = -frontNormal;
 
-	Vec3 leftNormal = -CrossProduct3D( CubeVerts[ 13 ].m_position - CubeVerts[ 12 ].m_position , CubeVerts[ 15 ].m_position - CubeVerts[ 12 ].m_position );
+	Vec3 leftNormal = CrossProduct3D( CubeVerts[ 13 ].m_position - CubeVerts[ 12 ].m_position , CubeVerts[ 15 ].m_position - CubeVerts[ 12 ].m_position );
 	Vec3 rightNormal = -leftNormal;
 
-	Vec3 topNormal	= -CrossProduct3D( CubeVerts[ 17 ].m_position - CubeVerts[ 16 ].m_position , CubeVerts[ 19 ].m_position - CubeVerts[ 16 ].m_position );
+	Vec3 topNormal	= CrossProduct3D( CubeVerts[ 17 ].m_position - CubeVerts[ 16 ].m_position , CubeVerts[ 19 ].m_position - CubeVerts[ 16 ].m_position );
 	Vec3 bottomNormal = -topNormal;
 
 	Vec3 faceNormals[ 6 ] = { frontNormal , backNormal, rightNormal,leftNormal,topNormal,bottomNormal };
@@ -480,10 +480,10 @@ void CreateUVSphere( uint hCuts , uint vCuts , std::vector<Vertex_PCU>& sphereMe
 
 	for ( float phi = -90.f; phi <= 90.0; phi += deltaPhi )
 	{
-		for ( float theta = 0.f; theta <= 360.0; theta += deltaTheta )
+		for ( float theta = -360.f; theta <= 0.0; theta += deltaTheta )
 		{
 			Vec3 currentCoordsNormal = Vec3::MakeFromSpericalCoordinates( theta , phi , radius );
-			float u = RangeMapFloat( 0.f , 360.f , 0.f , 1.f , theta );
+			float u = RangeMapFloat( -360.f , 0.f , 0.f , 1.f , theta );
 			float v = RangeMapFloat( -90.f , 90.f , 0.f , 1.f , phi );
 		
 			Vertex_PCU currentCoordVerts = Vertex_PCU( center + currentCoordsNormal , tint , Vec2( u , v ) );
@@ -520,24 +520,21 @@ void CreateUVSphere( uint hCuts , uint vCuts , std::vector<VertexMaster>& sphere
 
 	for ( float phi = -90.f; phi <= 90.0; phi += deltaPhi )
 	{
-		for ( float theta = 0.f; theta <= 360.0; theta += deltaTheta )
+		for ( float theta = -360.f; theta <= 0.0; theta += deltaTheta )
 		{
 			Vec3 currentCoordsNormal = Vec3::MakeFromSpericalCoordinates( theta , phi , 1.f );
-			float u = RangeMapFloat( 0.f , 360.f , 0.f , 1.f , theta );
+			float u = RangeMapFloat( -360.f , 0.f , 0.f , 1.f , theta );
 			float v = RangeMapFloat( -90.f , 90.f , 0.f , 1.f , phi );
-
-			//Rgba8 vertColor;
-			//vertColor.SetColorFromNormalizedFloat( Vec4( currentCoordsNormal , 1.f ) );
 			
 			VertexMaster currentCoordVerts = VertexMaster(
-															Vertex_PCU( center + ( currentCoordsNormal * radius ) , tint  ,
+															Vertex_PCU( center - ( currentCoordsNormal * radius ) , tint  ,
 																Vec2::ONE - Vec2( u , v ) ) ,
-															currentCoordsNormal.GetNormalized() );
+															-currentCoordsNormal.GetNormalized() );
 			
 			sphereMeshVerts.push_back( currentCoordVerts );
 		}
 	}
-
+	
 	for ( uint hcutIndex = 0; hcutIndex < hCuts; hcutIndex++ )
 	{
 		for ( uint vCutIndex = 0; vCutIndex < vCuts; vCutIndex++ )

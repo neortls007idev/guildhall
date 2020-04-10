@@ -24,11 +24,14 @@ extern DevConsole*		g_theDevConsole;
 Game::Game()
 {
 	m_lightShaders[ LitShaderTypes::LIT ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/litDefault2.hlsl" );
+	m_lightShaders[ LitShaderTypes::UV ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/uvDebugger.hlsl" );
 	m_lightShaders[ LitShaderTypes::NORMAL ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/normalLit.hlsl" );
-	m_lightShaders[ LitShaderTypes::TANGENT ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/tangentLit.hlsl" );
-	m_lightShaders[ LitShaderTypes::BITANGENT ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/bitangentLit.hlsl" );
+//	m_lightShaders[ LitShaderTypes::TANGENT ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/tangentLit.hlsl" );
+//	m_lightShaders[ LitShaderTypes::BITANGENT ] = g_theRenderer->GetOrCreateShader( "Data/Shaders/bitangentLit.hlsl" );
 
 	m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
+
+	m_currentShaderIndex = LitShaderTypes::LIT;
 	
 	m_worldMapSphere = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/2kEarthDaymap.png" );
 	   	
@@ -45,6 +48,7 @@ Game::Game()
 	//m_lights.lights[ 0 ].intensity = 0.0001f;
 	m_lights.lights[ 0 ].intensity = 0.0f;
 	m_lights.lights[ 0 ].world_position = Vec3( 100.f , 0.f , -5.f );
+	m_gameCamera.SetPosition( Vec3( -7.f , 0.f , -10.f ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -157,8 +161,7 @@ void Game::Render() const
 	g_theRenderer->DrawMesh( m_quadMesh );
 	//g_theRenderer->DrawAABB2( AABB2::ZERO_TO_ONE , WHITE );
 
-	g_theRenderer->BindTexture( nullptr );
-	g_theRenderer->BindShader( m_lightShaders[ LitShaderTypes::NORMAL ] );
+	//g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->SetModelMatrix( m_cubeMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
@@ -255,6 +258,43 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 
 void Game::UpdateLightsFromKeyBoard( float deltaSeconds )
 {
+	if ( g_theInput->WasKeyJustPressed( KEY_F5 ) )
+	{
+		m_isLightFollowingTheCamera = false;
+		m_lights.lights[ m_currentLightIndex ].world_position = Vec3::ZERO;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( KEY_F6 ) )
+	{
+		m_isLightFollowingTheCamera = false;
+		m_lights.lights[ m_currentLightIndex ].world_position = m_gameCamera.GetPosition();
+	}
+
+	if ( g_theInput->WasKeyJustPressed( KEY_F7 ) )
+	{
+		m_isLightFollowingTheCamera = true;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( KEY_LEFTARROW ) )
+	{
+		m_currentShaderIndex -= 1;
+		
+		if ( m_currentShaderIndex < 0 )
+		{
+			m_currentShaderIndex = LitShaderTypes::TOTAL - 1;
+		}
+		
+		m_currentShaderIndex %= LitShaderTypes::TOTAL;
+		m_currentShader = m_lightShaders[ m_currentShaderIndex ];
+	}
+	
+	if ( g_theInput->WasKeyJustPressed( KEY_RIGHTARROW ) )
+	{
+		m_currentShaderIndex += 1;
+		m_currentShaderIndex %= LitShaderTypes::TOTAL;
+		m_currentShader = m_lightShaders[ m_currentShaderIndex ];
+	}
+	
 	if ( g_theInput->IsKeyHeldDown( '0' ) )
 	{
 		m_lights.ambientLight.w += deltaSeconds;
