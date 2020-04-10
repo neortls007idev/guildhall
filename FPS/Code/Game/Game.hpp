@@ -20,7 +20,7 @@ enum LitShaderTypes
 	UV,
 	NORMAL,
 	TANGENT,
-	//BITANGENT,
+	BITANGENT,
 	SURFACE_NORMAL,
 	TOTAL,
 };
