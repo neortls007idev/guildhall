@@ -568,7 +568,7 @@ Texture* RenderContext::CreateTextureFromFile( const char* imageFilePath )
 // 			
 // 		}
 	
-//		GUARANTEE_OR_DIE( numComponents == 4 && imageTexelSizeX > 0 && imageTexelSizeY > 0 , Stringf( "ERROR loading image \"%s\" (Bpp=%i, size=%i,%i)" , imageFilePath , numComponents , imageTexelSizeX , imageTexelSizeY ) );
+		//GUARANTEE_OR_DIE( numComponents == 4 && imageTexelSizeX > 0 && imageTexelSizeY > 0 , Stringf( "ERROR loading image \"%s\" (Bpp=%i, size=%i,%i)" , imageFilePath , numComponents , imageTexelSizeX , imageTexelSizeY ) );
 
 		// describe the texture
 		D3D11_TEXTURE2D_DESC desc;
@@ -995,6 +995,7 @@ void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes
 	size_t  bufferTotalByteSize	= numVertexes * sizeof( Vertex_PCU );
 	size_t	elementSize			= sizeof( Vertex_PCU );
 	m_immediateVBO->SetVBOStide( sizeof( Vertex_PCU ) );
+	m_immediateVBO->SetVertexBufferLayout( Vertex_PCU::LAYOUT );
 	m_immediateVBO->Update( vertexes , bufferTotalByteSize , elementSize );
 
 	// Bind the Shader
@@ -1004,7 +1005,7 @@ void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes
 	// Index Buffers - to be covered later
 
 	// Draw
-	Draw( numVertexes , 0 , Vertex_PCU::LAYOUT );
+	Draw( numVertexes , 0 , m_immediateVBO->GetVertexBufferLayout() );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

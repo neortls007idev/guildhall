@@ -157,8 +157,8 @@ void Game::Render() const
 	//g_theRenderer->SetBlendMode( SOLID );
 	
 	g_theRenderer->BindShader( m_currentShader );
-	//g_theRenderer->BindTexture( m_tileDiffuse );
-	g_theRenderer->BindTexture( m_tileNormal , eTextureType::TEX_NORMAL );
+	g_theRenderer->BindTexture( m_tileDiffuse );
+	//g_theRenderer->BindTexture( m_tileNormal , eTextureType::TEX_NORMAL );
 		
  	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_meshSphere );

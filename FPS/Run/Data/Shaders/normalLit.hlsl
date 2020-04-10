@@ -135,7 +135,7 @@ float4 ConvertVectorToColor( float3 vec )
     float4 color;
     color.x = RangeMap(vec.x, -1.f, 1.f, 0.f, 1.f);
     color.y = RangeMap(vec.y, -1.f, 1.f, 0.f, 1.f);
-    color.z = RangeMap(vec.z, -1.f, 1.f, 0.f, 1.f);
+    color.z = RangeMap(vec.z, 0.f, 1.f, 0.f, 1.f);
     color.w = 1;
     return color;
 }

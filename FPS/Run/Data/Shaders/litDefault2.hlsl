@@ -180,7 +180,7 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
     //return float4(dir_to_light, 1); 
     float dot3 = max(0.0f, dot(dir_to_light, surface_normal));
    
-    return float4(dot3.xxxx );
+    //return float4(dot3.xxxx );
     diffuse += dot3;
  
    // just diffuse lighting
