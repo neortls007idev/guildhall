@@ -35,12 +35,14 @@ Game::Game()
 	m_sphereMeshTransform.SetPosition( -7.f , 0.0f , -10.0f );
 	m_quadTransform.SetPosition( 0.f , 0.0f , -10.0f );
 
-	m_lights.ambientLight = Vec4( 1.f , 1.f , 1.f , 1.f );
+	m_lights.ambientLight = Vec4( 0.f , 0.f , 0.f , 0.f );
 	m_ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
-	m_lights.lights[ 0 ].color = Vec3( 1.f , 0.f , 0.f );
+	m_lights.lights[ 0 ].color = Vec3( 1.f , 1.f , 1.f );
 	//m_lights.lights[ 0 ].intensity = 0.0001f;
-	m_lights.lights[ 0 ].intensity = 0.0f;
-	m_lights.lights[ 0 ].world_position = Vec3( 100.f , 0.f , -5.f );
+	m_lights.lights[ 0 ].intensity = 1.0f;
+	m_lights.lights[ 0 ].world_position = Vec3( 0.f , 0.f , -5.f );
+	m_lights.lights[ 0 ].attenuation = Vec3::UNIT_VECTOR_ALONG_K_BASIS;
+	m_lights.lights[ 0 ].spec_attenuation = Vec3::UNIT_VECTOR_ALONG_K_BASIS;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -137,7 +139,11 @@ void Game::Update( float deltaSeconds )
 	{
 		m_lights.lights[ m_currentLightIndex ].world_position = m_gameCamera.GetPosition();
 	}
-	
+
+	Rgba8 lightColor;
+	lightColor.SetColorFromNormalizedFloat( Vec4( m_lights.lights[ 0 ].color , m_lights.lights[ 0 ].intensity ) );
+	DebugAddWorldPoint( m_lights.lights[ 0 ].world_position , 0.125f , lightColor , deltaSeconds , DEBUG_RENDER_XRAY );
+		
 	static float y = 0;
 	y += deltaSeconds;
 	m_cubeMeshTransform.SetRotation( 15.f * ( float ) GetCurrentTimeSeconds()/* 0.f*/ ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
@@ -191,6 +197,7 @@ void Game::Render() const
 	g_theRenderer->DisableLight( 0 );
 	g_theRenderer->EndCamera( m_gameCamera );
 
+	DebugRenderWorldToCamera( &m_gameCamera );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

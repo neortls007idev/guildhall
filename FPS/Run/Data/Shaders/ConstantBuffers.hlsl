@@ -15,8 +15,11 @@ cbuffer frame_constants : register( b0 )                                        
 {
     float           SYSTEM_TIME;
     float           SYSTEM_FRAME_TIME;
-    float           GAME_TIME;
-    float           GAME_DELTA_TIME;
+ //   float           GAME_TIME;
+ //   float           GAME_DELTA_TIME;
+    
+    float           GAMMA;
+    float           INVERSE_GAMMA;
 };
 
 //--------------------------------------------------------------------------------------
@@ -27,6 +30,9 @@ cbuffer camera_constants : register( b1 )                                       
 {
     float4x4        PROJECTION;                                                             // aka, CameraToClipTransform
     float4x4        VIEW;                                                                   // aka, WorldToCameraTransform
+    
+    float3          CAMERA_POSITION;
+    float           padding00;
 };
 
 //--------------------------------------------------------------------------------------
@@ -48,6 +54,10 @@ struct light_t
 
     float3          color;
     float           intensity;                                                              // rgb and an intensity
+    float3          attenuation;                                                            // attentuation for diffuse light, default (0,0,1)
+    float pad01;
+    float3          spec_attenuation;                                                       // attenuation for specular lighting (constant,linear,quadratic), default (0,0,1)
+    float pad02;
 };
 
 //--------------------------------------------------------------------------------------
@@ -57,7 +67,14 @@ struct light_t
 cbuffer light_constants : register( b3 )                                                    // constant buffer slot 3
 {
     float4          AMBIENT;
-    light_t         LIGHT;
+    light_t         LIGHTS;
+    
+     // all 0 to 1 and help influence the lighting equation
+    float           DIFFUSE_FACTOR;                                                         // default: 1  - scales diffuse lighting in equation (lower values make an object absorb light
+    float           SPECULAR_FACTOR;                                                        // default: 1  - scales specular lighting in the equation (higher values create a "shinier" surface)
+    float           SPECULAR_POWER;                                                         // default: 32 - controls the specular falloff (higher values create a "smoother" looking surface)
+
+    float           padding01;
 };
 
 //--------------------------------------------------------------------------------------
