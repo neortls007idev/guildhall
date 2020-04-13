@@ -35,14 +35,15 @@ public:
 	Game();
 
 	void LoadShaders();
+	void InitializeCameras();
+	void intializeGameObjects();
 
 	~Game();
 
-	void InitializeCameras();
-	void intializeGameObjects();
-	
 	void Update( float deltaSeconds );
-
+	void DebugDrawUI( float deltaSeconds );
+	void UpdateLightPosition( float deltaSeconds );
+	
 	void Render() const;
 	void UpdateCamera();
 	void RenderUI() const;
@@ -56,7 +57,14 @@ public:
 private:
 
 	void UpdateFromKeyBoard( float deltaSeconds );
+
 	void UpdateLightsFromKeyBoard( float deltaSeconds );
+	void UpdateCurrentShaderFromUserInput();
+	void UpdateAmbientLightFromUserInput( float deltaSeconds );
+	void UpdateSpecularLightFromUserInput( float deltaSeconds );
+	void UpdateLightAttenuationFromUserInput();
+	void UpdateLightPositionOnUserInput();
+
 	void CreateDebugObjectsFromUserInput();
 	void DebugLineStripDrawModeTest();
 	void CameraPositionUpdateOnInput( float deltaSeconds );
@@ -97,6 +105,7 @@ public:
 	shaderLightDataT	m_lights;
 	Rgba8				m_ambientLightColor;
 	bool				m_isLightFollowingTheCamera = false;
+	bool				m_isLightAnimated			= false;
 	uint				m_currentLightIndex			= 0;
 
 	bool				m_lineStripMode				= false;

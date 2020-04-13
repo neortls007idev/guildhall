@@ -215,16 +215,24 @@ public:
 	
 	void SetAmbientIntensity( float intensity );
 
+	// disabling Ambient is the same as doing...  SetAmbient( WHITE, 1.0f ); 
 	void SetAmbientLight( Rgba8 color = WHITE, float intensity = 1.f );
+
 	// Takes in color as RGB8 converted to normalized float4
 	void SetAmbientLight( Vec4 color , float intensity );
-	// disabling Ambient is the same as doing...  SetAmbient( WHITE, 1.0f ); 
 
 	// for now, assume idx is 0, we only have one light
-	void EnableLight( uint idx , lightDataT const& lightInfo );
 	// void EnablePointLight( uint idx, vec3 position, rgba color, float intensity, vec3 attenuation ); 
-	void DisableLight( uint idx );
+	void EnableLight( uint idx , lightDataT const& lightInfo );
+
 	// disabling a light is the same as just saying the light has 0 intensity
+	void DisableLight( uint idx );
+
+	//how much does specular light show up
+	void SetSpecularFactor( float normalizedFactor );
+
+	// Intensity of specular light
+	void SetSpecularPower( float specularPower );
 	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			DRAW METHODS
