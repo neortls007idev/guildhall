@@ -37,7 +37,7 @@
         - [x] `F5` - Origin (light is positioned at (0,0,0))
         - [x] `F6` - Move to Camera (light is moved to where the camera currently is, and stays there)
         - [x] `F7` - Follow Camera (light is moved to camera each frame while in this mode)
-        - [x] `F8` - Animated.  Light follows a fixed path through the enfironment (cirlce your objects, or figure 8 through the objects)
+        - [x] `F9` - Animated.  Light follows a fixed path through the enfironment (cirlce your objects, or figure 8 through the objects)
 - [x] Be able to adjust object material properties...
     - [x] `[,]` keys should adjust specular factor between 0 and 1 (how much does specular light show up
     - [x] `I,K` keys should adjust specular power (min of 1, but allow it to go as high as you want.
@@ -67,6 +67,7 @@
 - Use Mouse to rotate in-place.
 - while holding down `Shift` + `WASD` for increased camera movement speed.
 - `O` (capitol letter 'Oh') to reset camera Position to origin. ( this does not rest the camera output Size ).
+- `F8` to delete and reset the game.
 
 ------
 
@@ -76,7 +77,7 @@
     - `F5` : Place Light at Origin.
     - `F6` : Place light at current Camera Position.
     - `F7` : Light Follows the Camera.
-    - `F8` : Light moves in a fixed path.
+    - `F9` : Light moves in a fixed path.
 
 - Switch/Cycle Current Shader Using `LEFT ARROW( <- ) KEY` & `RIGHT ARROW( -> ) KEY`.
       - Name of Current Shader Is displayed on screen using debug render always;

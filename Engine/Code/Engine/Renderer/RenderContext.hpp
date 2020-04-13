@@ -237,7 +237,7 @@ public:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			DRAW METHODS
 //--------------------------------------------------------------------------------------------------------------------------------------------
-	void Draw( int numVertexes , int vertexOffset , buffer_attribute_t const* attribs );
+	void Draw( int numVertexes , int vertexOffset , buffer_attribute_t const* attribs = Vertex_PCU::LAYOUT );
 	void DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes );
 	void DrawVertexArray( const std::vector<Vertex_PCU>& vertexArray );
 	void DrawVertexArray( int numVertexes , VertexBuffer* vertices );
