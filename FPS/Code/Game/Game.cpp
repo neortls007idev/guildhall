@@ -243,7 +243,7 @@ void Game::DebugDrawUI( float deltaSeconds )
 	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 8 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
 		"[ [ / ] ] = Change Specular Factor (Clamped 0-1)" );
 	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 9 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
-		"[ U / J ] = Change Specular Power (Clamped 0-INF)" );
+		"[ U / J ] = Change Specular Power (Clamped 1-INF)" );
 	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 10 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
 		"[ T / R / G / Y ] = Change Light Attenuation to ZERO / Constant / Linear / Quadratic" );
 

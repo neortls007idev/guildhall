@@ -2,7 +2,7 @@
 
 ### A06 Checklist
 **( NOTE :- Controls And Known bugs Listed at the Bottom after the Checklist )**
-------
+======
 
 ## Checklist
 - [x] Have a Quad, Sphere, and Cube rendering in world with normals and tangents;
@@ -42,20 +42,67 @@
     - [x] `[,]` keys should adjust specular factor between 0 and 1 (how much does specular light show up
     - [x] `I,K` keys should adjust specular power (min of 1, but allow it to go as high as you want.
 
-------
+======
 
 ##General Notes
+------
 
 - [1] Support For GAMMA is Present but not using GAMMA at the moment.
 ------
+
+======
+
 ### Known Errors/ Bugs
+------
 
 - *__NONE__*
 
 ------
 
+======
+
 ### Control Scheme
 
+- `WASD` for Camera Movement.
+- Use Mouse to rotate in-place.
+- while holding down `Shift` + `WASD` for increased camera movement speed.
+- `O` (capitol letter 'Oh') to reset camera Position to origin. ( this does not rest the camera output Size ).
 
+------
 
+**Lighting Testing ( Also present onScreen )**
+
+- To change Light Position
+    - `F5` : Place Light at Origin.
+    - `F6` : Place light at current Camera Position.
+    - `F7` : Light Follows the Camera.
+    - `F8` : Light moves in a fixed path.
+
+- Switch/Cycle Current Shader Using `LEFT ARROW( <- ) KEY` & `RIGHT ARROW( -> ) KEY`.
+      - Name of Current Shader Is displayed on screen using debug render always;
+- `9` , `0`  : Change Ambient Light Intensity
+      - (Clamped 0-1)
+-  `-` , `+` : Change Light Intensity
+      - (UnClamped)
+- `[`, `]`   : Change Specular Factor
+      - (Clamped 0-1)
+- `U` , `J`  : Change Specular Power
+      - (Clamped 1-INFINITY)
+- `T` , `R` , `G` , `Y` : Change Light Attenuation to `ZERO` , `Constant` , `Linear` , `Quadratic`
+------
+
+**Lighting Devconsole Commands ( Also present in devconsole help )**
+------
+
+- ChangeLightColor            : Change Light Color at Index.
+              - Ex - ChangeLightColor idx = 0 |color = 255 , 255 , 255 , 255
+
+- ChangeLightAttenuation      : Update Light Attenuation of Ambient Light.
+              - Ex - ChangeLightAttenuation idx = 0 |attenuation = 1.f , 0.f , 2.3f
+
+- ChangeAmbientLightColor     : Update Color of Ambient Light.
+              - Ex - ChangeAmbientLightColor  color = 255 , 255 , 255 , 255
+
+- ChangeAmbientLightIntensity : Update Intensity of Ambient Light.
+              - Ex -  ChangeAmbientLightIntensity intensity = 0.3f
 ------
