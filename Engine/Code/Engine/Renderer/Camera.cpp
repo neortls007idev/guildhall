@@ -261,8 +261,9 @@ RenderBuffer* Camera::UpdateUBO( RenderContext* ctx )
 	// View -> worldToCamera
 	// Mat44 View  = Invert(cameraModel);
 
-	cameraData.view = GetViewMatrix();
-
+	cameraData.view		= GetViewMatrix();
+	cameraData.position = GetPosition();
+	
 	m_cameraUBO->Update( &cameraData , sizeof( cameraData ) , sizeof( cameraData ) );
 
 	return m_cameraUBO;

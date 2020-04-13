@@ -41,6 +41,8 @@ struct	ID3D11DepthStencilState;
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 constexpr uint TOTAL_LIGHTS = 1;
+//float GAMMA = 2.2f;
+//float INVERSE_GAMMA = 1 / GAMMA;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -71,6 +73,7 @@ enum eTextureType
 	TEX_ALBEDO		= 2 ,
 	TEX_SPECULAR	= 3 ,
 };
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 struct FrameDataT
@@ -78,7 +81,10 @@ struct FrameDataT
 	float m_systemTime;
 	float m_systemDeltaTime;
 
-	float m_padding[ 2 ];
+	//float m_padding[ 2 ];
+
+	float m_GAMMA				= 2.2f/*GAMMA*/;
+	float m_INVERSE_GAMMA		= 1/m_GAMMA;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -93,20 +99,34 @@ struct ModelDataT
 
 struct lightDataT
 {
-	Vec3	world_position	= Vec3::ZERO;
-	float	pad00			= 0.f;									// this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
+	Vec3	world_position		= Vec3::ZERO;
+	float	pad00				= 0.f;							// this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
 
-	Vec3	color			= Vec3::ONE;
-	float	intensity		= 0.f;									// rgb and an intensity
-	//float	attenuation		= 0.f;									// intensity falloff
+	Vec3	color				= Vec3::ONE;
+	float	intensity			= 0.f;									// rgb and an intensity
+
+	Vec3    attenuation			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;      // intensity falloff , attentuation for diffuse light, default (0,0,1)
+	float	pad01;
+	//Vec3    attenuation			= Vec3::UNIT_VECTOR_ALONG_I_BASIS;      // intensity falloff , attentuation for diffuse light, default (0,0,1)
+	//Vec3    spec_attenuation	= Vec3::UNIT_VECTOR_ALONG_I_BASIS;      // attenuation for specular lighting (constant,linear,quadratic), default (0,0,1)
+	Vec3    spec_attenuation	= Vec3::UNIT_VECTOR_ALONG_K_BASIS;      // attenuation for specular lighting (constant,linear,quadratic), default (0,0,1)
+	float pad02;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
 struct shaderLightDataT
 {
 	Vec4		ambientLight;										// rgb and an intensity
 	lightDataT	lights[ TOTAL_LIGHTS ];
+
+	// all 0 to 1 and help influence the lighting equation
+	float		DIFFUSE_FACTOR		= 1;							// default: 1  - scales diffuse lighting in equation (lower values make an object absorb light
+	float		SPECULAR_FACTOR		= 1;							// default: 1  - scales specular lighting in the equation (higher values create a "shinier" surface)
+	float		SPECULAR_POWER		= 32;							// default: 32 - controls the specular falloff (higher values create a "smoother" looking surface)
+	float		padding00			= 0.f;					
 };
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 typedef unsigned uint;
@@ -195,16 +215,24 @@ public:
 	
 	void SetAmbientIntensity( float intensity );
 
+	// disabling Ambient is the same as doing...  SetAmbient( WHITE, 1.0f ); 
 	void SetAmbientLight( Rgba8 color = WHITE, float intensity = 1.f );
+
 	// Takes in color as RGB8 converted to normalized float4
 	void SetAmbientLight( Vec4 color , float intensity );
-	// disabling Ambient is the same as doing...  SetAmbient( WHITE, 1.0f ); 
 
 	// for now, assume idx is 0, we only have one light
-	void EnableLight( uint idx , lightDataT const& lightInfo );
 	// void EnablePointLight( uint idx, vec3 position, rgba color, float intensity, vec3 attenuation ); 
-	void DisableLight( uint idx );
+	void EnableLight( uint idx , lightDataT const& lightInfo );
+
 	// disabling a light is the same as just saying the light has 0 intensity
+	void DisableLight( uint idx );
+
+	//how much does specular light show up
+	void SetSpecularFactor( float normalizedFactor );
+
+	// Intensity of specular light
+	void SetSpecularPower( float specularPower );
 	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			DRAW METHODS

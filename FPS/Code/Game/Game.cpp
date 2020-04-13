@@ -1,4 +1,4 @@
-#include "Engine/Core/DebugRender.hpp"
+﻿#include "Engine/Core/DebugRender.hpp"
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/VertexUtils.hpp"
@@ -31,16 +31,18 @@ Game::Game()
 	InitializeCameras();
 	intializeGameObjects();
 		
-	m_cubeMeshTransform.SetPosition( 7.f , 0.0f , -10.0f );
-	m_sphereMeshTransform.SetPosition( -7.f , 0.0f , -10.0f );
+	m_cubeMeshTransform.SetPosition( 5.f , 0.0f , -10.0f );
+	m_sphereMeshTransform.SetPosition( -5.f , 0.0f , -10.0f );
 	m_quadTransform.SetPosition( 0.f , 0.0f , -10.0f );
 
-	m_lights.ambientLight = Vec4( 1.f , 1.f , 1.f , 1.f );
+	m_lights.ambientLight = Vec4( 0.f , 0.f , 0.f , 0.f );
 	m_ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
-	m_lights.lights[ 0 ].color = Vec3( 1.f , 0.f , 0.f );
+	m_lights.lights[ 0 ].color = Vec3( 1.f , 1.f , 1.f );
 	//m_lights.lights[ 0 ].intensity = 0.0001f;
-	m_lights.lights[ 0 ].intensity = 0.0f;
-	m_lights.lights[ 0 ].world_position = Vec3( 100.f , 0.f , -5.f );
+	m_lights.lights[ 0 ].intensity = 1.0f;
+	m_lights.lights[ 0 ].world_position = Vec3( 0.f , 0.f , -5.f );
+	m_lights.lights[ 0 ].attenuation = Vec3::UNIT_VECTOR_ALONG_J_BASIS;
+	m_lights.lights[ 0 ].spec_attenuation = Vec3::UNIT_VECTOR_ALONG_K_BASIS;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -133,16 +135,121 @@ void Game::InitializeCameras()
 
 void Game::Update( float deltaSeconds )
 {
-	if ( m_isLightFollowingTheCamera )
-	{
-		m_lights.lights[ m_currentLightIndex ].world_position = m_gameCamera.GetPosition();
-	}
-	
+	DebugDrawUI( deltaSeconds );
+	UpdateLightPosition( deltaSeconds );
+
 	static float y = 0;
 	y += deltaSeconds;
 	m_cubeMeshTransform.SetRotation( 15.f * ( float ) GetCurrentTimeSeconds()/* 0.f*/ ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	m_sphereMeshTransform.SetRotation( 20.f * ( float ) GetCurrentTimeSeconds() /*0.f*/,  50.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	UpdateFromKeyBoard( deltaSeconds );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateLightPosition( float deltaSeconds )
+{
+	if ( m_isLightFollowingTheCamera )
+	{
+		m_lights.lights[ m_currentLightIndex ].world_position = m_gameCamera.GetPosition();
+	}
+
+	Rgba8 lightColor;
+	lightColor.SetColorFromNormalizedFloat( Vec4( m_lights.lights[ 0 ].color , m_lights.lights[ 0 ].intensity ) );
+
+	if ( !m_isLightFollowingTheCamera )
+	{
+		DebugAddWorldPoint( m_lights.lights[ 0 ].world_position , 0.125f , lightColor , deltaSeconds * 0.5f , DEBUG_RENDER_USE_DEPTH );
+	}
+
+	if ( m_isLightAnimated )
+	{
+		m_lights.lights[ 0 ].world_position = Vec3( 0 , 0 , -5 ) + Vec3::MakeFromSpericalCoordinates(
+			45.f * ( float ) GetCurrentTimeSeconds() , 30.f * SinDegrees( ( float ) GetCurrentTimeSeconds() ) , 7.f );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::DebugDrawUI( float deltaSeconds )
+{
+	std::string cureentShaderName;
+
+	switch ( m_currentShaderIndex )
+	{
+	case LitShaderTypes::LIT:
+		cureentShaderName = "LIT SHADER";
+		break;
+
+	case LitShaderTypes::UV:
+		cureentShaderName = "UV SHADER";
+		break;
+
+	case LitShaderTypes::NORMAL:
+		cureentShaderName = "VERTEX NORMAL SHADER";
+		break;
+
+	case LitShaderTypes::TANGENT:
+		cureentShaderName = "VERTEX TANGENT SHADER";
+		break;
+
+	case LitShaderTypes::BITANGENT:
+		cureentShaderName = "VERTEX BITANGENT SHADER";
+		break;
+
+	case LitShaderTypes::SURFACE_NORMAL:
+		cureentShaderName = "SURFACE NORMAL SHADER";
+		break;
+	}
+
+	float leftVerticalAlignment = ( 1080.f * 0.25f ) / 11.f;
+	float normalizedOffset = RangeMapFloat( 0.f , 1080.f , 0.f , 1.f , leftVerticalAlignment );
+
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1.00f ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+		"[ LT-ARRW / RT-ARRW ] : SWITCH SHADERS" );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 1 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+		"CURRENT SHADER = %s" , cureentShaderName.c_str() );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 2 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+		"[ F5 ] = Position Light At Origin" );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 3 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+		"[ F6 ] = Position Light At Current Camera Position" );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 4 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+		"[ F7 ] = Light Follows Camera" );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 5 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+		"[ F9 ] = Light Moves in an fixed Path" );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 6 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+		"[ 9 / 0 ] = Change Ambient Light Intensity (Clamped 0-1)" );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 7 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+		"[ - / + ] = Change Light Intensity (UnClamped)" );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 8 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+		"[ [ / ] ] = Change Specular Factor (Clamped 0-1)" );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 9 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+		"[ U / J ] = Change Specular Power (Clamped 0-INF)" );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 10 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+		"[ T / R / G / Y ] = Change Light Attenuation to ZERO / Constant / Linear / Quadratic" );
+
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1.f ) , Vec2::ONE , 16.f , ORANGE , deltaSeconds ,
+		"Specular Power = %.2f" , m_lights.SPECULAR_POWER );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 1 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE , deltaSeconds ,
+		"Specular Factor = %.2f" , m_lights.SPECULAR_FACTOR );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 2 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE , deltaSeconds ,
+		"Attenuation = ( %.0f , %.0f , %.0f ) " , m_lights.lights[ 0 ].attenuation.x ,
+		m_lights.lights[ 0 ].attenuation.y , m_lights.lights[ 0 ].attenuation.z );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 3 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE , deltaSeconds , "Ambient Light Intensity = %.2f" , m_lights.ambientLight.w );
+
+	Rgba8 ambientLightColor;
+	ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
+
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 4 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE , deltaSeconds , "Ambient Light Color = R(%u) G(%u) B(%u) " , ambientLightColor.r , ambientLightColor.g , ambientLightColor.b );
+
+	Rgba8 debuglightColor;
+	debuglightColor.SetColorFromNormalizedFloat( Vec4( m_lights.lights[ 0 ].color , 1.f ) );
+
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 5 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE ,
+		deltaSeconds , "Light Intensity = %.2f" , m_lights.lights[ 0 ].intensity );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 6 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE ,
+		deltaSeconds , "Light Color = R(%u) G(%u) B(%u) " , debuglightColor.r , debuglightColor.g ,
+		debuglightColor.b );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -158,11 +265,12 @@ void Game::Render() const
 	
 	g_theRenderer->SetCullMode( CULL_BACK );
 	g_theRenderer->SetDepthTest( COMPARE_LEQUAL , true );
-	//lightDataT lightData;
+
 	g_theRenderer->SetAmbientLight( m_ambientLightColor , m_lights.ambientLight.w );
 	g_theRenderer->EnableLight( 0 , m_lights.lights[ 0 ] );
 
-	//g_theRenderer->SetBlendMode( SOLID );
+	g_theRenderer->SetSpecularFactor( m_lights.SPECULAR_FACTOR );
+	g_theRenderer->SetSpecularPower( m_lights.SPECULAR_POWER );
 	
 	g_theRenderer->BindShader( m_currentShader );
 	g_theRenderer->BindTexture( m_tileDiffuse );
@@ -171,13 +279,9 @@ void Game::Render() const
  	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_meshSphere );
 
-	//g_theRenderer->BindShader( m_lightShaders[ NORMAL ] );
  	g_theRenderer->SetModelMatrix( m_quadTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_quadMesh );
-	//g_theRenderer->DrawAABB2( AABB2::ZERO_TO_ONE , WHITE );
-
-	//g_theRenderer->BindShader( m_currentShader );
-	//g_theRenderer->BindTexture( nullptr );
+	
 	g_theRenderer->SetModelMatrix( m_cubeMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
@@ -191,6 +295,8 @@ void Game::Render() const
 	g_theRenderer->DisableLight( 0 );
 	g_theRenderer->EndCamera( m_gameCamera );
 
+	DebugRenderWorldToCamera( &m_gameCamera );
+	DebugRenderScreenTo( nullptr );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -272,51 +378,52 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	//CreateDebugObjectsFromUserInput();
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Game::UpdateLightsFromKeyBoard( float deltaSeconds )
 {
-	if ( g_theInput->WasKeyJustPressed( KEY_F5 ) )
-	{
-		m_isLightFollowingTheCamera = false;
-		m_lights.lights[ m_currentLightIndex ].world_position = Vec3::ZERO;
-	}
+	UpdateLightPositionOnUserInput();
+	UpdateCurrentShaderFromUserInput();
+	UpdateAmbientLightFromUserInput( deltaSeconds );
+	UpdateSpecularLightFromUserInput( deltaSeconds );
+	UpdateLightAttenuationFromUserInput();
+}
 
-	if ( g_theInput->WasKeyJustPressed( KEY_F6 ) )
-	{
-		m_isLightFollowingTheCamera = false;
-		m_lights.lights[ m_currentLightIndex ].world_position = m_gameCamera.GetPosition();
-	}
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-	if ( g_theInput->WasKeyJustPressed( KEY_F7 ) )
-	{
-		m_isLightFollowingTheCamera = true;
-	}
-
+void Game::UpdateCurrentShaderFromUserInput()
+{
 	if ( g_theInput->WasKeyJustPressed( KEY_LEFTARROW ) )
 	{
 		m_currentShaderIndex -= 1;
-		
+
 		if ( m_currentShaderIndex < 0 )
 		{
 			m_currentShaderIndex = LitShaderTypes::TOTAL - 1;
 		}
-		
+
 		m_currentShaderIndex %= LitShaderTypes::TOTAL;
 		m_currentShader = m_lightShaders[ m_currentShaderIndex ];
 	}
-	
+
 	if ( g_theInput->WasKeyJustPressed( KEY_RIGHTARROW ) )
 	{
 		m_currentShaderIndex += 1;
 		m_currentShaderIndex %= LitShaderTypes::TOTAL;
 		m_currentShader = m_lightShaders[ m_currentShaderIndex ];
 	}
+}
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateAmbientLightFromUserInput( float deltaSeconds )
+{
 	if ( g_theInput->IsKeyHeldDown( '9' ) )
 	{
 		m_lights.ambientLight.w -= deltaSeconds;
 		m_lights.ambientLight.w = ClampZeroToOne( m_lights.ambientLight.w );
 	}
-	
+
 	if ( g_theInput->IsKeyHeldDown( '0' ) )
 	{
 		m_lights.ambientLight.w += deltaSeconds;
@@ -326,15 +433,101 @@ void Game::UpdateLightsFromKeyBoard( float deltaSeconds )
 	if ( g_theInput->IsKeyHeldDown( KEY_MINUS ) )
 	{
 		m_lights.lights[ m_currentLightIndex ].intensity -= deltaSeconds;
-		//m_lights.ambientLight.w = ClampZeroToOne( m_lights.ambientLight.w );
+		m_lights.ambientLight.w = ClampZeroToOne( m_lights.ambientLight.w );
 	}
 
 	if ( g_theInput->IsKeyHeldDown( KEY_PLUS ) )
 	{
 		m_lights.lights[ m_currentLightIndex ].intensity += deltaSeconds;
-		//m_lights.ambientLight.w = ClampZeroToOne( m_lights.ambientLight.w );
+		m_lights.ambientLight.w = ClampZeroToOne( m_lights.ambientLight.w );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateSpecularLightFromUserInput( float deltaSeconds )
+{
+	if ( g_theInput->IsKeyHeldDown( 'U' ) )
+	{
+		m_lights.SPECULAR_POWER -= 20.f * deltaSeconds;
+		m_lights.SPECULAR_POWER = Clamp( m_lights.SPECULAR_POWER , 1.f , INFINITY );
+		return;
 	}
 
+	if ( g_theInput->IsKeyHeldDown( 'J' ) )
+	{
+		m_lights.SPECULAR_POWER += 20.f * deltaSeconds;
+		m_lights.SPECULAR_POWER = Clamp( m_lights.SPECULAR_POWER , 1.f , INFINITY );
+		return;
+	}
+
+	if ( g_theInput->IsKeyHeldDown( KEY_LEFT_SQ_BRACKET ) )
+	{
+		m_lights.SPECULAR_FACTOR -= deltaSeconds;
+		m_lights.SPECULAR_FACTOR = ClampZeroToOne( m_lights.SPECULAR_FACTOR );
+	}
+
+	if ( g_theInput->IsKeyHeldDown( KEY_RIGHT_SQ_BRACKET ) )
+	{
+		m_lights.SPECULAR_FACTOR += deltaSeconds;
+		m_lights.SPECULAR_FACTOR = ClampZeroToOne( m_lights.SPECULAR_FACTOR );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateLightAttenuationFromUserInput()
+{
+	if ( g_theInput->WasKeyJustPressed( 'T' ) )
+	{
+		m_lights.lights[ 0 ].attenuation = Vec3::ZERO;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'R' ) )
+	{
+		m_lights.lights[ 0 ].attenuation = Vec3::UNIT_VECTOR_ALONG_I_BASIS;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'G' ) )
+	{
+		m_lights.lights[ 0 ].attenuation = Vec3::UNIT_VECTOR_ALONG_J_BASIS;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'Y' ) )
+	{
+		m_lights.lights[ 0 ].attenuation = Vec3::UNIT_VECTOR_ALONG_K_BASIS;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateLightPositionOnUserInput()
+{
+	if ( g_theInput->WasKeyJustPressed( KEY_F5 ) )
+	{
+		m_isLightFollowingTheCamera = false;
+		m_isLightAnimated = false;
+		m_lights.lights[ m_currentLightIndex ].world_position = Vec3::ZERO;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( KEY_F6 ) )
+	{
+		m_isLightFollowingTheCamera = false;
+		m_isLightAnimated = false;
+		m_lights.lights[ m_currentLightIndex ].world_position = m_gameCamera.GetPosition();
+	}
+
+	if ( g_theInput->WasKeyJustPressed( KEY_F7 ) )
+	{
+		m_isLightFollowingTheCamera = true;
+		m_isLightAnimated = false;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( KEY_F9 ) )
+	{
+		m_isLightFollowingTheCamera = false;
+		m_isLightAnimated = true;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -961,6 +961,24 @@ void RenderContext::DisableLight( uint idx )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void RenderContext::SetSpecularFactor( float normalizedFactor )
+{
+	m_lights.SPECULAR_FACTOR = normalizedFactor;
+	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
+	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::SetSpecularPower( float specularPower )
+{
+	m_lights.SPECULAR_POWER = specularPower;
+	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
+	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void RenderContext::Draw( int numVertexes , int vertexOffset , buffer_attribute_t const* attribs )
 {
 	SetInputLayoutForIA( attribs );

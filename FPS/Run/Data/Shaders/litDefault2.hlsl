@@ -4,6 +4,41 @@
 
 //--------------------------------------------------------------------------------------
 
+float2 ComputeLightFactor( light_t light , float3 world_pos , float3 world_normal , float3 dir_to_eye )
+{
+    float3 vec_to_light = light.world_position - world_pos;
+
+    float dist = length( vec_to_light );
+    float3 dir_to_light = normalize( vec_to_light );
+    float3 att_vec = float3( 1.0f , dist , dist * dist );
+
+    float diff_att = light.intensity / dot( att_vec , light.attenuation );
+    float spec_att = light.intensity / dot( att_vec , light.spec_attenuation );
+    
+   // compute diffuse
+   // max prevents lighting from the "back", which would subtract light
+    float diffuse = max( 0.0f , dot( dir_to_light , world_normal ) );
+   
+
+   // compute specular 
+
+   // phong
+   // vec3 ref_dir_to_light = reflect( -dir_to_light, world_normal );  
+   // float specular = max( 0.0f, dot( ref_dir_to_light, dir_to_eye ) );  
+   
+   // blinn-phong
+    float3 hv = normalize( dir_to_light + dir_to_eye );
+    float specular = max( 0.0f , dot( normalize( world_normal ) , hv ) );
+   // finalize specular
+    specular = SPECULAR_FACTOR * pow( specular , SPECULAR_POWER );
+    //specular = min( 0.f ,  );
+
+   // return resultla
+    return float2( diff_att * diffuse , spec_att * specular );
+}
+
+//--------------------------------------------------------------------------------------
+
 //--------------------------------------------------------------------------------------
 //                      PROGRAMMABLE SHADER STAGES FUNCTIONS
 //--------------------------------------------------------------------------------------
@@ -102,39 +137,88 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
 
 float4 FragmentFunction( v2f_t input ) : SV_Target0
 {
-   // use the uv to sample the texture
-    float4 texture_color = tDiffuse.Sample( sSampler , input.uv );
-    float3 surface_color = ( input.color * texture_color ).xyz; // multiply our tint with our texture color to get our final color; 
-    float surface_alpha = ( input.color.a * texture_color.a );
-
-    float3 diffuse = AMBIENT.xyz * AMBIENT.w; // ambient color * ambient intensity
-
-    float3 tangent = normalize( input.world_tangent.xyz );
-    float3 normal = normalize( input.world_normal );
-    float3 bitangent = normalize( cross( normal , tangent ) ) * input.world_tangent.w;
-    float3x3 TBN = float3x3( tangent , bitangent , normal );
     
-   // get my surface normal - this comes from the vertex format
-   // We now have a NEW vertex format
-    float3 normal_color = tNormal.Sample( sSampler , input.uv );
-    float3 surface_normal = NormalColorToVector3( normal_color ); // (0 to 1) space to (-1, -1, 0),(1, 1, 1) space
-    surface_normal = mul( surface_normal , TBN );
+//--------------------------------------------------------------------------------------
+//              SAMPLE THE TEXTURES
+//--------------------------------------------------------------------------------------    
+    float4   diffuseColor        = tDiffuse.Sample( sSampler , input.uv );
+    float4   normalColor         = tNormal.Sample( sSampler , input.uv );
 
-   // float3 surface_normal = normalize( input.world_normal ); 
-
-   // for each light, we going to add in dot3 factor it
-    float3 light_position = LIGHT.world_position;
-    float3 dir_to_light = normalize( light_position - input.world_position );
-    float dot3 = max( 0.0f , dot( dir_to_light , surface_normal ) );
-
-    diffuse += dot3;
-
-   // just diffuse lighting
-    diffuse = min( float3( 1 , 1 , 1 ) , diffuse );
-    diffuse = saturate( diffuse ); // saturate is clamp01(v)
-    float3 final_color = diffuse * surface_color;
-
+//--------------------------------------------------------------------------------------
+//              COMPUTE SURFACE COLOR
+//--------------------------------------------------------------------------------------
+    
+    float3   surfaceColor        = pow( diffuseColor.xyz , INVERSE_GAMMA.xxx );
+             surfaceColor        = surfaceColor * input.color.xyz;
+    float    alpha               = diffuseColor.w * input.color.w;
+  
+    float3   tangent             = normalize( input.world_tangent.xyz );
+    float3   normal              = normalize( input.world_normal );
+    float3   bitangent           = normalize( cross( normal , tangent ) ) * input.world_tangent.w;
+    float3x3 TBN                 = float3x3( tangent , bitangent , normal );
+    float3   directionToCamera   = normalize( CAMERA_POSITION - input.world_position );                 // As the Camera IS OUR EYE
+    
+    float3   diffuse             = AMBIENT.xyz * AMBIENT.w;
+    float3   surfaceNormal       = NormalColorToVector3( normalColor.xyz );
+    float3   worldNormal         = mul( surfaceNormal , TBN );
+  
+    
+    float3   specular            = float3( 0.0f.xxx );
    
-    return float4( final_color , surface_alpha );
+//--------------------------------------------------------------------------------------
+//              COMPUTE LIGHT FACTOR
+//--------------------------------------------------------------------------------------
+    
+    float3   lightColor          = LIGHTS.color.xyz;
+    float2   lightFactor = ComputeLightFactor( LIGHTS , input.world_position , worldNormal , directionToCamera );
+    
+      
+             diffuse            += lightFactor.x * lightColor;
+             specular           += lightFactor.y * lightColor;
+    
+    
+    // clamp diffuse to max of 1 (can't wash out a surface)
+             diffuse             = min( diffuse , 1.0f );
+    
+    // spec does not get clamped - allowed to "blow out" for HDR purposes
+//           spec               *= spec_color.xyz;
+
+    // compute final color; 
+    float3 finalColor            = diffuse * surfaceColor + specular;
+    //finalColor                   = pow( finalColor.xyz , GAMMA.xxx );
+        
+    return float4( finalColor , alpha );
+    
+//    float3 surface_color = ( input.color * diffuse_color ).xyz; // multiply our tint with our texture color to get our final color; 
+//    float surface_alpha = ( input.color.a * diffuse_color.a );
+//
+//    float3 diffuse = AMBIENT.xyz * AMBIENT.w; // ambient color * ambient intensity
+//    float3 surf_color = pow( diffuse_color.xyz , INVERSE_GAMMA.xxx );
+//    float3 tangent = normalize( input.world_tangent.xyz );
+//    float3 normal = normalize( input.world_normal );
+//    float3 bitangent = normalize( cross( normal , tangent ) ) * input.world_tangent.w;
+//    float3x3 TBN = float3x3( tangent , bitangent , normal );
+//    
+//   // get my surface normal - this comes from the vertex format
+//   // We now have a NEW vertex format
+//    float3 surface_normal = NormalColorToVector3( normal_color ); // (0 to 1) space to (-1, -1, 0),(1, 1, 1) space
+//    surface_normal = mul( surface_normal , TBN );
+//
+//   // float3 surface_normal = normalize( input.world_normal ); 
+//
+//   // for each light, we going to add in dot3 factor it
+//    float3 light_position = LIGHT.world_position;
+//    float3 dir_to_light = normalize( light_position - input.world_position );
+//    float dot3 = max( 0.0f , dot( dir_to_light , surface_normal ) );
+//
+//    diffuse += dot3;
+//
+//   // just diffuse lighting
+//    diffuse = min( float3( 1 , 1 , 1 ) , diffuse );
+//    diffuse = saturate( diffuse ); // saturate is clamp01(v)
+//    float3 final_color = diffuse * surface_color;
+//
+//   
+//    return float4( final_color , surface_alpha );
 }
 //--------------------------------------------------------------------------------------

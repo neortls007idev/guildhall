@@ -24,8 +24,11 @@ enum eCameraClearBitFlag : unsigned int
 
 struct CameraDataT
 {
-	Mat44 cameraToClipTransform;
-	Mat44 view;
+	Mat44	cameraToClipTransform;
+	Mat44	view;
+
+	Vec3	position;
+	float	padding00;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
