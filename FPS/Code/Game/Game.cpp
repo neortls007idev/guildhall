@@ -63,6 +63,7 @@ Game::Game()
 void Game::LoadShaders()
 {
 	m_lightShaders[ LitShaderTypes::LIT ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/litDefault2.hlsl" );
+	m_lightShaders[ LitShaderTypes::UNLIT ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/default.hlsl" );
 	m_lightShaders[ LitShaderTypes::UV ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/uvDebugger.hlsl" );
 	m_lightShaders[ LitShaderTypes::NORMAL ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/normalLit.hlsl" );
 	m_lightShaders[ LitShaderTypes::TANGENT ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/tangentLit.hlsl" );
@@ -191,29 +192,33 @@ void Game::DebugDrawUI( float deltaSeconds )
 
 	switch ( m_currentShaderIndex )
 	{
-	case LitShaderTypes::LIT:
-		cureentShaderName = "LIT SHADER";
+		case LitShaderTypes::LIT:
+			cureentShaderName = "LIT SHADER";
+			break;
+
+		case LitShaderTypes::UNLIT:
+		cureentShaderName = "UNLIT SHADER";
 		break;
 
-	case LitShaderTypes::UV:
-		cureentShaderName = "UV SHADER";
-		break;
+		case LitShaderTypes::UV:
+			cureentShaderName = "UV SHADER";
+			break;
 
-	case LitShaderTypes::NORMAL:
-		cureentShaderName = "VERTEX NORMAL SHADER";
-		break;
+		case LitShaderTypes::NORMAL:
+			cureentShaderName = "VERTEX NORMAL SHADER";
+			break;
 
-	case LitShaderTypes::TANGENT:
-		cureentShaderName = "VERTEX TANGENT SHADER";
-		break;
+		case LitShaderTypes::TANGENT:
+			cureentShaderName = "VERTEX TANGENT SHADER";
+			break;
 
-	case LitShaderTypes::BITANGENT:
-		cureentShaderName = "VERTEX BITANGENT SHADER";
-		break;
+		case LitShaderTypes::BITANGENT:
+			cureentShaderName = "VERTEX BITANGENT SHADER";
+			break;
 
-	case LitShaderTypes::SURFACE_NORMAL:
-		cureentShaderName = "SURFACE NORMAL SHADER";
-		break;
+		case LitShaderTypes::SURFACE_NORMAL:
+			cureentShaderName = "SURFACE NORMAL SHADER";
+			break;
 	}
 
 	float leftVerticalAlignment = ( 1080.f * 0.25f ) / 11.f;

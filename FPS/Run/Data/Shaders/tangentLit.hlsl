@@ -14,22 +14,22 @@
 
 v2f_t VertexFunction(vs_input_t input)
 {
-    v2f_t v2f = ( v2f_t ) 0;
+    v2f_t v2f = (v2f_t) 0;
 
    // move the vertex through the spaces
     float4 local_pos        = float4( input.position , 1.0f );                                  // passed in position is usually inferred to be "local position", ie, local to the object
     float4 world_pos        = mul( MODEL , local_pos );                                         // world pos is the object moved to its place int he world by the model, not used yet
-    float4 camera_pos       = mul( VIEW , world_pos );
-    float4 clip_pos         = mul( PROJECTION , camera_pos );
+    float4 camera_pos       = mul( VIEW , world_pos );                                          
+    float4 clip_pos         = mul( PROJECTION , camera_pos );                                   
                                                                                                 
    // normal is currently in model/local space                                                  
-    float4 local_normal     = float4( input.normal , 0.0f );
-    float4 world_normal     = mul( MODEL , local_normal );
+    float4 local_normal     = float4( input.normal , 0.0f );                                    
+    float4 world_normal     = mul( MODEL , local_normal );                                      
                                                                                                 
    // tangent & bitangent                                                                       
                                                                                                 
-    float4 local_tangent    = float4( input.tangent.xyz , 0.0f );
-    float4 world_tangent    = mul( MODEL , local_tangent );
+    float4 local_tangent    = float4( input.tangent.xyz , 0.0f );                               
+    float4 world_tangent    = mul( MODEL , local_tangent );                                     
                                                                                                 
     v2f.position            = clip_pos;                                                         // we want to output the clip position to raster (a perspective point)
     v2f.color               = input.color * TINT;
@@ -49,10 +49,12 @@ v2f_t VertexFunction(vs_input_t input)
 // is being drawn to the first bound color target.
 //--------------------------------------------------------------------------------------
 
-float4 FragmentFunction( v2f_t input ) : SV_Target0
+//--------------------------------------------------------------------------------------
+
+float4 FragmentFunction(v2f_t input) : SV_Target0
 {
-    float3 tangent      = normalize( input.world_tangent.xyz );
-    float4 tangentColor = ConvertNormalizedVector3ToColor( tangent );
+    float3 tangent          = normalize( input.world_tangent.xyz );   
+    float4 tangentColor   = ConvertNormalizedVector3ToColor( tangent );
     return tangentColor;
 }
 
