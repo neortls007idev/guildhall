@@ -48,7 +48,7 @@ Game::Game()
 	m_sphereMeshTransform.SetPosition( -5.f , 0.0f , -10.0f );
 	m_quadTransform.SetPosition( 0.f , 0.0f , -10.0f );
 
-	m_lights.ambientLight = Vec4( 1.f , 1.f , 1.f , 1.f );
+	m_lights.ambientLight = Vec4( 1.f , 1.f , 1.f , 0.f );
 	m_ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
 	m_lights.lights[ 0 ].color = Vec3( 1.f , 1.f , 1.f );
 	//m_lights.lights[ 0 ].intensity = 0.0001f;
@@ -63,6 +63,7 @@ Game::Game()
 void Game::LoadShaders()
 {
 	m_lightShaders[ LitShaderTypes::LIT ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/litDefault2.hlsl" );
+	m_lightShaders[ LitShaderTypes::UNLIT ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/default.hlsl" );
 	m_lightShaders[ LitShaderTypes::UV ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/uvDebugger.hlsl" );
 	m_lightShaders[ LitShaderTypes::NORMAL ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/normalLit.hlsl" );
 	m_lightShaders[ LitShaderTypes::TANGENT ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/tangentLit.hlsl" );
@@ -154,7 +155,7 @@ void Game::Update( float deltaSeconds )
 
 	static float y = 0;
 	y += deltaSeconds;
-	m_cubeMeshTransform.SetRotation( 15.f * ( float ) GetCurrentTimeSeconds()/* 0.f*/ ,  20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
+	m_cubeMeshTransform.SetRotation( -15.f * ( float ) GetCurrentTimeSeconds()/* 0.f*/ ,  -20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	m_sphereMeshTransform.SetRotation( 20.f * ( float ) GetCurrentTimeSeconds() /*0.f*/,  50.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	UpdateFromKeyBoard( deltaSeconds );
 }
@@ -191,29 +192,33 @@ void Game::DebugDrawUI( float deltaSeconds )
 
 	switch ( m_currentShaderIndex )
 	{
-	case LitShaderTypes::LIT:
-		cureentShaderName = "LIT SHADER";
+		case LitShaderTypes::LIT:
+			cureentShaderName = "LIT SHADER";
+			break;
+
+		case LitShaderTypes::UNLIT:
+		cureentShaderName = "UNLIT SHADER";
 		break;
 
-	case LitShaderTypes::UV:
-		cureentShaderName = "UV SHADER";
-		break;
+		case LitShaderTypes::UV:
+			cureentShaderName = "UV SHADER";
+			break;
 
-	case LitShaderTypes::NORMAL:
-		cureentShaderName = "VERTEX NORMAL SHADER";
-		break;
+		case LitShaderTypes::NORMAL:
+			cureentShaderName = "VERTEX NORMAL SHADER";
+			break;
 
-	case LitShaderTypes::TANGENT:
-		cureentShaderName = "VERTEX TANGENT SHADER";
-		break;
+		case LitShaderTypes::TANGENT:
+			cureentShaderName = "VERTEX TANGENT SHADER";
+			break;
 
-	case LitShaderTypes::BITANGENT:
-		cureentShaderName = "VERTEX BITANGENT SHADER";
-		break;
+		case LitShaderTypes::BITANGENT:
+			cureentShaderName = "VERTEX BITANGENT SHADER";
+			break;
 
-	case LitShaderTypes::SURFACE_NORMAL:
-		cureentShaderName = "SURFACE NORMAL SHADER";
-		break;
+		case LitShaderTypes::SURFACE_NORMAL:
+			cureentShaderName = "SURFACE NORMAL SHADER";
+			break;
 	}
 
 	float leftVerticalAlignment = ( 1080.f * 0.25f ) / 11.f;
@@ -238,7 +243,7 @@ void Game::DebugDrawUI( float deltaSeconds )
 	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 8 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
 		"[ [ / ] ] = Change Specular Factor (Clamped 0-1)" );
 	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 9 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
-		"[ U / J ] = Change Specular Power (Clamped 0-INF)" );
+		"[ U / J ] = Change Specular Power (Clamped 1-INF)" );
 	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 10 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
 		"[ T / R / G / Y ] = Change Light Attenuation to ZERO / Constant / Linear / Quadratic" );
 
@@ -365,15 +370,15 @@ void Game::AddLightDevConsoleCommands( DevConsole* devConsole )
 	devConsole->CreateCommand( "ChangeLightColor" , "Ex - ChangeLightColor idx = 0 |color = 255 , 255 , 255 , 255" , consoleArgs );
 	g_theEventSystem->SubscribeToEvent( "ChangeLightColor" , ChangeLightColorViaConsole );
 
-	devConsole->CreateCommand( "ChangeAmbientLightColor" ,
-	                           "Update Color of Ambient Light .Ex - ChangeAmbientLightColor color = 255 , 255 , 255 , 255" ,
-	                           consoleArgs );
-	g_theEventSystem->SubscribeToEvent( "ChangeAmbientLightColor" , ChangeAmbientLightColorViaConsole );
-
 	devConsole->CreateCommand( "ChangeLightAttenuation" ,
 		"Update Light Attenuation of Ambient Light .Ex - ChangeLightAttenuation idx = 0 |attenuation = 1.f , 0.f , 2.3f" ,
 		consoleArgs );
 	g_theEventSystem->SubscribeToEvent( "ChangeLightAttenuation" , ChangeLightAttenuationViaConsole );
+
+	devConsole->CreateCommand( "ChangeAmbientLightColor" ,
+	                           "Update Color of Ambient Light .Ex - ChangeAmbientLightColor color = 255 , 255 , 255 , 255" ,
+	                           consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "ChangeAmbientLightColor" , ChangeAmbientLightColorViaConsole );
 
 	devConsole->CreateCommand( "ChangeAmbientLightIntensity" ,
 		"Update Intensity of Ambient Light .Ex -  ChangeAmbientLightIntensity intensity = 0.3f" ,

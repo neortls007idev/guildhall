@@ -17,6 +17,7 @@ class GPUMesh;
 enum LitShaderTypes
 {
 	LIT,
+	UNLIT,
 	UV,
 	NORMAL,
 	TANGENT,

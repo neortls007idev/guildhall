@@ -250,7 +250,7 @@ void DebugRenderWorldToCamera( Camera* cam )
 	g_currentManager->RenderObjectsUseDepth( g_currentManager->m_debugRenderWorldObjectsUseDepth ,g_debugCamera , eBlendMode::SOLID );
 	g_currentManager->RenderObjectsXRAY( g_currentManager->m_debugRenderWorldObjectsXRay , g_debugCamera , eBlendMode::SOLID );
 	g_currentManager->RenderObjectsAlways( g_currentManager->m_debugRenderWorldObjectsAlways , g_debugCamera , eBlendMode::SOLID );
-	g_currentManager->RenderObjectsAlways( g_currentManager->m_debugRenderScreenObjects		, g_debugCamera , eBlendMode::ALPHA );
+	//g_currentManager->RenderObjectsAlways( g_currentManager->m_debugRenderScreenObjects		, g_debugCamera , eBlendMode::ALPHA );
 
 	//g_debugRenderContext->DrawVertexArray( vertices );
 	//g_debugRenderContext->EndCamera( *cam );
