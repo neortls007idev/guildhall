@@ -56,6 +56,12 @@ public:
 
 private:
 
+	void AddLightDevConsoleCommands( DevConsole* devConsole );
+	static bool ChangeLightColorViaConsole( EventArgs& args );
+	static bool ChangeLightAttenuationViaConsole( EventArgs& args );
+	static bool ChangeAmbientLightColorViaConsole( EventArgs& args );
+	static bool ChangeAmbientLightIntensityViaConsole( EventArgs& args );
+	
 	void UpdateFromKeyBoard( float deltaSeconds );
 
 	void UpdateLightsFromKeyBoard( float deltaSeconds );
@@ -102,8 +108,8 @@ public:
 	Shader* 			m_currentShader;
 	int					m_currentShaderIndex;
 	
-	shaderLightDataT	m_lights;
-	Rgba8				m_ambientLightColor;
+	static shaderLightDataT	m_lights;
+	static Rgba8			m_ambientLightColor;
 	bool				m_isLightFollowingTheCamera = false;
 	bool				m_isLightAnimated			= false;
 	uint				m_currentLightIndex			= 0;

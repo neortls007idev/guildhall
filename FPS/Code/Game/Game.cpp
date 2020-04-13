@@ -19,10 +19,23 @@ extern RenderContext*	g_theRenderer;
 extern TheApp*			g_theApp;
 extern DevConsole*		g_theDevConsole;
 
+static  bool			s_areDevconsoleCommandsLoaded = false;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC shaderLightDataT Game::m_lights;
+STATIC Rgba8 Game::m_ambientLightColor;
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Game::Game()
 {
+	if ( !s_areDevconsoleCommandsLoaded )
+	{
+		AddLightDevConsoleCommands( g_theDevConsole );
+		s_areDevconsoleCommandsLoaded = true;
+	}
+	
 	LoadShaders();
 
 	m_tileDiffuse	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/tile_diffuse.png" );
@@ -35,7 +48,7 @@ Game::Game()
 	m_sphereMeshTransform.SetPosition( -5.f , 0.0f , -10.0f );
 	m_quadTransform.SetPosition( 0.f , 0.0f , -10.0f );
 
-	m_lights.ambientLight = Vec4( 0.f , 0.f , 0.f , 0.f );
+	m_lights.ambientLight = Vec4( 1.f , 1.f , 1.f , 1.f );
 	m_ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
 	m_lights.lights[ 0 ].color = Vec3( 1.f , 1.f , 1.f );
 	//m_lights.lights[ 0 ].intensity = 0.0001f;
@@ -135,6 +148,7 @@ void Game::InitializeCameras()
 
 void Game::Update( float deltaSeconds )
 {
+	m_ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
 	DebugDrawUI( deltaSeconds );
 	UpdateLightPosition( deltaSeconds );
 
@@ -268,7 +282,7 @@ void Game::Render() const
 
 	g_theRenderer->SetAmbientLight( m_ambientLightColor , m_lights.ambientLight.w );
 	g_theRenderer->EnableLight( 0 , m_lights.lights[ 0 ] );
-
+	
 	g_theRenderer->SetSpecularFactor( m_lights.SPECULAR_FACTOR );
 	g_theRenderer->SetSpecularPower( m_lights.SPECULAR_POWER );
 	
@@ -341,6 +355,77 @@ void Game::GarbageDeletion()
 void Game::Die()
 {
 
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::AddLightDevConsoleCommands( DevConsole* devConsole )
+{
+	EventArgs consoleArgs;
+	devConsole->CreateCommand( "ChangeLightColor" , "Ex - ChangeLightColor idx = 0 |color = 255 , 255 , 255 , 255" , consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "ChangeLightColor" , ChangeLightColorViaConsole );
+
+	devConsole->CreateCommand( "ChangeAmbientLightColor" ,
+	                           "Update Color of Ambient Light .Ex - ChangeAmbientLightColor color = 255 , 255 , 255 , 255" ,
+	                           consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "ChangeAmbientLightColor" , ChangeAmbientLightColorViaConsole );
+
+	devConsole->CreateCommand( "ChangeLightAttenuation" ,
+		"Update Light Attenuation of Ambient Light .Ex - ChangeLightAttenuation idx = 0 |attenuation = 1.f , 0.f , 2.3f" ,
+		consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "ChangeLightAttenuation" , ChangeLightAttenuationViaConsole );
+
+	devConsole->CreateCommand( "ChangeAmbientLightIntensity" ,
+		"Update Intensity of Ambient Light .Ex -  ChangeAmbientLightIntensity intensity = 0.3f" ,
+		consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "ChangeAmbientLightIntensity" , ChangeAmbientLightIntensityViaConsole );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC bool Game::ChangeLightColorViaConsole( EventArgs& args )
+{
+	int		lightIndex		= args.GetValue( "idx " , 0 );
+	Rgba8	color			= args.GetValue( "color " , WHITE );
+	Vec4	normalizedColor = color.GetAsNormalizedFloat4();
+			lightIndex	   %= TOTAL_LIGHTS;
+			m_lights.lights[ lightIndex ].color = Vec3( normalizedColor.x , normalizedColor.y , normalizedColor.z );
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC bool Game::ChangeLightAttenuationViaConsole( EventArgs& args )
+{
+	int		lightIndex	= args.GetValue( "idx " , 0 );
+	Vec3	attenuation = args.GetValue( "attenuation " , Vec3::UNIT_VECTOR_ALONG_J_BASIS );
+			lightIndex %= TOTAL_LIGHTS;
+			m_lights.lights[ lightIndex ].attenuation = attenuation;
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC bool Game::ChangeAmbientLightColorViaConsole( EventArgs& args )
+{
+	Rgba8	color			= args.GetValue( "color " , WHITE );
+	Vec4	normalizedColor = color.GetAsNormalizedFloat4();
+
+	m_lights.ambientLight	= Vec4( normalizedColor.x , normalizedColor.y , normalizedColor.z , m_lights.ambientLight.w );
+	m_ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC bool Game::ChangeAmbientLightIntensityViaConsole( EventArgs& args )
+{
+	float	intensity		= args.GetValue( "intensity " , 1.f );
+			intensity		= ClampZeroToOne(intensity);
+	m_lights.ambientLight.w = intensity;
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
