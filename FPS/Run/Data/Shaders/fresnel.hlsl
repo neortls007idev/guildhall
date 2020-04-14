@@ -60,15 +60,10 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
     float3 normal_color     = tNormal.Sample( sSampler , input.uv );
     float3 surface_normal   = NormalColorToVector3( normal_color );
     float3 world_normal     = mul( surface_normal , TBN );
-    //float3 world_normal = mul( TBN , surface_normal  );
-    
+        
     float3 directionToSurface = normalize( input.world_position - CAMERA_POSITION );
-    float dp = length( cross( directionToSurface , world_normal ) );
-    float factor = pow( dp , 1.f * 16.0f + 15 * sin( SYSTEM_TIME ) );
-    
-    //return float4( directionToSurface.xxx , 1.0f );
-    //return float4( dp.xxx , 1.0f );
-    //return float4( factor.xxx , 1.f );
+    float dp                = length( cross( directionToSurface , world_normal ) );
+    float factor            = pow( dp , 1.f * 16.0f + 15 * sin( SYSTEM_TIME ) );
     
     return float4( 0.f , 1.f , 0.f , factor );
 }
