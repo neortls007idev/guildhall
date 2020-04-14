@@ -23,6 +23,7 @@ enum LitShaderTypes
 	TANGENT,
 	BITANGENT,
 	SURFACE_NORMAL,
+	FRESNEL,
 	TOTAL,
 };
 
@@ -33,90 +34,96 @@ class Game
 
 public:
 
-	Game();
+			Game();
 
-	void LoadShaders();
-	void InitializeCameras();
-	void intializeGameObjects();
+			void LoadShaders();
+			void InitializeCameras();
+			void intializeGameObjects();
 
-	~Game();
+			~Game();
 
-	void Update( float deltaSeconds );
-	void DebugDrawUI( float deltaSeconds );
-	void UpdateLightPosition( float deltaSeconds );
+			void Update( float deltaSeconds );
+			void DebugDrawUI( float deltaSeconds );
+			void UpdateLightPosition( float deltaSeconds );
+NOT_IN_USE	void UpdateCamera();
 	
-	void Render() const;
-	void UpdateCamera();
-	void RenderUI() const;
-	
-	void AddScreenShakeIntensity( float deltaShakeIntensity );
+			void Render() const;
+			void RenderFresnelShader2ndPass() const;
+NOT_IN_USE	void RenderUI() const;
+			
+NOT_IN_USE	void AddScreenShakeIntensity( float deltaShakeIntensity );
 
-	void GarbageCollection();
-	void GarbageDeletion();
-	void Die();
+NOT_IN_USE	void GarbageCollection();
+NOT_IN_USE	void GarbageDeletion();
+NOT_IN_USE	void Die();
 
 private:
 
-	void AddLightDevConsoleCommands( DevConsole* devConsole );
-	static bool ChangeLightColorViaConsole( EventArgs& args );
-	static bool ChangeLightAttenuationViaConsole( EventArgs& args );
-	static bool ChangeAmbientLightColorViaConsole( EventArgs& args );
-	static bool ChangeAmbientLightIntensityViaConsole( EventArgs& args );
-	
-	void UpdateFromKeyBoard( float deltaSeconds );
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//				DEVCONSOLE COMMANDS
+//--------------------------------------------------------------------------------------------------------------------------------------------
+			void AddLightDevConsoleCommands( DevConsole* devConsole );
+	static	bool ChangeLightColorViaConsole( EventArgs& args );
+	static	bool ChangeLightAttenuationViaConsole( EventArgs& args );
+	static	bool ChangeAmbientLightColorViaConsole( EventArgs& args );
+	static	bool ChangeAmbientLightIntensityViaConsole( EventArgs& args );
 
-	void UpdateLightsFromKeyBoard( float deltaSeconds );
-	void UpdateCurrentShaderFromUserInput();
-	void UpdateAmbientLightFromUserInput( float deltaSeconds );
-	void UpdateSpecularLightFromUserInput( float deltaSeconds );
-	void UpdateLightAttenuationFromUserInput();
-	void UpdateLightPositionOnUserInput();
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//				METHODS TO HANDLE USER INPUT
+//--------------------------------------------------------------------------------------------------------------------------------------------
+			void UpdateFromKeyBoard( float deltaSeconds );
 
-	void CreateDebugObjectsFromUserInput();
-	void DebugLineStripDrawModeTest();
-	void CameraPositionUpdateOnInput( float deltaSeconds );
+			void UpdateLightsFromKeyBoard( float deltaSeconds );
+			void UpdateCurrentShaderFromUserInput();
+			void UpdateAmbientLightFromUserInput( float deltaSeconds );
+			void UpdateSpecularLightFromUserInput( float deltaSeconds );
+			void UpdateLightAttenuationFromUserInput();
+			void UpdateLightPositionOnUserInput();
+
+NOT_IN_USE	void CreateDebugObjectsFromUserInput();
+NOT_IN_USE	void DebugLineStripDrawModeTest();
+			void CameraPositionUpdateOnInput( float deltaSeconds );
 
 private:
 
-	int					m_controllerID			= -1;
-	float				m_screenShakeIntensity	= 0.f;
+	int							m_controllerID			= -1;
+	float						m_screenShakeIntensity	= 0.f;
 
 public:
 
-	AABB2				m_normalImage;
-	AABB2				m_invertedColorImage;
-	GPUMesh*			m_cubeMesh;
-	GPUMesh*			m_meshSphere;
-	GPUMesh*			m_quadMesh;
-	Transform			m_cubeMeshTransform;
-	Transform			m_sphereMeshTransform;
-	Transform			m_quadTransform;
-	Texture*			m_meshTex_D					= nullptr;
-	Texture*			m_meshTex_N					= nullptr;
-	Texture*			m_tileDiffuse				= nullptr;
-	Texture*			m_tileNormal				= nullptr;
+	GPUMesh*					m_cubeMesh;
+	GPUMesh*					m_meshSphere;
+	GPUMesh*					m_quadMesh;
+	Transform					m_cubeMeshTransform;
+	Transform					m_sphereMeshTransform;
+	Transform					m_quadTransform;
+	Texture*					m_meshTex_D											= nullptr;
+	Texture*					m_meshTex_N											= nullptr;
+	Texture*					m_tileDiffuse										= nullptr;
+	Texture*					m_tileNormal										= nullptr;
 
-	uint				m_hCuts						= 32;		// slices
-	uint				m_vCuts						= 16;		// stacks
+	uint						m_hCuts												= 32;		// slices
+	uint						m_vCuts												= 16;		// stacks
 
-	mutable Camera		m_gameCamera;
-	Camera				m_uiCamera;
+	mutable Camera				m_gameCamera;
+	Camera						m_uiCamera;
 
-	Vec3				m_cameraPosition			= Vec3::ZERO;
-	Vec3				m_cameraRotation			= Vec3::ZERO;
+	Vec3						m_cameraPosition									= Vec3::ZERO;
+	Vec3						m_cameraRotation									= Vec3::ZERO;
 	
-	Shader*				m_lightShaders[ LitShaderTypes::TOTAL ];
-	Shader* 			m_currentShader;
-	int					m_currentShaderIndex;
+	Shader*						m_lightShaders[ LitShaderTypes::TOTAL ];
+	Shader* 					m_currentShader;
+	int							m_currentShaderIndex;
+	bool						m_isFresnelShaderActive = false;
 	
-	static shaderLightDataT	m_lights;
-	static Rgba8			m_ambientLightColor;
-	bool				m_isLightFollowingTheCamera = false;
-	bool				m_isLightAnimated			= false;
-	uint				m_currentLightIndex			= 0;
-
-	bool				m_lineStripMode				= false;
-	std::vector<Vec3>	m_lineStripPoints;
-	eDebugRenderMode	m_debugRenderMode			= DEBUG_RENDER_ALWAYS;
+	static shaderLightDataT		m_lights;
+	static Rgba8				m_ambientLightColor;
+	bool						m_isLightFollowingTheCamera							= false;
+	bool						m_isLightAnimated									= false;
+	uint						m_currentLightIndex									= 0;
+																					
+	bool						m_lineStripMode										= false;
+	std::vector<Vec3>			m_lineStripPoints;									
+	eDebugRenderMode			m_debugRenderMode									= DEBUG_RENDER_ALWAYS;
 	
 };

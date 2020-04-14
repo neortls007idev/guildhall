@@ -18,7 +18,8 @@ typedef unsigned char	uchar;
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 #define UNUSED(x) (void)(x);
-#define STATIC // DO NOTHING JUST A PLACEHOLDER STATIC KEYWORD TO IDENTIFY STATIC TYPES IN CPPS
+#define STATIC									// DO NOTHING JUST A PLACEHOLDER STATIC KEYWORD TO IDENTIFY STATIC TYPES IN CPPS
+#define NOT_IN_USE								// DO NOTHING JUST A PLACEHOLDER TO IDENTIFY METHODS/VARIABLES NOT IN USE 
 #define BIT_FLAG( b ) ( 1 << ( b ) )
 #define BREAKPOINT( x ) int myBreakpoint ## x; \ UNUSED( myBreakPoint ## x );
 #define SAFE_RELEASE_POINTER( ptr ) if ( nullptr != ptr ) { delete ptr; ptr = nullptr; }

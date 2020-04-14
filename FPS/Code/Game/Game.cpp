@@ -69,6 +69,7 @@ void Game::LoadShaders()
 	m_lightShaders[ LitShaderTypes::TANGENT ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/tangentLit.hlsl" );
 	m_lightShaders[ LitShaderTypes::BITANGENT ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/bitangentLit.hlsl" );
 	m_lightShaders[ LitShaderTypes::SURFACE_NORMAL ]			= g_theRenderer->GetOrCreateShader( "Data/Shaders/surfaceNormalLit.hlsl" );
+	m_lightShaders[ LitShaderTypes::FRESNEL ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/fresnel.hlsl" );
 
 	m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
 	m_currentShaderIndex = LitShaderTypes::LIT;
@@ -219,6 +220,9 @@ void Game::DebugDrawUI( float deltaSeconds )
 		case LitShaderTypes::SURFACE_NORMAL:
 			cureentShaderName = "SURFACE NORMAL SHADER";
 			break;
+		
+		case LitShaderTypes::FRESNEL:
+			cureentShaderName = "FRESNEL SHADER";
 	}
 
 	float leftVerticalAlignment = ( 1080.f * 0.25f ) / 11.f;
@@ -303,7 +307,9 @@ void Game::Render() const
 	
 	g_theRenderer->SetModelMatrix( m_cubeMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_cubeMesh );
-
+	
+	if ( m_isFresnelShaderActive )													{	RenderFresnelShader2ndPass();	}
+	
 	g_theRenderer->SetRasterState( FILL_SOLID );
 
 	g_theRenderer->BindShader( nullptr );
@@ -320,11 +326,28 @@ void Game::Render() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Game::RenderFresnelShader2ndPass() const
+{
+	g_theRenderer->BindShader( m_lightShaders[ LitShaderTypes::FRESNEL ] );
+	g_theRenderer->SetBlendMode( ALPHA );
+
+	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
+	g_theRenderer->DrawMesh( m_meshSphere );
+
+	g_theRenderer->SetModelMatrix( m_quadTransform.GetAsMatrix() );
+	g_theRenderer->DrawMesh( m_quadMesh );
+
+	g_theRenderer->SetModelMatrix( m_cubeMeshTransform.GetAsMatrix() );
+	g_theRenderer->DrawMesh( m_cubeMesh );
+	g_theRenderer->SetBlendMode( SOLID );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Game::RenderUI() const
 {
 
 }
-
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -494,6 +517,16 @@ void Game::UpdateCurrentShaderFromUserInput()
 
 		m_currentShaderIndex %= LitShaderTypes::TOTAL;
 		m_currentShader = m_lightShaders[ m_currentShaderIndex ];
+
+		if ( LitShaderTypes::FRESNEL == m_currentShaderIndex )
+		{
+			m_isFresnelShaderActive = true;
+			m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
+		}
+		else
+		{
+			m_isFresnelShaderActive = false;
+		}
 	}
 
 	if ( g_theInput->WasKeyJustPressed( KEY_RIGHTARROW ) )
@@ -501,6 +534,16 @@ void Game::UpdateCurrentShaderFromUserInput()
 		m_currentShaderIndex += 1;
 		m_currentShaderIndex %= LitShaderTypes::TOTAL;
 		m_currentShader = m_lightShaders[ m_currentShaderIndex ];
+
+		if ( LitShaderTypes::FRESNEL == m_currentShaderIndex )
+		{
+			m_isFresnelShaderActive = true;
+			m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
+		}
+		else
+		{
+			m_isFresnelShaderActive = false;
+		}
 	}
 }
 
