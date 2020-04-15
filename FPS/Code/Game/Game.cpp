@@ -71,6 +71,8 @@ void Game::LoadShaders()
 	m_lightShaders[ LitShaderTypes::BITANGENT ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/bitangentLit.hlsl" );
 	m_lightShaders[ LitShaderTypes::SURFACE_NORMAL ]			= g_theRenderer->GetOrCreateShader( "Data/Shaders/surfaceNormalLit.hlsl" );
 	m_lightShaders[ LitShaderTypes::FRESNEL ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/fresnel.hlsl" );
+	m_lightShaders[ LitShaderTypes::TRIPLANAR_UNLIT ]			= g_theRenderer->GetOrCreateShader( "Data/Shaders/triplanarUnlit.hlsl" );
+	m_lightShaders[ LitShaderTypes::TRIPLANAR_LIT ]				= g_theRenderer->GetOrCreateShader( "Data/Shaders/triplanarLit.hlsl" );
 
 	m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
 	m_currentShaderIndex = LitShaderTypes::LIT;
@@ -236,6 +238,15 @@ void Game::DebugDrawUI( float deltaSeconds )
 		
 		case LitShaderTypes::FRESNEL:
 			cureentShaderName = "FRESNEL SHADER";
+			break;
+		
+		case LitShaderTypes::TRIPLANAR_LIT:
+			cureentShaderName = "TRIPLANAR LIT SHADER";
+			break;
+		
+		case LitShaderTypes::TRIPLANAR_UNLIT:
+			cureentShaderName = "TRIPLANAR UNLIT SHADER";
+			break;
 	}
 
 	float leftVerticalAlignment = ( 1080.f * 0.25f ) / 11.f;
@@ -312,7 +323,7 @@ void Game::Render() const
 	g_theRenderer->BindTexture( m_tileDiffuse );
 	g_theRenderer->BindTexture( m_tileNormal , eTextureType::TEX_NORMAL );
 
-	g_theRenderer->BindShader( g_theRenderer->GetOrCreateShader( "Data/Shaders/triplanar.hlsl" ) );
+	//g_theRenderer->BindShader( g_theRenderer->GetOrCreateShader( "Data/Shaders/triplanar.hlsl" ) );
 	g_theRenderer->BindTexture( m_triplanarShaderTextures[ 0 ] , eTextureType::TEX_USER_TYPE , 0 );
 	g_theRenderer->BindTexture( m_triplanarShaderTextures[ 1 ] , eTextureType::TEX_USER_TYPE , 1 );
 	g_theRenderer->BindTexture( m_triplanarShaderTextures[ 2 ] , eTextureType::TEX_USER_TYPE , 2 );
