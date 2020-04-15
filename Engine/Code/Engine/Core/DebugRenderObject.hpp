@@ -4,12 +4,11 @@
 #include "Engine/Math/Vec4.hpp"
 #include "Engine/Primitives/AABB2.hpp"
 #include "Engine/Primitives/AABB3.hpp"
+#include "Engine/Primitives/Polygon2D.hpp"
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Renderer/D3D11Utils.hpp"
 
 #include <vector>
-
-#include "Engine/Primitives/Polygon2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -74,7 +73,7 @@ struct DebugRenderObject
 	//DebugRenderObjects();
 public:
 	DebugRenderObject( eDebugRenderObjectType type , eDebugRenderMode mode , float duration , bool isBillboarded = false );
-	~DebugRenderObject() {};
+	virtual ~DebugRenderObject();
 
 	virtual void Update();
 	virtual void UpdateColor() = 0;
@@ -99,7 +98,7 @@ struct DRO_point2D : public DebugRenderObject
 {
 public:
 	DRO_point2D( Vec2 pos , float size , Rgba8 startColor , Rgba8 endColor, float duration , bool isBillboarded = false );
-
+		
 	void UpdateColor() override;
 	
 public:
@@ -121,7 +120,7 @@ public:
 		Rgba8 endPosStartColor , Rgba8 endPosEndColor , float duration = 0.f , float thickness = 1.f );
 
 	DRO_line2D( Vec2 startPos , Vec2 endPos , Rgba8 color , float duration = 0.0f , float thickness = 1.f );
-
+	
 	void UpdateColor() override;
 
 public:

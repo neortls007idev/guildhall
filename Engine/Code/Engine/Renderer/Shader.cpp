@@ -379,7 +379,7 @@ ID3D11InputLayout* Shader::GetOrCreateInputLayout( buffer_attribute_t const* att
 		m_vertexStage.GetByteCode() , m_vertexStage.GetByteCodeLength() ,
 		&m_inputLayout );
 	SetDebugName( m_inputLayout , &m_user );																		// describe the Vertex PCU
-	//delete vertexDescription;
+	delete[] vertexDescription;
 	return m_inputLayout;
 }
 

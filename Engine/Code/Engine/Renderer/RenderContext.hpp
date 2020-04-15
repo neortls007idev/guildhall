@@ -72,6 +72,7 @@ enum eTextureType
 	TEX_NORMAL		= 1 ,
 	TEX_ALBEDO		= 2 ,
 	TEX_SPECULAR	= 3 ,
+	TEX_USER_TYPE	= 8 ,
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -140,52 +141,51 @@ public:
 	RenderContext() {};
 	~RenderContext();
 
-	void		Startup( Window* window );
-	void		BeginFrame();
-	void		UpdateFrameTime( float deltaSeconds );
-	void		EndFrame();
-	void		Shutdown();
+	void					Startup( Window* window );
+	void					BeginFrame();
+	void					UpdateFrameTime( float deltaSeconds );
+	void					EndFrame();
+	void					Shutdown();
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			CAMERA METHODS
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	
-	void		ClearScreen( const Rgba8& clearColor );											// Clear Color
-	void		ClearColor( Texture* colorTarget , Rgba8 color );								// TODO :- IMPLEMENT ME
-	void		ClearDepth( Texture* depthStencilTextureTarget , float depth );					// TODO :- TEST ME
-	void		SetDepthTest( eCompareOp compare  = COMPARE_LESS , bool writeOnPass = true );						
-	Texture*	GetFrameColorTarget();															// TODO :- IMPLEMENT ME
+	void					ClearScreen( const Rgba8& clearColor );											// Clear Color
+	void					ClearColor( Texture* colorTarget , Rgba8 color );								// TODO :- IMPLEMENT ME
+	void					ClearDepth( Texture* depthStencilTextureTarget , float depth );					
+	void					SetDepthTest( eCompareOp compare  = COMPARE_LESS , bool writeOnPass = true );						
+	Texture*				GetFrameColorTarget();															// TODO :- IMPLEMENT ME
 	
-	void		BeginCamera( const Camera& camera );
-	void		EndCamera( const Camera& camera);
+	void					BeginCamera( const Camera& camera );
+	void					EndCamera( const Camera& camera);
 
-	void		SetModelMatrix( Mat44 modelmat , Rgba8 color = WHITE );
+	void					SetModelMatrix( Mat44 modelmat , Rgba8 color = WHITE );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			D3D11 DEBUG MODULE 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-	void		CreateDebugModule();
-	void		DestroyDebugModule();
-	void		ReportLiveObjects();
-
+	void					CreateDebugModule();
+	void					DestroyDebugModule();
+	void					ReportLiveObjects();
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			RENDERING PIPELINE BINDING METHODS
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	
-	void		SetBlendMode( eBlendMode blendMode );
-	void		SetRasterState( eRasterStateFillMode rasterState );
-	void		SetTransientRasterStateAsRasterState();
+	void					SetBlendMode( eBlendMode blendMode );
+	void					SetRasterState( eRasterStateFillMode rasterState );
+	void					SetTransientRasterStateAsRasterState();
 	
-	void		BindTexture( const Texture* constTexture , UINT textureType = eTextureType::TEX_DIFFUSE );
-	bool		BindShader( Shader* shader );
-	void		BindShader( std::string shaderFileName );
-	void		BindVertexBuffer( VertexBuffer* vbo );
-	void		BindIndexBuffer( IndexBuffer* ibo );
-	void		BindUniformBuffer( unsigned int slot , RenderBuffer* ubo ); // UBO - uniform buffer object
-	void		BindSampler( const Sampler* sampler );
-	void		BindDepthStencil( Texture* depthStencilView );
+	void					BindTexture( const Texture* constTexture , UINT textureType = eTextureType::TEX_DIFFUSE , UINT userTextureIndexOffset = 0 );
+	bool					BindShader( Shader* shader );
+	void					BindShader( std::string shaderFileName );
+	void					BindVertexBuffer( VertexBuffer* vbo );
+	void					BindIndexBuffer( IndexBuffer* ibo );
+	void					BindUniformBuffer( unsigned int slot , RenderBuffer* ubo ); // UBO - uniform buffer object
+	void					BindSampler( const Sampler* sampler );
+	void					BindDepthStencil( Texture* depthStencilView );
 	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			RENDERING PIPELINE CREATION METHODS
@@ -322,7 +322,6 @@ public:
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	
-
 private:
 
 	void SetInputLayoutForIA( buffer_attribute_t const* attribs );
@@ -339,35 +338,36 @@ private:
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 public:
-	ID3D11Device*						m_device								= nullptr ;
-	ID3D11DeviceContext*				m_context								= nullptr ; // Immediate context
-	SwapChain*							m_swapChain								= nullptr;
-	ID3D11DepthStencilState*			m_currentDepthStencilState				= nullptr;
+	ID3D11Device*						m_device												= nullptr ;
+	ID3D11DeviceContext*				m_context												= nullptr ;					// Immediate context
+	SwapChain*							m_swapChain												= nullptr;
+	ID3D11DepthStencilState*			m_currentDepthStencilState								= nullptr;
 
-	Camera*								m_currentCamera							= nullptr;
+	Camera*								m_currentCamera											= nullptr;
 
-	void*								m_debugModule							= nullptr;
-	IDXGIDebug*							m_debug									= nullptr;
+	void*								m_debugModule											= nullptr;
+	IDXGIDebug*							m_debug													= nullptr;
 
-	Shader*								m_defaultShader							= nullptr;
-	Shader*								m_currentShader							= nullptr;
-	VertexBuffer*						m_immediateVBO							= nullptr;
-	//IndexBuffer*						m_immediateIBO							= nullptr;
-	GPUMesh*							m_immediateMesh							= nullptr;
-	ID3D11Buffer*						m_lastBoundVBO							= nullptr;
-	ID3D11Buffer*						m_lastBoundIBO							= nullptr;
-	Texture*							m_textureTarget							= nullptr;
+	Shader*								m_defaultShader											= nullptr;
+	Shader*								m_currentShader											= nullptr;
+	VertexBuffer*						m_immediateVBO											= nullptr;
+	//IndexBuffer*						m_immediateIBO											= nullptr;
+	GPUMesh*							m_immediateMesh											= nullptr;
+	ID3D11Buffer*						m_lastBoundVBO											= nullptr;
+	ID3D11Buffer*						m_lastBoundIBO											= nullptr;
+	Texture*							m_textureTarget											= nullptr;
 
 	ID3D11BlendState*					m_blendStates[eBlendMode::TOTAL_BLEND_MODES];
 	ID3D11RasterizerState*				m_rasterStates[eBlendMode::TOTAL_BLEND_MODES];
 	ID3D11RasterizerState*				m_currentRasterState;
 	ID3D11RasterizerState*				m_transientRaterState;
 
-	RenderBuffer*						m_frameUBO								= nullptr;
-	RenderBuffer*						m_modelMatrixUBO						= nullptr;
-	RenderBuffer*						m_lightDataUBO							= nullptr;
-	Sampler*							m_defaultSampler						= nullptr;
-	Texture*							m_textureDefault						= nullptr;
+	RenderBuffer*						m_frameUBO												= nullptr;
+	RenderBuffer*						m_modelMatrixUBO										= nullptr;
+	RenderBuffer*						m_lightDataUBO											= nullptr;
+	RenderBuffer*						m_materialDataUBO										= nullptr;
+	Sampler*							m_defaultSampler										= nullptr;
+	Texture*							m_textureDefault										= nullptr;
 	shaderLightDataT					m_lights;
 
 private:

@@ -24,6 +24,14 @@ DebugRenderObject::DebugRenderObject( eDebugRenderObjectType type , eDebugRender
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+DebugRenderObject::~DebugRenderObject()
+{
+	delete m_timer;
+	m_timer = nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void DebugRenderObject::Update()
 {	
 	UpdateColor();

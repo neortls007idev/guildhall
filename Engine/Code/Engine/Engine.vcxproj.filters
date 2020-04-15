@@ -313,6 +313,9 @@
     <ClCompile Include="Core\VertexUtils.cpp">
       <Filter>Core\Vertex</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\Material.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -590,6 +593,9 @@
     </ClInclude>
     <ClInclude Include="Core\VertexUtils.hpp">
       <Filter>Core\Vertex</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Material.hpp">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
