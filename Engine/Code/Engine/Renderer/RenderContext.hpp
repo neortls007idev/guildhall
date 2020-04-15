@@ -40,7 +40,7 @@ struct	ID3D11DepthStencilState;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-constexpr uint TOTAL_LIGHTS = 1;
+constexpr uint TOTAL_LIGHTS = 8;
 //float GAMMA = 2.2f;
 //float INVERSE_GAMMA = 1 / GAMMA;
 
@@ -58,10 +58,11 @@ enum eBlendMode
 
 enum eBufferSlot
 {
-	UBO_FRAME_SLOT	= 0,
-	UBO_CAMERA_SLOT = 1,
-	UBO_MODEL_SLOT	= 2,
-	UBO_LIGHT_SLOT	= 3,
+	UBO_FRAME_SLOT			= 0,
+	UBO_CAMERA_SLOT			= 1,
+	UBO_MODEL_SLOT			= 2,
+	UBO_LIGHT_SLOT			= 3,
+	UBO_MATERIAL_SLOT		= 4,
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -184,6 +185,7 @@ public:
 	void					BindVertexBuffer( VertexBuffer* vbo );
 	void					BindIndexBuffer( IndexBuffer* ibo );
 	void					BindUniformBuffer( unsigned int slot , RenderBuffer* ubo ); // UBO - uniform buffer object
+	void					BindMaterialData( void* pointerToData , int sizeOfData ); 
 	void					BindSampler( const Sampler* sampler );
 	void					BindDepthStencil( Texture* depthStencilView );
 	
@@ -324,7 +326,7 @@ public:
 	
 private:
 
-	void SetInputLayoutForIA( buffer_attribute_t const* attribs );
+	void		SetInputLayoutForIA( buffer_attribute_t const* attribs );
 	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			RENDERING PIPELINE CREATION METHODS ( TO BE ACCESSED BY THE RENDERER ONLY )

@@ -7,6 +7,8 @@
 // changed in-between draw calls on the CPU
 //--------------------------------------------------------------------------------------
 
+static const uint TOTAL_LIGHTS = 8;
+
 //--------------------------------------------------------------------------------------
 // buffer holding time information from our game
 //--------------------------------------------------------------------------------------
@@ -67,7 +69,7 @@ struct light_t
 cbuffer light_constants : register( b3 )                                                    // constant buffer slot 3
 {
     float4          AMBIENT;
-    light_t         LIGHTS;
+    light_t         LIGHTS[TOTAL_LIGHTS];
     
      // all 0 to 1 and help influence the lighting equation
     float           DIFFUSE_FACTOR;                                                         // default: 1  - scales diffuse lighting in equation (lower values make an object absorb light

@@ -57,6 +57,11 @@ Game::Game()
 	m_lights.lights[ 0 ].world_position = Vec3( 0.f , 0.f , -5.f );
 	m_lights.lights[ 0 ].attenuation = Vec3::UNIT_VECTOR_ALONG_J_BASIS;
 	m_lights.lights[ 0 ].spec_attenuation = Vec3::UNIT_VECTOR_ALONG_K_BASIS;
+
+	m_dissolveShaderData.startColor			= CYAN.GetAsNormalizedFloat3();
+	m_dissolveShaderData.burnEdgeWidth		= 1.f;
+	m_dissolveShaderData.endColor			= ORANGE.GetAsNormalizedFloat3();
+	m_dissolveShaderData.burnValue			= 0.f;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -70,6 +75,7 @@ void Game::LoadShaders()
 	m_lightShaders[ LitShaderTypes::TANGENT ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/tangentLit.hlsl" );
 	m_lightShaders[ LitShaderTypes::BITANGENT ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/bitangentLit.hlsl" );
 	m_lightShaders[ LitShaderTypes::SURFACE_NORMAL ]			= g_theRenderer->GetOrCreateShader( "Data/Shaders/surfaceNormalLit.hlsl" );
+	m_lightShaders[ LitShaderTypes::DISSOLVE ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/dissolve.hlsl" );
 	m_lightShaders[ LitShaderTypes::FRESNEL ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/fresnel.hlsl" );
 	m_lightShaders[ LitShaderTypes::TRIPLANAR_UNLIT ]			= g_theRenderer->GetOrCreateShader( "Data/Shaders/triplanarUnlit.hlsl" );
 	m_lightShaders[ LitShaderTypes::TRIPLANAR_LIT ]				= g_theRenderer->GetOrCreateShader( "Data/Shaders/triplanarLit.hlsl" );
@@ -82,6 +88,8 @@ void Game::LoadShaders()
 
 void Game::LoadTextures()
 {
+	m_dissolveShaderPatternTextures[0] = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/noise.png" );
+	
 	m_triplanarShaderTextures[ 0 ] = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/rockT6/rock_06_diff_1k.png" );
 	m_triplanarShaderTextures[ 1 ] = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/rockT6/rock_06_nor_1k.png" );
 	m_triplanarShaderTextures[ 2 ] = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/grass/aerial_grass_rock_diff_1k.png" );
@@ -235,6 +243,9 @@ void Game::DebugDrawUI( float deltaSeconds )
 		case LitShaderTypes::SURFACE_NORMAL:
 			cureentShaderName = "SURFACE NORMAL SHADER";
 			break;
+		case LitShaderTypes::DISSOLVE:
+			cureentShaderName = "DISSOLVE LIT SHADER";
+			break;
 		
 		case LitShaderTypes::FRESNEL:
 			cureentShaderName = "FRESNEL SHADER";
@@ -324,12 +335,22 @@ void Game::Render() const
 	g_theRenderer->BindTexture( m_tileNormal , eTextureType::TEX_NORMAL );
 
 	//g_theRenderer->BindShader( g_theRenderer->GetOrCreateShader( "Data/Shaders/triplanar.hlsl" ) );
-	g_theRenderer->BindTexture( m_triplanarShaderTextures[ 0 ] , eTextureType::TEX_USER_TYPE , 0 );
-	g_theRenderer->BindTexture( m_triplanarShaderTextures[ 1 ] , eTextureType::TEX_USER_TYPE , 1 );
-	g_theRenderer->BindTexture( m_triplanarShaderTextures[ 2 ] , eTextureType::TEX_USER_TYPE , 2 );
-	g_theRenderer->BindTexture( m_triplanarShaderTextures[ 3 ] , eTextureType::TEX_USER_TYPE , 3 );
-	g_theRenderer->BindTexture( m_triplanarShaderTextures[ 4 ] , eTextureType::TEX_USER_TYPE , 4 );
-	g_theRenderer->BindTexture( m_triplanarShaderTextures[ 5 ] , eTextureType::TEX_USER_TYPE , 5 );
+
+	if (  LitShaderTypes::TRIPLANAR_LIT == m_currentShaderIndex || LitShaderTypes::TRIPLANAR_UNLIT == m_currentShaderIndex )
+	{
+		g_theRenderer->BindTexture( m_triplanarShaderTextures[ 0 ] , eTextureType::TEX_USER_TYPE , 0 );
+		g_theRenderer->BindTexture( m_triplanarShaderTextures[ 1 ] , eTextureType::TEX_USER_TYPE , 1 );
+		g_theRenderer->BindTexture( m_triplanarShaderTextures[ 2 ] , eTextureType::TEX_USER_TYPE , 2 );
+		g_theRenderer->BindTexture( m_triplanarShaderTextures[ 3 ] , eTextureType::TEX_USER_TYPE , 3 );
+		g_theRenderer->BindTexture( m_triplanarShaderTextures[ 4 ] , eTextureType::TEX_USER_TYPE , 4 );
+		g_theRenderer->BindTexture( m_triplanarShaderTextures[ 5 ] , eTextureType::TEX_USER_TYPE , 5 );
+	}
+
+	if ( LitShaderTypes::DISSOLVE )
+	{
+		g_theRenderer->BindTexture( m_dissolveShaderPatternTextures[ m_currentDissolveShaderPatternIndex ] , eTextureType::TEX_USER_TYPE , 0 );
+		g_theRenderer->BindMaterialData( ( void* ) &m_dissolveShaderData , sizeof( m_dissolveShaderData ) );
+	}
 	
  	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_meshSphere );
@@ -362,6 +383,7 @@ void Game::Render() const
 void Game::RenderFresnelShader2ndPass() const
 {
 	g_theRenderer->BindShader( m_lightShaders[ LitShaderTypes::FRESNEL ] );
+	g_theRenderer->BindMaterialData( ( void* ) &m_fresnelShaderData , sizeof( m_fresnelShaderData ) );
 	g_theRenderer->SetBlendMode( ALPHA );
 
 	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
@@ -498,6 +520,36 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 		return;
 	}
 	//DebugLineStripDrawModeTest();
+
+
+	if ( g_theInput->IsKeyHeldDown( 'C' ) )
+	{
+		m_dissolveShaderData.burnEdgeWidth -= deltaSeconds;
+		//m_dissolveShaderData.burnEdgeWidth = ClampZeroToOne( m_dissolveShaderData.burnEdgeWidth );
+		m_dissolveShaderData.burnEdgeWidth = Clamp( m_dissolveShaderData.burnEdgeWidth , 0.f , ( 1 + 2 * m_dissolveShaderData.burnValue ) );
+	}
+
+	if ( g_theInput->IsKeyHeldDown( 'V' ) )
+	{
+		m_dissolveShaderData.burnEdgeWidth += deltaSeconds;
+		//m_dissolveShaderData.burnEdgeWidth = ClampZeroToOne( m_dissolveShaderData.burnEdgeWidth );
+		m_dissolveShaderData.burnEdgeWidth = Clamp( m_dissolveShaderData.burnEdgeWidth , 0.f , ( 1 + 2 * m_dissolveShaderData.burnValue ) );
+	}
+	
+	if ( g_theInput->IsKeyHeldDown( 'Z' ) )
+	{
+		m_dissolveShaderData.burnValue -= deltaSeconds;
+//		m_dissolveShaderData.burnValue = Clamp( m_dissolveShaderData.burnValue , 0.f , ( 1 + 2 * m_dissolveShaderData.burnEdgeWidth ) );
+		m_dissolveShaderData.burnValue  = ClampZeroToOne( m_dissolveShaderData.burnValue );
+	}
+
+	if ( g_theInput->IsKeyHeldDown( 'X' ) )
+	{
+		m_dissolveShaderData.burnValue += deltaSeconds;
+//		m_dissolveShaderData.burnValue = Clamp( m_dissolveShaderData.burnValue , 0.f , ( 1 + 2 * m_dissolveShaderData.burnEdgeWidth ) );
+		m_dissolveShaderData.burnValue  = ClampZeroToOne( m_dissolveShaderData.burnValue );
+	}
+	
 	CameraPositionUpdateOnInput( deltaSeconds );
 	UpdateLightsFromKeyBoard( deltaSeconds );
 	

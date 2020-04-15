@@ -40,36 +40,28 @@ float2 ComputeLightFactor( light_t light , float3 worldPosition , float3 worldNo
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-float3 ComputeLightingAt( float3 world_pos , float3 world_normal ,
-   float3 surf_color , float3 emsv_color , float spec_factor )
+float3 ComputeLightingAt( float3 worldPos , float3 worldNormal , float3 surfaceColor , float3 emmisiveColor , float specularFactor )
 {
-    float3 dir_to_eye = normalize( CAMERA_POSITION - world_pos );
+    float3 directionToEye           = normalize( CAMERA_POSITION - worldPos );
 
-    float3 diffuse = pow( AMBIENT.xyz * AMBIENT.w , GAMMA.xxx ); // assumes ambient is set from a user - so sRGB space
-    float3 spec = float3( 0.0f.xxx );
+    float3 diffuse                  = pow( AMBIENT.xyz * AMBIENT.w , GAMMA.xxx );                                       // assumes ambient is set from a user - so sRGB space
+    float3 specular                 = float3( 0.0f.xxx );
 
    // add up contribution of all lights
-//    for( uint i = 0 ; i < MAX_LIGHTS ; ++i )
-//    {
-//        float3 light_color = LIGHTS[ i ].color.xyz;
-//        light_color = pow( light_color , GAMMA.xxx ); // assumes light color is set by a user - so sRGB space
-//        float3 light_factors = ComputeLightFactor( LIGHTS[ i ] , world_pos , world_normal , dir_to_eye );
-//      
-//        diffuse += light_factors.x * light_color;
-//        spec += light_factors.y * light_color;
-//    }
-
-    float3 light_color = LIGHTS.color.xyz;
-    light_color = pow( light_color , GAMMA.xxx ); // assumes light color is set by a user - so sRGB space
-    float2 light_factors = ComputeLightFactor( LIGHTS , world_pos , world_normal , dir_to_eye );
+    for( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
+    {
+        float3 lightColor           = LIGHTS[ index ].color.xyz;
+        lightColor                  = pow( lightColor , GAMMA.xxx );                                                    // assumes light color is set by a user - so sRGB space
+        float2 lightFactors         = ComputeLightFactor( LIGHTS[ index ] , worldPos , worldNormal , directionToEye );
       
-    diffuse += light_factors.x * light_color;
-    spec += light_factors.y * light_color;
+        diffuse                    += lightFactors.x * lightColor;
+        specular                   += lightFactors.y * lightColor;
+    }
     
    // limit it
-    diffuse = min( DIFFUSE_FACTOR * diffuse , float3( 1.0f.xxx ) );
-    spec *= spec_factor; // scale back specular based on spec factor
+    diffuse                         = min( DIFFUSE_FACTOR * diffuse , float3( 1.0f.xxx ) );
+    specular                       *= specularFactor;                                                                   // scale back specular based on spec factor
 
    // returns light color (in linear space)
-    return diffuse * surf_color + spec + emsv_color;
+    return diffuse * surfaceColor + specular + emmisiveColor;
 }

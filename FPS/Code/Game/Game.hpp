@@ -23,10 +23,43 @@ enum LitShaderTypes
 	TANGENT,
 	BITANGENT,
 	SURFACE_NORMAL,
+	DISSOLVE,
 	FRESNEL,
 	TRIPLANAR_UNLIT,
 	TRIPLANAR_LIT,
 	TOTAL,
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct fresnelData_t
+{
+	Vec3	fresnelColor	= Vec3::UNIT_VECTOR_ALONG_J_BASIS;
+	float	fresnelPower	= 1.f; 
+
+	Vec3	padding00		= Vec3::ZERO; 
+	float	fresnelfactor	= 1.f; 
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct dissolveData_t
+{
+	Vec3	startColor;
+	float	burnEdgeWidth;
+
+	Vec3	endColor;
+	float	burnValue;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct fogData_t
+{
+	float	nearFog;
+	float	farFog;
+	Rgba8	nearFogColor	= WHITE;
+	Rgba8	farFogColor		= WHITE;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -92,6 +125,9 @@ private:
 	int							m_controllerID			= -1;
 	float						m_screenShakeIntensity	= 0.f;
 
+	fresnelData_t				m_fresnelShaderData;
+	dissolveData_t				m_dissolveShaderData;
+
 public:
 
 	GPUMesh*					m_cubeMesh;
@@ -118,6 +154,8 @@ public:
 	Shader* 					m_currentShader;
 	int							m_currentShaderIndex;
 	bool						m_isFresnelShaderActive								= false;
+	Texture*					m_dissolveShaderPatternTextures[ 3 ];
+	int							m_currentDissolveShaderPatternIndex					= 0;
 	Texture*					m_triplanarShaderTextures[ 6 ];
 	
 	static shaderLightDataT		m_lights;

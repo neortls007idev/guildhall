@@ -4,6 +4,15 @@
 
 //--------------------------------------------------------------------------------------
 
+cbuffer material_constants : register( b4 )                                                     // constant buffer slot 5
+{                                                                                               
+    float3 FRESNEL_COLOR;                                                                       
+    float  FRESNEL_POWER;
+    
+    float3 pad00;
+    float  FRESNEL_FACTOR;
+};
+
 //--------------------------------------------------------------------------------------
 //                      PROGRAMMABLE SHADER STAGES FUNCTIONS
 //--------------------------------------------------------------------------------------
@@ -11,6 +20,7 @@
 // VERTEX SHADER
 //
 //--------------------------------------------------------------------------------------
+
 
 v2f_t VertexFunction(vs_input_t input)
 {
@@ -63,9 +73,9 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
         
     float3 directionToSurface = normalize( input.world_position - CAMERA_POSITION );
     float dp                = length( cross( directionToSurface , world_normal ) );
-    float factor            = pow( dp , 1.f * 16.0f + 15 * sin( SYSTEM_TIME ) );
+    float factor            = FRESNEL_FACTOR * pow( dp , FRESNEL_POWER * 16.0f + 15 * sin( SYSTEM_TIME ) );
     
-    return float4( 0.f , 1.f , 0.f , factor );
+    return float4( FRESNEL_COLOR , factor );
 }
 
 //--------------------------------------------------------------------------------------
