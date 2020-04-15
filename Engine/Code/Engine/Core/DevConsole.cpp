@@ -368,8 +368,8 @@ void DevConsole::RenderPhoenixAnimation( RenderContext& renderer , const Camera&
 {
 	UNUSED( camera );
 	Texture* texture						= renderer.GetOrCreateTextureFromFile( "Data/DevConsole/devconsolePhoenixSpriteSheet4.png" );
-	SpriteSheet* spriteSheet				= new SpriteSheet( *texture , IntVec2( 5 , 8 ) );
-	SpriteAnimDefinition anim				= SpriteAnimDefinition( *spriteSheet , 0 , 39 , m_phoenixAnimationDuration , SpriteAnimPlaybackType::LOOP );
+	SpriteSheet spriteSheet( *texture , IntVec2( 5 , 8 ) );
+	SpriteAnimDefinition anim				= SpriteAnimDefinition( spriteSheet , 0 , 39 , m_phoenixAnimationDuration , SpriteAnimPlaybackType::LOOP );
 	const SpriteDefinition& devConsoleAnim	= anim.GetSpriteDefAtTime( m_currentPhoenixAnimFrame );
 	Vec2 uvMins;
 	Vec2 uvMaxs;
@@ -391,8 +391,8 @@ void DevConsole::RenderCatAnimation( RenderContext& renderer , const Camera& cam
 {
 	UNUSED( camera );
 	Texture* texture						= renderer.GetOrCreateTextureFromFile( "Data/DevConsole/GamerCatHFlippedSpriteSheet2.png" );
-	SpriteSheet* spriteSheet				= new SpriteSheet( *texture , IntVec2( 3 , 11 ) );
-	SpriteAnimDefinition anim				= SpriteAnimDefinition( *spriteSheet , 0 , 32 , m_catAnimationDuration , SpriteAnimPlaybackType::LOOP );
+	SpriteSheet spriteSheet( *texture , IntVec2( 3 , 11 ) );
+	SpriteAnimDefinition anim				= SpriteAnimDefinition( spriteSheet , 0 , 32 , m_catAnimationDuration , SpriteAnimPlaybackType::LOOP );
 	const SpriteDefinition& devConsoleAnim	= anim.GetSpriteDefAtTime( m_currentCatAnimFrame );
 	Vec2 uvMins;
 	Vec2 uvMaxs;

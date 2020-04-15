@@ -74,7 +74,7 @@ struct DebugRenderObject
 	//DebugRenderObjects();
 public:
 	DebugRenderObject( eDebugRenderObjectType type , eDebugRenderMode mode , float duration , bool isBillboarded = false );
-	~DebugRenderObject() {};
+	virtual ~DebugRenderObject() {};
 
 	virtual void Update();
 	virtual void UpdateColor() = 0;
