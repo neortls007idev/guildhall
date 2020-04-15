@@ -291,21 +291,7 @@ void DebugAddWorldPoint( Vec3 pos , float size , Rgba8 color , float duration /*
 	DRO_point3D* obj = new DRO_point3D( pos , size , color , duration , mode );
 	obj->m_transform.SetPosition( pos );
 
-	switch ( mode )
-	{
-	case DEBUG_RENDER_ALWAYS:
-									g_currentManager->m_debugRenderWorldObjectsAlways.push_back( obj );
-									break;
-	case DEBUG_RENDER_USE_DEPTH:
-									g_currentManager->m_debugRenderWorldObjectsUseDepth.push_back( obj );
-									break;
-	case DEBUG_RENDER_XRAY:
-									g_currentManager->m_debugRenderWorldObjectsUseDepth.push_back( obj );
-									break;
-	default:
-		break;
-	}
-	
+	g_currentManager->AddDebugObjectTo( WORLDSPACE , obj );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
