@@ -37,6 +37,7 @@ public:
 			Game();
 
 			void LoadShaders();
+			void LoadTextures();
 			void InitializeCameras();
 			void intializeGameObjects();
 
@@ -114,7 +115,8 @@ public:
 	Shader*						m_lightShaders[ LitShaderTypes::TOTAL ];
 	Shader* 					m_currentShader;
 	int							m_currentShaderIndex;
-	bool						m_isFresnelShaderActive = false;
+	bool						m_isFresnelShaderActive								= false;
+	Texture*					m_triplanarShaderTextures[ 6 ];
 	
 	static shaderLightDataT		m_lights;
 	static Rgba8				m_ambientLightColor;

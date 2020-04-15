@@ -641,20 +641,20 @@ Texture* RenderContext::GetOrCreateTextureFromFile( const char* imageFilePath )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::BindTexture( const Texture* constTexture , UINT textureType /*= eTextureType::DIFFUSE*/ )
+void RenderContext::BindTexture( const Texture* constTexture , UINT textureType /*= eTextureType::DIFFUSE*/ , UINT userTextureIndexOffset /*= 0*/ )
 {
 	if ( nullptr == constTexture )
 	{
 		TextureView* shaderResourceView = m_textureDefault->GetOrCreateShaderResourceView();
 		ID3D11ShaderResourceView* shaderResourceViewHandle = shaderResourceView->GetSRVHandle();
-		m_context->PSSetShaderResources( textureType , 1 , &shaderResourceViewHandle );
+		m_context->PSSetShaderResources( textureType + userTextureIndexOffset , 1 , &shaderResourceViewHandle );
 		return;
 	}
 
 	Texture* texture = const_cast< Texture* >( constTexture );
 	TextureView* shaderResourceView =  texture->GetOrCreateShaderResourceView();
 	ID3D11ShaderResourceView* shaderResourceViewHandle = shaderResourceView->GetSRVHandle();
-	m_context->PSSetShaderResources( textureType , 1 , &shaderResourceViewHandle );
+	m_context->PSSetShaderResources( textureType + userTextureIndexOffset , 1 , &shaderResourceViewHandle );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
