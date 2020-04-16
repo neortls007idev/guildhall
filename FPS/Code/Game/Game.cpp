@@ -81,10 +81,10 @@ void Game::InitializeShaderMaterialData()
 	m_dissolveShaderData.burnValue				= 0.f;
 
 	m_fogShaderData.nearFog						= 0.f;
-	m_fogShaderData.farFog						= 25.f;
+	m_fogShaderData.farFog						= 100.f;
 	
 	m_fogShaderData.nearFogColor				= GRAY.GetAsNormalizedFloat3();
-	m_fogShaderData.fogFarColor					= WHITE.GetAsNormalizedFloat3();
+	m_fogShaderData.fogFarColor					= /*WHITE.GetAsNormalizedFloat3();*/ Rgba8( 37 , 70 , 87 , 127 ).GetAsNormalizedFloat3();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

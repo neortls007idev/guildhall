@@ -1,19 +1,8 @@
 #include "ShaderMathUtils.hlsl"
-#include "LightMathUtils.hlsl"
+#include "ConstantBuffers.hlsl"
 #include "defaultLitStageStructs.hlsl"
 
 //--------------------------------------------------------------------------------------
-
-cbuffer material_constants : register( b4 )                                                     // constant buffer slot 5
-{                                                                                               
-    float3 burnStartColor;
-    float  burnEdgeWidth;
-    
-    float3 burnEndColor;
-    float  burnAmount;
-};
-
-Texture2D<float4> tDissolvePattern : register( t8 );
 
 //--------------------------------------------------------------------------------------
 //                      PROGRAMMABLE SHADER STAGES FUNCTIONS
@@ -22,11 +11,13 @@ Texture2D<float4> tDissolvePattern : register( t8 );
 // VERTEX SHADER
 //
 //--------------------------------------------------------------------------------------
+Texture2D<float4> tProjection : register( t8 );
 
+// PROJECTION_MATRIX -> VIEW * PROJECTION -> WORLD TO CLIP
 
 v2f_t VertexFunction(vs_input_t input)
 {
-    v2f_t v2f = (v2f_t) 0;                                                                      
+    v2f_t v2f = (v2f_t) 0;
 
    // move the vertex through the spaces
     float4 local_pos        = float4( input.position , 1.0f );                                  // passed in position is usually inferred to be "local position", ie, local to the object
@@ -63,51 +54,33 @@ v2f_t VertexFunction(vs_input_t input)
 
 float4 FragmentFunction(v2f_t input) : SV_Target0
 {
-            
-//--------------------------------------------------------------------------------------
-//              SAMPLE THE TEXTURES
-//--------------------------------------------------------------------------------------    
+    float4  clipPos                 = float4( input.world_position , 1.0f ) * PROJECTION_MATRIX;
+    float   localZ                  = clipPos.w;
+    float3  ndc                     = clipPos.xyz / localZ;
+    float2  UVs                     = ( ndc.xy + float2( 1.0f ) ) * 0.5f;
     
-    float4 diffuseColor            = tDiffuse.Sample( sSampler , input.uv );
-    float4 normalColor             = tNormal.Sample( sSampler , input.uv );    
-    float burnValue                = tDissolvePattern.Sample( sSampler , input.uv ).x;
+    float   uBlend                  = step( 0 , UVs.x ) + ( 1.0f - step( 1.0f , UVs.x ) );
+    float   vBlend                  = step( 0 , UVs.y ) + ( 1.0f - step( 1.0f , UVs.y ) );
+    float   Blend                   = uBlend * vBlend;
+     
+    float4  texColor                = tProjection.Sample( sSampler , UVs );
     
-    float burnMin                  = lerp( -burnEdgeWidth , 1.0f , burnAmount );
-    float burnMax                  = burnMin + burnEdgeWidth;
+    float4  finalColor              = lerp( 0.0f.xxxx , texColor , Blend );
     
-   // if( burnValue < burnMin )
-   // {
-   //     discard;                                                                                // like an exit - short circuits the pixel completely
-   // }
-
-    clip( burnValue - burnMin );
     
-    float  burnMix                 = smoothstep( burnMin , burnMax , burnValue );
-    float3 burnColor               = lerp( burnStartColor , burnEndColor , burnMix );
-
-    float3 tangent                 = normalize( input.world_tangent.xyz );
-    float3 normal                  = normalize( input.world_normal );    
-    float3 bitangent               = normalize( cross( normal , tangent ) ) * input.world_tangent.w;
-    float3x3 TBN                   = float3x3( tangent, bitangent, normal );
-
-    float3 surfaceColor            = pow( diffuseColor.xyz , GAMMA.xxx );
     
-          surfaceColor             = surfaceColor * input.color.xyz;
-   // float3 surfaceColor             = input.color.xyz;
-    float alpha                    = diffuseColor.w * input.color.w;
-
-    float3 surfaceNormal           = NormalColorToVector3( normalColor.xyz );
-    float3 worldNormal             = mul( surfaceNormal , TBN );
-
-    surfaceColor = ComputeLightingAt( input.world_position , worldNormal , surfaceColor , float3( 0.0f.xxx ) , SPECULAR_FACTOR );
-
-   // compute final color; 
-    float3 finalColor              = pow( surfaceColor.xyz , INVERSE_GAMMA.xxx );
-           finalColor              = lerp( burnColor , finalColor , burnMix );
-    //float3    finalColor              = lerp( burnColor , surfaceColor , burnMix );
-  //            finalColor              = lerp( burnColor , finalColor , burnMix );
-
-    return float4( finalColor , alpha );
+    float   facing                  = max( 0.0f , dot( directionToProjection , normal ) );                                 // Use step to make sharp cuts at the edges over the smooth fadeout effect
+    
+    float3 tangent          = normalize( input.world_tangent.xyz );
+    float3 normal           = normalize( input.world_normal );    
+    float3 bitangent        = normalize( cross( normal , tangent ) ) * input.world_tangent.w;
+    float3x3 TBN            = float3x3( tangent, bitangent, normal );
+    
+    float3 normal_color     = tNormal.Sample( sSampler , input.uv );
+    float3 surface_normal   = NormalColorToVector3( normal_color );
+    float3 world_normal     = mul( surface_normal , TBN );
+    
+    return ConvertNormalizedVector3ToColor( world_normal );
 }
 
 //--------------------------------------------------------------------------------------
