@@ -405,6 +405,8 @@ void RenderContext::BeginCamera( const Camera& camera )
 	SetRasterState( eRasterStateFillMode::FILL_SOLID );
 	//SetDepthTest( COMPARE_ALWAYS , true );
 	//BindDepthStencil( m_currentCamera->GetDepthStencilTarget() );
+
+	DisableAllLights();												// Disable all lights at the start 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -947,11 +949,29 @@ void RenderContext::EnableLight( uint idx , lightDataT const& lightInfo )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void RenderContext::EnableAllLights()
+{
+	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
+	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void RenderContext::DisableLight( uint idx )
 {
 	m_lights.lights[ idx ].intensity = 0.f;
 	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
 	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::DisableAllLights()
+{
+	for ( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
+	{
+		DisableLight( index );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

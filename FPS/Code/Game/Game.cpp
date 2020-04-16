@@ -57,12 +57,12 @@ Game::Game()
 
 	m_lights.ambientLight = Vec4( 1.f , 1.f , 1.f , 0.f );
 	m_ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
-	m_lights.lights[ 0 ].color = Vec3( 1.f , 1.f , 1.f );
+	m_lights.lights[ 0 ].color					= Vec3( 1.f , 1.f , 1.f );
 	//m_lights.lights[ 0 ].intensity = 0.0001f;
-	m_lights.lights[ 0 ].intensity = 1.0f;
-	m_lights.lights[ 0 ].world_position = Vec3( 0.f , 0.f , -5.f );
-	m_lights.lights[ 0 ].attenuation = Vec3::UNIT_VECTOR_ALONG_J_BASIS;
-	m_lights.lights[ 0 ].spec_attenuation = Vec3::UNIT_VECTOR_ALONG_K_BASIS;
+	m_lights.lights[ 0 ].intensity				= 1.0f;
+	m_lights.lights[ 0 ].worldPosition			= Vec3( 0.f , 0.f , -5.f );
+	m_lights.lights[ 0 ].attenuation			= Vec3::UNIT_VECTOR_ALONG_J_BASIS;
+	m_lights.lights[ 0 ].specularAttenuation	= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
 
 	InitializeShaderMaterialData();
 }
@@ -214,7 +214,7 @@ void Game::UpdateLightPosition( float deltaSeconds )
 {
 	if ( m_isLightFollowingTheCamera )
 	{
-		m_lights.lights[ m_currentLightIndex ].world_position = m_gameCamera.GetPosition();
+		m_lights.lights[ m_currentLightIndex ].worldPosition = m_gameCamera.GetPosition();
 	}
 
 	Rgba8 lightColor;
@@ -222,12 +222,12 @@ void Game::UpdateLightPosition( float deltaSeconds )
 
 	if ( !m_isLightFollowingTheCamera )
 	{
-		DebugAddWorldPoint( m_lights.lights[ 0 ].world_position , 0.125f , lightColor , deltaSeconds * 0.5f , DEBUG_RENDER_USE_DEPTH );
+		DebugAddWorldPoint( m_lights.lights[ 0 ].worldPosition , 0.125f , lightColor , deltaSeconds * 0.5f , DEBUG_RENDER_USE_DEPTH );
 	}
 
 	if ( m_isLightAnimated )
 	{
-		m_lights.lights[ 0 ].world_position = Vec3( 0 , 0 , -5 ) + Vec3::MakeFromSpericalCoordinates(
+		m_lights.lights[ 0 ].worldPosition = Vec3( 0 , 0 , -5 ) + Vec3::MakeFromSpericalCoordinates(
 			45.f * ( float ) GetCurrentTimeSeconds() , 30.f * SinDegrees( ( float ) GetCurrentTimeSeconds() ) , 7.f );
 	}
 }
@@ -354,7 +354,7 @@ void Game::Render() const
 
 	g_theRenderer->SetAmbientLight( m_ambientLightColor , m_lights.ambientLight.w );
 	g_theRenderer->EnableLight( 0 , m_lights.lights[ 0 ] );
-	
+	g_theRenderer->EnableAllLights();
 	g_theRenderer->SetSpecularFactor( m_lights.SPECULAR_FACTOR );
 	g_theRenderer->SetSpecularPower( m_lights.SPECULAR_POWER );
 	
@@ -903,14 +903,14 @@ void Game::UpdateLightPositionOnUserInput()
 	{
 		m_isLightFollowingTheCamera = false;
 		m_isLightAnimated = false;
-		m_lights.lights[ m_currentLightIndex ].world_position = Vec3::ZERO;
+		m_lights.lights[ m_currentLightIndex ].worldPosition = Vec3::ZERO;
 	}
 
 	if ( g_theInput->WasKeyJustPressed( KEY_F6 ) )
 	{
 		m_isLightFollowingTheCamera = false;
 		m_isLightAnimated = false;
-		m_lights.lights[ m_currentLightIndex ].world_position = m_gameCamera.GetPosition();
+		m_lights.lights[ m_currentLightIndex ].worldPosition = m_gameCamera.GetPosition();
 	}
 
 	if ( g_theInput->WasKeyJustPressed( KEY_F7 ) )

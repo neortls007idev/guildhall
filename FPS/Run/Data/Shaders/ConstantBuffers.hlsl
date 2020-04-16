@@ -51,15 +51,20 @@ cbuffer model_constants : register( b2 )                                        
 
 struct light_t
 {
-    float3          world_position;
+    float3          worldPosition;
     float           pad00;                                                                  // this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
 
     float3          color;
     float           intensity;                                                              // rgb and an intensity
+    
+    float3          direction;                                                              // direction light is point, default (0,0,1)
+    float           directionFactor;                                                        // do we consider this a point light (0.0f) or a directional light (1.0f).  Determine how we calcualte the incident light vector, default (0.0f)
+    
     float3          attenuation;                                                            // attentuation for diffuse light, default (0,0,1)
-    float pad01;
-    float3          spec_attenuation;                                                       // attenuation for specular lighting (constant,linear,quadratic), default (0,0,1)
-    float pad02;
+    float           dotInnerAngle;                                                          // cone light inner angle (default -1.0f) - angle at which cone lights begin to stop affecting an object
+  
+    float3          specularAttenuation;                                                    // attenuation for specular lighting (constant,linear,quadratic), default (0,0,1)
+    float           dotOuterAngle;                                                          // cone light outer angle (default -1.0f) - angle at which cone lights stop affecting the object completely
 };
 
 //--------------------------------------------------------------------------------------
