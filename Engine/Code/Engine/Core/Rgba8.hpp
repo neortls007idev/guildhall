@@ -39,6 +39,7 @@ public:
 
 	void LerpColorOverTime( Rgba8 startColor , Rgba8 endColor , float lerpDuration , Timer* timer );
 	Vec4 GetAsNormalizedFloat4() const;
+	Vec3 GetAsNormalizedFloat3() const;
 
 	void SetColorFromNormalizedFloat( Vec4 color );
 	

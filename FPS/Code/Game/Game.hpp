@@ -23,8 +23,45 @@ enum LitShaderTypes
 	TANGENT,
 	BITANGENT,
 	SURFACE_NORMAL,
+	DISSOLVE,
 	FRESNEL,
+	TRIPLANAR_UNLIT,
+	TRIPLANAR_LIT,
+	FOG,
 	TOTAL,
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct fresnelData_t
+{
+	Vec3	fresnelColor	= Vec3::UNIT_VECTOR_ALONG_J_BASIS;
+	float	fresnelPower	= 1.f; 
+
+	Vec3	padding00		= Vec3::ZERO; 
+	float	fresnelfactor	= 1.f; 
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct dissolveData_t
+{
+	Vec3	startColor;
+	float	burnEdgeWidth;
+
+	Vec3	endColor;
+	float	burnValue;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct fogData_t
+{
+	float	nearFog;
+	Vec3	nearFogColor	= GRAY.GetAsNormalizedFloat3();
+	
+	float	farFog;
+	Vec3	fogFarColor		= WHITE.GetAsNormalizedFloat3();
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -33,13 +70,13 @@ class Game
 {
 
 public:
-
 			Game();
 
 			void LoadShaders();
 			void LoadTextures();
 			void InitializeCameras();
 			void intializeGameObjects();
+			void InitializeShaderMaterialData();
 
 			~Game();
 
@@ -49,7 +86,9 @@ public:
 NOT_IN_USE	void UpdateCamera();
 	
 			void Render() const;
+			void BindShaderSpecificMaterialData() const;
 			void RenderFresnelShader2ndPass() const;
+			void RenderFogShader2ndPass() const;
 NOT_IN_USE	void RenderUI() const;
 			
 NOT_IN_USE	void AddScreenShakeIntensity( float deltaShakeIntensity );
@@ -69,6 +108,11 @@ private:
 	static	bool ChangeAmbientLightColorViaConsole( EventArgs& args );
 	static	bool ChangeAmbientLightIntensityViaConsole( EventArgs& args );
 
+			void AddShaderDevConsoleCommands( DevConsole* devConsole );
+	static	bool UpdateFresnelShaderMaterialDataViaConsole( EventArgs& args );
+	static	bool UpdateDissolveShaderMaterialViaConsole( EventArgs& args );
+	static	bool UpdateDissolveShaderPatternViaConsole( EventArgs& args );
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				METHODS TO HANDLE USER INPUT
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -76,6 +120,7 @@ private:
 
 			void UpdateLightsFromKeyBoard( float deltaSeconds );
 			void UpdateCurrentShaderFromUserInput();
+			void UpdateMaterialShaderFromUserInput( float deltaSeconds );
 			void UpdateAmbientLightFromUserInput( float deltaSeconds );
 			void UpdateSpecularLightFromUserInput( float deltaSeconds );
 			void UpdateLightAttenuationFromUserInput();
@@ -87,8 +132,12 @@ NOT_IN_USE	void DebugLineStripDrawModeTest();
 
 private:
 
-	int							m_controllerID			= -1;
-	float						m_screenShakeIntensity	= 0.f;
+	int							m_controllerID										= -1;
+	float						m_screenShakeIntensity								= 0.f;
+
+	static fresnelData_t		m_fresnelShaderData;
+	static dissolveData_t		m_dissolveShaderData;
+	static fogData_t			m_fogShaderData;
 
 public:
 
@@ -116,6 +165,8 @@ public:
 	Shader* 					m_currentShader;
 	int							m_currentShaderIndex;
 	bool						m_isFresnelShaderActive								= false;
+	bool						m_isFogShaderActive									= false;
+	static Texture*				m_dissolveShaderPatternTexture;
 	Texture*					m_triplanarShaderTextures[ 6 ];
 	
 	static shaderLightDataT		m_lights;

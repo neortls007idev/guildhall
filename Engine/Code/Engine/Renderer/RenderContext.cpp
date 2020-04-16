@@ -108,6 +108,9 @@ RenderContext::~RenderContext()
 
 	delete m_lightDataUBO;
 	m_lightDataUBO = nullptr;
+
+	delete m_materialDataUBO;
+	m_materialDataUBO = nullptr;
 	
 	delete m_modelMatrixUBO;
 	m_modelMatrixUBO = nullptr;
@@ -207,6 +210,7 @@ void RenderContext::Startup( Window* window )
 	m_frameUBO			= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 	m_modelMatrixUBO	= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 	m_lightDataUBO		= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	m_materialDataUBO	= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 	
 	m_defaultSampler = new Sampler( this , SAMPLER_POINT );
 	m_textureDefault = CreateTextureFromColor( WHITE );
@@ -401,6 +405,8 @@ void RenderContext::BeginCamera( const Camera& camera )
 	SetRasterState( eRasterStateFillMode::FILL_SOLID );
 	//SetDepthTest( COMPARE_ALWAYS , true );
 	//BindDepthStencil( m_currentCamera->GetDepthStencilTarget() );
+
+	DisableAllLights();												// Disable all lights at the start 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -911,15 +917,6 @@ void RenderContext::SetAmbientIntensity( float intensity )
 
 void RenderContext::SetAmbientLight( Rgba8 color /*= WHITE*/ , float intensity /*= 1.f */ )
 {
-// 	Vec4 normalizedColor;
-// 	normalizedColor.x = static_cast< float >( color.r % 256 );
-// 	normalizedColor.x = RangeMapFloat( 0.f , 255.f , 0.f , 1.f , normalizedColor.x );
-// 	normalizedColor.y = static_cast< float >( color.g % 256 );
-// 	normalizedColor.y = RangeMapFloat( 0.f , 255.f , 0.f , 1.f , normalizedColor.y );
-// 	normalizedColor.z = static_cast< float >( color.b % 256 );
-// 	normalizedColor.z = RangeMapFloat( 0.f , 255.f , 0.f , 1.f , normalizedColor.z );	
-// 	normalizedColor.w = intensity;
-
 	Vec4 normalizedColor;
 	normalizedColor.x = RangeMapFloat( 0.f , 255.f , 0.f , 1.f , ( float ) color.r );
 	normalizedColor.y = RangeMapFloat( 0.f , 255.f , 0.f , 1.f , ( float ) color.g );
@@ -952,11 +949,29 @@ void RenderContext::EnableLight( uint idx , lightDataT const& lightInfo )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void RenderContext::EnableAllLights()
+{
+	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
+	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void RenderContext::DisableLight( uint idx )
 {
 	m_lights.lights[ idx ].intensity = 0.f;
 	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
 	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::DisableAllLights()
+{
+	for ( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
+	{
+		DisableLight( index );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1677,6 +1692,14 @@ void RenderContext::BindUniformBuffer( unsigned int slot , RenderBuffer* ubo )
 
 	m_context->VSSetConstantBuffers( slot , 1 , &uboHandle );
 	m_context->PSSetConstantBuffers( slot , 1 , &uboHandle );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::BindMaterialData( void* pointerToData , int sizeOfData )
+{
+	m_materialDataUBO->Update( pointerToData , sizeOfData , sizeOfData );
+	BindUniformBuffer( UBO_MATERIAL_SLOT , m_materialDataUBO );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

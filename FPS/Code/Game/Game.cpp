@@ -21,10 +21,15 @@ extern DevConsole*		g_theDevConsole;
 
 static  bool			s_areDevconsoleCommandsLoaded = false;
 
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 STATIC shaderLightDataT Game::m_lights;
-STATIC Rgba8 Game::m_ambientLightColor;
+STATIC Rgba8			Game::m_ambientLightColor;
+STATIC fresnelData_t	Game::m_fresnelShaderData;
+STATIC dissolveData_t	Game::m_dissolveShaderData;
+STATIC fogData_t		Game::m_fogShaderData;
+STATIC Texture*			Game::m_dissolveShaderPatternTexture;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -33,6 +38,7 @@ Game::Game()
 	if ( !s_areDevconsoleCommandsLoaded )
 	{
 		AddLightDevConsoleCommands( g_theDevConsole );
+		AddShaderDevConsoleCommands( g_theDevConsole );
 		s_areDevconsoleCommandsLoaded = true;
 	}
 	
@@ -51,12 +57,34 @@ Game::Game()
 
 	m_lights.ambientLight = Vec4( 1.f , 1.f , 1.f , 0.f );
 	m_ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
-	m_lights.lights[ 0 ].color = Vec3( 1.f , 1.f , 1.f );
+	m_lights.lights[ 0 ].color					= Vec3( 1.f , 1.f , 1.f );
 	//m_lights.lights[ 0 ].intensity = 0.0001f;
-	m_lights.lights[ 0 ].intensity = 1.0f;
-	m_lights.lights[ 0 ].world_position = Vec3( 0.f , 0.f , -5.f );
-	m_lights.lights[ 0 ].attenuation = Vec3::UNIT_VECTOR_ALONG_J_BASIS;
-	m_lights.lights[ 0 ].spec_attenuation = Vec3::UNIT_VECTOR_ALONG_K_BASIS;
+	m_lights.lights[ 0 ].intensity				= 1.0f;
+	m_lights.lights[ 0 ].worldPosition			= Vec3( 0.f , 0.f , -5.f );
+	m_lights.lights[ 0 ].attenuation			= Vec3::UNIT_VECTOR_ALONG_J_BASIS;
+	m_lights.lights[ 0 ].specularAttenuation	= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
+
+	InitializeShaderMaterialData();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::InitializeShaderMaterialData()
+{
+	m_fresnelShaderData.fresnelColor			= Vec3::UNIT_VECTOR_ALONG_J_BASIS;
+	m_fresnelShaderData.fresnelfactor			= 1.f;
+	m_fresnelShaderData.fresnelPower			= 1.f;
+
+	m_dissolveShaderData.startColor				= CYAN.GetAsNormalizedFloat3();
+	m_dissolveShaderData.burnEdgeWidth			= 1.f;
+	m_dissolveShaderData.endColor				= ORANGE.GetAsNormalizedFloat3();
+	m_dissolveShaderData.burnValue				= 0.f;
+
+	m_fogShaderData.nearFog						= 0.f;
+	m_fogShaderData.farFog						= 100.f;
+	
+	m_fogShaderData.nearFogColor				= GRAY.GetAsNormalizedFloat3();
+	m_fogShaderData.fogFarColor					= /*WHITE.GetAsNormalizedFloat3();*/ Rgba8( 37 , 70 , 87 , 127 ).GetAsNormalizedFloat3();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -70,7 +98,11 @@ void Game::LoadShaders()
 	m_lightShaders[ LitShaderTypes::TANGENT ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/tangentLit.hlsl" );
 	m_lightShaders[ LitShaderTypes::BITANGENT ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/bitangentLit.hlsl" );
 	m_lightShaders[ LitShaderTypes::SURFACE_NORMAL ]			= g_theRenderer->GetOrCreateShader( "Data/Shaders/surfaceNormalLit.hlsl" );
+	m_lightShaders[ LitShaderTypes::DISSOLVE ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/dissolve.hlsl" );
 	m_lightShaders[ LitShaderTypes::FRESNEL ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/fresnel.hlsl" );
+	m_lightShaders[ LitShaderTypes::TRIPLANAR_UNLIT ]			= g_theRenderer->GetOrCreateShader( "Data/Shaders/triplanarUnlit.hlsl" );
+	m_lightShaders[ LitShaderTypes::TRIPLANAR_LIT ]				= g_theRenderer->GetOrCreateShader( "Data/Shaders/triplanarLit.hlsl" );
+	m_lightShaders[ LitShaderTypes::FOG ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/fog.hlsl" );
 
 	m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
 	m_currentShaderIndex = LitShaderTypes::LIT;
@@ -80,6 +112,8 @@ void Game::LoadShaders()
 
 void Game::LoadTextures()
 {
+	m_dissolveShaderPatternTexture = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/noise.png" );
+	
 	m_triplanarShaderTextures[ 0 ] = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/rockT6/rock_06_diff_1k.png" );
 	m_triplanarShaderTextures[ 1 ] = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/rockT6/rock_06_nor_1k.png" );
 	m_triplanarShaderTextures[ 2 ] = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/grass/aerial_grass_rock_diff_1k.png" );
@@ -92,7 +126,7 @@ void Game::LoadTextures()
 
 void Game::intializeGameObjects()
 {
-	m_cubeMesh = new GPUMesh( g_theRenderer );
+	m_cubeMesh = new GPUMesh( g_theRenderer ); 
 	std::vector<VertexMaster>	cubeMeshVerts;
 	std::vector<VertexLit>		cubeMeshLitVerts;
 	std::vector<uint>			cubeMeshIndices;
@@ -180,7 +214,7 @@ void Game::UpdateLightPosition( float deltaSeconds )
 {
 	if ( m_isLightFollowingTheCamera )
 	{
-		m_lights.lights[ m_currentLightIndex ].world_position = m_gameCamera.GetPosition();
+		m_lights.lights[ m_currentLightIndex ].worldPosition = m_gameCamera.GetPosition();
 	}
 
 	Rgba8 lightColor;
@@ -188,12 +222,12 @@ void Game::UpdateLightPosition( float deltaSeconds )
 
 	if ( !m_isLightFollowingTheCamera )
 	{
-		DebugAddWorldPoint( m_lights.lights[ 0 ].world_position , 0.125f , lightColor , deltaSeconds * 0.5f , DEBUG_RENDER_USE_DEPTH );
+		DebugAddWorldPoint( m_lights.lights[ 0 ].worldPosition , 0.125f , lightColor , deltaSeconds * 0.5f , DEBUG_RENDER_USE_DEPTH );
 	}
 
 	if ( m_isLightAnimated )
 	{
-		m_lights.lights[ 0 ].world_position = Vec3( 0 , 0 , -5 ) + Vec3::MakeFromSpericalCoordinates(
+		m_lights.lights[ 0 ].worldPosition = Vec3( 0 , 0 , -5 ) + Vec3::MakeFromSpericalCoordinates(
 			45.f * ( float ) GetCurrentTimeSeconds() , 30.f * SinDegrees( ( float ) GetCurrentTimeSeconds() ) , 7.f );
 	}
 }
@@ -233,9 +267,25 @@ void Game::DebugDrawUI( float deltaSeconds )
 		case LitShaderTypes::SURFACE_NORMAL:
 			cureentShaderName = "SURFACE NORMAL SHADER";
 			break;
+		case LitShaderTypes::DISSOLVE:
+			cureentShaderName = "DISSOLVE LIT SHADER";
+			break;
 		
 		case LitShaderTypes::FRESNEL:
 			cureentShaderName = "FRESNEL SHADER";
+			break;
+		
+		case LitShaderTypes::TRIPLANAR_LIT:
+			cureentShaderName = "TRIPLANAR LIT SHADER";
+			break;
+		
+		case LitShaderTypes::TRIPLANAR_UNLIT:
+			cureentShaderName = "TRIPLANAR UNLIT SHADER";
+			break;
+		
+		case LitShaderTypes::FOG:
+			cureentShaderName = "FOG SHADER";
+			break;
 	}
 
 	float leftVerticalAlignment = ( 1080.f * 0.25f ) / 11.f;
@@ -304,7 +354,7 @@ void Game::Render() const
 
 	g_theRenderer->SetAmbientLight( m_ambientLightColor , m_lights.ambientLight.w );
 	g_theRenderer->EnableLight( 0 , m_lights.lights[ 0 ] );
-	
+	g_theRenderer->EnableAllLights();
 	g_theRenderer->SetSpecularFactor( m_lights.SPECULAR_FACTOR );
 	g_theRenderer->SetSpecularPower( m_lights.SPECULAR_POWER );
 	
@@ -312,14 +362,9 @@ void Game::Render() const
 	g_theRenderer->BindTexture( m_tileDiffuse );
 	g_theRenderer->BindTexture( m_tileNormal , eTextureType::TEX_NORMAL );
 
-	g_theRenderer->BindShader( g_theRenderer->GetOrCreateShader( "Data/Shaders/triplanar.hlsl" ) );
-	g_theRenderer->BindTexture( m_triplanarShaderTextures[ 0 ] , eTextureType::TEX_USER_TYPE , 0 );
-	g_theRenderer->BindTexture( m_triplanarShaderTextures[ 1 ] , eTextureType::TEX_USER_TYPE , 1 );
-	g_theRenderer->BindTexture( m_triplanarShaderTextures[ 2 ] , eTextureType::TEX_USER_TYPE , 2 );
-	g_theRenderer->BindTexture( m_triplanarShaderTextures[ 3 ] , eTextureType::TEX_USER_TYPE , 3 );
-	g_theRenderer->BindTexture( m_triplanarShaderTextures[ 4 ] , eTextureType::TEX_USER_TYPE , 4 );
-	g_theRenderer->BindTexture( m_triplanarShaderTextures[ 5 ] , eTextureType::TEX_USER_TYPE , 5 );
-	
+	//g_theRenderer->BindShader( g_theRenderer->GetOrCreateShader( "Data/Shaders/triplanar.hlsl" ) );
+	BindShaderSpecificMaterialData();
+
  	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_meshSphere );
 
@@ -331,6 +376,7 @@ void Game::Render() const
 	g_theRenderer->DrawMesh( m_cubeMesh );
 	
 	if ( m_isFresnelShaderActive )													{	RenderFresnelShader2ndPass();	}
+	if ( m_isFogShaderActive )														{	RenderFogShader2ndPass();	}
 	
 	g_theRenderer->SetRasterState( FILL_SOLID );
 
@@ -348,9 +394,55 @@ void Game::Render() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Game::BindShaderSpecificMaterialData() const
+{
+	if ( LitShaderTypes::TRIPLANAR_LIT == m_currentShaderIndex || LitShaderTypes::TRIPLANAR_UNLIT == m_currentShaderIndex )
+	{
+		g_theRenderer->BindTexture( m_triplanarShaderTextures[ 0 ] , eTextureType::TEX_USER_TYPE , 0 );
+		g_theRenderer->BindTexture( m_triplanarShaderTextures[ 1 ] , eTextureType::TEX_USER_TYPE , 1 );
+		g_theRenderer->BindTexture( m_triplanarShaderTextures[ 2 ] , eTextureType::TEX_USER_TYPE , 2 );
+		g_theRenderer->BindTexture( m_triplanarShaderTextures[ 3 ] , eTextureType::TEX_USER_TYPE , 3 );
+		g_theRenderer->BindTexture( m_triplanarShaderTextures[ 4 ] , eTextureType::TEX_USER_TYPE , 4 );
+		g_theRenderer->BindTexture( m_triplanarShaderTextures[ 5 ] , eTextureType::TEX_USER_TYPE , 5 );
+	}
+
+	if ( LitShaderTypes::DISSOLVE == m_currentShaderIndex )
+	{
+		g_theRenderer->BindTexture( m_dissolveShaderPatternTexture , eTextureType::TEX_USER_TYPE , 0 );
+		g_theRenderer->BindMaterialData( ( void* ) &m_dissolveShaderData , sizeof( m_dissolveShaderData ) );
+	}
+
+	//if ( LitShaderTypes::FOG == m_currentShaderIndex )
+	//{
+	//	g_theRenderer->BindMaterialData( ( void* ) &m_fogShaderData , sizeof( m_fogShaderData ) );
+	//}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Game::RenderFresnelShader2ndPass() const
 {
 	g_theRenderer->BindShader( m_lightShaders[ LitShaderTypes::FRESNEL ] );
+	g_theRenderer->BindMaterialData( ( void* ) &m_fresnelShaderData , sizeof( m_fresnelShaderData ) );
+	g_theRenderer->SetBlendMode( ALPHA );
+
+	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
+	g_theRenderer->DrawMesh( m_meshSphere );
+
+	g_theRenderer->SetModelMatrix( m_quadTransform.GetAsMatrix() );
+	g_theRenderer->DrawMesh( m_quadMesh );
+
+	g_theRenderer->SetModelMatrix( m_cubeMeshTransform.GetAsMatrix() );
+	g_theRenderer->DrawMesh( m_cubeMesh );
+	g_theRenderer->SetBlendMode( SOLID );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::RenderFogShader2ndPass() const
+{
+	g_theRenderer->BindShader( m_lightShaders[ LitShaderTypes::FOG ] );
+	g_theRenderer->BindMaterialData( ( void* ) &m_fogShaderData , sizeof( m_fogShaderData ) );
 	g_theRenderer->SetBlendMode( ALPHA );
 
 	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
@@ -480,6 +572,80 @@ STATIC bool Game::ChangeAmbientLightIntensityViaConsole( EventArgs& args )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Game::AddShaderDevConsoleCommands( DevConsole* devConsole )
+{
+	EventArgs consoleArgs;
+	
+	devConsole->CreateCommand( "UpdateFresnelShader" ,
+		"Update Fresnel Shader.Ex -  UpdateFresnelShader color = 255, 0 , 255 , 255| power = .9f| factor = .3f" ,
+		consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "UpdateFresnelShader" , UpdateFresnelShaderMaterialDataViaConsole );
+
+	devConsole->CreateCommand( "UpdateDissolveShader" ,
+		"Ex -  UpdateDissolveShader startColor = 255, 0 , 255 , 255| endColor = 255, 0 , 255 , 255| edgeWidth = .9f| burnValue = .3f" ,
+		consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "UpdateDissolveShader" , UpdateDissolveShaderMaterialViaConsole );
+
+	devConsole->CreateCommand( "UpdateDissolveShaderPattern" ,
+		"Ex -  UpdateDissolveShaderPattern patternTexPath = Data\\Images\\..." ,
+		consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "UpdateDissolveShaderPattern" , UpdateDissolveShaderPatternViaConsole );
+	
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC bool Game::UpdateFresnelShaderMaterialDataViaConsole( EventArgs& args )
+{
+	Rgba8 curColor;
+	curColor.SetColorFromNormalizedFloat( Vec4( m_fresnelShaderData.fresnelColor , 1.f ) );
+	Rgba8 color = args.GetValue( "color " , curColor );
+	m_fresnelShaderData.fresnelColor = color.GetAsNormalizedFloat3();
+
+	float power = args.GetValue( "power " , m_fresnelShaderData.fresnelPower );
+	m_fresnelShaderData.fresnelPower = power;
+
+	float factor = args.GetValue( "factor " , m_fresnelShaderData.fresnelfactor );
+	m_fresnelShaderData.fresnelfactor = factor;
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Game::UpdateDissolveShaderMaterialViaConsole( EventArgs& args )
+{
+	Rgba8 curStartColor;
+	curStartColor.SetColorFromNormalizedFloat( Vec4( m_dissolveShaderData.startColor , 1.f ) );
+	Rgba8 startColor = args.GetValue( "startColor " , curStartColor );
+	m_dissolveShaderData.startColor = startColor.GetAsNormalizedFloat3();
+
+	Rgba8 curEndColor;
+	curEndColor.SetColorFromNormalizedFloat( Vec4( m_dissolveShaderData.endColor , 1.f ) );
+	Rgba8 endColor = args.GetValue( "endColor " , curStartColor );
+	m_dissolveShaderData.startColor = endColor.GetAsNormalizedFloat3();
+
+	float burnEdgeWidth = args.GetValue( "edgeWidth " , m_dissolveShaderData.burnEdgeWidth );
+	m_dissolveShaderData.burnEdgeWidth = burnEdgeWidth;
+
+	float burnValue = args.GetValue( "burnValue " , m_dissolveShaderData.burnValue );
+	m_dissolveShaderData.burnValue = burnValue;
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Game::UpdateDissolveShaderPatternViaConsole( EventArgs& args )
+{
+	std::string patternTexPath		= args.GetValue( "patternTexPath " ,"" );
+	m_dissolveShaderPatternTexture	= g_theRenderer->GetOrCreateTextureFromFile( patternTexPath.c_str() );
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Game::UpdateFromKeyBoard( float deltaSeconds )
 {
 	if ( g_theDevConsole->IsOpen() )
@@ -487,8 +653,10 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 		return;
 	}
 	//DebugLineStripDrawModeTest();
+	
 	CameraPositionUpdateOnInput( deltaSeconds );
 	UpdateLightsFromKeyBoard( deltaSeconds );
+	UpdateMaterialShaderFromUserInput( deltaSeconds );
 	
 	if ( g_theInput->WasKeyJustPressed( 'I' ) )
 	{
@@ -549,6 +717,16 @@ void Game::UpdateCurrentShaderFromUserInput()
 		{
 			m_isFresnelShaderActive = false;
 		}
+
+		if ( LitShaderTypes::FOG == m_currentShaderIndex )
+		{
+			m_isFogShaderActive = true;
+			m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
+		}
+		else
+		{
+			m_isFogShaderActive = false;
+		}
 	}
 
 	if ( g_theInput->WasKeyJustPressed( KEY_RIGHTARROW ) )
@@ -566,7 +744,70 @@ void Game::UpdateCurrentShaderFromUserInput()
 		{
 			m_isFresnelShaderActive = false;
 		}
+
+		if ( LitShaderTypes::FOG == m_currentShaderIndex )
+		{
+			m_isFogShaderActive = true;
+			m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
+		}
+		else
+		{
+			m_isFogShaderActive = false;
+		}
+		
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateMaterialShaderFromUserInput( float deltaSeconds )
+{
+	if ( LitShaderTypes::DISSOLVE == m_currentShaderIndex )
+	{
+		if ( g_theInput->IsKeyHeldDown( 'C' ) )
+		{
+			m_dissolveShaderData.burnEdgeWidth -= deltaSeconds;
+			//m_dissolveShaderData.burnEdgeWidth = ClampZeroToOne( m_dissolveShaderData.burnEdgeWidth );
+			m_dissolveShaderData.burnEdgeWidth = Clamp( m_dissolveShaderData.burnEdgeWidth , 0.f , ( 1 + 2 * m_dissolveShaderData.burnValue ) );
+		}
+
+		if ( g_theInput->IsKeyHeldDown( 'V' ) )
+		{
+			m_dissolveShaderData.burnEdgeWidth += deltaSeconds;
+			//m_dissolveShaderData.burnEdgeWidth = ClampZeroToOne( m_dissolveShaderData.burnEdgeWidth );
+			m_dissolveShaderData.burnEdgeWidth = Clamp( m_dissolveShaderData.burnEdgeWidth , 0.f , ( 1 + 2 * m_dissolveShaderData.burnValue ) );
+		}
+
+		if ( g_theInput->IsKeyHeldDown( 'Z' ) )
+		{
+			m_dissolveShaderData.burnValue -= deltaSeconds;
+			//		m_dissolveShaderData.burnValue = Clamp( m_dissolveShaderData.burnValue , 0.f , ( 1 + 2 * m_dissolveShaderData.burnEdgeWidth ) );
+			m_dissolveShaderData.burnValue = ClampZeroToOne( m_dissolveShaderData.burnValue );
+		}
+
+		if ( g_theInput->IsKeyHeldDown( 'X' ) )
+		{
+			m_dissolveShaderData.burnValue += deltaSeconds;
+			//		m_dissolveShaderData.burnValue = Clamp( m_dissolveShaderData.burnValue , 0.f , ( 1 + 2 * m_dissolveShaderData.burnEdgeWidth ) );
+			m_dissolveShaderData.burnValue = ClampZeroToOne( m_dissolveShaderData.burnValue );
+		}
+	}
+
+	if ( LitShaderTypes::FRESNEL == m_currentShaderIndex )
+	{
+		if ( g_theInput->IsKeyHeldDown( 'Z' ) )
+		{
+			m_fresnelShaderData.fresnelfactor -= deltaSeconds;
+			m_fresnelShaderData.fresnelfactor = ClampZeroToOne( m_fresnelShaderData.fresnelfactor );
+		}
+
+		if ( g_theInput->IsKeyHeldDown( 'X' ) )
+		{
+			m_fresnelShaderData.fresnelfactor -= deltaSeconds;
+			m_fresnelShaderData.fresnelfactor = ClampZeroToOne( m_fresnelShaderData.fresnelfactor );
+		}
+	}
+	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -662,14 +903,14 @@ void Game::UpdateLightPositionOnUserInput()
 	{
 		m_isLightFollowingTheCamera = false;
 		m_isLightAnimated = false;
-		m_lights.lights[ m_currentLightIndex ].world_position = Vec3::ZERO;
+		m_lights.lights[ m_currentLightIndex ].worldPosition = Vec3::ZERO;
 	}
 
 	if ( g_theInput->WasKeyJustPressed( KEY_F6 ) )
 	{
 		m_isLightFollowingTheCamera = false;
 		m_isLightAnimated = false;
-		m_lights.lights[ m_currentLightIndex ].world_position = m_gameCamera.GetPosition();
+		m_lights.lights[ m_currentLightIndex ].worldPosition = m_gameCamera.GetPosition();
 	}
 
 	if ( g_theInput->WasKeyJustPressed( KEY_F7 ) )
@@ -858,5 +1099,6 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	m_gameCamera.SetPitchYawRollRotation( finalPitch , finalRoll , finalYaw );
 	//m_gameCamera.SetPitchYawRollRotation( m_cameraRotation.x , m_cameraRotation.z , m_cameraRotation.y );
 }
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -168,23 +168,25 @@ void Rgba8::LerpColorOverTime( Rgba8 startColor , Rgba8 endColor , float lerpDur
 Vec4 Rgba8::GetAsNormalizedFloat4() const
 {
 	Vec4 normalizedColor;
-	//normalizedColor.x = static_cast< float >( r % 256 );
-	//normalizedColor.y = static_cast< float >( g % 256 );
-	//normalizedColor.z = static_cast< float >( b % 256 );
-	//normalizedColor.w = static_cast< float >( a % 256 );
+	
 	normalizedColor.x = RangeMapFloatNormalizedOutput( 0.f , 255.f , ( float ) r );
 	normalizedColor.y = RangeMapFloatNormalizedOutput( 0.f , 255.f , ( float ) g );
 	normalizedColor.z = RangeMapFloatNormalizedOutput( 0.f , 255.f , ( float ) b );
 	normalizedColor.w = RangeMapFloatNormalizedOutput( 0.f , 255.f , ( float ) a );
 	return normalizedColor;
+}
 
-// 	Vec4 normalizedColor;
-// 	
-// 	normalizedColor.x = RangeMapFloat( 0.f , 255.f , -1.f , 1.f , ( float ) r );
-// 	normalizedColor.y = RangeMapFloat( 0.f , 255.f , -1.f , 1.f , ( float ) g );
-// 	normalizedColor.z = RangeMapFloat( 0.f , 255.f , 0.f , 1.f , ( float ) b );
-// 	normalizedColor.w = RangeMapFloat( 0.f , 255.f , 0.f , 1.f , ( float ) a );
-// 	return normalizedColor;
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec3 Rgba8::GetAsNormalizedFloat3() const
+{
+	Vec3 normalizedColor;
+
+	normalizedColor.x = RangeMapFloatNormalizedOutput( 0.f , 255.f , ( float ) r );
+	normalizedColor.y = RangeMapFloatNormalizedOutput( 0.f , 255.f , ( float ) g );
+	normalizedColor.z = RangeMapFloatNormalizedOutput( 0.f , 255.f , ( float ) b );
+	
+	return normalizedColor;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -195,11 +197,6 @@ void Rgba8::SetColorFromNormalizedFloat( Vec4 color )
 	g = ( uchar ) RangeMapFloatNormalizedInput( 0.f , 255.f , color.y );
 	b = ( uchar ) RangeMapFloatNormalizedInput( 0.f , 255.f , color.z );
 	a = ( uchar ) RangeMapFloatNormalizedInput( 0.f , 255.f , color.w );
-
-// 	r = ( uchar ) RangeMapFloat( -1.f , 1.f , 0.f , 255.f , color.x );
-// 	g = ( uchar ) RangeMapFloat( -1.f , 1.f , 0.f , 255.f , color.y );
-// 	b = ( uchar ) RangeMapFloat( 0.f , 1.f , 0.f , 255.f , color.z );
-// 	a = ( uchar ) RangeMapFloat( 0.f , 1.f , 0.f , 255.f , color.w );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

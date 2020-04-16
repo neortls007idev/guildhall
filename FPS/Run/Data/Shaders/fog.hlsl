@@ -6,11 +6,11 @@
 
 cbuffer material_constants : register( b4 )                                                     // constant buffer slot 5
 {                                                                                               
-    float3 FRESNEL_COLOR;                                                                       
-    float  FRESNEL_POWER;
+    float   nearFog;
+    float3  fogNearColor;
     
-    float3 pad00;
-    float  FRESNEL_FACTOR;
+    float   farFog;
+    float3  fogFarColor;
 };
 
 //--------------------------------------------------------------------------------------
@@ -61,21 +61,28 @@ v2f_t VertexFunction(vs_input_t input)
 
 float4 FragmentFunction(v2f_t input) : SV_Target0
 {
+    float4 diffuseColor     = tDiffuse.Sample( sSampler , input.uv );
+    float4 normalColor      = tNormal.Sample( sSampler , input.uv );
     
     float3 tangent          = normalize( input.world_tangent.xyz );
     float3 normal           = normalize( input.world_normal );    
     float3 bitangent        = normalize( cross( normal , tangent ) ) * input.world_tangent.w;
     float3x3 TBN            = float3x3( tangent, bitangent, normal );
     
-    float3 normal_color     = tNormal.Sample( sSampler , input.uv );
-    float3 surface_normal   = NormalColorToVector3( normal_color );
-    float3 world_normal     = mul( surface_normal , TBN );
+    float3 surfaceNormal    = NormalColorToVector3( normalColor );
+    float3 worldNormal      = mul( surfaceNormal , TBN );
         
-    float3 directionToSurface = normalize( input.world_position - CAMERA_POSITION );
-    float dp                = length( cross( directionToSurface , world_normal ) );
-    float factor            = FRESNEL_FACTOR * pow( dp , FRESNEL_POWER * 16.0f + 15 * sin( SYSTEM_TIME ) );
+    float3 directionToSurface = input.world_position - CAMERA_POSITION;
+    float  distanceToSurface  = length( directionToSurface );
+           directionToSurface = normalize(directionToSurface);
     
-    return float4( FRESNEL_COLOR , factor );
+    float3 fogMix             = RangeMap( distanceToSurface , nearFog , farFog , 0.f , 1.f );
+    float3 finalColor         = fogFarColor;
+           finalColor         = lerp( fogNearColor , finalColor , fogMix );
+       
+    float surfaceAlpha        = RangeMap( distanceToSurface , nearFog , farFog , 0.f , 1.f );
+    
+    return float4( finalColor , surfaceAlpha );
 }
 
 //--------------------------------------------------------------------------------------

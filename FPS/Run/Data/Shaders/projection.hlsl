@@ -4,15 +4,6 @@
 
 //--------------------------------------------------------------------------------------
 
-cbuffer material_constants : register( b4 )                                                     // constant buffer slot 5
-{                                                                                               
-    float3 FRESNEL_COLOR;                                                                       
-    float  FRESNEL_POWER;
-    
-    float3 pad00;
-    float  FRESNEL_FACTOR;
-};
-
 //--------------------------------------------------------------------------------------
 //                      PROGRAMMABLE SHADER STAGES FUNCTIONS
 //--------------------------------------------------------------------------------------
@@ -20,7 +11,9 @@ cbuffer material_constants : register( b4 )                                     
 // VERTEX SHADER
 //
 //--------------------------------------------------------------------------------------
+Texture2D<float4> tProjection : register( t8 );
 
+// PROJECTION_MATRIX -> VIEW * PROJECTION -> WORLD TO CLIP
 
 v2f_t VertexFunction(vs_input_t input)
 {
@@ -61,6 +54,22 @@ v2f_t VertexFunction(vs_input_t input)
 
 float4 FragmentFunction(v2f_t input) : SV_Target0
 {
+    float4  clipPos                 = float4( input.world_position , 1.0f ) * PROJECTION_MATRIX;
+    float   localZ                  = clipPos.w;
+    float3  ndc                     = clipPos.xyz / localZ;
+    float2  UVs                     = ( ndc.xy + float2( 1.0f ) ) * 0.5f;
+    
+    float   uBlend                  = step( 0 , UVs.x ) + ( 1.0f - step( 1.0f , UVs.x ) );
+    float   vBlend                  = step( 0 , UVs.y ) + ( 1.0f - step( 1.0f , UVs.y ) );
+    float   Blend                   = uBlend * vBlend;
+     
+    float4  texColor                = tProjection.Sample( sSampler , UVs );
+    
+    float4  finalColor              = lerp( 0.0f.xxxx , texColor , Blend );
+    
+    
+    
+    float   facing                  = max( 0.0f , dot( directionToProjection , normal ) );                                 // Use step to make sharp cuts at the edges over the smooth fadeout effect
     
     float3 tangent          = normalize( input.world_tangent.xyz );
     float3 normal           = normalize( input.world_normal );    
@@ -70,12 +79,8 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
     float3 normal_color     = tNormal.Sample( sSampler , input.uv );
     float3 surface_normal   = NormalColorToVector3( normal_color );
     float3 world_normal     = mul( surface_normal , TBN );
-        
-    float3 directionToSurface = normalize( input.world_position - CAMERA_POSITION );
-    float dp                = length( cross( directionToSurface , world_normal ) );
-    float factor            = FRESNEL_FACTOR * pow( dp , FRESNEL_POWER * 16.0f + 15 * sin( SYSTEM_TIME ) );
     
-    return float4( FRESNEL_COLOR , factor );
+    return ConvertNormalizedVector3ToColor( world_normal );
 }
 
 //--------------------------------------------------------------------------------------

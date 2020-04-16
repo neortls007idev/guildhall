@@ -40,7 +40,7 @@ struct	ID3D11DepthStencilState;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-constexpr uint TOTAL_LIGHTS = 1;
+constexpr uint TOTAL_LIGHTS = 8;
 //float GAMMA = 2.2f;
 //float INVERSE_GAMMA = 1 / GAMMA;
 
@@ -58,10 +58,11 @@ enum eBlendMode
 
 enum eBufferSlot
 {
-	UBO_FRAME_SLOT	= 0,
-	UBO_CAMERA_SLOT = 1,
-	UBO_MODEL_SLOT	= 2,
-	UBO_LIGHT_SLOT	= 3,
+	UBO_FRAME_SLOT			= 0,
+	UBO_CAMERA_SLOT			= 1,
+	UBO_MODEL_SLOT			= 2,
+	UBO_LIGHT_SLOT			= 3,
+	UBO_MATERIAL_SLOT		= 4,
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -100,18 +101,20 @@ struct ModelDataT
 
 struct lightDataT
 {
-	Vec3	world_position		= Vec3::ZERO;
-	float	pad00				= 0.f;							// this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
+	Vec3        worldPosition				= Vec3::ZERO;
+	float       pad00						= 0.f;                                         // this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
 
-	Vec3	color				= Vec3::ONE;
-	float	intensity			= 0.f;									// rgb and an intensity
+	Vec3        color						= Vec3::ONE;
+	float       intensity					= 1.f;                                         // rgb and an intensity
 
-	Vec3    attenuation			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;      // intensity falloff , attentuation for diffuse light, default (0,0,1)
-	float	pad01;
-	//Vec3    attenuation			= Vec3::UNIT_VECTOR_ALONG_I_BASIS;      // intensity falloff , attentuation for diffuse light, default (0,0,1)
-	//Vec3    spec_attenuation	= Vec3::UNIT_VECTOR_ALONG_I_BASIS;      // attenuation for specular lighting (constant,linear,quadratic), default (0,0,1)
-	Vec3    spec_attenuation	= Vec3::UNIT_VECTOR_ALONG_K_BASIS;      // attenuation for specular lighting (constant,linear,quadratic), default (0,0,1)
-	float pad02;
+	Vec3        direction					= Vec3::UNIT_VECTOR_ALONG_K_BASIS;             // direction light is point, default (0,0,1)
+	float       directionFactor				= 0.f;                                         // do we consider this a point light (0.0f) or a directional light (1.0f).  Determine how we calcualte the incident light vector, default (0.0f)
+
+	Vec3        attenuation					= Vec3::UNIT_VECTOR_ALONG_J_BASIS;             // intensity falloff , attenuation for diffuse light, default (0,0,1)
+	float       dotInnerAngle				= -1.0f;                                       // cone light inner angle (default -1.0f) - angle at which cone lights begin to stop affecting an object
+
+	Vec3        specularAttenuation			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;             // attenuation for specular lighting (constant,linear,quadratic), default (0,0,1)
+	float       dotOuterAngle				= -1.f;                                        // cone light outer angle (default -1.0f) - angle at which cone lights stop affecting the object completely
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -184,6 +187,7 @@ public:
 	void					BindVertexBuffer( VertexBuffer* vbo );
 	void					BindIndexBuffer( IndexBuffer* ibo );
 	void					BindUniformBuffer( unsigned int slot , RenderBuffer* ubo ); // UBO - uniform buffer object
+	void					BindMaterialData( void* pointerToData , int sizeOfData ); 
 	void					BindSampler( const Sampler* sampler );
 	void					BindDepthStencil( Texture* depthStencilView );
 	
@@ -224,10 +228,12 @@ public:
 	// for now, assume idx is 0, we only have one light
 	// void EnablePointLight( uint idx, vec3 position, rgba color, float intensity, vec3 attenuation ); 
 	void EnableLight( uint idx , lightDataT const& lightInfo );
+	void EnableAllLights();
 
 	// disabling a light is the same as just saying the light has 0 intensity
 	void DisableLight( uint idx );
-
+	void DisableAllLights();
+	
 	//how much does specular light show up
 	void SetSpecularFactor( float normalizedFactor );
 
@@ -324,7 +330,7 @@ public:
 	
 private:
 
-	void SetInputLayoutForIA( buffer_attribute_t const* attribs );
+	void		SetInputLayoutForIA( buffer_attribute_t const* attribs );
 	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			RENDERING PIPELINE CREATION METHODS ( TO BE ACCESSED BY THE RENDERER ONLY )

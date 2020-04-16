@@ -1,17 +1,21 @@
 #include "ShaderMathUtils.hlsl"
-#include "ConstantBuffers.hlsl"
+//#include "ConstantBuffers.hlsl"
+#include "LightMathUtils.hlsl"
 #include "defaultLitStageStructs.hlsl"
 
 //--------------------------------------------------------------------------------------
 
-cbuffer material_constants : register( b4 )                                                     // constant buffer slot 5
-{                                                                                               
-    float3 FRESNEL_COLOR;                                                                       
-    float  FRESNEL_POWER;
-    
-    float3 pad00;
-    float  FRESNEL_FACTOR;
-};
+    Texture2D<float4> tXDiffuse : register( t8 );
+    Texture2D<float4> tXNormal  : register( t9 );
+    Texture2D<float4> tYDiffuse : register( t10 );
+    Texture2D<float4> tYNormal  : register( t11 );
+    Texture2D<float4> tZDiffuse : register( t12 );
+    Texture2D<float4> tZNormal  : register( t13 );
+
+//--------------------------------------------------------------------------------------
+
+
+
 
 //--------------------------------------------------------------------------------------
 //                      PROGRAMMABLE SHADER STAGES FUNCTIONS
@@ -20,7 +24,6 @@ cbuffer material_constants : register( b4 )                                     
 // VERTEX SHADER
 //
 //--------------------------------------------------------------------------------------
-
 
 v2f_t VertexFunction(vs_input_t input)
 {
@@ -62,20 +65,29 @@ v2f_t VertexFunction(vs_input_t input)
 float4 FragmentFunction(v2f_t input) : SV_Target0
 {
     
-    float3 tangent          = normalize( input.world_tangent.xyz );
-    float3 normal           = normalize( input.world_normal );    
-    float3 bitangent        = normalize( cross( normal , tangent ) ) * input.world_tangent.w;
-    float3x3 TBN            = float3x3( tangent, bitangent, normal );
+                                                                    
+    float2      zUV              = frac( input.world_position.xy );                             // frac is used to sample correctly since we are not usinga wrapping/tiling sampler    
+//  return      float4( zUV , 0.0f , 1.f );
+    float2      xUV              = frac( input.world_position.zy );                             // frac is used to sample correctly since we are not usinga wrapping/tiling sampler
+//  return      float4( xUV , 0.0f , 1.f );
+    float2      yUV              = frac( input.world_position.xz);                              // frac is used to sample correctly since we are not usinga wrapping/tiling sampler
+//  return      float4( yUV , 0.0f , 1.f );
     
-    float3 normal_color     = tNormal.Sample( sSampler , input.uv );
-    float3 surface_normal   = NormalColorToVector3( normal_color );
-    float3 world_normal     = mul( surface_normal , TBN );
+    float4      xColor           = tXDiffuse.Sample( sSampler , xUV );
+    float4      yColor           = tYDiffuse.Sample( sSampler , yUV );
+    float4      zColor           = tZDiffuse.Sample( sSampler , zUV );
         
-    float3 directionToSurface = normalize( input.world_position - CAMERA_POSITION );
-    float dp                = length( cross( directionToSurface , world_normal ) );
-    float factor            = FRESNEL_FACTOR * pow( dp , FRESNEL_POWER * 16.0f + 15 * sin( SYSTEM_TIME ) );
+    float3      weights          = normalize( input.world_normal );
+                weights          = weights * weights;
+                weights          = abs( weights );
+    float       sum              = weights.x + weights.y + weights.z;
+                weights         /= sum;   
     
-    return float4( FRESNEL_COLOR , factor );
+    float4  finalColor          = 
+                                   weights.x * xColor +
+                                   weights.y * yColor +
+                                   weights.z * zColor;
+    return finalColor;
 }
 
 //--------------------------------------------------------------------------------------
