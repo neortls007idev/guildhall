@@ -50,28 +50,31 @@ v2f_t VertexFunction(vs_input_t input)
 
 float4 FragmentFunction( v2f_t input ) : SV_Target0
 {
-    
+    //return float4( LIGHTS[ 0 ].directionFactor.xxx , 1.f );
 //--------------------------------------------------------------------------------------
 //              SAMPLE THE TEXTURES
 //--------------------------------------------------------------------------------------    
     float4 diffuseColor            = tDiffuse.Sample( sSampler , input.uv );
     float4 normalColor             = tNormal.Sample( sSampler , input.uv );
+    //return float4( normalColor );
 
 //--------------------------------------------------------------------------------------
 //              COMPUTE SURFACE COLOR
 //--------------------------------------------------------------------------------------
     
-    float3 surfaceColor            = pow( diffuseColor.xyz , INVERSE_GAMMA.xxx );
-    surfaceColor                   = surfaceColor * input.color.xyz;
+    float3 surfaceColor            = diffuseColor.xyz * input.color.xyz;
+           surfaceColor            = pow( surfaceColor , GAMMA.xxx );
     float alpha                    = diffuseColor.w * input.color.w;
   
+    //return float4( alpha.xxx , 1 ); - match found
+    
     float3 tangent                 = normalize( input.world_tangent.xyz );
     float3 normal                  = normalize( input.world_normal );
     float3 bitangent               = normalize( cross( normal , tangent ) ) * input.world_tangent.w;
     float3x3 TBN                   = float3x3( tangent , bitangent , normal );
     float3 directionToCamera       = normalize( CAMERA_POSITION - input.world_position ); // As the Camera IS OUR EYE
     
-    float3 diffuse                 = AMBIENT.xyz * AMBIENT.w;
+    //float3 diffuse                 = AMBIENT.xyz * AMBIENT.w;
     float3 surfaceNormal           = NormalColorToVector3( normalColor.xyz );
     float3 worldNormal             = mul( surfaceNormal , TBN );
   
@@ -82,24 +85,38 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 //              COMPUTE LIGHT FACTOR
 //--------------------------------------------------------------------------------------
     
-    for( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
-    {
-        float3 lightColor          = LIGHTS[ index ].color.xyz;
-        float2 lightFactor         = ComputeLightFactor( LIGHTS[ index ] , input.world_position , worldNormal , directionToCamera );
-      
-        diffuse                   += lightFactor.x * lightColor;
-        specular                  += lightFactor.y * lightColor;
-    }
+    
+   // for( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
+   // {
+   //     float3 lightColor          = LIGHTS[ index ].color.xyz;
+   //     float2 lightFactor         = ComputeLightFactor( LIGHTS[ index ] , input.world_position , worldNormal , directionToCamera );
+   //   
+   //     //return float4( lightFactor.xxxx );
+   //     diffuse                   += lightFactor.x * lightColor;
+   //     specular                  += lightFactor.y * lightColor;
+   // }
     
     // clamp diffuse to max of 1 (can't wash out a surface)
-    diffuse = min( diffuse , 1.0f );
+//            diffuse                = min( diffuse , 1.0f );
+//       
+//    // spec does not get clamped - allowed to "blow out" for HDR purposes
+////           spec               *= spec_color.xyz;
+//
+//    // compute final color; 
+//    float3 finalColor              = diffuse * surfaceColor + specular;
+//           finalColor              = pow( finalColor.xyz , INVERSE_GAMMA.xxx );
     
-    // spec does not get clamped - allowed to "blow out" for HDR purposes
-//           spec               *= spec_color.xyz;
+       // get emissive - scaled down
+    //float specularFactor = specularcolor.x * SPECULAR_FACTOR;
 
-    // compute final color; 
-    float3 finalColor              = diffuse * surfaceColor + specular;
-    //finalColor                     = pow( finalColor.xyz , GAMMA.xxx );
+   // compute lighting for surface
+    float3 finalColor = ComputeLightingAt( input.world_position , worldNormal , surfaceColor , float3( 0.0f.xxx ) , SPECULAR_FACTOR );
+   
+   // gamma correct back, and output
+    //finalColor = pow( finalColor.xyz , INVERSE_GAMMA.xxx );
+
+  //  final_color = ApplyFog( v2fWorldPosition , final_color );
+  //  outColor = vec4( final_color , alpha );
         
     return float4( finalColor , alpha );
 }
