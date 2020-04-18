@@ -87,7 +87,10 @@
       - 4. `V` : increase Burn Edge Width. ( Clamped 0 to 1 + 2 * Current Burn Value )
       - __Dev console command__ :- `UpdateDissolveShader` can be used to change `startColor`, `endColor` , `burnValue`, `burnEdgeWidth`.
       - __Dev console command__ :- `UpdateDissolveShaderPattern` can be used to change dissolve pattern. see dev console help.
+      - A good test for this would be - UpdateDissolveShaderPattern patternTexPath =Data\Images\metalPlate\metal_plate_rough_1k.png
+      (You can just copy and paste this :) )
       *__WARNING :- Updating pattern can cause the program to crash in case texture is missing.__*
+
 
 **Lighting Testing ( Also present on Screen )**
 
