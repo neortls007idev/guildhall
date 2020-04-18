@@ -27,7 +27,6 @@ enum LitShaderTypes
 	FRESNEL,
 	TRIPLANAR_UNLIT,
 	TRIPLANAR_LIT,
-	//FOG,
 	TOTAL,
 };
 
@@ -71,7 +70,7 @@ class Game
 public:
 			Game();
 
-			void initializeLightData();
+			void InitializeLightData();
 			void LoadShaders();
 			void LoadTextures();
 			void InitializeCameras();
@@ -167,6 +166,7 @@ public:
 	Vec3						m_cameraPosition									= Vec3::ZERO;
 	Vec3						m_cameraRotation									= Vec3::ZERO;
 	
+	bool						m_isHUDEnabled										= true;
 	Shader*						m_lightShaders[ LitShaderTypes::TOTAL ];
 	Shader* 					m_currentShader;
 	int							m_currentShaderIndex;

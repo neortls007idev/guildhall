@@ -318,16 +318,6 @@ void TheApp::UpdateFromKeyboard()
 
 	if ( g_theInput->GetButtonState( 'P' ).WasJustPressed() ) { m_isPaused = !m_isPaused; }
 
-
-	if ( g_theInput->GetButtonState( KEY_F4 ).WasJustPressed() )
-	{
-		m_debugCamera = !m_debugCamera;
-		if (m_debugCamera)
-		{
-			g_theGame->m_gameCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( WORLD_CAMERA_SIZE_X , WORLD_CAMERA_SIZE_Y ) );
-		}
-	}
-
 	if ( g_theInput->GetButtonState( KEY_F8 ).WasJustPressed() )
 	{
 		delete g_theGame;
@@ -335,9 +325,9 @@ void TheApp::UpdateFromKeyboard()
 		g_theGame = new Game();
 	}
 
-	if ( g_theInput->WasKeyJustPressed( 'R' ) )
-	{
-		g_theRenderer->ReCompileAllShaders();
-	}
+	//if ( g_theInput->WasKeyJustPressed( 'R' ) )
+	//{
+	//	g_theRenderer->ReCompileAllShaders();
+	//}
 }
 

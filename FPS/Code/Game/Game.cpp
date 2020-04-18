@@ -57,13 +57,13 @@ Game::Game()
 	m_sphereMeshTransform.SetPosition( -5.f , 0.0f , -10.0f );
 	m_quadTransform.SetPosition( 0.f , 0.0f , -10.0f );
 
-	initializeLightData();
+	InitializeLightData();
 	InitializeShaderMaterialData();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Game::initializeLightData()
+void Game::InitializeLightData()
 {
 	m_lights.ambientLight								= Vec4( 1.f , 1.f , 1.f , 0.f );
 	m_ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
@@ -73,11 +73,18 @@ void Game::initializeLightData()
 	m_lights.lights[ 0 ].attenuation					= Vec3::UNIT_VECTOR_ALONG_J_BASIS;
 	m_lights.lights[ 0 ].specularAttenuation			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
 
+	RandomNumberGenerator rng;
+	
 	for ( uint index = 1 ; index < TOTAL_LIGHTS ; index++ )
 	{
-		m_lights.lights[ index ].color					= Vec3::ONE;
-		m_lights.lights[ index ].attenuation			= Vec3::UNIT_VECTOR_ALONG_J_BASIS;
+		Rgba8 color;
+		color.RollRandomColor( rng );
+		rng.manuallyIncrementPosition();
+		m_lights.lights[ index ].color					= color.GetAsNormalizedFloat3();
+		m_lights.lights[ index ].intensity				= 0.f;
+		m_lights.lights[ index ].attenuation			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
 		m_lights.lights[ index ].specularAttenuation	= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
+		m_lights.lights[ index ].worldPosition			= Vec3( index * 1.5f , 0.f , 10.f );
 	}
 
 	for ( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
@@ -99,11 +106,11 @@ void Game::InitializeShaderMaterialData()
 	m_dissolveShaderData.endColor				= ORANGE.GetAsNormalizedFloat3();
 	m_dissolveShaderData.burnValue				= 0.f;
 
-	//m_fogShaderData.nearFog						= 0.f;
-	//m_fogShaderData.farFog						= 100.f;
-	//
-	//m_fogShaderData.nearFogColor				= GRAY.GetAsNormalizedFloat3();
-	//m_fogShaderData.fogFarColor					= /*WHITE.GetAsNormalizedFloat3();*/ Rgba8( 37 , 70 , 87 , 127 ).GetAsNormalizedFloat3();
+	m_fogData.nearFog							= 0.f;
+	m_fogData.farFog							= 15.f;
+	
+	m_fogData.nearFogColor						= GRAY.GetAsNormalizedFloat3();
+	m_fogData.farFogColor						= /*WHITE.GetAsNormalizedFloat3();*/ Rgba8( 37 , 70 , 87 , 127 ).GetAsNormalizedFloat3();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -218,7 +225,19 @@ void Game::InitializeCameras()
 void Game::Update( float deltaSeconds )
 {
 	m_ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
-	DebugDrawUI( deltaSeconds );
+	
+	if ( m_isHUDEnabled )
+	{
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.625f , 1.00f ) , Vec2::ONE , 20.f , RED , deltaSeconds ,
+			"[ H ] : HIDE HELP HUD" );
+		DebugDrawUI( deltaSeconds );
+	}
+	else
+	{
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.625f , 1.00f ) , Vec2::ONE , 20.f , RED , deltaSeconds ,
+			"[ H ] : SHOW HELP HUD" );
+	}
+
 	UpdateLightPosition( deltaSeconds );
 
 	static float y = 0;
@@ -317,101 +336,147 @@ void Game::DebugDrawUI( float deltaSeconds )
 		case LitShaderTypes::TRIPLANAR_UNLIT:
 			cureentShaderName = "TRIPLANAR UNLIT SHADER";
 			break;
-		
-		//case LitShaderTypes::FOG:
-		//	cureentShaderName = "FOG SHADER";
-		//	break;
 	}
 
-	float leftVerticalAlignment = ( 1080.f * 0.25f ) / 11.f;
+	float leftVerticalAlignment = ( 1080.f * 0.25f ) / 16.f;
 	float normalizedOffset = RangeMapFloat( 0.f , 1080.f , 0.f , 1.f , leftVerticalAlignment );
 
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1.00f ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1.00f ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
 		"[ LT-ARRW / RT-ARRW ] : SWITCH SHADERS" );
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 1 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 1 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
 		"CURRENT SHADER = %s" , cureentShaderName.c_str() );
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 2 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 2 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
 		"[ F5 ] = Position Light At Origin" );
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 3 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 3 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
 		"[ F6 ] = Position Light At Current Camera Position" );
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 4 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 4 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
 		"[ F7 ] = Light Follows Camera" );
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 5 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 5 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
 		"[ F9 ] = Light Moves in an fixed Path" );
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 6 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 6 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
 		"[ 9 / 0 ] = Change Ambient Light Intensity (Clamped 0-1)" );
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 7 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 7 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
 		"[ - / + ] = Change Light Intensity (UnClamped)" );
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 8 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 8 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
 		"[ [ / ] ] = Change Specular Factor (Clamped 0-1)" );
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 9 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 9 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
 		"[ U / J ] = Change Specular Power (Clamped 1-INF)" );
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 10 * normalizedOffset ) ) , Vec2::ZERO_ONE , 16.f , PINK , deltaSeconds ,
-		"[ T / R / G / Y ] = Change Light Attenuation to ZERO / Constant / Linear / Quadratic" );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 10 * normalizedOffset ) ) , Vec2::ZERO_ONE, 14.5f , PINK , deltaSeconds ,
+		"[ T / R / G / Y ] = Change Current Light Attenuation to ZERO / Constant / Linear / Quadratic" );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 11 * normalizedOffset ) ) , Vec2::ZERO_ONE, 14.5f , PINK , deltaSeconds ,
+		"[ 1 - 8 ] = Change Current Selected Light" );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 12 * normalizedOffset ) ) , Vec2::ZERO_ONE, 14.5f , PINK , deltaSeconds ,
+		"[ M ] = Cycle Current Selected Light between POINT / DIRECTIONAL / SPOT" );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 13 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
+		"[ Q / E ] = ENABLE / DISABLE Currently Selected Light" );
 
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1.f ) , Vec2::ONE , 16.f , ORANGE , deltaSeconds ,
-		"Specular Power = %.2f" , m_lights.SPECULAR_POWER );
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 1 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE , deltaSeconds ,
-		"Specular Factor = %.2f" , m_lights.SPECULAR_FACTOR );
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 2 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE , deltaSeconds ,
-		"Attenuation = ( %.3f , %.3f , %.3f ) " , m_lights.lights[ m_currentLightIndex ].attenuation.x ,
-		m_lights.lights[ m_currentLightIndex ].attenuation.y , m_lights.lights[ m_currentLightIndex ].attenuation.z );
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 3 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE , deltaSeconds , "Ambient Light Intensity = %.2f" , m_lights.ambientLight.w );
+	if ( LitShaderTypes::FRESNEL == m_currentShaderIndex )
+	{
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 14 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
+			"[ Z / X ] = Fresnel Factor = %f", m_fresnelShaderData.fresnelfactor );
+
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 15 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
+			"[ C / V ] = Fresnel Power = %f" , m_fresnelShaderData.fresnelPower );
+
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 16 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
+			"Fresnel Color = ( %u , %u ,%u )" , (uint)(m_fresnelShaderData.fresnelColor.x * 255), ( uint ) (m_fresnelShaderData.fresnelColor.y * 255), ( uint ) ( m_fresnelShaderData.fresnelColor.z * 255 ) );
+	}
+
+	if ( LitShaderTypes::DISSOLVE == m_currentShaderIndex )
+	{
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 14 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
+			"[ Z / X ] = Dissolve Burn Value = %f" , m_dissolveShaderData.burnValue );
+
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 15 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
+			"[ C / V ] = Dissolve Burn Edge Width = %f" , m_dissolveShaderData.burnValue );
+
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 16 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
+			"Dissolve Start Color = ( %u , %u ,%u )" , ( uint ) ( m_dissolveShaderData.startColor.x * 255 ) , ( uint ) ( m_dissolveShaderData.startColor.y * 255 ) , ( uint ) ( m_dissolveShaderData.startColor.z * 255 ) );
+
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 16 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
+			"Dissolve End Color = ( %u , %u ,%u )" , ( uint ) ( m_dissolveShaderData.endColor.x * 255 ) , ( uint ) ( m_dissolveShaderData.endColor.y * 255 ) , ( uint ) ( m_dissolveShaderData.endColor.z * 255 ) );
+	}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1.f ) , Vec2::ONE , 14.5f , ORANGE , deltaSeconds ,
+		"Global Specular Power = %.2f" , m_lights.SPECULAR_POWER );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 1 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE , deltaSeconds ,
+		"Global Specular Factor = %.2f" , m_lights.SPECULAR_FACTOR );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 2 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE , deltaSeconds , "Ambient Light Intensity = %.2f" , m_lights.ambientLight.w );
 
 	Rgba8 ambientLightColor;
 	ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
 
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 4 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE , deltaSeconds , "Ambient Light Color = R(%u) G(%u) B(%u) " , ambientLightColor.r , ambientLightColor.g , ambientLightColor.b );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 3 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE , deltaSeconds , "Ambient Light Color = R(%u) G(%u) B(%u) " , ambientLightColor.r , ambientLightColor.g , ambientLightColor.b );
 
 	Rgba8 debuglightColor;
 	debuglightColor.SetColorFromNormalizedFloat( Vec4( m_lights.lights[ m_currentLightIndex ].color , 1.f ) );
 
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 5 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 4 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
 		deltaSeconds , "Current Light Number = %u" , m_currentLightIndex );
 
 	if ( POINT_LIGHT == m_lightType[ m_currentLightIndex ] )
 	{
-		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 6 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE ,
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 5 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
 			deltaSeconds , "Current Light Type = POINT LIGHT");
 	}
 	else if ( DIRECTIONAL_LIGHT == m_lightType[ m_currentLightIndex ] )
 	{
-		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 6 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE ,
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 5 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
 			deltaSeconds , "Current Light Type = DIRECTIONAL LIGHT" );
 	}
 	else if ( SPOT_LIGHT == m_lightType[ m_currentLightIndex ] )
 	{
-		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 6 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE ,
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 5 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
 			deltaSeconds , "Current Light Type = SPOT LIGHT" );
 	}
 
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 7 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 6 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
 		deltaSeconds , "Current Light Intensity = %.2f" , m_lights.lights[ m_currentLightIndex ].intensity );
 	
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 8 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 7 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE , deltaSeconds ,
+		"Diffuse Attenuation = ( %.3f , %.3f , %.3f ) " , m_lights.lights[ m_currentLightIndex ].attenuation.x ,
+		m_lights.lights[ m_currentLightIndex ].attenuation.y , m_lights.lights[ m_currentLightIndex ].attenuation.z );
+	
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 8 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
 		deltaSeconds , "Current Light Color = R(%u) G(%u) B(%u) " , debuglightColor.r , debuglightColor.g ,
 		debuglightColor.b );
 	
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 11 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 11 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
 		deltaSeconds , "Current Light InnerAngle = %f" , m_lights.lights[ m_currentLightIndex ].dotInnerAngle );
 
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 12 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 12 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
 		deltaSeconds , "Current Light OuterAngle = %f" , m_lights.lights[ m_currentLightIndex ].dotOuterAngle );
 
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 13 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 13 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
 		deltaSeconds , "Current Light Specular attenuation = ( %.0f , %.0f , %.0f )" ,
 		m_lights.lights[ m_currentLightIndex ].specularAttenuation.x ,
 		m_lights.lights[ m_currentLightIndex ].specularAttenuation.y ,
 		m_lights.lights[ m_currentLightIndex ].specularAttenuation.z );
 
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 14 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 14 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
 		deltaSeconds , "Current Light direction Factor = %f" , m_lights.lights[ m_currentLightIndex ].directionFactor );
 
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 15 * normalizedOffset ) ) , Vec2::ONE , 16.f , ORANGE ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 15 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
 		deltaSeconds , "Current Light direction = ( %.0f , %.0f , %.0f )" ,
 		m_lights.lights[ m_currentLightIndex ].direction.x ,
 		m_lights.lights[ m_currentLightIndex ].direction.y ,
 		m_lights.lights[ m_currentLightIndex ].direction.z );
+
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 17 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+		deltaSeconds , "Fog Near Distance = %f" , m_fogData.nearFog );
+
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 18 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+		deltaSeconds , "Fog Far Distance = %f" , m_fogData.farFog );
+
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 19 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+		deltaSeconds , "Fog Near Color = ( %u , %u , %u )" ,
+		( uint ) ( m_fogData.nearFogColor.x * 255.f ) , ( uint ) ( m_fogData.nearFogColor.y * 255.f ) , ( uint ) ( m_fogData.nearFogColor.z * 255.f ) );
+
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 20 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+		deltaSeconds , "Fog Far Color = ( %u , %u , %u )" ,
+		( uint ) ( m_fogData.farFogColor.x * 255.f ) , ( uint ) ( m_fogData.farFogColor.y * 255.f ) , ( uint ) ( m_fogData.farFogColor.z * 255.f ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -429,11 +494,11 @@ void Game::Render() const
 	g_theRenderer->SetDepthTest( COMPARE_LEQUAL , true );
 
 	g_theRenderer->SetAmbientLight( m_ambientLightColor , m_lights.ambientLight.w );
-	g_theRenderer->EnableLight( 0 , m_lights.lights[ 0 ] );
+	//g_theRenderer->EnableLight( 0 , m_lights.lights[ 0 ] );
 	//g_theRenderer->EnableLight( 1 , m_lights.lights[ 1 ] );
 	//g_theRenderer->EnableLight( 2 , m_lights.lights[ 2 ] );
 	//g_theRenderer->EnableLight( 3 , m_lights.lights[ 3 ] );
-	//g_theRenderer->UpdateLightsData( m_lights );
+	g_theRenderer->UpdateLightsData( m_lights );
 	g_theRenderer->EnableAllLights();
 	g_theRenderer->SetSpecularFactor( m_lights.SPECULAR_FACTOR );
 	g_theRenderer->SetSpecularPower( m_lights.SPECULAR_POWER );
@@ -752,6 +817,11 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	}
 	//DebugLineStripDrawModeTest();
 	
+	if ( g_theInput->WasKeyJustPressed( 'H' ) )
+	{
+		m_isHUDEnabled = !m_isHUDEnabled;
+	}
+
 	CameraPositionUpdateOnInput( deltaSeconds );
 	UpdateLightsFromKeyBoard( deltaSeconds );
 	UpdateMaterialShaderFromUserInput( deltaSeconds );
@@ -873,6 +943,18 @@ void Game::UpdateCurrentSelectedLightFromKeyBoard()
 									}	break;
 		}
 	}
+
+	if ( g_theInput->WasKeyJustPressed( 'Q' ) )
+	{
+		g_theRenderer->EnableLight( m_currentLightIndex , m_lights.lights[ m_currentLightIndex ] );
+		m_lights.lights[ m_currentLightIndex ].intensity = 1.f;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'E' ) )
+	{
+		g_theRenderer->DisableLight( m_currentLightIndex );
+		m_lights.lights[ m_currentLightIndex ].intensity = 0.f;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -978,6 +1060,18 @@ void Game::UpdateMaterialShaderFromUserInput( float deltaSeconds )
 
 	if ( LitShaderTypes::FRESNEL == m_currentShaderIndex )
 	{
+		if ( g_theInput->IsKeyHeldDown( 'C' ) )
+		{
+			m_fresnelShaderData.fresnelPower -= deltaSeconds;
+			m_fresnelShaderData.fresnelPower  = ClampZeroToOne( m_fresnelShaderData.fresnelPower );
+		}
+
+		if ( g_theInput->IsKeyHeldDown( 'V' ) )
+		{
+			m_fresnelShaderData.fresnelPower += deltaSeconds;
+			m_fresnelShaderData.fresnelPower  = ClampZeroToOne( m_fresnelShaderData.fresnelPower );
+		}
+
 		if ( g_theInput->IsKeyHeldDown( 'Z' ) )
 		{
 			m_fresnelShaderData.fresnelfactor -= deltaSeconds;
@@ -986,7 +1080,7 @@ void Game::UpdateMaterialShaderFromUserInput( float deltaSeconds )
 
 		if ( g_theInput->IsKeyHeldDown( 'X' ) )
 		{
-			m_fresnelShaderData.fresnelfactor -= deltaSeconds;
+			m_fresnelShaderData.fresnelfactor += deltaSeconds;
 			m_fresnelShaderData.fresnelfactor = ClampZeroToOne( m_fresnelShaderData.fresnelfactor );
 		}
 	}
