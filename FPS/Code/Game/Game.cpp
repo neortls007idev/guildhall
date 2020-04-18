@@ -84,6 +84,7 @@ void Game::InitializeLightData()
 		m_lights.lights[ index ].intensity				= 0.f;
 		m_lights.lights[ index ].attenuation			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
 		m_lights.lights[ index ].specularAttenuation	= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
+		m_lights.lights[ index ].worldPosition			= Vec3( index * 1.5f , 0.f , 10.f );
 	}
 
 	for ( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
@@ -335,10 +336,6 @@ void Game::DebugDrawUI( float deltaSeconds )
 		case LitShaderTypes::TRIPLANAR_UNLIT:
 			cureentShaderName = "TRIPLANAR UNLIT SHADER";
 			break;
-		
-		//case LitShaderTypes::FOG:
-		//	cureentShaderName = "FOG SHADER";
-		//	break;
 	}
 
 	float leftVerticalAlignment = ( 1080.f * 0.25f ) / 16.f;
@@ -372,6 +369,34 @@ void Game::DebugDrawUI( float deltaSeconds )
 		"[ M ] = Cycle Current Selected Light between POINT / DIRECTIONAL / SPOT" );
 	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 13 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
 		"[ Q / E ] = ENABLE / DISABLE Currently Selected Light" );
+
+	if ( LitShaderTypes::FRESNEL == m_currentShaderIndex )
+	{
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 14 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
+			"[ Z / X ] = Fresnel Factor = %f", m_fresnelShaderData.fresnelfactor );
+
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 15 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
+			"[ C / V ] = Fresnel Power = %f" , m_fresnelShaderData.fresnelPower );
+
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 16 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
+			"Fresnel Color = ( %u , %u ,%u )" , (uint)(m_fresnelShaderData.fresnelColor.x * 255), ( uint ) (m_fresnelShaderData.fresnelColor.y * 255), ( uint ) ( m_fresnelShaderData.fresnelColor.z * 255 ) );
+	}
+
+	if ( LitShaderTypes::DISSOLVE == m_currentShaderIndex )
+	{
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 14 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
+			"[ Z / X ] = Dissolve Burn Value = %f" , m_dissolveShaderData.burnValue );
+
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 15 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
+			"[ C / V ] = Dissolve Burn Edge Width = %f" , m_dissolveShaderData.burnValue );
+
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 16 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
+			"Dissolve Start Color = ( %u , %u ,%u )" , ( uint ) ( m_dissolveShaderData.startColor.x * 255 ) , ( uint ) ( m_dissolveShaderData.startColor.y * 255 ) , ( uint ) ( m_dissolveShaderData.startColor.z * 255 ) );
+
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 16 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
+			"Dissolve End Color = ( %u , %u ,%u )" , ( uint ) ( m_dissolveShaderData.endColor.x * 255 ) , ( uint ) ( m_dissolveShaderData.endColor.y * 255 ) , ( uint ) ( m_dissolveShaderData.endColor.z * 255 ) );
+	}
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1.f ) , Vec2::ONE , 14.5f , ORANGE , deltaSeconds ,
@@ -438,6 +463,20 @@ void Game::DebugDrawUI( float deltaSeconds )
 		m_lights.lights[ m_currentLightIndex ].direction.x ,
 		m_lights.lights[ m_currentLightIndex ].direction.y ,
 		m_lights.lights[ m_currentLightIndex ].direction.z );
+
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 17 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+		deltaSeconds , "Fog Near Distance = %f" , m_fogData.nearFog );
+
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 18 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+		deltaSeconds , "Fog Far Distance = %f" , m_fogData.farFog );
+
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 19 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+		deltaSeconds , "Fog Near Color = ( %u , %u , %u )" ,
+		( uint ) ( m_fogData.nearFogColor.x * 255.f ) , ( uint ) ( m_fogData.nearFogColor.y * 255.f ) , ( uint ) ( m_fogData.nearFogColor.z * 255.f ) );
+
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 20 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+		deltaSeconds , "Fog Far Color = ( %u , %u , %u )" ,
+		( uint ) ( m_fogData.farFogColor.x * 255.f ) , ( uint ) ( m_fogData.farFogColor.y * 255.f ) , ( uint ) ( m_fogData.farFogColor.z * 255.f ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1021,6 +1060,18 @@ void Game::UpdateMaterialShaderFromUserInput( float deltaSeconds )
 
 	if ( LitShaderTypes::FRESNEL == m_currentShaderIndex )
 	{
+		if ( g_theInput->IsKeyHeldDown( 'C' ) )
+		{
+			m_fresnelShaderData.fresnelPower -= deltaSeconds;
+			m_fresnelShaderData.fresnelPower  = ClampZeroToOne( m_fresnelShaderData.fresnelPower );
+		}
+
+		if ( g_theInput->IsKeyHeldDown( 'V' ) )
+		{
+			m_fresnelShaderData.fresnelPower += deltaSeconds;
+			m_fresnelShaderData.fresnelPower  = ClampZeroToOne( m_fresnelShaderData.fresnelPower );
+		}
+
 		if ( g_theInput->IsKeyHeldDown( 'Z' ) )
 		{
 			m_fresnelShaderData.fresnelfactor -= deltaSeconds;
@@ -1029,7 +1080,7 @@ void Game::UpdateMaterialShaderFromUserInput( float deltaSeconds )
 
 		if ( g_theInput->IsKeyHeldDown( 'X' ) )
 		{
-			m_fresnelShaderData.fresnelfactor -= deltaSeconds;
+			m_fresnelShaderData.fresnelfactor += deltaSeconds;
 			m_fresnelShaderData.fresnelfactor = ClampZeroToOne( m_fresnelShaderData.fresnelfactor );
 		}
 	}

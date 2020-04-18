@@ -27,7 +27,6 @@ enum LitShaderTypes
 	FRESNEL,
 	TRIPLANAR_UNLIT,
 	TRIPLANAR_LIT,
-	//FOG,
 	TOTAL,
 };
 
