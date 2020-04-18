@@ -254,19 +254,19 @@ DRO_arrow3D::DRO_arrow3D ( Vec3 startPos , Vec3 endPos , Rgba8 color , float dur
 
 	m_shaftStartPosStartColor	= color;
 	m_shaftStartPosEndColor		= color;
-	m_shaftStartPosCurrentColor = m_shaftStartPosCurrentColor;
+	m_shaftStartPosCurrentColor = color;
 
 	m_shaftEndPosStartColor		= color;
 	m_shaftEndPosEndColor		= color;
-	m_shaftEndPosCurrentColor	= m_shaftEndPosStartColor;
+	m_shaftEndPosCurrentColor	= color;
 
 	m_tipStartPosStartColor		= color;
 	m_tipStartPosEndColor		= color;
-	m_tipStartPosCurrentColor	= m_tipStartPosStartColor;
+	m_tipStartPosCurrentColor	= color;
 
 	m_tipEndPosStartColor		= color;
 	m_tipEndPosEndColor			= color;
-	m_tipEndPosCurrentColor		= m_tipEndPosStartColor;
+	m_tipEndPosCurrentColor		= color;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

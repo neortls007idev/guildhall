@@ -323,7 +323,7 @@ public:
 				  Rgba8 tipStartPosStartColor	, Rgba8 tipStartPosEndColor	  , Rgba8 tipEndPosStartColor   , Rgba8 tipEndPosEndColor   ,
 	              float duration = 0.f , eDebugRenderMode mode = DEBUG_RENDER_ALWAYS , float shaftRadius = 0.9f , float tipRadius = 1.f );
 	
-	DRO_arrow3D( Vec3 startPos , Vec3 endPos , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH , float radius = 0.3f );
+	DRO_arrow3D( Vec3 startPos , Vec3 endPos , Rgba8 color , float duration = 0.0f , eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH , float radius = 0.05f );
 
 	void UpdateColor() override;
 

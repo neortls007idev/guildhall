@@ -413,7 +413,7 @@ void RenderContext::BeginCamera( const Camera& camera )
 	//SetDepthTest( COMPARE_ALWAYS , true );
 	//BindDepthStencil( m_currentCamera->GetDepthStencilTarget() );
 
-	DisableAllLights();												// Disable all lights at the start 
+	//DisableAllLights();												// Disable all lights at the start 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
