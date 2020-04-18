@@ -81,9 +81,8 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
    // gamma correct back, and output
            finalColor              = pow( finalColor.xyz , INVERSE_GAMMA.xxx );
 
-  //  final_color = ApplyFog( v2fWorldPosition , final_color );
-  //  outColor = vec4( final_color , alpha );
-        
+    finalColor                      = ApplyLinearFog( input.world_position , finalColor );
+            
     return float4( finalColor , alpha );
 }
 

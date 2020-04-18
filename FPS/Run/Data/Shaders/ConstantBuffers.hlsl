@@ -7,7 +7,7 @@
 // changed in-between draw calls on the CPU
 //--------------------------------------------------------------------------------------
 
-static const uint TOTAL_LIGHTS = 1;
+static const uint TOTAL_LIGHTS = 8;
 
 //--------------------------------------------------------------------------------------
 // buffer holding time information from our game
@@ -85,6 +85,17 @@ cbuffer light_constants : register( b3 )                                        
 };
 
 //--------------------------------------------------------------------------------------
+
+cbuffer fog_constants : register( b4 )                                                      // constant buffer slot 5
+{
+    float           nearFog;
+    float3          fogNearColor;
+    
+    float           farFog;
+    float3          fogFarColor;
+};
+
+//--------------------------------------------------------------------------------------
 // Textures & Samplers are also a form of constant
 // data - uniform/constant across the entire call
 //--------------------------------------------------------------------------------------
@@ -94,3 +105,10 @@ Texture2D<float4>   tNormal     : register( t1 );                               
 SamplerState        sSampler    : register( s0 );                                           // sampler are rules on how to sample (read) from the texture.
 
 //--------------------------------------------------------------------------------------
+
+float3 ApplyLinearFog( float3 worldPosition , float3 color )
+{
+    float distance          = length( worldPosition - CAMERA_POSITION );
+    float alpha             = smoothstep( nearFog , farFog , distance );
+    return lerp( color , fogFarColor , alpha.xxx );
+}

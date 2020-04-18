@@ -29,7 +29,7 @@ STATIC Rgba8			Game::m_ambientLightColor;
 STATIC LightType		Game::m_lightType[ TOTAL_LIGHTS ];
 STATIC fresnelData_t	Game::m_fresnelShaderData;
 STATIC dissolveData_t	Game::m_dissolveShaderData;
-STATIC fogData_t		Game::m_fogShaderData;
+STATIC fogDataT			Game::m_fogData;
 STATIC Texture*			Game::m_dissolveShaderPatternTexture;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -40,6 +40,7 @@ Game::Game()
 	{
 		AddLightDevConsoleCommands( g_theDevConsole );
 		AddShaderDevConsoleCommands( g_theDevConsole );
+		AddFogCommandsToDevConsole( g_theDevConsole );
 		s_areDevconsoleCommandsLoaded = true;
 	}
 	
@@ -98,11 +99,11 @@ void Game::InitializeShaderMaterialData()
 	m_dissolveShaderData.endColor				= ORANGE.GetAsNormalizedFloat3();
 	m_dissolveShaderData.burnValue				= 0.f;
 
-	m_fogShaderData.nearFog						= 0.f;
-	m_fogShaderData.farFog						= 100.f;
-	
-	m_fogShaderData.nearFogColor				= GRAY.GetAsNormalizedFloat3();
-	m_fogShaderData.fogFarColor					= /*WHITE.GetAsNormalizedFloat3();*/ Rgba8( 37 , 70 , 87 , 127 ).GetAsNormalizedFloat3();
+	//m_fogShaderData.nearFog						= 0.f;
+	//m_fogShaderData.farFog						= 100.f;
+	//
+	//m_fogShaderData.nearFogColor				= GRAY.GetAsNormalizedFloat3();
+	//m_fogShaderData.fogFarColor					= /*WHITE.GetAsNormalizedFloat3();*/ Rgba8( 37 , 70 , 87 , 127 ).GetAsNormalizedFloat3();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -120,7 +121,7 @@ void Game::LoadShaders()
 	m_lightShaders[ LitShaderTypes::FRESNEL ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/fresnel.hlsl" );
 	m_lightShaders[ LitShaderTypes::TRIPLANAR_UNLIT ]			= g_theRenderer->GetOrCreateShader( "Data/Shaders/triplanarUnlit.hlsl" );
 	m_lightShaders[ LitShaderTypes::TRIPLANAR_LIT ]				= g_theRenderer->GetOrCreateShader( "Data/Shaders/triplanarLit.hlsl" );
-	m_lightShaders[ LitShaderTypes::FOG ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/fog.hlsl" );
+	//m_lightShaders[ LitShaderTypes::FOG ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/fog.hlsl" );
 
 	m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
 	m_currentShaderIndex = LitShaderTypes::LIT;
@@ -317,9 +318,9 @@ void Game::DebugDrawUI( float deltaSeconds )
 			cureentShaderName = "TRIPLANAR UNLIT SHADER";
 			break;
 		
-		case LitShaderTypes::FOG:
-			cureentShaderName = "FOG SHADER";
-			break;
+		//case LitShaderTypes::FOG:
+		//	cureentShaderName = "FOG SHADER";
+		//	break;
 	}
 
 	float leftVerticalAlignment = ( 1080.f * 0.25f ) / 11.f;
@@ -441,13 +442,16 @@ void Game::Render() const
 	g_theRenderer->BindTexture( m_tileDiffuse );
 	g_theRenderer->BindTexture( m_tileNormal , eTextureType::TEX_NORMAL );
 
-	//g_theRenderer->BindShader( g_theRenderer->GetOrCreateShader( "Data/Shaders/triplanar.hlsl" ) );
+	//g_theRenderer->EnableFog( m_fogData.nearFog , m_fogData.farFog , m_fogData.nearFogColor , m_fogData.farFogColor );
+	g_theRenderer->EnableFog( m_fogData );
+
 	BindShaderSpecificMaterialData();
 
  	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_meshSphere );
 
-	//g_theRenderer->BindShader( m_currentShader );
+	g_theRenderer->DisableFog();
+
  	g_theRenderer->SetModelMatrix( m_quadTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_quadMesh );
 	
@@ -455,8 +459,7 @@ void Game::Render() const
 	g_theRenderer->DrawMesh( m_cubeMesh );
 	
 	if ( m_isFresnelShaderActive )													{	RenderFresnelShader2ndPass();	}
-	if ( m_isFogShaderActive )														{	RenderFogShader2ndPass();	}
-	
+		
 	g_theRenderer->SetRasterState( FILL_SOLID );
 
 	g_theRenderer->BindShader( nullptr );
@@ -490,11 +493,6 @@ void Game::BindShaderSpecificMaterialData() const
 		g_theRenderer->BindTexture( m_dissolveShaderPatternTexture , eTextureType::TEX_USER_TYPE , 0 );
 		g_theRenderer->BindMaterialData( ( void* ) &m_dissolveShaderData , sizeof( m_dissolveShaderData ) );
 	}
-
-	//if ( LitShaderTypes::FOG == m_currentShaderIndex )
-	//{
-	//	g_theRenderer->BindMaterialData( ( void* ) &m_fogShaderData , sizeof( m_fogShaderData ) );
-	//}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -503,25 +501,6 @@ void Game::RenderFresnelShader2ndPass() const
 {
 	g_theRenderer->BindShader( m_lightShaders[ LitShaderTypes::FRESNEL ] );
 	g_theRenderer->BindMaterialData( ( void* ) &m_fresnelShaderData , sizeof( m_fresnelShaderData ) );
-	g_theRenderer->SetBlendMode( ALPHA );
-
-	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
-	g_theRenderer->DrawMesh( m_meshSphere );
-
-	g_theRenderer->SetModelMatrix( m_quadTransform.GetAsMatrix() );
-	g_theRenderer->DrawMesh( m_quadMesh );
-
-	g_theRenderer->SetModelMatrix( m_cubeMeshTransform.GetAsMatrix() );
-	g_theRenderer->DrawMesh( m_cubeMesh );
-	g_theRenderer->SetBlendMode( SOLID );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Game::RenderFogShader2ndPass() const
-{
-	g_theRenderer->BindShader( m_lightShaders[ LitShaderTypes::FOG ] );
-	g_theRenderer->BindMaterialData( ( void* ) &m_fogShaderData , sizeof( m_fogShaderData ) );
 	g_theRenderer->SetBlendMode( ALPHA );
 
 	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
@@ -725,6 +704,46 @@ bool Game::UpdateDissolveShaderPatternViaConsole( EventArgs& args )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Game::AddFogCommandsToDevConsole( DevConsole* devConsole )
+{
+	EventArgs consoleArgs;
+	devConsole->CreateCommand( "DisableFog" , "Disables the Fog" , consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "DisableFog" , DisableFog );
+
+	devConsole->CreateCommand( "EnableFog" ,
+		"Ex - EnableFog nearFog = 0.f |farFog = 15.f |nearFogColor = 100,100,100,100 |farFogColor = 255,100,0,100" ,
+		consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "EnableFog" , UpdateFog );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC bool Game::UpdateFog( EventArgs& args )
+{
+	m_fogData.nearFog		= args.GetValue( "nearFog "			, m_fogData.nearFog );
+	m_fogData.farFog		= args.GetValue( "farFog "			, m_fogData.farFog );
+	 
+	Rgba8 nearFogColor		= args.GetValue( "nearFogColor "	, GRAY );
+	Rgba8 farFogColor		= args.GetValue( "farFogColor "		, Rgba8( 37 , 70 , 87 , 127 ) );
+	
+	m_fogData.nearFogColor	= nearFogColor.GetAsNormalizedFloat3();
+	m_fogData.farFogColor	= farFogColor.GetAsNormalizedFloat3();
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC bool Game::DisableFog( EventArgs& args )
+{
+	UNUSED( args );
+	m_fogData.nearFog			= INFINITY;
+	m_fogData.farFog			= INFINITY;
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Game::UpdateFromKeyBoard( float deltaSeconds )
 {
 	if ( g_theDevConsole->IsOpen() )
@@ -779,42 +798,42 @@ void Game::SwitchCurrentSelectedLightFromKeyBoard()
 {
 	if ( g_theInput->WasKeyJustPressed( '1' ) )
 	{
-		m_currentLightIndex = 0;
+		m_currentLightIndex = 0 % TOTAL_LIGHTS;
 	}
 
 	if ( g_theInput->WasKeyJustPressed( '2' ) )
 	{
-		m_currentLightIndex = 1;
+		m_currentLightIndex = 1 % TOTAL_LIGHTS;
 	}
 
 	if ( g_theInput->WasKeyJustPressed( '3' ) )
 	{
-		m_currentLightIndex = 2;
+		m_currentLightIndex = 2 % TOTAL_LIGHTS;
 	}
 
 	if ( g_theInput->WasKeyJustPressed( '4' ) )
 	{
-		m_currentLightIndex = 3;
+		m_currentLightIndex = 3 % TOTAL_LIGHTS;
 	}
 
 	if ( g_theInput->WasKeyJustPressed( '5' ) )
 	{
-		m_currentLightIndex = 4;
+		m_currentLightIndex = 4 % TOTAL_LIGHTS;
 	}
 
 	if ( g_theInput->WasKeyJustPressed( '6' ) )
 	{
-		m_currentLightIndex = 5;
+		m_currentLightIndex = 5 % TOTAL_LIGHTS;
 	}
 
 	if ( g_theInput->WasKeyJustPressed( '7' ) )
 	{
-		m_currentLightIndex = 6;
+		m_currentLightIndex = 6 % TOTAL_LIGHTS;
 	}
 
-	if ( g_theInput->WasKeyJustPressed( '7' ) )
+	if ( g_theInput->WasKeyJustPressed( '8' ) )
 	{
-		m_currentLightIndex = 7;
+		m_currentLightIndex = 7 % TOTAL_LIGHTS;
 	}
 }
 
@@ -882,15 +901,15 @@ void Game::UpdateCurrentShaderFromUserInput()
 			m_isFresnelShaderActive = false;
 		}
 
-		if ( LitShaderTypes::FOG == m_currentShaderIndex )
-		{
-			m_isFogShaderActive = true;
-			m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
-		}
-		else
-		{
-			m_isFogShaderActive = false;
-		}
+		//if ( LitShaderTypes::FOG == m_currentShaderIndex )
+		//{
+		//	m_isFogShaderActive = true;
+		//	m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
+		//}
+		//else
+		//{
+		//	m_isFogShaderActive = false;
+		//}
 	}
 
 	if ( g_theInput->WasKeyJustPressed( KEY_RIGHTARROW ) )
@@ -909,15 +928,15 @@ void Game::UpdateCurrentShaderFromUserInput()
 			m_isFresnelShaderActive = false;
 		}
 
-		if ( LitShaderTypes::FOG == m_currentShaderIndex )
-		{
-			m_isFogShaderActive = true;
-			m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
-		}
-		else
-		{
-			m_isFogShaderActive = false;
-		}
+		//if ( LitShaderTypes::FOG == m_currentShaderIndex )
+		//{
+		//	m_isFogShaderActive = true;
+		//	m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
+		//}
+		//else
+		//{
+		//	m_isFogShaderActive = false;
+		//}
 		
 	}
 }

@@ -27,7 +27,7 @@ enum LitShaderTypes
 	FRESNEL,
 	TRIPLANAR_UNLIT,
 	TRIPLANAR_LIT,
-	FOG,
+	//FOG,
 	TOTAL,
 };
 
@@ -65,17 +65,6 @@ struct dissolveData_t
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-struct fogData_t
-{
-	float	nearFog;
-	Vec3	nearFogColor	= GRAY.GetAsNormalizedFloat3();
-	
-	float	farFog;
-	Vec3	fogFarColor		= WHITE.GetAsNormalizedFloat3();
-};
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 class Game
 {
 
@@ -99,7 +88,7 @@ NOT_IN_USE	void UpdateCamera();
 			void Render() const;
 			void BindShaderSpecificMaterialData() const;
 			void RenderFresnelShader2ndPass() const;
-			void RenderFogShader2ndPass() const;
+
 NOT_IN_USE	void RenderUI() const;
 			
 NOT_IN_USE	void AddScreenShakeIntensity( float deltaShakeIntensity );
@@ -123,6 +112,10 @@ private:
 	static	bool UpdateFresnelShaderMaterialDataViaConsole( EventArgs& args );
 	static	bool UpdateDissolveShaderMaterialViaConsole( EventArgs& args );
 	static	bool UpdateDissolveShaderPatternViaConsole( EventArgs& args );
+
+			void AddFogCommandsToDevConsole( DevConsole* devConsole );
+	static	bool UpdateFog( EventArgs& args );
+	static	bool DisableFog( EventArgs& args );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				METHODS TO HANDLE USER INPUT
@@ -150,7 +143,7 @@ private:
 
 	static fresnelData_t		m_fresnelShaderData;
 	static dissolveData_t		m_dissolveShaderData;
-	static fogData_t			m_fogShaderData;
+	static fogDataT				m_fogData;
 
 public:
 
@@ -178,7 +171,7 @@ public:
 	Shader* 					m_currentShader;
 	int							m_currentShaderIndex;
 	bool						m_isFresnelShaderActive								= false;
-	bool						m_isFogShaderActive									= false;
+	//bool						m_isFogShaderActive									= false;
 	static Texture*				m_dissolveShaderPatternTexture;
 	Texture*					m_triplanarShaderTextures[ 6 ];
 	

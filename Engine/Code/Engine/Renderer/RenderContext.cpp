@@ -1,19 +1,20 @@
 #include "Engine/Core/EngineCommon.hpp"
-#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Core/DevConsole.hpp"
+#include "Engine/Core/Rgba8.hpp"
+#include "Engine/Core/StringUtils.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Core/VertexUtils.hpp"
-#include "Engine/Core/Rgba8.hpp"
+#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Platform/Window.hpp"
+#include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Renderer/Camera.hpp"
+#include "Engine/Renderer/IndexBuffer.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
-#include "Engine/Core/ErrorWarningAssert.hpp"
-#include "Engine/Core/StringUtils.hpp"
+#include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Renderer/Texture.hpp"
 #include "Engine/Renderer/TextureView.hpp"
-#include "Engine/Renderer/BitmapFont.hpp"
-#include "Engine/Platform/Window.hpp"
-#include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Renderer/VertexBuffer.hpp"
-#include "Engine/Renderer/IndexBuffer.hpp"
 #include "Engine/Time/Time.hpp"
 //#include "Engine/Renderer/RenderBuffer.hpp"
 
@@ -48,8 +49,10 @@
 #pragma comment( lib, "d3dcompiler.lib" )   // needed when we get to shaders
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-BitmapFont* g_bitmapFont = nullptr;
-extern char const* g_errorShaderCode;
+		BitmapFont*			g_bitmapFont = nullptr;
+extern	char const*			g_errorShaderCode;
+
+STATIC	fogDataT			RenderContext::m_fog;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -108,6 +111,9 @@ RenderContext::~RenderContext()
 
 	delete m_lightDataUBO;
 	m_lightDataUBO = nullptr;
+
+	delete m_fogDataUBO;
+	m_fogDataUBO = nullptr;
 
 	delete m_materialDataUBO;
 	m_materialDataUBO = nullptr;
@@ -210,6 +216,7 @@ void RenderContext::Startup( Window* window )
 	m_frameUBO			= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 	m_modelMatrixUBO	= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 	m_lightDataUBO		= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	m_fogDataUBO		= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 	m_materialDataUBO	= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 	
 	m_defaultSampler = new Sampler( this , SAMPLER_POINT );
@@ -997,6 +1004,88 @@ void RenderContext::SetSpecularPower( float specularPower )
 	m_lights.SPECULAR_POWER = specularPower;
 	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
 	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::AddFogCommandsToDevConsole( DevConsole* devConsole )
+{
+	EventArgs consoleArgs;
+	devConsole->CreateCommand( "DisableFog" , "Disables the Fog" , consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "DisableFog" , DisableFog );
+
+	devConsole->CreateCommand( "EnableFog" ,
+		"Ex - EnableFog nearFog = 0.f |farFog = 15.f |nearFogColor = 100,100,100,100 |farFogColor = 255,100,0,100" ,
+		consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "EnableFog" , UpdateFog );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::EnableFog( float nearFog , float farFog , Rgba8 nearFogColor , Rgba8 farFogColor )
+{
+	m_fog.nearFog			= nearFog;
+	m_fog.farFog			= farFog;
+	m_fog.nearFogColor		= nearFogColor.GetAsNormalizedFloat3();
+	m_fog.farFogColor		= farFogColor.GetAsNormalizedFloat3();
+	
+	m_fogDataUBO->Update( &m_fog , sizeof( fogDataT ) , sizeof( fogDataT ) );
+	BindUniformBuffer( UBO_FOG_SLOT , m_fogDataUBO );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::EnableFog( float nearFog , float farFog , Vec3 nearFogColor , Vec3 farFogColor )
+{
+	m_fog.nearFog			= nearFog;
+	m_fog.farFog			= farFog;
+	m_fog.nearFogColor		= nearFogColor;
+	m_fog.farFogColor		= farFogColor;
+
+	m_fogDataUBO->Update( &m_fog , sizeof( fogDataT ) , sizeof( fogDataT ) );
+	BindUniformBuffer( UBO_FOG_SLOT , m_fogDataUBO );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::EnableFog( fogDataT fogData )
+{
+	m_fog = fogData;
+	m_fogDataUBO->Update( &m_fog , sizeof( fogDataT ) , sizeof( fogDataT ) );
+	BindUniformBuffer( UBO_FOG_SLOT , m_fogDataUBO );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool RenderContext::UpdateFog( EventArgs& args )
+{
+	m_fog.nearFog				= args.GetValue("nearFog ", m_fog.nearFog );
+	m_fog.farFog				= args.GetValue("farFog ", m_fog.farFog );
+	m_fog.nearFogColor			= args.GetValue("nearFogColor ", m_fog.nearFogColor );
+	m_fog.farFogColor			= args.GetValue("farFogColor ", m_fog.farFogColor );
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::DisableFog()
+{
+	m_fog.nearFog			= INFINITY;
+	m_fog.farFog			= INFINITY;
+
+	m_fogDataUBO->Update( &m_fog , sizeof( fogDataT ) , sizeof( fogDataT ) );
+	BindUniformBuffer( UBO_FOG_SLOT , m_fogDataUBO );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC bool RenderContext::DisableFog( EventArgs& args )
+{
+	UNUSED( args );
+	m_fog.nearFog			= INFINITY;
+	m_fog.farFog			= INFINITY;
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
