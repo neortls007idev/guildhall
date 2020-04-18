@@ -33,6 +33,16 @@ enum LitShaderTypes
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+enum  LightType
+{
+	POINT_LIGHT,
+	DIRECTIONAL_LIGHT,
+	SPOT_LIGHT,
+	TOTAL_LIGHT_TYPES
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 struct fresnelData_t
 {
 	Vec3	fresnelColor	= Vec3::UNIT_VECTOR_ALONG_J_BASIS;
@@ -72,6 +82,7 @@ class Game
 public:
 			Game();
 
+			void initializeLightData();
 			void LoadShaders();
 			void LoadTextures();
 			void InitializeCameras();
@@ -119,6 +130,8 @@ private:
 			void UpdateFromKeyBoard( float deltaSeconds );
 
 			void UpdateLightsFromKeyBoard( float deltaSeconds );
+			void SwitchCurrentSelectedLightFromKeyBoard();
+			void UpdateCurrentSelectedLightFromKeyBoard();
 			void UpdateCurrentShaderFromUserInput();
 			void UpdateMaterialShaderFromUserInput( float deltaSeconds );
 			void UpdateAmbientLightFromUserInput( float deltaSeconds );
@@ -171,6 +184,7 @@ public:
 	
 	static shaderLightDataT		m_lights;
 	static Rgba8				m_ambientLightColor;
+	static LightType			m_lightType[ TOTAL_LIGHTS ];
 	bool						m_isLightFollowingTheCamera							= false;
 	bool						m_isLightAnimated									= false;
 	uint						m_currentLightIndex									= 0;

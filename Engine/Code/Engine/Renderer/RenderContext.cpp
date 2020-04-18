@@ -976,6 +976,13 @@ void RenderContext::DisableAllLights()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void RenderContext::UpdateLightsData( const shaderLightDataT& lightsData )
+{
+	m_lights = lightsData;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void RenderContext::SetSpecularFactor( float normalizedFactor )
 {
 	m_lights.SPECULAR_FACTOR = normalizedFactor;

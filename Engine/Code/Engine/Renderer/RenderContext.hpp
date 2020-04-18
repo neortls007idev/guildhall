@@ -40,7 +40,7 @@ struct	ID3D11DepthStencilState;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-constexpr uint TOTAL_LIGHTS = 8;
+constexpr uint TOTAL_LIGHTS = 1;
 //float GAMMA = 2.2f;
 //float INVERSE_GAMMA = 1 / GAMMA;
 
@@ -102,10 +102,10 @@ struct ModelDataT
 struct lightDataT
 {
 	Vec3        worldPosition				= Vec3::ZERO;
-	float       pad00						= 0.f;                                         // this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
+	float       pad00						= -5000.f;                                     // this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
 
 	Vec3        color						= Vec3::ONE;
-	float       intensity					= 1.f;                                         // rgb and an intensity
+	float       intensity					= 1.0f;                                        // rgb and an intensity
 
 	Vec3        direction					= Vec3::UNIT_VECTOR_ALONG_K_BASIS;             // direction light is point, default (0,0,1)
 	float       directionFactor				= 0.f;                                         // do we consider this a point light (0.0f) or a directional light (1.0f).  Determine how we calcualte the incident light vector, default (0.0f)
@@ -114,7 +114,7 @@ struct lightDataT
 	float       dotInnerAngle				= -1.0f;                                       // cone light inner angle (default -1.0f) - angle at which cone lights begin to stop affecting an object
 
 	Vec3        specularAttenuation			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;             // attenuation for specular lighting (constant,linear,quadratic), default (0,0,1)
-	float       dotOuterAngle				= -1.f;                                        // cone light outer angle (default -1.0f) - angle at which cone lights stop affecting the object completely
+	float       dotOuterAngle				= -1.0f;                                       // cone light outer angle (default -1.0f) - angle at which cone lights stop affecting the object completely
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -233,6 +233,8 @@ public:
 	// disabling a light is the same as just saying the light has 0 intensity
 	void DisableLight( uint idx );
 	void DisableAllLights();
+
+	void UpdateLightsData( const shaderLightDataT& lightsData );
 	
 	//how much does specular light show up
 	void SetSpecularFactor( float normalizedFactor );
