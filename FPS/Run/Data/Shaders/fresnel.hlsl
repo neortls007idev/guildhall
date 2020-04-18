@@ -4,7 +4,7 @@
 
 //--------------------------------------------------------------------------------------
 
-cbuffer material_constants : register( b4 )                                                     // constant buffer slot 5
+cbuffer material_constants : register( b8 )                                                     // constant buffer slot 9
 {                                                                                               
     float3 FRESNEL_COLOR;                                                                       
     float  FRESNEL_POWER;

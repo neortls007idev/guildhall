@@ -3,17 +3,6 @@
 #include "defaultLitStageStructs.hlsl"
 
 //--------------------------------------------------------------------------------------
-
-cbuffer material_constants : register( b4 )                                                     // constant buffer slot 5
-{                                                                                               
-    float   nearFog;
-    float3  fogNearColor;
-    
-    float   farFog;
-    float3  fogFarColor;
-};
-
-//--------------------------------------------------------------------------------------
 //                      PROGRAMMABLE SHADER STAGES FUNCTIONS
 //--------------------------------------------------------------------------------------
 //
@@ -69,7 +58,7 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
     float3 bitangent        = normalize( cross( normal , tangent ) ) * input.world_tangent.w;
     float3x3 TBN            = float3x3( tangent, bitangent, normal );
     
-    float3 surfaceNormal    = NormalColorToVector3( normalColor );
+    float3 surfaceNormal    = NormalColorToVector3( normalColor.xyz );
     float3 worldNormal      = mul( surfaceNormal , TBN );
         
     float3 directionToSurface = input.world_position - CAMERA_POSITION;

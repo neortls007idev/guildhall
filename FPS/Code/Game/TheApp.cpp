@@ -98,7 +98,7 @@ void TheApp::Startup()
 	}
 	g_theDevConsole->Startup();
 	AddDebugRenderDevConsoleCommands( g_theDevConsole );
-
+	
 	if ( g_currentManager == nullptr )
 	{
 		// instantiating a default DRO_Manager

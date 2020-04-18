@@ -40,7 +40,7 @@ struct	ID3D11DepthStencilState;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-constexpr uint TOTAL_LIGHTS = 1;
+constexpr uint TOTAL_LIGHTS = 8;
 //float GAMMA = 2.2f;
 //float INVERSE_GAMMA = 1 / GAMMA;
 
@@ -62,7 +62,8 @@ enum eBufferSlot
 	UBO_CAMERA_SLOT			= 1,
 	UBO_MODEL_SLOT			= 2,
 	UBO_LIGHT_SLOT			= 3,
-	UBO_MATERIAL_SLOT		= 4,
+	UBO_FOG_SLOT			= 4,
+	UBO_MATERIAL_SLOT		= 8,
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -129,6 +130,17 @@ struct shaderLightDataT
 	float		SPECULAR_FACTOR		= 1;							// default: 1  - scales specular lighting in the equation (higher values create a "shinier" surface)
 	float		SPECULAR_POWER		= 32;							// default: 32 - controls the specular falloff (higher values create a "smoother" looking surface)
 	float		padding00			= 0.f;					
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct fogDataT
+{
+	float	nearFog;
+	Vec3	nearFogColor = GRAY.GetAsNormalizedFloat3();
+
+	float	farFog;
+	Vec3	farFogColor = WHITE.GetAsNormalizedFloat3();
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -241,6 +253,17 @@ public:
 
 	// Intensity of specular light
 	void SetSpecularPower( float specularPower );
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	
+	void AddFogCommandsToDevConsole( DevConsole* devConsole );
+	void EnableFog( float nearFog , float farFog , Rgba8 nearFogColor , Rgba8 farFogColor );
+	void EnableFog( float nearFog , float farFog , Vec3 nearFogColor , Vec3 farFogColor );
+	void EnableFog( fogDataT fogData );
+	void DisableFog();
+	
+	static bool UpdateFog( EventArgs& args );
+	static bool DisableFog( EventArgs& args );
 	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			DRAW METHODS
@@ -373,10 +396,12 @@ public:
 	RenderBuffer*						m_frameUBO												= nullptr;
 	RenderBuffer*						m_modelMatrixUBO										= nullptr;
 	RenderBuffer*						m_lightDataUBO											= nullptr;
+	RenderBuffer*						m_fogDataUBO											= nullptr;
 	RenderBuffer*						m_materialDataUBO										= nullptr;
 	Sampler*							m_defaultSampler										= nullptr;
 	Texture*							m_textureDefault										= nullptr;
 	shaderLightDataT					m_lights;
+	static fogDataT						m_fog;
 
 private:
 
