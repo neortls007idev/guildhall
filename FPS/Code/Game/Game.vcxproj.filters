@@ -59,12 +59,6 @@
     <FxCompile Include="..\..\Run\Data\Shaders\Grid.hlsl">
       <Filter>Data\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="..\..\Run\Data\Shaders\litDefault.hlsl">
-      <Filter>Data\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="..\..\Run\Data\Shaders\litDefault2.hlsl">
-      <Filter>Data\Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="..\..\Run\Data\Shaders\normalLit.hlsl">
       <Filter>Data\Shaders</Filter>
     </FxCompile>
@@ -111,6 +105,9 @@
       <Filter>Data\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="..\..\Run\Data\Shaders\branchlessComparison.hlsl">
+      <Filter>Data\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\litDefault.hlsl">
       <Filter>Data\Shaders</Filter>
     </FxCompile>
   </ItemGroup>

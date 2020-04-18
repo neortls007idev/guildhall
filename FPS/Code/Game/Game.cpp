@@ -109,7 +109,7 @@ void Game::InitializeShaderMaterialData()
 
 void Game::LoadShaders()
 {
-	m_lightShaders[ LitShaderTypes::LIT ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/litDefault2.hlsl" );
+	m_lightShaders[ LitShaderTypes::LIT ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/litDefault.hlsl" );
 	m_lightShaders[ LitShaderTypes::UNLIT ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/default.hlsl" );
 	m_lightShaders[ LitShaderTypes::UV ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/uvDebugger.hlsl" );
 	m_lightShaders[ LitShaderTypes::NORMAL ]					= g_theRenderer->GetOrCreateShader( "Data/Shaders/normalLit.hlsl" );
@@ -241,7 +241,7 @@ void Game::UpdateLightPosition( float deltaSeconds )
 		{
 			m_lights.lights[ m_currentLightIndex ].worldPosition = m_gameCamera.GetPosition();
 			Vec3 direction = m_gameCamera.GetCameraTransform().GetAsMatrix().GetKBasis3D();
-			m_lights.lights[ m_currentLightIndex ].direction = direction;
+			m_lights.lights[ m_currentLightIndex ].direction = -direction;
 			continue;
 		}
 		if ( POINT_LIGHT == m_lightType[ index ] )
@@ -839,7 +839,7 @@ void Game::UpdateCurrentSelectedLightFromKeyBoard()
 									{
 										m_lights.lights[ m_currentLightIndex ].directionFactor = 1.f;
 										Vec3 direction = m_gameCamera.GetCameraTransform().GetAsMatrix().GetKBasis3D();
-										m_lights.lights[ m_currentLightIndex ].direction = direction;
+										m_lights.lights[ m_currentLightIndex ].direction = -direction;
 										m_lights.lights[ m_currentLightIndex ].dotInnerAngle = -1.f;
 										m_lights.lights[ m_currentLightIndex ].dotOuterAngle = -1.f;
 									}	break;
@@ -848,9 +848,9 @@ void Game::UpdateCurrentSelectedLightFromKeyBoard()
 									{
 										m_lights.lights[ m_currentLightIndex ].directionFactor = 0.f;
 										Vec3 direction = m_gameCamera.GetCameraTransform().GetAsMatrix().GetKBasis3D();
-										m_lights.lights[ m_currentLightIndex ].direction = direction;						
-										m_lights.lights[ m_currentLightIndex ].dotInnerAngle = ConvertDegreesToRadians( 55.f );
-										m_lights.lights[ m_currentLightIndex ].dotOuterAngle = ConvertDegreesToRadians( 60.f );
+										m_lights.lights[ m_currentLightIndex ].direction = -direction;						
+										m_lights.lights[ m_currentLightIndex ].dotInnerAngle = CosDegrees( 15.f );/*ConvertDegreesToRadians( 55.f );*/
+										m_lights.lights[ m_currentLightIndex ].dotOuterAngle = CosDegrees( 30.f );/*ConvertDegreesToRadians( 60.f );*/
 									}	break;
 		}
 	}
@@ -993,13 +993,11 @@ void Game::UpdateAmbientLightFromUserInput( float deltaSeconds )
 	if ( g_theInput->IsKeyHeldDown( KEY_MINUS ) )
 	{
 		m_lights.lights[ m_currentLightIndex ].intensity -= deltaSeconds;
-		//m_lights.ambientLight.w = ClampZeroToOne( m_lights.ambientLight.w );
 	}
 
 	if ( g_theInput->IsKeyHeldDown( KEY_PLUS ) )
 	{
 		m_lights.lights[ m_currentLightIndex ].intensity += deltaSeconds;
-		//m_lights.ambientLight.w = ClampZeroToOne( m_lights.ambientLight.w );
 	}
 }
 
@@ -1072,15 +1070,8 @@ void Game::UpdateLightPositionOnUserInput()
 		if ( m_lightType[m_currentLightIndex] != POINT_LIGHT )
 		{
 			Vec3 direction = m_gameCamera.GetCameraTransform().GetAsMatrix().GetKBasis3D();
-			m_lights.lights[ m_currentLightIndex ].direction = direction;
-			//m_lights.lights[ m_currentLightIndex ].direction = Vec3( direction.x , direction.z , direction.y );
+			m_lights.lights[ m_currentLightIndex ].direction = -direction;
 		}
-
-// 		if ( m_lightType[ m_currentLightIndex ] == SPOT_LIGHT )
-// 		{
-// 			m_lights.lights[ m_currentLightIndex ].dotInnerAngle = 30.f;
-// 			m_lights.lights[ m_currentLightIndex ].dotOuterAngle = 60.f;
-// 		}
 	}
 
 	if ( g_theInput->WasKeyJustPressed( KEY_F6 ) )
@@ -1092,15 +1083,8 @@ void Game::UpdateLightPositionOnUserInput()
 		if ( m_lightType[ m_currentLightIndex ] != POINT_LIGHT )
 		{
 			Vec3 direction = m_gameCamera.GetCameraTransform().GetAsMatrix().GetKBasis3D();
-			m_lights.lights[ m_currentLightIndex ].direction = direction;
-		}
-
-// 		if ( m_lightType[ m_currentLightIndex ] == SPOT_LIGHT )
-// 		{
-// 			m_lights.lights[ m_currentLightIndex ].dotInnerAngle = 30.f;
-// 			m_lights.lights[ m_currentLightIndex ].dotOuterAngle = 60.f;
-// 		}
-		
+			m_lights.lights[ m_currentLightIndex ].direction = -direction;
+		}		
 	}
 
 	if ( g_theInput->WasKeyJustPressed( KEY_F7 ) )
