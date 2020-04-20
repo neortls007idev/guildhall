@@ -140,6 +140,21 @@ Vec3 RandomNumberGenerator::RollRandomVec3InRange( float minInclusive , float ma
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Vec3 RandomNumberGenerator::RollRandomInUnitDisk()
+{
+	while ( true )
+	{
+		Vec3 result = Vec3( RollRandomFloatInRange( -1.f , 1.f ) , RollRandomFloatInRange( -1.f , 1.f ) , 0.f );
+		if ( result.GetLengthSquared() >= 1.f )
+		{
+			continue;
+		}
+		return result;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Vec3 RandomNumberGenerator::RollRandomInUnitSphere()
 {
 	while ( true )

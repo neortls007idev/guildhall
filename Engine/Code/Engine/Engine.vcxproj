@@ -198,6 +198,7 @@
     <ClCompile Include="Experimental\Raytracer\RayHittableSphere.cpp" />
     <ClCompile Include="Experimental\Raytracer\RaytracerCamera.cpp" />
     <ClCompile Include="Experimental\Raytracer\RaytracerMaterial.cpp" />
+    <ClCompile Include="Experimental\Raytracer\RaytracerMaterialDielectrics.cpp" />
     <ClCompile Include="Experimental\Raytracer\RaytracerUtils.cpp" />
     <ClCompile Include="Input\AnalogJoystick.cpp" />
     <ClCompile Include="Input\InputSystem.cpp" />
@@ -299,6 +300,7 @@
     <ClInclude Include="Experimental\Raytracer\RayHittableSphere.hpp" />
     <ClInclude Include="Experimental\Raytracer\RaytracerCamera.hpp" />
     <ClInclude Include="Experimental\Raytracer\RaytracerMaterial.hpp" />
+    <ClInclude Include="Experimental\Raytracer\RaytracerMaterialDielectrics.hpp" />
     <ClInclude Include="Experimental\Raytracer\RaytracerUtils.hpp" />
     <ClInclude Include="Input\AnalogJoystick.hpp" />
     <ClInclude Include="Input\InputSystem.hpp" />

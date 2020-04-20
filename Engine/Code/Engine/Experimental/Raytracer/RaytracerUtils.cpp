@@ -82,3 +82,13 @@ float HitSphere( const Vec3& center , float radius , const Ray& ray )
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+float SchlickPolynomialApproximation( float cosine , float refractionIndex )
+{
+	float	r0 = ( 1.f - refractionIndex ) / ( 1.f + refractionIndex );
+			r0 = r0 * r0;
+	
+	return r0 + ( 1.f - r0 ) * pow( ( 1.f - cosine ) , 5.f );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

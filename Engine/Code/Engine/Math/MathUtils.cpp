@@ -1072,6 +1072,16 @@ Vec3 Reflect( const Vec3& vec , const Vec3& normal )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Vec3 Refract( const Vec3& uv , const Vec3& normal , float coeffecientOfRefraction )
+{
+	float CosTheta					= DotProduct3D( -uv , normal );
+	Vec3 rayOutParallel				= coeffecientOfRefraction * ( uv + CosTheta * normal );
+	Vec3 rayOutPerpendicular		= -sqrtf( 1.0f - rayOutParallel.GetLengthSquared() ) * normal;
+	return rayOutParallel + rayOutPerpendicular;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 float SmoothStart2( float t )
 {
 	return t * t;

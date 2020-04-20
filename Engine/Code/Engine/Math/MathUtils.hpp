@@ -124,6 +124,9 @@ float	   GetFractionInRange(); // TO DO
 
 Vec3		Reflect( const Vec3& vec , const Vec3& normal );
 
+// coeffecientOfRefraction - Etai Over Etat
+Vec3		Refract( const Vec3& uv , const Vec3& normal , float coeffecientOfRefraction );
+
 //-----------------------------------------------------------------------------------------------------------------
 //	STEPPING/EASING UTILITIES
 //-----------------------------------------------------------------------------------------------------------------

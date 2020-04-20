@@ -21,6 +21,7 @@ public:
 	Vec3  RollRandomVec3BetweenZerotoOne();
 	Vec3  RollRandomUnitVec3();
 	Vec3  RollRandomVec3InRange( float minInclusive , float maxInclusive );
+	Vec3  RollRandomInUnitDisk();
 	Vec3  RollRandomInUnitSphere();
 	Vec3  RollRandomInHemiSphere( const Vec3& normal );
 
