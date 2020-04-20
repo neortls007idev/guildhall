@@ -4,6 +4,7 @@
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Math/Transform.hpp"
 #include "Game/GameCommon.hpp"
+
 #pragma once
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -11,22 +12,16 @@
 class Shader;
 class Texture;
 class GPUMesh;
+class Player;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-enum LitShaderTypes
+enum ShaderTypes
 {
-	LIT,
 	UNLIT,
-	UV,
-	NORMAL,
-	TANGENT,
-	BITANGENT,
-	SURFACE_NORMAL,
 	DISSOLVE,
 	FRESNEL,
-	TRIPLANAR_UNLIT,
-	TRIPLANAR_LIT,
+	
 	TOTAL,
 };
 
@@ -82,29 +77,13 @@ public:
 			void Update( float deltaSeconds );
 			void DebugDrawUI( float deltaSeconds );
 			void UpdateLightPosition( float deltaSeconds );
+			void AddScreenShakeIntensity( float deltaShakeIntensity );
+
 	
 			void Render() const;
 			void BindShaderSpecificMaterialData() const;
 			void RenderFresnelShader2ndPass() const;
 private:
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-//				DEVCONSOLE COMMANDS
-//--------------------------------------------------------------------------------------------------------------------------------------------
-			void AddLightDevConsoleCommands( DevConsole* devConsole );
-	static	bool ChangeLightColorViaConsole( EventArgs& args );
-	static	bool ChangeLightAttenuationViaConsole( EventArgs& args );
-	static	bool ChangeAmbientLightColorViaConsole( EventArgs& args );
-	static	bool ChangeAmbientLightIntensityViaConsole( EventArgs& args );
-
-			void AddShaderDevConsoleCommands( DevConsole* devConsole );
-	static	bool UpdateFresnelShaderMaterialDataViaConsole( EventArgs& args );
-	static	bool UpdateDissolveShaderMaterialViaConsole( EventArgs& args );
-	static	bool UpdateDissolveShaderPatternViaConsole( EventArgs& args );
-
-			void AddFogCommandsToDevConsole( DevConsole* devConsole );
-	static	bool UpdateFog( EventArgs& args );
-	static	bool DisableFog( EventArgs& args );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				METHODS TO HANDLE USER INPUT
@@ -116,48 +95,13 @@ private:
 
 	int							m_controllerID										= -1;
 	float						m_screenShakeIntensity								= 0.f;
-
-	static fresnelData_t		m_fresnelShaderData;
-	static dissolveData_t		m_dissolveShaderData;
-	static fogDataT				m_fogData;
+	Shader*						m_shaders[ ShaderTypes::TOTAL ];
 
 public:
+	float						m_timeElapsed										= 0.f;
+	Camera						m_gameCamera;
+	Player*						m_player;
 
-	GPUMesh*					m_cubeMesh;
-	GPUMesh*					m_meshSphere;
-	
-	Transform					m_cubeMeshTransform;
-	Transform					m_sphereMeshTransform;
-	
-	Texture*					m_meshTex_D											= nullptr;
-	Texture*					m_meshTex_N											= nullptr;
-	Texture*					m_tileDiffuse										= nullptr;
-	Texture*					m_tileNormal										= nullptr;
-
-	uint						m_hCuts												= 32;		// slices
-	uint						m_vCuts												= 16;		// stacks
-
-	mutable Camera				m_gameCamera;
-	
-	Vec3						m_cameraPosition									= Vec3::ZERO;
-	Vec3						m_cameraRotation									= Vec3::ZERO;
-	
-	bool						m_isHUDEnabled										= true;
-	Shader*						m_lightShaders[ LitShaderTypes::TOTAL ];
-	Shader* 					m_currentShader;
-	int							m_currentShaderIndex;
-	bool						m_isFresnelShaderActive								= false;
-	//bool						m_isFogShaderActive									= false;
-	static Texture*				m_dissolveShaderPatternTexture;
-	Texture*					m_triplanarShaderTextures[ 6 ];
-	
-	static shaderLightDataT		m_lights;
-	static Rgba8				m_ambientLightColor;
-	static LightType			m_lightType[ TOTAL_LIGHTS ];
-	bool						m_isLightFollowingTheCamera							= false;
-	bool						m_isLightAnimated									= false;
-	uint						m_currentLightIndex									= 0;
-																					
-	eDebugRenderMode			m_debugRenderMode									= DEBUG_RENDER_ALWAYS;
+//--------------------------------------------------------------------------------------------------------------------------------------------
 	
 };

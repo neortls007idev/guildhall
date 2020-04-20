@@ -26,7 +26,8 @@ constexpr float MIN_CAMERA_SHAKE										= -10.0f;
 constexpr float MAX_CAMERA_SHAKE										= 10.0f;
 constexpr float SCREEN_SHAKE_ABLATION_PER_SECOND						= 0.05f;
 
-constexpr float PERCENTAGE_OF_OBSTACLES_IN_MAP							= 0.3f;
+constexpr float PLAYER_SHIP_ACCELERATION								= 30.f;
+constexpr float PLAYER_SHIP_TURN_SPEED									= 300.f;
 
 
 //void DrawLine( const Vec2& start, const Vec2& end, const Rgba8& color, float thickness);
