@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Math/Vec2.hpp"
+#include "Engine/Math/Vec3.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -17,6 +18,11 @@ public:
 	float RollRandomFloatInRange( float minInclusive, float maxInclusive );
 	bool  RollPercentChance( float probablityOfReturningTrue );
 	Vec2  RollRandomDirection2D();
+	Vec3  RollRandomVec3BetweenZerotoOne();
+	Vec3  RollRandomUnitVec3();
+	Vec3  RollRandomVec3InRange( float minInclusive , float maxInclusive );
+	Vec3  RollRandomInUnitSphere();
+	Vec3  RollRandomInHemiSphere( const Vec3& normal );
 
 	void Reset( unsigned int seed = 0 );
 	void manuallyIncrementPosition();

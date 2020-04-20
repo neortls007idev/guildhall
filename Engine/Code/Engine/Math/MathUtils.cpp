@@ -1065,6 +1065,13 @@ const Vec2 GetNearestPointOnOBB2D( const Vec2& referencePoint , const OBB2& box 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Vec3 Reflect( const Vec3& vec , const Vec3& normal )
+{
+	return vec - 2 * DotProduct3D( vec , normal ) * normal;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 float SmoothStart2( float t )
 {
 	return t * t;

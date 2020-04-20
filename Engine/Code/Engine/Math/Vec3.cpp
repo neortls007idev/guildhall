@@ -1,7 +1,7 @@
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Math/MathUtils.hpp"
-#include <cmath>
 #include "Engine/Core/EngineCommon.hpp"
+#include <cmath>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -308,6 +308,23 @@ STATIC Vec3 Vec3::MakeFromSpericalCoordinates( float YToXZPlaneDegrees , float X
 	coords.y = SinDegrees( XToZYPlaneDegrees ) * radius;
 	coords.z = CosDegrees( XToZYPlaneDegrees ) * SinDegrees( YToXZPlaneDegrees ) * radius;
 	return coords;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Vec3::WriteColor( std::ostream& out , int samplesPerPixel /*= 1*/ )
+{
+	static float INVERSE_GAMMA = 1.f / 2.2f;
+	// Divide the color total by the number of samples.
+	float scale = 1.0f / ( float ) samplesPerPixel;
+	float r		= pow( scale * x , INVERSE_GAMMA );
+	float g		= pow( scale * y , INVERSE_GAMMA );
+	float b		= pow( scale * z , INVERSE_GAMMA );
+	
+	// Write the translated [0,255] value of each color component.
+	out << static_cast< int >( 256 * Clamp( r , 0.0f , 0.999f ) ) << ' '
+		<< static_cast< int >( 256 * Clamp( g , 0.0f , 0.999f ) ) << ' '
+		<< static_cast< int >( 256 * Clamp( b , 0.0f , 0.999f ) ) << '\n';
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

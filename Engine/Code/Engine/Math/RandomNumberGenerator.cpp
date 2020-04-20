@@ -1,6 +1,10 @@
+#include "Engine/Math/MathConstants.hpp"
+#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Math/RawNoise.hpp"
 #include <stdlib.h>
+
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //	GLOBAL RANDOM NUMBER GENERATOR VARIABLE
@@ -105,6 +109,63 @@ bool RandomNumberGenerator::RollPercentChance( float probablityOfReturningTrue )
 Vec2 RandomNumberGenerator::RollRandomDirection2D()
 {
 	return Vec2( RollRandomFloatBetweenZerotoOne() , RollRandomFloatBetweenZerotoOne() );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec3 RandomNumberGenerator::RollRandomVec3BetweenZerotoOne()
+{
+	return Vec3( RollRandomFloatBetweenZerotoOne() , RollRandomFloatBetweenZerotoOne() , RollRandomFloatBetweenZerotoOne() );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec3 RandomNumberGenerator::RollRandomUnitVec3()
+{
+	float a = RollRandomFloatInRange( 0.f , 2.f * PI );
+	float z = RollRandomFloatInRange( -1.f , 1.f );
+	float r = sqrtf( 1.f - z * z );
+	return Vec3( r * cos( a ) , r * sin( a ) , z );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec3 RandomNumberGenerator::RollRandomVec3InRange( float minInclusive , float maxInclusive )
+{
+	return Vec3( RollRandomFloatInRange( minInclusive , maxInclusive ) ,
+	             RollRandomFloatInRange( minInclusive , maxInclusive ) ,
+	             RollRandomFloatInRange( minInclusive , maxInclusive ) );
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec3 RandomNumberGenerator::RollRandomInUnitSphere()
+{
+	while ( true )
+	{
+		Vec3 result = RollRandomVec3InRange( -1.f , 1.f );
+		
+		if ( result.GetLengthSquared() >= 1 )
+		{
+			continue;
+		}
+		return result;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec3 RandomNumberGenerator::RollRandomInHemiSphere( const Vec3& normal )
+{
+	Vec3 unitSphere = RollRandomInUnitSphere();
+	
+	if ( DotProduct3D( unitSphere , normal ) > 0.0 )					 // In the same hemisphere as the normal
+	{
+		return unitSphere;
+	}
+
+	return -unitSphere;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
