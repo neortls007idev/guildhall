@@ -149,10 +149,10 @@ RayHittableList RandomizeScene()
 
 int main()
 {
-	//const int imageWidth		= 2160;
-	//const int imageHeight		= 1080;
-	const int imageWidth		= 600;
-	const int imageHeight		= 300;
+	const int imageWidth		= 2160;
+	const int imageHeight		= 1080;
+	//const int imageWidth		= 600;
+	//const int imageHeight		= 300;
 	const int samplesPerPixel	= 100;
 	const int maxDepth			= 50;
 	
