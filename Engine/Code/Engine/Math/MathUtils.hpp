@@ -122,6 +122,11 @@ const Vec2 TripleProduct( const Vec2& a , const Vec2& b , const Vec2& c );
 const Vec2 AveragePoint( const Vec2* vertices , size_t count );
 float	   GetFractionInRange(); // TO DO
 
+Vec3		Reflect( const Vec3& vec , const Vec3& normal );
+
+// coeffecientOfRefraction - Etai Over Etat
+Vec3		Refract( const Vec3& uv , const Vec3& normal , float coeffecientOfRefraction );
+
 //-----------------------------------------------------------------------------------------------------------------
 //	STEPPING/EASING UTILITIES
 //-----------------------------------------------------------------------------------------------------------------

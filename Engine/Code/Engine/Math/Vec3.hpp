@@ -1,4 +1,6 @@
 ﻿#pragma once
+
+#include <iostream>
 #include "Engine/Math/Vec2.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -87,6 +89,12 @@ public:
 
 	//  YToXZPlaneDegrees = Θ (theta) -> Horizontal Angle |  XToZYPlaneDegrees = Φ (phi) -> Vertical Angle
 	static Vec3 MakeFromSpericalCoordinates( float YToXZPlaneDegrees /* Θ (theta) */ , float XToZYPlaneDegrees /* Φ (phi) */  , float radius );
+	void WriteColor ( std::ostream& out , int samplesPerPixel = 1 );
 };
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
+inline std::ostream& operator<<( std::ostream& out , const Vec3& vector )
+{
+	return out << vector.x << ' ' << vector.y << ' ' << vector.z;
+}

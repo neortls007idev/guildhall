@@ -71,6 +71,12 @@
     <Filter Include="Core\Vertex">
       <UniqueIdentifier>{ff942c79-2e5d-4c35-80f4-0867d2c9f9fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Experimental">
+      <UniqueIdentifier>{96226bbe-43f0-4dfe-a8b5-33e2cbcc4dcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Experimental\Raytracer">
+      <UniqueIdentifier>{1a2ad2de-ea8f-45b3-a378-22cccb7a4d2a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Rgba8.cpp">
@@ -315,6 +321,36 @@
     </ClCompile>
     <ClCompile Include="Renderer\Material.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Experimental\Raytracer\Ray.cpp">
+      <Filter>Experimental\Raytracer</Filter>
+    </ClCompile>
+    <ClCompile Include="Experimental\Raytracer\RaytracerUtils.cpp">
+      <Filter>Experimental\Raytracer</Filter>
+    </ClCompile>
+    <ClCompile Include="Experimental\Raytracer\RayHittable.cpp">
+      <Filter>Experimental\Raytracer</Filter>
+    </ClCompile>
+    <ClCompile Include="Experimental\Raytracer\RayHittableSphere.cpp">
+      <Filter>Experimental\Raytracer</Filter>
+    </ClCompile>
+    <ClCompile Include="Experimental\Raytracer\RayHittableList.cpp">
+      <Filter>Experimental\Raytracer</Filter>
+    </ClCompile>
+    <ClCompile Include="Experimental\Raytracer\RaytracerCamera.cpp">
+      <Filter>Experimental\Raytracer</Filter>
+    </ClCompile>
+    <ClCompile Include="Experimental\Raytracer\RaytracerMaterial.cpp">
+      <Filter>Experimental\Raytracer</Filter>
+    </ClCompile>
+    <ClCompile Include="Experimental\Raytracer\LambertianDiffuseMaterial.cpp">
+      <Filter>Experimental\Raytracer</Filter>
+    </ClCompile>
+    <ClCompile Include="Experimental\Raytracer\LDM_Metal.cpp">
+      <Filter>Experimental\Raytracer</Filter>
+    </ClCompile>
+    <ClCompile Include="Experimental\Raytracer\RaytracerMaterialDielectrics.cpp">
+      <Filter>Experimental\Raytracer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -596,6 +632,36 @@
     </ClInclude>
     <ClInclude Include="Renderer\Material.hpp">
       <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\Raytracer\Ray.hpp">
+      <Filter>Experimental\Raytracer</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\Raytracer\RaytracerUtils.hpp">
+      <Filter>Experimental\Raytracer</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\Raytracer\RayHittable.hpp">
+      <Filter>Experimental\Raytracer</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\Raytracer\RayHittableSphere.hpp">
+      <Filter>Experimental\Raytracer</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\Raytracer\RayHittableList.hpp">
+      <Filter>Experimental\Raytracer</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\Raytracer\RaytracerCamera.hpp">
+      <Filter>Experimental\Raytracer</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\Raytracer\RaytracerMaterial.hpp">
+      <Filter>Experimental\Raytracer</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\Raytracer\LambertianDiffuseMaterial.hpp">
+      <Filter>Experimental\Raytracer</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\Raytracer\LDM_Metal.hpp">
+      <Filter>Experimental\Raytracer</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\Raytracer\RaytracerMaterialDielectrics.hpp">
+      <Filter>Experimental\Raytracer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
