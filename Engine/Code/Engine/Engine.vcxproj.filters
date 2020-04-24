@@ -663,5 +663,8 @@
     <ClInclude Include="Experimental\Raytracer\RaytracerMaterialDielectrics.hpp">
       <Filter>Experimental\Raytracer</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Delegate.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

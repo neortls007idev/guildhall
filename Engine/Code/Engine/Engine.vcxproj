@@ -274,6 +274,7 @@
     <ClInclude Include="Core\CoreUtils.hpp" />
     <ClInclude Include="Core\DebugRender.hpp" />
     <ClInclude Include="Core\DebugRenderObject.hpp" />
+    <ClInclude Include="Core\Delegate.hpp" />
     <ClInclude Include="Core\DevConsole.hpp" />
     <ClInclude Include="Core\DirectoryWatcher.hpp" />
     <ClInclude Include="Core\EngineCommon.hpp" />
