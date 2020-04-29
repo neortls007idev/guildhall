@@ -9,18 +9,20 @@
 #include "Engine/Primitives/OBB2.hpp"
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Renderer/D3D11Utils.hpp"
+#include "Engine/Renderer/RendererCommon.hpp"
 #include "Engine/Renderer/Texture.hpp"
 
 #include <map>
 #include <string>
 #include <vector>
 
-
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				FORWARD DECLARATIONS 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 class	Window;
 class	Shader;
+class	ShaderState;
+class	Material;
 class	SwapChain;
 class	VertexBuffer;
 class	IndexBuffer;
@@ -43,16 +45,6 @@ struct	ID3D11DepthStencilState;
 constexpr uint TOTAL_LIGHTS = 8;
 //float GAMMA = 2.2f;
 //float INVERSE_GAMMA = 1 / GAMMA;
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-enum eBlendMode
-{
-	ALPHA ,
-	ADDITIVE ,
-	SOLID,
-	TOTAL_BLEND_MODES
-};
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -172,6 +164,14 @@ public:
 	void					SetDepthTest( eCompareOp compare  = COMPARE_LESS , bool writeOnPass = true );						
 	Texture*				GetFrameColorTarget();															// TODO :- IMPLEMENT ME
 	
+	// RENDER TARGET TEXTURE DOES NOT GET STORED IN ANY MAP
+	Texture*				CreateRenderTarget( IntVec2 texelSize );			
+	void					CopyTexture( Texture* destination , Texture* source );
+
+	Texture*				GetOrCreatematchingRenderTarget( Texture* texture );
+	void					ReleaseRenderTarget( Texture* texture );
+	int						GetTotalRenderTargetPoolSize() const				 { return m_renderTargetPoolSize;  }
+
 	void					BeginCamera( const Camera& camera );
 	void					EndCamera( const Camera& camera);
 
@@ -196,6 +196,11 @@ public:
 	void					BindTexture( const Texture* constTexture , UINT textureType = eTextureType::TEX_DIFFUSE , UINT userTextureIndexOffset = 0 );
 	bool					BindShader( Shader* shader );
 	void					BindShader( std::string shaderFileName );
+	
+	bool					BindShaderState( ShaderState* shaderState );
+	void					BindShaderState( std::string shaderStateFileName );
+	bool					BindMaterial( Material* material );
+
 	void					BindVertexBuffer( VertexBuffer* vbo );
 	void					BindIndexBuffer( IndexBuffer* ibo );
 	void					BindUniformBuffer( unsigned int slot , RenderBuffer* ubo ); // UBO - uniform buffer object
@@ -406,6 +411,8 @@ public:
 private:
 
 	std::map<std::string , Texture*>	m_LoadedTextures;									// LOOKUP TABLE OF FILEPATH & TEXTURE
+	std::vector<Texture*>				m_renderTargetPool;
+	int									m_renderTargetPoolSize = 0;
 	std::map<std::string , BitmapFont*> m_LoadedBitMapFonts;								// LOOKUP TABLE OF FILEPATH & BITMAPFONT
 	std::map<std::string , Shader*>		m_LoadedShaders;									// LOOKUP TABLE OF FILEPATH & SHADERS
 };

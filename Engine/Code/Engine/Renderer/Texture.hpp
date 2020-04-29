@@ -28,7 +28,7 @@ public:
 	unsigned int	 GetTextureID() const;
 		     float	 GetAspect() const;
 	const    IntVec2 GetDimensions() const;
-	const   ID3D11Texture2D* GetHandle() const																			{ return m_handle; }
+			 ID3D11Texture2D* GetHandle()																				{ return m_handle; }
 
 	Texture* CreateDepthStencil( Vec2 outputDimensions );
 	RenderContext* GetRenderContext() const																				{ return m_owner;  }

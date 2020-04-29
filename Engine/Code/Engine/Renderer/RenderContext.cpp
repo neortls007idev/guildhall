@@ -41,6 +41,8 @@
 
 #include "Engine/Renderer/D3D11Common.hpp"
 #include "Engine/Renderer/Shader.hpp"
+#include "Engine/Renderer/ShaderState.hpp"
+#include "Engine/Renderer/Material.hpp"
 #include "Engine/Renderer/Sampler.hpp"
 #include "Engine/Primitives/GPUMesh.hpp"
 
@@ -58,6 +60,16 @@ STATIC	fogDataT			RenderContext::m_fog;
 
 RenderContext::~RenderContext()
 {
+	GUARANTEE_OR_DIE( m_renderTargetPool.size() == m_renderTargetPoolSize , "Someone Did not release a Render Target " );
+
+	for ( auto& renderTargetIndex : m_renderTargetPool )
+	{
+		if ( renderTargetIndex != nullptr )
+		{
+			delete renderTargetIndex;
+			renderTargetIndex = nullptr;
+		}
+	}
 
 	for ( int index = 0; index < eBlendMode::TOTAL_BLEND_MODES; index++ )
 	{
@@ -260,7 +272,7 @@ void RenderContext::EndFrame()
 
 void RenderContext::Shutdown()
 {
-
+	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -346,6 +358,35 @@ void RenderContext::SetDepthTest( eCompareOp compare , bool writeOnPass )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Texture* RenderContext::CreateRenderTarget( IntVec2 texelSize )
+{
+	D3D11_TEXTURE2D_DESC desc;
+	desc.Width						= texelSize.x;
+	desc.Height						= texelSize.y;
+	desc.MipLevels					= 1;
+	desc.ArraySize					= 1;
+	desc.Format						= DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.SampleDesc.Count			= 1;															// Multi sampling Anti-Aliasing
+	desc.SampleDesc.Quality			= 0;															// Multi sampling Anti-Aliasing
+	desc.Usage						= D3D11_USAGE_DEFAULT;											//  if we do mip-chains, we change this to GPU/DEFAULT
+	desc.BindFlags					= D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags				= 0;															// does the CPU write to this? 0  = no
+	desc.MiscFlags					= 0;															// extension features like cube maps
+
+	// DirectX Creation
+	ID3D11Texture2D* texHandle = nullptr;
+	m_device->CreateTexture2D( &desc , nullptr , &texHandle );
+
+	Texture* temp = new Texture( this , texHandle );
+	
+	std::string debugName = "Render Target Texture";
+	SetDebugName( ( ID3D11DeviceChild* ) temp->GetHandle() , &debugName );
+
+	return temp;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void RenderContext::BeginCamera( const Camera& camera )
 {
 	m_currentCamera = const_cast< Camera* >( &camera );
@@ -356,7 +397,24 @@ void RenderContext::BeginCamera( const Camera& camera )
 
 	if ( camera.GetClearMode() & CLEAR_COLOR_BIT )
 	{
-		ClearScreen( camera.GetClearColor() );
+		float clearFloats[ 4 ];
+		float scaleToFloat = 1 / 255.f;
+
+		Rgba8 clearColor = camera.GetClearColor();
+
+		clearFloats[ 0 ] = ( float ) clearColor.r * scaleToFloat;
+		clearFloats[ 1 ] = ( float ) clearColor.g * scaleToFloat;
+		clearFloats[ 2 ] = ( float ) clearColor.b * scaleToFloat;
+		clearFloats[ 3 ] = ( float ) clearColor.a * scaleToFloat;
+
+		// can be put under clear Texture function
+
+		Texture* backbuffer = camera.GetColorTarget();
+		TextureView* backbuffer_rtv = backbuffer->GetOrCreateRenderTargetView();
+
+		ID3D11RenderTargetView* rtv = backbuffer_rtv->GetRTVHandle();
+		m_context->ClearRenderTargetView( rtv , clearFloats );
+		//ClearScreen( camera.GetClearColor() );
 	}
 
 	if ( ( camera.GetDepthStencilTarget() ) && ( camera.GetClearMode() & CLEAR_DEPTH_BIT ) )
@@ -615,6 +673,46 @@ Texture* RenderContext::CreateTextureFromFile( const char* imageFilePath )
 		std::string filePath = imageFilePath;
 		SetDebugName( ( ID3D11DeviceChild* ) temp->GetHandle() , &filePath );
 		return m_LoadedTextures[ imageFilePath ];
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::CopyTexture( Texture* destination , Texture* source )
+{
+	m_context->CopyResource( destination->GetHandle() , source->GetHandle() );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Texture* RenderContext::GetOrCreatematchingRenderTarget( Texture* texture )
+{
+	IntVec2 size = texture->GetDimensions();
+
+	for ( int index = 0; index < m_renderTargetPoolSize; index++ )
+	{
+		Texture* renderTarget = m_renderTargetPool[ index ];
+		
+		if ( renderTarget->GetDimensions() == size )
+		{
+			// fast remove at index
+			m_renderTargetPool[ index ] = m_renderTargetPool[ m_renderTargetPool.size() - 1 ];
+			m_renderTargetPool.pop_back();
+
+			// return the object from pool
+			return renderTarget;
+		}
+	}
+
+	Texture* newRenderTarget = CreateRenderTarget( size );
+	m_renderTargetPoolSize++;
+	return newRenderTarget;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::ReleaseRenderTarget( Texture* texture )
+{
+	m_renderTargetPool.push_back( texture );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1195,7 +1293,6 @@ void RenderContext:: DrawLine(const Vec2& start, const Vec2& end, const Rgba8& c
 
 void RenderContext::DrawMesh( const GPUMesh* mesh )
 {
-	
 	BindVertexBuffer( mesh->GetVertexBuffer() );
 
 	bool hasIndices = mesh->GetIndexCount();
@@ -1741,6 +1838,67 @@ bool RenderContext::HasAnyShaderChangedAtPath( const wchar_t* relativePath , flo
 		return false;
 	}
 	return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool RenderContext::BindShaderState( ShaderState* shaderState )
+{
+	if ( shaderState == nullptr )
+	{
+		BindShader( nullptr );
+		return false;
+	}
+	return BindShader( shaderState->GetCurrentShader() );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::BindShaderState( std::string shaderStateFileName )
+{
+	// TODO - IMPLEMENT ME
+	DEBUGBREAK();
+	//Shader* temp = nullptr;
+	//if ( shaderFileName == "" )
+	//{
+	//	BindShader( temp );
+	//	return;
+	//}
+	//temp = GetOrCreateShader( shaderFileName.c_str() );
+	//BindShader( temp );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool RenderContext::BindMaterial( Material* material )
+{
+	if ( material == nullptr )
+	{
+		BindShader( nullptr );
+		return false;
+	}
+
+	BindShaderState( material->GetShaderState() );
+
+	if ( nullptr != material->m_ubo)
+	{
+		BindMaterialData( material->m_ubo , material->m_ubo->GetBufferSize() );
+	}
+
+	for ( auto index : material->m_texturePerSlot )
+	{
+		BindTexture( index.second , index.first );
+	}
+
+	if ( material->m_samplersPerSlot.size() > 0 )
+	{
+		BindSampler( material->m_samplersPerSlot[ 0 ] );					// HARD CODED TO ONLY BIND THE FIRST SAMPLER RIGHT NOW.
+	}
+	
+	m_lights.SPECULAR_FACTOR = material->m_specularFactor;
+	m_lights.SPECULAR_POWER  = material->m_specularPower;
+
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

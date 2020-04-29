@@ -45,6 +45,8 @@ public:
 	bool IsCompatible( size_t dataByteSize , size_t elementByteSize ) const;
 	void Cleanup();
 
+	size_t GetBufferSize() const																					{ return m_bufferByteSize; }
+
 private:
 	bool Create( size_t dataByteSize , size_t elementByteSize );
 
@@ -57,8 +59,8 @@ private:
 	eRenderBufferUsage m_usage;
 	eRenderMemoryHint m_memHint;
 
-	size_t m_bufferByteSize;
-	size_t m_elementBysize;
+	size_t m_bufferByteSize				= 0;
+	size_t m_elementBysize				= 0;
 };
 
 

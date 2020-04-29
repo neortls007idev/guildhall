@@ -149,6 +149,7 @@ public:
 	GPUMesh*					m_cubeMesh;
 	GPUMesh*					m_meshSphere;
 	GPUMesh*					m_quadMesh;
+	GPUMesh*					m_objMesh1;
 	Transform					m_cubeMeshTransform;
 	Transform					m_sphereMeshTransform;
 	Transform					m_quadTransform;
@@ -156,6 +157,9 @@ public:
 	Texture*					m_meshTex_N											= nullptr;
 	Texture*					m_tileDiffuse										= nullptr;
 	Texture*					m_tileNormal										= nullptr;
+	Texture*					m_objMesh1Tex										= nullptr;
+
+	//Texture*					m_renderTarget										= nullptr;
 
 	uint						m_hCuts												= 32;		// slices
 	uint						m_vCuts												= 16;		// stacks
@@ -169,6 +173,7 @@ public:
 	bool						m_isHUDEnabled										= true;
 	Shader*						m_lightShaders[ LitShaderTypes::TOTAL ];
 	Shader* 					m_currentShader;
+	Material*					m_testMaterial;
 	int							m_currentShaderIndex;
 	bool						m_isFresnelShaderActive								= false;
 	//bool						m_isFogShaderActive									= false;

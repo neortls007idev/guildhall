@@ -22,7 +22,10 @@ struct vs_input_t
 
    float3 position      : POSITION;
    float4 color         : COLOR;
-   float2 uv            : TEXCOORD;
+   float2   uv            : TEXCOORD;
+    
+   // float3 normal           : NORMAL;
+   // float4 tangent          : TANGENT;
 };
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------

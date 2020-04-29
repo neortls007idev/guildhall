@@ -352,6 +352,9 @@
     <ClCompile Include="Experimental\Raytracer\RaytracerMaterialDielectrics.cpp">
       <Filter>Experimental\Raytracer</Filter>
     </ClCompile>
+    <ClCompile Include="Core\OBJUtils.cpp">
+      <Filter>Core\Vertex</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -665,6 +668,12 @@
     </ClInclude>
     <ClInclude Include="Core\Delegate.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\OBJUtils.hpp">
+      <Filter>Core\Vertex</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\RendererCommon.hpp">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

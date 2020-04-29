@@ -6,12 +6,16 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Primitives/GPUMesh.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Time/Time.hpp"
 
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
 #include "Engine/Core/VertexMaster.hpp"
+#include "Engine/Core/OBJUtils.hpp"
+#include "Engine/Renderer/Material.hpp"
+#include "Engine/Renderer/ShaderState.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -59,6 +63,19 @@ Game::Game()
 
 	InitializeLightData();
 	InitializeShaderMaterialData();
+
+	m_testMaterial = new Material();
+	
+	//m_testMaterial->m_shaderState = new ShaderState();
+	m_testMaterial->CreateFromFile( "Data/Materials/fresnel.xml" );
+	//m_testMaterial->m_shaderState->m_shader = m_lightShaders[ TRIPLANAR_UNLIT ];
+
+	//m_testMaterial->m_texturePerSlot[ 8 ] = m_triplanarShaderTextures[ 0 ];
+	//m_testMaterial->m_texturePerSlot[ 9 ] = m_triplanarShaderTextures[ 1 ];
+	//m_testMaterial->m_texturePerSlot[ 10 ] = m_triplanarShaderTextures[ 2 ];
+	//m_testMaterial->m_texturePerSlot[ 11 ] = m_triplanarShaderTextures[ 3 ];
+	//m_testMaterial->m_texturePerSlot[ 12 ] = m_triplanarShaderTextures[ 4 ];
+	//m_testMaterial->m_texturePerSlot[ 13 ] = m_triplanarShaderTextures[ 5 ];
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -146,6 +163,8 @@ void Game::LoadTextures()
 	m_triplanarShaderTextures[ 3 ] = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/grass/aerial_grass_rock_nor_1k.png" );
 	m_triplanarShaderTextures[ 4 ] = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/dirt/dirt_aerial_03_diff_1k.png" );
 	m_triplanarShaderTextures[ 5 ] = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/dirt/dirt_aerial_03_nor_1k.png" );
+
+	m_objMesh1Tex				   = g_theRenderer->GetOrCreateTextureFromFile( "Data/Models/scifiFighter/diffuse.jpg" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -189,6 +208,10 @@ void Game::intializeGameObjects()
 	m_quadMesh->UpdateVertices( ( uint ) quadMeshVerts.size() , quadMeshVerts.data() );
 	m_quadMesh->UpdateIndices( quadIndices );
 	
+
+	MeshBuilderOptions objMeshOptions1;
+	m_objMesh1 = new GPUMesh( g_theRenderer );
+	m_objMesh1 = LoadObjFileIntoGpuMesh( objMeshOptions1 , "Data/Models/scifiFighter/mesh.obj" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -203,6 +226,9 @@ Game::~Game()
 
 	delete m_quadMesh;
 	m_quadMesh			= nullptr;
+
+	delete m_objMesh1;
+	m_objMesh1			= nullptr;
 
 	m_meshTex_D			= nullptr;
 	m_meshTex_N			= nullptr;
@@ -483,11 +509,14 @@ void Game::DebugDrawUI( float deltaSeconds )
 
 void Game::Render() const
 {
+	Texture* backBuffer = g_theRenderer->m_swapChain->GetBackBuffer();
+	Texture* frameTarget = g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+	m_gameCamera.SetColorTarget( frameTarget );
 	g_theRenderer->BeginCamera( m_gameCamera );
 	m_gameCamera.CreateMatchingDepthStencilTarget(); 
 	g_theRenderer->BindDepthStencil( m_gameCamera.GetDepthStencilTarget() );
-
 	g_theRenderer->BindShader( nullptr );
+
 	g_theRenderer->SetRasterState( FILL_SOLID );
 	
 	g_theRenderer->SetCullMode( CULL_BACK );
@@ -512,8 +541,8 @@ void Game::Render() const
 
 	BindShaderSpecificMaterialData();
 
- 	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
-	g_theRenderer->DrawMesh( m_meshSphere );
+// 	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
+//	g_theRenderer->DrawMesh( m_meshSphere );
 
 	g_theRenderer->DisableFog();
 
@@ -526,14 +555,28 @@ void Game::Render() const
 	if ( m_isFresnelShaderActive )													{	RenderFresnelShader2ndPass();	}
 		
 	g_theRenderer->SetRasterState( FILL_SOLID );
-
+	
+	g_theRenderer->BindTexture( m_objMesh1Tex );
+	g_theRenderer->DrawMesh( m_objMesh1 );
+	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindShader( nullptr );
+	
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
+	g_theRenderer->BindMaterial( m_testMaterial );
+
+	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
+	g_theRenderer->DrawMesh( m_meshSphere );
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->SetDepthTest( COMPARE_ALWAYS , true );
 	g_theRenderer->SetCullMode( CULL_NONE );
 	g_theRenderer->DisableLight( 0 );
+	
 	g_theRenderer->EndCamera( m_gameCamera );
+	
+	g_theRenderer->CopyTexture( backBuffer , frameTarget );
+	g_theRenderer->ReleaseRenderTarget( frameTarget );
+	m_gameCamera.SetColorTarget( backBuffer );
+	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8 , "LEAKING RENDER TARGETS" );
 
 	DebugRenderWorldToCamera( &m_gameCamera );
 	DebugRenderScreenTo( nullptr );

@@ -180,6 +180,7 @@
     <ClCompile Include="Core\FileUtils.cpp" />
     <ClCompile Include="Core\Image.cpp" />
     <ClCompile Include="Core\NamedStrings.cpp" />
+    <ClCompile Include="Core\OBJUtils.cpp" />
     <ClCompile Include="Core\Rgba8.cpp" />
     <ClCompile Include="Core\SimpleTriangleFont.cpp" />
     <ClCompile Include="Core\StdExtensions.cpp" />
@@ -283,6 +284,7 @@
     <ClInclude Include="Core\FileUtils.hpp" />
     <ClInclude Include="Core\Image.hpp" />
     <ClInclude Include="Core\NamedStrings.hpp" />
+    <ClInclude Include="Core\OBJUtils.hpp" />
     <ClInclude Include="Core\Rgba8.hpp" />
     <ClInclude Include="Core\SimpleTriangleFont.hpp" />
     <ClInclude Include="Core\StdExtensions.hpp" />
@@ -351,6 +353,7 @@
     <ClInclude Include="Renderer\Material.hpp" />
     <ClInclude Include="Renderer\RenderBuffer.hpp" />
     <ClInclude Include="Renderer\RenderContext.hpp" />
+    <ClInclude Include="Renderer\RendererCommon.hpp" />
     <ClInclude Include="Renderer\Sampler.hpp" />
     <ClInclude Include="Renderer\Shader.hpp" />
     <ClInclude Include="Renderer\SpriteAnimation.hpp" />
