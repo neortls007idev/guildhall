@@ -355,6 +355,9 @@
     <ClCompile Include="Renderer\Material.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\ShaderState.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -673,6 +676,9 @@
       <Filter>Core\Vertex</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\RendererCommon.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ShaderState.hpp">
       <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>

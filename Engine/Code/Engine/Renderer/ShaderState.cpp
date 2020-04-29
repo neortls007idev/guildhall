@@ -1,6 +1,7 @@
 #include "Engine/Renderer/ShaderState.hpp"
 #include "Engine/Core/XmlUtils.hpp"
 #include "Engine/Renderer/Shader.hpp"
+#include "Engine/Renderer/RenderContext.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

@@ -2,7 +2,10 @@
 #include "Engine/Renderer/RendererCommon.hpp"
 #include "Engine/Core/CoreUtils.hpp"
 #include "Engine/Renderer/D3D11Utils.hpp"
-//#include "Engine/Renderer/RenderContext.hpp"
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+class Shader;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
