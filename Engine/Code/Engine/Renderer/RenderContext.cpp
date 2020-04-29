@@ -60,6 +60,8 @@ STATIC	fogDataT			RenderContext::m_fog;
 
 RenderContext::~RenderContext()
 {
+	//m_effectCamera;
+	
 	GUARANTEE_OR_DIE( m_renderTargetPool.size() == m_renderTargetPoolSize , "Someone Did not release a Render Target " );
 
 	for ( auto& renderTargetIndex : m_renderTargetPool )
@@ -241,6 +243,8 @@ void RenderContext::Startup( Window* window )
 	{
 		g_bitmapFont = GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
 	}
+
+	m_effectCamera.SetClearMode( 0 , WHITE );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -449,7 +453,12 @@ void RenderContext::BeginCamera( const Camera& camera )
 
 	//ID3D11RenderTargetView* rtv = m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
 	//BindDepthStencil( m_textureTarget );
-	//m_context->OMSetRenderTargets( 1 , &rtv , nullptr );
+	ID3D11RenderTargetView* rtvCopy = m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
+	ID3D11RenderTargetView* const* rtv = &rtvCopy;
+	
+	m_context->OMSetRenderTargets( 1 ,          // One rendertarget view
+		rtv ,      // Render target view, created earlier
+		nullptr );
 
 // 	DepthStencilTargetView* dsv = new DepthStencilTargetView( this );
 // 	dsv->CreateDepthStencilState();
@@ -680,6 +689,28 @@ Texture* RenderContext::CreateTextureFromFile( const char* imageFilePath )
 void RenderContext::CopyTexture( Texture* destination , Texture* source )
 {
 	m_context->CopyResource( destination->GetHandle() , source->GetHandle() );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::StartEffect( Texture* destination , Texture* source , Shader* shader )
+{
+	// THIS SHOULD HAVE IDENTITY PROJECTION , VIEW AND MODEL AT THIS POINT
+	// COULD JUST DO THIS WITH "BINDCORTARGET" IF AVAILABLE
+	
+	m_effectCamera.SetColorTarget( destination );
+	BeginCamera( m_effectCamera );
+	BindShader( shader );
+	BindTexture( source );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::EndEffect()
+{
+	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+	Draw( 3 , 0 );
+	EndCamera( m_effectCamera );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

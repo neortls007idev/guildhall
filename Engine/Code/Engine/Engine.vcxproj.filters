@@ -319,9 +319,6 @@
     <ClCompile Include="Core\VertexUtils.cpp">
       <Filter>Core\Vertex</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\Material.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Experimental\Raytracer\Ray.cpp">
       <Filter>Experimental\Raytracer</Filter>
     </ClCompile>
@@ -354,6 +351,9 @@
     </ClCompile>
     <ClCompile Include="Core\OBJUtils.cpp">
       <Filter>Core\Vertex</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Material.cpp">
+      <Filter>Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

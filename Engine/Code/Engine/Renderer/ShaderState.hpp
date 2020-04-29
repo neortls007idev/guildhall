@@ -14,9 +14,9 @@ public:
 
 	void SetupFromXML( XMLElement const& node );
 
-	inline Shader* GetCurrentShader() const															{ return m_shader; }
+	Shader* GetCurrentShader() const															{ return m_shader; }
 
-	inline Shader* SetCurrentShader( Shader* const shader );
+	void	SetCurrentShader( Shader* const shader );
 
 public:
 	Shader*						m_shader;

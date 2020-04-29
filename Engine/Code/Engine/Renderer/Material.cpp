@@ -1,8 +1,7 @@
 ﻿#include "Engine/Renderer/Material.hpp"
-//#include "Engine/Renderer/Shader.hpp"
+#include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/ShaderState.hpp"
-#include "Engine/Renderer/Texture.hpp"
-#include "Engine/Renderer/RenderBuffer.hpp"
+#include "Engine/Renderer/Sampler.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

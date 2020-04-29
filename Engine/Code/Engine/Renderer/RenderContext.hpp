@@ -167,7 +167,9 @@ public:
 	// RENDER TARGET TEXTURE DOES NOT GET STORED IN ANY MAP
 	Texture*				CreateRenderTarget( IntVec2 texelSize );			
 	void					CopyTexture( Texture* destination , Texture* source );
-
+	void					StartEffect( Texture* destination , Texture* source , Shader* shader );
+	void					EndEffect();
+	
 	Texture*				GetOrCreatematchingRenderTarget( Texture* texture );
 	void					ReleaseRenderTarget( Texture* texture );
 	int						GetTotalRenderTargetPoolSize() const				 { return m_renderTargetPoolSize;  }
@@ -407,7 +409,8 @@ public:
 	Texture*							m_textureDefault										= nullptr;
 	shaderLightDataT					m_lights;
 	static fogDataT						m_fog;
-
+	Camera								m_effectCamera;
+	
 private:
 
 	std::map<std::string , Texture*>	m_LoadedTextures;									// LOOKUP TABLE OF FILEPATH & TEXTURE

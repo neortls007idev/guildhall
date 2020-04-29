@@ -110,5 +110,8 @@
     <FxCompile Include="..\..\Run\Data\Shaders\litDefault.hlsl">
       <Filter>Data\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\imageEffect.hlsl">
+      <Filter>Data\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

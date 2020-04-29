@@ -2,7 +2,6 @@
 #include "Engine/Core/XmlUtils.hpp"
 #include "Engine/Renderer/Shader.hpp"
 
-
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 extern RenderContext* g_theRenderer;
@@ -43,7 +42,7 @@ void ShaderState::SetupFromXML( XMLElement const& node )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Shader* ShaderState::SetCurrentShader( Shader* const shader )
+void ShaderState::SetCurrentShader( Shader* const shader )
 {
 	m_shader = shader;
 }
