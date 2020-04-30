@@ -316,7 +316,10 @@ void TheApp::UpdateFromKeyboard()
 		m_taskbarProgressMode = WND_PROGRESS_NONE;
 	}
 
-	if ( g_theInput->GetButtonState( 'P' ).WasJustPressed() ) { m_isPaused = !m_isPaused; }
+	if ( g_theInput->GetButtonState( 'P' ).WasJustPressed() )
+	{
+		m_isPaused = !m_isPaused;
+	}
 
 	if ( g_theInput->GetButtonState( KEY_F8 ).WasJustPressed() )
 	{

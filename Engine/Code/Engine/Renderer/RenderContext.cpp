@@ -1913,7 +1913,8 @@ bool RenderContext::BindMaterial( Material* material )
 
 	if ( nullptr != material->m_ubo)
 	{
-		BindMaterialData( material->m_ubo , material->m_ubo->GetBufferSize() );
+		m_materialDataUBO = material->m_ubo;
+		BindUniformBuffer( UBO_MATERIAL_SLOT , m_materialDataUBO );
 	}
 
 	for ( auto index : material->m_texturePerSlot )
@@ -1924,6 +1925,10 @@ bool RenderContext::BindMaterial( Material* material )
 	if ( material->m_samplersPerSlot.size() > 0 )
 	{
 		BindSampler( material->m_samplersPerSlot[ 0 ] );					// HARD CODED TO ONLY BIND THE FIRST SAMPLER RIGHT NOW.
+	}
+	else
+	{
+		BindSampler( m_defaultSampler );
 	}
 	
 	m_lights.SPECULAR_FACTOR = material->m_specularFactor;

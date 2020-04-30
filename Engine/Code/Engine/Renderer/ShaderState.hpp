@@ -14,6 +14,7 @@ class ShaderState
 public:
 	ShaderState() {};
 	ShaderState( XMLElement const& node );
+	~ShaderState();
 
 	void SetupFromXML( XMLElement const& node );
 

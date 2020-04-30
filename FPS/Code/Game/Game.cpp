@@ -66,16 +66,21 @@ Game::Game()
 
  	m_testMaterial = new Material();
  
- 	m_testMaterial->m_shaderState = new ShaderState();
- 	m_testMaterial->m_shaderState->SetCurrentShader( m_lightShaders[ TRIPLANAR_UNLIT ] );
- 	//m_testMaterial->CreateFromFile( "Data/Materials/fresnel.xml" );
- 
- 	m_testMaterial->m_texturePerSlot[ 8 ] = m_triplanarShaderTextures[ 0 ];
- 	m_testMaterial->m_texturePerSlot[ 9 ] = m_triplanarShaderTextures[ 1 ];
- 	m_testMaterial->m_texturePerSlot[ 10 ] = m_triplanarShaderTextures[ 2 ];
- 	m_testMaterial->m_texturePerSlot[ 11 ] = m_triplanarShaderTextures[ 3 ];
- 	m_testMaterial->m_texturePerSlot[ 12 ] = m_triplanarShaderTextures[ 4 ];
- 	m_testMaterial->m_texturePerSlot[ 13 ] = m_triplanarShaderTextures[ 5 ];
+ 	//m_testMaterial->m_shaderState = new ShaderState();
+ 	//m_testMaterial->m_shaderState->SetCurrentShader( m_lightShaders[ TRIPLANAR_UNLIT ] );
+ 	m_testMaterial->CreateFromFile( "Data/Materials/fresnel.xml" );
+	m_testMaterial->SetData( m_dissolveShaderData );
+	
+ 	m_testMaterial->m_texturePerSlot[ 0 ] = m_tileDiffuse;
+ 	m_testMaterial->m_texturePerSlot[ 1 ] = m_tileNormal;
+ 	m_testMaterial->m_texturePerSlot[ 8 ] = m_dissolveShaderPatternTexture;
+
+	//m_testMaterial->m_texturePerSlot[ 8 ] = m_triplanarShaderTextures[ 0 ];
+ 	//m_testMaterial->m_texturePerSlot[ 9 ] = m_triplanarShaderTextures[ 1 ];
+ 	//m_testMaterial->m_texturePerSlot[ 10 ] = m_triplanarShaderTextures[ 2 ];
+ 	//m_testMaterial->m_texturePerSlot[ 11 ] = m_triplanarShaderTextures[ 3 ];
+ 	//m_testMaterial->m_texturePerSlot[ 12 ] = m_triplanarShaderTextures[ 4 ];
+ 	//m_testMaterial->m_texturePerSlot[ 13 ] = m_triplanarShaderTextures[ 5 ];
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -219,6 +224,9 @@ void Game::IntializeGameObjects()
 
 Game::~Game()
 {
+	delete m_testMaterial;
+	m_testMaterial		= nullptr;
+	 
 	delete m_cubeMesh;
 	m_cubeMesh			= nullptr;
 
@@ -272,6 +280,12 @@ void Game::Update( float deltaSeconds )
 	m_cubeMeshTransform.SetRotation( -15.f * ( float ) GetCurrentTimeSeconds()/* 0.f*/ ,  -20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	m_sphereMeshTransform.SetRotation( 20.f * ( float ) GetCurrentTimeSeconds() /*0.f*/,  50.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	UpdateFromKeyBoard( deltaSeconds );
+
+	if ( m_testMaterial->m_uboIsDirty )
+	{
+		m_testMaterial->SetData( m_dissolveShaderData );
+		m_testMaterial->m_uboIsDirty = false;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1092,6 +1106,8 @@ void Game::UpdateMaterialShaderFromUserInput( float deltaSeconds )
 			m_dissolveShaderData.burnEdgeWidth -= deltaSeconds;
 			//m_dissolveShaderData.burnEdgeWidth = ClampZeroToOne( m_dissolveShaderData.burnEdgeWidth );
 			m_dissolveShaderData.burnEdgeWidth = Clamp( m_dissolveShaderData.burnEdgeWidth , 0.f , ( 1 + 2 * m_dissolveShaderData.burnValue ) );
+
+			m_testMaterial->m_uboIsDirty = true;
 		}
 
 		if ( g_theInput->IsKeyHeldDown( 'V' ) )
@@ -1099,6 +1115,8 @@ void Game::UpdateMaterialShaderFromUserInput( float deltaSeconds )
 			m_dissolveShaderData.burnEdgeWidth += deltaSeconds;
 			//m_dissolveShaderData.burnEdgeWidth = ClampZeroToOne( m_dissolveShaderData.burnEdgeWidth );
 			m_dissolveShaderData.burnEdgeWidth = Clamp( m_dissolveShaderData.burnEdgeWidth , 0.f , ( 1 + 2 * m_dissolveShaderData.burnValue ) );
+
+			m_testMaterial->m_uboIsDirty = true;
 		}
 
 		if ( g_theInput->IsKeyHeldDown( 'Z' ) )
@@ -1106,6 +1124,8 @@ void Game::UpdateMaterialShaderFromUserInput( float deltaSeconds )
 			m_dissolveShaderData.burnValue -= deltaSeconds;
 			//		m_dissolveShaderData.burnValue = Clamp( m_dissolveShaderData.burnValue , 0.f , ( 1 + 2 * m_dissolveShaderData.burnEdgeWidth ) );
 			m_dissolveShaderData.burnValue = ClampZeroToOne( m_dissolveShaderData.burnValue );
+
+			m_testMaterial->m_uboIsDirty = true;
 		}
 
 		if ( g_theInput->IsKeyHeldDown( 'X' ) )
@@ -1113,6 +1133,9 @@ void Game::UpdateMaterialShaderFromUserInput( float deltaSeconds )
 			m_dissolveShaderData.burnValue += deltaSeconds;
 			//		m_dissolveShaderData.burnValue = Clamp( m_dissolveShaderData.burnValue , 0.f , ( 1 + 2 * m_dissolveShaderData.burnEdgeWidth ) );
 			m_dissolveShaderData.burnValue = ClampZeroToOne( m_dissolveShaderData.burnValue );
+
+			
+			m_testMaterial->m_uboIsDirty = true;
 		}
 	}
 

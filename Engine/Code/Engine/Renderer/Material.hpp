@@ -22,6 +22,9 @@ typedef unsigned int uint;
 class Material
 {
 public:
+
+	~Material();
+	
 	void CreateFromFile( const char* xmlFilePath );
 	void SetData( void const* data , size_t dataSize );
 	

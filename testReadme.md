@@ -47,6 +47,6 @@
       - [ ] Must be able to support owning at least one UBO for material specific data?
       - [x] Can set material specific textures
       - [ ] Can set material specific samplers
-      - [ ] Can set your engine specific constants (spec/tint)
-  - [ ] Can make a material from file
+      - [x] Can set your engine specific constants (spec/tint)
+  - [x] Can make a material from file
   - [x] Can call `RenderContext::BindMaterial` to bind the shader and all data assocated with the material
