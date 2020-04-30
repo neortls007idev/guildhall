@@ -55,7 +55,7 @@ Game::Game()
 	m_tileNormal	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/tile_normal.png" );
 	   	
 	InitializeCameras();
-	intializeGameObjects();
+	IntializeGameObjects();
 		
 	m_cubeMeshTransform.SetPosition( 5.f , 0.0f , -10.0f );
 	m_sphereMeshTransform.SetPosition( -5.f , 0.0f , -10.0f );
@@ -169,7 +169,7 @@ void Game::LoadTextures()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Game::intializeGameObjects()
+void Game::IntializeGameObjects()
 {
 	m_cubeMesh = new GPUMesh( g_theRenderer ); 
 	std::vector<VertexMaster>	cubeMeshVerts;
@@ -208,9 +208,11 @@ void Game::intializeGameObjects()
 	m_quadMesh->UpdateVertices( ( uint ) quadMeshVerts.size() , quadMeshVerts.data() );
 	m_quadMesh->UpdateIndices( quadIndices );
 	
-	//MeshBuilderOptions objMeshOptions1;
-	//m_objMesh1 = new GPUMesh( g_theRenderer );
-	//m_objMesh1 = LoadObjFileIntoGpuMesh( objMeshOptions1 , "Data/Models/scifiFighter/mesh.obj" );
+	MeshBuilderOptions objMeshOptions1;
+	objMeshOptions1.generateTangents = true;
+	objMeshOptions1.generateNormals = true;
+	m_objMesh1 = new GPUMesh( g_theRenderer );
+	m_objMesh1 = LoadObjFileIntoGpuMesh( objMeshOptions1 , "Data/Models/scifiFighter/mesh.obj" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -555,8 +557,8 @@ void Game::Render() const
 		
 	g_theRenderer->SetRasterState( FILL_SOLID );
 	
-// 	g_theRenderer->BindTexture( m_objMesh1Tex );
-// 	g_theRenderer->DrawMesh( m_objMesh1 );
+ 	g_theRenderer->BindTexture( m_objMesh1Tex );
+ 	g_theRenderer->DrawMesh( m_objMesh1 );
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindShader( nullptr );
 	
@@ -581,11 +583,11 @@ void Game::Render() const
 	// 5. render a full screen image( quad / triangle )
 	// 6. end the effect camera.
 
-	Shader* shader = g_theRenderer->GetOrCreateShader( "Data/Shaders/imageEffect.hlsl" );
-	g_theRenderer->StartEffect( backBuffer , frameTarget , shader );
-	g_theRenderer->EndEffect();
+	//Shader* shader = g_theRenderer->GetOrCreateShader( "Data/Shaders/imageEffect.hlsl" );
+	//g_theRenderer->StartEffect( backBuffer , frameTarget , shader );
+	//g_theRenderer->EndEffect();
 	
-	//g_theRenderer->CopyTexture( backBuffer , frameTarget );
+	g_theRenderer->CopyTexture( backBuffer , frameTarget );
 	g_theRenderer->ReleaseRenderTarget( frameTarget );
 	m_gameCamera.SetColorTarget( backBuffer );
 	

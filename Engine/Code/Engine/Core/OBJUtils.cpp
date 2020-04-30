@@ -1,6 +1,7 @@
 #include "Engine/Core/OBJUtils.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Math/Vec3.hpp"
+#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Primitives/GPUMesh.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Core/VertexMaster.hpp"
@@ -54,125 +55,6 @@ void ParseObjFile( std::string filePath , std::vector<std::string>& out )
 
 GPUMesh* LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::string objFilePath )
 {
-	/*std::vector<std::string> linesOfObjFile;
-	ParseObjFile( objFilePath , linesOfObjFile );
-
-	std::vector<Vec3>	postions;
-	std::vector<Vec3>	normals;
-	std::vector<Vec2>	uvs;
-	std::vector<int>	indexForVert;
-	std::vector<int>	indexForNormal;
-	std::vector<int>	indexForTex;
-
-	for ( long index = 0; index < linesOfObjFile.size(); index++ )
-	{
-		if ( linesOfObjFile[ index ] == "" )
-		{
-			continue;
-		}
-
-		Strings trimedString = GetTrimmedStrings( linesOfObjFile[ index ] );
-
-		if ( trimedString[ 0 ] == "#" )
-		{
-			continue;
-		}
-
-		if ( trimedString[ 0 ] == "v" )
-		{
-			Vec3 vec;
-			vec.x = ( float ) atof( trimedString[ 1 ].c_str() );
-			vec.y = ( float ) atof( trimedString[ 2 ].c_str() );
-			vec.z = ( float ) atof( trimedString[ 3 ].c_str() );
-			postions.push_back( vec );
-		}
-
-		if ( trimedString[ 0 ] == "vn" )
-		{
-			Vec3 vec;
-			vec.x = ( float ) atof( trimedString[ 1 ].c_str() );
-			vec.y = ( float ) atof( trimedString[ 2 ].c_str() );
-			vec.z = ( float ) atof( trimedString[ 3 ].c_str() );
-			normals.push_back( vec );
-		}
-
-		if ( trimedString[ 0 ] == "vt" )
-		{
-			Vec2 vec;
-			vec.x = ( float ) atof( trimedString[ 1 ].c_str() );
-			vec.y = ( float ) atof( trimedString[ 2 ].c_str() );
-			uvs.push_back( vec );
-		}
-
-		if ( trimedString[ 0 ] == "f" )
-		{
-			if ( trimedString.size() == 5 )
-			{
-				Strings t1 = SplitStringAtGivenDelimiter( trimedString[ 1 ] , '/' );
-				indexForVert.push_back( atoi( t1[ 0 ].c_str() ) );
-				indexForTex.push_back( atoi( t1[ 1 ].c_str() ) );
-				indexForNormal.push_back( atoi( t1[ 2 ].c_str() ) );
-
-				Strings t2 = SplitStringAtGivenDelimiter( trimedString[ 2 ] , '/' );
-				indexForVert.push_back( atoi( t2[ 0 ].c_str() ) );
-				indexForTex.push_back( atoi( t2[ 1 ].c_str() ) );
-				indexForNormal.push_back( atoi( t2[ 2 ].c_str() ) );
-
-				Strings t3 = SplitStringAtGivenDelimiter( trimedString[ 3 ] , '/' );
-				indexForVert.push_back( atoi( t3[ 0 ].c_str() ) );
-				indexForTex.push_back( atoi( t3[ 1 ].c_str() ) );
-				indexForNormal.push_back( atoi( t3[ 2 ].c_str() ) );
-
-				Strings t4 = SplitStringAtGivenDelimiter( trimedString[ 4 ] , '/' );
-				indexForVert.push_back( atoi( t4[ 0 ].c_str() ) );
-				indexForTex.push_back( atoi( t4[ 1 ].c_str() ) );
-				indexForNormal.push_back( atoi( t4[ 2 ].c_str() ) );
-			}
-			else if ( trimedString.size() == 4 )
-			{
-				Strings t1 = SplitStringAtGivenDelimiter( trimedString[ 1 ] , '/' );
-				indexForVert.push_back( atoi( t1[ 0 ].c_str() ) );
-				indexForTex.push_back( atoi( t1[ 1 ].c_str() ) );
-				indexForNormal.push_back( atoi( t1[ 2 ].c_str() ) );
-
-				Strings t2 = SplitStringAtGivenDelimiter( trimedString[ 2 ] , '/' );
-				indexForVert.push_back( atoi( t2[ 0 ].c_str() ) );
-				indexForTex.push_back( atoi( t2[ 1 ].c_str() ) );
-				indexForNormal.push_back( atoi( t2[ 2 ].c_str() ) );
-
-				Strings t3 = SplitStringAtGivenDelimiter( trimedString[ 3 ] , '/' );
-				indexForVert.push_back( atoi( t3[ 0 ].c_str() ) );
-				indexForTex.push_back( atoi( t3[ 1 ].c_str() ) );
-				indexForNormal.push_back( atoi( t3[ 2 ].c_str() ) );
-			}
-			else
-			{
-				DebuggerPrintf( "Error in obj definition" );
-				DEBUGBREAK();
-			}
-		}
-	}
-	GPUMesh* mesh = new GPUMesh( g_theRenderer );
-	std::vector<VertexMaster> finalVerts;
-
-	for ( int index = 0; index < indexForVert.size(); index++ )
-	{
-		VertexMaster vert;
-		int positionIndex			= indexForVert[ index ] - 1;
-		int normalIndex				= indexForNormal[ index ] - 1;
-		int uvIndex					= indexForTex[ index ] - 1;
-
-		vert.m_position				= postions[ positionIndex ];
-		vert.m_normal				= normals[ normalIndex ];
-		vert.m_color				= Rgba8( 255 , 255 , 255 , 255 );
-		vert.m_normalizedColor		= vert.m_color.GetAsNormalizedFloat4();
-		vert.m_uvTexCoords			= uvs[ uvIndex ];
-
-		finalVerts.push_back( vert );
-	}
-	mesh->UpdateVertices( ( unsigned int ) finalVerts.size() , &finalVerts[ 0 ] );
-	return mesh;*/
-
 	std::vector<std::string> linesOfObjFile;
 	ParseObjFile( objFilePath , linesOfObjFile );
 
@@ -335,10 +217,118 @@ GPUMesh* LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::string objFil
 			finalVerts.push_back( v2 );
 			finalVerts.push_back( v3 );
 		}
-
 	}
+
+	if ( options.generateNormals )
+	{
+		for ( int i = 0; i < finalVerts.size(); i += 3 )
+		{
+			Vec3 normal = CrossProduct3D( finalVerts[ i + 1 ].m_position - finalVerts[ i ].m_position , finalVerts[ i + 2 ].m_position - finalVerts[ i ].m_position );
+			finalVerts[ i ].m_normal = normal;
+			finalVerts[ i + 1 ].m_normal = normal;
+			finalVerts[ i + 2 ].m_normal = normal;
+		}
+	}
+
+	if ( options.generateTangents )
+	{
+		GenerateTangentsForVertexArray( finalVerts );
+	}
+	
 	mesh->UpdateVertices( ( unsigned int ) finalVerts.size() , &finalVerts[ 0 ] );
 	return mesh;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+int GetNumFaces( SMikkTSpaceContext const* context )
+{
+	std::vector<VertexMaster>& vertices = *( std::vector<VertexMaster>* )( context->m_pUserData );
+	return ( int ) ( vertices.size() / 3 );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+int GetNumVerticesOfFace( SMikkTSpaceContext const* context , int iFace )
+{
+	UNUSED( context );
+	UNUSED( iFace );
+	return 3;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void GetPositionForFaceVert( const SMikkTSpaceContext* pContext , float fvPosOut[] , const int iFace , const int iVert )
+{
+	std::vector<VertexMaster>& vertices = *( std::vector<VertexMaster>* )( pContext->m_pUserData );
+	int indexInVertexArray = iFace * 3 + iVert;
+
+	// get our posistion
+	Vec3 outPos = vertices[ indexInVertexArray ].m_position;
+
+	fvPosOut[ 0 ] = outPos.x;
+	fvPosOut[ 1 ] = outPos.y;
+	fvPosOut[ 2 ] = outPos.z;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void GetNormalForFaceVert( const SMikkTSpaceContext* pContext , float fvNormOut[] , const int iFace , const int iVert )
+{
+	std::vector<VertexMaster>& vertices = *( std::vector<VertexMaster>* )( pContext->m_pUserData );
+	int indexInVertexArray = iFace * 3 + iVert;
+
+	Vec3 outPos = vertices[ indexInVertexArray ].m_normal;
+
+	fvNormOut[ 0 ] = outPos.x;
+	fvNormOut[ 1 ] = outPos.y;
+	fvNormOut[ 2 ] = outPos.z;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void GetUVForFaceVert( const SMikkTSpaceContext* pContext , float fvTexcOut[] , const int iFace , const int iVert )
+{
+	std::vector<VertexMaster>& vertices = *( std::vector<VertexMaster>* )( pContext->m_pUserData );
+	int indexInVertexArray = iFace * 3 + iVert;
+
+	Vec2 outPos = vertices[ indexInVertexArray ].m_uvTexCoords;
+
+	fvTexcOut[ 0 ] = outPos.x;
+	fvTexcOut[ 1 ] = outPos.y;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void SetTangent( const SMikkTSpaceContext* pContext , const float fvTangent[] , const float fSign , const int iFace , const int iVert )
+{
+	std::vector<VertexMaster>& vertices = *( std::vector<VertexMaster>* )( pContext->m_pUserData );
+	int indexInVertexArray = iFace * 3 + iVert;
+
+	vertices[ indexInVertexArray ].m_tangent = Vec4( fvTangent[ 0 ] , fvTangent[ 1 ] , fvTangent[ 2 ] , fSign );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void GenerateTangentsForVertexArray( std::vector<VertexMaster>& vertices )
+{
+	SMikkTSpaceInterface mikkTInterface;
+
+	mikkTInterface.m_getNumFaces = GetNumFaces;
+	mikkTInterface.m_getNumVerticesOfFace = GetNumVerticesOfFace;
+
+	mikkTInterface.m_getPosition = GetPositionForFaceVert;
+	mikkTInterface.m_getNormal = GetNormalForFaceVert;
+	mikkTInterface.m_getTexCoord = GetUVForFaceVert;
+
+	mikkTInterface.m_setTSpaceBasic = SetTangent;
+	mikkTInterface.m_setTSpace = nullptr;
+
+	SMikkTSpaceContext context;
+	context.m_pInterface = &mikkTInterface;
+	context.m_pUserData = &vertices;
+
+	genTangSpaceDefault( &context );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

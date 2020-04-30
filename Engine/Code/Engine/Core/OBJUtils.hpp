@@ -1,6 +1,8 @@
 #pragma once
 #include "Engine/Math/Matrix4x4.hpp"
 #include "Engine/Core/StringUtils.hpp"
+#include "ThirdParty/MikkT/MikktSpace.h"
+#include "VertexMaster.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -23,4 +25,10 @@ struct MeshBuilderOptions
 Strings				GetTrimmedStrings( std::string& stringData );								// TODO :- MOVE TO STRING UTILS
 void				ParseObjFile( std::string filePath , std::vector<std::string>& out );
 GPUMesh*			LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::string objFilePath );
+int					GetNumFaces( SMikkTSpaceContext const* context );
+int					GetNumVerticesOfFace( SMikkTSpaceContext const* context , int iFace );
+void				GetPositionForFaceVert( const SMikkTSpaceContext* pContext , float fvPosOut[] , const int iFace , const int iVert );
+void				GetNormalForFaceVert( const SMikkTSpaceContext* pContext , float fvNormOut[] , const int iFace , const int iVert );
+void				SetTangent( const SMikkTSpaceContext* pContext , const float fvTangent[] , const float fSign , const int iFace , const int iVert );
+void				GenerateTangentsForVertexArray( std::vector<VertexMaster>& vertices );
 //--------------------------------------------------------------------------------------------------------------------------------------------

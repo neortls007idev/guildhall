@@ -74,7 +74,7 @@ public:
 			void LoadShaders();
 			void LoadTextures();
 			void InitializeCameras();
-			void intializeGameObjects();
+			void IntializeGameObjects();
 			void InitializeShaderMaterialData();
 
 			~Game();

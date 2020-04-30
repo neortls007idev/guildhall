@@ -358,6 +358,9 @@
     <ClCompile Include="Renderer\ShaderState.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\ThirdParty\MikkT\MikktSpace.c">
+      <Filter>ThirdParty</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -680,6 +683,9 @@
     </ClInclude>
     <ClInclude Include="Renderer\ShaderState.hpp">
       <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\MikkT\MikktSpace.h">
+      <Filter>ThirdParty</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
