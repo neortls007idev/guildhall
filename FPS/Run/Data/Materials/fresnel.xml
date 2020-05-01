@@ -1,6 +1,5 @@
 <Material
   
-	Shader = "Data/Shaders/dissolve.hlsl" 
-
-               
+	Shader   = "Data/Shaders/default.hlsl"
+	FillMode= "4"          
 />

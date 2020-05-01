@@ -35,14 +35,21 @@ char ParseXmlAttribute( const tinyxml2::XMLElement& element , const char* attrib
 
 bool ParseXmlAttribute( const tinyxml2::XMLElement& element , const char* attributeName , bool defaultValue )
 {
-	std::string attributeValueText = element.Attribute( attributeName );
+	const char* attributeValueText = element.Attribute( attributeName );
+	std::string attributeValueTextAsString = "";
+
+	if ( nullptr != attributeValueText )
+	{
+		attributeValueTextAsString = attributeValueText;
+	}
+	
 	bool value = defaultValue;
 	
-	if ( attributeValueText.compare( "true" ) == 0 )
+	if ( attributeValueTextAsString.compare( "true" ) == 0 )
 	{
 		value = true;
 	}
-	else if( attributeValueText.compare( "false" ) == 0 )
+	else if( attributeValueTextAsString.compare( "false" ) == 0 )
 	{
 		value = false;
 	} 

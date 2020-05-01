@@ -68,6 +68,9 @@ GPUMesh* LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::string objFil
 	std::vector<std::vector<int>>		iForVerts;
 	std::vector<std::vector<int>>		iForNormals;
 	std::vector<std::vector<int>>		iForTex;
+
+	std::vector<uint>					indices;
+	uint currentVert					= 0;
 	
 	for ( long i = 0; i < linesOfObjFile.size(); i++ )
 	{
@@ -165,6 +168,7 @@ GPUMesh* LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::string objFil
 			}
 		}
 	}
+	
 	for ( int i = 0; i < iForVerts.size(); i++ )
 	{
 		if ( iForVerts[ i ].size() == 4 )
@@ -173,52 +177,138 @@ GPUMesh* LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::string objFil
 			VertexMaster v2;
 			VertexMaster v3;
 			VertexMaster v4;
+			
 			v1.m_normalizedColor = Rgba8( 255 , 255 , 255 , 255 ).GetAsNormalizedFloat4();
 			v2.m_normalizedColor = Rgba8( 255 , 255 , 255 , 255 ).GetAsNormalizedFloat4();
 			v3.m_normalizedColor = Rgba8( 255 , 255 , 255 , 255 ).GetAsNormalizedFloat4();
 			v4.m_normalizedColor = Rgba8( 255 , 255 , 255 , 255 ).GetAsNormalizedFloat4();
+
 			v1.m_position = postions[ ( iForVerts[ i ][ 0 ] ) - 1 ];
 			v2.m_position = postions[ ( iForVerts[ i ][ 1 ] ) - 1 ];
 			v3.m_position = postions[ ( iForVerts[ i ][ 2 ] ) - 1 ];
 			v4.m_position = postions[ ( iForVerts[ i ][ 3 ] ) - 1 ];
+
 			v1.m_normal = normals[ ( iForNormals[ i ][ 0 ] ) - 1 ];
 			v2.m_normal = normals[ ( iForNormals[ i ][ 1 ] ) - 1 ];
 			v3.m_normal = normals[ ( iForNormals[ i ][ 2 ] ) - 1 ];
 			v4.m_normal = normals[ ( iForNormals[ i ][ 3 ] ) - 1 ];
+
 			v1.m_uvTexCoords = uvs[ ( iForTex[ i ][ 0 ] ) - 1 ];
 			v2.m_uvTexCoords = uvs[ ( iForTex[ i ][ 1 ] ) - 1 ];
 			v3.m_uvTexCoords = uvs[ ( iForTex[ i ][ 2 ] ) - 1 ];
 			v4.m_uvTexCoords = uvs[ ( iForTex[ i ][ 3 ] ) - 1 ];
-			finalVerts.push_back( v1 );
-			finalVerts.push_back( v2 );
-			finalVerts.push_back( v3 );
-			finalVerts.push_back( v1 );
-			finalVerts.push_back( v3 );
-			finalVerts.push_back( v4 );
+
+			if ( iForNormals.size() > 0 )
+			{
+				v1.m_normal = normals[ ( iForNormals[ i ][ 0 ] ) - 1 ];
+				v2.m_normal = normals[ ( iForNormals[ i ][ 1 ] ) - 1 ];
+				v3.m_normal = normals[ ( iForNormals[ i ][ 2 ] ) - 1 ];
+				v4.m_normal = normals[ ( iForNormals[ i ][ 3 ] ) - 1 ];
+			}
+			
+			if ( options.invertWindingOrder && !options.clean )
+			{
+				finalVerts.push_back( v1 );
+				finalVerts.push_back( v4 );
+				finalVerts.push_back( v3 );
+
+				finalVerts.push_back( v4 );
+				finalVerts.push_back( v2 );
+				finalVerts.push_back( v1 );
+
+				currentVert = ( uint ) finalVerts.size();
+			}
+			else if( !options.invertWindingOrder && !options.clean )
+			{
+				finalVerts.push_back( v1 );
+				finalVerts.push_back( v2 );
+				finalVerts.push_back( v3 );
+
+				finalVerts.push_back( v3 );
+				finalVerts.push_back( v4 );
+				finalVerts.push_back( v1 );
+
+				currentVert = ( uint ) finalVerts.size();
+			}
+			else if( options.clean && options.invertWindingOrder )
+			{
+				finalVerts.push_back( v1 );
+				finalVerts.push_back( v2 );
+				finalVerts.push_back( v3 );
+				finalVerts.push_back( v4 );
+
+				currentVert = ( uint ) finalVerts.size();
+				
+				indices.push_back( currentVert - 4 );
+				indices.push_back( currentVert - 1  );
+				indices.push_back( currentVert - 2 );
+
+				indices.push_back( currentVert - 1 );
+				indices.push_back( currentVert - 3 );
+				indices.push_back( currentVert - 4 );
+			}
+			else if ( options.clean && !options.invertWindingOrder )
+			{
+				finalVerts.push_back( v1 );
+				finalVerts.push_back( v2 );
+				finalVerts.push_back( v3 );
+				finalVerts.push_back( v4 );
+				
+				currentVert = ( uint ) finalVerts.size();
+				
+				indices.push_back( currentVert - 4 );
+				indices.push_back( currentVert - 3 );
+				indices.push_back( currentVert - 2 );
+
+				indices.push_back( currentVert - 3 );
+				indices.push_back( currentVert - 1 );
+				indices.push_back( currentVert - 4 );
+			}
 		}
 		else if ( iForVerts[ i ].size() == 3 )
 		{
 			VertexMaster v1;
 			VertexMaster v2;
 			VertexMaster v3;
+
 			v1.m_normalizedColor = Rgba8( 255 , 255 , 255 , 255 ).GetAsNormalizedFloat4();
 			v2.m_normalizedColor = Rgba8( 255 , 255 , 255 , 255 ).GetAsNormalizedFloat4();
 			v3.m_normalizedColor = Rgba8( 255 , 255 , 255 , 255 ).GetAsNormalizedFloat4();
+
 			v1.m_position = postions[ ( iForVerts[ i ][ 0 ] ) - 1 ];
 			v2.m_position = postions[ ( iForVerts[ i ][ 1 ] ) - 1 ];
 			v3.m_position = postions[ ( iForVerts[ i ][ 2 ] ) - 1 ];
+
 			v1.m_normal = normals[ ( iForNormals[ i ][ 0 ] ) - 1 ];
 			v2.m_normal = normals[ ( iForNormals[ i ][ 1 ] ) - 1 ];
 			v3.m_normal = normals[ ( iForNormals[ i ][ 2 ] ) - 1 ];
+
 			v1.m_uvTexCoords = uvs[ ( iForTex[ i ][ 0 ] ) - 1 ];
 			v2.m_uvTexCoords = uvs[ ( iForTex[ i ][ 1 ] ) - 1 ];
 			v3.m_uvTexCoords = uvs[ ( iForTex[ i ][ 2 ] ) - 1 ];
+
+			if ( iForNormals.size() > 0 )
+			{
+				v1.m_normal = normals[ ( iForNormals[ i ][ 0 ] ) - 1 ];
+				v2.m_normal = normals[ ( iForNormals[ i ][ 1 ] ) - 1 ];
+				v3.m_normal = normals[ ( iForNormals[ i ][ 2 ] ) - 1 ];
+			}
+			
 			finalVerts.push_back( v1 );
 			finalVerts.push_back( v2 );
 			finalVerts.push_back( v3 );
+
+			currentVert = ( uint ) finalVerts.size();
+			
+			if ( options.clean )
+			{
+				indices.push_back( currentVert - 3 );
+				indices.push_back( currentVert - 2 );
+				indices.push_back( currentVert - 1 );
+			}
 		}
 	}
-
+	
 	if ( options.generateNormals )
 	{
 		for ( int i = 0; i < finalVerts.size(); i += 3 )
@@ -236,6 +326,12 @@ GPUMesh* LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::string objFil
 	}
 	
 	mesh->UpdateVertices( ( unsigned int ) finalVerts.size() , &finalVerts[ 0 ] );
+	if ( options.clean )
+	{
+		mesh->UpdateIndices( indices );
+	}
+
+	//uint vertS = mesh->m_vertices->GetBufferSize();
 	return mesh;
 }
 

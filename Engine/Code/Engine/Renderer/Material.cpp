@@ -1,4 +1,6 @@
 ﻿#include "Engine/Renderer/Material.hpp"
+
+#include "Engine/Core/XmlUtils.hpp"
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/ShaderState.hpp"
 #include "Engine/Renderer/Sampler.hpp"
@@ -32,14 +34,14 @@ void Material::CreateFromFile( const char* xmlFilePath )
 	tinyxml2::XMLElement* materialDefinition = xmlDocument.RootElement();
 	//materialDefinition = materialDefinition->FirstChildElement( "Shader" );
 
-	m_shaderState = new ShaderState();
-	m_shaderState->SetupFromXML( *materialDefinition );
-// 	while ( materialDefinition )
-// 	{
-// 		std::string key = ParseXmlAttribute( *materialDefinition , "name" , "Invalid Name" );
-// 		s_definitions[ key ] = currentActorDefiniton;
-// 		materialDefinition = materialDefinition->NextSiblingElement();
-// 	}
+	m_shaderState = g_theRenderer->GetOrCreateShaderState( xmlFilePath );
+	//m_shaderState = new ShaderState();
+	//m_shaderState->SetupFromXML( *materialDefinition );
+ 	while ( materialDefinition )
+ 	{
+ 		std::string key = ParseXmlAttribute( *materialDefinition , "name" , "Invalid Name" );
+ 		materialDefinition = materialDefinition->NextSiblingElement();
+ 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

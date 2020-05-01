@@ -72,6 +72,8 @@ enum eCompareOp            // A04
 	COMPARE_LEQUAL ,      // <=          "lequal"
 	COMPARE_GREATER ,     // >           "greater"
 	COMPARE_GEQUAL ,      // >=          "gequal"
+
+	TOTAL_COMPARISON_OPS
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

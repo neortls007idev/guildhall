@@ -29,6 +29,12 @@
 #include <stdlib.h>
 
 #include "ThirdParty/MikkT/MikktSpace.h"
+#pragma warning( push )
+#pragma warning ( disable: 4456 )
+#pragma warning( push )
+#pragma warning ( disable: 4204 )
+#pragma warning( push )
+#pragma warning ( disable: 4201 )
 
 #define TFALSE    0
 #define TTRUE     1
@@ -98,6 +104,7 @@ static float         Length( const SVec3 v )
 {
     return sqrtf( LengthSquared( v ) );
 }
+
 
 static SVec3      Normalize( const SVec3 v )
 {
@@ -1913,3 +1920,7 @@ static void DegenEpilogue( STSpace psTspace[] , STriInfo pTriInfos[] , int piTri
         }
     }
 }
+
+#pragma warning( pop )
+#pragma warning( pop )
+#pragma warning( pop )

@@ -399,6 +399,25 @@ void RenderContext::BeginCamera( const Camera& camera )
 	m_context->ClearState();
 #endif
 
+	int rtvCount = camera.GetColorTargetCount();
+	std::vector<ID3D11RenderTargetView*> rtvs;
+
+	rtvs.resize( rtvCount );
+
+	for ( int i = 0; i < rtvCount; i++ )
+	{
+		rtvs[ i ] = nullptr;
+
+		Texture* colorTarget = camera.GetColorTarget( i );
+		TextureView* rtv = nullptr;
+
+		if ( colorTarget != nullptr )
+		{
+			TextureView* rtv = colorTarget->GetOrCreateRenderTargetView();
+			rtvs[ i ] = rtv->GetRTVHandle();
+		}
+	}
+
 	if ( camera.GetClearMode() & CLEAR_COLOR_BIT )
 	{
 		float clearFloats[ 4 ];
@@ -412,6 +431,14 @@ void RenderContext::BeginCamera( const Camera& camera )
 		clearFloats[ 3 ] = ( float ) clearColor.a * scaleToFloat;
 
 		// can be put under clear Texture function
+
+		for ( size_t index = 0 ; index < rtvCount  ; index++ )
+		{
+			if ( nullptr != rtvs[ index ]  )
+			{
+				m_context->ClearRenderTargetView( rtvs[ index ] , clearFloats );
+			}
+		}
 
 		Texture* backbuffer = camera.GetColorTarget();
 		TextureView* backbuffer_rtv = backbuffer->GetOrCreateRenderTargetView();
@@ -448,7 +475,7 @@ void RenderContext::BeginCamera( const Camera& camera )
 	viewport.Height = ( float ) output.y;
 	viewport.MinDepth = 0.0;
 	viewport.MaxDepth = 1.f;
-
+	
 	m_context->RSSetViewports( 1 , &viewport );
 
 	//ID3D11RenderTargetView* rtv = m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
@@ -456,8 +483,8 @@ void RenderContext::BeginCamera( const Camera& camera )
 	ID3D11RenderTargetView* rtvCopy = m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
 	ID3D11RenderTargetView* const* rtv = &rtvCopy;
 	
-	m_context->OMSetRenderTargets( 1 ,          // One rendertarget view
-		rtv ,      // Render target view, created earlier
+	m_context->OMSetRenderTargets( rtvCount ,          // One rendertarget view
+		rtvs.data() ,      // Render target view, created earlier
 		nullptr );
 
 // 	DepthStencilTargetView* dsv = new DepthStencilTargetView( this );
@@ -590,13 +617,25 @@ void RenderContext::ReportLiveObjects()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Shader* RenderContext::GetOrCreateShader( char const* filename )
+Shader* RenderContext::GetOrCreateShader( char const* shaderFilename )
 {
-	Shader* Temp = m_LoadedShaders[ filename ];
+	Shader* Temp = m_LoadedShaders[ shaderFilename ];
 
 	if (Temp == nullptr)
 	{
-		Temp = CreateShaderFromFile( filename );
+		Temp = CreateShaderFromFile( shaderFilename );
+	}
+
+	return Temp;
+}
+
+ShaderState* RenderContext::GetOrCreateShaderState( char const* shaderStateFilename )
+{
+	ShaderState* Temp = m_LoadedShaderStates[ shaderStateFilename ];
+
+	if ( Temp == nullptr )
+	{
+		Temp = CreateShaderStateFromFile( shaderStateFilename );
 	}
 
 	return Temp;
@@ -625,6 +664,28 @@ Shader* RenderContext::CreateShaderFromFile( char const* shaderFilePath )
 	temp->CreateFromFile( this , shaderFilePath );
 	m_LoadedShaders[ shaderFilePath ] = temp;
 	return temp;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+ShaderState* RenderContext::CreateShaderStateFromFile( char const* shaderStateFilePath )
+{
+	tinyxml2::XMLDocument xmlDocument;
+	xmlDocument.LoadFile( shaderStateFilePath );
+
+	if ( xmlDocument.ErrorID() != tinyxml2::XML_SUCCESS )
+	{
+		ERROR_AND_DIE( "XML FILE DID NOT LOAD" );
+		return nullptr;
+	}
+
+	tinyxml2::XMLElement* materialDefinition = xmlDocument.RootElement();
+	//materialDefinition = materialDefinition->FirstChildElement( "Shader" );
+
+	ShaderState* Temp = new ShaderState( *materialDefinition );
+
+	m_LoadedShaderStates[ shaderStateFilePath ] = Temp;
+	return Temp;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -719,7 +780,7 @@ Texture* RenderContext::GetOrCreatematchingRenderTarget( Texture* texture )
 {
 	IntVec2 size = texture->GetDimensions();
 
-	for ( int index = 0; index < m_renderTargetPoolSize; index++ )
+	for ( int index = 0; index < m_renderTargetPool.size(); index++ )
 	{
 		Texture* renderTarget = m_renderTargetPool[ index ];
 		
@@ -728,13 +789,13 @@ Texture* RenderContext::GetOrCreatematchingRenderTarget( Texture* texture )
 			// fast remove at index
 			m_renderTargetPool[ index ] = m_renderTargetPool[ m_renderTargetPool.size() - 1 ];
 			m_renderTargetPool.pop_back();
-
 			// return the object from pool
 			return renderTarget;
 		}
 	}
 
 	Texture* newRenderTarget = CreateRenderTarget( size );
+	//m_renderTargetPool.push_back( newRenderTarget );
 	m_renderTargetPoolSize++;
 	return newRenderTarget;
 }
@@ -902,9 +963,9 @@ void RenderContext::CreateTransientRasterState( eRasterStateFillMode rasterFillM
 		m_transientRaterState->GetDesc( &currentRSDesc );
 		bool result = false;
 
-		if ( currentRSDesc.FillMode == GetD3D11FillMode( rasterFillMode ) )				{	result = result | true;	}
-		if ( currentRSDesc.CullMode == GetD3D11CullMode( cullMode ) )					{	result = result | true;	}
-		if ( currentRSDesc.FrontCounterClockwise == ::GetWindingOrder( windingOrder ) )	{	result = result | true;	}
+		if ( currentRSDesc.FillMode == GetD3D11FillMode( rasterFillMode ) )				{	result = result & true;	}
+		if ( currentRSDesc.CullMode == GetD3D11CullMode( cullMode ) )					{	result = result & true;	}
+		if ( currentRSDesc.FrontCounterClockwise == ::GetWindingOrder( windingOrder ) )	{	result = result & true;	}
 		
 		if ( result )
 		{
@@ -1878,25 +1939,34 @@ bool RenderContext::BindShaderState( ShaderState* shaderState )
 	if ( shaderState == nullptr )
 	{
 		BindShader( nullptr );
+		SetRasterState( eRasterStateFillMode::FILL_SOLID );
+		SetDepthTest( COMPARE_LEQUAL , false );
+		SetBlendMode( eBlendMode::SOLID );
+		
 		return false;
 	}
-	return BindShader( shaderState->GetCurrentShader() );
+
+	BindShader( shaderState->GetCurrentShader() );
+	CreateTransientRasterState( shaderState->GetRasterFillMode() , shaderState->GetCullMode() , shaderState->GetWindingOrder() );
+	SetTransientRasterStateAsRasterState();
+	SetDepthTest( shaderState->GetCurrentDepthTest() , shaderState->GetWriteToDepth() );
+	SetBlendMode( shaderState->GetCurrentBlendMode() );
+	
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void RenderContext::BindShaderState( std::string shaderStateFileName )
 {
-	// TODO - IMPLEMENT ME
-	DEBUGBREAK();
-	//Shader* temp = nullptr;
-	//if ( shaderFileName == "" )
-	//{
-	//	BindShader( temp );
-	//	return;
-	//}
-	//temp = GetOrCreateShader( shaderFileName.c_str() );
-	//BindShader( temp );
+	ShaderState* temp = nullptr;
+	if ( shaderStateFileName == "" )
+	{
+		BindShaderState( temp );
+		return;
+	}
+	temp = GetOrCreateShaderState( shaderStateFileName.c_str() );
+	BindShaderState( temp );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1905,7 +1975,12 @@ bool RenderContext::BindMaterial( Material* material )
 {
 	if ( material == nullptr )
 	{
-		BindShader( nullptr );
+		BindShaderState( nullptr );
+		BindTexture( nullptr );
+		BindSampler( m_defaultSampler );
+		m_materialDataUBO = nullptr;
+		m_materialDataUBO = new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+		BindUniformBuffer( UBO_MATERIAL_SLOT , m_materialDataUBO );
 		return false;
 	}
 
@@ -1913,6 +1988,8 @@ bool RenderContext::BindMaterial( Material* material )
 
 	if ( nullptr != material->m_ubo)
 	{
+		delete m_materialDataUBO;
+		m_materialDataUBO = nullptr;
 		m_materialDataUBO = material->m_ubo;
 		BindUniformBuffer( UBO_MATERIAL_SLOT , m_materialDataUBO );
 	}
@@ -2023,20 +2100,36 @@ void RenderContext::BindSampler( const Sampler* sampler )
 
 void RenderContext::BindDepthStencil( Texture* depthStencilView )
 {
-	ID3D11RenderTargetView*  rtvCopy = m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
-	ID3D11RenderTargetView* const* rtv = &rtvCopy;
-	
+	int rtvCount = m_currentCamera->GetColorTargetCount();
+	std::vector<ID3D11RenderTargetView*> rtvs;
+
+	rtvs.resize( rtvCount );
+
+	for ( int i = 0; i < rtvCount; i++ )
+	{
+		rtvs[ i ] = nullptr;
+
+		Texture* colorTarget = m_currentCamera->GetColorTarget( i );
+		TextureView* rtv = nullptr;
+
+		if ( colorTarget != nullptr )
+		{
+			TextureView* rtv = colorTarget->GetOrCreateRenderTargetView();
+			rtvs[ i ] = rtv->GetRTVHandle();
+		}
+	}
+
 	if ( depthStencilView == nullptr )
 	{
-		m_context->OMSetRenderTargets( 1 ,          // One rendertarget view
-			rtv ,      // Render target view, created earlier
+		m_context->OMSetRenderTargets( rtvCount ,          // One rendertarget view
+			rtvs.data() ,      // Render target view, created earlier
 			nullptr );
 		return;
 	}
 	
 	TextureView* dsv = depthStencilView->GetOrCreateDepthStencilView();
-	m_context->OMSetRenderTargets( 1 ,          // One rendertarget view
-		 rtv ,      // Render target view, created earlier
+	m_context->OMSetRenderTargets( rtvCount ,          // One rendertarget view
+		rtvs.data() ,      // Render target view, created earlier
 		dsv->m_dsv );
 }
 

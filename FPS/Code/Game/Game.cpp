@@ -216,6 +216,7 @@ void Game::IntializeGameObjects()
 	MeshBuilderOptions objMeshOptions1;
 	objMeshOptions1.generateTangents = true;
 	objMeshOptions1.generateNormals = true;
+	//objMeshOptions1.clean = true;
 	m_objMesh1 = new GPUMesh( g_theRenderer );
 	m_objMesh1 = LoadObjFileIntoGpuMesh( objMeshOptions1 , "Data/Models/scifiFighter/mesh.obj" );
 }
@@ -524,9 +525,19 @@ void Game::DebugDrawUI( float deltaSeconds )
 
 void Game::Render() const
 {
-	Texture* backBuffer = g_theRenderer->m_swapChain->GetBackBuffer();
-	Texture* frameTarget = g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
-	m_gameCamera.SetColorTarget( frameTarget );
+	Texture* backBuffer		= g_theRenderer->m_swapChain->GetBackBuffer();
+	Texture* colorTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+	Texture* bloomTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+	Texture* normalTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+	Texture* tangentTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+	Texture* albedoTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+
+	m_gameCamera.SetColorTarget( 0 , colorTarget );
+	m_gameCamera.SetColorTarget( 1 , bloomTarget );
+	m_gameCamera.SetColorTarget( 2 , normalTarget );
+	m_gameCamera.SetColorTarget( 3 , albedoTarget );
+	m_gameCamera.SetColorTarget( 4 , tangentTarget );
+	
 	g_theRenderer->BeginCamera( m_gameCamera );
 	m_gameCamera.CreateMatchingDepthStencilTarget(); 
 	g_theRenderer->BindDepthStencil( m_gameCamera.GetDepthStencilTarget() );
@@ -556,8 +567,8 @@ void Game::Render() const
 
 	BindShaderSpecificMaterialData();
 
-// 	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
-// 	g_theRenderer->DrawMesh( m_meshSphere );
+//  	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
+//  	g_theRenderer->DrawMesh( m_meshSphere );
 
 	g_theRenderer->DisableFog();
 
@@ -578,10 +589,13 @@ void Game::Render() const
 	
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 	
-	g_theRenderer->BindMaterial( m_testMaterial );
-
-	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
-	g_theRenderer->DrawMesh( m_meshSphere );
+ 	g_theRenderer->BindMaterial( m_testMaterial );
+	m_meshSphere->GetVertexBuffer()->SetVertexBufferLayout( Vertex_PCU::LAYOUT );
+  	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
+  	g_theRenderer->DrawMesh( m_meshSphere );
+	m_meshSphere->GetVertexBuffer()->SetVertexBufferLayout( VertexMaster::LAYOUT );
+ 
+ 	g_theRenderer->BindMaterial( nullptr );
 	
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->SetDepthTest( COMPARE_ALWAYS , true );
@@ -601,8 +615,12 @@ void Game::Render() const
 	//g_theRenderer->StartEffect( backBuffer , frameTarget , shader );
 	//g_theRenderer->EndEffect();
 	
-	g_theRenderer->CopyTexture( backBuffer , frameTarget );
-	g_theRenderer->ReleaseRenderTarget( frameTarget );
+	g_theRenderer->CopyTexture( backBuffer , colorTarget );
+	g_theRenderer->ReleaseRenderTarget( colorTarget );
+	g_theRenderer->ReleaseRenderTarget( bloomTarget );
+	g_theRenderer->ReleaseRenderTarget( normalTarget );
+	g_theRenderer->ReleaseRenderTarget( albedoTarget );
+	g_theRenderer->ReleaseRenderTarget( tangentTarget );
 	m_gameCamera.SetColorTarget( backBuffer );
 	
 	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8 , "LEAKING RENDER TARGETS" );

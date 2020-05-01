@@ -5,6 +5,8 @@
 #include "Engine/Math/Transform.hpp"
 #include "Engine/Math/Vec3.hpp"
 
+#include <vector>
+
 class Texture;
 class RenderBuffer;
 class RenderContext;
@@ -51,7 +53,9 @@ public:
 
 	Rgba8			GetClearColor() const																			{ return m_clearColor; }
 	unsigned int	GetClearMode() const																			{ return m_clearMode; }
-	Texture*		GetColorTarget() const																			{ return m_colorTarget; }
+	Texture*		GetColorTarget() const;																			
+	Texture*		GetColorTarget( int index ) const;																			
+	uint			GetColorTargetCount() const;																			
 	Vec2			GetColorTargetSize() const;
 	Texture*		GetDepthStencilTarget() const																	{ return m_depthStencilTarget; }
 
@@ -70,6 +74,7 @@ public:
 	void			SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
 	void			SetClearMode( unsigned int clearFlags , Rgba8 color , float depth = 0.f , unsigned int stencil = 0 );
 	void			SetColorTarget( Texture* texture );
+	void			SetColorTarget( int index , Texture* texture );
 	void			CreateMatchingDepthStencilTarget();
 	void			SetDepthStencilTarget( Texture* texture );
 	void			SetDepthStencilTargetFromAnotherCamera( Camera* camera );
@@ -100,7 +105,7 @@ private:
 	Transform			m_transform;
 	Mat44				m_view;
 	
-	Texture*			m_colorTarget			= nullptr;
+	std::vector< Texture* >			m_colorTargets			/*= nullptr*/;
 	Texture*			m_depthStencilTarget	= nullptr;
 	float				m_clearDepth			= 1.0f;
 	float				m_clearStencil			= 0.f;

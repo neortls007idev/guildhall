@@ -1,3 +1,4 @@
+#include "ConstantBuffers.hlsl"
 // input to the vertex shader - for now, a special input that is the index of the vertex we're drawing
 
 struct vs_input_t
@@ -10,8 +11,8 @@ struct vs_input_t
 // data - unform/constant across the entire call
 // tSlots are for big things
 
-Texture2D <float4>      tDiffuse    : register(t0);         // color of the surface
-SamplerState            sSampler    : register(s0);         // sampler are rules on how to sample color per pixel
+//Texture2D <float4>      tDiffuse    : register(t0);         // color of the surface
+//SamplerState            sSampler    : register(s0);         // sampler are rules on how to sample color per pixel
 
 // Output from Vertex Shader, and Input to Fragment Shader
 // For now, just position
@@ -76,7 +77,10 @@ VertexToFragment_t VertexFunction( vs_input_t input )
 
 float4 FragmentFunction( VertexToFragment_t input ) : SV_Target0 // semeantic of what I'm returning
 {
-    float2 uvToUse = input.uv;
+    float2 uvToUse = input.uv; //+ float2( sin( 1.77f * SYSTEM_TIME + 4.0f * input.uv.y ) , /*cos( 3.19 * SYSTEM_TIME )*/ 0.0f ) * 0.075f;
     float4 color = tDiffuse.Sample( sSampler , uvToUse );
-    return float4( float3( 1,1,1 ) - color.xyz , color.w );
+    float4 inversecolor = float4( float3( 1 , 1 , 1 ) - color.xyz , color.w );
+    float4 lerpColor = lerp( color , inversecolor , ( sin( SYSTEM_TIME ) + 1.f ) * .5f );
+    
+    return color;
 }

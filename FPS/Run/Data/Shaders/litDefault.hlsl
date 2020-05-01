@@ -47,9 +47,19 @@ v2f_t VertexFunction(vs_input_t input)
 // is being drawn to the first bound color target.
 //--------------------------------------------------------------------------------------
 
-float4 FragmentFunction( v2f_t input ) : SV_Target0
+struct fragmentFunctionOutput
 {
-  
+    float4 color    : SV_Target0;
+    float4 bloom    : SV_Target1;
+    float4 normal   : SV_Target2;
+    float4 albedo   : SV_Target3;
+    float4 tangent  : SV_Target4;
+};
+
+
+fragmentFunctionOutput FragmentFunction( v2f_t input )
+{
+
 //--------------------------------------------------------------------------------------
 //              SAMPLE THE TEXTURES
 //--------------------------------------------------------------------------------------    
@@ -83,7 +93,16 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 
     finalColor                      = ApplyLinearFog( input.world_position , finalColor );
             
-    return float4( finalColor , alpha );
+   // return float4( finalColor , alpha );
+    
+    fragmentFunctionOutput output;
+    output.color    = float4( finalColor.xyz , alpha );
+    output.bloom    = float4( 0 , 0 , 0 , 1 );
+    output.tangent  = float4( ( tangent     + float3( 1 , 1 , 1 ) ) * .5f , 1);
+    output.normal   = float4( ( worldNormal + float3( 1 , 1 , 1 ) ) * .5f , 1);
+    output.albedo   = diffuseColor;
+    
+    return output;
 }
 
 //--------------------------------------------------------------------------------------

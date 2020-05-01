@@ -215,6 +215,7 @@ public:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 	Shader*					GetOrCreateShader( char const* shaderFilename );
+	ShaderState*			GetOrCreateShaderState( char const* shaderStateFilename );
 	Texture*				GetOrCreateTextureFromFile( const char* imageFilePath );
 	BitmapFont*				GetOrCreateBitmapFontFromFile( std::string bitmapFontFilePath );
 	void					CreateBlendStates();
@@ -369,55 +370,57 @@ private:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 	Shader*		CreateShaderFromFile( char const* shaderFilePath );
+	ShaderState* CreateShaderStateFromFile( char const* shaderStateFilePath );
 	Texture*	CreateTextureFromFile( const char* imageFilePath );
 	Texture*	CreateTextureFromColor( Rgba8 color );
-	Texture*	CreateFromImage( Image* image );											// TODO :- IMPLEMENT ME
+	Texture*	CreateFromImage( Image* image );														// TODO :- IMPLEMENT ME
 	BitmapFont* CreateBitMapFontFromFile( std::string bitmapFontFilePath );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 public:
-	ID3D11Device*						m_device												= nullptr ;
-	ID3D11DeviceContext*				m_context												= nullptr ;					// Immediate context
-	SwapChain*							m_swapChain												= nullptr;
-	ID3D11DepthStencilState*			m_currentDepthStencilState								= nullptr;
+	ID3D11Device*								m_device												= nullptr;
+	ID3D11DeviceContext*						m_context												= nullptr;					// Immediate context
+	SwapChain*									m_swapChain												= nullptr;
+	ID3D11DepthStencilState*					m_currentDepthStencilState								= nullptr;
 
-	Camera*								m_currentCamera											= nullptr;
+	Camera*										m_currentCamera											= nullptr;
 
-	void*								m_debugModule											= nullptr;
-	IDXGIDebug*							m_debug													= nullptr;
+	void*										m_debugModule											= nullptr;
+	IDXGIDebug*									m_debug													= nullptr;
 
-	Shader*								m_defaultShader											= nullptr;
-	Shader*								m_currentShader											= nullptr;
-	VertexBuffer*						m_immediateVBO											= nullptr;
-	//IndexBuffer*						m_immediateIBO											= nullptr;
-	GPUMesh*							m_immediateMesh											= nullptr;
-	ID3D11Buffer*						m_lastBoundVBO											= nullptr;
-	ID3D11Buffer*						m_lastBoundIBO											= nullptr;
-	Texture*							m_textureTarget											= nullptr;
+	Shader*										m_defaultShader											= nullptr;
+	Shader*										m_currentShader											= nullptr;
+	VertexBuffer*								m_immediateVBO											= nullptr;
+	//IndexBuffer*								m_immediateIBO											= nullptr;
+	GPUMesh*									m_immediateMesh											= nullptr;
+	ID3D11Buffer*								m_lastBoundVBO											= nullptr;
+	ID3D11Buffer*								m_lastBoundIBO											= nullptr;
+	Texture*									m_textureTarget											= nullptr;
 
-	ID3D11BlendState*					m_blendStates[eBlendMode::TOTAL_BLEND_MODES];
-	ID3D11RasterizerState*				m_rasterStates[eBlendMode::TOTAL_BLEND_MODES];
-	ID3D11RasterizerState*				m_currentRasterState;
-	ID3D11RasterizerState*				m_transientRaterState;
+	ID3D11BlendState*							m_blendStates[eBlendMode::TOTAL_BLEND_MODES];
+	ID3D11RasterizerState*						m_rasterStates[eBlendMode::TOTAL_BLEND_MODES];
+	ID3D11RasterizerState*						m_currentRasterState;
+	ID3D11RasterizerState*						m_transientRaterState;
 
-	RenderBuffer*						m_frameUBO												= nullptr;
-	RenderBuffer*						m_modelMatrixUBO										= nullptr;
-	RenderBuffer*						m_lightDataUBO											= nullptr;
-	RenderBuffer*						m_fogDataUBO											= nullptr;
-	RenderBuffer*						m_materialDataUBO										= nullptr;
-	Sampler*							m_defaultSampler										= nullptr;
-	Texture*							m_textureDefault										= nullptr;
-	shaderLightDataT					m_lights;
-	static fogDataT						m_fog;
-	Camera								m_effectCamera;
+	RenderBuffer*								m_frameUBO												= nullptr;
+	RenderBuffer*								m_modelMatrixUBO										= nullptr;
+	RenderBuffer*								m_lightDataUBO											= nullptr;
+	RenderBuffer*								m_fogDataUBO											= nullptr;
+	RenderBuffer*								m_materialDataUBO										= nullptr;
+	Sampler*									m_defaultSampler										= nullptr;
+	Texture*									m_textureDefault										= nullptr;
+	shaderLightDataT							m_lights;
+	static fogDataT								m_fog;
+	Camera										m_effectCamera;
 	
 private:
 
-	std::map<std::string , Texture*>	m_LoadedTextures;									// LOOKUP TABLE OF FILEPATH & TEXTURE
-	std::vector<Texture*>				m_renderTargetPool;
-	int									m_renderTargetPoolSize = 0;
-	std::map<std::string , BitmapFont*> m_LoadedBitMapFonts;								// LOOKUP TABLE OF FILEPATH & BITMAPFONT
-	std::map<std::string , Shader*>		m_LoadedShaders;									// LOOKUP TABLE OF FILEPATH & SHADERS
+	std::map<std::string , Texture*>			m_LoadedTextures;									// LOOKUP TABLE OF FILEPATH & TEXTURE
+	std::vector<Texture*>						m_renderTargetPool;
+	int											m_renderTargetPoolSize = 0;
+	std::map<std::string , BitmapFont*>			m_LoadedBitMapFonts;								// LOOKUP TABLE OF FILEPATH & BITMAPFONT
+	std::map<std::string , Shader*>				m_LoadedShaders;									// LOOKUP TABLE OF FILEPATH & SHADERS
+	std::map<std::string , ShaderState*>		m_LoadedShaderStates;								// LOOKUP TABLE OF FILEPATH & SHADER STATES
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

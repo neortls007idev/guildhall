@@ -104,7 +104,7 @@ Camera::~Camera()
 	m_cameraUBO = nullptr;
 
 	//delete m_colorTarget;
-	m_colorTarget = nullptr;
+	//m_colorTarget = nullptr;
 
 	delete m_depthStencilTarget;
 	m_depthStencilTarget = nullptr;
@@ -213,7 +213,19 @@ void Camera::SetProjectionMatrix( const Mat44& projection )
 
 void Camera::SetColorTarget( Texture* texture )
 {
-	m_colorTarget = texture;
+	SetColorTarget( 0 , texture );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Camera::SetColorTarget( int index , Texture* texture )
+{
+	if ( index >= m_colorTargets.size() )
+	{
+		m_colorTargets.resize( index + 1 );
+	}
+
+	m_colorTargets[ index ] = texture;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -222,9 +234,12 @@ void Camera::CreateMatchingDepthStencilTarget()
 {
 	if ( !m_depthStencilTarget )
 	{
-		Texture* depthStencilTexture = new Texture( g_theRenderer , m_colorTarget->GetDimensions() );
-		depthStencilTexture->GetOrCreateDepthStencilView( Vec2( m_colorTarget->GetDimensions() ) );
-		SetDepthStencilTarget( depthStencilTexture );
+		if ( nullptr != m_colorTargets[ 0 ] )
+		{
+			Texture* depthStencilTexture = new Texture( g_theRenderer , m_colorTargets[ 0 ]->GetDimensions() );
+			depthStencilTexture->GetOrCreateDepthStencilView( Vec2( m_colorTargets[ 0 ]->GetDimensions() ) );
+			SetDepthStencilTarget( depthStencilTexture );
+		}
 	}
 }
 
@@ -271,11 +286,43 @@ RenderBuffer* Camera::UpdateUBO( RenderContext* ctx )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Texture* Camera::GetColorTarget() const
+{
+	if ( m_colorTargets.size() == 0 )
+	{
+		return nullptr;
+	}
+	return m_colorTargets[ 0 ];
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Texture* Camera::GetColorTarget( int index ) const
+{
+	if ( index < m_colorTargets.size() )
+	{
+		return m_colorTargets[ index ];
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+uint Camera::GetColorTargetCount() const
+{
+	return ( uint ) m_colorTargets.size();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Vec2 Camera::GetColorTargetSize() const // is needed for depth buffers
 {
-	if ( m_colorTarget != nullptr )
+	if ( m_colorTargets[ 0 ] != nullptr )
 	{
-		return Vec2( m_colorTarget->GetDimensions() );
+		return Vec2( m_colorTargets[ 0 ]->GetDimensions() );
 	}
 	else
 	{

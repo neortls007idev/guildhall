@@ -16,11 +16,17 @@ public:
 	ShaderState( XMLElement const& node );
 	~ShaderState();
 
-	void SetupFromXML( XMLElement const& node );
+	void						SetupFromXML( XMLElement const& node );
 
-	Shader* GetCurrentShader() const															{ return m_shader; }
-
-	void	SetCurrentShader( Shader* const shader );
+	Shader*						GetCurrentShader() const															{ return m_shader; }
+	eBlendMode					GetCurrentBlendMode() const															{ return m_blendMode; }
+	eCompareOp					GetCurrentDepthTest() const															{ return m_depthTest; }
+	bool						GetWriteToDepth() const																{ return m_writeDepth; }
+	eWindingOrder				GetWindingOrder() const																{ return m_windingOrder; }
+	eCullMode					GetCullMode() const																	{ return m_culling; }
+	eRasterStateFillMode		GetRasterFillMode() const															{ return m_fillMode; }
+	
+	void						SetCurrentShader( Shader* const shader );
 
 public:
 	Shader*						m_shader;
