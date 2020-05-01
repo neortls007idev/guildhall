@@ -413,7 +413,7 @@ void RenderContext::BeginCamera( const Camera& camera )
 
 		if ( colorTarget != nullptr )
 		{
-			TextureView* rtv = colorTarget->GetOrCreateRenderTargetView();
+			rtv = colorTarget->GetOrCreateRenderTargetView();
 			rtvs[ i ] = rtv->GetRTVHandle();
 		}
 	}
@@ -480,9 +480,7 @@ void RenderContext::BeginCamera( const Camera& camera )
 
 	//ID3D11RenderTargetView* rtv = m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
 	//BindDepthStencil( m_textureTarget );
-	ID3D11RenderTargetView* rtvCopy = m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
-	ID3D11RenderTargetView* const* rtv = &rtvCopy;
-	
+		
 	m_context->OMSetRenderTargets( rtvCount ,          // One rendertarget view
 		rtvs.data() ,      // Render target view, created earlier
 		nullptr );
@@ -2003,7 +2001,7 @@ bool RenderContext::BindMaterial( Material* material )
 	{
 		for ( size_t index = 0 ; index < material->m_texturePerSlot.size() ; index++ )
 		{
-			BindSampler( material->m_samplersPerSlot[ index ] );
+			BindSampler( material->m_samplersPerSlot[ ( uint ) index ] );
 		}
 	}
 	else
@@ -2117,7 +2115,7 @@ void RenderContext::BindDepthStencil( Texture* depthStencilView )
 
 		if ( colorTarget != nullptr )
 		{
-			TextureView* rtv = colorTarget->GetOrCreateRenderTargetView();
+			rtv = colorTarget->GetOrCreateRenderTargetView();
 			rtvs[ i ] = rtv->GetRTVHandle();
 		}
 	}
