@@ -188,6 +188,11 @@ GPUMesh* LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::string objFil
 			v3.m_position = postions[ ( iForVerts[ i ][ 2 ] ) - 1 ];
 			v4.m_position = postions[ ( iForVerts[ i ][ 3 ] ) - 1 ];
 
+			v1.m_position = options.transform.TransformPosition3D( v1.m_position );
+			v2.m_position = options.transform.TransformPosition3D( v2.m_position );
+			v3.m_position = options.transform.TransformPosition3D( v3.m_position );
+			v4.m_position = options.transform.TransformPosition3D( v4.m_position );
+			
 			v1.m_normal = normals[ ( iForNormals[ i ][ 0 ] ) - 1 ];
 			v2.m_normal = normals[ ( iForNormals[ i ][ 1 ] ) - 1 ];
 			v3.m_normal = normals[ ( iForNormals[ i ][ 2 ] ) - 1 ];
@@ -204,6 +209,11 @@ GPUMesh* LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::string objFil
 				v2.m_normal = normals[ ( iForNormals[ i ][ 1 ] ) - 1 ];
 				v3.m_normal = normals[ ( iForNormals[ i ][ 2 ] ) - 1 ];
 				v4.m_normal = normals[ ( iForNormals[ i ][ 3 ] ) - 1 ];
+
+				v1.m_normal = options.transform.TransformPosition3D( v1.m_normal );
+				v2.m_normal = options.transform.TransformPosition3D( v2.m_normal );
+				v3.m_normal = options.transform.TransformPosition3D( v3.m_normal );
+				v4.m_normal = options.transform.TransformPosition3D( v4.m_normal );
 			}
 			
 			if ( options.invertWindingOrder && !options.clean )
@@ -279,10 +289,14 @@ GPUMesh* LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::string objFil
 			v2.m_position = postions[ ( iForVerts[ i ][ 1 ] ) - 1 ];
 			v3.m_position = postions[ ( iForVerts[ i ][ 2 ] ) - 1 ];
 
+			v1.m_position = options.transform.TransformPosition3D( v1.m_position );
+			v2.m_position = options.transform.TransformPosition3D( v2.m_position );
+			v3.m_position = options.transform.TransformPosition3D( v3.m_position );
+			
 			v1.m_normal = normals[ ( iForNormals[ i ][ 0 ] ) - 1 ];
 			v2.m_normal = normals[ ( iForNormals[ i ][ 1 ] ) - 1 ];
 			v3.m_normal = normals[ ( iForNormals[ i ][ 2 ] ) - 1 ];
-
+			
 			v1.m_uvTexCoords = uvs[ ( iForTex[ i ][ 0 ] ) - 1 ];
 			v2.m_uvTexCoords = uvs[ ( iForTex[ i ][ 1 ] ) - 1 ];
 			v3.m_uvTexCoords = uvs[ ( iForTex[ i ][ 2 ] ) - 1 ];
@@ -292,6 +306,10 @@ GPUMesh* LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::string objFil
 				v1.m_normal = normals[ ( iForNormals[ i ][ 0 ] ) - 1 ];
 				v2.m_normal = normals[ ( iForNormals[ i ][ 1 ] ) - 1 ];
 				v3.m_normal = normals[ ( iForNormals[ i ][ 2 ] ) - 1 ];
+
+				v1.m_normal = options.transform.TransformPosition3D( v1.m_normal );
+				v2.m_normal = options.transform.TransformPosition3D( v2.m_normal );
+				v3.m_normal = options.transform.TransformPosition3D( v3.m_normal );
 			}
 			
 			finalVerts.push_back( v1 );

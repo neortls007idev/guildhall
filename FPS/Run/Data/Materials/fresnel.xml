@@ -1,5 +1,0 @@
-<Material
-  
-	Shader   = "Data/Shaders/default.hlsl"
-	FillMode= "4"          
-/>

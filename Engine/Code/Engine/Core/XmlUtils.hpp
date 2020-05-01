@@ -1,15 +1,16 @@
 #pragma once
-#include <string>
-#include <vector>
 #include "Engine/Core/Rgba8.hpp"
+#include "Engine/Core/StringUtils.hpp"
+#include "Engine/Math/FloatRange.hpp"
+#include "Engine/Math/IntRange.hpp"
 #include "Engine/Math/IntVec2.hpp"
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Primitives/AABB2.hpp"
-#include "Engine/Core/StringUtils.hpp"
-#include "Engine/Math/IntRange.hpp"
-#include "Engine/Math/FloatRange.hpp"
 #include "ThirdParty/TinyXML2/tinyxml2.h"
+
+#include <string>
+#include <vector>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

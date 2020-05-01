@@ -6,9 +6,9 @@
       - [x] Invert -V
       - [x] Calculate Normals
       - [x] Calculate Tangents
-  - [ ] At end of import...
-      -  [ ] Apply transform
-      -  [-] *Clean* (is an extra)
+  - [x] At end of import...
+      -  [x] Apply transform
+      -  [-] *Clean* (is an extra) ( does not work correctly triangles are missing )
       -  [x] Invert Winding
 - [x] Post-Import Options supported
     - [x] Invert-V
@@ -28,8 +28,8 @@
           normals should also be true.
           Use [./mikktspace.h](./mikktspace.h) and [./mikktspace.c](./mikktspace.c) to
           do this step.  
-  - [ ] Post import transform from the authoring engines space to our space.
-        - [ ] Transform Positions (full)
+  - [x] Post import transform from the authoring engines space to our space.
+        - [x] Transform Positions (full)
         - [x] Normals (just direction, not scaled or translated)
         - [x] Tangents & Bitangents (just direction, not scaled or translated)
 - [x] Have a lit model loaded in your scene to show it is working
@@ -46,7 +46,7 @@
   - [x] Define a `Material` class you can use that works with our data
       - [x] Must be able to support owning at least one UBO for material specific data?
       - [x] Can set material specific textures
-      - [ ] Can set material specific samplers
+      - [x] Can set material specific samplers
       - [x] Can set your engine specific constants (spec/tint)
   - [x] Can make a material from file
   - [x] Can call `RenderContext::BindMaterial` to bind the shader and all data assocated with the material

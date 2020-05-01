@@ -118,7 +118,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="..\..\Run\Data\Materials\fresnel.xml">
+    <Xml Include="..\..\Run\Data\Materials\testMaterial.xml">
       <Filter>Data\Materials</Filter>
     </Xml>
   </ItemGroup>

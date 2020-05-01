@@ -66,7 +66,7 @@ public:
 	
 	// GENERALDATA
 	std::map< uint , Texture* >					m_texturePerSlot;
-	std::vector<Sampler*>						m_samplersPerSlot;
+	std::map< uint , Sampler* >					m_samplersPerSlot;
 
 	std::vector<unsigned char>					m_uboCPUData;
 	RenderBuffer*								m_ubo					= nullptr;

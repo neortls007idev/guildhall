@@ -2001,7 +2001,10 @@ bool RenderContext::BindMaterial( Material* material )
 
 	if ( material->m_samplersPerSlot.size() > 0 )
 	{
-		BindSampler( material->m_samplersPerSlot[ 0 ] );					// HARD CODED TO ONLY BIND THE FIRST SAMPLER RIGHT NOW.
+		for ( size_t index = 0 ; index < material->m_texturePerSlot.size() ; index++ )
+		{
+			BindSampler( material->m_samplersPerSlot[ index ] );
+		}
 	}
 	else
 	{

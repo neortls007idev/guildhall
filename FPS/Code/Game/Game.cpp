@@ -65,22 +65,9 @@ Game::Game()
 	InitializeShaderMaterialData();
 
  	m_testMaterial = new Material();
- 
- 	//m_testMaterial->m_shaderState = new ShaderState();
- 	//m_testMaterial->m_shaderState->SetCurrentShader( m_lightShaders[ TRIPLANAR_UNLIT ] );
- 	m_testMaterial->CreateFromFile( "Data/Materials/fresnel.xml" );
-	m_testMaterial->SetData( m_dissolveShaderData );
-	
- 	m_testMaterial->m_texturePerSlot[ 0 ] = m_tileDiffuse;
- 	m_testMaterial->m_texturePerSlot[ 1 ] = m_tileNormal;
- 	m_testMaterial->m_texturePerSlot[ 8 ] = m_dissolveShaderPatternTexture;
 
-	//m_testMaterial->m_texturePerSlot[ 8 ] = m_triplanarShaderTextures[ 0 ];
- 	//m_testMaterial->m_texturePerSlot[ 9 ] = m_triplanarShaderTextures[ 1 ];
- 	//m_testMaterial->m_texturePerSlot[ 10 ] = m_triplanarShaderTextures[ 2 ];
- 	//m_testMaterial->m_texturePerSlot[ 11 ] = m_triplanarShaderTextures[ 3 ];
- 	//m_testMaterial->m_texturePerSlot[ 12 ] = m_triplanarShaderTextures[ 4 ];
- 	//m_testMaterial->m_texturePerSlot[ 13 ] = m_triplanarShaderTextures[ 5 ];
+ 	m_testMaterial->CreateFromFile( "Data/Materials/testMaterial.xml" );
+	m_testMaterial->SetData( m_dissolveShaderData );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -567,8 +554,8 @@ void Game::Render() const
 
 	BindShaderSpecificMaterialData();
 
-//  	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
-//  	g_theRenderer->DrawMesh( m_meshSphere );
+ 	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
+ 	g_theRenderer->DrawMesh( m_meshSphere );
 
 	g_theRenderer->DisableFog();
 
@@ -590,10 +577,10 @@ void Game::Render() const
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 	
  	g_theRenderer->BindMaterial( m_testMaterial );
-	m_meshSphere->GetVertexBuffer()->SetVertexBufferLayout( Vertex_PCU::LAYOUT );
-  	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
+	//m_meshSphere->GetVertexBuffer()->SetVertexBufferLayout( Vertex_PCU::LAYOUT );
+  	//g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
   	g_theRenderer->DrawMesh( m_meshSphere );
-	m_meshSphere->GetVertexBuffer()->SetVertexBufferLayout( VertexMaster::LAYOUT );
+	//m_meshSphere->GetVertexBuffer()->SetVertexBufferLayout( VertexMaster::LAYOUT );
  
  	g_theRenderer->BindMaterial( nullptr );
 	

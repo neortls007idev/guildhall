@@ -343,7 +343,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="..\..\Run\Data\Materials\fresnel.xml" />
+    <Xml Include="..\..\Run\Data\Materials\testMaterial.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

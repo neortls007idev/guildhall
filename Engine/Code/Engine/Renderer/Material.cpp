@@ -16,6 +16,15 @@ Material::~Material()
 {
 	SAFE_RELEASE_POINTER( m_ubo );
 	SAFE_RELEASE_POINTER( m_shaderState );
+	
+	for ( auto& samplerIndex : m_samplersPerSlot )
+	{
+		if ( samplerIndex.second != nullptr )
+		{
+			delete samplerIndex.second;
+			samplerIndex.second = nullptr;
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -35,11 +44,30 @@ void Material::CreateFromFile( const char* xmlFilePath )
 	//materialDefinition = materialDefinition->FirstChildElement( "Shader" );
 
 	m_shaderState = g_theRenderer->GetOrCreateShaderState( xmlFilePath );
-	//m_shaderState = new ShaderState();
-	//m_shaderState->SetupFromXML( *materialDefinition );
+
+	materialDefinition = materialDefinition->FirstChildElement();
+	
  	while ( materialDefinition )
  	{
- 		std::string key = ParseXmlAttribute( *materialDefinition , "name" , "Invalid Name" );
+		std::string childElementName = materialDefinition->Value();
+ 		
+		if ( childElementName == "Texture" )
+ 		{
+ 			std::string texPath		= ParseXmlAttribute( *materialDefinition , "texPath" , "Invalid Name" );
+ 			int			bindSlot	= ParseXmlAttribute( *materialDefinition , "bindSlot" , 0 );
+
+			Texture* temp = g_theRenderer->GetOrCreateTextureFromFile( texPath.c_str() );
+			m_texturePerSlot[ bindSlot ] = temp;
+ 		}
+
+		if ( childElementName == "Sampler" )
+		{
+			int			type		= ( ParseXmlAttribute( *materialDefinition , "type" , 0 ) % eSamplerType::SAMPLER_TOTAL );
+			int			bindSlot	= ParseXmlAttribute( *materialDefinition , "bindSlot" , 0 );
+
+			Sampler* temp = new Sampler( g_theRenderer , ( eSamplerType )type );
+			m_samplersPerSlot[ bindSlot ] = temp;
+		}
  		materialDefinition = materialDefinition->NextSiblingElement();
  	}
 }
