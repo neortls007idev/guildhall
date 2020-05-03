@@ -116,6 +116,9 @@
     <FxCompile Include="..\..\Run\Data\Shaders\imageEffect.hlsl">
       <Filter>Data\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\blur.hlsl">
+      <Filter>Data\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\..\Run\Data\Materials\testMaterial.xml">

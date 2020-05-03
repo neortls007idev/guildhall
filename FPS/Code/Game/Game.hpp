@@ -130,6 +130,7 @@ private:
 			void UpdateSpecularLightFromUserInput( float deltaSeconds );
 			void UpdateLightAttenuationFromUserInput();
 			void UpdateLightPositionOnUserInput();
+			void UpdateBlurEffectsOnUserInput();
 
 NOT_IN_USE	void CreateDebugObjectsFromUserInput();
 NOT_IN_USE	void DebugLineStripDrawModeTest();
@@ -173,9 +174,11 @@ public:
 	bool						m_isHUDEnabled										= true;
 	Shader*						m_lightShaders[ LitShaderTypes::TOTAL ];
 	Shader* 					m_currentShader;
+	//Shader* 					m_blurShader;
 	Material*					m_testMaterial;
 	int							m_currentShaderIndex;
 	bool						m_isFresnelShaderActive								= false;
+	bool						m_isblurShaderActive								= false;
 	//bool						m_isFogShaderActive									= false;
 	static Texture*				m_dissolveShaderPatternTexture;
 	Texture*					m_triplanarShaderTextures[ 6 ];

@@ -233,7 +233,7 @@ void RenderContext::Startup( Window* window )
 	m_fogDataUBO		= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 	m_materialDataUBO	= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 	
-	m_defaultSampler = new Sampler( this , SAMPLER_POINT );
+	m_defaultSampler = new Sampler( this , SAMPLER_BILINEAR );
 	m_textureDefault = CreateTextureFromColor( WHITE );
 
 	CreateBlendStates();

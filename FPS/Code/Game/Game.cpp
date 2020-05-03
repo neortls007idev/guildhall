@@ -139,6 +139,8 @@ void Game::LoadShaders()
 	m_lightShaders[ LitShaderTypes::TRIPLANAR_LIT ]				= g_theRenderer->GetOrCreateShader( "Data/Shaders/triplanarLit.hlsl" );
 	//m_lightShaders[ LitShaderTypes::FOG ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/fog.hlsl" );
 
+	//m_blurShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );
+
 	m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
 	m_currentShaderIndex = LitShaderTypes::LIT;
 }
@@ -599,15 +601,34 @@ void Game::Render() const
 	// 6. end the effect camera.
 
 	//Shader* shader = g_theRenderer->GetOrCreateShader( "Data/Shaders/imageEffect.hlsl" );
-	//g_theRenderer->StartEffect( backBuffer , frameTarget , shader );
-	//g_theRenderer->EndEffect();
-	
-	g_theRenderer->CopyTexture( backBuffer , colorTarget );
-	g_theRenderer->ReleaseRenderTarget( colorTarget );
-	g_theRenderer->ReleaseRenderTarget( bloomTarget );
-	g_theRenderer->ReleaseRenderTarget( normalTarget );
-	g_theRenderer->ReleaseRenderTarget( albedoTarget );
+
+	if ( m_isblurShaderActive )
+	{
+		Shader* shader = g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );;
+		Texture* blurTarget = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
+		g_theRenderer->StartEffect( blurTarget , colorTarget , shader );
+		g_theRenderer->BindTexture( colorTarget , TEX_USER_TYPE );
+		g_theRenderer->EndEffect();
+		
+		Texture* finalImage = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
+		g_theRenderer->StartEffect( finalImage , colorTarget , shader );
+		g_theRenderer->BindTexture( blurTarget , TEX_USER_TYPE );
+		g_theRenderer->EndEffect();
+		g_theRenderer->ReleaseRenderTarget( blurTarget );
+		g_theRenderer->CopyTexture( backBuffer , finalImage );
+		g_theRenderer->ReleaseRenderTarget( finalImage );
+	}
+	else
+	{
+		g_theRenderer->CopyTexture( backBuffer , colorTarget );
+	}
+
 	g_theRenderer->ReleaseRenderTarget( tangentTarget );
+	g_theRenderer->ReleaseRenderTarget( albedoTarget );
+	g_theRenderer->ReleaseRenderTarget( normalTarget );
+	g_theRenderer->ReleaseRenderTarget( bloomTarget );
+	g_theRenderer->ReleaseRenderTarget( colorTarget );
+	
 	m_gameCamera.SetColorTarget( backBuffer );
 	
 	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8 , "LEAKING RENDER TARGETS" );
@@ -813,7 +834,7 @@ STATIC bool Game::UpdateFresnelShaderMaterialDataViaConsole( EventArgs& args )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-bool Game::UpdateDissolveShaderMaterialViaConsole( EventArgs& args )
+STATIC bool Game::UpdateDissolveShaderMaterialViaConsole( EventArgs& args )
 {
 	Rgba8 curStartColor;
 	curStartColor.SetColorFromNormalizedFloat( Vec4( m_dissolveShaderData.startColor , 1.f ) );
@@ -836,7 +857,7 @@ bool Game::UpdateDissolveShaderMaterialViaConsole( EventArgs& args )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-bool Game::UpdateDissolveShaderPatternViaConsole( EventArgs& args )
+STATIC bool Game::UpdateDissolveShaderPatternViaConsole( EventArgs& args )
 {
 	std::string patternTexPath		= args.GetValue( "patternTexPath " ,"" );
 	m_dissolveShaderPatternTexture	= g_theRenderer->GetOrCreateTextureFromFile( patternTexPath.c_str() );
@@ -902,6 +923,7 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	CameraPositionUpdateOnInput( deltaSeconds );
 	UpdateLightsFromKeyBoard( deltaSeconds );
 	UpdateMaterialShaderFromUserInput( deltaSeconds );
+	UpdateBlurEffectsOnUserInput();
 	
 	if ( g_theInput->WasKeyJustPressed( 'I' ) )
 	{
@@ -1296,6 +1318,16 @@ void Game::UpdateLightPositionOnUserInput()
 	{
 		m_isLightFollowingTheCamera = false;
 		m_isLightAnimated = true;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateBlurEffectsOnUserInput()
+{
+	if ( g_theInput->WasKeyJustPressed( KEY_F2 ) )
+	{
+		m_isblurShaderActive = !m_isblurShaderActive;
 	}
 }
 
