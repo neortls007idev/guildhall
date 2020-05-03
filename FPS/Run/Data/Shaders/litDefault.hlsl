@@ -51,9 +51,9 @@ struct fragmentFunctionOutput
 {
     float4 color    : SV_Target0;
     float4 bloom    : SV_Target1;
-    float4 normal   : SV_Target2;
-    float4 albedo   : SV_Target3;
-    float4 tangent  : SV_Target4;
+  //  float4 normal   : SV_Target2;
+  //  float4 albedo   : SV_Target3;
+  //  float4 tangent  : SV_Target4;
 };
 
 
@@ -85,9 +85,11 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
 //--------------------------------------------------------------------------------------
 //              COMPUTE LIGHT FACTOR
 //--------------------------------------------------------------------------------------
-
-    float3 finalColor              = ComputeLightingAt( input.world_position , worldNormal , surfaceColor , float3( 0.0f.xxx ) , SPECULAR_FACTOR );
+    PostLightingData lightResult   = ComputeLightingAt( input.world_position , worldNormal , surfaceColor , float3( 0.0f.xxx ) , SPECULAR_FACTOR );
+    float3 finalColor              = lightResult.diffuse - lightResult.specularEmmisive;
    
+    float3 bloom                    = max( float3( 0.f , 0.f , 0.f ) , lightResult.specularEmmisive - float3( 1.f , 1.f ,1.f ) );
+    
    // gamma correct back, and output
            finalColor              = pow( finalColor.xyz , INVERSE_GAMMA.xxx );
 
@@ -97,10 +99,10 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
     
     fragmentFunctionOutput output;
     output.color    = float4( finalColor.xyz , alpha );
-    output.bloom    = float4( 0 , 0 , 0 , 1 );
-    output.tangent  = float4( ( tangent     + float3( 1 , 1 , 1 ) ) * .5f , 1);
-    output.normal   = float4( ( worldNormal + float3( 1 , 1 , 1 ) ) * .5f , 1);
-    output.albedo   = diffuseColor;
+    output.bloom    = float4( bloom , 1 );
+    //output.tangent  = float4( ( tangent     + float3( 1 , 1 , 1 ) ) * .5f , 1);
+    //output.normal   = float4( ( worldNormal + float3( 1 , 1 , 1 ) ) * .5f , 1);
+    //output.albedo   = diffuseColor;
     
     return output;
 }

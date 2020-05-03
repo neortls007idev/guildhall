@@ -26,42 +26,6 @@ static float2 UVS[ 3 ] =
 
 //--------------------------------------------------------------------------------------
 
-static float Offsets[ 11 ] =
-{
-  -5 ,
-  -4 ,
-  -3 ,
-  -2 ,
-  -1 ,
-  0 ,
-  1 ,
-  2 ,
-  3 ,
-  4 ,
-  5 ,
-};
-
-//--------------------------------------------------------------------------------------
-
-static float Weights[ 11 ][ 11 ] =
-{
-  
-{0	    ,    0	     ,   0	     ,   0	     ,   0.000001,	0.000001,	0.000001,	0	    ,    0	     ,   0	     ,   0       },
-{0	    ,    0	     ,   0.000001,	 0.000014,	 0.000055,	0.000088,	0.000055,	0.000014,	 0.000001,	 0	     ,   0       },
-{0	    ,    0.000001,	 0.000036,	 0.000362,	 0.001445,	0.002289,	0.001445,	0.000362,	 0.000036,	 0.000001,	 0       },
-{0	    ,    0.000014,	 0.000362,	 0.003672,	 0.014648,	0.023204,	0.014648,	0.003672,	 0.000362,	 0.000014,	 0       },
-{0.000001,	 0.000055,	 0.001445,	 0.014648,	 0.058433,	0.092564,	0.058433,	0.014648,	 0.001445,	 0.000055,	 0.000001},
-{0.000001,	 0.000088,	 0.002289,	 0.023204,	 0.092564,	0.146632,	0.092564,	0.023204,	 0.002289,	 0.000088,	 0.000001},
-{0.000001,	 0.000055,	 0.001445,	 0.014648,	 0.058433,	0.092564,	0.058433,	0.014648,	 0.001445,	 0.000055,	 0.000001},
-{0	    ,    0.000014,	 0.000362,	 0.003672,	 0.014648,	0.023204,	0.014648,	0.003672,	 0.000362,	 0.000014,	 0       },
-{0	    ,    0.000001,	 0.000036,	 0.000362,	 0.001445,	0.002289,	0.001445,	0.000362,	 0.000036,	 0.000001,	 0       },
-{0	    ,    0	     ,   0.000001,	 0.000014,	 0.000055,	0.000088,	0.000055,	0.000014,	 0.000001,	 0	     ,   0       },
-{0	    ,    0	     ,   0	     ,   0	     ,   0.000001,	0.000001,	0.000001,	0	    ,    0	     ,   0	     ,   0       },
-
-};
-
-//--------------------------------------------------------------------------------------
-
 struct vs_input_t
 {
    uint vidx : SV_VERTEXID;                                 // SV_* stands for System Variable (ie, built-in by D3D11 and has special meaning)
@@ -103,6 +67,7 @@ VertexToFragment_t VertexFunction( vs_input_t input )
 }
 
 Texture2D<float4> blurDiffuse : register( t8 );
+Texture2D<float4> colorDiffuse : register( t9 );
 
 float4 FragmentFunction( VertexToFragment_t input ) : SV_Target0
 {
@@ -111,28 +76,21 @@ float4 FragmentFunction( VertexToFragment_t input ) : SV_Target0
 //              SAMPLE THE TEXTURES
 //--------------------------------------------------------------------------------------    
   
-    float2 textureDimensions; 
-    blurDiffuse.GetDimensions( textureDimensions.x , textureDimensions.y );
+    float4 imageColor   = colorDiffuse.Sample( sSampler , input.uv );
+    float4 blurColor    = blurDiffuse.Sample( sSampler , input.uv );
     
-    float PixelWidth = 1.0f / textureDimensions.x;
-    float PixelHeight = 1.0f / textureDimensions.y;
-
-    float4 Color = { 0 , 0 , 0 , 0 };
-
-    float2 Blur;
-        
-    for( int x = 0 ; x < 11 ; x++ )
-    {
-        Blur.x = input.uv.x + Offsets[ x ] * PixelWidth;
-        for( int y = 0 ; y < 11 ; y++ )
-        {
-            Blur.y = input.uv.y + Offsets[ y ] * PixelHeight;
-            Color += blurDiffuse.Sample( sSampler , Blur ) * Weights[ x ][ y ] ;
-        }
-    }
-     
-    //return float4( Blur.x , Blur.y , 0 , 1 );
-    return Color;
+    //if( blurColor.a == 0.0 )
+    //{
+    //    return imageColor;
+    //}
+    
+    float4 finalColor;
+    //finalColor = lerp( blurColor , imageColor , imageColor.a - blurColor.a );
+    finalColor = blurColor * ( blurColor.a ) + imageColor * imageColor.a;
+    //return float4( blurColor * ( 1 - imageColor.a ) );
+    //return float4( ( 1 - imageColor.a ).xxx , 1 );
+    //return float4( ( 1 - imageColor.a ).xxx , 1 );
+    return finalColor;
 }
 
 //--------------------------------------------------------------------------------------

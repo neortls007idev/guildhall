@@ -40,7 +40,13 @@ float2 ComputeLightFactor( light_t light , float3 worldPosition , float3 worldNo
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-float3 ComputeLightingAt( float3 worldPos , float3 worldNormal , float3 surfaceColor , float3 emmisiveColor , float specularFactor )
+struct PostLightingData
+{
+    float3 diffuse;
+    float3 specularEmmisive;
+};
+
+PostLightingData ComputeLightingAt( float3 worldPos , float3 worldNormal , float3 surfaceColor , float3 emmisiveColor , float specularFactor )
 {
     float3 directionToEye           = normalize( CAMERA_POSITION - worldPos );
  
@@ -65,5 +71,8 @@ float3 ComputeLightingAt( float3 worldPos , float3 worldNormal , float3 surfaceC
     specular                       *= specularFactor;                                                                   // scale back specular based on spec factor
 
    // returns light color (in linear space)
-    return diffuse * surfaceColor + specular + emmisiveColor;
+    PostLightingData result;
+    result.specularEmmisive = specular + emmisiveColor;
+    result.diffuse = diffuse * surfaceColor + result.specularEmmisive;
+    return result;
 }

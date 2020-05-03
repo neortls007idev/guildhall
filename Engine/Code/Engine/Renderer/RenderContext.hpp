@@ -173,6 +173,7 @@ public:
 	Texture*				GetOrCreatematchingRenderTarget( Texture* texture );
 	void					ReleaseRenderTarget( Texture* texture );
 	int						GetTotalRenderTargetPoolSize() const				 { return m_renderTargetPoolSize;  }
+	int						GetTexturePoolFreeCount() const						 { return 8 - m_renderTargetPoolSize;  }
 
 	void					BeginCamera( const Camera& camera );
 	void					EndCamera( const Camera& camera);

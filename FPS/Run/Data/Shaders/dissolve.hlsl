@@ -99,7 +99,9 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
     float3 surfaceNormal           = NormalColorToVector3( normalColor.xyz );
     float3 worldNormal             = mul( surfaceNormal , TBN );
 
-    surfaceColor = ComputeLightingAt( input.world_position , worldNormal , surfaceColor , float3( 0.0f.xxx ) , SPECULAR_FACTOR );
+    PostLightingData lightResult    = ComputeLightingAt( input.world_position , worldNormal , surfaceColor , float3( 0.0f.xxx ) , SPECULAR_FACTOR );
+    
+    surfaceColor                    = lightResult.diffuse;
 
    // compute final color; 
     float3 finalColor              = pow( surfaceColor.xyz , INVERSE_GAMMA.xxx );

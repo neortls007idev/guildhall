@@ -53,6 +53,8 @@ Game::Game()
 	
 	m_tileDiffuse	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/tile_diffuse.png" );
 	m_tileNormal	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/tile_normal.png" );
+	//m_tileDiffuse	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/couch/diffuse.png" );
+	//m_tileNormal	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/couch/normal.png" );
 	   	
 	InitializeCameras();
 	IntializeGameObjects();
@@ -242,7 +244,8 @@ void Game::InitializeCameras()
 		m_uiCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
 		m_gameCamera.SetProjectionPerspective( 60.f , CLIENT_ASPECT , -.1f , -100.f );
 		m_gameCamera.SetPosition( Vec3( 0.f , 0.f , 0.f ) );
-		m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 37 , 70 , 87 , 127 ) , 1.f , 0 );
+		//m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 37 , 70 , 87 , 127 ) , 1.f , 0 );
+		m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -268,7 +271,7 @@ void Game::Update( float deltaSeconds )
 	static float y = 0;
 	y += deltaSeconds;
 	m_cubeMeshTransform.SetRotation( -15.f * ( float ) GetCurrentTimeSeconds()/* 0.f*/ ,  -20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
-	m_sphereMeshTransform.SetRotation( 20.f * ( float ) GetCurrentTimeSeconds() /*0.f*/,  50.f * ( float ) GetCurrentTimeSeconds() , 0.f );
+	//m_sphereMeshTransform.SetRotation( 20.f * ( float ) GetCurrentTimeSeconds() /*0.f*/,  50.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	UpdateFromKeyBoard( deltaSeconds );
 
 	if ( m_testMaterial->m_uboIsDirty )
@@ -424,7 +427,7 @@ void Game::DebugDrawUI( float deltaSeconds )
 		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 16 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
 			"Dissolve Start Color = ( %u , %u ,%u )" , ( uint ) ( m_dissolveShaderData.startColor.x * 255 ) , ( uint ) ( m_dissolveShaderData.startColor.y * 255 ) , ( uint ) ( m_dissolveShaderData.startColor.z * 255 ) );
 
-		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 16 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.f , 1 - ( 17 * normalizedOffset ) ) , Vec2::ZERO_ONE , 14.5f , PINK , deltaSeconds ,
 			"Dissolve End Color = ( %u , %u ,%u )" , ( uint ) ( m_dissolveShaderData.endColor.x * 255 ) , ( uint ) ( m_dissolveShaderData.endColor.y * 255 ) , ( uint ) ( m_dissolveShaderData.endColor.z * 255 ) );
 	}
 
@@ -508,6 +511,12 @@ void Game::DebugDrawUI( float deltaSeconds )
 	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 20 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
 		deltaSeconds , "Fog Far Color = ( %u , %u , %u )" ,
 		( uint ) ( m_fogData.farFogColor.x * 255.f ) , ( uint ) ( m_fogData.farFogColor.y * 255.f ) , ( uint ) ( m_fogData.farFogColor.z * 255.f ) );
+
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 22 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+		deltaSeconds , "RTVs Created = %d" , g_theRenderer->GetTotalRenderTargetPoolSize() );
+
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 23 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+		deltaSeconds , "RTVs To be Recycled = %d" , g_theRenderer->GetTexturePoolFreeCount() );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -517,15 +526,15 @@ void Game::Render() const
 	Texture* backBuffer		= g_theRenderer->m_swapChain->GetBackBuffer();
 	Texture* colorTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
 	Texture* bloomTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
-	Texture* normalTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
-	Texture* tangentTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
-	Texture* albedoTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+	//Texture* normalTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+	//Texture* tangentTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+	//Texture* albedoTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
 
 	m_gameCamera.SetColorTarget( 0 , colorTarget );
 	m_gameCamera.SetColorTarget( 1 , bloomTarget );
-	m_gameCamera.SetColorTarget( 2 , normalTarget );
-	m_gameCamera.SetColorTarget( 3 , albedoTarget );
-	m_gameCamera.SetColorTarget( 4 , tangentTarget );
+	//m_gameCamera.SetColorTarget( 2 , normalTarget );
+	//m_gameCamera.SetColorTarget( 3 , albedoTarget );
+	//m_gameCamera.SetColorTarget( 4 , tangentTarget );
 	
 	g_theRenderer->BeginCamera( m_gameCamera );
 	m_gameCamera.CreateMatchingDepthStencilTarget(); 
@@ -604,17 +613,28 @@ void Game::Render() const
 
 	if ( m_isblurShaderActive )
 	{
-		Shader* shader = g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );;
-		Texture* blurTarget = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
-		g_theRenderer->StartEffect( blurTarget , colorTarget , shader );
-		g_theRenderer->BindTexture( colorTarget , TEX_USER_TYPE );
+		Shader* blurShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );;
+		Texture* blurredBloom = g_theRenderer->GetOrCreatematchingRenderTarget( bloomTarget );
+		g_theRenderer->StartEffect( blurredBloom , bloomTarget , blurShader );
+		g_theRenderer->BindTexture( bloomTarget , TEX_USER_TYPE );
 		g_theRenderer->EndEffect();
+
+		//g_theRenderer->CopyTexture( backBuffer , colorTarget );
+		//g_theRenderer->BindShader( nullptr );
+		//g_theRenderer->SetBlendMode( ALPHA );
+		//AABB2 screen = AABB2( m_gameCamera.GetOrthoMin().GetXYComponents() , m_gameCamera.GetOrthoMax().GetXYComponents() );
+		//g_theRenderer->BindTexture( blurredBloom );
+		//g_theRenderer->DrawAABB2( screen , WHITE );
+		//g_theRenderer->BindTexture( nullptr );
+		//g_theRenderer->SetBlendMode( SOLID );
 		
+		Shader* combineImageShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/combineImage.hlsl" );;
 		Texture* finalImage = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
-		g_theRenderer->StartEffect( finalImage , colorTarget , shader );
-		g_theRenderer->BindTexture( blurTarget , TEX_USER_TYPE );
+		g_theRenderer->StartEffect( finalImage , colorTarget , combineImageShader );
+		g_theRenderer->BindTexture( blurredBloom , TEX_USER_TYPE );
+		g_theRenderer->BindTexture( colorTarget , TEX_USER_TYPE , 1 );
 		g_theRenderer->EndEffect();
-		g_theRenderer->ReleaseRenderTarget( blurTarget );
+		g_theRenderer->ReleaseRenderTarget( blurredBloom );
 		g_theRenderer->CopyTexture( backBuffer , finalImage );
 		g_theRenderer->ReleaseRenderTarget( finalImage );
 	}
@@ -623,9 +643,9 @@ void Game::Render() const
 		g_theRenderer->CopyTexture( backBuffer , colorTarget );
 	}
 
-	g_theRenderer->ReleaseRenderTarget( tangentTarget );
-	g_theRenderer->ReleaseRenderTarget( albedoTarget );
-	g_theRenderer->ReleaseRenderTarget( normalTarget );
+	//g_theRenderer->ReleaseRenderTarget( tangentTarget );
+	//g_theRenderer->ReleaseRenderTarget( albedoTarget );
+	//g_theRenderer->ReleaseRenderTarget( normalTarget );
 	g_theRenderer->ReleaseRenderTarget( bloomTarget );
 	g_theRenderer->ReleaseRenderTarget( colorTarget );
 	
