@@ -1,4 +1,4 @@
-﻿#include "Engine/Renderer/Material.hpp"
+#include "Engine/Renderer/Material.hpp"
 
 #include "Engine/Core/XmlUtils.hpp"
 #include "Engine/Renderer/Shader.hpp"

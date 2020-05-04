@@ -23,6 +23,8 @@ PolygonCollider2D::PolygonCollider2D( Physics2D* system , Rigidbody2D* rigidbody
 	//m_polygon.SetNewCenter( Vec2::ZERO );
 	m_polygon.m_localPos = m_worldPosition;
 	CreateBoundingDisc();
+
+	colliderId = ++Physics2D::colliderIds;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -62,6 +62,7 @@ Game::Game()
 	m_cubeMeshTransform.SetPosition( 5.f , 0.0f , -10.0f );
 	m_sphereMeshTransform.SetPosition( -5.f , 0.0f , -10.0f );
 	m_quadTransform.SetPosition( 0.f , 0.0f , -10.0f );
+	m_objSciFiShipTransform.SetPosition( 0.f , 10.0f , -10.0f );
 
 	InitializeLightData();
 	InitializeShaderMaterialData();
@@ -160,7 +161,8 @@ void Game::LoadTextures()
 	m_triplanarShaderTextures[ 4 ] = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/dirt/dirt_aerial_03_diff_1k.png" );
 	m_triplanarShaderTextures[ 5 ] = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/dirt/dirt_aerial_03_nor_1k.png" );
 
-	m_objMesh1Tex				   = g_theRenderer->GetOrCreateTextureFromFile( "Data/Models/scifiFighter/diffuse.jpg" );
+	m_objSciFiShipMeshTex_D		   = g_theRenderer->GetOrCreateTextureFromFile( "Data/Models/scifiFighter/diffuse.jpg" );
+	m_objSciFiShipMeshTex_N		   = g_theRenderer->GetOrCreateTextureFromFile( "Data/Models/scifiFighter/normal.png" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -208,8 +210,8 @@ void Game::IntializeGameObjects()
 	objMeshOptions1.generateTangents = true;
 	objMeshOptions1.generateNormals = true;
 	//objMeshOptions1.clean = true;
-	m_objMesh1 = new GPUMesh( g_theRenderer );
-	m_objMesh1 = LoadObjFileIntoGpuMesh( objMeshOptions1 , "Data/Models/scifiFighter/mesh.obj" );
+	m_objSciFiShipMesh = new GPUMesh( g_theRenderer );
+	m_objSciFiShipMesh = LoadObjFileIntoGpuMesh( objMeshOptions1 , "Data/Models/scifiFighter/mesh.obj" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -228,8 +230,8 @@ Game::~Game()
 	delete m_quadMesh;
 	m_quadMesh			= nullptr;
 
-	delete m_objMesh1;
-	m_objMesh1			= nullptr;
+	delete m_objSciFiShipMesh;
+	m_objSciFiShipMesh			= nullptr;
 
 	m_meshTex_D			= nullptr;
 	m_meshTex_N			= nullptr;
@@ -254,17 +256,17 @@ void Game::Update( float deltaSeconds )
 {
 	m_ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
 	
-	if ( m_isHUDEnabled )
-	{
-		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.625f , 1.00f ) , Vec2::ONE , 20.f , RED , deltaSeconds ,
-			"[ H ] : HIDE HELP HUD" );
-		DebugDrawUI( deltaSeconds );
-	}
-	else
-	{
-		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.625f , 1.00f ) , Vec2::ONE , 20.f , RED , deltaSeconds ,
-			"[ H ] : SHOW HELP HUD" );
-	}
+	//if ( m_isHUDEnabled )
+	//{
+	//	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.625f , 1.00f ) , Vec2::ONE , 20.f , RED , deltaSeconds ,
+	//		"[ H ] : HIDE HELP HUD" );
+	//	DebugDrawUI( deltaSeconds );
+	//}
+	//else
+	//{
+	//	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.625f , 1.00f ) , Vec2::ONE , 20.f , RED , deltaSeconds ,
+	//		"[ H ] : SHOW HELP HUD" );
+	//}
 
 	UpdateLightPosition( deltaSeconds );
 
@@ -580,8 +582,10 @@ void Game::Render() const
 		
 	g_theRenderer->SetRasterState( FILL_SOLID );
 	
- 	g_theRenderer->BindTexture( m_objMesh1Tex );
- 	g_theRenderer->DrawMesh( m_objMesh1 );
+ 	g_theRenderer->BindTexture( m_objSciFiShipMeshTex_D );
+	g_theRenderer->BindTexture( m_objSciFiShipMeshTex_N , eTextureType::TEX_NORMAL );
+	g_theRenderer->SetModelMatrix( m_objSciFiShipTransform.GetAsMatrix() );
+ 	g_theRenderer->DrawMesh( m_objSciFiShipMesh );
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindShader( nullptr );
 	
@@ -661,8 +665,8 @@ void Game::Render() const
 	
 	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8 , "LEAKING RENDER TARGETS" );
 
-	DebugRenderWorldToCamera( &m_gameCamera );
-	DebugRenderScreenTo( nullptr );
+	//DebugRenderWorldToCamera( &m_gameCamera );
+	//DebugRenderScreenTo( nullptr );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

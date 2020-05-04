@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include "Engine/Core/NamedStrings.hpp"
-#include "Engine/Core/NamedProperties.hpp"
+//#include "Engine/Core/NamedProperties.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

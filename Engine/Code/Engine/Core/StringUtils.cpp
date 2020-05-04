@@ -1,3 +1,4 @@
+#include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/StringUtils.hpp"
 #include <stdarg.h>
 #include <windows.h>
@@ -223,6 +224,89 @@ void SetClipboardDataAsText( std::string clipboardStringToSet )
 	EmptyClipboard();
 	SetClipboardData( CF_TEXT , hMem );
 	CloseClipboard();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+std::string ToString( float const value )
+{
+	return std::to_string( value );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+std::string ToString( int const value )
+{
+	return std::to_string( value );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+std::string ToString( bool const value )
+{
+	if ( value )
+	{
+		return "true";
+	}
+	else
+	{
+		return "false";
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+std::string ToString( Rgba8 const value )
+{
+	return std::to_string( value.r ) + "," + std::to_string( value.g ) + "," + std::to_string( value.b ) + "," + std::to_string( value.a );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+std::string ToString( Vec2 const value )
+{
+	return std::to_string( value.x ) + "," + std::to_string( value.y );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+std::string ToString( Vec3 const value )
+{
+	return std::to_string( value.x ) + "," + std::to_string( value.y ) + "," + std::to_string( value.z );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+std::string ToString( Vec4 const value )
+{
+	return std::to_string( value.x ) + "," + std::to_string( value.y ) + "," + std::to_string( value.z ) + "," + std::to_string( value.w );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+std::string ToString( IntVec2 const value )
+{
+	return std::to_string( value.x ) + "," + std::to_string( value.y );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+int StringConvertToValue( const char* text , int defaultValue )
+{
+	int value = defaultValue;
+		value = static_cast< int >( atoi( text ) );
+
+	return value;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+float StringConvertToValue( const char* text , float defaultValue )
+{
+	float value = defaultValue;
+		  value = static_cast< float >( atof( text ) );
+
+	return value;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -3,6 +3,8 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Physics/Physics2D.hpp"
 #include "Engine/Math/Vec2.hpp"
+#include "PhysicsUtils.hpp"
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -78,6 +80,11 @@ public:
 	void			SetMoment( float newMoment );
 
 	Vec2			CalculateImpactVelocity( Vec2 pos ) const;
+
+	void SetLayer( Layers layer ) { m_layer = layer; };
+	Layers GetLayer() { return m_layer; };
+
+	
 		
 public:
 	Physics2D*			m_system				= nullptr;											// which scene created/owns this object
@@ -98,6 +105,7 @@ public:
 	float				m_moment				= 0.f;
 	float				m_frameRotation			= 0.f;
 	float				m_angularDrag			= 0.f;
+	Layers				m_layer = LAYER_DEFAULT;
 	
 private:
 	~Rigidbody2D();																					// destroys the collider

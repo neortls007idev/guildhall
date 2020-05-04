@@ -19,6 +19,12 @@ enum COLLIDER2D_TYPE
 	NUM_COLLIDER_TYPES,
 };
 
+struct Subscription
+{
+	std::string eventName;
+	EventArgs args;
+};
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 class Collider2D
@@ -47,6 +53,23 @@ public:
 	Rigidbody2D*			GetRigidBody() const														{ return m_rigidbody; }
 	PhysicsMaterial*		GetPhysicsMaterial() const													{ return m_physicsMaterial; }
 
+
+	void AddEventToOverlapStart( Subscription subscription );
+	void AddEventToOverlapEnd( Subscription subscription );
+	void AddEventToOverlapStay( Subscription subscription );
+
+	void AddEventToTriggerStart( Subscription subscription );
+	void AddEventToTriggerStay( Subscription subscription );
+	void AddEventToTriggerExit( Subscription subscription );
+
+	void FireOverLapStartEvents( int otherColliderId );
+	void FireOverLapEndEvents( int otherColliderId );
+	void FireOverLapStayEvents( int otherColliderId );
+
+	void FireTriggerStartEvents( int otherColliderId );
+	void FireTiggerEndEvents( int otherColliderId );
+	void FireTriggerStayEvents( int otherColliderId );
+
 protected:
 	virtual ~Collider2D(); // private - make sure this is virtual so correct deconstructor gets called
 
@@ -58,6 +81,16 @@ public:
 	PhysicsMaterial*	m_physicsMaterial;
 	bool				m_isDrawingCollisions	= false;
 	bool				m_isColliding			= false;
+
+	bool isTrigger = false;
+	int colliderId;
+
+	std::vector<Subscription> m_overlapStartSubscriptions;
+	std::vector<Subscription> m_overlapEndSubscriptions;
+	std::vector<Subscription> m_overlapStaySubscriptions;
+	std::vector<Subscription> m_triggerEnterSubscriptions;
+	std::vector<Subscription> m_triggerStaySubscriptions;
+	std::vector<Subscription> m_triggerExitSubscriptions;
 
 private:
 };

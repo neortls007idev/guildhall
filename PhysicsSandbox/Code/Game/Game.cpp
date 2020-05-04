@@ -5,6 +5,7 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Physics/Physics2D.hpp"
 #include "Engine/Physics/Collider2D.hpp"
@@ -168,6 +169,7 @@ void Game::EndFrame()
 
 void Game::Render() const
 {
+	m_worldCamera.SetColorTarget( g_theRenderer->m_swapChain->GetBackBuffer() );
 	g_theRenderer->BeginCamera( m_worldCamera );
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 	g_theRenderer->BindDepthStencil( nullptr );
@@ -210,6 +212,7 @@ void Game::Render() const
 
 void Game::RenderUI() const
 {
+	m_UICamera.SetColorTarget( g_theRenderer->m_swapChain->GetBackBuffer() );
 	g_theRenderer->BeginCamera( m_UICamera );
 	g_theRenderer->BindDepthStencil( nullptr );
 	g_theRenderer->SetBlendMode( ALPHA );

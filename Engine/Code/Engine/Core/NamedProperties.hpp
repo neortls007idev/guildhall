@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <map>
 #include <string>
+#include "Engine/Core/StringUtils.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 /*
@@ -45,15 +46,7 @@ public:
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	
-	~NamedProperties()
-	{
-		for ( auto iter : m_keyValuePairs )
-		{
-			delete iter.second;
-		}
-
-		m_keyValuePairs.clear();
-	}
+	~NamedProperties();
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	// for everything else, there's templates!
@@ -111,7 +104,7 @@ public:
 			else
 			{
 				std::string strValue = base->GetAsString();
-				return StringConvert( strValue.c_str() , defValue );
+				return StringConvertToValue( strValue , defValue );
 			}
 		}
 		else
@@ -135,30 +128,16 @@ public:
 
 private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------
-	TypedPropertyBase* FindInMap( std::string const& key ) const
-	{
-		auto iter = m_keyValuePairs.find( key );
-		if ( iter != m_keyValuePairs.end() )
-		{
-			return iter->second;
-		}
-		else
-		{
-			return nullptr;
-		}
-	}
-
+	TypedPropertyBase* FindInMap( std::string const& key ) const;
 
 	// this is going to be different
 	// std::map<std::string, std::string> m_keyValuePairs;
 	// std::map<std::string, void*> m_keyValuePointers;
 
 	// We need to type type in a map
-	// But we can't store the temlate argument... or can we?
+	// But we can't store the template argument... or can we?
 	std::map<std::string , TypedPropertyBase*> m_keyValuePairs;
-};
-
-*/
+};*/
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

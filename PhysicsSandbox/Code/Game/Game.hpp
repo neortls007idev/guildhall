@@ -88,7 +88,7 @@ public:
 
 	static RandomNumberGenerator	m_rng;
 	mutable  Camera					m_worldCamera;
-		   Camera					m_UICamera;
+	mutable  Camera					m_UICamera;
 
 		   Rgba8					m_fillColor					= Rgba8( 255 , 255 , 255 , 0 );
 		   Rgba8					m_overlapColor				= Rgba8( 255 , 0 , 0 , 255 );

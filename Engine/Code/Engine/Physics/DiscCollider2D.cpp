@@ -13,6 +13,7 @@ DiscCollider2D::DiscCollider2D( Physics2D* system , Rigidbody2D* rigidbody ,Vec2
 																									m_radius( radius )
 {
 	m_worldPosition = m_rigidbody->m_worldPosition + m_localPosition;
+	colliderId = ++Physics2D::colliderIds;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

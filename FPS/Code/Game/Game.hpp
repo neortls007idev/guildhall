@@ -150,15 +150,17 @@ public:
 	GPUMesh*					m_cubeMesh;
 	GPUMesh*					m_meshSphere;
 	GPUMesh*					m_quadMesh;
-	GPUMesh*					m_objMesh1;
+	GPUMesh*					m_objSciFiShipMesh;
 	Transform					m_cubeMeshTransform;
 	Transform					m_sphereMeshTransform;
 	Transform					m_quadTransform;
+	Transform					m_objSciFiShipTransform;
 	Texture*					m_meshTex_D											= nullptr;
 	Texture*					m_meshTex_N											= nullptr;
 	Texture*					m_tileDiffuse										= nullptr;
 	Texture*					m_tileNormal										= nullptr;
-	Texture*					m_objMesh1Tex										= nullptr;
+	Texture*					m_objSciFiShipMeshTex_D								= nullptr;
+	Texture*					m_objSciFiShipMeshTex_N								= nullptr;
 
 	//Texture*					m_renderTarget										= nullptr;
 

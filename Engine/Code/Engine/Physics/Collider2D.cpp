@@ -4,6 +4,7 @@
 #include "Engine/Core/DebugRender.hpp"
 #include "Engine/Physics/DiscCollider2D.hpp"
 #include "Engine/Physics/PolygonCollider2D.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -236,6 +237,110 @@ float Collider2D::GetFrictionWith( Collider2D const* other ) const
 	float otherFriction = other->GetPhysicsMaterial()->GetFriction();
 
 	return meFriction * otherFriction;
+}
+
+
+void Collider2D::AddEventToOverlapStart( Subscription subscription )
+{
+	m_overlapStartSubscriptions.push_back( subscription );
+}
+
+void Collider2D::AddEventToOverlapEnd( Subscription subscription )
+{
+	m_overlapEndSubscriptions.push_back( subscription );
+}
+
+void Collider2D::AddEventToOverlapStay( Subscription subscription )
+{
+	m_overlapStaySubscriptions.push_back( subscription );
+}
+
+void Collider2D::AddEventToTriggerStart( Subscription subscription )
+{
+	m_triggerEnterSubscriptions.push_back( subscription );
+}
+
+void Collider2D::AddEventToTriggerStay( Subscription subscription )
+{
+	m_triggerStaySubscriptions.push_back( subscription );
+}
+
+void Collider2D::AddEventToTriggerExit( Subscription subscription )
+{
+	m_triggerExitSubscriptions.push_back( subscription );
+}
+
+void Collider2D::FireOverLapStartEvents( int otherColliderId )
+{
+	for ( int i = 0; i < m_overlapStartSubscriptions.size(); i++ )
+	{
+		EventArgs args = m_overlapStartSubscriptions[ i ].args;
+		args.SetValue( "MyColliderId" , std::to_string( colliderId ) );
+		args.SetValue( "OtherColliderId" , std::to_string( otherColliderId ) );
+
+		g_theEventSystem->FireEvent( m_overlapStartSubscriptions[ i ].eventName , args );
+	}
+}
+
+void Collider2D::FireOverLapEndEvents( int otherColliderId )
+{
+	for ( int i = 0; i < m_overlapEndSubscriptions.size(); i++ )
+	{
+		EventArgs args = m_overlapEndSubscriptions[ i ].args;
+		args.SetValue( "MyColliderId" , std::to_string( colliderId ) );
+		args.SetValue( "OtherColliderId" , std::to_string( otherColliderId ) );
+
+		g_theEventSystem->FireEvent( m_overlapEndSubscriptions[ i ].eventName , args );
+	}
+}
+
+void Collider2D::FireOverLapStayEvents( int otherColliderId )
+{
+	for ( int i = 0; i < m_overlapStaySubscriptions.size(); i++ )
+	{
+		EventArgs args = m_overlapStaySubscriptions[ i ].args;
+		args.SetValue( "MyColliderId" , std::to_string( colliderId ) );
+		args.SetValue( "OtherColliderId" , std::to_string( otherColliderId ) );
+
+		g_theEventSystem->FireEvent( m_overlapStaySubscriptions[ i ].eventName , args );
+	}
+}
+
+void Collider2D::FireTriggerStartEvents( int otherColliderId )
+{
+	for ( int i = 0; i < m_triggerEnterSubscriptions.size(); i++ )
+	{
+		EventArgs args = m_triggerEnterSubscriptions[ i ].args;
+		args.SetValue( "MyColliderId" , std::to_string( colliderId ) );
+		args.SetValue( "OtherColliderId" , std::to_string( otherColliderId ) );
+
+		g_theEventSystem->FireEvent( m_triggerEnterSubscriptions[ i ].eventName , args );
+	}
+}
+
+void Collider2D::FireTiggerEndEvents( int otherColliderId )
+{
+	for ( int i = 0; i < m_triggerExitSubscriptions.size(); i++ )
+	{
+		EventArgs args = m_triggerExitSubscriptions[ i ].args;
+		args.SetValue( "MyColliderId" , std::to_string( colliderId ) );
+		args.SetValue( "OtherColliderId" , std::to_string( otherColliderId ) );
+
+		g_theEventSystem->FireEvent( m_triggerExitSubscriptions[ i ].eventName , args );
+	}
+}
+
+void Collider2D::FireTriggerStayEvents( int otherColliderId )
+{
+	for ( int i = 0; i < m_triggerStaySubscriptions.size(); i++ )
+	{
+		EventArgs args = m_triggerStaySubscriptions[ i ].args;
+		args.SetValue( "MyColliderId" , std::to_string( colliderId ) );
+		args.SetValue( "OtherColliderId" , std::to_string( otherColliderId ) );
+
+
+		g_theEventSystem->FireEvent( m_triggerStaySubscriptions[ i ].eventName , args );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
