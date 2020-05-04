@@ -634,13 +634,21 @@ void Game::Render() const
 		g_theRenderer->BindTexture( blurredBloom , TEX_USER_TYPE );
 		g_theRenderer->BindTexture( colorTarget , TEX_USER_TYPE , 1 );
 		g_theRenderer->EndEffect();
-		g_theRenderer->ReleaseRenderTarget( blurredBloom );
 		g_theRenderer->CopyTexture( backBuffer , finalImage );
+		g_theRenderer->ReleaseRenderTarget( blurredBloom );
 		g_theRenderer->ReleaseRenderTarget( finalImage );
 	}
 	else
 	{
-		g_theRenderer->CopyTexture( backBuffer , colorTarget );
+		Shader* combineImageShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/combineImage.hlsl" );;
+		Texture* finalImage = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
+		g_theRenderer->StartEffect( finalImage , colorTarget , combineImageShader );
+		g_theRenderer->BindTexture( bloomTarget , TEX_USER_TYPE );
+		g_theRenderer->BindTexture( colorTarget , TEX_USER_TYPE , 1 );
+		g_theRenderer->EndEffect();
+		g_theRenderer->CopyTexture( backBuffer , finalImage );
+		g_theRenderer->ReleaseRenderTarget( finalImage );
+		//g_theRenderer->CopyTexture( backBuffer , colorTarget );
 	}
 
 	//g_theRenderer->ReleaseRenderTarget( tangentTarget );
