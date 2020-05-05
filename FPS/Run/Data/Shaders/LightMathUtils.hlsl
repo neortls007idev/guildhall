@@ -20,6 +20,7 @@ float2 ComputeLightFactor( light_t light , float3 worldPosition , float3 worldNo
     float       diffuseAttenuation      = light.intensity / dot( attenuationVector , light.attenuation ) * coneAttenuation;
     float       specularAttenuation     = light.intensity / dot( attenuationVector , light.specularAttenuation )* coneAttenuation;
 
+   // specularAttenuation = light.intensity;
     
    // compute diffuse
    // max prevents lighting from the "back", which would subtract light

@@ -175,7 +175,7 @@ void TheApp::Update( float deltaSeconds )
 {
 	//g_theInput->Update( deltaSeconds );
 	g_theRenderer->UpdateFrameTime( deltaSeconds );
-	//g_currentManager->Update( deltaSeconds );
+	g_currentManager->Update( deltaSeconds );
 	UpdateFromKeyboard();
 
 	if ( m_isPaused ) { deltaSeconds = 0; }

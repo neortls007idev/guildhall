@@ -202,8 +202,8 @@ float4 FragmentFunction( VertexToFragment_t input ) : SV_Target0
     float2 textureDimensions;
     blurDiffuse.GetDimensions( textureDimensions.x , textureDimensions.y );
     
-    float PixelWidth = 1.0f / textureDimensions.x;
-    float PixelHeight = 1.0f / textureDimensions.y;
+    float PixelWidth = 3.2f / textureDimensions.x;
+    float PixelHeight = 3.2f / textureDimensions.y;
 
     float4 Color = { 0 , 0 , 0 , 0 };
 

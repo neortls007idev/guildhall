@@ -412,7 +412,7 @@ public:
 	Texture*									m_textureDefault										= nullptr;
 	shaderLightDataT							m_lights;
 	static fogDataT								m_fog;
-	Camera										m_effectCamera;
+	Camera*										m_effectCamera;
 	
 private:
 

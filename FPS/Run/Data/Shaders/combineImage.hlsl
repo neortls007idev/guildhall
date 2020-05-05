@@ -86,7 +86,8 @@ float4 FragmentFunction( VertexToFragment_t input ) : SV_Target0
     
     float4 finalColor;
     //finalColor = lerp( blurColor , imageColor , imageColor.a - blurColor.a );
-    finalColor = blurColor * ( blurColor.a ) + imageColor * imageColor.a;
+    //finalColor = blurColor * ( blurColor.a ) + imageColor * imageColor.a;
+    finalColor = blurColor + imageColor;
     //finalColor = blurColor * ( 1 - imageColor.a ) + imageColor * imageColor.a;
     //return float4( blurColor * ( 1 - imageColor.a ) );
     //return float4( ( 1 - imageColor.a ).xxx , 1 );

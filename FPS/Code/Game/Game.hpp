@@ -176,7 +176,7 @@ public:
 	bool						m_isHUDEnabled										= true;
 	Shader*						m_lightShaders[ LitShaderTypes::TOTAL ];
 	Shader* 					m_currentShader;
-	//Shader* 					m_blurShader;
+	Shader* 					m_blurShader;
 	Material*					m_testMaterial;
 	int							m_currentShaderIndex;
 	bool						m_isFresnelShaderActive								= false;

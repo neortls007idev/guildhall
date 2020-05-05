@@ -105,7 +105,14 @@ Camera::~Camera()
 
 	//delete m_colorTarget;
 	//m_colorTarget = nullptr;
-
+	for ( auto& colorTargetIndex : m_colorTargets )
+	{
+		if ( colorTargetIndex != nullptr )
+		{
+			colorTargetIndex = nullptr;
+		}
+	}
+	
 	delete m_depthStencilTarget;
 	m_depthStencilTarget = nullptr;
 }

@@ -86,9 +86,9 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
 //              COMPUTE LIGHT FACTOR
 //--------------------------------------------------------------------------------------
     PostLightingData lightResult   = ComputeLightingAt( input.world_position , worldNormal , surfaceColor , float3( 0.0f.xxx ) , SPECULAR_FACTOR );
-    float3 finalColor              = lightResult.diffuse - lightResult.specularEmmisive;
+    float3 finalColor              = lightResult.diffuse + lightResult.specularEmmisive;
    
-    float3 bloom                    = max( float3( 0.f , 0.f , 0.f ) , lightResult.specularEmmisive - float3( 1.f , 1.f ,1.f ) );
+    float3 bloom                    = max( float3( 0.f , 0.f , 0.f ) , finalColor - float3( 1.f , 1.f , 1.f ) );
            bloom                    = pow( bloom.xyz , INVERSE_GAMMA.xxx );
    // gamma correct back, and output
            finalColor              = pow( finalColor.xyz , INVERSE_GAMMA.xxx );

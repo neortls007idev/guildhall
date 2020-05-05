@@ -142,7 +142,7 @@ void Game::LoadShaders()
 	m_lightShaders[ LitShaderTypes::TRIPLANAR_LIT ]				= g_theRenderer->GetOrCreateShader( "Data/Shaders/triplanarLit.hlsl" );
 	//m_lightShaders[ LitShaderTypes::FOG ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/fog.hlsl" );
 
-	//m_blurShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );
+	m_blurShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );
 
 	m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
 	m_currentShaderIndex = LitShaderTypes::LIT;
@@ -256,17 +256,17 @@ void Game::Update( float deltaSeconds )
 {
 	m_ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
 	
-	//if ( m_isHUDEnabled )
-	//{
-	//	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.625f , 1.00f ) , Vec2::ONE , 20.f , RED , deltaSeconds ,
-	//		"[ H ] : HIDE HELP HUD" );
-	//	DebugDrawUI( deltaSeconds );
-	//}
-	//else
-	//{
-	//	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.625f , 1.00f ) , Vec2::ONE , 20.f , RED , deltaSeconds ,
-	//		"[ H ] : SHOW HELP HUD" );
-	//}
+	if ( m_isHUDEnabled )
+	{
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.625f , 1.00f ) , Vec2::ONE , 20.f , RED , deltaSeconds ,
+			"[ H ] : HIDE HELP HUD" );
+		DebugDrawUI( deltaSeconds );
+	}
+	else
+	{
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.625f , 1.00f ) , Vec2::ONE , 20.f , RED , deltaSeconds ,
+			"[ H ] : SHOW HELP HUD" );
+	}
 
 	UpdateLightPosition( deltaSeconds );
 
@@ -584,7 +584,7 @@ void Game::Render() const
 	
  	g_theRenderer->BindTexture( m_objSciFiShipMeshTex_D );
 	g_theRenderer->BindTexture( m_objSciFiShipMeshTex_N , eTextureType::TEX_NORMAL );
-	g_theRenderer->SetModelMatrix( m_objSciFiShipTransform.GetAsMatrix() );
+	//g_theRenderer->SetModelMatrix( m_objSciFiShipTransform.GetAsMatrix() );
  	g_theRenderer->DrawMesh( m_objSciFiShipMesh );
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindShader( nullptr );
@@ -615,6 +615,8 @@ void Game::Render() const
 
 	//Shader* shader = g_theRenderer->GetOrCreateShader( "Data/Shaders/imageEffect.hlsl" );
 
+	//g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );
+	
 	if ( m_isblurShaderActive )
 	{
 		Shader* blurShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );;
@@ -622,15 +624,6 @@ void Game::Render() const
 		g_theRenderer->StartEffect( blurredBloom , bloomTarget , blurShader );
 		g_theRenderer->BindTexture( bloomTarget , TEX_USER_TYPE );
 		g_theRenderer->EndEffect();
-
-		//g_theRenderer->CopyTexture( backBuffer , colorTarget );
-		//g_theRenderer->BindShader( nullptr );
-		//g_theRenderer->SetBlendMode( ALPHA );
-		//AABB2 screen = AABB2( m_gameCamera.GetOrthoMin().GetXYComponents() , m_gameCamera.GetOrthoMax().GetXYComponents() );
-		//g_theRenderer->BindTexture( blurredBloom );
-		//g_theRenderer->DrawAABB2( screen , WHITE );
-		//g_theRenderer->BindTexture( nullptr );
-		//g_theRenderer->SetBlendMode( SOLID );
 		
 		Shader* combineImageShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/combineImage.hlsl" );;
 		Texture* finalImage = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
@@ -652,12 +645,9 @@ void Game::Render() const
 		g_theRenderer->EndEffect();
 		g_theRenderer->CopyTexture( backBuffer , finalImage );
 		g_theRenderer->ReleaseRenderTarget( finalImage );
-		//g_theRenderer->CopyTexture( backBuffer , colorTarget );
-	}
+	} 
+	//g_theRenderer->CopyTexture( backBuffer , colorTarget );
 
-	//g_theRenderer->ReleaseRenderTarget( tangentTarget );
-	//g_theRenderer->ReleaseRenderTarget( albedoTarget );
-	//g_theRenderer->ReleaseRenderTarget( normalTarget );
 	g_theRenderer->ReleaseRenderTarget( bloomTarget );
 	g_theRenderer->ReleaseRenderTarget( colorTarget );
 	
@@ -665,8 +655,8 @@ void Game::Render() const
 	
 	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8 , "LEAKING RENDER TARGETS" );
 
-	//DebugRenderWorldToCamera( &m_gameCamera );
-	//DebugRenderScreenTo( nullptr );
+	DebugRenderWorldToCamera( &m_gameCamera );
+	DebugRenderScreenTo( nullptr );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
