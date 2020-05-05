@@ -27,7 +27,17 @@ enum LitShaderTypes
 	FRESNEL,
 	TRIPLANAR_UNLIT,
 	TRIPLANAR_LIT,
-	TOTAL,
+	
+	TOTAL_LITSHADERS,
+};
+
+enum ToneMap
+{
+	NO_TONE,
+	GRAYSCALE,
+	SEPHIA,
+	
+	TOTAL_TONEMAPS ,
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -37,6 +47,7 @@ enum  LightType
 	POINT_LIGHT,
 	DIRECTIONAL_LIGHT,
 	SPOT_LIGHT,
+	
 	TOTAL_LIGHT_TYPES
 };
 
@@ -131,6 +142,7 @@ private:
 			void UpdateLightAttenuationFromUserInput();
 			void UpdateLightPositionOnUserInput();
 			void UpdateBlurEffectsOnUserInput();
+			void UpdateToneMapEffectsOnUserInput();
 
 NOT_IN_USE	void CreateDebugObjectsFromUserInput();
 NOT_IN_USE	void DebugLineStripDrawModeTest();
@@ -174,16 +186,20 @@ public:
 	Vec3						m_cameraRotation									= Vec3::ZERO;
 	
 	bool						m_isHUDEnabled										= true;
-	Shader*						m_lightShaders[ LitShaderTypes::TOTAL ];
+	Shader*						m_lightShaders[ LitShaderTypes::TOTAL_LITSHADERS ];
 	Shader* 					m_currentShader;
 	Shader* 					m_blurShader;
 	Material*					m_testMaterial;
 	int							m_currentShaderIndex;
 	bool						m_isFresnelShaderActive								= false;
 	bool						m_isblurShaderActive								= false;
+	bool						m_isToneMapShaderActive								= false;
 	//bool						m_isFogShaderActive									= false;
 	static Texture*				m_dissolveShaderPatternTexture;
 	Texture*					m_triplanarShaderTextures[ 6 ];
+	Shader* 					m_toneMapShader;
+	ToneMap						m_currentToneMap									= ToneMap::NO_TONE;
+	Mat44						m_toneMapTransform;
 	
 	static shaderLightDataT		m_lights;
 	static Rgba8				m_ambientLightColor;

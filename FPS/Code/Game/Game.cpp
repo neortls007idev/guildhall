@@ -143,9 +143,10 @@ void Game::LoadShaders()
 	//m_lightShaders[ LitShaderTypes::FOG ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/fog.hlsl" );
 
 	m_blurShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );
+	m_toneMapShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/toneMap.hlsl" );
 
-	m_currentShader = m_lightShaders[ LitShaderTypes::LIT ];
-	m_currentShaderIndex = LitShaderTypes::LIT;
+	m_currentShader												= m_lightShaders[ LitShaderTypes::LIT ];
+	m_currentShaderIndex										= LitShaderTypes::LIT;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -645,7 +646,19 @@ void Game::Render() const
 		g_theRenderer->EndEffect();
 		g_theRenderer->CopyTexture( backBuffer , finalImage );
 		g_theRenderer->ReleaseRenderTarget( finalImage );
-	} 
+	}
+	if ( m_isToneMapShaderActive )
+	{
+		Texture* toneMapTarget = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
+		Texture* currentView   = g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+		g_theRenderer->CopyTexture( currentView , backBuffer );
+		g_theRenderer->StartEffect( toneMapTarget , currentView , m_toneMapShader );
+		g_theRenderer->BindMaterialData( ( void* ) &m_toneMapTransform , sizeof( m_toneMapTransform ) );
+		g_theRenderer->EndEffect();
+		g_theRenderer->CopyTexture( backBuffer , toneMapTarget );
+		g_theRenderer->ReleaseRenderTarget( currentView );
+		g_theRenderer->ReleaseRenderTarget( toneMapTarget );
+	}
 	//g_theRenderer->CopyTexture( backBuffer , colorTarget );
 
 	g_theRenderer->ReleaseRenderTarget( bloomTarget );
@@ -946,6 +959,7 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	UpdateLightsFromKeyBoard( deltaSeconds );
 	UpdateMaterialShaderFromUserInput( deltaSeconds );
 	UpdateBlurEffectsOnUserInput();
+	UpdateToneMapEffectsOnUserInput();
 	
 	if ( g_theInput->WasKeyJustPressed( 'I' ) )
 	{
@@ -1088,10 +1102,10 @@ void Game::UpdateCurrentShaderFromUserInput()
 
 		if ( m_currentShaderIndex < 0 )
 		{
-			m_currentShaderIndex = LitShaderTypes::TOTAL - 1;
+			m_currentShaderIndex = LitShaderTypes::TOTAL_LITSHADERS - 1;
 		}
 
-		m_currentShaderIndex %= LitShaderTypes::TOTAL;
+		m_currentShaderIndex %= LitShaderTypes::TOTAL_LITSHADERS;
 		m_currentShader = m_lightShaders[ m_currentShaderIndex ];
 
 		if ( LitShaderTypes::FRESNEL == m_currentShaderIndex )
@@ -1118,7 +1132,7 @@ void Game::UpdateCurrentShaderFromUserInput()
 	if ( g_theInput->WasKeyJustPressed( KEY_RIGHTARROW ) )
 	{
 		m_currentShaderIndex += 1;
-		m_currentShaderIndex %= LitShaderTypes::TOTAL;
+		m_currentShaderIndex %= LitShaderTypes::TOTAL_LITSHADERS;
 		m_currentShader = m_lightShaders[ m_currentShaderIndex ];
 
 		if ( LitShaderTypes::FRESNEL == m_currentShaderIndex )
@@ -1350,6 +1364,48 @@ void Game::UpdateBlurEffectsOnUserInput()
 	if ( g_theInput->WasKeyJustPressed( KEY_F2 ) )
 	{
 		m_isblurShaderActive = !m_isblurShaderActive;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateToneMapEffectsOnUserInput()
+{
+	if ( g_theInput->WasKeyJustPressed( KEY_F3 ) )
+	{
+		m_isToneMapShaderActive = !m_isToneMapShaderActive;
+	}
+
+	if ( g_theInput->WasKeyJustPressed( KEY_UPARROW ) )
+	{
+		m_currentToneMap = ToneMap( ( m_currentToneMap + 1 ) % ToneMap::TOTAL_TONEMAPS );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( KEY_DOWNARROW ) )
+	{
+		m_currentToneMap = ToneMap( ( m_currentToneMap - 1 ) % ToneMap::TOTAL_TONEMAPS );
+	}
+
+	switch ( m_currentToneMap )
+	{
+		case ToneMap::NO_TONE :
+		{
+			m_toneMapTransform = Mat44::IDENTITY;
+		}break;
+
+		case ToneMap::GRAYSCALE:
+		{
+			Vec3 grayScale = Vec3( 0.2126f , 0.7152f , 0.0722f );
+			m_toneMapTransform.SetBasisVectors3D( grayScale , grayScale , grayScale );
+		}break;
+
+		case ToneMap::SEPHIA:
+		{
+			Vec3 newRed		= Vec3( 0.393f , 0.769f , 0.189f );
+			Vec3 newGreen	= Vec3( 0.394f , 0.686f , 0.168f );
+			Vec3 newBlue	= Vec3( 0.272f , 0.534f , 0.131f );
+			m_toneMapTransform.SetBasisVectors3D( newRed , newGreen , newBlue );
+		}break;
 	}
 }
 
