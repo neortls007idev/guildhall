@@ -49,6 +49,8 @@ public:
 	}
 };
 
+Rahul r = Rahul();
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Game::Game()
@@ -97,10 +99,7 @@ Game::Game()
  	m_testMaterial->CreateFromFile( "Data/Materials/testMaterial.xml" );
 	m_testMaterial->SetData( m_dissolveShaderData );
 
-
-	Rahul r = Rahul();
 	g_theEventSystem->SubscribeToMethod( "me" , &r , &Rahul::SomeMethod );
-	g_theEventSystem->FireEvent( "me" , g_gameConfigBlackboard );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1026,6 +1025,7 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	UpdateMaterialShaderFromUserInput( deltaSeconds );
 	UpdateBlurEffectsOnUserInput();
 	UpdateToneMapEffectsOnUserInput( deltaSeconds );
+	UpdateClassMethodSubscriptionsOnUserInput();
 	
 	if ( g_theInput->WasKeyJustPressed( 'I' ) )
 	{
@@ -1509,6 +1509,26 @@ void Game::UpdateToneMapEffectsOnUserInput( float deltaSeconds )
 	}
 
 	m_toneMapTransform.ScaleUniform3D( m_tonePower );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateClassMethodSubscriptionsOnUserInput()
+{
+	if ( g_theInput->WasKeyJustPressed( 'K' ) )
+	{
+		g_theEventSystem->UnsubscribeMethod( "me" , &r );
+	}
+
+	if ( g_theInput->WasKeyJustPressed( 'L' ) )
+	{
+		g_theEventSystem->SubscribeToMethod( "me" , &r , &Rahul::SomeMethod );
+	}
+	
+	if ( g_theInput->WasKeyJustPressed( KEY_F4 ) )
+	{
+		g_theEventSystem->FireEvent( "me" , g_gameConfigBlackboard );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

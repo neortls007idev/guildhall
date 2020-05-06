@@ -143,6 +143,7 @@ private:
 			void UpdateLightPositionOnUserInput();
 			void UpdateBlurEffectsOnUserInput();
 			void UpdateToneMapEffectsOnUserInput( float deltaSeconds );
+			void UpdateClassMethodSubscriptionsOnUserInput();
 
 NOT_IN_USE	void CreateDebugObjectsFromUserInput();
 NOT_IN_USE	void DebugLineStripDrawModeTest();

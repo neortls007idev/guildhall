@@ -80,6 +80,7 @@
 
 - If XML file data is set incorrectly game will not run.
 - Pressing `left alt` key causes some kind of pause effect ( can be toggled ).
+- Certain keys might be double bounded.
 ------
 
 ======
@@ -92,6 +93,10 @@
 - `O` (capitol letter 'Oh') to reset camera Position to origin. ( this does not rest the camera output Size ).
 
 ------
+**Specific Object Subsciprion Testing**
+- `F4` : Fires Event bounded to method of class Rahul.
+- `K`  : Unsubscribes the Event Of class Rahul.
+- `L`  : Subscribes the Event Of class Rahul.
 
 **Specific Shader Testing( Also Present ON screen when shader is active)**
 
