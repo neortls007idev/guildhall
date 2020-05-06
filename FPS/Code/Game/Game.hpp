@@ -142,7 +142,7 @@ private:
 			void UpdateLightAttenuationFromUserInput();
 			void UpdateLightPositionOnUserInput();
 			void UpdateBlurEffectsOnUserInput();
-			void UpdateToneMapEffectsOnUserInput();
+			void UpdateToneMapEffectsOnUserInput( float deltaSeconds );
 
 NOT_IN_USE	void CreateDebugObjectsFromUserInput();
 NOT_IN_USE	void DebugLineStripDrawModeTest();
@@ -200,6 +200,7 @@ public:
 	Shader* 					m_toneMapShader;
 	ToneMap						m_currentToneMap									= ToneMap::NO_TONE;
 	Mat44						m_toneMapTransform;
+	float						m_tonePower											= 1.f;
 	
 	static shaderLightDataT		m_lights;
 	static Rgba8				m_ambientLightColor;

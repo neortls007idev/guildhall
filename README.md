@@ -1,63 +1,62 @@
 
 
-### A07 Checklist
+### FINAL Checklist
 **( NOTE :- Controls And Known bugs Listed at the Bottom after the Checklist )**
 ======
 
 ## Checklist
 
 ## Tasks
-- [x] Be able to load `OBJ` Files
-    - [x] Load OBJ as a single   vertex array
-    - [x] At end of each group (or at very end), apply post steps..
-      - [x] Invert -V
-      - [x] Calculate Normals
-      - [x] Calculate Tangents
-  - [x] At end of import...
-      -  [x] Apply transform
-      -  [-] *Clean* (is an extra) ( does not work correctly triangles are missing )
-      -  [x] Invert Winding
-- [x] Post-Import Options supported
-    - [x] Invert-V
-        - Some programs us UV with V at the top, and some bottom.  On import
-          be able to swap it out to the correct version for your engine.
-    - [x] Invert Winding Order
-        - Some programs use clockwise by default.  If you notice your mesh is
-          inside out (you can see it from the inside, but not outside), you will
-          want to invert the winding order of faces.
-  - [x] Generate Normals (Flat only required)
-        - Some OBJ files-  do not include normals.  If this import option is set,
-          you will want - to generate normals if the file didn't include them.
-          For **Flat Normals**, just calculate the normal for each face and assign it to
-          each version that-defines the face.
-  - [x] Generate Tangents-        
-        - Use MikkT to generate tangents.  This requires the mesh have normals, so generate
-          normals should also be true.
-          Use [./mikktspace.h](./mikktspace.h) and [./mikktspace.c](./mikktspace.c) to
-          do this step.  
-  - [x] Post import transform from the authoring engines space to our space.
-        - [x] Transform Positions (full)
-        - [x] Normals (just direction, not scaled or translated)
-        - [x] Tangents & Bitangents (just direction, not scaled or translated)
-- [x] Have a lit model loaded in your scene to show it is working
-- [x] Support a `Shader` or `ShaderState` class that is data driven
-  - [x] Define a data format you like
-  - [x] Define a class you like
-  - [x] Implement `RenderContext::BindShader` or `BindShaderState` that
-        binds the program and the additional state for you.
-  - [x] Add `RenderContext::GetOrCreateShader(...)` to support a database of shaders
-  - [x] Implement `RenderContext::BindShaderByName` or `RenderContext::BindShaderStateByName`
-- [x] Support a `Material` class to make managing material data easier.
-  - [x] Should encapsulate a `ShaderState` and relevant data needed for the material
-  - [x] Define a data format you like.
-  - [x] Define a `Material` class you can use that works with our data
-      - [x] Must be able to support owning at least one UBO for material specific data?
-      - [x] Can set material specific textures
-      - [x] Can set material specific samplers
-      - [x] Can set your engine specific constants (spec/tint)
-  - [x] Can make a material from file
-  - [x] Can call `RenderContext::BindMaterial` to bind the shader and all data assocated with the material
+- [x] `NamedProperties`
+    - [ ] Switch EventArgs to use NamedProperties instead NamedStrings
+    - [x] Add ability to subscribe methods to your event system.
+    - [x] Add ability to unsubscribe an object from the event system (unsubscribes all methods on that object)
 
+- [x] Color Transform (ex: Grayscale) Effect
+    - [x] Create/Recycle a color target matching your swapchain's output.
+    - [x] Render game as normal
+    - [x] Create/Recycle another match target
+    - [x] Apply an effect on the original image, outputting to this new texture
+        - [x] Effect applies a per-pixel color transform using a matrix.
+        - [x] Make it so you can specify a "strength" for this transform, where 0
+              has no effect, and 1 is the full effect so you can blend between them.
+        - [x] Be able to specify a tint and tint power that pixels trend toward (useful for fades)
+              - `0` would have no effect
+              - `1` the resultant color would be the tint
+        - [x] **Optional Challenge: Have all the above be done with a single mat44.**
+    - [x] Copy this final image to the swapchain before present
+
+- [x] Bloom Effect
+    - [x] Set your normal color target, and a secondary "bloom" target
+        - [x] Camera can set set tertiary render targets
+        - [x] Shader has a secondary output specified
+    - [x] When done, be able to blur the bloom target
+        - [x] Create/Recycle a matching color/render target
+        - [x] Can use any blur algorithm you can find online, some suggestions...
+            - [x] Doing a Hardcoded 11x11 Kernel single pass Guassian Blur.
+            - Simple single pass box blur
+            - Single pass guassian blur
+            - Multiple pass guassian blur
+    - [x] Take the result of the blur, and the normal color output, and combine them
+          into the final image.
+    - [x] Be able to toggle blur on-and-off to see it working or not
+        - [x] Disabling the blur just doesn't run the blur and composite steps;
+
+- [x] Texture Pool
+    - [x] Be able to ask your `RenderContext` for a temporary render target of a given resolution and size.
+        - [x] Search for an existing free texture first, and return it if you find one.
+        - [x] If there are none available, create and return a new one.
+    - [x] Be able to relinquish back these temporary textures back to the `RenderContext` when you're done with them.
+        - This will allow them to be reused.
+    - [x] Add a `RenderContext::GetTotalTexturePoolCount()` to tell you how many textures have been created this way.
+    - [x] Add a `RenderContext::GetTexturePoolFreeCount()` to tell you how many are currently in the pool to be recycled
+    - [x] Debug render these counts to the screen to you can make sure you're properly recycling during this assignment.
+        - At any given time you likely will not have more than 3 textures in use at once, meaning your pool should never exceed that count.  This can really depend on your scene though.  For eaxmple, in this assignment for bloom...
+          1. Camera color output
+          2. Camera bloom target
+          3. Temporaries
+             - Blurring secondary output
+             - Composite output
 
 ======
 ##General Notes
@@ -69,6 +68,8 @@
 - 4. At start only the 1st light which is White is enabled.
 - 5. When Testing directional and spot light debug arrow might seem big if left at a spot and might block the view. recommended to test while moving objects with camera.
 - 6. Fog is only enabled on the sphere and will only work when in Fresnel Shader or Lit Shader mode.( This is intentional )
+- 7. Tone Map tint power clamped from 0 to infinity on purpose.
+- 8. Tone Map tint power is a uniform scale on the tone map matrix so if tone shader is and power is 0 you will see nothing.
 
 ------
 
@@ -96,14 +97,22 @@
 
 **Specific Shader Testing( Also Present ON screen when shader is active)**
 
-- 1. *__FRESNEL SHADER__*
+- 1. *__TONEMAP SHADER__*
+      - 1. `N`                  : Increase TINT Power. ( Clamped 0 to INFINITY )
+      - 2. `B`                  : decrease TINT Power. ( Clamped 0 to INFINITY )
+      - 3. `Shift + UP ARROW`   : Increase TINT Strength. ( Clamped 0 to 1 )
+      - 4. `Shift + DOWN ARROW` : decrease TINT Strength. ( Clamped 0 to 1 )
+      - 5. `UP/DOWN ARROW`      : Cycle the Tint to ALPHA TINT / GRAY SCALE / SEPHIA.
+      - 6. `F3`                 : Toggle Tint
+
+- 2. *__FRESNEL SHADER__*
       - 1. `Z` : decrease Fresnel Factor. ( Clamped 0 to 1 )
       - 2. `X` : increase Fresnel Factor. ( Clamped 0 to 1 )
       - 3. `C` : decrease Fresnel Power. ( Clamped 0 to 1 )
       - 4. `V` : increase Fresnel Power. ( Clamped 0 to 1 )
       - __Dev console command__ :- `UpdateFresnelShader` can be used to change `Fresnel Color`, `Factor` and `Power`.
 
-- 2. *__DISSOLVE SHADER__*
+- 3. *__DISSOLVE SHADER__*
       - 1. `Z` : decrease Burn Value. ( Clamped 0 to 1 )
       - 2. `X` : increase Burn Value. ( Clamped 0 to 1 )
       - 3. `C` : decrease Burn Edge Width. ( Clamped 0 to 1 + 2 * Current Burn Value )

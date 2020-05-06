@@ -79,7 +79,7 @@ float4 ToneMap( float4 color )
     toneMappedColor.r = toneMapMatrix[ 0 ][ 0 ] * color.r + toneMapMatrix[ 1 ][ 0 ] * color.g + toneMapMatrix[ 2 ][ 0 ] * color.b;
     toneMappedColor.g = toneMapMatrix[ 0 ][ 1 ] * color.r + toneMapMatrix[ 1 ][ 1 ] * color.g + toneMapMatrix[ 2 ][ 1 ] * color.b;
     toneMappedColor.b = toneMapMatrix[ 0 ][ 2 ] * color.r + toneMapMatrix[ 1 ][ 2 ] * color.g + toneMapMatrix[ 2 ][ 2 ] * color.b;
-    toneMappedColor.a = color.a;
+    toneMappedColor.a = toneMapMatrix[ 3 ][ 3 ];
     return toneMappedColor;
 }
 
@@ -98,6 +98,8 @@ float4 FragmentFunction( VertexToFragment_t input ) : SV_Target0
     //float lum  = 0.2126f *  imageColor.r + 0.7152f * imageColor.g + 0.0722f * imageColor.b;
     //return float4( lum , lum , lum , imageColor.a );
     finalColor = ToneMap( imageColor );
+    float4 imageFactor = float4( imageColor.xyz * ( 1 - finalColor.a ) , ( 1 - finalColor.a ) );
+    finalColor = float4( finalColor.xyz * finalColor.a , finalColor.a ) + imageFactor;
     return finalColor;
 }
 

@@ -16,6 +16,7 @@
 #include "Engine/Core/OBJUtils.hpp"
 #include "Engine/Renderer/Material.hpp"
 #include "Engine/Renderer/ShaderState.hpp"
+#include "Engine/Core/NamedProperties.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -36,6 +37,18 @@ STATIC dissolveData_t	Game::m_dissolveShaderData;
 STATIC fogDataT			Game::m_fogData;
 STATIC Texture*			Game::m_dissolveShaderPatternTexture;
 
+
+class Rahul
+{
+public:
+	bool SomeMethod(EventArgs& args)
+	{
+		UNUSED( args );
+		g_theDevConsole->PrintString( WHITE , "Rahul object is called" , DEVCONSOLE_SYTEMLOG );
+		return false;
+	}
+};
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Game::Game()
@@ -50,6 +63,8 @@ Game::Game()
 	
 	LoadShaders();
 	LoadTextures();
+
+	
 	
 	m_tileDiffuse	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/tile_diffuse.png" );
 	m_tileNormal	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/tile_normal.png" );
@@ -67,10 +82,25 @@ Game::Game()
 	InitializeLightData();
 	InitializeShaderMaterialData();
 
+	NamedProperties temp;
+	temp.SetValue( "num" , 3.67f );
+
+	float n = temp.GetValue( "num" , 0.0f );
+
+	Rgba8 x = temp.GetValue( "color" , Rgba8( 255 , 255 , 255 , 255 ) );
+
+	UNUSED( n );
+	UNUSED( x );
+	
  	m_testMaterial = new Material();
 
  	m_testMaterial->CreateFromFile( "Data/Materials/testMaterial.xml" );
 	m_testMaterial->SetData( m_dissolveShaderData );
+
+
+	Rahul r = Rahul();
+	g_theEventSystem->SubscribeToMethod( "me" , &r , &Rahul::SomeMethod );
+	g_theEventSystem->FireEvent( "me" , g_gameConfigBlackboard );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -520,6 +550,42 @@ void Game::DebugDrawUI( float deltaSeconds )
 
 	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 23 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
 		deltaSeconds , "RTVs To be Recycled = %d" , g_theRenderer->GetTexturePoolFreeCount() );
+
+	if ( m_isblurShaderActive )
+	{
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 25 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+			deltaSeconds , "[F2] Bloom = ACTIVE" );
+	}
+
+	if ( !m_isblurShaderActive )
+	{
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 25 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+			deltaSeconds , "[F2] Bloom = INACTIVE" );
+	}
+
+	if ( m_isToneMapShaderActive )
+	{
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 26 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+			deltaSeconds , "[F3] Tone Map = ACTIVE" );
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 27 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+			deltaSeconds , "[UP/DOWN ARROW] Switch Tone Map" );
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 28 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+			deltaSeconds , "[SHIFT + UP/DOWN ARROW] Tone Map Strength = %f" , m_toneMapTransform.Tw );
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 29 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+			deltaSeconds , "[B/N] Tone Map Power = %f" , m_tonePower );
+	}
+
+	if ( !m_isToneMapShaderActive )
+	{
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 26 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+			deltaSeconds , "[F3] TONEMAP = INACTIVE" );
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 27 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+			deltaSeconds , "[UP/DOWN ARROW] Switch Tone Map" );
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 28 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+			deltaSeconds , "[SHIFT + UP/DOWN ARROW] Tone Map Strength = %f" , m_toneMapTransform.Tw );
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 29 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
+			deltaSeconds , "[B/N] Tone Map Power = %f" , m_tonePower );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -959,7 +1025,7 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	UpdateLightsFromKeyBoard( deltaSeconds );
 	UpdateMaterialShaderFromUserInput( deltaSeconds );
 	UpdateBlurEffectsOnUserInput();
-	UpdateToneMapEffectsOnUserInput();
+	UpdateToneMapEffectsOnUserInput( deltaSeconds );
 	
 	if ( g_theInput->WasKeyJustPressed( 'I' ) )
 	{
@@ -1369,13 +1435,27 @@ void Game::UpdateBlurEffectsOnUserInput()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Game::UpdateToneMapEffectsOnUserInput()
+void Game::UpdateToneMapEffectsOnUserInput( float deltaSeconds )
 {
 	if ( g_theInput->WasKeyJustPressed( KEY_F3 ) )
 	{
 		m_isToneMapShaderActive = !m_isToneMapShaderActive;
 	}
 
+	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasKeyJustPressed( KEY_UPARROW ) )
+	{
+		m_toneMapTransform.Tw += deltaSeconds * 3.f;
+		m_toneMapTransform.Tw = ClampZeroToOne( m_toneMapTransform.Tw );
+		return;
+	}
+
+	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasKeyJustPressed( KEY_DOWNARROW ) )
+	{
+		m_toneMapTransform.Tw -= deltaSeconds * 3.f;
+		m_toneMapTransform.Tw  = ClampZeroToOne( m_toneMapTransform.Tw );
+		return;
+	}
+	
 	if ( g_theInput->WasKeyJustPressed( KEY_UPARROW ) )
 	{
 		m_currentToneMap = ToneMap( ( m_currentToneMap + 1 ) % ToneMap::TOTAL_TONEMAPS );
@@ -1394,6 +1474,18 @@ void Game::UpdateToneMapEffectsOnUserInput()
 		m_currentToneMap = ToneMap( m_currentToneMap % ToneMap::TOTAL_TONEMAPS );
 	}
 
+	if ( g_theInput->IsKeyHeldDown( 'B' ) )
+	{
+		m_tonePower -= deltaSeconds * 2.f;
+		m_tonePower  = Clamp( m_tonePower , 0.f , INFINITY );
+	}
+
+	if ( g_theInput->IsKeyHeldDown( 'N' ) )
+	{
+		m_tonePower += deltaSeconds * 2.f;
+		m_tonePower  = Clamp( m_tonePower , 0.f , INFINITY );
+	}
+	
 	switch ( m_currentToneMap )
 	{
 		case ToneMap::NO_TONE :
@@ -1416,7 +1508,7 @@ void Game::UpdateToneMapEffectsOnUserInput()
 		}break;
 	}
 
-	//m_toneMapTransform.Tw = 0.5f;
+	m_toneMapTransform.ScaleUniform3D( m_tonePower );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

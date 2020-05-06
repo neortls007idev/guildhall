@@ -56,6 +56,18 @@ bool EventSystem::FireEvent( const std::string& eventName , EventArgs& defaultAr
 			return true;
 		}
 	}
+
+	for(int i=0; i<m_methodSubscriptions.size(); i++ )
+	{
+		if(m_methodSubscriptions[i]!=nullptr )
+		{
+			if(m_methodSubscriptions[i]->eventName == eventName )
+			{
+				m_methodSubscriptions[ i ]->func( defaultArguments );
+			}
+		}
+	}
+	
 	return false;
 }
 

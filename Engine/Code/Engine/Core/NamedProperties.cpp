@@ -1,29 +1,15 @@
 ﻿#include "Engine/Core/NamedProperties.hpp"
 
-/*
-NamedProperties::~NamedProperties()
+void NamedProperties::PopulateFromXmlElementAttributes( const tinyxml2::XMLElement& element )
 {
-	for ( auto iter : m_keyValuePairs )
-	{
-		delete iter.second;
-		iter.second = nullptr;
-	}
+	std::string name;
+	std::string value;
+	const tinyxml2::XMLAttribute* attrib = element.FirstAttribute();
 
-	m_keyValuePairs.clear();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-TypedPropertyBase* NamedProperties::FindInMap( std::string const& key ) const
-{
-	auto iter = m_keyValuePairs.find( key );
-	if ( iter != m_keyValuePairs.end() )
+	for ( attrib; attrib; attrib = attrib->Next() )
 	{
-		return iter->second;
-	}
-	else
-	{
-		return nullptr;
+		name = attrib->Name();
+		value = attrib->Value();
+		SetValue( name , value );
 	}
 }
-*/
