@@ -1383,7 +1383,15 @@ void Game::UpdateToneMapEffectsOnUserInput()
 
 	if ( g_theInput->WasKeyJustPressed( KEY_DOWNARROW ) )
 	{
-		m_currentToneMap = ToneMap( ( m_currentToneMap - 1 ) % ToneMap::TOTAL_TONEMAPS );
+		m_currentToneMap = ToneMap( ( m_currentToneMap - 1 ) );
+		
+		if ( m_currentToneMap < 0 )
+		{
+			m_currentToneMap = ToneMap( ToneMap::TOTAL_TONEMAPS - 1 );
+			return;
+		}
+		
+		m_currentToneMap = ToneMap( m_currentToneMap % ToneMap::TOTAL_TONEMAPS );
 	}
 
 	switch ( m_currentToneMap )
@@ -1407,6 +1415,8 @@ void Game::UpdateToneMapEffectsOnUserInput()
 			m_toneMapTransform.SetBasisVectors3D( newRed , newGreen , newBlue );
 		}break;
 	}
+
+	//m_toneMapTransform.Tw = 0.5f;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
