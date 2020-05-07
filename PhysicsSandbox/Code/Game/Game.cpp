@@ -199,6 +199,8 @@ void Game::InitialGameObjectsSpawner()
 	g_thePhysicsSystem->SetLayerInteraction( LAYER_DEFAULT , LAYER_1 , false );
 	m_gameObjects.push_back( thirdObject );
 	m_isMouseOnGameObject.push_back( false );
+
+	Vec2 testData = thirdObject->m_rigidbody->GetUserData( "Velocity" , Vec2::ZERO );
 	
 }
 
