@@ -192,6 +192,13 @@ void Game::InitialGameObjectsSpawner()
 
 	m_gameObjects.push_back( secondObject );
 	m_isMouseOnGameObject.push_back( false );
+
+
+	GameObject* thirdObject = new GameObject( g_thePhysicsSystem , Vec2( -350.f , 300.f ) , Vec2::ZERO , radius );
+	thirdObject->m_rigidbody->SetLayer( LAYER_1 );
+	g_thePhysicsSystem->SetLayerInteraction( LAYER_DEFAULT , LAYER_1 , false );
+	m_gameObjects.push_back( thirdObject );
+	m_isMouseOnGameObject.push_back( false );
 	
 }
 

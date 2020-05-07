@@ -15,12 +15,14 @@ class Camera;
 class Timer;
 class Clock;
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 struct CollissionInfo
 {
-	int colliderId1;
-	int colliderId2;
-	bool wasCollidingLastFrame = false;
-	bool isCollidingThisFrame = false;
+	int		colliderId1;
+	int		colliderId2;
+	bool	wasCollidingLastFrame	= false;
+	bool	isCollidingThisFrame	= false;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -71,13 +73,12 @@ public:
 	static bool SetPhysicsUpdateStep( EventArgs& args );
 
 	void HandleCollissionInfo( int colliderId1 , int colliderId2 );
-	Collider2D* GetCColliderForID( int id );
+	Collider2D* GetColliderForID( int id );
 
-	void FireStartEvents( int colliderId1 , int colliderId2 );
+	void FireEnterEvents( int colliderId1 , int colliderId2 );
 	void FireExitEvents( int colliderId1 , int colliderId2 );
 	void FireStayEvents( int colliderId1 , int colliderId2 );
 
-	
 public:
 	Vec2 m_sceneGravity = Vec2( 0.f , -9.8f );
 	static int colliderIds;
@@ -93,9 +94,6 @@ public:
 	static Clock*				s_clock;
 	static Timer*				s_timer;
 	static double				s_fixedTimeStep;
-
-	Polygon2D					minskowskiDifference;
-	Polygon2D					EPAminskowski;
 
 	static bool					LayerInteractions[ TOTAL_LAYERS ][ TOTAL_LAYERS ];
 
