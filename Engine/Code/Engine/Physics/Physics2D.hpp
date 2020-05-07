@@ -94,10 +94,10 @@ public:
 	static Timer*				s_timer;
 	static double				s_fixedTimeStep;
 
-	Polygon2D minskowskiDifference;
-	Polygon2D EPAminskowski;
+	Polygon2D					minskowskiDifference;
+	Polygon2D					EPAminskowski;
 
-	static bool LayerInteractions[ TOTAL_LAYERS ][ TOTAL_LAYERS ];
+	static bool					LayerInteractions[ TOTAL_LAYERS ][ TOTAL_LAYERS ];
 
 	bool DoLayersInteract( Layers layer1 , Layers layer2 );
 	void SetLayerInteraction( Layers layer1 , Layers layer2 , bool enableInteraction );

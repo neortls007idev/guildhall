@@ -716,25 +716,26 @@ void Physics2D::CleanupDestroyedColliders()
 		
 		if ( m_colliders2D[ colliderIndex ]->m_isGarbage == true )
 		{
-			FireExitEvents( m_collissionInfo[ colliderIndex ]->colliderId1 , m_collissionInfo[ colliderIndex ]->colliderId2 );
-			for ( int x = 0; x < m_collissionInfo.size(); x++ )
+			if ( colliderIndex < m_collissionInfo.size() && m_collissionInfo[ colliderIndex ] )
 			{
-				if ( m_collissionInfo[ x ] == nullptr )
+				FireExitEvents( m_collissionInfo[ colliderIndex ]->colliderId1 , m_collissionInfo[ colliderIndex ]->colliderId2 );
+			}
+			for ( size_t collisionInfoIndex = 0; collisionInfoIndex < m_collissionInfo.size(); collisionInfoIndex++ )
+			{
+				if ( m_collissionInfo[ collisionInfoIndex ] == nullptr )
 				{
 					continue;
 				}
 
-				if ( m_collissionInfo[ x ]->colliderId1 == m_colliders2D[ colliderIndex ]->colliderId || m_collissionInfo[ x ]->colliderId2 == m_colliders2D[ colliderIndex ]->colliderId )
+				if ( m_collissionInfo[ collisionInfoIndex ]->colliderId1 == m_colliders2D[ colliderIndex ]->colliderId || m_collissionInfo[ collisionInfoIndex ]->colliderId2 == m_colliders2D[ colliderIndex ]->colliderId )
 				{
-					//Fire exit events for both colliders
-					FireExitEvents( m_collissionInfo[ x ]->colliderId1 , m_collissionInfo[ x ]->colliderId2 );
-
-					delete m_collissionInfo[ x ];
-					m_collissionInfo[ x ] = nullptr;
+						//Fire exit events for both colliders
+						FireExitEvents( m_collissionInfo[ collisionInfoIndex ]->colliderId1 , m_collissionInfo[ collisionInfoIndex ]->colliderId2 );
+						delete m_collissionInfo[ collisionInfoIndex ];
+						m_collissionInfo[ collisionInfoIndex ]			= nullptr;
 				}
-			}
 
-			
+			}			
 			delete m_colliders2D[ colliderIndex ];
 			m_colliders2D[ colliderIndex ] = nullptr;
 		}
