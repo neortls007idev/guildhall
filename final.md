@@ -1,168 +1,128 @@
-
-
-### A07 Checklist
-**( NOTE :- Controls And Known bugs Listed at the Bottom after the Checklist )**
+MP2.Final : Fleshing Out the System
 ======
+
+## Overview
+Just going to flesh out the physics system so it can easily be used for a game.
+
 
 ## Checklist
 
-## Tasks
-- [x] `NamedProperties`
-    - [ ] Switch EventArgs to use NamedProperties instead NamedStrings
-    - [x] Add ability to subscribe methods to your event system.
-    - [x] Add ability to unsubscribe an object from the event system (unsubscribes all methods on that object)
+- [ ] Be able to attach user data to a rigidbody and/or collider to hook the physics system up to game code.
 
-- [x] Color Transform (ex: Grayscale) Effect
-    - [x] Create/Recycle a color target matching your swapchain's output.
-    - [x] Render game as normal
-    - [x] Create/Recycle another match target
-    - [x] Apply an effect on the original image, outputting to this new texture
-        - [x] Effect applies a per-pixel color transform using a matrix.
-        - [x] Make it so you can specify a "strength" for this transform, where 0
-              has no effect, and 1 is the full effect so you can blend between them.
-        - [x] Be able to specify a tint and tint power that pixels trend toward (useful for fades)
-              - `0` would have no effect
-              - `1` the resultant color would be the tint
-        - [x] **Optional Challenge: Have all the above be done with a single mat44.**
-    - [x] Copy this final image to the swapchain before present
+- [x] Add collision/contact events
+    - [x] `OnOverlapBegin`
+    - [x] `OnOverlapStay`
+    - [x] `OnOverlapLeave`
 
-- [x] Bloom Effect
-    - [x] Set your normal color target, and a secondary "bloom" target
-        - [x] Camera can set set tertiary render targets
-        - [x] Shader has a secondary output specified
-    - [x] When done, be able to blur the bloom target
-        - [x] Create/Recycle a matching color/render target
-        - [x] Can use any blur algorithm you can find online, some suggestions...
-            - [x] Doing a Hardcoded 11x11 Kernel single pass Guassian Blur.
-            - Simple single pass box blur
-            - Single pass guassian blur
-            - Multiple pass guassian blur
-    - [x] Take the result of the blur, and the normal color output, and combine them
-          into the final image.
-    - [x] Be able to toggle blur on-and-off `F2` to see it working or not
-        - [x] Disabling the blur just doesn't run the blur and composite steps;
+- [x] Add Trigger Volumes
+    - [x] `OnTriggerEnter`
+    - [x] `OnTriggerStay`
+    - [x] `OnTriggerLeave`
 
-- [x] Texture Pool
-    - [x] Be able to ask your `RenderContext` for a temporary render target of a given resolution and size.
-        - [x] Search for an existing free texture first, and return it if you find one.
-        - [x] If there are none available, create and return a new one.
-    - [x] Be able to relinquish back these temporary textures back to the `RenderContext` when you're done with them.
-        - This will allow them to be reused.
-    - [x] Add a `RenderContext::GetTotalTexturePoolCount()` to tell you how many textures have been created this way.
-    - [x] Add a `RenderContext::GetTexturePoolFreeCount()` to tell you how many are currently in the pool to be recycled
-    - [x] Debug render these counts to the screen to you can make sure you're properly recycling during this assignment.
-        - At any given time you likely will not have more than 3 textures in use at once, meaning your pool should never exceed that count.  This can really depend on your scene though.  For eaxmple, in this assignment for bloom...
-          1. Camera color output
-          2. Camera bloom target
-          3. Temporaries
-             - Blurring secondary output
-             - Composite output
+- [x] Support Physics Layers
+    - [x] Be able to specify which layer a rigid body and/or collider belongs to.
+    - [x] Be able to enable or disable collision between two given layers.
+    - [x] Only process collisions if the two objects are allowed to interact
+    - [x] Only process triggers if the two objects are on the same layer
+
+- [ ] **Optional**: Support axis locks.
+    - [ ] Support `X` and `Y` axis locks, only allowing movement in those directions.
+    - [ ] Support `Rotation` lock preventing the object from rotating.
+
+------
+## Next Steps - The Future is here soon
+This assignmetn just fleshes out the features of the system, but still has a lot of room for improvement.
+
+If you find yourself using it in DFS or Ludum Dares, some areas of improvement are...
+- `Transform2D`
+  - Have a transform object that a rigidbody can watch/modify instead of having to copy back out.
+  - That or allow transforms be parent/child relationships so that your game object can just child itself to the rigidbody.
+- Optimization
+  - Better Memory Management
+  - Scene Management
+- Queries
+  - `GetOverlappingObjects` - Ask the environment for all objects touching a shape with certain properties
+  - `Raycast2D` - Be able to raycast against first hit, or all hit in the scene.
+- Effectors
+  - Objects in a scene that don't collider, but instead apply some other kind of force/behaviour on interaction
+    - 1-Way Platforms
+    - Gravity Wells
+    - Conveyer Belts
+- Constraints/Joints
+  - Be able to connect rigidbodies together with a constraint/joint - usedful for ragdolling
+    - `FixedJoint` - maintains rotation and dispacement between two objects
+    - `SpringJoint` - maintains rotation, and behaves long a spring along the displacement vector
+    - `HingeJoint` - Maintain distance, but allow rotation between two objects.
+    - ...
 
 ======
 ##General Notes
-------
 
-- 1. Support For GAMMA is Present but not using GAMMA at the moment. by that I mean GAMAA is not adjustable by the USER.
-- 2. The game starts with only the 1st light enabled but all 8 lights are always rendered in the scene.
-- 3. All 8 lights are Initialized with random colors.
-- 4. At start only the 1st light which is White is enabled.
-- 5. When Testing directional and spot light debug arrow might seem big if left at a spot and might block the view. recommended to test while moving objects with camera.
-- 6. Fog is only enabled on the sphere and will only work when in Fresnel Shader or Lit Shader mode.( This is intentional )
-- 7. Tone Map tint power clamped from 0 to infinity on purpose.
-- 8. Tone Map tint power is a uniform scale on the tone map matrix so if tone shader is and power is 0 you will see nothing.
+1. Floor Object is now present and does not move with the camera and cannot to destroyed.( drawn in orange. )
+2. All objects other than the floor object now spawn in dynamic mode.
+3. Initial friction is set to 1.0 , Initial Bounciness is set to 0.8, Initial Linear drag is set to 0.1.
 
 ------
-
-======
-
 ### Known Errors/ Bugs
-------
 
-- If XML file data is set incorrectly game will not run.
-- Pressing `left alt` key causes some kind of pause effect ( can be toggled ).
-------
+1. contact points are imperfect and at time polygons may intersect.
+2. might be just me but non - uniformly dense polygon rotations seem weird.
+3. Using a temp hack in polygon collider update as a fix - but even with 0 rotation polygons seem to be having a sheering effect on them - to be discussed with forseth.
+4. static disc vs polygon collision seem to be having a sticky effect. - to be discussed with forseth.
 
-======
+------
 
 ### Control Scheme
 
 - `WASD` for Camera Movement.
-- Use Mouse to rotate in-place.
-- while holding down `Shift` + `WASD` for increased camera movement speed.
 - `O` (capitol letter 'Oh') to reset camera Position to origin. ( this does not rest the camera output Size ).
+- `Right Mouse Button` To spawn New Game Objects ( circular disc type ).
+- `Scroll Mouse Wheel Up` and `Down Movement` for Zooming in and out.
+- `HoldDown  Left Mouse Button` to select any object and `release` the button to release the object.
+- Select an object and hit `delete` or `backspace` key to delete the currently selected object.
+- `F8` key to delete and reset the game.
+- Press `2` while any Game Object is not selected to enter *Polygon Draw mode*.
+- Use `+` or `-` ( non numpad keys ) to change the Scene Gravity.
 
-------
+**Physics Controls**
 
-**Specific Shader Testing( Also Present ON screen when shader is active)**
+Most controls are present in the hover-over tooltip.
 
-- 1. *__TONEMAP SHADER__*
-      - 1. `N`                  : Increase TINT Power. ( Clamped 0 to INFINITY )
-      - 2. `B`                  : decrease TINT Power. ( Clamped 0 to INFINITY )
-      - 3. `Shift + UP ARROW`   : Increase TINT Strength. ( Clamped 0 to 1 )
-      - 4. `Shift + DOWN ARROW` : decrease TINT Strength. ( Clamped 0 to 1 )
-      - 5. `UP/DOWN ARROW`      : Cycle the Tint to ALPHA TINT / GRAY SCALE / SEPHIA.
-      - 6. `F3`                 : Toggle Tint
+ `[` , `]` : Decrement , Increment Mass by 1.
 
-- 2. *__FRESNEL SHADER__*
-      - 1. `Z` : decrease Fresnel Factor. ( Clamped 0 to 1 )
-      - 2. `X` : increase Fresnel Factor. ( Clamped 0 to 1 )
-      - 3. `C` : decrease Fresnel Power. ( Clamped 0 to 1 )
-      - 4. `V` : increase Fresnel Power. ( Clamped 0 to 1 )
-      - __Dev console command__ :- `UpdateFresnelShader` can be used to change `Fresnel Color`, `Factor` and `Power`.
 
-- 3. *__DISSOLVE SHADER__*
-      - 1. `Z` : decrease Burn Value. ( Clamped 0 to 1 )
-      - 2. `X` : increase Burn Value. ( Clamped 0 to 1 )
-      - 3. `C` : decrease Burn Edge Width. ( Clamped 0 to 1 + 2 * Current Burn Value )
-      - 4. `V` : increase Burn Edge Width. ( Clamped 0 to 1 + 2 * Current Burn Value )
-      - __Dev console command__ :- `UpdateDissolveShader` can be used to change `startColor`, `endColor` , `burnValue`, `burnEdgeWidth`.
-      - __Dev console command__ :- `UpdateDissolveShaderPattern` can be used to change dissolve pattern. see dev console help.
-      *__WARNING :- Updating pattern can cause the program to crash in case texture is missing.__*
+ `1` `STATIC` , `2` `DYNAMIC` , `3` `KINEMATIC` : Update Simulation Mode
 
-**Lighting Testing ( Also present on Screen )**
+`Left Arrow Key` , `Right Arrow Key` : Decrement , Increment Friction( defaulted to 0.8 ) by 0.05.
 
-- To change current Light press `1-8` for the light number which you want to select.
-- To Enable ( `Q` ) or Disable( `E` ) current light.
-- `M` To cycle the light Type.
-    - If light type is Directional / Spot Light - the directional angle changes with current camera rotation( forward vector ) so `F6` or `F7` can be used to change that.
-    - Spot Light inner and outer angles are fixed and hard coded at the moment.
+ `:`  ,  `\` : Decrement , Increment Drag by 0.5 * deltaSeconds.
 
-- To change Light Position
-    - `F5` : Place Current Light at Origin.
-    - `F6` : Place current light at current Camera Position.
-    - `F7` : current Light Follows the Camera.
-    - `F9` : Light moves in a fixed path.
+`Shift` + `Scroll Mouse Wheel Up` and `Down Movement` : Decrement , Increment Bounciness.
+`R`  ,  `F` : Decrement , Increment Rotation In Degrees by 10 * deltaSeconds.
+`T` , `G` , `V` : Decrement , Increment , Reset Angular Velocity In Degrees
+`K`  ,  `L` : Decrement , Increment Angular Drag by 0.5 * deltaSeconds
 
-- Switch/Cycle Current Shader Using `LEFT ARROW( <- ) KEY` & `RIGHT ARROW( -> ) KEY`.
-      - Name of Current Shader Is displayed on screen using debug render always;
-- `9` , `0`  : Change Ambient Light Intensity
-      - (Clamped 0-1)
--  `-` , `+` : Change current Light Intensity
-      - (UnClamped)
-- `[`, `]`   : Change Global Specular Factor
-      - (Clamped 0-1)
-- `U` , `J`  : Change Global Specular Power
-      - (Clamped 1-INFINITY)
-- `T` , `R` , `G` , `Y` : Change current Light Attenuation to `ZERO` , `Constant` , `Linear` , `Quadratic`
-------
+*__NOTE__ :- If angular velocity is manually provided to a static object then it will rotate in place once object is deselected.*
 
-**Lighting Devconsole Commands ( Also present in devconsole help )**
-------
+*__NOTE__ :- All most multipliers can be changed using GameCommon.hpp.*
 
-- `ChangeLightColor`            : Change Light Color at Index.
-              - Ex - `ChangeLightColor` idx = 0 |color = 255 , 255 , 255 , 255
-              - __If index is not passed light color of current selected light gets changed.__
+**Polygon Draw Mode Info ( When in Draw Mode )**
+- use `Backspace` to delete last added point. Can be used to delete all points if you continuously press `Backspace` in the reverse order of insertion. If no points are left on screen you can still create the polygon as you have technically not exited the draw mode yet.
+- use `Esc` to cancel the polygon construction and exit out of the draw mode.
+- use `Right Mouse button` to confirm the polygon construction and exit of the draw mode.
+- If number of points are less then 3 and `Right Mouse button` is pressed then you exit out of draw mode.
+- *When you first enter the draw mode, the first point is the place where the mouse is currently located and this point can me outside the client space if cursor is outside the client space and the window is active when you enter the draw mode, this first point can also be deleted using `BackSpace`*
+- *__NOTE__ :- Center of the polygon is considered as average of all valid vertices of polygon.*
+- Objects that overlap the cursor will still be highlighted but new disc objects cannot be spawned while in this mode and also no object can be selected while in this mode.
 
-- `ChangeLightAttenuation`      : Update Light Attenuation of Ambient Light.
-              - Ex - `ChangeLightAttenuation` idx = 0 |attenuation = 1.f , 0.f , 2.3f
-              - __If index is not passed light diffuse attenuation of current selected light gets changed.__
+**Object Selection**
+-  While selected, `1`, `2`, and `3` should switch the object to `STATIC`, `KINEMATIC`, or `DYNAMIC` respectively.
+- *__NOTE__ :- Once you select an object you are essentially changing its velocity over the last 30 frames till deselection, so when you change it to `KINEMATIC` make sure you drag around the cursor or it shall feel as if the object is now `STATIC` as velocity due to no cursor drag would be essentially ZERO.*
+- By default all objects are created in `DYNAMIC` mode.
+- Selected object is not influenced by physics simulations i.e. the gravity and movement but collisions will still be visible.
+- Select an object and drag around the cursor and deselect the object to throw it around ( might feel slow also recommended to use an actual mouse rather than the trackpad ).
+- *__NOTE__ :- may feel a bit more finicky when selecting polygons in comparison to the discs.*
 
-- `ChangeAmbientLightColor`     : Update Color of Ambient Light.
-              - Ex - `ChangeAmbientLightColor`  color = 255 , 255 , 255 , 255
+Makes sure you mouse position is correct for your current view - converting the client position (offset from top-left of window) to a world location.
 
-- `ChangeAmbientLightIntensity` : Update Intensity of Ambient Light.
-              - Ex -  `ChangeAmbientLightIntensity` intensity = 0.3f
-
-- `DisableFog` : Disables the Fog.
-- `EnableFog`  : `EnableFog` can be used to change near and far fog distance and color.
 ------
