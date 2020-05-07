@@ -40,6 +40,21 @@ extern BitmapFont*		g_bitmapFont;
 
 STATIC RandomNumberGenerator Game::m_rng;
 
+bool TriggerStartEvent( EventArgs& args )
+{ UNUSED( args );	g_theDevConsole->PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "This is triggerStart Event", DEVCONSOLE_SYTEMLOG );	return false; }
+bool TriggerEndEvent( EventArgs& args )
+{ UNUSED( args );	g_theDevConsole->PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "This is triggerEnd Event",DEVCONSOLE_SYTEMLOG );	return false; }
+bool TriggerStayEvent( EventArgs& args )
+{ UNUSED( args );	g_theDevConsole->PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "This is trigger Stay Event",DEVCONSOLE_SYTEMLOG );	return false; }
+bool CollissionStartEvent( EventArgs& args )
+{ UNUSED( args );	g_theDevConsole->PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "This is collissionStartEvent",DEVCONSOLE_SYTEMLOG );	return false; }
+bool CollissionEndEvent( EventArgs& args )
+{ UNUSED( args );	g_theDevConsole->PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "This is collissionEndEvent",DEVCONSOLE_SYTEMLOG );	return false; }
+bool CollissionStayEvent( EventArgs& args )
+{
+	UNUSED( args );	g_theDevConsole->PrintString( Rgba8( 0 , 0 , 100 , 255 ) , "This collission Stay event",DEVCONSOLE_SYTEMLOG );	return false;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Game::Game()
@@ -68,7 +83,7 @@ Game::Game()
 	m_floorObject->m_rigidbody->SetSimulationMode( SIMULATIONMODE_STATIC );
 	//RandomizePointCloud( m_rng );
 
-	//InitialGameObjectsSpawner();
+	InitialGameObjectsSpawner();
 
 // 	m_pointCloud.push_back( Vec2(-50,-50) );
 // 	m_pointCloud.push_back( Vec2(50,50) );
@@ -98,13 +113,20 @@ Game::Game()
 	m_gameObjects.push_back( temp2 );
 	m_isMouseOnGameObject.push_back( false );
 
+	g_theEventSystem->SubscribeToEvent( "TriggerStart" , TriggerStartEvent );
+	g_theEventSystem->SubscribeToEvent( "TriggerEnd",TriggerEndEvent );
+	g_theEventSystem->SubscribeToEvent( "TriggerStay" , TriggerStayEvent );
+	g_theEventSystem->SubscribeToEvent( "OverlapStart" , CollissionStartEvent );
+	g_theEventSystem->SubscribeToEvent( "OverlapEnd" , CollissionEndEvent );
+	g_theEventSystem->SubscribeToEvent( "OverlapStay" , CollissionStayEvent );
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Game::InitialGameObjectsSpawner()
 {
-	int numInitialGameObjects = m_rng.RollRandomIntInRange( MIN_INITIAL_GAME_OBJECTS , MAX_INITIAL_GAME_OBJECTS );
+	/*int numInitialGameObjects = m_rng.RollRandomIntInRange( MIN_INITIAL_GAME_OBJECTS , MAX_INITIAL_GAME_OBJECTS );
 
 	for ( int index = 0; index < numInitialGameObjects; index++ )
 	{
@@ -114,7 +136,39 @@ void Game::InitialGameObjectsSpawner()
 		GameObject* temp = new GameObject( g_thePhysicsSystem , spawnPos , Vec2::ZERO , m_currentColliderRadius );
 		m_gameObjects.push_back( temp );
 		m_isMouseOnGameObject.push_back( false );
-	}
+	}*/
+
+
+	float radius = 100.f;
+	Vec2 sPos = Vec2( 0.f , 0.f );
+
+	Subscription sub;
+	sub.eventName = "TriggerStart";
+
+	GameObject* obj = new GameObject( g_thePhysicsSystem , sPos , Vec2::ZERO , radius );
+	obj->m_rigidbody->m_collider->isTrigger = true;
+	obj->m_rigidbody->m_collider->AddEventToTriggerStart( sub );
+	sub.eventName = "TriggerEnd";
+	obj->m_rigidbody->m_collider->AddEventToTriggerExit( sub );
+	sub.eventName = "TriggerStay";
+	obj->m_rigidbody->m_collider->AddEventToTriggerStay( sub );
+	m_gameObjects.push_back( obj );
+	m_isMouseOnGameObject.push_back( false );
+
+	radius = 80.f;
+	sPos = Vec2( 200.f , 200.f );
+
+	GameObject* obj1 = new GameObject( g_thePhysicsSystem , sPos , Vec2::ZERO , radius );
+	sub.eventName = "OverlapStart";
+	obj1->m_rigidbody->m_collider->AddEventToOverlapStart( sub );
+	sub.eventName = "OverlapEnd";
+	obj1->m_rigidbody->m_collider->AddEventToOverlapEnd( sub );
+	sub.eventName = "OverlapStay";
+	obj1->m_rigidbody->m_collider->AddEventToOverlapStay( sub );
+
+	m_gameObjects.push_back( obj1 );
+	m_isMouseOnGameObject.push_back( false );
+	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
