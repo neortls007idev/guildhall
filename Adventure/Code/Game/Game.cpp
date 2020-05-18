@@ -134,8 +134,8 @@ void Game::UpdateCamera()
 void Game::InspectOnMouseOver() const
 {
 	Vec2 normalizedMousePos = g_theInput->GetMouseNormalizedClientPosition();
-	float positionX = RangeMapFloat( 0.f , 1.f , m_worldCamera.GetOrthoBottomLeft().x , m_worldCamera.GetOrthoTopRight().x , normalizedMousePos.x );
-	float positionY = RangeMapFloat( 0.f , 1.f , m_worldCamera.GetOrthoBottomLeft().y , m_worldCamera.GetOrthoTopRight().y , normalizedMousePos.y );
+	float positionX = RangeMapFloat( 0.f , 1.f , m_worldCamera.GetOrthoMin().x , m_worldCamera.GetOrthoMax().x , normalizedMousePos.x );
+	float positionY = RangeMapFloat( 0.f , 1.f , m_worldCamera.GetOrthoMin().y , m_worldCamera.GetOrthoMax().y , normalizedMousePos.y );
 	Vec2 mouseLocalPos = Vec2( positionX , positionY );
 	AABB2 temp = AABB2( mouseLocalPos , Vec2( positionX + 10.f , positionY + 1.f ) );
 	IntVec2 tileInfo = IntVec2( mouseLocalPos );

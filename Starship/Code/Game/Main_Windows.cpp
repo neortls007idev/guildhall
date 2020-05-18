@@ -20,7 +20,7 @@ extern InputSystem*			g_theInput;
 
 //-----------------------------------------------------------------------------------------------
 
-const	char*	APP_NAME		= "SD:A3 Starship : Gold";
+const	char*	APP_NAME		= "SD1:A3 Starship : Gold";
 
 //-----------------------------------------------------------------------------------------------
 // Processes all Windows messages (WM_xxx) for this app that have queued up since last frame.

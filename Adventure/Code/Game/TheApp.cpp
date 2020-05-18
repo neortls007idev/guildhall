@@ -1,12 +1,14 @@
-#include "Game/TheApp.hpp"
-#include "Game/GameCommon.hpp"
-#include "Engine/Core/EngineCommon.hpp"
-#include "Engine/Math/MathUtils.hpp"
-#include "Engine/Time/Time.hpp"
-#include "Engine/Input/VirtualKeyboard.hpp"
-#include "Engine/Input/InputSystem.hpp"
-#include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
+#include "Engine/Core/DevConsole.hpp"
+#include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Input/InputSystem.hpp"
+#include "Engine/Input/VirtualKeyboard.hpp"
+#include "Engine/Platform/Window.hpp"
+#include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Time/Clock.hpp"
+#include "Engine/Time/Time.hpp"
+#include "Game/GameCommon.hpp"
+#include "Game/TheApp.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			GLOBAL VARIABLES
@@ -28,11 +30,15 @@ bool SunRise( EventArgs& args )
 	return true;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void SunSet( EventArgs& args )
 {
 	UNUSED( args );
 	g_theDevConsole->PrintString( WHITE , "Sunrise has been called." );
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 TheApp::TheApp()
 {
@@ -43,36 +49,83 @@ TheApp::TheApp()
 
 TheApp::~TheApp()
 {
+	delete g_theGame;
+	g_theGame = nullptr;
 
+	delete g_theAudioSystem;
+	g_theAudioSystem = nullptr;
+	// 
+	// 	delete g_thePhysicsSystem;
+	// 	g_thePhysicsSystem = nullptr;
+
+	delete g_theDevConsole;
+	g_theDevConsole = nullptr;
+
+	delete g_theRenderer;
+	g_theRenderer = nullptr;
+
+	delete g_theInput;
+	g_theInput = nullptr;
+
+	delete g_theEventSystem;
+	g_theEventSystem = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::Startup()
 {
-	if (g_theEventSystem == nullptr )
+	Clock::Startup();
+
+	if ( g_theEventSystem == nullptr )
 	{
 		g_theEventSystem = new EventSystem();
 	}
+	g_theEventSystem->Startup();
 
- 	if ( g_theInput == nullptr )
- 	{
+	if ( g_theWindow == nullptr )
+	{
+		g_theWindow = new Window();
+	}
+
+	if ( g_theInput == nullptr )
+	{
 		g_theInput = new InputSystem();
- 	}
+		g_theWindow->SetInputSystem( g_theInput );
+	}
+	g_theInput->Startup();
 
 	if ( g_theRenderer == nullptr )
 	{
 		g_theRenderer = new RenderContext();
-
-	g_theRenderer->Startup();
-	g_theRenderer->ClearScreen(BLACK);
 	}
+	g_theRenderer->Startup( g_theWindow );
+	g_theRenderer->ClearScreen( BLACK );
+
+	// 	if ( g_bitmapFont == nullptr )
+	// 	{
+	// 		g_bitmapFont = g_theRenderer->GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
+	// 	}
 
 	if ( g_theDevConsole == nullptr )
 	{
 		g_theDevConsole = new DevConsole();
-		g_theDevConsole->PrintString( CYAN , "DEVCONSOLE STARTED" );
 	}
+	g_theDevConsole->Startup();
+	// 	AddDebugRenderDevConsoleCommands( g_theDevConsole );
+
+	// 	if ( g_currentManager == nullptr )
+	// 	{
+	// 		// instantiating a default DRO_Manager
+	// 		g_currentManager = new DebugRenderObjectsManager();
+	// 	}
+	// 	g_currentManager->Startup();
+
+	// 	if ( g_thePhysicsSystem == nullptr )
+	// 	{
+	// 		g_thePhysicsSystem = new Physics2D();
+	// 	}
+	// 	g_thePhysicsSystem->Startup();
 	
 	if ( g_theAudioSystem == nullptr )
 	{
@@ -107,12 +160,15 @@ void TheApp::RunFrame()
 void TheApp::BeginFrame()
 {
 	// all engine things that must begin at the beginning of each frame and not the game
+	Clock::BeginFrame();
 	g_theEventSystem->BeginFrame();
+	g_theWindow->BeginFrame();
 	g_theInput->BeginFrame();
 	g_theRenderer->BeginFrame();
-	g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
+	g_theDevConsole->BeginFrame();
 	g_theAudioSystem->BeginFrame();
-
+	
+	g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -120,45 +176,49 @@ void TheApp::BeginFrame()
 void TheApp::Update( float deltaSeconds )
 {
 	UpdateFromKeyboard();
-	if ( m_isPaused ) { deltaSeconds = 0; }
-	else if ( m_isSloMo == true ) { deltaSeconds /= 10.f; }
-	if ( m_isSpeedMo ) { deltaSeconds = deltaSeconds * 4.0f; }
-	g_theGame->Update( deltaSeconds );
-	g_theInput->EndFrame();
 
+	if ( m_isPaused )								{ deltaSeconds = 0; }
+	else if ( m_isSloMo == true )					{ deltaSeconds /= 10.f; }
+	if ( m_isSpeedMo )								{ deltaSeconds = deltaSeconds * 4.0f; }
+
+	g_theGame->Update( deltaSeconds );
+
+	if ( g_theDevConsole->IsOpen() )
+	{
+		g_theDevConsole->Update( deltaSeconds );
+	}
+	
+	g_theInput->EndFrame();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::Render() const
 {
-		g_theRenderer->ClearScreen( BLACK );
 		g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
+		g_theRenderer->SetBlendMode( ALPHA );
 		g_theGame->Render();
 		g_theRenderer->EndCamera( g_theGame->m_worldCamera );
-
-		g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
 		
 		if ( g_theDevConsole->IsOpen() )
 		{
 			//g_theGame->m_worldCamera.SetOrthoView( Vec2( 5 , 5 ) , Vec2( 35 , 35 ) );
-			g_theDevConsole->Render( *g_theRenderer , g_theGame->m_worldCamera , 0.5f );
+			g_theDevConsole->Render( *g_theRenderer , *g_theDevConsole->GetDevConsoleCamera() , 14.f );
 		}
-		
-		g_theRenderer->EndCamera( g_theGame->m_worldCamera );
-	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::EndFrame()
 {
-	// all engine things that must end at the end of the frame and not the game
-	//SwapBuffers( m_displayDeviceContext );
+// all engine things that must end at the end of the frame and not the game
+/*	g_currentManager->EndFrame();*/
 	g_theAudioSystem->EndFrame();
+	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
-	g_theEventSystem->EndFrame();
+
+	Clock::EndFrame();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -166,28 +226,25 @@ void TheApp::EndFrame()
 void TheApp::Shutdown()
 {
 	delete g_theGame;
-	g_theGame = nullptr;
+	g_theGame			= nullptr;
 
 	g_theAudioSystem->Shutdown();
-	delete g_theAudioSystem;
-	g_theAudioSystem = nullptr;
-	
+	// 	g_thePhysicsSystem->Shutdown();
+	// 	g_currentManager->Shutdown();
+	g_theDevConsole->Shutdown();
 	g_theRenderer->Shutdown();
-	delete g_theRenderer;
-	g_theRenderer = nullptr;
-	
-	delete g_theInput;
-	g_theInput = nullptr;
-
-	delete g_theEventSystem;
-	g_theEventSystem = nullptr;
+	g_theInput->Shutdown();
+	// TODO :- write me g_theWindow->Shutdown();
+	g_theEventSystem->Shutdown();
+	Clock::Shutdown();
+	g_theRenderer->Shutdown();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 bool TheApp::HandleQuitRequested()
 {
-	m_isQuitting = true;
+	m_isQuitting			= true;
 	return m_isQuitting;
 }
 
@@ -196,12 +253,16 @@ bool TheApp::HandleQuitRequested()
 void TheApp::UpdateFromKeyboard()
 {
 	if ( g_theInput->GetButtonState( 'T' ).IsPressed() )					{ m_isSloMo = true; }
-	else																	{ m_isSloMo = false; }
+	else																		{ m_isSloMo = false; }
 	
 	if ( g_theInput->GetButtonState( 'Y' ).IsPressed() )					{ m_isSpeedMo = true; }
-	else																	{ m_isSpeedMo = false; }
+	else																		{ m_isSpeedMo = false; }
 
-	if ( g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() )			{	HandleQuitRequested(); 	}
+	if ( g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() )
+	{
+		HandleQuitRequested();
+		g_theWindow->HandleQuitRequested();
+	}
 	
 	if ( m_isPaused && g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() )
 	{			}
@@ -246,7 +307,8 @@ void TheApp::UpdateFromKeyboard()
 
 	if ( g_theInput->WasKeyJustPressed( 'F' ) )
 	{
-		g_theEventSystem->FireEvent( "sunrise" );
+		EventArgs something;
+		g_theEventSystem->FireEvent( "sunrise" , something );
 	}
 }
 
