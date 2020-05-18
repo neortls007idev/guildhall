@@ -216,7 +216,7 @@ void RenderContext::Startup( Window* window )
 	// Device - create resources like textures buffers etc.
 	// Context - issue commands
 
-	//~ swapchain
+	// swapchain
 	GUARANTEE_OR_DIE( SUCCEEDED( result ) , "FAILED TO CREATE RESOURCES" );
 	m_swapChain = new SwapChain( this , swapchain );
 
@@ -442,6 +442,13 @@ void RenderContext::BeginCamera( const Camera& camera )
 		}
 
 		Texture* backbuffer = camera.GetColorTarget();
+		
+		if ( backbuffer == nullptr )
+		{
+			backbuffer = m_swapChain->GetBackBuffer();
+			m_currentCamera->SetColorTarget( backbuffer );
+		}
+		
 		TextureView* backbuffer_rtv = backbuffer->GetOrCreateRenderTargetView();
 
 		ID3D11RenderTargetView* rtv = backbuffer_rtv->GetRTVHandle();

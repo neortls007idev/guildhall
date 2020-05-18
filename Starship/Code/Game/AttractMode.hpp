@@ -1,12 +1,11 @@
 #pragma once
-#include "Game/TheApp.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Game/GameCommon.hpp"
 
-class AttractMode {
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-private:
-
+class AttractMode
+{
 public:
 
 	AttractMode();
@@ -182,7 +181,6 @@ private:
 			Vertex_PCU((Vec3(77.f, 28.f, 0.f)) , attractMode, Vec2(0.f, 0.f)),
 			Vertex_PCU((Vec3(65.f, 15.f, 0.f)) , attractMode, Vec2(0.f, 0.f)),
 	};
-	
-
-
 };
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

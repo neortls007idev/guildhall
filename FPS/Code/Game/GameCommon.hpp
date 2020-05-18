@@ -1,15 +1,18 @@
 #pragma once
-#include "Engine/Math/Vec2.hpp"
-#include "Engine/Math/Vec3.hpp"
-#include "Engine/Core/Rgba8.hpp"
 #include "Engine/Input/InputSystem.hpp"
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 class Game;
 class Window;
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 extern InputSystem* g_theInput;
-extern Game* g_theGame;
-extern Window* g_theWindow;
+extern Game*		g_theGame;
+extern Window*		g_theWindow;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 constexpr float CLIENT_ASPECT											= 16.f/9.f;
 
@@ -28,8 +31,4 @@ constexpr float SCREEN_SHAKE_ABLATION_PER_SECOND						= 0.05f;
 
 constexpr float PERCENTAGE_OF_OBSTACLES_IN_MAP							= 0.3f;
 
-
-//void DrawLine( const Vec2& start, const Vec2& end, const Rgba8& color, float thickness);
-//void DrawRing( const Vec2& center, float radius, const Rgba8& color, float thickness);
-
-
+//--------------------------------------------------------------------------------------------------------------------------------------------

@@ -133,6 +133,19 @@ void Camera::Translate( const Vec3& translation )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Camera::Translate2D( const Vec2 cameraTranslate )
+{
+	Vec2 bottomLeftCoordinate	= GetOrthoMin().GetXYComponents();
+	Vec2 topRightCoordinate		= GetOrthoMax().GetXYComponents();
+	
+	bottomLeftCoordinate		= bottomLeftCoordinate + cameraTranslate;
+	topRightCoordinate			= topRightCoordinate + cameraTranslate;
+
+	SetOrthoView( bottomLeftCoordinate , topRightCoordinate );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Camera::SetPitchYawRollRotation( float pitch , float yaw , float roll )
 {
 	m_transform.SetRotation( pitch , yaw , roll );

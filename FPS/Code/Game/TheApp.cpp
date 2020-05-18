@@ -4,7 +4,6 @@
 #include "Engine/Core/EventSystem.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Input/VirtualKeyboard.hpp"
-#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Renderer/D3D11Common.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
@@ -12,6 +11,7 @@
 #include "Engine/Time/Time.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
+#include "Game/Game.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

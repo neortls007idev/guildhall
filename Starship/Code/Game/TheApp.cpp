@@ -1,54 +1,132 @@
-#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-#include "Game/GameCommon.hpp"
-#include "Engine/Input/VirtualKeyboard.hpp"
-#include "Game/TheApp.hpp"
-#include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Input/InputSystem.hpp"
+#include "Engine/Input/VirtualKeyboard.hpp"
+#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Platform/Window.hpp"
+#include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Time/Clock.hpp"
 #include "Engine/Time/Time.hpp"
+#include "Game/GameCommon.hpp"
+#include "Game/GameCommon.hpp"
+#include "Game/TheApp.hpp"
 
-#include <windows.h>
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-RenderContext* g_theRenderer = nullptr;
-TheApp* g_theApp = nullptr;
-InputSystem* g_theInput = nullptr;
-//extern Camera* g_Camera;
-//Rgba8 Clrscr(0,0,0,255);
+RenderContext*						g_theRenderer		= nullptr;
+TheApp*								g_theApp			= nullptr;
+InputSystem*						g_theInput			= nullptr;
+DevConsole*							g_theDevConsole		= nullptr;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 TheApp::TheApp()
 {
 
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 TheApp::~TheApp()
 {
+	delete m_theGame;
+	m_theGame = nullptr;
 
+// 	delete g_theAudioSystem;
+// 	g_theAudioSystem = nullptr;
+// 
+// 	delete g_thePhysicsSystem;
+// 	g_thePhysicsSystem = nullptr;
+
+	delete g_theDevConsole;
+	g_theDevConsole = nullptr;
+
+	delete g_theRenderer;
+	g_theRenderer = nullptr;
+
+	delete g_theInput;
+	g_theInput = nullptr;
+
+	delete g_theEventSystem;
+	g_theEventSystem = nullptr;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::Startup()
 {
- 	if ( g_theInput == nullptr )
- 	{
+	Clock::Startup();
+
+	if ( g_theEventSystem == nullptr )
+	{
+		g_theEventSystem = new EventSystem();
+	}
+	g_theEventSystem->Startup();
+
+	if ( g_theWindow == nullptr )
+	{
+		g_theWindow = new Window();
+	}
+
+	if ( g_theInput == nullptr )
+	{
 		g_theInput = new InputSystem();
- 	}
+		g_theWindow->SetInputSystem( g_theInput );
+	}
+	g_theInput->Startup();
+
 	if ( g_theRenderer == nullptr )
 	{
 		g_theRenderer = new RenderContext();
-
-	g_theRenderer->Startup();
-	g_theCamera->SetOrthoView(Vec2(0.f, 0.f), Vec2(WORLD_SIZE_X, WORLD_SIZE_Y));
-	g_theRenderer->ClearScreen( BLACK );
 	}
+	g_theRenderer->Startup( g_theWindow );
+	g_theCamera->SetOrthoView( Vec2::ZERO , Vec2( WORLD_SIZE_X , WORLD_SIZE_Y ) );
+	g_theRenderer->ClearScreen( BLACK );
+
+// 	if ( g_bitmapFont == nullptr )
+// 	{
+// 		g_bitmapFont = g_theRenderer->GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
+// 	}
+
+	if ( g_theDevConsole == nullptr )
+	{
+		g_theDevConsole = new DevConsole();
+	}
+	g_theDevConsole->Startup();
+// 	AddDebugRenderDevConsoleCommands( g_theDevConsole );
+
+// 	if ( g_currentManager == nullptr )
+// 	{
+// 		// instantiating a default DRO_Manager
+// 		g_currentManager = new DebugRenderObjectsManager();
+// 	}
+// 	g_currentManager->Startup();
+
+// 	if ( g_thePhysicsSystem == nullptr )
+// 	{
+// 		g_thePhysicsSystem = new Physics2D();
+// 	}
+// 	g_thePhysicsSystem->Startup();
+	
+// 	if ( g_theAudioSystem == nullptr )
+// 	{
+// 		g_theAudioSystem = new AudioSystem();
+// 	}
+// 	g_theAudioSystem->Startup();
+
 	if ( m_theAttractMode == nullptr )
 	{
 		m_theAttractMode = new AttractMode();
 		m_attractModeStatus = true;
 	}
+
 	if ( m_theGame == nullptr )
 	{
 		m_theGame = new Game();
 	}
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::RunFrame()
 {
@@ -63,136 +141,162 @@ void TheApp::RunFrame()
 	EndFrame();
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void TheApp::BeginFrame()
 {
 	// all engine things that must begin at the beginning of each frame and not the game
-	Startup();
+	Clock::BeginFrame();
+	g_theEventSystem->BeginFrame();
+	g_theWindow->BeginFrame();
 	g_theInput->BeginFrame();
 	g_theRenderer->BeginFrame();
-	g_theRenderer->BeginCamera(*g_theCamera);
+	g_theDevConsole->BeginFrame();
+//	g_currentManager->BeginFrame();
 
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::Update( float deltaSeconds )
 {
-	
 	HandleKeyPressed();
-	if (m_attractModeStatus)
+	if ( m_attractModeStatus )
 	{
-		m_theAttractMode->Update(deltaSeconds);
+		m_theAttractMode->Update( deltaSeconds );
+
 	}
-	if (m_attractModeStatus == false)
+	if ( m_attractModeStatus == false )
 	{
-		if (m_isPaused) { deltaSeconds = 0; }
-		else if (m_isSloMo == true) { deltaSeconds /= 10.f; }
-		m_theGame->Update(deltaSeconds);
+		if ( m_isPaused )										{ deltaSeconds = 0.f; }
+		else if ( m_isSloMo == true )							{ deltaSeconds /= 10.f; }
+		else													{ m_theGame->Update( deltaSeconds ); }
 	}
-	if (m_theGame->m_waveNumber == 5 && m_theGame->m_Ship->m_age <= 0)
+	
+	if ( m_theGame->m_waveNumber == 5 && m_theGame->m_Ship->m_age <= 0 )
 	{
-		m_keyPressed[KEY_SPACE] = false;
-		m_keyPressed['N'] = false;
-		m_attractModeStatus = true;
+		m_keyPressed[ KEY_SPACE ]	= false;
+		m_keyPressed[ 'N' ]			= false;
+		m_attractModeStatus			= true;
+		
 		delete m_theGame;
 		m_theGame = new Game;
 	}
-		g_theInput->EndFrame();
+
+	g_theInput->EndFrame();
 	HandleKeyReleased();
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::Render() const
 {
 	g_theRenderer->BindTexture( nullptr );
-	g_theRenderer->ClearScreen( BLACK );
-	g_theRenderer->BeginCamera(*g_theCamera);
+	g_theRenderer->BeginCamera( *g_theCamera );
 	
-	if (m_attractModeStatus)
+	if ( m_attractModeStatus )
 	{
 		m_theAttractMode->Render();
 	}
-	if (m_attractModeStatus == false && m_theGame->m_waveNumber < 5)
+	if ( m_attractModeStatus == false && m_theGame->m_waveNumber < 5 )
 	{
 		m_theGame->Render();
 		m_theGame->RenderUI();
 	}
-		g_theRenderer->EndCamera(*g_theCamera);	
-	
+
+	g_theRenderer->EndCamera(*g_theCamera);	
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::EndFrame()
 {
 	// all engine things that must end at the end of the frame and not the game
-	//SwapBuffers( m_displayDeviceContext );
+/*	g_currentManager->EndFrame();*/
+	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
+
+	Clock::EndFrame();
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TheApp::Shutdown()
 {
-	g_theRenderer->Shutdown();
-	delete g_theRenderer;
-	g_theRenderer = nullptr;
-	delete g_theInput;
-	g_theInput = nullptr;
 	delete m_theGame;
-	m_theGame = nullptr;
+	m_theGame					= nullptr;
+	
 	delete m_theAttractMode;
-	m_theAttractMode = nullptr;
+	m_theAttractMode			= nullptr;
+
+// 	g_theAudioSystem->Shutdown();
+// 	g_thePhysicsSystem->Shutdown();
+// 	g_currentManager->Shutdown();
+	g_theDevConsole->Shutdown();
+	g_theRenderer->Shutdown();
+	g_theInput->Shutdown();
+	// TODO :- write me g_theWindow->Shutdown();
+	g_theEventSystem->Shutdown();
+	Clock::Shutdown();
+	g_theRenderer->Shutdown();
+	
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 bool TheApp::HandleQuitRequested()
 {
-	m_isQuitting = true;
+	m_isQuitting				= true;
 	return m_isQuitting;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 bool TheApp::IsKeyPressed( unsigned char keyCode )
 {
-	return m_keyPressed[keyCode];
+	return m_keyPressed[ keyCode ];
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 bool TheApp::HandleKeyReleased( unsigned char keyCode )
 {
 	
-	if (keyCode == 'T')
+	if ( keyCode == 'T' )
 	{
 		m_isSloMo = false;
 		
 	}
 	
-	m_keyPressed[keyCode] = false;
-	return(m_keyPressed[keyCode]);
+	m_keyPressed[ keyCode ]		= false;
+	return	( m_keyPressed[ keyCode ] );
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 bool TheApp::HandleKeyReleased()
 {
-
-	if (!g_theInput->IsKeyHeldDown('T'))
-	{
-		m_isSloMo = false;
-
-	}
+	if ( !g_theInput->IsKeyHeldDown( 'T' ) )								{ m_isSloMo = false; }
 	
 	return true;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 bool TheApp::HandleKeyPressed()
 {
-	if (g_theInput->IsKeyHeldDown('T'))
-	{
-		m_isSloMo = true;
-	}
+	if ( g_theInput->IsKeyHeldDown( 'T' ) )									{ m_isSloMo = true;	}
 
-	if (g_theInput->WasKeyJustPressed('P'))
-	{
-			m_isPaused = !m_isPaused;
-	}
+	if ( g_theInput->WasKeyJustPressed( 'P' ) )								{ m_isPaused = !m_isPaused; }
 	
-	if (g_theInput->WasKeyJustPressed(KEY_ESC)) // 0x1B is the VK_ESCAPE macro defined in windows.h and used here directly in hexadecimal.
+	if ( g_theInput->WasKeyJustPressed( KEY_ESC ) )
 	{
 		HandleQuitRequested();
-		return 0; // "Consumes" this message (tells Windows "okay, we handled it")
+		return false; // "Consumes" this message (tells Windows "okay, we handled it")
 	}
 
-	if (g_theInput->WasKeyJustPressed(KEY_F8))
+	if ( g_theInput->WasKeyJustPressed( KEY_F8 ) )
 	{
 		delete m_theGame;
 		m_theGame = nullptr;
@@ -202,9 +306,11 @@ bool TheApp::HandleKeyPressed()
 	return false;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 bool TheApp::HandleKeyPressed( unsigned char keyCode )
 {
-	if (keyCode == 'T' )
+	if ( keyCode == 'T' )
 	{
 		m_isSloMo = true;
 	
@@ -212,17 +318,16 @@ bool TheApp::HandleKeyPressed( unsigned char keyCode )
 
 	if ( keyCode == 'P' )
 	{
-		if ( m_keyPressed['P'] == false )
+		if ( m_keyPressed[ 'P' ] == false )
 		{
 			m_isPaused = !m_isPaused;
 		}
-		
 	}
   	
-	if( keyCode == KEY_ESC ) // 0x1B is the VK_ESCAPE macro defined in windows.h and used here directly in hexadecimal.
+	if( keyCode == KEY_ESC ) 
 	{
 		HandleQuitRequested();
-		return 0; // "Consumes" this message (tells Windows "okay, we handled it")
+		return false; 
 	}
 
 	if ( keyCode == KEY_F8 )
@@ -232,8 +337,9 @@ bool TheApp::HandleKeyPressed( unsigned char keyCode )
 		m_theGame = new Game();
 	}
 
-	m_keyPressed[keyCode] = true;
+	m_keyPressed[ keyCode ] = true;
 	
-
 	return( m_keyPressed[keyCode] );
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

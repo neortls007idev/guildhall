@@ -1,44 +1,52 @@
-#include "Game/AttractMode.hpp"
-
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Input/VirtualKeyboard.hpp"
-
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Game/AttractMode.hpp"
 #include "Game/TheApp.hpp"
 
-extern RenderContext* g_theRenderer;
-extern TheApp* g_theApp;
-extern InputSystem* g_theInput;
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-AttractMode::AttractMode()
+extern	RenderContext*					g_theRenderer;
+extern	TheApp*							g_theApp;
+extern	InputSystem*					g_theInput;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+AttractMode::AttractMode ()
 {
-	
 }
 
-void AttractMode::InitializeAttractModeVertices()
-{
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
+void AttractMode::InitializeAttractModeVertices ()
+{
 }
 
-void AttractMode::BeginFrame()
-{
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
+void AttractMode::BeginFrame ()
+{
 }
 
-void AttractMode::Update(float deltaSeconds)
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void AttractMode::Update ( float deltaSeconds )
 {
-	UNUSED(deltaSeconds);
-	m_controllerID = g_theInput->GetXboxController(m_controllerID).GetControllerID();
-	XboxController controller = g_theInput->GetXboxController(m_controllerID);
-	const KeyButtonState& startButton = controller.GetButtonState(XBOX_BUTTON_ID_START);
-	if (g_theInput->WasKeyJustPressed(KEY_SPACE) == true || g_theInput->WasKeyJustPressed('N') == true || startButton.WasJustPressed())
+	UNUSED( deltaSeconds );
+	m_controllerID = g_theInput->GetXboxController( m_controllerID ).GetControllerID();
+	XboxController controller = g_theInput->GetXboxController( m_controllerID );
+	const KeyButtonState& startButton = controller.GetButtonState( XBOX_BUTTON_ID_START );
+	if ( g_theInput->WasKeyJustPressed( KEY_SPACE ) == true || g_theInput->WasKeyJustPressed( 'N' ) == true ||
+		startButton.WasJustPressed() )
 	{
 		EndFrame();
 	}
 }
 
-void AttractMode::Render() const
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void AttractMode::Render () const
 {
 	static bool colorStatus = false;
 	static Rgba8 color;
@@ -46,40 +54,43 @@ void AttractMode::Render() const
 	color.b += 7;
 	color.g += 1;
 
-	if (colorStatus == false)
+	if ( colorStatus == false )
 	{
 		Vertex_PCU tempVerts[NUM_ATTRACTMODE_VERTS];
-		for (int vertIndex = 0; vertIndex < NUM_ATTRACTMODE_VERTS; vertIndex++)
+		for ( int vertIndex = 0 ; vertIndex < NUM_ATTRACTMODE_VERTS ; vertIndex++ )
 		{
-			tempVerts[vertIndex] = m_localAttractModeVerts[vertIndex];
-			tempVerts[vertIndex].m_color = color;
+			tempVerts[ vertIndex ] = m_localAttractModeVerts[ vertIndex ];
+			tempVerts[ vertIndex ].m_color = color;
 		}
-		TransformVertexArray2D(NUM_ATTRACTMODE_VERTS, tempVerts, 1.f, m_orientationDegrees, m_position);
-		g_theRenderer->DrawVertexArray(NUM_ATTRACTMODE_VERTS, tempVerts);
+		TransformVertexArray2D( NUM_ATTRACTMODE_VERTS , tempVerts , 1.f , m_orientationDegrees , m_position );
+		g_theRenderer->DrawVertexArray( NUM_ATTRACTMODE_VERTS , tempVerts );
 		colorStatus = true;
 	}
-	else if (colorStatus)
+	else if ( colorStatus )
 	{
-
 		Vertex_PCU tempVerts[NUM_ATTRACTMODE_VERTS];
-		for (int vertIndex = 0; vertIndex < NUM_ATTRACTMODE_VERTS; vertIndex++)
+		for ( int vertIndex = 0 ; vertIndex < NUM_ATTRACTMODE_VERTS ; vertIndex++ )
 		{
-			tempVerts[vertIndex] = m_localAttractModeVerts[vertIndex];
-			tempVerts[vertIndex].m_color = color;
+			tempVerts[ vertIndex ] = m_localAttractModeVerts[ vertIndex ];
+			tempVerts[ vertIndex ].m_color = color;
 		}
-		TransformVertexArray2D(NUM_ATTRACTMODE_VERTS, tempVerts, 1.f, m_orientationDegrees, m_position);
-		g_theRenderer->DrawVertexArray(NUM_ATTRACTMODE_VERTS, tempVerts);
+		TransformVertexArray2D( NUM_ATTRACTMODE_VERTS , tempVerts , 1.f , m_orientationDegrees , m_position );
+		g_theRenderer->DrawVertexArray( NUM_ATTRACTMODE_VERTS , tempVerts );
 		colorStatus = false;
 	}
-	
 }
 
-void AttractMode::Die()
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void AttractMode::Die ()
 {
-
 }
 
-void AttractMode::EndFrame()
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void AttractMode::EndFrame ()
 {
 	g_theApp->m_attractModeStatus = false;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

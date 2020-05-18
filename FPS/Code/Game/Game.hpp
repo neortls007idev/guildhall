@@ -1,7 +1,8 @@
+#pragma once
 #include "Engine/Core/DebugRenderObject.hpp"
 #include "Engine/Math/Vec3.hpp"
-#include "Engine/Primitives/AABB2.hpp"
 #include "Engine/Renderer/Camera.hpp"
+#include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Math/Transform.hpp"
 #include "Game/GameCommon.hpp"
 

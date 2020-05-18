@@ -12,7 +12,6 @@ class RenderBuffer;
 class RenderContext;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-// TODO :-
 
 enum eCameraClearBitFlag : unsigned int
 {
@@ -55,7 +54,7 @@ public:
 	unsigned int	GetClearMode() const																			{ return m_clearMode; }
 	Texture*		GetColorTarget() const;																			
 	Texture*		GetColorTarget( int index ) const;																			
-	uint			GetColorTargetCount() const;																			
+	uint			GetColorTargetCount() const;
 	Vec2			GetColorTargetSize() const;
 	Texture*		GetDepthStencilTarget() const																	{ return m_depthStencilTarget; }
 

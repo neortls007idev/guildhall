@@ -1,5 +1,4 @@
 ﻿#pragma once
-
 #include "Engine/Math/Transform.hpp"
 #include "Engine/Math/Vec4.hpp"
 #include "Engine/Primitives/AABB2.hpp"
