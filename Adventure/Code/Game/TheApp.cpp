@@ -100,7 +100,6 @@ void TheApp::Startup()
 		g_theRenderer = new RenderContext();
 	}
 	g_theRenderer->Startup( g_theWindow );
-	g_theRenderer->ClearScreen( BLACK );
 
 	// 	if ( g_bitmapFont == nullptr )
 	// 	{
@@ -177,7 +176,7 @@ void TheApp::Update( float deltaSeconds )
 {
 	UpdateFromKeyboard();
 
-	if ( m_isPaused )								{ deltaSeconds = 0; }
+	if ( m_isPaused )								{ deltaSeconds = 0.f; }
 	else if ( m_isSloMo == true )					{ deltaSeconds /= 10.f; }
 	if ( m_isSpeedMo )								{ deltaSeconds = deltaSeconds * 4.0f; }
 
@@ -211,7 +210,7 @@ void TheApp::Render() const
 
 void TheApp::EndFrame()
 {
-// all engine things that must end at the end of the frame and not the game
+	// all engine things that must end at the end of the frame and not the game
 /*	g_currentManager->EndFrame();*/
 	g_theAudioSystem->EndFrame();
 	g_theDevConsole->EndFrame();

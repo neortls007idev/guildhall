@@ -77,9 +77,9 @@ void Explosion::Render() const
 
 		TransformVertexArray2D( 6 , tempExplosion , m_blastRadius , m_orientationDegrees , m_position );
 		g_theRenderer->BindTexture( texture );
-		g_theRenderer->SetBlendMode( BlendMode::ADDITIVE );
+		g_theRenderer->SetBlendMode( eBlendMode::ADDITIVE );
 		g_theRenderer->DrawVertexArray( 6 , tempExplosion );
-		g_theRenderer->SetBlendMode( BlendMode::ALPHA );
+		g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 		g_theRenderer->BindTexture( nullptr );
 	}
 	

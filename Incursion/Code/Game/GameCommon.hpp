@@ -1,17 +1,19 @@
 #pragma once
-#include "Engine/Math/Vec2.hpp"
-#include "Engine/Math/Vec3.hpp"
-#include "Engine/Core/Rgba8.hpp"
 #include "Engine/Input/InputSystem.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 class Game;
-extern InputSystem* g_theInput;
-extern Game* g_theGame;
+class Window;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-//  GENERAL GAME CONSTANTS
+
+extern InputSystem* g_theInput;
+extern Game*		g_theGame;
+extern Window*		g_theWindow;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//									GENERAL GAME CONSTANTS
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 constexpr float CLIENT_ASPECT											=  16.f / 9.f; // We are requesting a 2:1 aspect (square) window area
@@ -32,21 +34,19 @@ constexpr int   MAX_WORM_LENGTH											=   13;
 constexpr int	PLAYER_HEALTH_PER_LIVES									=    3;
 constexpr int	TOTAL_PLAYER_LIVES										=    5;
 
-
-
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // INITIAL MAP AND WORLD CONSTANTS
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-constexpr int TOTAL_MAPS_IN_THE_WORLD = 4;
-constexpr int TOTAL_WORLDS_IN_THE_GAME = 1;
-constexpr int TOTAL_MAPS_IN_THE_GAME = TOTAL_MAPS_IN_THE_WORLD * TOTAL_WORLDS_IN_THE_GAME;
+constexpr int TOTAL_MAPS_IN_THE_WORLD									= 4;
+constexpr int TOTAL_WORLDS_IN_THE_GAME									= 1;
+constexpr int TOTAL_MAPS_IN_THE_GAME									= TOTAL_MAPS_IN_THE_WORLD * TOTAL_WORLDS_IN_THE_GAME;
 
-constexpr float INTITAL_MAP_SIZE_X												= 20.f;
-constexpr float INTITAL_MAP_SIZE_Y												= 30.f;
-constexpr int	INTITAL_MAP_MAX_NUM_NPC_TURRETS									=  5;
-constexpr int	INTITAL_MAP_MAX_NUM_NPC_TANKS									=  6;
-constexpr int	INTITAL_MAP_MAX_NUM_BOULDERS									=  5;
+constexpr float INTITAL_MAP_SIZE_X										= 20.f;
+constexpr float INTITAL_MAP_SIZE_Y										= 30.f;
+constexpr int	INTITAL_MAP_MAX_NUM_NPC_TURRETS							=  5;
+constexpr int	INTITAL_MAP_MAX_NUM_NPC_TANKS							=  6;
+constexpr int	INTITAL_MAP_MAX_NUM_BOULDERS							=  5;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -56,7 +56,6 @@ enum class GameStates
 	GAME_STATE_ATTRACT ,
 	GAME_STATE_PLAYING ,
 	GAME_STATE_VICTORY ,
-
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -86,8 +85,6 @@ enum TextureType
 	TEXTURE_TILE_BOULDER ,
 
 	NUM_TOTAL_TEXTURES
-
-
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -113,10 +110,6 @@ enum AudioType
 	SOUND_GAME_UNPAUSED ,
 
 	NUM_TOTAL_SOUNDS
-
-
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-
-

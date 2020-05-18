@@ -81,7 +81,7 @@ public:
 	bool             m_gameOverAudio   = false;
 	GameStates		 m_gameState;
 	World*			 m_world1		   = nullptr;
-	Camera			 m_worldCamera;
+	mutable Camera	 m_worldCamera;
 	Camera			 m_uiCamera;
 	Texture*		 m_textures[ NUM_TOTAL_TEXTURES ];
 	BitmapFont*		 m_font;
