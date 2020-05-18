@@ -33,8 +33,6 @@ void Map::Update( float deltaSeconds )
 
 void Map::Render() const
 {
-	
-	
 		for ( int index = 0; index < m_tiles.size(); index++ )
 		{
 			m_tiles[ index ].Render();
@@ -44,15 +42,15 @@ void Map::Render() const
 		g_theRenderer->BindTexture( m_game->m_Waldo );
 		
 		static int waldoTile;
+		static RandomNumberGenerator RNG;
 
 		if ( m_age >= 1.5f )
 		{
-			RandomNumberGenerator RNG;
-			waldoTile = RNG.GetRandomIntInRangebothinclusive( 0 , m_tiles.size() - 1 );
+			waldoTile = RNG.RollRandomIntInRange( 0 , ( int ) m_tiles.size() - 1 );
+			RNG.manuallyIncrementPosition();
 		}
 		m_tiles[ waldoTile ].Render();
 		g_theRenderer->BindTexture( nullptr );
-	
 }
 
 int Map::GetTileIndexforTileCoords( const IntVec2& tileCoords ) const

@@ -19,8 +19,10 @@ void Tile::Update( float deltaSeconds )
 
 void Tile::Render() const
 {
-	RandomNumberGenerator RNG;
-	Rgba8 color = Rgba8( (unsigned char)RNG.GetRandomIntInRangebothinclusive( 0 , 255 ) , ( unsigned char ) RNG.GetRandomIntInRangebothinclusive( 0 , 255 ) , ( unsigned char ) RNG.GetRandomIntInRangebothinclusive( 0 , 255 ) , 255 );
+	static RandomNumberGenerator RNG;
+	Rgba8 color;
+	color.RollRandomColor( RNG );
+	RNG.manuallyIncrementPosition();
 	g_theRenderer->DrawAABB2( AABB2( ( float ) m_tileCoords.x , ( float ) m_tileCoords.y , ( float ) m_tileCoords.x + 40 , ( float ) m_tileCoords.y + 40 ) , color );
 }
 

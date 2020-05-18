@@ -1,9 +1,18 @@
 #pragma once
-#include "Engine/Math/Vec2.hpp"
-#include "Engine/Core/Rgba8.hpp"
 #include "Engine/Input/InputSystem.hpp"
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+class Game;
+class Window;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 extern InputSystem* g_theInput;
+extern Game* g_theGame;
+extern Window* g_theWindow;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 constexpr float CLIENT_ASPECT											= 2.f; // We are requesting a 2:1 aspect (square) window area
 

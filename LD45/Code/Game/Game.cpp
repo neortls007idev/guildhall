@@ -21,13 +21,13 @@ Game::Game()
 {
 	m_worldCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( WORLD_SIZE_X , WORLD_SIZE_Y ) );
 	m_uiCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
+	m_uiCamera.SetClearMode( CLEAR_NONE , BLACK );
 	m_world1 = new World(this);
-	m_tankBaseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PlayerTankBase1.png" );
+	m_tankBaseTexture = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/PlayerTankBase1.png" );
 	//m_tankBaseTexture = g_theRenderer->CreateTextureFromFile( "Data/Images/Test_StbiFlippedAndOpenGL.png" );
-	m_Waldo = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/stewie1.png" );
+	m_Waldo = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/stewie1.png" );
 
 }
-
 
 void Game::Update(float deltaSeconds)
 {
@@ -51,9 +51,6 @@ void Game::Render() const
 	m_world1->Render();
 }
 
-
-
-
 void Game::RenderUI() const
 {
 	g_theRenderer->BeginCamera(m_uiCamera);
@@ -63,15 +60,16 @@ void Game::RenderUI() const
 
 void Game::UpdateCamera()
 {
-	RandomNumberGenerator rng;
-
+	static RandomNumberGenerator rng;
 	
 	m_screenShakeIntensity -= SCREEN_SHAKE_ABLATION_PER_SECOND;
 	m_screenShakeIntensity = ClampZeroToOne(m_screenShakeIntensity);
 
 	float maxShakeDist = m_screenShakeIntensity * MAX_CAMERA_SHAKE;
-	float cameraShakeX = static_cast<float> (rng.GetRandomIntInRangebothinclusive((int)-maxShakeDist, (int)maxShakeDist));
-	float cameraShakeY = static_cast<float> (rng.GetRandomIntInRangebothinclusive((int)-maxShakeDist, (int)maxShakeDist));
+	float cameraShakeX = static_cast<float> (rng.RollRandomIntInRange((int)-maxShakeDist, (int)maxShakeDist));
+	rng.manuallyIncrementPosition();
+	float cameraShakeY = static_cast<float> (rng.RollRandomIntInRange((int)-maxShakeDist, (int)maxShakeDist));
+	rng.manuallyIncrementPosition();
 	
 	m_worldCamera.SetOrthoView(Vec2(0.f, 0.f), Vec2(WORLD_SIZE_X, WORLD_SIZE_Y));
 	m_worldCamera.Translate2D(Vec2(cameraShakeX, cameraShakeY));
@@ -93,10 +91,6 @@ void Game::AddScreenShakeIntensity(float deltaShakeIntensity)
  	m_screenShakeIntensity += deltaShakeIntensity;
 	//clamp it!
 }
-
-
-
-
 
 void Game::GarbageCollection()
 {

@@ -41,11 +41,13 @@ void Enemy::RollEnemy( float deltaSeconds )
 void Enemy::InitializeMemberVariables()
 {
 	{
-		m_position = Vec2( ( float ) rng.GetRandomIntInRangebothinclusive( 20 , 180 ) , ( float ) rng.GetRandomIntInRangebothinclusive( 20 , 80 ) );
-
-		m_orientationDegrees = ( float ) rng.GetRandomIntInRangebothinclusive( 0 , 360 );
+		m_position = Vec2( ( float ) rng.RollRandomIntInRange( 20 , 180 ) , ( float ) rng.RollRandomIntInRange( 20 , 80 ) );
+		rng.manuallyIncrementPosition();
+		m_orientationDegrees = ( float ) rng.RollRandomIntInRange( 0 , 360 );
+		rng.manuallyIncrementPosition();
 		m_velocity = Vec2::MakeFromPolarDegrees( m_orientationDegrees , 10.f );
-		m_angularVelocity = ( float ) rng.GetRandomIntInRangebothinclusive( -200 , 200 );
+		m_angularVelocity = ( float ) rng.RollRandomIntInRange( -200 , 200 );
+		rng.manuallyIncrementPosition();
 
 		m_health = 3;
 		m_isDead = false;
