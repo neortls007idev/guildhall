@@ -33,8 +33,8 @@ Game::Game()
 {
 	m_worldCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 1600.f , 800.f ) );
 	
-	Vec2 cameraBottomLeft = m_worldCamera.GetOrthoBottomLeft();
-	Vec2 cameraTopRight = m_worldCamera.GetOrthoTopRight();
+	Vec2 cameraBottomLeft = m_worldCamera.GetOrthoMin().GetXYComponents();
+	Vec2 cameraTopRight = m_worldCamera.GetOrthoMax().GetXYComponents();
 	
 	m_rng.manuallyIncrementPosition();
 	RandomizeAABB2(		  cameraBottomLeft , cameraTopRight , m_rng );
@@ -146,8 +146,8 @@ void Game::RandomizeShapes( Vec2 mins , Vec2 maxs , RandomNumberGenerator* rng )
 
 void Game::Update( float deltaSeconds )
 {
-	Vec2 cameraBottomLeft = m_worldCamera.GetOrthoBottomLeft();
-	Vec2 cameraTopRight	  = m_worldCamera.GetOrthoTopRight();
+	Vec2 cameraBottomLeft = m_worldCamera.GetOrthoMin().GetXYComponents();
+	Vec2 cameraTopRight	  = m_worldCamera.GetOrthoMax().GetXYComponents();
 	UpdateFromKeyBoard();
 	m_mousePosition = g_theInput->GetMouseNormalizedClientPosition() * ( cameraTopRight - cameraBottomLeft );
 
@@ -238,7 +238,7 @@ void Game::Render() const
 
 	g_theRenderer->DrawLine( m_lineSegment2D.m_start, m_lineSegment2D.m_end , m_color , 5.f );
 
-	g_theRenderer->DrawPolygon( &m_polygon[ 0 ] , m_polygon.size() , WHITE );
+	g_theRenderer->DrawPolygon( &m_polygon[ 0 ] , ( uint ) m_polygon.size() , WHITE );
 
 	DrawMouseCurrentPosition( m_worldCamera );
 }
@@ -255,7 +255,7 @@ void Game::UpdateCamera()
 void Game::DrawMouseCurrentPosition( const Camera& camera ) const
 {
 	Vec2 mouseNormalizedPos = g_theInput->GetMouseNormalizedClientPosition();
-	AABB2 orthoBounds = AABB2( camera.GetOrthoBottomLeft() , camera.GetOrthoTopRight() );
+	AABB2 orthoBounds = AABB2( camera.GetOrthoMin().GetXYComponents() , camera.GetOrthoMax().GetXYComponents() );
 	Vec2 mouseDrawPos = orthoBounds.GetPointForUV( mouseNormalizedPos );
 	//g_theRenderer->DrawRing( mouseDrawPos , 2.f , RED , 2.f );
 	g_theRenderer->DrawDisc( Disc2D( mouseDrawPos , 2.5f ) , RED );
@@ -267,8 +267,8 @@ void Game::UpdateFromKeyBoard()
 {
 	if ( g_theInput->WasKeyJustPressed( KEY_F8 ) )
 	{
-		Vec2 cameraBottomLeft = m_worldCamera.GetOrthoBottomLeft();
-		Vec2 cameraTopRight = m_worldCamera.GetOrthoTopRight();
+		Vec2 cameraBottomLeft = m_worldCamera.GetOrthoMin().GetXYComponents();
+		Vec2 cameraTopRight = m_worldCamera.GetOrthoMax().GetXYComponents();
 		RandomizeShapes( cameraBottomLeft , cameraTopRight , &m_rng );
 		m_color.RollRandomColor( m_rng );
 		m_color.a = 100;

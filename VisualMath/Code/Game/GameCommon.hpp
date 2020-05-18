@@ -1,14 +1,16 @@
 #pragma once
-#include "Engine/Math/Vec2.hpp"
-#include "Engine/Math/Vec3.hpp"
-#include "Engine/Core/Rgba8.hpp"
 #include "Engine/Input/InputSystem.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 class Game;
+class Window;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 extern InputSystem* g_theInput;
-extern Game* g_theGame;
+extern Game*		g_theGame;
+extern Window*		g_theWindow;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //  GENERAL GAME CONSTANTS
