@@ -446,12 +446,15 @@ void RenderContext::BeginCamera( const Camera& camera )
 		if ( backbuffer == nullptr )
 		{
 			backbuffer = m_swapChain->GetBackBuffer();
-			m_currentCamera->SetColorTarget( backbuffer );
+			m_currentCamera->SetColorTarget( 0 , backbuffer );
+			rtvCount++;
+			rtvs.resize( rtvCount );
+			
 		}
 		
 		TextureView* backbuffer_rtv = backbuffer->GetOrCreateRenderTargetView();
-
 		ID3D11RenderTargetView* rtv = backbuffer_rtv->GetRTVHandle();
+		rtvs[ 0 ] = rtv;
 		m_context->ClearRenderTargetView( rtv , clearFloats );
 		//ClearScreen( camera.GetClearColor() );
 	}
@@ -470,6 +473,11 @@ void RenderContext::BeginCamera( const Camera& camera )
 	{
 		m_textureTarget = m_swapChain->GetBackBuffer();
 		m_currentCamera->SetColorTarget( m_textureTarget );
+		rtvCount++;
+		rtvs.resize( rtvCount );
+		TextureView* target_rtv = m_textureTarget->GetOrCreateRenderTargetView();
+		ID3D11RenderTargetView* rtv = target_rtv->GetRTVHandle();
+		rtvs[ 0 ] = rtv;
 	}
 
 	Vec2 backBufferDimensions = Vec2( m_textureTarget->GetDimensions() );

@@ -296,6 +296,7 @@ bool TheApp::HandleKeyPressed()
 	if ( g_theInput->WasKeyJustPressed( KEY_ESC ) )
 	{
 		HandleQuitRequested();
+		g_theWindow->HandleQuitRequested();
 		return false; // "Consumes" this message (tells Windows "okay, we handled it")
 	}
 

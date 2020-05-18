@@ -347,7 +347,6 @@ int Window::GetClientHeight()
 
 bool Window::HandleQuitRequested()
 {
-
 	if ( g_theDevConsole->IsOpen() && g_theDevConsole->GetCurrentInputLength() > 0 )
 	{
 		g_theDevConsole->ResetCurrentInput();
