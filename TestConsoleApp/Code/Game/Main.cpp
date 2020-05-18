@@ -38,6 +38,15 @@ void SunSet()
 typedef void( *EventCallbackFunctionPtrType )( );
 typedef void( *EventCallbackFunctionPtrTypeThatTakesXY )( int x, int y );
 
+// template<class T>
+// class selfRef : public <T>
+// {
+// 	selfRef()
+// 	{
+// 		printf( "Inheritence successful" );
+// 	}
+// };
+
 int main( int, char** )
 {
 	printf( "\n\n%zd %zd \n\n" , sizeof( abc ), sizeof( abc1 ) );
@@ -45,7 +54,7 @@ int main( int, char** )
 	int b;
 	char c;
 	char* d;
-	printf( "\n%d %d %d %d %d\n\n" , sizeof( a ) , sizeof( b ) , sizeof( c ) , sizeof( d ) , sizeof( Vertex_PCU* ) );
+	printf( "\n%zd %zd %zd %zd %zd\n\n" , sizeof( a ) , sizeof( b ) , sizeof( c ) , sizeof( d ) , sizeof( Vertex_PCU* ) );
 
 	const char* name = "Amy"; // array of '4' bytes: 'A' 'm' 'y' 0 or '\0';
 	std::string a1( "Amy" ); // array of '4' bytes: 'A' 'm' 'y' 0 or '\0'; , copy constructor that takes in a const char*
@@ -103,8 +112,8 @@ int main( int, char** )
 		mySunrise();
 	}
 
-
-
+// 	class jkdn{};
+// 	selfRef:<jkdn> obj;
 
 	return 0;
 }

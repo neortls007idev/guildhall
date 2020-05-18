@@ -10,11 +10,9 @@
 #include "Engine/Primitives/Polygon2D.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Primitives/Plane.hpp"
-#include "Game/Game.hpp"
-
 
 extern RenderContext* g_theRenderer;
-extern Game* g_theGame;
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // ANGLE UTILITIES
 //--------------------------------------------------------------------------------------------------------------------------------------------

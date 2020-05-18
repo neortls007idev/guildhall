@@ -364,6 +364,9 @@
     <ClCompile Include="Core\NamedProperties.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\DrawableObjects.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -692,6 +695,9 @@
     </ClInclude>
     <ClInclude Include="Core\NamedProperties.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\DrawableObjects.hpp">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

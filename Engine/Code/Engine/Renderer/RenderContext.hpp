@@ -153,7 +153,7 @@ public:
 	void					UpdateFrameTime( float deltaSeconds );
 	void					EndFrame();
 	void					Shutdown();
-
+	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			CAMERA METHODS
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -283,7 +283,7 @@ public:
 	void DrawVertexArray( int numVertexes , VertexBuffer* vertices );
 	void DrawIndexed( uint indexCount , uint startIndex, uint indexStride , buffer_attribute_t const* attribs );
 	void DrawMesh( const GPUMesh* mesh );
-
+	
 	// Draw Line in WorldSpace and Transform Relative to World Space Origin
 	void DrawLine ( const Vec2& start , const Vec2& end , const Rgba8& color , float thickness , float scale = 1.f ,
 	                float orientationDegrees = 0.f , Vec2 translate = Vec2::ZERO );
