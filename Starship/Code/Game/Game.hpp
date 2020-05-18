@@ -36,10 +36,11 @@ public:
 	int				m_WaspSpawnCount						= 0;
 
 	bool			m_devMode								= false;
-	Camera			m_uiCamera;
+	Camera*			m_uiCamera								= new Camera();
 
 public:
 	Game();
+	~Game();
 
 	void		Levels();
 

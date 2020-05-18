@@ -230,6 +230,9 @@ void TheApp::Shutdown()
 	delete m_theAttractMode;
 	m_theAttractMode			= nullptr;
 
+	delete g_theCamera;
+	g_theCamera					= nullptr;
+	
 // 	g_theAudioSystem->Shutdown();
 // 	g_thePhysicsSystem->Shutdown();
 // 	g_currentManager->Shutdown();

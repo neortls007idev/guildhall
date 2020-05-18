@@ -22,9 +22,18 @@ extern TheApp*				g_theApp;
 
 Game::Game ()
 {
-	m_uiCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
+	m_uiCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
+	m_uiCamera->SetClearMode( CLEAR_NONE , BLACK );
 	SpawnPlayerShip();
 	SpawnInitialEnemies();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Game::~Game()
+{
+	delete m_uiCamera;
+	m_uiCamera = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -194,7 +203,7 @@ void Game::Render () const
 
 void Game::RenderUI () const
 {
-	g_theRenderer->BeginCamera( m_uiCamera );
+	g_theRenderer->BeginCamera( *m_uiCamera );
 	Rgba8 iconColor = Rgba8( 132 , 156 , 169 , 127 );
 
 
@@ -223,7 +232,7 @@ void Game::RenderUI () const
 		                        Vec2( ( 10.f + ( 50 * lifeIcons ) ) , UI_SIZE_Y - 50.f ) );
 		g_theRenderer->DrawVertexArray( NUM_SHIP_VERTS , lives );
 	}
-	g_theRenderer->EndCamera( m_uiCamera );
+	g_theRenderer->EndCamera( *m_uiCamera );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
