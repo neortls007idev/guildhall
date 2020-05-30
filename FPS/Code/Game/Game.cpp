@@ -63,8 +63,6 @@ Game::Game()
 	
 	LoadShaders();
 	LoadTextures();
-
-	
 	
 	m_tileDiffuse	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/tile_diffuse.png" );
 	m_tileNormal	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/tile_normal.png" );
@@ -205,7 +203,7 @@ void Game::IntializeGameObjects()
 	std::vector<VertexLit>		cubeMeshLitVerts;
 	std::vector<uint>			cubeMeshIndices;
 
-	AABB3 box( Vec3( -1 , -1 , -1 ) , Vec3( 1 , 1 , 1 ) );
+	AABB3 box( Vec3( -1 , -1 , -1 ) , Vec3( 1 , 3 , 1 ) );
 	CreateCuboid( cubeMeshVerts , cubeMeshIndices , box , WHITE );
 	VertexMaster::ConvertVertexMasterToVertexLit( cubeMeshLitVerts , cubeMeshVerts );
 
@@ -303,7 +301,7 @@ void Game::Update( float deltaSeconds )
 
 	static float y = 0;
 	y += deltaSeconds;
-	m_cubeMeshTransform.SetRotation( -15.f * ( float ) GetCurrentTimeSeconds()/* 0.f*/ ,  -20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
+	//m_cubeMeshTransform.SetRotation( -15.f * ( float ) GetCurrentTimeSeconds()/* 0.f*/ ,  -20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	//m_sphereMeshTransform.SetRotation( 20.f * ( float ) GetCurrentTimeSeconds() /*0.f*/,  50.f * ( float ) GetCurrentTimeSeconds() , 0.f );
 	UpdateFromKeyBoard( deltaSeconds );
 
@@ -649,19 +647,19 @@ void Game::Render() const
 		
 	g_theRenderer->SetRasterState( FILL_SOLID );
 	
- 	g_theRenderer->BindTexture( m_objSciFiShipMeshTex_D );
-	g_theRenderer->BindTexture( m_objSciFiShipMeshTex_N , eTextureType::TEX_NORMAL );
+ 	//g_theRenderer->BindTexture( m_objSciFiShipMeshTex_D );
+	//g_theRenderer->BindTexture( m_objSciFiShipMeshTex_N , eTextureType::TEX_NORMAL );
 	//g_theRenderer->SetModelMatrix( m_objSciFiShipTransform.GetAsMatrix() );
- 	g_theRenderer->DrawMesh( m_objSciFiShipMesh );
+ 	//g_theRenderer->DrawMesh( m_objSciFiShipMesh );
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindShader( nullptr );
 	
-	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
+	//g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 	
- 	g_theRenderer->BindMaterial( m_testMaterial );
+ 	//g_theRenderer->BindMaterial( m_testMaterial );
 	//m_meshSphere->GetVertexBuffer()->SetVertexBufferLayout( Vertex_PCU::LAYOUT );
   	//g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
-  	g_theRenderer->DrawMesh( m_meshSphere );
+  	//g_theRenderer->DrawMesh( m_meshSphere );
 	//m_meshSphere->GetVertexBuffer()->SetVertexBufferLayout( VertexMaster::LAYOUT );
  
  	g_theRenderer->BindMaterial( nullptr );
