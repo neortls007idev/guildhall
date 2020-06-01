@@ -38,6 +38,7 @@ Game::Game()
 	IntializeGameObjects();
 		
 	m_cubeMeshTransform.SetPosition( 5.f , 0.0f , -10.0f );
+	//m_cubeMeshTransform.SetRotation( 0.f , 90.0f , 90.0f );
 
 	std::string gameConfigData = g_gameConfigBlackboard.GetValue( "testkey" , "Invalid Value" );
 	g_theDevConsole->PrintString( gameConfigData , eDevConsoleMessageType::DEVCONSOLE_SYTEMLOG );
@@ -47,7 +48,7 @@ Game::Game()
 
 void Game::LoadShaders()
 {
-
+	m_imageEffectShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/selectiveImageEffect.hlsl" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -136,8 +137,10 @@ void Game::Render() const
 {
 	Texture* backBuffer		= g_theRenderer->m_swapChain->GetBackBuffer();
 	Texture* colorTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+	Texture* finalImage		= g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
 
 	m_gameCamera.SetColorTarget( 0 , colorTarget );
+	m_gameCamera.SetColorTarget( 1 , finalImage );
 
 	g_theRenderer->BeginCamera( m_gameCamera );
 	m_gameCamera.CreateMatchingDepthStencilTarget(); 
@@ -152,11 +155,15 @@ void Game::Render() const
 	g_theRenderer->SetModelMatrix( m_cubeMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
+	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( nullptr );
-				
 	g_theRenderer->EndCamera( m_gameCamera );
 
-	g_theRenderer->CopyTexture( backBuffer , colorTarget );
+	g_theRenderer->StartEffect( finalImage , colorTarget , m_imageEffectShader );
+	g_theRenderer->EndEffect();
+
+	g_theRenderer->CopyTexture( backBuffer , finalImage );
+	g_theRenderer->ReleaseRenderTarget( finalImage );
 	g_theRenderer->ReleaseRenderTarget( colorTarget );
 	
 	m_gameCamera.SetColorTarget( backBuffer );

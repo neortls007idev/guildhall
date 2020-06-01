@@ -125,6 +125,9 @@
     <FxCompile Include="..\..\Run\Data\Shaders\toneMap.hlsl">
       <Filter>Data\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\selectiveImageEffect.hlsl">
+      <Filter>Data\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\..\Run\Data\Materials\testMaterial.xml">

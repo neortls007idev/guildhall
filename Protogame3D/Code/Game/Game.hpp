@@ -64,6 +64,8 @@ public:
 	
 	bool						m_isHUDEnabled										= true;
 
+	Shader*						m_imageEffectShader									= nullptr;
+	
 	Texture*					m_testTexture										= nullptr;
 	SoundPlaybackID				m_testSound;
 	RandomNumberGenerator		m_rng;
