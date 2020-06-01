@@ -28,9 +28,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Entity.cpp">
-      <Filter>Gameplay\Entities</Filter>
-    </ClCompile>
     <ClCompile Include="GameCommon.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
@@ -42,21 +39,6 @@
     </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="World.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="Map.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="MapDefinition.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="Actor.cpp">
-      <Filter>Gameplay\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="ActorDefs.cpp">
-      <Filter>Gameplay\Entities</Filter>
     </ClCompile>
     <ClCompile Include="MapGenStep.cpp">
       <Filter>Gameplay\Map Generation</Filter>
@@ -79,9 +61,6 @@
     <ClCompile Include="MapGenStepRoomsAndPaths.cpp">
       <Filter>Gameplay\Map Generation</Filter>
     </ClCompile>
-    <ClCompile Include="TileMetaData.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
     <ClCompile Include="Tile.cpp">
       <Filter>Gameplay\Tile</Filter>
     </ClCompile>
@@ -90,9 +69,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Entity.hpp">
-      <Filter>Gameplay\Entities</Filter>
-    </ClInclude>
     <ClInclude Include="GameCommon.hpp">
       <Filter>Framework</Filter>
     </ClInclude>
@@ -102,23 +78,8 @@
     <ClInclude Include="Game.hpp">
       <Filter>Gameplay</Filter>
     </ClInclude>
-    <ClInclude Include="World.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="Map.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
     <ClInclude Include="EngineBuildPreferences.hpp">
       <Filter>Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="MapDefinition.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="Actor.hpp">
-      <Filter>Gameplay\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="ActorDefs.hpp">
-      <Filter>Gameplay\Entities</Filter>
     </ClInclude>
     <ClInclude Include="MapGenStep.hpp">
       <Filter>Gameplay\Map Generation</Filter>
@@ -141,29 +102,12 @@
     <ClInclude Include="MapGenStepRoomsAndPaths.hpp">
       <Filter>Gameplay\Map Generation</Filter>
     </ClInclude>
-    <ClInclude Include="TileMetaData.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
     <ClInclude Include="Tile.hpp">
       <Filter>Gameplay\Tile</Filter>
     </ClInclude>
     <ClInclude Include="TileDefinition.hpp">
       <Filter>Gameplay\Tile</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Xml Include="..\..\Run\Data\GamePlay\ActorDefs.xml">
-      <Filter>Gameplay\XML Data</Filter>
-    </Xml>
-    <Xml Include="..\..\Run\Data\GamePlay\MapDefs.xml">
-      <Filter>Gameplay\XML Data</Filter>
-    </Xml>
-    <Xml Include="..\..\Run\Data\GamePlay\TileDefs.xml">
-      <Filter>Gameplay\XML Data</Filter>
-    </Xml>
-    <Xml Include="..\..\Run\Data\Gameconfig.xml">
-      <Filter>Gameplay\XML Data</Filter>
-    </Xml>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\Plan\Proposal\1_Features.txt">

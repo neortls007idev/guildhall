@@ -1,8 +1,7 @@
 #pragma once
+#include "Engine/Core/EventSystem.hpp"
 #include "Engine/Math/IntRange.hpp"
 #include "Engine/Math/FloatRange.hpp"
-#include "Engine/Core/XmlUtils.hpp"
-#include "Game/Map.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

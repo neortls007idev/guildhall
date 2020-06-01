@@ -279,12 +279,7 @@ void TheApp::UpdateFromKeyboard()
 		
 		}
 	}
-	
-	if ( g_theInput->GetButtonState( KEY_F4 ).WasJustPressed() )
-	{
-		m_debugCamera = !m_debugCamera;
-	}
-	
+		
 	if ( g_theInput->GetButtonState( KEY_F8 ).WasJustPressed() ) 
 	{
 		delete g_theGame;
