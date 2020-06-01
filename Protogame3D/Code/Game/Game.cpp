@@ -38,7 +38,7 @@ Game::Game()
 	IntializeGameObjects();
 		
 	m_cubeMeshTransform.SetPosition( 5.f , 0.0f , -10.0f );
-	//m_cubeMeshTransform.SetRotation( 0.f , 90.0f , 90.0f );
+	//m_cubeMeshTransform.SetRotation( -90.f , 0.0f , 0.0f );
 
 	std::string gameConfigData = g_gameConfigBlackboard.GetValue( "testkey" , "Invalid Value" );
 	g_theDevConsole->PrintString( gameConfigData , eDevConsoleMessageType::DEVCONSOLE_SYTEMLOG );

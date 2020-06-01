@@ -65,6 +65,7 @@ Game::Game()
 	LoadTextures();
 	
 	m_tileDiffuse	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/tile_diffuse.png" );
+	m_tileDiffuse	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Test_StbiFlippedAndOpenGL.png" );
 	m_tileNormal	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/tile_normal.png" );
 	//m_tileDiffuse	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/couch/diffuse.png" );
 	//m_tileNormal	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/couch/normal.png" );
@@ -203,7 +204,7 @@ void Game::IntializeGameObjects()
 	std::vector<VertexLit>		cubeMeshLitVerts;
 	std::vector<uint>			cubeMeshIndices;
 
-	AABB3 box( Vec3( -1 , -1 , -1 ) , Vec3( 1 , 3 , 1 ) );
+	AABB3 box( Vec3( 1 , -1 , -1 ) , Vec3( -1 , 1 , 1 ) );
 	CreateCuboid( cubeMeshVerts , cubeMeshIndices , box , WHITE );
 	VertexMaster::ConvertVertexMasterToVertexLit( cubeMeshLitVerts , cubeMeshVerts );
 

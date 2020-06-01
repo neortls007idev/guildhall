@@ -390,20 +390,8 @@ void CreateCuboid( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uin
 	//	   (Y - Upwards/Height/ /Right hand - Middle Finger) <---------\|
 	//--------------------------------------------------------------------------------
 	
-	Vertex_PCU CubeVerts[ 24 ] = {
-
-		// FRONT FACE VERTS
-						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,box.m_mins.z ) , tint, Vec2( 0.f, 0.f ) ),
-						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,box.m_maxs.z ) , tint, Vec2( 0.f, 1.f ) ),
-
-						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,box.m_maxs.z ) , tint, Vec2( 1.f, 1.f ) ),
-						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,box.m_mins.z ) , tint, Vec2( 1.f, 0.f ) ),
-		// BACK FACE VERTS
-						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,box.m_mins.z ) , tint, Vec2( 0.f, 0.f ) ),
-						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,box.m_mins.z ) , tint, Vec2( 1.f, 0.f ) ),
-
-						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,box.m_maxs.z ) , tint, Vec2( 1.f, 1.f ) ),
-						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,box.m_maxs.z ) , tint, Vec2( 0.f, 1.f ) ),
+	Vertex_PCU CubeVerts[ 16 ] = {
+/*
 		// RIGHT FACE VERTS
 						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,box.m_mins.z ) , tint, Vec2( 0.f, 0.f ) ),
 						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,box.m_mins.z ) , tint, Vec2( 1.f, 0.f ) ),
@@ -429,11 +417,49 @@ void CreateCuboid( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uin
 
 						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,box.m_mins.z ) , tint, Vec2( 1.f, 1.f ) ),
 						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,box.m_mins.z ) , tint, Vec2( 0.f, 1.f ) ),
+*/
+		// FRONT FACE VERTS
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,box.m_mins.z ) , tint, Vec2::ZERO ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,box.m_mins.z ) , tint, Vec2::ONE_ZERO ),
+
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,box.m_mins.z ) , tint, Vec2::ONE ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,box.m_mins.z ) , tint, Vec2::ZERO_ONE ),
+		// BACK FACE VERTS
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,box.m_maxs.z ) , tint, Vec2::ZERO ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,box.m_maxs.z ) , tint, Vec2::ONE_ZERO ),
+
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,box.m_maxs.z ) , tint, Vec2::ONE ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,box.m_maxs.z ) , tint, Vec2::ZERO_ONE ),
+		// RIGHT FACE VERTS
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,box.m_mins.z ) , tint, Vec2::ZERO ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,box.m_maxs.z ) , tint, Vec2::ONE_ZERO ),
+
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,box.m_maxs.z ) , tint, Vec2::ONE ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,box.m_mins.z ) , tint, Vec2::ZERO_ONE ),
+		// LEFT FACE VERTS
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,box.m_maxs.z ) , tint, Vec2::ZERO ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,box.m_mins.z ) , tint, Vec2::ONE_ZERO ),
+
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,box.m_mins.z ) , tint, Vec2::ONE ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,box.m_maxs.z ) , tint, Vec2::ZERO_ONE ),
+		// TOP FACE VERTS
+				/*		Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,box.m_maxs.z ) , tint, Vec2::ZERO ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,box.m_maxs.z ) , tint, Vec2::ONE_ZERO ),
+
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,box.m_maxs.z ) , tint, Vec2::ONE ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,box.m_maxs.z ) , tint, Vec2::ZERO_ONE ),
+
+		// BOTTOM FACE VERTS
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,box.m_mins.z ) , tint, Vec2::ZERO ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,box.m_mins.z ) , tint, Vec2::ONE_ZERO ),
+
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,box.m_mins.z ) , tint, Vec2::ONE ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,box.m_mins.z ) , tint, Vec2::ZERO_ONE ),*/
 	};
 
 	std::vector<Vertex_PCU> cubeVertPCUS;
 	
-	for ( uint index = 0; index < 24; index++ )
+	for ( uint index = 0; index < 16; index++ )
 	{
 		cubeVertPCUS.push_back( CubeVerts[ index ] );
 	}
@@ -441,10 +467,10 @@ void CreateCuboid( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uin
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			CUBOID NORMALS
 //--------------------------------------------------------------------------------------------------------------------------------------------
-	Vec3 frontNormal		= CrossProduct3D( CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position , CubeVerts[ 3 ].m_position - CubeVerts[ 0 ].m_position );
+	Vec3 frontNormal		= CrossProduct3D( CubeVerts[ 3 ].m_position - CubeVerts[ 1 ].m_position , CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position );
 	Vec3 backNormal			= -frontNormal;
 
-	Vec3 leftNormal			= CrossProduct3D( CubeVerts[ 13 ].m_position - CubeVerts[ 12 ].m_position , CubeVerts[ 15 ].m_position - CubeVerts[ 12 ].m_position );
+	/*Vec3 leftNormal			= CrossProduct3D( CubeVerts[ 13 ].m_position - CubeVerts[ 12 ].m_position , CubeVerts[ 15 ].m_position - CubeVerts[ 12 ].m_position );
 	Vec3 rightNormal		= -leftNormal;
 
 	Vec3 topNormal			= CrossProduct3D( CubeVerts[ 17 ].m_position - CubeVerts[ 16 ].m_position , CubeVerts[ 19 ].m_position - CubeVerts[ 16 ].m_position );
@@ -462,7 +488,7 @@ void CreateCuboid( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uin
 	Vec3 rightTangent		= -leftTangent;
 	Vec3 topTangent			= frontTangent;
 	Vec3 bottomTangent		= frontTangent;
-	Vec3 faceTangents[ 6 ]	= { frontTangent , backTangent , rightTangent , leftTangent , topTangent , bottomTangent };
+	Vec3 faceTangents[ 6 ]	= { frontTangent , backTangent , rightTangent , leftTangent , topTangent , bottomTangent };*/
 	
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -472,12 +498,12 @@ void CreateCuboid( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uin
 	{
 		for ( uint vert = 0 ; vert < 4 ; vert++ )
 		{
-			cubeMeshVerts[ ( faces * 4 ) + vert ].m_normal = faceNormals[ faces ];
-			cubeMeshVerts[ ( faces * 4 ) + vert ].m_tangent = Vec4( faceTangents[ faces ] , 1.f );
+			//cubeMeshVerts[ ( faces * 4 ) + vert ].m_normal = faceNormals[ faces ];
+			//cubeMeshVerts[ ( faces * 4 ) + vert ].m_tangent = Vec4( faceTangents[ faces ] , 1.f );
 		}
 	}
 	
-	uint CubeIndices[ 36 ] = {
+	uint CubeIndices[ 24 ] = {
 		// FRONT FACE INDICES
 			0,1,2,
 			2,3,0,
@@ -491,14 +517,14 @@ void CreateCuboid( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uin
 			12,13,14,
 			14,15,12,
 		// TOP FACE INDICES
-			16,17,18,
+			/*16,17,18,
 			18,19,16,
 		// BOTTOM FACE INDICES
 			20,21,22,
-			22,23,20,
+			22,23,20,*/
 	};
 
-	for ( uint index = 0; index < 36; index++ )
+	for ( uint index = 0; index < 24; index++ )
 	{
 		cubeIndices.push_back( CubeIndices[ index ] );
 	}
