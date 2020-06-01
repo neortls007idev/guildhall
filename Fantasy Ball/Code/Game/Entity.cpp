@@ -3,25 +3,32 @@
 #include "Game/TheApp.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 
-Entity::Entity( Game* pointerToGameInstance, Vec2 pos, Vec2 velocity, float orientation )
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Entity::Entity( Game* pointerToGameInstance , Vec2 pos , float orientation )
 {
-	m_game = pointerToGameInstance;
+	m_theGame = pointerToGameInstance;
 	m_position = pos;
-	m_velocity = velocity;
 	m_orientationDegrees = orientation;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Entity::Update (float deltaSeconds)
 {
-	Movement(deltaSeconds);
+	MoveEntity(deltaSeconds);
 
 }
 
-void Entity::Movement(float deltaSeconds)
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Entity::MoveEntity(float deltaSeconds)
 {
+	m_velocity = Vec2::MakeFromPolarDegrees( m_orientationDegrees , m_velocity.GetLength() );
 	m_position += m_velocity * deltaSeconds;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Entity::WrapAroundScreen()
 {
@@ -35,29 +42,45 @@ void Entity::WrapAroundScreen()
 	}
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Entity::TakeDamage()
+{
+	m_health -= 1;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Entity::Render() const
 {
 
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Entity::IsDead()
 {
 	if (m_health <= 0)
 	{
 		m_isDead = true;
-		m_game->AddScreenShakeIntensity(1.f);
+		m_theGame->AddScreenShakeIntensity(1.f);
 	}
 }
 
-bool Entity::IsAlive()
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Entity::IsAlive() const
 {
-	if (this !=  nullptr)
-	{
-		return true;
-	}
-	return false;
+	return !m_isDead;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
+bool Entity::IsGarbage() const
+{
+	return this==nullptr || m_isGarbage;
+}
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
 

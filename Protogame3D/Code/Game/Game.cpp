@@ -13,6 +13,7 @@
 #include "Engine/Core/VertexMaster.hpp"
 #include "Engine/Renderer/ShaderState.hpp"
 #include "Engine/Core/NamedProperties.hpp"
+#include "Engine/Time/Time.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -37,8 +38,13 @@ Game::Game()
 	InitializeCameras();
 	IntializeGameObjects();
 		
-	m_cubeMeshTransform.SetPosition( 5.f , 0.0f , -10.0f );
-	//m_cubeMeshTransform.SetRotation( -90.f , 0.0f , 0.0f );
+	m_cubeMesh1Transform.SetPosition( 2.5f , 0.5f , 0.5f );
+	m_cubeMesh1Transform.SetScale( 1.f , 1.f , 1.f );
+	m_cubeMesh2Transform.SetPosition( 0.5f , 2.5f , 0.5f );
+	m_cubeMesh1Transform.SetScale( 1.f , 1.f , 1.f );
+	m_cubeMesh3Transform.SetPosition( 2.5f , 2.5f , 0.5f );
+	m_cubeMesh1Transform.SetScale( 1.f , 1.f , 1.f );
+	//m_cubeMesh1Transform.SetRotation( -90.f , 0.0f , 0.0f );
 
 	std::string gameConfigData = g_gameConfigBlackboard.GetValue( "testkey" , "Invalid Value" );
 	g_theDevConsole->PrintString( gameConfigData , eDevConsoleMessageType::DEVCONSOLE_SYTEMLOG );
@@ -81,6 +87,18 @@ void Game::IntializeGameObjects()
 	
 	m_cubeMesh->UpdateVertices( ( uint ) cubeMeshVerts.size() , cubeMeshVerts.data() );
 	m_cubeMesh->UpdateIndices( cubeMeshIndices );
+
+	m_sphereMesh = new GPUMesh( g_theRenderer );
+	std::vector<VertexMaster>	SphereVertsMaster;
+	std::vector<Vertex_PCU>		SphereVerts;
+	std::vector<uint>			SphereIndices;
+
+	CreateUVSphere( 32 , 16 , SphereVertsMaster , SphereIndices , 5.f );
+	VertexMaster::ConvertVertexMasterToVertexPCU( SphereVerts , SphereVertsMaster );
+
+	m_sphereMesh->UpdateVertices( ( uint ) SphereVerts.size() , SphereVerts.data() );
+	m_sphereMesh->UpdateIndices( SphereIndices );
+	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -96,8 +114,10 @@ Game::~Game()
 void Game::InitializeCameras()
 {
 		m_uiCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
-		m_gameCamera.SetProjectionPerspective( 60.f , CLIENT_ASPECT , -.1f , -100.f );
-		m_gameCamera.SetPosition( Vec3( 0.f , 0.f , 0.f ) );
+		m_gameCamera.SetWorldCoordinateSystem( X_IN_Y_LEFT_Z_UP );
+		m_gameCamera.SetProjectionPerspective( 70.f , CLIENT_ASPECT , -.1f , -100.f );
+		m_gameCamera.SetPosition( Vec3( 1.f , 1.f , 1.f ) );
+		m_gameCamera.SetPosition( Vec3( -10.f , 1.f , 1.f ) );
 		//m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 37 , 70 , 87 , 127 ) , 1.f , 0 );
 		m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );
 }
@@ -118,7 +138,7 @@ void Game::Update( float deltaSeconds )
 			"[ H ] : SHOW HELP HUD" );
 	}
 
-	//m_cubeMeshTransform.SetRotation( -15.f * ( float ) GetCurrentTimeSeconds()/* 0.f*/ ,  -20.f * ( float ) GetCurrentTimeSeconds() , 0.f );
+	//m_cubeMesh1Transform.SetRotation(  90.f ,  180.f , 90.f );
 
 	UpdateFromKeyBoard( deltaSeconds );
 	UpdateAudioFromKeyBoard();
@@ -147,14 +167,24 @@ void Game::Render() const
 	g_theRenderer->BindDepthStencil( m_gameCamera.GetDepthStencilTarget() );
 
 	g_theRenderer->SetCullMode( CULL_BACK );
+	//g_theRenderer->SetWindingOrder( CLOCKWISE );
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( m_testTexture );
 			
-	g_theRenderer->SetModelMatrix( m_cubeMeshTransform.GetAsMatrix() );
+	g_theRenderer->SetModelMatrix( m_cubeMesh1Transform.GetAsMatrix( X_IN_Y_LEFT_Z_UP ) );
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
+	g_theRenderer->SetModelMatrix( m_cubeMesh2Transform.GetAsMatrix( X_IN_Y_LEFT_Z_UP ) );
+	g_theRenderer->DrawMesh( m_cubeMesh );
+
+	g_theRenderer->SetModelMatrix( m_cubeMesh3Transform.GetAsMatrix( X_IN_Y_LEFT_Z_UP ) );
+	g_theRenderer->DrawMesh( m_cubeMesh );
+
+	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
+	g_theRenderer->DrawMesh( m_sphereMesh );
+	
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->EndCamera( m_gameCamera );
@@ -232,9 +262,9 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	Vec3 movement = Vec3::ZERO;
 	Vec3 rotation = Vec3::ZERO;
 
-	Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix();
-	Vec3 forwardVector = cameraTransform.GetKBasis3D();
-	Vec3 rightVector = cameraTransform.GetIBasis3D();
+	Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix( m_gameCamera.GetWorldCoordinateSystem() );
+	Vec3 forwardVector = cameraTransform.GetIBasis3D();
+	Vec3 rightVector = -cameraTransform.GetJBasis3D();
 
 	float speed = 4.0f;
 
@@ -245,27 +275,31 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 
 	if ( g_theInput->IsKeyHeldDown( 'A' ) )
 	{
-		m_gameCamera.SetPosition( m_gameCamera.GetPosition() - rightVector * speed * deltaSeconds );
+		//m_gameCamera.SetPosition( m_gameCamera.GetPosition() - rightVector * speed * deltaSeconds );
 	}
 	if ( g_theInput->IsKeyHeldDown( 'D' ) )
 	{
-		m_gameCamera.SetPosition( m_gameCamera.GetPosition() + rightVector * speed * deltaSeconds );
+		//m_gameCamera.SetPosition( m_gameCamera.GetPosition() + rightVector * speed * deltaSeconds );
 	}
 	if ( g_theInput->IsKeyHeldDown( 'W' ) )
 	{
-		m_gameCamera.SetPosition( m_gameCamera.GetPosition() - forwardVector * speed * deltaSeconds );
+		Vec3 newPos = m_gameCamera.GetPosition() - forwardVector * speed * deltaSeconds;
+		//newPos = cameraTransform.TransformPosition3D( newPos );
+		m_gameCamera.SetPosition( newPos );
 	}
 	if ( g_theInput->IsKeyHeldDown( 'S' ) )
 	{
-		m_gameCamera.SetPosition( m_gameCamera.GetPosition() + forwardVector * speed * deltaSeconds );
+		Vec3 newPos = m_gameCamera.GetPosition() + forwardVector * speed * deltaSeconds;
+		//newPos = cameraTransform.TransformPosition3D( newPos );
+		m_gameCamera.SetPosition( newPos );
 	}
 	if ( g_theInput->IsKeyHeldDown( 'Q' ) )
 	{
-		movement.y -= 1.f;
+		//movement.y -= 1.f;
 	}
 	if ( g_theInput->IsKeyHeldDown( 'E' ) )
 	{
-		movement.y += 1.f;
+		//movement.y += 1.f;
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 'O' ) )
@@ -276,14 +310,14 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 
 	Vec2 mousePos		= g_theInput->GetRelativeMovement();
 
-	m_cameraRotation.x -= mousePos.y * speed * deltaSeconds;
-	m_cameraRotation.y -= mousePos.x * speed * deltaSeconds;
+	//m_cameraRotation.x -= mousePos.y * speed * deltaSeconds;
+	//m_cameraRotation.y -= mousePos.x * speed * deltaSeconds;
 
-	float finalPitch	= Clamp( m_cameraRotation.x , -180.f , 180.f );
-	float finalYaw		= m_cameraRotation.z;//Clamp( m_cameraRotation.z , -175.f , 175.f );
-	float finalRoll		= m_cameraRotation.y;//Clamp( m_cameraRotation.y , -85.f , 85.f );
+	//float finalPitch	= Clamp( m_cameraRotation.x , -180.f , 180.f );
+	//float finalYaw		= m_cameraRotation.z;//Clamp( m_cameraRotation.z , -175.f , 175.f );
+	//float finalRoll		= m_cameraRotation.y;//Clamp( m_cameraRotation.y , -85.f , 85.f );
 
-	m_gameCamera.SetPitchYawRollRotation( finalPitch , finalRoll , finalYaw );
+	//m_gameCamera.SetPitchYawRollRotation( finalPitch , finalRoll , finalYaw );
 	//m_gameCamera.SetPitchYawRollRotation( m_cameraRotation.x , m_cameraRotation.z , m_cameraRotation.y );
 }
 

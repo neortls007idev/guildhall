@@ -45,22 +45,22 @@ public:
 
 	Vec2			GetWorldNormalizedToClientPosition( Vec2 worldPos ) const;
 	Vec2			GetClientToWorldPosition( Vec2 clientPos ) const;
-	
+
 	Vec2			GetOutputSize() const;
 
 	Vec3			GetPosition() const;
 	Vec3			GetOrthoMin() const;
 	Vec3			GetOrthoMax() const;
 
-	Rgba8			GetClearColor() const																			{ return m_clearColor; }
-	unsigned int	GetClearMode() const																			{ return m_clearMode; }
-	Texture*		GetColorTarget() const;																			
-	Texture*		GetColorTarget( int index ) const;																			
+	Rgba8			GetClearColor() const																					{ return m_clearColor; }
+	unsigned int	GetClearMode() const																					{ return m_clearMode; }
+	Texture* GetColorTarget() const;
+	Texture* GetColorTarget( int index ) const;
 	uint			GetColorTargetCount() const;
 	Vec2			GetColorTargetSize() const;
-	Texture*		GetDepthStencilTarget() const																	{ return m_depthStencilTarget; }
+	Texture* GetDepthStencilTarget() const																					{ return m_depthStencilTarget; }
 
-	Mat44			GetProjectionMatrix() const																		{ return m_projection; }
+	Mat44			GetProjectionMatrix() const																				{ return m_projection; }
 	Mat44			GetViewMatrix();
 	float			GetAspectRatio() const;
 
@@ -70,9 +70,9 @@ public:
 	void			SetPitchYawRollRotation( float pitch , float yaw , float roll );
 	void			SetOutputSize( Vec2 size );
 	void			CorrectAspectRatio( float clientAspectRatio );
-	Transform		GetCameraTransform() const																			{ return m_transform;  }
+	Transform		GetCameraTransform() const																				{ return m_transform; }
 
-	void			SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight );
+	void			SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight );
 	void			SetClearMode( unsigned int clearFlags , Rgba8 color , float depth = 0.f , unsigned int stencil = 0 );
 	void			SetColorTarget( Texture* texture );
 	void			SetColorTarget( int index , Texture* texture );
@@ -80,9 +80,11 @@ public:
 	void			SetDepthStencilTarget( Texture* texture );
 	void			SetDepthStencilTargetFromAnotherCamera( Camera* camera );
 
-// USE WITH CAUTION :- USED WHEN 2 CAMERA ARE USING THE SAME DEPTH BUFFERS ONLY !!!
+	// USE WITH CAUTION :- USED WHEN 2 CAMERA ARE USING THE SAME DEPTH BUFFERS ONLY !!!
 	void			ResetDepthStencilTarget();
 
+	void			SetWorldCoordinateSystem( const eWorldCoordinateSystem newWorldCoordinateSystem );
+	eWorldCoordinateSystem GetWorldCoordinateSystem() const																	{ return m_worldCoordinateSystem; }
 	void			SetCameraTransform( const Transform& newTransform );
 	void			SetProjectionOrthographic( float height , float nearZ = 0.f , float farZ = 1.f );
 //	void			SetProjectionOrthographic( float height , float nearZ = -1.0f , float farZ = 1.0f );
@@ -99,6 +101,8 @@ public:
 
 private:
 
+	eWorldCoordinateSystem m_worldCoordinateSystem = ENGINE_DEFAULT;
+	
 	eCameraClearBitFlag	m_clearMode				= CLEAR_COLOR_BIT;
 	Rgba8				m_clearColor			= BLACK;
 

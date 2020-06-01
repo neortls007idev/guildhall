@@ -366,9 +366,16 @@ void Camera::ResetDepthStencilTarget()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Camera::SetWorldCoordinateSystem( const eWorldCoordinateSystem newWorldCoordinateSystem )
+{
+	m_worldCoordinateSystem = newWorldCoordinateSystem;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Mat44 Camera::GetViewMatrix()
 {
-	Mat44 cameraModel = m_transform.GetAsMatrix();
+	Mat44 cameraModel = m_transform.GetAsMatrix( m_worldCoordinateSystem );
 
 	//bool check = IsMatrixOrtonormal( cameraModel );
 	//ASSERT_RECOVERABLE( check , " Are you sure the CAmera MOdel Matrix is coorect? " );

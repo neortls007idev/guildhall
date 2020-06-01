@@ -4,17 +4,20 @@
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Game/Game.hpp"
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 class TheApp
 {
 
 public:
+
 	TheApp();
 	~TheApp();
 	void Startup();
 	void Shutdown();
 	void RunFrame();
 
-	bool IsQuitting() const { return m_isQuitting; }
+	bool IsQuitting() const														{ return m_isQuitting; }
 	bool HandleQuitRequested();
 
 	void BeginFrame();
@@ -23,14 +26,20 @@ public:
 	void Render() const;
 
 	void EndFrame();
-		
+	
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 private :
+
 	bool m_isQuitting  = false ;
 	bool m_isSloMo = false;
 	bool m_isSpeedMo = false;
 
 public:
+
 	bool m_isPaused = false;
 	bool m_debugCamera = false;
 };
 
+//--------------------------------------------------------------------------------------------------------------------------------------------

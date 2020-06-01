@@ -1630,7 +1630,7 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	Vec3 rotation = Vec3::ZERO;
 
 	Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix();
-	Vec3 forwardVector = cameraTransform.GetKBasis3D();
+	Vec3 forwardVector = -cameraTransform.GetKBasis3D();
 	Vec3 rightVector = cameraTransform.GetIBasis3D();
 
 	float speed = 4.0f;
@@ -1650,11 +1650,11 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	}
 	if ( g_theInput->IsKeyHeldDown( 'W' ) )
 	{
-		m_gameCamera.SetPosition( m_gameCamera.GetPosition() - forwardVector * speed * deltaSeconds );
+		m_gameCamera.SetPosition( m_gameCamera.GetPosition() + forwardVector * speed * deltaSeconds );
 	}
 	if ( g_theInput->IsKeyHeldDown( 'S' ) )
 	{
-		m_gameCamera.SetPosition( m_gameCamera.GetPosition() + forwardVector * speed * deltaSeconds );
+		m_gameCamera.SetPosition( m_gameCamera.GetPosition() - forwardVector * speed * deltaSeconds );
 	}
 	if ( g_theInput->IsKeyHeldDown( 'Q' ) )
 	{

@@ -110,12 +110,12 @@ constexpr int	TOTAL_MOUSE_DRAG_TRACK_FRAMES = 120;
 
 enum eWorldCoordinateSystem
 {
-	X_LEFT_Y_UP_Z_IN,
-	Y_LEFT_Z_UP_X_IN,
+	X_RIGHT_Y_UP_Z_IN,
+	X_IN_Y_LEFT_Z_UP,
 	
 	NUM_TOTAL_WORLDCOORDSYS,
 
-	ENGINE_DEFAULT			=	X_LEFT_Y_UP_Z_IN
+	ENGINE_DEFAULT			=	X_RIGHT_Y_UP_Z_IN
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
