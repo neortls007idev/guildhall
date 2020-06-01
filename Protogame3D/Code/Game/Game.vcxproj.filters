@@ -20,6 +20,9 @@
     <Filter Include="Data\Materials">
       <UniqueIdentifier>{b9f5ec4c-4805-458f-b477-2b81d7e58d50}</UniqueIdentifier>
     </Filter>
+    <Filter Include="TaskList">
+      <UniqueIdentifier>{b29fc0c8-ea01-4d7d-98d6-1a4b18f06bf3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameCommon.cpp">
@@ -136,5 +139,10 @@
     <Xml Include="..\..\Run\Data\Gameconfig.xml">
       <Filter>Data</Filter>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Run\TaskList\C29 SDST A1 - Protogame3D.docx">
+      <Filter>TaskList</Filter>
+    </None>
   </ItemGroup>
 </Project>
