@@ -130,5 +130,8 @@
     <Xml Include="..\..\Run\Data\Materials\testMaterial.xml">
       <Filter>Data\Materials</Filter>
     </Xml>
+    <Xml Include="..\..\Run\Data\Gameconfig.xml">
+      <Filter>Data</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

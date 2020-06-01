@@ -32,7 +32,8 @@ int WINAPI WinMain( _In_ HINSTANCE applicationInstanceHandle, _In_opt_ HINSTANCE
 {
 	UNUSED( applicationInstanceHandle );
 	UNUSED( commandLineString );
-	
+
+	g_gameConfigBlackboard.PopulateFromXmlElementAttributes( "Data/Gameconfig.xml" );
 	g_theApp = new TheApp();
 
 	g_theWindow = new Window();

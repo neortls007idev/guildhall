@@ -1,3 +1,4 @@
+#include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/DebugRender.hpp"
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EngineCommon.hpp"
@@ -11,15 +12,17 @@
 #include "Engine/Time/Time.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
+
 #include "Game/Game.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-RenderContext*						g_theRenderer	= nullptr;
-TheApp*								g_theApp		= nullptr;
-InputSystem*						g_theInput		= nullptr;
-DevConsole*							g_theDevConsole = nullptr;
-Game*								g_theGame		= nullptr;
+AudioSystem*						g_theAudioSystem	= nullptr;
+RenderContext*						g_theRenderer		= nullptr;
+TheApp*								g_theApp			= nullptr;
+InputSystem*						g_theInput			= nullptr;
+DevConsole*							g_theDevConsole		= nullptr;
+Game*								g_theGame			= nullptr;
 extern BitmapFont*					g_bitmapFont;
 extern DebugRenderObjectsManager*	g_currentManager;
 
@@ -37,8 +40,8 @@ TheApp::~TheApp()
 	delete g_theGame;
 	g_theGame = nullptr;
 
-	//delete g_theAudioSystem;
-	//g_theAudioSystem = nullptr;
+	delete g_theAudioSystem;
+	g_theAudioSystem = nullptr;
 
 	//delete g_thePhysicsSystem;
 	//g_thePhysicsSystem = nullptr;
@@ -105,17 +108,18 @@ void TheApp::Startup()
 		g_currentManager = new DebugRenderObjectsManager();
 	}
 	g_currentManager->Startup();
+	
 // 	if ( g_thePhysicsSystem == nullptr )
 // 	{
 // 		g_thePhysicsSystem = new Physics2D();
 // 	}
 // 	g_thePhysicsSystem->Startup();
 // 
-// 	if ( g_theAudioSystem == nullptr )
-// 	{
-// 		g_theAudioSystem = new AudioSystem();
-// 	}
-// 	g_theAudioSystem->Startup();
+	if ( g_theAudioSystem == nullptr )
+	{
+		g_theAudioSystem = new AudioSystem();
+	}
+	g_theAudioSystem->Startup();
 
 	if ( g_theGame == nullptr )
 	{
@@ -151,6 +155,7 @@ void TheApp::BeginFrame()
 	g_theRenderer->BeginFrame();
 	g_theDevConsole->BeginFrame();
 	g_currentManager->BeginFrame();
+	g_theAudioSystem->BeginFrame();
 	
 	if ( m_taskbarProgress < 100.f  && m_taskbarProgressMode == WND_PROGRESS_VALUE )
 	{
@@ -215,6 +220,7 @@ void TheApp::Render() const
 void TheApp::EndFrame()
 {
 	// all engine things that must end at the end of the frame and not the game
+	g_theAudioSystem->EndFrame();
 	g_currentManager->EndFrame();
 	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
@@ -233,7 +239,7 @@ void TheApp::EndFrame()
 
 void TheApp::Shutdown()
 {
-	//g_theAudioSystem->Shutdown();
+	g_theAudioSystem->Shutdown();
 	//g_thePhysicsSystem->Shutdown();
 	g_currentManager->Shutdown();
 	g_theDevConsole->Shutdown();

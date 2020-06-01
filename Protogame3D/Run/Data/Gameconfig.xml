@@ -1,0 +1,8 @@
+<GameConfig
+
+	testkey="Game Config Test Data"
+	startLevel="WizardTower3"
+	windowAspect="1.777"
+	isFullscreen="false"
+
+/>
