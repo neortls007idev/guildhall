@@ -1,4 +1,5 @@
 #pragma once
+#include "Engine/Core/EngineCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 struct Vec2;
@@ -126,7 +127,7 @@ private:
 	const Mat44 operator*( const Mat44& rhs ) const = delete;
 
 public:
-	static Mat44 CreateFromScaleRotationTransformation( const Vec3& scale , const Vec3& eulerRotation , const Vec3& position );
+	static Mat44 CreateFromScaleRotationTransformation( const Vec3& scale , const Vec3& eulerRotation , const Vec3& position , eWorldCoordinateSystem worldCoordinateSystem = ENGINE_DEFAULT );
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

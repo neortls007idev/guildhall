@@ -107,3 +107,15 @@ constexpr uint	DEVCONSOLE_MAX_COMMAND_HISTORY = 10;
 constexpr int	TOTAL_MOUSE_DRAG_TRACK_FRAMES = 120;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum eWorldCoordinateSystem
+{
+	X_LEFT_Y_UP_Z_IN,
+	Y_LEFT_Z_UP_X_IN,
+	
+	NUM_TOTAL_WORLDCOORDSYS,
+
+	ENGINE_DEFAULT			=	X_LEFT_Y_UP_Z_IN
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

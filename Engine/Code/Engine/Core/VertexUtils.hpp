@@ -48,6 +48,9 @@ void CreateQuad( std::vector< VertexMaster >& quadMeshVerts , std::vector< uint 
 void CreateCuboid ( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uint >& cubeIndices , const AABB3 box ,
                   const Rgba8& tint = WHITE );
 
+void CreateCuboidXInYLeftZUp( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uint >& cubeIndices , const AABB3 box ,
+	const Rgba8& tint = WHITE );
+
 void CreateUVSphere ( uint hCuts , uint vCuts , std::vector< VertexMaster >& sphereMeshVerts ,
                       std::vector< uint >& sphereIndices , float radius = 1.f , Vec3 center = Vec3::ZERO ,
                       const Rgba8& tint = WHITE );

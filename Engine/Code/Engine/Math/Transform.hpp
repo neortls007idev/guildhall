@@ -24,6 +24,9 @@ public:
 private:
 	Vec3 m_position			= Vec3( 0.0f );
 	Vec3 m_rotationDegrees	= Vec3( 0.0f );
+	//float pitch				= 0.f;
+	//float yaw				= 0.f;
+	//float roll				= 0.f;
 	Vec3 m_scale			= Vec3( 1.0f );
 };
 

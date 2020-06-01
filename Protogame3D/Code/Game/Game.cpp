@@ -69,11 +69,14 @@ void Game::LoadAudio()
 void Game::IntializeGameObjects()
 {
 	m_cubeMesh = new GPUMesh( g_theRenderer ); 
+	std::vector<VertexMaster>	cubeMeshVertsMaster;
 	std::vector<Vertex_PCU>		cubeMeshVerts;
 	std::vector<uint>			cubeMeshIndices;
 
-	AABB3 box( Vec3( -1 , -1 , -1 ) , Vec3( 1 , 1 , 1 ) );
-	CreateCuboid( cubeMeshVerts , cubeMeshIndices , box , WHITE );
+	AABB3 box( Vec3( -0.5f, -0.5f , -0.5f ) , Vec3( 0.5f , 0.5f , 0.5f ) );
+	//CreateCuboid( cubeMeshVerts , cubeMeshIndices , box , WHITE );
+	CreateCuboidXInYLeftZUp( cubeMeshVertsMaster , cubeMeshIndices , box , WHITE );
+	VertexMaster::ConvertVertexMasterToVertexPCU( cubeMeshVerts , cubeMeshVertsMaster );
 	
 	m_cubeMesh->UpdateVertices( ( uint ) cubeMeshVerts.size() , cubeMeshVerts.data() );
 	m_cubeMesh->UpdateIndices( cubeMeshIndices );
@@ -139,6 +142,10 @@ void Game::Render() const
 	g_theRenderer->BeginCamera( m_gameCamera );
 	m_gameCamera.CreateMatchingDepthStencilTarget(); 
 	g_theRenderer->BindDepthStencil( m_gameCamera.GetDepthStencilTarget() );
+
+	g_theRenderer->SetCullMode( CULL_BACK );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( m_testTexture );
 			
