@@ -1681,7 +1681,7 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	float finalYaw		= m_cameraRotation.z;//Clamp( m_cameraRotation.z , -175.f , 175.f );
 	float finalRoll		= m_cameraRotation.y;//Clamp( m_cameraRotation.y , -85.f , 85.f );
 
-	m_gameCamera.SetPitchYawRollRotation( finalPitch , finalRoll , finalYaw );
+	m_gameCamera.SetPitchYawRollRotation( finalPitch , finalYaw , finalRoll );
 	//m_gameCamera.SetPitchYawRollRotation( m_cameraRotation.x , m_cameraRotation.z , m_cameraRotation.y );
 }
 

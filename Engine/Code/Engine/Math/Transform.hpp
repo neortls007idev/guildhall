@@ -17,17 +17,18 @@ public:
 	void	SetTransform( const Mat44 transform );
 	Mat44	GetAsMatrix( eWorldCoordinateSystem worldCoordinateSystem = ENGINE_DEFAULT ) const;
 
-	inline Vec3	GetScale() const															{ return m_scale; }
-	inline Vec3	GetRotation() const															{ return m_rotationDegrees; }
-	inline Vec3	GetPostion() const															{ return m_position; }
+	inline Vec3	 GetScale() const															{ return m_scale; }
+	inline float GetPitch() const															{ return m_pitch; }
+	inline float GetYaw() const																{ return m_yaw; }
+	inline float GetRoll() const															{ return m_roll; }
+	inline Vec3  GetPostion() const															{ return m_position; }
 
 private:
-	Vec3 m_position			= Vec3( 0.0f );
-	Vec3 m_rotationDegrees	= Vec3( 0.0f );
-	//float pitch				= 0.f;
-	//float yaw				= 0.f;
-	//float roll				= 0.f;
-	Vec3 m_scale			= Vec3( 1.0f );
+	Vec3	m_position			= Vec3( 0.0f );
+	float	m_pitch				= 0.f;
+	float	m_yaw				= 0.f;
+	float	m_roll				= 0.f;
+	Vec3	m_scale				= Vec3( 1.0f );
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

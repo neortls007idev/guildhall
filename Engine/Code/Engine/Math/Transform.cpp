@@ -17,7 +17,12 @@ void Transform::SetRotation( float pitch , float yaw , float roll )
 // 	float finalRoll	 = fmodf( roll , 180.f ) - 90.f;
 // 
 // 	m_rotationDegrees = Vec3( finalPitch , finalYaw , finalRoll );
-	m_rotationDegrees = Vec3( pitch , yaw , roll );
+
+	//----------------------------------------------------------------------------------------------------------
+	
+	m_pitch = pitch;
+	m_yaw	= yaw;
+	m_roll	= roll;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -38,6 +43,6 @@ void Transform::SetPosition( Vec3 pos )
 
 Mat44 Transform::GetAsMatrix( eWorldCoordinateSystem worldCoordinateSystem /*= ENGINE_DEFAULT*/ ) const
 {
-	Mat44 transformBy = Mat44::CreateFromScaleRotationTransformation( m_scale , m_rotationDegrees , m_position , worldCoordinateSystem );
+	Mat44 transformBy = Mat44::CreateFromScaleRotationTransformation( m_scale , m_pitch , m_yaw , m_roll , m_position , worldCoordinateSystem );
 	return transformBy;
 }

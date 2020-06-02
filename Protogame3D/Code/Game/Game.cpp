@@ -47,6 +47,11 @@ Game::Game()
 	//m_cubeMesh1Transform.SetRotation( -90.f , 0.0f , 0.0f );
 	m_basisMeshTransform.SetPosition( 0.f , 0.f , 0.f );
 
+	Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix();
+	Vec3 forwardVector = cameraTransform.GetIBasis3D();
+	m_compassMeshTransform.SetPosition( m_gameCamera.GetPosition() + 0.1f * forwardVector );
+	m_compassMeshTransform.SetScale( 0.01f , 0.01f , 0.01f );
+
 	std::string gameConfigData = g_gameConfigBlackboard.GetValue( "testkey" , "Invalid Value" );
 	g_theDevConsole->PrintString( gameConfigData , eDevConsoleMessageType::DEVCONSOLE_SYTEMLOG );
 }
@@ -161,8 +166,9 @@ void Game::InitializeCameras()
 		m_gameCamera.SetWorldCoordinateSystem( X_IN_Y_LEFT_Z_UP );
 		m_gameCamera.SetProjectionPerspective( 40.f , CLIENT_ASPECT , -.1f , -100.f );
 		m_gameCamera.SetPosition( Vec3( 1.f , 1.f , 1.f ) );
-		m_gameCamera.SetPosition( Vec3( 3.5f , 3.5f , 0.3f ) );
-		m_gameCamera.SetPitchYawRollRotation( 0.f , 0.f , 180.f );
+		m_gameCamera.SetPosition( Vec3( -10.f , 1.f , 1.f ) );
+		//m_gameCamera.SetPosition( Vec3( 3.5f , 3.5f , 0.3f ) );
+		//m_gameCamera.SetPitchYawRollRotation( 0.f , 0.f , 180.f );
 		//m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 37 , 70 , 87 , 127 ) , 1.f , 0 );
 		m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );
 }
@@ -183,8 +189,14 @@ void Game::Update( float deltaSeconds )
 			"[ H ] : SHOW HELP HUD" );
 	}
 
-	//m_cubeMesh1Transform.SetRotation(  90.f ,  180.f , 90.f );
-
+	Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix();
+	Vec3 forwardVector = cameraTransform.GetIBasis3D();
+	m_compassMeshTransform.SetPosition( m_gameCamera.GetPosition() + 0.1f * forwardVector );
+	/*float pitch = m_gameCamera.GetCameraTransform().GetPitch();
+	float yaw   = m_gameCamera.GetCameraTransform().GetYaw();
+	float roll  = m_gameCamera.GetCameraTransform().GetRoll();
+	m_compassMeshTransform.SetRotation( pitch , yaw , roll );*/
+	
 	UpdateFromKeyBoard( deltaSeconds );
 	UpdateAudioFromKeyBoard();
 }
@@ -258,6 +270,10 @@ void Game::Render() const
 	g_theRenderer->SetDepthTest( COMPARE_NOTEQUAL , false );
 	g_theRenderer->SetBlendMode( eBlendMode::SOLID );
 	g_theRenderer->SetModelMatrix( m_basisMeshTransform.GetAsMatrix() );
+	g_theRenderer->DrawMesh( m_basisMesh );
+
+	g_theRenderer->SetDepthTest( COMPARE_NOTEQUAL , false );
+	g_theRenderer->SetModelMatrix( m_compassMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_basisMesh );
 	
 	g_theRenderer->EndCamera( m_gameCamera );
@@ -399,7 +415,7 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	float finalYaw		= Clamp( m_cameraRotation.z , -175.f , 175.f );
 	float finalRoll		= m_cameraRotation.x;//Clamp( m_cameraRotation.y , -85.f , 85.f );
 
-	m_gameCamera.SetPitchYawRollRotation( finalPitch , finalRoll , finalYaw );
+	m_gameCamera.SetPitchYawRollRotation( finalPitch , finalYaw , finalRoll );
 	//m_gameCamera.SetPitchYawRollRotation( m_cameraRotation.x , m_cameraRotation.z , m_cameraRotation.y );
 	
 }

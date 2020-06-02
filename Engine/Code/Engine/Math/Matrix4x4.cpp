@@ -851,7 +851,8 @@ Mat44 Mat44::GetInverse()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Mat44 Mat44::CreateFromScaleRotationTransformation ( const Vec3& scale , const Vec3& eulerRotation ,
+STATIC Mat44 Mat44::CreateFromScaleRotationTransformation ( const Vec3& scale ,
+													 const float& pitch ,const float& yaw ,const float& roll ,
                                                      const Vec3& position ,
                                                      eWorldCoordinateSystem worldCoordinateSystem
                                                      /*= ENGINE_DEFAULT */ )
@@ -861,9 +862,9 @@ Mat44 Mat44::CreateFromScaleRotationTransformation ( const Vec3& scale , const V
 		Mat44 transform;
 		Mat44 scaleMatrix = CreateNonUniformScale3D( scale );
 		Mat44 translateBy = CreateTranslation3D( position );
-		Mat44 tranformPitch = CreateXRotationDegrees( eulerRotation.x );
-		Mat44 tranformYaw = CreateZRotationDegrees( eulerRotation.z );
-		Mat44 tranformRoll = CreateYRotationDegrees( eulerRotation.y );
+		Mat44 tranformPitch = CreateXRotationDegrees( pitch );
+		Mat44 tranformYaw = CreateZRotationDegrees( yaw );
+		Mat44 tranformRoll = CreateYRotationDegrees( roll );
 		//--------------------------------------------------------------------------------------------------------------------------------------------
 		transform.TransformBy( translateBy );
 		transform.TransformBy( tranformRoll );
@@ -882,20 +883,18 @@ Mat44 Mat44::CreateFromScaleRotationTransformation ( const Vec3& scale , const V
 		//--------------------------------------------------------------------------------
 
 		Mat44 transform;
-		//transform.SetBasisVectors3D( Vec3::UNIT_VECTOR_ALONG_J_BASIS , Vec3::UNIT_VECTOR_ALONG_I_BASIS , Vec3::UNIT_VECTOR_ALONG_K_BASIS );
 		Mat44 scaleMatrix = CreateNonUniformScale3D( scale );
 		Mat44 translateBy = CreateTranslation3D( position );
-		Mat44 tranformPitch = CreateXRotationDegrees( eulerRotation.x );
-		Mat44 tranformYaw = CreateZRotationDegrees( eulerRotation.z );
-		Mat44 tranformRoll = CreateYRotationDegrees( eulerRotation.y );
+		Mat44 tranformPitch = CreateXRotationDegrees( pitch );
+		Mat44 tranformYaw = CreateZRotationDegrees( yaw );
+		Mat44 tranformRoll = CreateYRotationDegrees( roll );
 		//--------------------------------------------------------------------------------------------------------------------------------------------
 		transform.TransformBy( translateBy );
 		transform.TransformBy( tranformRoll );
 		transform.TransformBy( tranformYaw );
 		transform.TransformBy( tranformPitch );
 		transform.TransformBy( scaleMatrix );
-		//transform.TransformBy( worldToEye );
-
+		
 		return transform;
 	}
 	return Mat44::IDENTITY;
