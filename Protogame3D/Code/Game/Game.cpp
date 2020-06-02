@@ -45,6 +45,7 @@ Game::Game()
 	m_cubeMesh3Transform.SetPosition( 2.5f , 2.5f , 0.5f );
 	m_cubeMesh1Transform.SetScale( 1.f , 1.f , 1.f );
 	//m_cubeMesh1Transform.SetRotation( -90.f , 0.0f , 0.0f );
+	m_basisMeshTransform.SetPosition( 0.f , 0.f , 0.f );
 
 	std::string gameConfigData = g_gameConfigBlackboard.GetValue( "testkey" , "Invalid Value" );
 	g_theDevConsole->PrintString( gameConfigData , eDevConsoleMessageType::DEVCONSOLE_SYTEMLOG );
@@ -88,17 +89,57 @@ void Game::IntializeGameObjects()
 	m_cubeMesh->UpdateVertices( ( uint ) cubeMeshVerts.size() , cubeMeshVerts.data() );
 	m_cubeMesh->UpdateIndices( cubeMeshIndices );
 
-	m_sphereMesh = new GPUMesh( g_theRenderer );
-	std::vector<VertexMaster>	SphereVertsMaster;
-	std::vector<Vertex_PCU>		SphereVerts;
-	std::vector<uint>			SphereIndices;
+// 	//----------------------------------------------------------------------------------------------------------
+// 	//							TEMP HACK 
+// 	//----------------------------------------------------------------------------------------------------------
+// 	m_sphereMesh = new GPUMesh( g_theRenderer );
+// 	std::vector<VertexMaster>	SphereVertsMaster;
+// 	std::vector<Vertex_PCU>		SphereVerts;
+// 	std::vector<uint>			SphereIndices;
+// 
+// 	CreateUVSphere( 32 , 16 , SphereVertsMaster , SphereIndices , 5.f );
+// 	VertexMaster::ConvertVertexMasterToVertexPCU( SphereVerts , SphereVertsMaster );
+// 
+// 	m_sphereMesh->UpdateVertices( ( uint ) SphereVerts.size() , SphereVerts.data() );
+// 	m_sphereMesh->UpdateIndices( SphereIndices );
+// 
+// 	//----------------------------------------------------------------------------------------------------------
 
-	CreateUVSphere( 32 , 16 , SphereVertsMaster , SphereIndices , 5.f );
-	VertexMaster::ConvertVertexMasterToVertexPCU( SphereVerts , SphereVertsMaster );
+	Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix();
+	Vec3 forwardVector = cameraTransform.GetIBasis3D();
+	Vec3 rightVector   = cameraTransform.GetJBasis3D();
+	Vec3 upVector	   = cameraTransform.GetKBasis3D();
 
-	m_sphereMesh->UpdateVertices( ( uint ) SphereVerts.size() , SphereVerts.data() );
-	m_sphereMesh->UpdateIndices( SphereIndices );
-	
+	constexpr float basisShaftRadius	= 0.03f;
+	constexpr float basisTipRadius		= 0.05f;
+
+	m_basisMesh = new GPUMesh( g_theRenderer );
+	std::vector<Vertex_PCU> arrowIBasis3DMeshVerts;
+	std::vector<uint>		arrowIBasis3DIndices;
+	CreateArrow3D( arrowIBasis3DMeshVerts , arrowIBasis3DIndices , basisShaftRadius , basisTipRadius ,
+		Vec3::ZERO , forwardVector ,
+		RED , RED , RED , RED );
+
+	std::vector<Vertex_PCU> arrowJBasis3DMeshVerts;
+	std::vector<uint>		arrowJBasis3DIndices;
+	CreateArrow3D( arrowJBasis3DMeshVerts , arrowJBasis3DIndices , basisShaftRadius , basisTipRadius ,
+		Vec3::ZERO , rightVector ,
+		GREEN , GREEN , GREEN , GREEN );
+
+	std::vector<Vertex_PCU> arrowKBasis3DMeshVerts;
+	std::vector<uint>		arrowKBasis3DIndices;
+	CreateArrow3D( arrowKBasis3DMeshVerts , arrowKBasis3DIndices , basisShaftRadius , basisTipRadius ,
+		Vec3::ZERO , upVector ,
+		BLUE , BLUE , BLUE , BLUE );
+
+	std::vector<Vertex_PCU> worldBasis3DMeshVerts;
+	std::vector<uint>		worldBasis3DIndices;
+
+	AppendIndexedVerts( arrowIBasis3DMeshVerts , arrowIBasis3DIndices , worldBasis3DMeshVerts , worldBasis3DIndices );
+	AppendIndexedVerts( arrowJBasis3DMeshVerts , arrowJBasis3DIndices , worldBasis3DMeshVerts , worldBasis3DIndices );
+	AppendIndexedVerts( arrowKBasis3DMeshVerts , arrowKBasis3DIndices , worldBasis3DMeshVerts , worldBasis3DIndices );
+	m_basisMesh->UpdateVertices( worldBasis3DMeshVerts );
+	m_basisMesh->UpdateIndices( worldBasis3DIndices );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -107,6 +148,9 @@ Game::~Game()
 {
 	delete m_cubeMesh;
 	m_cubeMesh			= nullptr;
+
+	delete m_basisMesh;
+	m_basisMesh			= nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -115,9 +159,10 @@ void Game::InitializeCameras()
 {
 		m_uiCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
 		m_gameCamera.SetWorldCoordinateSystem( X_IN_Y_LEFT_Z_UP );
-		m_gameCamera.SetProjectionPerspective( 70.f , CLIENT_ASPECT , -.1f , -100.f );
+		m_gameCamera.SetProjectionPerspective( 40.f , CLIENT_ASPECT , -.1f , -100.f );
 		m_gameCamera.SetPosition( Vec3( 1.f , 1.f , 1.f ) );
-		m_gameCamera.SetPosition( Vec3( -10.f , 1.f , 1.f ) );
+		m_gameCamera.SetPosition( Vec3( 3.5f , 3.5f , 0.3f ) );
+		m_gameCamera.SetPitchYawRollRotation( 0.f , 0.f , 180.f );
 		//m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 37 , 70 , 87 , 127 ) , 1.f , 0 );
 		m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );
 }
@@ -148,7 +193,28 @@ void Game::Update( float deltaSeconds )
 
 void Game::DebugDrawUI( float deltaSeconds )
 {
+	Mat44 cameraTransform	= m_gameCamera.GetCameraTransform().GetAsMatrix();
+	Vec3 forwardVector		= cameraTransform.GetIBasis3D();
+	Vec3 rightVector		= cameraTransform.GetJBasis3D();
+	Vec3 upVector			= cameraTransform.GetKBasis3D();
 
+	float leftVerticalAlignment = ( 1080.f * 0.25f ) / 10.f;
+	float normalizedOffset		= RangeMapFloat( 0.f , 1080.f , 0.f , 1.f , leftVerticalAlignment );
+	float fontSize				= 16.5f;
+	
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 1 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , RED , deltaSeconds ,
+		"forwardVector = %f , %f , %f " , forwardVector.x , forwardVector.y , forwardVector.z );
+
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 2 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , GREEN , deltaSeconds ,
+		"rightVector = %f , %f , %f " , rightVector.x , rightVector.y , rightVector.z );
+
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 3 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , BLUE , deltaSeconds ,
+		"upVector = %f , %f , %f " , upVector.x , upVector.y , upVector.z );
+
+	Mat44 basis = m_gameCamera.GetCameraTransform().GetAsMatrix();
+	basis.SetTranslation3D( m_gameCamera.GetPosition() + 3.f * forwardVector );
+	
+	DebugAddWorldBasis( basis , deltaSeconds , m_debugRenderMode );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -179,14 +245,21 @@ void Game::Render() const
 	g_theRenderer->SetModelMatrix( m_cubeMesh2Transform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
-	g_theRenderer->SetModelMatrix( m_cubeMesh3Transform.GetAsMatrix( X_IN_Y_LEFT_Z_UP ) );
+	g_theRenderer->SetModelMatrix( m_cubeMesh3Transform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
-	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
-	g_theRenderer->DrawMesh( m_sphereMesh );
-	
+//	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
+//	g_theRenderer->DrawMesh( m_sphereMesh );
+
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( nullptr );
+
+	g_theRenderer->SetCullMode( CULL_NONE );
+	g_theRenderer->SetDepthTest( COMPARE_NOTEQUAL , false );
+	g_theRenderer->SetBlendMode( eBlendMode::SOLID );
+	g_theRenderer->SetModelMatrix( m_basisMeshTransform.GetAsMatrix() );
+	g_theRenderer->DrawMesh( m_basisMesh );
+	
 	g_theRenderer->EndCamera( m_gameCamera );
 
 	g_theRenderer->StartEffect( finalImage , colorTarget , m_imageEffectShader );
@@ -262,12 +335,22 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	Vec3 movement = Vec3::ZERO;
 	Vec3 rotation = Vec3::ZERO;
 
+	//--------------------------------------------------------------------------------
+	//			NOTES
+	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	//	NOTE - WHEN DEALING WITH BASIS YOU WANT TO MOVE FROM WORLD TO ENGINE.
+	//	
+	//	So doing m_gameCamera.GetCameraTransform().GetAsMatrix( worldCoordinateSystem );
+	//	is doing A Game * Engine * Engine system multiplication which results in Leaving us to old Engine System.
+	//--------------------------------------------------------------------------------
+	
 	Mat44 cameraTransform	= m_gameCamera.GetCameraTransform().GetAsMatrix();
 	Vec3 forwardVector		= cameraTransform.GetIBasis3D();
+	//forwardVector.z			= 0.f;
 	Vec3 rightVector		= -cameraTransform.GetJBasis3D();
 	Vec3 upVector			= cameraTransform.GetKBasis3D();
 
-	float speed = 4.0f;
+	float speed = 0.5f;
 
 	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) )
 	{
@@ -309,15 +392,16 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 
 	Vec2 mousePos		= g_theInput->GetRelativeMovement();
 
-	//m_cameraRotation.x -= mousePos.y * speed * deltaSeconds;
-	//m_cameraRotation.y -= mousePos.x * speed * deltaSeconds;
+	m_cameraRotation.z -= mousePos.x * speed * deltaSeconds;
+	m_cameraRotation.x -= mousePos.y * speed * deltaSeconds;
 
-	//float finalPitch	= Clamp( m_cameraRotation.x , -180.f , 180.f );
-	//float finalYaw		= m_cameraRotation.z;//Clamp( m_cameraRotation.z , -175.f , 175.f );
-	//float finalRoll		= m_cameraRotation.y;//Clamp( m_cameraRotation.y , -85.f , 85.f );
+	float finalPitch	= Clamp( m_cameraRotation.y , -85.f , 85.f );
+	float finalYaw		= Clamp( m_cameraRotation.z , -175.f , 175.f );
+	float finalRoll		= m_cameraRotation.x;//Clamp( m_cameraRotation.y , -85.f , 85.f );
 
-	//m_gameCamera.SetPitchYawRollRotation( finalPitch , finalRoll , finalYaw );
+	m_gameCamera.SetPitchYawRollRotation( finalPitch , finalRoll , finalYaw );
 	//m_gameCamera.SetPitchYawRollRotation( m_cameraRotation.x , m_cameraRotation.z , m_cameraRotation.y );
+	
 }
 
 

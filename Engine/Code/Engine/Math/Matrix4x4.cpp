@@ -875,23 +875,26 @@ Mat44 Mat44::CreateFromScaleRotationTransformation ( const Vec3& scale , const V
 	}
 	else if ( X_IN_Y_LEFT_Z_UP == worldCoordinateSystem )
 	{
+		//--------------------------------------------------------------------------------
+		//			NOTES
+		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+		//	NOTE - WHEN DEALING WITH BASIS YOU WANT TO MOVE FROM WORLD TO ENGINE.
+		//--------------------------------------------------------------------------------
+
 		Mat44 transform;
 		//transform.SetBasisVectors3D( Vec3::UNIT_VECTOR_ALONG_J_BASIS , Vec3::UNIT_VECTOR_ALONG_I_BASIS , Vec3::UNIT_VECTOR_ALONG_K_BASIS );
-		Mat44 worldToEye;
-		worldToEye.SetBasisVectors3D( -Vec3::UNIT_VECTOR_ALONG_K_BASIS , -Vec3::UNIT_VECTOR_ALONG_I_BASIS , Vec3::UNIT_VECTOR_ALONG_J_BASIS );
-		MatrixTranspose( worldToEye );
 		Mat44 scaleMatrix = CreateNonUniformScale3D( scale );
 		Mat44 translateBy = CreateTranslation3D( position );
 		Mat44 tranformPitch = CreateXRotationDegrees( eulerRotation.x );
-		Mat44 tranformYaw = CreateYRotationDegrees( eulerRotation.y );
-		Mat44 tranformRoll = CreateZRotationDegrees( eulerRotation.z );
+		Mat44 tranformYaw = CreateZRotationDegrees( eulerRotation.z );
+		Mat44 tranformRoll = CreateYRotationDegrees( eulerRotation.y );
 		//--------------------------------------------------------------------------------------------------------------------------------------------
 		transform.TransformBy( translateBy );
 		transform.TransformBy( tranformRoll );
 		transform.TransformBy( tranformYaw );
 		transform.TransformBy( tranformPitch );
 		transform.TransformBy( scaleMatrix );
-		transform.TransformBy( worldToEye );
+		//transform.TransformBy( worldToEye );
 
 		return transform;
 	}

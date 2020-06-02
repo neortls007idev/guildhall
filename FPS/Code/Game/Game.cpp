@@ -286,11 +286,12 @@ void Game::Update( float deltaSeconds )
 {
 	m_ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
 	
+	DebugDrawUI( deltaSeconds );
+	
 	if ( m_isHUDEnabled )
 	{
 		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.625f , 1.00f ) , Vec2::ONE , 20.f , RED , deltaSeconds ,
 			"[ H ] : HIDE HELP HUD" );
-		DebugDrawUI( deltaSeconds );
 	}
 	else
 	{

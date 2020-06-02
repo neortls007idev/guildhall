@@ -377,6 +377,14 @@ Mat44 Camera::GetViewMatrix()
 {
 	Mat44 cameraModel = m_transform.GetAsMatrix( m_worldCoordinateSystem );
 
+	if ( X_IN_Y_LEFT_Z_UP == m_worldCoordinateSystem )
+	{
+		Mat44 worldToEye;
+		worldToEye.SetBasisVectors3D( -Vec3::UNIT_VECTOR_ALONG_K_BASIS , -Vec3::UNIT_VECTOR_ALONG_I_BASIS , Vec3::UNIT_VECTOR_ALONG_J_BASIS );
+		MatrixTranspose( worldToEye );
+		cameraModel.TransformBy( worldToEye );
+	}
+	
 	//bool check = IsMatrixOrtonormal( cameraModel );
 	//ASSERT_RECOVERABLE( check , " Are you sure the CAmera MOdel Matrix is coorect? " );
 	

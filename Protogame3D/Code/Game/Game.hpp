@@ -51,10 +51,12 @@ private:
 public:
 
 	GPUMesh*					m_cubeMesh;
-	GPUMesh*					m_sphereMesh;
+	GPUMesh*					m_basisMesh;
+	
 	Transform					m_cubeMesh1Transform;
 	Transform					m_cubeMesh2Transform;
 	Transform					m_cubeMesh3Transform;
+	Transform					m_basisMeshTransform;
 	
 	uint						m_hCuts												= 32;		// slices
 	uint						m_vCuts												= 16;		// stacks

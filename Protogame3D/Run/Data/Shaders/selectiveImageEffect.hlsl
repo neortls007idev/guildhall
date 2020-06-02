@@ -88,5 +88,7 @@ float4 FragmentFunction( VertexToFragment_t input ) : SV_Target0 // semeantic of
         color.g *= gradient;
     }
     
+    clip( color.a - 0.01 );
+    
     return color;
 }
