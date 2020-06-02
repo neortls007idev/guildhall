@@ -26,6 +26,12 @@
     <Filter Include="Plan\Proposal">
       <UniqueIdentifier>{85b29b33-ada0-459a-aa4e-348d1dd67d0d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Gameplay\Levels">
+      <UniqueIdentifier>{f51155d9-7e07-4b37-9c01-b0998b1e4a40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Gameplay\Powerups">
+      <UniqueIdentifier>{26809449-66f9-44fd-9ee3-b9e6ce32dabe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameCommon.cpp">
@@ -67,6 +73,9 @@
     <ClCompile Include="TileDefinition.cpp">
       <Filter>Gameplay\Tile</Filter>
     </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>Gameplay\Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">
@@ -107,6 +116,9 @@
     </ClInclude>
     <ClInclude Include="TileDefinition.hpp">
       <Filter>Gameplay\Tile</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.hpp">
+      <Filter>Gameplay\Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

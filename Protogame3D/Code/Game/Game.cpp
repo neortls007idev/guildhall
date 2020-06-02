@@ -173,10 +173,10 @@ void Game::Render() const
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( m_testTexture );
 			
-	g_theRenderer->SetModelMatrix( m_cubeMesh1Transform.GetAsMatrix( X_IN_Y_LEFT_Z_UP ) );
+	g_theRenderer->SetModelMatrix( m_cubeMesh1Transform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
-	g_theRenderer->SetModelMatrix( m_cubeMesh2Transform.GetAsMatrix( X_IN_Y_LEFT_Z_UP ) );
+	g_theRenderer->SetModelMatrix( m_cubeMesh2Transform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
 	g_theRenderer->SetModelMatrix( m_cubeMesh3Transform.GetAsMatrix( X_IN_Y_LEFT_Z_UP ) );
@@ -262,9 +262,10 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	Vec3 movement = Vec3::ZERO;
 	Vec3 rotation = Vec3::ZERO;
 
-	Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix( m_gameCamera.GetWorldCoordinateSystem() );
-	Vec3 forwardVector = cameraTransform.GetIBasis3D();
-	Vec3 rightVector = -cameraTransform.GetJBasis3D();
+	Mat44 cameraTransform	= m_gameCamera.GetCameraTransform().GetAsMatrix();
+	Vec3 forwardVector		= cameraTransform.GetIBasis3D();
+	Vec3 rightVector		= -cameraTransform.GetJBasis3D();
+	Vec3 upVector			= cameraTransform.GetKBasis3D();
 
 	float speed = 4.0f;
 
@@ -275,31 +276,29 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 
 	if ( g_theInput->IsKeyHeldDown( 'A' ) )
 	{
-		//m_gameCamera.SetPosition( m_gameCamera.GetPosition() - rightVector * speed * deltaSeconds );
+		m_gameCamera.SetPosition( m_gameCamera.GetPosition() - rightVector * speed * deltaSeconds );
 	}
 	if ( g_theInput->IsKeyHeldDown( 'D' ) )
 	{
-		//m_gameCamera.SetPosition( m_gameCamera.GetPosition() + rightVector * speed * deltaSeconds );
+		m_gameCamera.SetPosition( m_gameCamera.GetPosition() + rightVector * speed * deltaSeconds );
 	}
 	if ( g_theInput->IsKeyHeldDown( 'W' ) )
 	{
-		Vec3 newPos = m_gameCamera.GetPosition() - forwardVector * speed * deltaSeconds;
-		//newPos = cameraTransform.TransformPosition3D( newPos );
+		Vec3 newPos = m_gameCamera.GetPosition() + forwardVector * speed * deltaSeconds;
 		m_gameCamera.SetPosition( newPos );
 	}
 	if ( g_theInput->IsKeyHeldDown( 'S' ) )
 	{
-		Vec3 newPos = m_gameCamera.GetPosition() + forwardVector * speed * deltaSeconds;
-		//newPos = cameraTransform.TransformPosition3D( newPos );
+		Vec3 newPos = m_gameCamera.GetPosition() - forwardVector * speed * deltaSeconds;
 		m_gameCamera.SetPosition( newPos );
 	}
 	if ( g_theInput->IsKeyHeldDown( 'Q' ) )
 	{
-		//movement.y -= 1.f;
+		m_gameCamera.SetPosition( m_gameCamera.GetPosition() - upVector * speed * deltaSeconds );
 	}
 	if ( g_theInput->IsKeyHeldDown( 'E' ) )
 	{
-		//movement.y += 1.f;
+		m_gameCamera.SetPosition( m_gameCamera.GetPosition() + upVector * speed * deltaSeconds );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 'O' ) )

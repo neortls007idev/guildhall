@@ -4,6 +4,7 @@
 #include "Engine/Math/Vec4.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "MatrixUtils.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -878,6 +879,7 @@ Mat44 Mat44::CreateFromScaleRotationTransformation ( const Vec3& scale , const V
 		//transform.SetBasisVectors3D( Vec3::UNIT_VECTOR_ALONG_J_BASIS , Vec3::UNIT_VECTOR_ALONG_I_BASIS , Vec3::UNIT_VECTOR_ALONG_K_BASIS );
 		Mat44 worldToEye;
 		worldToEye.SetBasisVectors3D( -Vec3::UNIT_VECTOR_ALONG_K_BASIS , -Vec3::UNIT_VECTOR_ALONG_I_BASIS , Vec3::UNIT_VECTOR_ALONG_J_BASIS );
+		MatrixTranspose( worldToEye );
 		Mat44 scaleMatrix = CreateNonUniformScale3D( scale );
 		Mat44 translateBy = CreateTranslation3D( position );
 		Mat44 tranformPitch = CreateXRotationDegrees( eulerRotation.x );
