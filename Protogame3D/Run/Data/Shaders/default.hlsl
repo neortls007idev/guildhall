@@ -99,5 +99,7 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	// use color to portray information;
     //return float4( input.uv , 0 , 1 );
 	float4 color = tDiffuse.Sample( eSampler, input.uv );
-	return color * input.color * TINT;
+	float4 finalColor = color * input.color * TINT;
+    clip( finalColor.a - 0.1 );                                                                    // For Transparency
+    return finalColor;
 }

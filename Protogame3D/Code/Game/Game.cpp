@@ -115,8 +115,8 @@ void Game::IntializeGameObjects()
 	Vec3 rightVector   = cameraTransform.GetJBasis3D();
 	Vec3 upVector	   = cameraTransform.GetKBasis3D();
 
-	constexpr float basisShaftRadius	= 0.03f;
-	constexpr float basisTipRadius		= 0.05f;
+	constexpr float basisShaftRadius	= 0.01f;
+	constexpr float basisTipRadius		= 0.03f;
 
 	m_basisMesh = new GPUMesh( g_theRenderer );
 	std::vector<Vertex_PCU> arrowIBasis3DMeshVerts;
@@ -164,7 +164,7 @@ void Game::InitializeCameras()
 {
 		m_uiCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
 		m_gameCamera.SetWorldCoordinateSystem( X_IN_Y_LEFT_Z_UP );
-		m_gameCamera.SetProjectionPerspective( 40.f , CLIENT_ASPECT , -.1f , -100.f );
+		m_gameCamera.SetProjectionPerspective( 40.f , CLIENT_ASPECT , -.09f , -100.f );
 		m_gameCamera.SetPosition( Vec3( 1.f , 1.f , 1.f ) );
 		m_gameCamera.SetPosition( Vec3( -10.f , 1.f , 1.f ) );
 		//m_gameCamera.SetPosition( Vec3( 3.5f , 3.5f , 0.3f ) );
@@ -177,6 +177,8 @@ void Game::InitializeCameras()
 
 void Game::Update( float deltaSeconds )
 {	
+	UpdateFromKeyBoard( deltaSeconds );
+	
 	if ( m_isHUDEnabled )
 	{
 		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.625f , 1.00f ) , Vec2::ONE , 20.f , RED , deltaSeconds ,
@@ -197,7 +199,6 @@ void Game::Update( float deltaSeconds )
 	float roll  = m_gameCamera.GetCameraTransform().GetRoll();
 	m_compassMeshTransform.SetRotation( pitch , yaw , roll );*/
 	
-	UpdateFromKeyBoard( deltaSeconds );
 	UpdateAudioFromKeyBoard();
 }
 
@@ -209,19 +210,25 @@ void Game::DebugDrawUI( float deltaSeconds )
 	Vec3 forwardVector		= cameraTransform.GetIBasis3D();
 	Vec3 rightVector		= cameraTransform.GetJBasis3D();
 	Vec3 upVector			= cameraTransform.GetKBasis3D();
+	Vec3 position			= m_gameCamera.GetPosition();
 
 	float leftVerticalAlignment = ( 1080.f * 0.25f ) / 10.f;
 	float normalizedOffset		= RangeMapFloat( 0.f , 1080.f , 0.f , 1.f , leftVerticalAlignment );
 	float fontSize				= 16.5f;
 	
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 1 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , RED , deltaSeconds ,
-		"forwardVector = %f , %f , %f " , forwardVector.x , forwardVector.y , forwardVector.z );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 2 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , YELLOW , deltaSeconds ,
+		"Camera Yaw = %.1f	Pitch = %.1f	Roll = %.1f	(XYZ) = (%.2f,%.2f,%.2f)" ,
+		 m_gameCamera.GetCameraTransform().GetYaw(),m_gameCamera.GetCameraTransform().GetPitch(),m_gameCamera.GetCameraTransform().GetRoll(),
+		 position.x,position.y,position.z);
+	
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 3 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , RED , deltaSeconds ,
+		"iBasis (forward, +world-east when identity) = (%.2f , %.2f , %.2f)" , forwardVector.x , forwardVector.y , forwardVector.z );
 
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 2 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , GREEN , deltaSeconds ,
-		"rightVector = %f , %f , %f " , rightVector.x , rightVector.y , rightVector.z );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 4 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , GREEN , deltaSeconds ,
+		"jBasis (left, +world-north when identity) = (%.2f , %.2f , %.2f)" , rightVector.x , rightVector.y , rightVector.z );
 
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 3 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , BLUE , deltaSeconds ,
-		"upVector = %f , %f , %f " , upVector.x , upVector.y , upVector.z );
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 5 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , BLUE , deltaSeconds ,
+		"kBasis (up, +world-up when identity) = (%.2f , %.2f , %.2f)" , upVector.x , upVector.y , upVector.z );
 
 	Mat44 basis = m_gameCamera.GetCameraTransform().GetAsMatrix();
 	basis.SetTranslation3D( m_gameCamera.GetPosition() + 3.f * forwardVector );
@@ -267,12 +274,12 @@ void Game::Render() const
 	g_theRenderer->BindTexture( nullptr );
 
 	g_theRenderer->SetCullMode( CULL_NONE );
-	g_theRenderer->SetDepthTest( COMPARE_NOTEQUAL , false );
+	g_theRenderer->SetDepthTest( COMPARE_ALWAYS , false );
 	g_theRenderer->SetBlendMode( eBlendMode::SOLID );
 	g_theRenderer->SetModelMatrix( m_basisMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_basisMesh );
 
-	g_theRenderer->SetDepthTest( COMPARE_NOTEQUAL , false );
+	g_theRenderer->SetDepthTest( COMPARE_ALWAYS , false );
 	g_theRenderer->SetModelMatrix( m_compassMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_basisMesh );
 	
@@ -364,9 +371,10 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	Vec3 forwardVector		= cameraTransform.GetIBasis3D();
 	//forwardVector.z			= 0.f;
 	Vec3 rightVector		= -cameraTransform.GetJBasis3D();
-	Vec3 upVector			= cameraTransform.GetKBasis3D();
-
-	float speed = 0.5f;
+	rightVector.z = 0.f;
+	Vec3 upMovement			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
+	
+	float speed = 4.f;
 
 	if ( g_theInput->IsKeyHeldDown( KEY_SHIFT ) )
 	{
@@ -393,29 +401,33 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	}
 	if ( g_theInput->IsKeyHeldDown( 'Q' ) )
 	{
-		m_gameCamera.SetPosition( m_gameCamera.GetPosition() - upVector * speed * deltaSeconds );
+		m_gameCamera.SetPosition( m_gameCamera.GetPosition() - upMovement * speed * deltaSeconds );
 	}
 	if ( g_theInput->IsKeyHeldDown( 'E' ) )
 	{
-		m_gameCamera.SetPosition( m_gameCamera.GetPosition() + upVector * speed * deltaSeconds );
+		m_gameCamera.SetPosition( m_gameCamera.GetPosition() + upMovement * speed * deltaSeconds );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 'O' ) )
 	{
 		m_cameraPosition = Vec3::ZERO;
-		m_cameraRotation = Vec3::ZERO;
+		m_gameCamera.SetPosition( m_cameraPosition );
+		m_pitch = 0.f;
+		m_yaw = 0.f;
 	}
 
 	Vec2 mousePos		= g_theInput->GetRelativeMovement();
+	
+	m_yaw	-= mousePos.x * speed * deltaSeconds;
+	m_pitch += mousePos.y * speed * deltaSeconds;
 
-	m_cameraRotation.z -= mousePos.x * speed * deltaSeconds;
-	m_cameraRotation.x -= mousePos.y * speed * deltaSeconds;
+	m_pitch				= Clamp( m_pitch , -89.9f , 89.9f );
+	//m_yaw				= Clamp( m_yaw , -180.f , 180.f );
+	//float finalPitch	= fmodf( m_pitch , 360.f ) - 90.f;
+	//float finalYaw		= fmodf( m_yaw , 360.f ) - 180.f;
+	float finalRoll		= 0.f;
 
-	float finalPitch	= Clamp( m_cameraRotation.y , -85.f , 85.f );
-	float finalYaw		= Clamp( m_cameraRotation.z , -175.f , 175.f );
-	float finalRoll		= m_cameraRotation.x;//Clamp( m_cameraRotation.y , -85.f , 85.f );
-
-	m_gameCamera.SetPitchYawRollRotation( finalPitch , finalYaw , finalRoll );
+	m_gameCamera.SetPitchYawRollRotation( m_pitch , m_yaw , finalRoll );
 	//m_gameCamera.SetPitchYawRollRotation( m_cameraRotation.x , m_cameraRotation.z , m_cameraRotation.y );
 	
 }

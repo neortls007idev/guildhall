@@ -66,7 +66,8 @@ public:
 	Camera						m_uiCamera;
 
 	Vec3						m_cameraPosition									= Vec3::ZERO;
-	Vec3						m_cameraRotation									= Vec3::ZERO;
+	float						m_pitch												= 0.f;
+	float						m_yaw												= 0.f;
 	
 	bool						m_isHUDEnabled										= true;
 

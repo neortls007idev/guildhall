@@ -54,10 +54,12 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 			if ( g_theInput &&  ( wParam ==  1  || wParam == 2 ) )
 			{
 				g_theInput->SetCursorMode( RELATIVE_MODE );
+				window->m_hasFocus = true;
 			}
 			if ( g_theInput && wParam == 0 )
 			{
 				g_theInput->SetCursorMode( ABSOLUTE_MODE );
+				window->m_hasFocus = false;
 			}break;		
  						
 		case WM_CHAR:

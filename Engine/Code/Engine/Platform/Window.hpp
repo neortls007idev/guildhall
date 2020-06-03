@@ -71,8 +71,8 @@ public:
 
 
 public:
-	void* m_hwnd = nullptr;
-
+	void*				m_hwnd = nullptr;
+	bool				m_hasFocus = false;
 private:
 	int					m_clientHeight		= 0;
 	int					m_ClientWidth		= 0;
