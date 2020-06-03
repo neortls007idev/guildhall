@@ -371,7 +371,7 @@
     <Xml Include="..\..\Run\Data\Materials\testMaterial.xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Run\TaskList\C29 SDST A1 - Protogame3D.docx">
+    <None Include="..\..\Run\TaskList\C29_SDST_A1_Protogame3D_GuptaRahul.docx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

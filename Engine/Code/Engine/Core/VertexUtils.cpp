@@ -267,7 +267,8 @@ void CreateQuad( std::vector< VertexMaster >& quadMeshVerts , std::vector< uint 
 
 						};
 
-	Vec3 quadNormal = CrossProduct3D( CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position , CubeVerts[ 3 ].m_position - CubeVerts[ 0 ].m_position );
+	Vec3 quadNormal = CrossProduct3D( CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position ,
+	                                  CubeVerts[ 3 ].m_position - CubeVerts[ 0 ].m_position );
 	Vec4 quadTangent = Vec4( CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position , 1.f );
 
 	std::vector<Vertex_PCU> quadVertPCUS;
@@ -383,11 +384,15 @@ void CreateCuboid( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uin
 	//
 	//		ENGINE DEFAULT BASIS
 	//
-	//											(Z - Inwards/Depth-width/East/Right hand - Thumb)
-	//																	^
-	//				(X - Left/Length/North/Right hand - Index Finger)	|
-	//																  \	|
-	//	   (Y - Upwards/Height/ /Right hand - Middle Finger) <---------\|
+	//		(Y - Upwards(ceiling)/Height/ /Right hand - Index Finger)
+	//							^
+	//							|
+	//							|
+	//							|--------->(X - Left/Length/North/Right hand - Thumb)
+	//							 \
+	//							  \
+	//							   \
+	//				(Z - outwards(facing myself)/Depth-width/East/Right hand - Middle Finger)
 	//--------------------------------------------------------------------------------
 	
 	Vertex_PCU CubeVerts[ 16 ] = {
@@ -530,17 +535,19 @@ void CreateCuboid( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uin
 	}
 }
 
-void CreateCuboidXInYLeftZUp( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uint >& cubeIndices , const AABB3 box , const Rgba8& tint /*= WHITE */ )
+void CreateCuboidXInYLeftZUp ( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uint >& cubeIndices ,
+                               const AABB3 box , const Rgba8& tint /*= WHITE */ )
 {
 //--------------------------------------------------------------------------------
 //			NOTES
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 //
-//											(Z - Upwards/Height/ /Right hand - Middle Finger)
-//																	^
-//				(X - Inwards/Depth-width/East/Right hand - Thumb)	|
-//																  \	|
-//	   (Y - Left/Length/North/Right hand - Index Finger) <---------\|
+//												(Z - Upwards(facing ceiling)/Height/ /Right hand - Middle Finger)
+//																				^
+//	(X - Inwards(point away from myself)/Depth-width/East/Right hand - Thumb)	|
+//																			  \	|
+//				   (Y - Left/Length/North/Right hand - Index Finger) <---------\|
+//				   
 //--------------------------------------------------------------------------------
 
 	Vertex_PCU CubeVerts[ 24 ] = {
@@ -659,9 +666,8 @@ void CreateCuboidXInYLeftZUp( std::vector< VertexMaster >& cubeMeshVerts , std::
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void CreateUVSphere( uint hCuts , uint vCuts , std::vector<Vertex_PCU>& sphereMeshVerts , std::vector<uint>& sphereIndices, float radius , Vec3 center , const Rgba8& tint )
+void CreateUVSphere ( uint hCuts , uint vCuts , std::vector< Vertex_PCU >& sphereMeshVerts ,
+                      std::vector< uint >& sphereIndices , float radius , Vec3 center , const Rgba8& tint )
 {
 	float deltaTheta = 360.f / ( float ) hCuts;
 	float deltaPhi = 180.f / ( float ) vCuts;
@@ -701,7 +707,8 @@ void CreateUVSphere( uint hCuts , uint vCuts , std::vector<Vertex_PCU>& sphereMe
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void CreateUVSphere( uint hCuts , uint vCuts , std::vector<VertexMaster>& sphereMeshVerts , std::vector<uint>& sphereIndices , float radius , Vec3 center , const Rgba8& tint )
+void CreateUVSphere ( uint hCuts , uint vCuts , std::vector< VertexMaster >& sphereMeshVerts ,
+                      std::vector< uint >& sphereIndices , float radius , Vec3 center , const Rgba8& tint )
 {
 	float deltaTheta = 360.f / ( float ) hCuts;
 	float deltaPhi = 180.f / ( float ) vCuts;
@@ -760,7 +767,9 @@ void CreateUVSphere( uint hCuts , uint vCuts , std::vector<VertexMaster>& sphere
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void CreateCylinder( std::vector<Vertex_PCU>& cylinderMeshVerts , std::vector<uint>& cylinderIndices , float radius /*= 1.f */ , const Vec3& start /*= Vec3::ZERO */ , const Vec3& end /*= Vec3::ONE*/ , const Rgba8& startTint /*= WHITE */ , const Rgba8& endTint /*= WHITE */ )
+void CreateCylinder ( std::vector< Vertex_PCU >& cylinderMeshVerts , std::vector< uint >& cylinderIndices ,
+                      float radius /*= 1.f */ , const Vec3& start /*= Vec3::ZERO */ , const Vec3& end /*= Vec3::ONE*/ ,
+                      const Rgba8& startTint /*= WHITE */ , const Rgba8& endTint /*= WHITE */ )
 {
 	// TODO :- Update UV mapping if needed ::- CURRENTLY MAPPED INCORRECTLY
 	
@@ -905,7 +914,9 @@ void CreateCylinder( std::vector<Vertex_PCU>& cylinderMeshVerts , std::vector<ui
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void CreateCone( std::vector<Vertex_PCU>& coneMeshVerts , std::vector<uint>& coneIndices , float radius /*= 1.f */ , const Vec3& start /*= Vec3::ZERO */ , const Vec3& end /*= Vec3::ONE*/ , const Rgba8& startTint /*= WHITE */ , const Rgba8& endTint /*= WHITE */ )
+void CreateCone ( std::vector< Vertex_PCU >& coneMeshVerts , std::vector< uint >& coneIndices ,
+                  float radius /*= 1.f */ , const Vec3& start /*= Vec3::ZERO */ , const Vec3& end /*= Vec3::ONE*/ ,
+                  const Rgba8& startTint /*= WHITE */ , const Rgba8& endTint /*= WHITE */ )
 {
 	// TODO :- Update UV mapping if needed ::- CURRENTLY MAPPED INCORRECTLY
 

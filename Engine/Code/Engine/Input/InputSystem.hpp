@@ -19,10 +19,30 @@ enum eMouseClipping
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+
 enum eMouseMode
 {
 	ABSOLUTE_MODE,
 	RELATIVE_MODE,
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct CursorSettings
+{
+	eMouseMode		m_cursorMode		= ABSOLUTE_MODE;
+	eMouseClipping	m_cursorClipMode	= MOUSE_IS_UNLOCKED;
+	bool			m_isCursorVisible	= true;
+public:
+	CursorSettings() {};
+	CursorSettings ( eMouseMode newCursorMode , eMouseClipping newClipMode , bool isCursorVisible )
+	{
+		m_cursorMode	  = newCursorMode;
+		m_cursorClipMode  = newClipMode;
+		m_isCursorVisible = isCursorVisible;
+	};
+	~CursorSettings() {};
+
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -80,6 +100,13 @@ public:
 	void ShowSystemCursor();
 	void ClipSystemCursor( eMouseClipping mouseLockMode );
 	void SetCursorMode( eMouseMode mode );
+	void PushCursorSettings( CursorSettings newCursorSettings );
+	void PopCursorSettings();
+	eMouseMode		GetCursorMode()															{ return m_cursorSettings.m_cursorMode; }
+	eMouseClipping	GetClipMode()															{ return m_cursorSettings.m_cursorClipMode; }
+	bool			GetCursorVisibility()													{ return m_cursorSettings.m_isCursorVisible; }
+	CursorSettings	GetCursorSettings()														{ return m_cursorSettings; }
+
 	void UpdateRelativeMode();
 	Vec2 GetRelativeMovement() const;
 
@@ -94,6 +121,7 @@ public:
 
 private:
 	eMouseMode		m_mouseMode			= ABSOLUTE_MODE;
+	CursorSettings  m_cursorSettings;
 	Vec2			m_relativeMovement	= Vec2::ZERO;
 	Vec2			m_positionLastFrame	= Vec2::ZERO;
 

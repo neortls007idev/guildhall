@@ -28,6 +28,8 @@ bool   s_wasDataLoaded = false;
 
 Game::Game()
 {
+	g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
+	
 	if ( !s_wasDataLoaded )
 	{
 		LoadShaders();
@@ -95,20 +97,6 @@ void Game::IntializeGameObjects()
 	m_cubeMesh->UpdateIndices( cubeMeshIndices );
 
 // 	//----------------------------------------------------------------------------------------------------------
-// 	//							TEMP HACK 
-// 	//----------------------------------------------------------------------------------------------------------
-// 	m_sphereMesh = new GPUMesh( g_theRenderer );
-// 	std::vector<VertexMaster>	SphereVertsMaster;
-// 	std::vector<Vertex_PCU>		SphereVerts;
-// 	std::vector<uint>			SphereIndices;
-// 
-// 	CreateUVSphere( 32 , 16 , SphereVertsMaster , SphereIndices , 5.f );
-// 	VertexMaster::ConvertVertexMasterToVertexPCU( SphereVerts , SphereVertsMaster );
-// 
-// 	m_sphereMesh->UpdateVertices( ( uint ) SphereVerts.size() , SphereVerts.data() );
-// 	m_sphereMesh->UpdateIndices( SphereIndices );
-// 
-// 	//----------------------------------------------------------------------------------------------------------
 
 	Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix();
 	Vec3 forwardVector = cameraTransform.GetIBasis3D();
@@ -167,9 +155,6 @@ void Game::InitializeCameras()
 		m_gameCamera.SetProjectionPerspective( 40.f , CLIENT_ASPECT , -.09f , -100.f );
 		m_gameCamera.SetPosition( Vec3( 1.f , 1.f , 1.f ) );
 		m_gameCamera.SetPosition( Vec3( -10.f , 1.f , 1.f ) );
-		//m_gameCamera.SetPosition( Vec3( 3.5f , 3.5f , 0.3f ) );
-		//m_gameCamera.SetPitchYawRollRotation( 0.f , 0.f , 180.f );
-		//m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , Rgba8( 37 , 70 , 87 , 127 ) , 1.f , 0 );
 		m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );
 }
 
@@ -177,7 +162,6 @@ void Game::InitializeCameras()
 
 void Game::Update( float deltaSeconds )
 {	
-	UpdateFromKeyBoard( deltaSeconds );
 	
 	if ( m_isHUDEnabled )
 	{
@@ -191,13 +175,11 @@ void Game::Update( float deltaSeconds )
 			"[ H ] : SHOW HELP HUD" );
 	}
 
+	UpdateFromKeyBoard( deltaSeconds );
+	
 	Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix();
 	Vec3 forwardVector = cameraTransform.GetIBasis3D();
 	m_compassMeshTransform.SetPosition( m_gameCamera.GetPosition() + 0.1f * forwardVector );
-	/*float pitch = m_gameCamera.GetCameraTransform().GetPitch();
-	float yaw   = m_gameCamera.GetCameraTransform().GetYaw();
-	float roll  = m_gameCamera.GetCameraTransform().GetRoll();
-	m_compassMeshTransform.SetRotation( pitch , yaw , roll );*/
 	
 	UpdateAudioFromKeyBoard();
 }
@@ -215,7 +197,7 @@ void Game::DebugDrawUI( float deltaSeconds )
 	float leftVerticalAlignment = ( 1080.f * 0.25f ) / 10.f;
 	float normalizedOffset		= RangeMapFloat( 0.f , 1080.f , 0.f , 1.f , leftVerticalAlignment );
 	float fontSize				= 16.5f;
-	
+		
 	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 2 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , YELLOW , deltaSeconds ,
 		"Camera Yaw = %.1f	Pitch = %.1f	Roll = %.1f	(XYZ) = (%.2f,%.2f,%.2f)" ,
 		 m_gameCamera.GetCameraTransform().GetYaw(),m_gameCamera.GetCameraTransform().GetPitch(),m_gameCamera.GetCameraTransform().GetRoll(),
@@ -267,9 +249,6 @@ void Game::Render() const
 	g_theRenderer->SetModelMatrix( m_cubeMesh3Transform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
-//	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
-//	g_theRenderer->DrawMesh( m_sphereMesh );
-
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( nullptr );
 
@@ -308,7 +287,6 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	{
 		return;
 	}
-	//DebugLineStripDrawModeTest();
 	
 	if ( g_theInput->WasKeyJustPressed( 'H' ) )
 	{
@@ -371,7 +349,7 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	Vec3 forwardVector		= cameraTransform.GetIBasis3D();
 	//forwardVector.z			= 0.f;
 	Vec3 rightVector		= -cameraTransform.GetJBasis3D();
-	rightVector.z = 0.f;
+	rightVector.z			= 0.f;
 	Vec3 upMovement			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
 	
 	float speed = 4.f;
@@ -427,9 +405,7 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	//float finalYaw		= fmodf( m_yaw , 360.f ) - 180.f;
 	float finalRoll		= 0.f;
 
-	m_gameCamera.SetPitchYawRollRotation( m_pitch , m_yaw , finalRoll );
-	//m_gameCamera.SetPitchYawRollRotation( m_cameraRotation.x , m_cameraRotation.z , m_cameraRotation.y );
-	
+	m_gameCamera.SetPitchYawRollRotation( m_pitch , m_yaw , finalRoll );	
 }
 
 

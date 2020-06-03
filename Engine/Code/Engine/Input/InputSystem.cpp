@@ -377,6 +377,37 @@ void InputSystem::SetCursorMode( eMouseMode mode )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void InputSystem::PushCursorSettings( CursorSettings newCursorSettings )
+{
+	m_cursorSettings = newCursorSettings;
+	ClipSystemCursor( newCursorSettings.m_cursorClipMode );
+	SetCursorMode( newCursorSettings.m_cursorMode );
+
+	if ( newCursorSettings.m_isCursorVisible )
+	{
+		ShowSystemCursor();
+	}
+	else
+	{
+		HideSystemCursor();
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void InputSystem::PopCursorSettings()
+{
+	//m_cursorSettings.m_cursorClipMode	= MOUSE_IS_UNLOCKED;
+	//m_cursorSettings.m_cursorMode		= ABSOLUTE_MODE;
+	//m_cursorSettings.m_isCursorVisible	= true;
+	
+	ClipSystemCursor( MOUSE_IS_UNLOCKED );
+	SetCursorMode( ABSOLUTE_MODE );
+	ShowSystemCursor();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void InputSystem::UpdateRelativeMode()
 {
 		POINT cursorPos;

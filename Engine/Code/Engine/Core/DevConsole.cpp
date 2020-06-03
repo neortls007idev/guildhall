@@ -17,6 +17,7 @@ extern BitmapFont*	g_bitmapFont;
 extern InputSystem* g_theInput;
 extern Window*		g_theWindow;
 
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 STATIC bool								DevConsole::m_isConsoleOpen;
@@ -48,6 +49,7 @@ DevConsole::DevConsole()
 	m_devConsoleCamera			= new Camera();
 	m_devConsoleCamera->SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( DEVCONSOLE_CAMERA_SIZE_X , DEVCONSOLE_CAMERA_SIZE_Y ) );
 	m_devConsoleCamera->SetClearMode( CLEAR_NONE | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , GRAY );
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -427,6 +429,16 @@ void DevConsole::ToggleVisibility()
 	ClearConsoleMessagesOfType( temp ,DEVCONSOLE_USERLOG );
 
 	m_isConsoleOpen = !m_isConsoleOpen;
+
+	if ( m_isConsoleOpen )
+	{
+		m_originalCursorSettings = g_theInput->GetCursorSettings();
+		g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_WINDOWLOCKED , true ) );
+	}
+	else
+	{
+		g_theInput->PushCursorSettings( m_originalCursorSettings );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

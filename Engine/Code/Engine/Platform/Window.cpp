@@ -46,6 +46,7 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 			// App close requested via "X" button, or right-click "Close Window" on task bar, or "Close" from system menu, or Alt-F4
 		case WM_CLOSE:
 		{
+			g_theInput->PopCursorSettings();
 			window->HandleQuitRequested();
 			return 0; // "Consumes" this message (tells Windows "okay, we handled it")
 		}
@@ -53,12 +54,13 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 		case WM_ACTIVATE:
 			if ( g_theInput &&  ( wParam ==  1  || wParam == 2 ) )
 			{
-				g_theInput->SetCursorMode( RELATIVE_MODE );
+				//g_theInput->SetCursorMode( RELATIVE_MODE );
+				g_theInput->PushCursorSettings( g_theInput->GetCursorSettings() );
 				window->m_hasFocus = true;
 			}
 			if ( g_theInput && wParam == 0 )
 			{
-				g_theInput->SetCursorMode( ABSOLUTE_MODE );
+				g_theInput->PopCursorSettings();
 				window->m_hasFocus = false;
 			}break;		
  						

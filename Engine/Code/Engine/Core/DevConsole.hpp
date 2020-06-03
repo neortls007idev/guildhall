@@ -3,6 +3,7 @@
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/EventSystem.hpp"
+#include "Engine/Input/InputSystem.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -112,7 +113,8 @@ protected:
 	static  std::vector<DevConsoleCommand>	m_consoleCommands;
 	static  std::string						m_consoleCommandHistory[ DEVCONSOLE_MAX_COMMAND_HISTORY ];
 		    
-private:    
+private:
+	CursorSettings							m_originalCursorSettings;
 	static  std::string						m_currentText;
 	static  std::string						m_currentSelectionText;
 		    
