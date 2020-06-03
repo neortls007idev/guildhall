@@ -85,8 +85,8 @@ public:
 	// TODO :- Add more commands with arguments
 	// TODO :- Move commands to XML;
 	
-	void SetIsOpen( bool isOpen );
-	void ToggleVisibility();
+	static void SetIsOpen( bool isOpen );
+	static void ToggleVisibility();
 	void Close();
 	bool IsOpen() const;
 
@@ -114,7 +114,7 @@ protected:
 	static  std::string						m_consoleCommandHistory[ DEVCONSOLE_MAX_COMMAND_HISTORY ];
 		    
 private:
-	CursorSettings							m_originalCursorSettings;
+	static	CursorSettings					m_originalCursorSettings;
 	static  std::string						m_currentText;
 	static  std::string						m_currentSelectionText;
 		    

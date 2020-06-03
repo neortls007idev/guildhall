@@ -364,13 +364,13 @@ void InputSystem::SetCursorMode( eMouseMode mode )
 	
 	switch ( m_mouseMode )
 	{
-		case RELATIVE_MODE: ClipSystemCursor( MOUSE_IS_WINDOWLOCKED );
-							HideSystemCursor();
+		case RELATIVE_MODE: //ClipSystemCursor( MOUSE_IS_WINDOWLOCKED );
+							//HideSystemCursor();
 							UpdateRelativeMode();
 							break;
 
-		case ABSOLUTE_MODE: ClipSystemCursor( MOUSE_IS_UNLOCKED );
-							ShowSystemCursor();
+		case ABSOLUTE_MODE: //ClipSystemCursor( MOUSE_IS_UNLOCKED );
+							//ShowSystemCursor();
 							break;
 	}
 }
@@ -380,8 +380,8 @@ void InputSystem::SetCursorMode( eMouseMode mode )
 void InputSystem::PushCursorSettings( CursorSettings newCursorSettings )
 {
 	m_cursorSettings = newCursorSettings;
-	ClipSystemCursor( newCursorSettings.m_cursorClipMode );
 	SetCursorMode( newCursorSettings.m_cursorMode );
+	ClipSystemCursor( newCursorSettings.m_cursorClipMode );
 
 	if ( newCursorSettings.m_isCursorVisible )
 	{

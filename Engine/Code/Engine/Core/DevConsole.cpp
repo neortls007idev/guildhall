@@ -30,6 +30,7 @@ STATIC bool								DevConsole::m_hasCarrotMovedMouseSelection;
 STATIC std::vector<ColoredLine>			DevConsole::m_consoleText;
 STATIC std::vector<DevConsoleCommand>	DevConsole::m_consoleCommands;
 STATIC std::string						DevConsole::m_consoleCommandHistory[10];
+STATIC CursorSettings					DevConsole::m_originalCursorSettings;
 STATIC std::string						DevConsole::m_currentText;
 STATIC std::string						DevConsole::m_currentSelectionText;
 STATIC uint								DevConsole::m_indexCurrentSelectedCommandFromHistory;
@@ -132,6 +133,12 @@ void DevConsole::PrintString( const Rgba8& textColor , const std::string& devCon
 	newLineText.text = devConsolePrintString;
 	newLineText.messageType = messageType;
 	m_consoleText.push_back( newLineText );
+
+	if ( DEVCONSOLE_ERROR == messageType )
+	{
+		ToggleVisibility();
+		SetIsOpen( true );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -145,6 +152,8 @@ void DevConsole::PrintString( const std::string& devConsolePrintString /*= "INVA
 	switch (messageType)
 	{
 	case DEVCONSOLE_ERROR:			newLineText.lineColor = RED;
+									ToggleVisibility();
+									SetIsOpen( true );
 									break;
 	case DEVCONSOLE_USERLOG:		newLineText.lineColor = PURPLE;
 									break;
@@ -413,14 +422,14 @@ void DevConsole::RenderCatAnimation( RenderContext& renderer , const Camera& cam
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void DevConsole::SetIsOpen( bool isOpen )
+STATIC void DevConsole::SetIsOpen( bool isOpen )
 {
 	m_isConsoleOpen = isOpen;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void DevConsole::ToggleVisibility()
+STATIC void DevConsole::ToggleVisibility()
 {
 	//ResetConsole();
 	EventArgs temp;
