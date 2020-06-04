@@ -82,8 +82,14 @@
     <ClCompile Include="GamePhysicsSystem.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
+    <ClCompile Include="Paddle.cpp">
+      <Filter>Gameplay\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Ball.cpp">
+      <Filter>Gameplay\Entities</Filter>
+    </ClCompile>
     <ClCompile Include="Level.cpp">
-      <Filter>Framework</Filter>
+      <Filter>Gameplay\Levels</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -134,6 +140,12 @@
     </ClInclude>
     <ClInclude Include="Level.hpp">
       <Filter>Gameplay\Levels</Filter>
+    </ClInclude>
+    <ClInclude Include="Paddle.hpp">
+      <Filter>Gameplay\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Ball.hpp">
+      <Filter>Gameplay\Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

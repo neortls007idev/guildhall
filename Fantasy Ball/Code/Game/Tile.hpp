@@ -6,7 +6,7 @@
 class Tile : public Entity
 {
 public:
-	Tile( int health , eEntityType eEntityType , );
+	Tile( int health , eEntityType eEntityType );
 protected:
 private:
 };

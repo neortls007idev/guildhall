@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Renderer/Camera.hpp"
+#include "Level.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -21,6 +22,9 @@ public:
 
 	void Die();
 
+	//----------------------------------------------------------------------------------------------------------
+	int GetPaddleHealth() const															{ return 3; }
+	
 private:
 	void UpdateFromKeyBoard();
 
@@ -39,6 +43,8 @@ public:
 								
 	Camera						m_worldCamera;
 	Camera						m_uiCamera;
+	std::vector<Level*>			m_levels;
+	Level*						m_currentLevel									= nullptr;
 };
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

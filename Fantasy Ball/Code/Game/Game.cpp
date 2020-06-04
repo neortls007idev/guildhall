@@ -2,7 +2,6 @@
 #include "Game/TheApp.hpp"
 #include "Game/Game.hpp"
 #include "Game/TileDefinition.hpp"
-
 #include "Engine/Input/VirtualKeyboard.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/EngineCommon.hpp"
@@ -16,15 +15,17 @@
 #include "Engine/Renderer/SpriteAnimation.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Renderer/SpriteAnimation.hpp"
+#include "Game/Level.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // GLOBAL VARIABLES
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-extern RenderContext* g_theRenderer;
-extern BitmapFont* g_bitmapFont;
-extern AudioSystem* g_theAudioSystem;
-extern TheApp* g_theApp;
+extern RenderContext*	g_theRenderer;
+extern BitmapFont*		g_bitmapFont;
+extern AudioSystem*		g_theAudioSystem;
+extern TheApp*			g_theApp;
+extern InputSystem*		g_theInput;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -35,8 +36,19 @@ SpriteSheet* g_characterSpriteSheet = nullptr;
 
 Game::Game()
 {
-	m_worldCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( 20.f * CLIENT_ASPECT , 20.f ) );
+	g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
+	
+	m_worldCamera.SetOrthoView( Vec2( -960.f * CLIENT_ASPECT , -960.f ) , Vec2( 960.f * CLIENT_ASPECT , 960.f ) );
 	LoadAssets();
+	m_currentLevel				= new Level( this );
+	Vec2 cameraMins				= m_worldCamera.GetOrthoMin().GetXYComponents();
+	Vec2 cameraMaxs				= m_worldCamera.GetOrthoMax().GetXYComponents();
+	m_currentLevel->m_leftWall	= AABB2( cameraMins.x , -960.f , cameraMins.x + 5.f , 960.f );
+	m_currentLevel->m_rightWall = AABB2( cameraMaxs.x - 5.f , -960.f , cameraMaxs.x , 960.f );
+	m_currentLevel->m_topWall	= AABB2( -540.f , 960.f , 540.f , 961.f );
+	m_currentLevel->m_pit		= AABB2( -540.f , cameraMins.y , 540.f , cameraMins.y - 1 );
+	m_currentLevel->SpawnNewEntity( PADDLE , Vec2::ZERO );
+	m_currentLevel->SpawnNewEntity( BALL , Vec2::ZERO );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -66,14 +78,18 @@ void Game::LoadAllTextures()
 void Game::Update( float deltaSeconds )
 {
 //	UpdateCamera();
-
+	m_currentLevel->Update( deltaSeconds );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Game::Render() const
 {
-	
+	m_currentLevel->Render();
+	Vec2 cameraMins = m_worldCamera.GetOrthoMin().GetXYComponents();
+	Vec2 cameraMaxs = m_worldCamera.GetOrthoMax().GetXYComponents();
+	g_theRenderer->DrawLine( Vec2( cameraMins.x , 0.f ) , Vec2( cameraMaxs.x , 0.f ) , MAGENTA , 5.f );
+	g_theRenderer->DrawLine( Vec2( 0.f , cameraMins.y ) , Vec2( 0.f , cameraMaxs.y ) , MAGENTA , 5.f );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
