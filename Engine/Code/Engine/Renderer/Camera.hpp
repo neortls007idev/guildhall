@@ -54,11 +54,11 @@ public:
 
 	Rgba8			GetClearColor() const																					{ return m_clearColor; }
 	unsigned int	GetClearMode() const																					{ return m_clearMode; }
-	Texture* GetColorTarget() const;
-	Texture* GetColorTarget( int index ) const;
+	Texture*		GetColorTarget() const;
+	Texture*		GetColorTarget( int index ) const;
 	uint			GetColorTargetCount() const;
 	Vec2			GetColorTargetSize() const;
-	Texture* GetDepthStencilTarget() const																					{ return m_depthStencilTarget; }
+	Texture*		GetDepthStencilTarget() const																			{ return m_depthStencilTarget; }
 
 	Mat44			GetProjectionMatrix() const																				{ return m_projection; }
 	Mat44			GetViewMatrix();
@@ -73,6 +73,7 @@ public:
 	Transform		GetCameraTransform() const																				{ return m_transform; }
 
 	void			SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight );
+	void			SetOrthoView( const float& halfHeight , const float& aspectRatio );
 	void			SetClearMode( unsigned int clearFlags , Rgba8 color , float depth = 0.f , unsigned int stencil = 0 );
 	void			SetColorTarget( Texture* texture );
 	void			SetColorTarget( int index , Texture* texture );

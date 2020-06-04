@@ -19,7 +19,13 @@ extern AudioSystem*		g_theAudioSystem;
 Level::Level( Game* owner ) :
 								m_owner( owner ) 
 {
-	
+	Vec2 cameraMins = owner->GetWorldCamera()->GetOrthoMin().GetXYComponents();
+	Vec2 cameraMaxs = owner->GetWorldCamera()->GetOrthoMax().GetXYComponents();
+
+	m_leftWall		= AABB2( cameraMins.x        , cameraMins.y , cameraMins.x + 5.f , cameraMaxs.y );
+	m_rightWall		= AABB2( cameraMaxs.x - 5.f , cameraMins.y , cameraMaxs.x       , cameraMaxs.y );
+	m_topWall		= AABB2( cameraMins.x		 , cameraMaxs.y , cameraMaxs.x		  , cameraMaxs.y + 50.f );
+	m_pit			= AABB2( cameraMins.x		 , cameraMins.y , cameraMaxs.x		  , cameraMins.y - 50.f );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

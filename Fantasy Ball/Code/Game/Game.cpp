@@ -16,6 +16,7 @@
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Renderer/SpriteAnimation.hpp"
 #include "Game/Level.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // GLOBAL VARIABLES
@@ -37,16 +38,16 @@ SpriteSheet* g_characterSpriteSheet = nullptr;
 Game::Game()
 {
 	g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
+	float cameraHalfHeight = g_gameConfigBlackboard.GetValue( "cameraHalfHeight" , 540.f );
+	float cameraAspectRatio = g_gameConfigBlackboard.GetValue( "windowAspect" , 1.77f );
 	
-	m_worldCamera.SetOrthoView( Vec2( -960.f * CLIENT_ASPECT , -960.f ) , Vec2( 960.f * CLIENT_ASPECT , 960.f ) );
+	//m_worldCamera.SetOrthoView( Vec2( -cameraHalfHeight * cameraAspectRatio , -cameraHalfHeight ) , 
+	//							  Vec2( cameraHalfHeight * cameraAspectRatio , cameraHalfHeight ) );
+
+	m_worldCamera.SetOrthoView( cameraHalfHeight , cameraAspectRatio );
 	LoadAssets();
 	m_currentLevel				= new Level( this );
-	Vec2 cameraMins				= m_worldCamera.GetOrthoMin().GetXYComponents();
-	Vec2 cameraMaxs				= m_worldCamera.GetOrthoMax().GetXYComponents();
-	m_currentLevel->m_leftWall	= AABB2( cameraMins.x , -960.f , cameraMins.x + 5.f , 960.f );
-	m_currentLevel->m_rightWall = AABB2( cameraMaxs.x - 5.f , -960.f , cameraMaxs.x , 960.f );
-	m_currentLevel->m_topWall	= AABB2( -540.f , 960.f , 540.f , 961.f );
-	m_currentLevel->m_pit		= AABB2( -540.f , cameraMins.y , 540.f , cameraMins.y - 1 );
+	
 	m_currentLevel->SpawnNewEntity( PADDLE , Vec2::ZERO );
 	m_currentLevel->SpawnNewEntity( BALL , Vec2::ZERO );
 }

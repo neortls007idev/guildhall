@@ -175,6 +175,17 @@ void Camera::SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Camera::SetOrthoView( const float& halfHeight , const float& aspectRatio )
+{
+	Vec2 bottomLeft = Vec2( -halfHeight * aspectRatio , -halfHeight );
+	Vec2 topRight	= Vec2(  halfHeight * aspectRatio ,  halfHeight );
+	
+	m_projection	= CreateOrthoGraphicProjeciton( Vec3( bottomLeft , 0.0f ) , Vec3( topRight , 1.0f ) );
+	m_outputSize	= ( GetOrthoMax() - GetOrthoMin() ).GetXYComponents();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Vec3 Camera::GetOrthoMin() const
 {
 	Vec4 ndc( -1 , -1 , 0 , 1 );				// bottom left of renderable space

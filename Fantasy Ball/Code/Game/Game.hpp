@@ -24,7 +24,7 @@ public:
 
 	//----------------------------------------------------------------------------------------------------------
 	int GetPaddleHealth() const															{ return 3; }
-	
+	Camera* GetWorldCamera()															{ return &m_worldCamera; }
 private:
 	void UpdateFromKeyBoard();
 
