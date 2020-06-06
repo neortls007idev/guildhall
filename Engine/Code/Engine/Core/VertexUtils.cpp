@@ -138,10 +138,12 @@ void AppendIndexedVerts ( std::vector< Vertex_PCU >& sourceVerts , std::vector< 
 		destinationIndices.push_back( destinationVertsEnd + sourceIndices[ index ] );
 	}
 
-	for ( size_t index = 0; index < sourceVerts.size(); index++ )
-	{
-		destinationVerts.push_back( sourceVerts[ index ] );
-	}
+	destinationVerts.insert( destinationVerts.end() , sourceVerts.begin() , sourceVerts.end() );
+	
+// 	for ( size_t index = 0; index < sourceVerts.size(); index++ )
+// 	{
+// 		destinationVerts.push_back( sourceVerts[ index ] );
+// 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

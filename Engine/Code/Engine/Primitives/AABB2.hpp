@@ -39,6 +39,7 @@ public:
 	const Vec2 GetCenter() const;
 	const Vec2 GetDimensions() const;
 	const Vec2 GetNearestPoint( const Vec2& referencePosition ) const;
+		  void GetClosestEdgeFromRefrerencePoint( const Vec2& refPos , Vec2& outVert1 , Vec2& outVert2 );
 	const Vec2 GetPointForUV( const Vec2& uvCoordsZeroToOne ) const;
 	const Vec2 GetUVForPoint( const Vec2& point ) const;
 	
@@ -83,5 +84,4 @@ public:
 
 	void FitWithinBounds( const AABB2& bounds );
 	void AlignWithinAABB2( const AABB2& outerAABB2 , const Vec2& alignment );
-
 };

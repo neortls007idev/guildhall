@@ -86,6 +86,10 @@ TextureView* Texture::GetOrCreateRenderTargetView()
 
 	ID3D11Device* device = m_owner->m_device;
 	ID3D11RenderTargetView* rtv = nullptr;
+
+	std::string debugName = "Unreleased RTV";
+	SetDebugName( rtv , &debugName );
+
 	device->CreateRenderTargetView( m_handle , nullptr , &rtv );
 
 	if ( nullptr != rtv )
@@ -111,6 +115,9 @@ TextureView* Texture::GetOrCreateShaderResourceView()
 
 	device->CreateShaderResourceView( m_handle , nullptr , &srv );
 
+	std::string debugName = "Unreleased Shader Resource View";
+	SetDebugName( srv , &debugName );
+	
 	if ( srv )
 	{
 		m_shaderResourceView = new TextureView();

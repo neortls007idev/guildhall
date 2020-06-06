@@ -18,14 +18,14 @@ std::map< std::string , TileDefinition* > TileDefinition::s_definitions;
 
 TileDefinition::TileDefinition( const tinyxml2::XMLElement& definitionXMLElement )
 {
-	//m_tileProperties.PopulateFromXmlElementAttributes( definitionXMLElement );
-	m_name		   = ParseXmlAttribute( definitionXMLElement , "name" , m_name );
-	m_allowsSight  = ParseXmlAttribute( definitionXMLElement , "allowsSight" , m_allowsSight	);
-	m_allowsSwim   = ParseXmlAttribute( definitionXMLElement , "allowsSwim"  , m_allowsSwim		);
-	m_allowsWalk   = ParseXmlAttribute( definitionXMLElement , "allowsWalk"  , m_allowsWalk		);
-	m_allowsFly    = ParseXmlAttribute( definitionXMLElement , "allowsFly"   , m_allowsFly		);
-	m_spriteCoords = ParseXmlAttribute( definitionXMLElement , "spriteCoords", m_spriteCoords	);
-	m_tileColor    = ParseXmlAttribute( definitionXMLElement , "colorInImageFile"  , m_tileColor		);
+	m_name				= ParseXmlAttribute( definitionXMLElement , "name"					, m_name );
+	m_health			= ParseXmlAttribute( definitionXMLElement , "health"					, m_health	);
+	m_solidAtHealth		= ParseXmlAttribute( definitionXMLElement , "healthToSolid"			, m_solidAtHealth);
+	m_isSolid			= ParseXmlAttribute( definitionXMLElement , "isSolid"				, m_isSolid		);
+	m_isVisible			= ParseXmlAttribute( definitionXMLElement , "isVisible"				, m_isVisible		);
+	m_visibleAtHealth	= ParseXmlAttribute( definitionXMLElement , "visibleAtHealth"		, m_visibleAtHealth );
+	m_spriteCoords		= ParseXmlAttribute( definitionXMLElement , "spriteCoords"			, m_spriteCoords	);
+	m_tileColor			= ParseXmlAttribute( definitionXMLElement , "colorInImageFile"		, m_tileColor		);
 
 	// TODO - below line of code needs further testing.
 	//int spriteSheetWidth = g_tileSpriteSheet->GetTexture().GetDimensions().x / g_tileSpriteSheet->GetSpriteDimension().x;
@@ -53,16 +53,16 @@ void TileDefinition::CreateTileDefinitions( const char* xmlFilePath )
 
 	//g_tileSpriteSheet
 	 
-	tinyxml2::XMLElement* tileDefinition = xmlDocument.RootElement();
-	std::string terrainFileName = ParseXmlAttribute( *tileDefinition , "spriteSheet" , "" );
-	IntVec2 terrainSpriteSheetDimensions = ParseXmlAttribute( *tileDefinition , "spriteLayout" , IntVec2::ZERO );
+	tinyxml2::XMLElement* tileDefinition	= xmlDocument.RootElement();
+	std::string tileSheetFileName			= ParseXmlAttribute( *tileDefinition , "spriteSheet" , "" );
+	IntVec2 terrainSpriteSheetDimensions	= ParseXmlAttribute( *tileDefinition , "spriteLayout" , IntVec2::ZERO );
 	
-	if ( ( terrainFileName == "" ) || ( terrainSpriteSheetDimensions.x == 0 && terrainSpriteSheetDimensions.y == 0 ) )
+	if ( ( tileSheetFileName == "" ) || ( terrainSpriteSheetDimensions.x == 0 && terrainSpriteSheetDimensions.y == 0 ) )
 	{
 		ERROR_AND_DIE( "You forgot To mention the filePath for the TileSpreadSheet or it's Grid Layout" );
 	}
 	
-	terrainTexturePath.append(terrainFileName);
+	terrainTexturePath.append(tileSheetFileName);
 	const char* filePath = terrainTexturePath.c_str();
 	//if ( g_tileSpriteSheet == NULL )
 	//{
@@ -94,3 +94,5 @@ TileDefinition* ParseXmlAttribute( const tinyxml2::XMLElement& element , const c
 
 	return value;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

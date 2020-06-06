@@ -177,7 +177,7 @@ void Game::Update( float deltaSeconds )
 
 	UpdateFromKeyBoard( deltaSeconds );
 	
-	Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix();
+	Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix( X_IN_Y_LEFT_Z_UP );
 	Vec3 forwardVector = cameraTransform.GetIBasis3D();
 	m_compassMeshTransform.SetPosition( m_gameCamera.GetPosition() + 0.1f * forwardVector );
 	

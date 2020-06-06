@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/Renderer/Camera.hpp"
-#include "Level.hpp"
+#include "Game/Map.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -43,8 +43,8 @@ public:
 								
 	Camera						m_worldCamera;
 	Camera						m_uiCamera;
-	std::vector<Level*>			m_levels;
-	Level*						m_currentLevel									= nullptr;
+	std::vector<Map*>			m_levels;
+	Map*						m_currentLevel									= nullptr;
 };
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

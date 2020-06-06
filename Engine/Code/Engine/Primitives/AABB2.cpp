@@ -132,6 +132,61 @@ const Vec2 AABB2::GetNearestPoint( const Vec2& referencePosition ) const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void AABB2::GetClosestEdgeFromRefrerencePoint( const Vec2& refPos , Vec2& outVert1 , Vec2& outVert2 )
+{
+	if( refPos.x < m_mins.x )
+	{
+		if( refPos.y > m_mins.y && refPos.y < m_maxs.y )
+		{
+			outVert1 = m_mins;
+			outVert2 = Vec2( m_mins.x , m_maxs.y );
+		}
+		else if( refPos.y < m_mins.y )
+		{
+			outVert1 = m_mins;
+			outVert2 = Vec2( m_maxs.x , m_mins.y );
+		}
+		else
+		{
+			outVert1 = Vec2( m_mins.x , m_maxs.y );
+			outVert2 = m_maxs;
+		}
+	}
+	if( refPos.x > m_maxs.x )
+	{
+		if( refPos.y > m_mins.y && refPos.y < m_maxs.y )
+		{
+			outVert1 = Vec2( m_maxs.x , m_mins.y );
+			outVert2 = m_maxs;
+		}
+		else if( refPos.y < m_mins.y )
+		{
+			outVert1 = m_mins;
+			outVert2 = Vec2( m_maxs.x , m_mins.y );
+		}
+		else
+		{
+			outVert1 = Vec2( m_mins.x , m_maxs.y );
+			outVert2 = m_maxs;
+		}
+	}
+	if( refPos.x > m_mins.x && refPos.x < m_maxs.x )
+	{
+		if( refPos.y < m_mins.y )
+		{
+			outVert1 = m_mins;
+			outVert2 = Vec2( m_maxs.x , m_mins.y );
+		}
+		else
+		{
+			outVert1 = Vec2( m_mins.x , m_maxs.y );
+			outVert2 = m_maxs;
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 const Vec2 AABB2::GetPointForUV( const Vec2& uvCoordsZeroToOne ) const
 {
 	Vec2 PointCoords;

@@ -867,9 +867,9 @@ STATIC Mat44 Mat44::CreateFromScaleRotationTransformation ( const Vec3& scale ,
 		Mat44 tranformRoll = CreateYRotationDegrees( roll );
 		//--------------------------------------------------------------------------------------------------------------------------------------------
 		transform.TransformBy( translateBy );
-		transform.TransformBy( tranformRoll );
 		transform.TransformBy( tranformYaw );
 		transform.TransformBy( tranformPitch );
+		transform.TransformBy( tranformRoll );
 		transform.TransformBy( scaleMatrix );
 
 		return transform;
@@ -885,16 +885,16 @@ STATIC Mat44 Mat44::CreateFromScaleRotationTransformation ( const Vec3& scale ,
 		Mat44 transform;
 
 		Mat44 scaleMatrix	= CreateNonUniformScale3D( scale );
-		Mat44 translateBy	= CreateTranslation3D( position );
  		Mat44 tranformPitch = CreateYRotationDegrees( pitch );
  		Mat44 tranformYaw	= CreateZRotationDegrees( yaw );
  		Mat44 tranformRoll	= CreateXRotationDegrees( roll );
+		Mat44 translateBy	= CreateTranslation3D( position );
 
 		//--------------------------------------------------------------------------------------------------------------------------------------------
 		transform.TransformBy( translateBy );
-		transform.TransformBy( tranformRoll );
 		transform.TransformBy( tranformYaw );
 		transform.TransformBy( tranformPitch );
+		transform.TransformBy( tranformRoll );
 		transform.TransformBy( scaleMatrix );
 		
 		return transform;

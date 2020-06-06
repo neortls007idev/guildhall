@@ -15,7 +15,7 @@
 #include "Engine/Renderer/SpriteAnimation.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Renderer/SpriteAnimation.hpp"
-#include "Game/Level.hpp"
+#include "Game/Map.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ Game::Game()
 
 	m_worldCamera.SetOrthoView( cameraHalfHeight , cameraAspectRatio );
 	LoadAssets();
-	m_currentLevel				= new Level( this );
+	m_currentLevel				= new Map( this );
 	
 	m_currentLevel->SpawnNewEntity( PADDLE , Vec2::ZERO );
 	m_currentLevel->SpawnNewEntity( BALL , Vec2::ZERO );
