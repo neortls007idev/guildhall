@@ -14,6 +14,7 @@
 #include "Engine/Renderer/ShaderState.hpp"
 #include "Engine/Core/NamedProperties.hpp"
 #include "Engine/Time/Time.hpp"
+#include "TileMap.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -63,6 +64,9 @@ Game::Game()
 	{
 		g_theDevConsole->PrintString( gameConfigData , eDevConsoleMessageType::DEVCONSOLE_SYTEMLOG );
 	}
+
+	//m_testMap = new TileMap( "Test" , IntVec2( 4 , 2 ) );
+	m_testMap = new TileMap( "Test" , IntVec2( 8 , 8 ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -100,7 +104,6 @@ void Game::IntializeGameObjects()
 	std::vector<uint>			cubeMeshIndices;
 
 	AABB3 box( Vec3( -0.5f, -0.5f , -0.5f ) , Vec3( 0.5f , 0.5f , 0.5f ) );
-	//CreateCuboid( cubeMeshVerts , cubeMeshIndices , box , WHITE );
 	CreateCuboidXInYLeftZUp( cubeMeshVertsMaster , cubeMeshIndices , box , WHITE );
 	VertexMaster::ConvertVertexMasterToVertexPCU( cubeMeshVerts , cubeMeshVertsMaster );
 	
@@ -190,6 +193,8 @@ void Game::Update( float deltaSeconds )
 	
 	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1.00f ) , Vec2::ONE , 20.f , PURPLE , deltaSeconds ,
 						 "FPS = %.0f" , m_fps );
+
+	m_testMap->UpdateMeshes();
 	
 	UpdateFromKeyBoard( deltaSeconds );
 	
@@ -256,14 +261,14 @@ void Game::Render() const
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( m_textures[ TEST_TEXTURE ] );
 			
-	g_theRenderer->SetModelMatrix( m_cubeMesh1Transform.GetAsMatrix() );
-	g_theRenderer->DrawMesh( m_cubeMesh );
-
-	g_theRenderer->SetModelMatrix( m_cubeMesh2Transform.GetAsMatrix() );
-	g_theRenderer->DrawMesh( m_cubeMesh );
-
-	g_theRenderer->SetModelMatrix( m_cubeMesh3Transform.GetAsMatrix() );
-	g_theRenderer->DrawMesh( m_cubeMesh );
+// 	g_theRenderer->SetModelMatrix( m_cubeMesh1Transform.GetAsMatrix() );
+// 	g_theRenderer->DrawMesh( m_cubeMesh );
+// 
+// 	g_theRenderer->SetModelMatrix( m_cubeMesh2Transform.GetAsMatrix() );
+// 	g_theRenderer->DrawMesh( m_cubeMesh );
+// 
+// 	g_theRenderer->SetModelMatrix( m_cubeMesh3Transform.GetAsMatrix() );
+// 	g_theRenderer->DrawMesh( m_cubeMesh );
 
 	if ( m_debugDraw )
 	{
@@ -280,6 +285,8 @@ void Game::Render() const
 		g_theRenderer->SetModelMatrix( m_compassMeshTransform.GetAsMatrix() );
 		g_theRenderer->DrawMesh( m_basisMesh );
 	}
+
+	m_testMap->Render();
 	
 	g_theRenderer->EndCamera( m_gameCamera );
 

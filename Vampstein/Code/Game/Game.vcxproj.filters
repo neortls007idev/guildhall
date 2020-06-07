@@ -34,6 +34,15 @@
     <ClCompile Include="Game.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
+    <ClCompile Include="World.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="TileMap.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">
@@ -47,6 +56,15 @@
     </ClInclude>
     <ClInclude Include="EngineBuildPreferences.hpp">
       <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="World.hpp">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.hpp">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="TileMap.hpp">
+      <Filter>Gameplay</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
