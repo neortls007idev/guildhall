@@ -12,7 +12,9 @@ public:
 	void LoadAssets();
 	void LoadAllSounds();
 	void LoadAllTextures();
-
+	void CreateAllTileDefinitions();
+	void CreateAllMapDefinitions();
+	
 	void Update( float deltaSeconds );
 	void UpdateCamera();
 	
@@ -28,7 +30,7 @@ public:
 private:
 	void UpdateFromKeyBoard();
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------------------------------------------------------------------------
 
 private:
 	int							m_controllerID									= -1;
@@ -43,6 +45,7 @@ public:
 								
 	Camera						m_worldCamera;
 	Camera						m_uiCamera;
+	int							m_currentLevelNumber							= 0;
 	std::vector<Map*>			m_levels;
 	Map*						m_currentLevel									= nullptr;
 };

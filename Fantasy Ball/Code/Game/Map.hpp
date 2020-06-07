@@ -5,6 +5,7 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+class MapDefinition;
 class Game;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -14,6 +15,13 @@ class Map
 {
 public:
 	Map( Game* owner );
+	Map( Game* owner , MapDefinition* mapDefinition , std::string mapName );
+
+	void LevelBounds();
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+
+
 	~Map();
 
 	void Update( float deltaSeconds );
@@ -33,7 +41,9 @@ public:
 	AABB2							m_rightWall;
 	AABB2							m_topWall;
 	AABB2							m_pit;
-	
+	IntVec2							m_dimensions;
+	//MapDefinition*					m_mapDefinition											= nullptr;
+	std::string						m_name;
 	Entitylist						m_entityListsByType[ NUM_ENTITY_TYPES ];
 };
 

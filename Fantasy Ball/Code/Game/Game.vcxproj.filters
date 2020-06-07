@@ -91,6 +91,9 @@
     <ClCompile Include="Map.cpp">
       <Filter>Gameplay\Levels</Filter>
     </ClCompile>
+    <ClCompile Include="MapDefinition.cpp">
+      <Filter>Gameplay\Levels</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">
@@ -145,6 +148,9 @@
       <Filter>Gameplay\Entities</Filter>
     </ClInclude>
     <ClInclude Include="Map.hpp">
+      <Filter>Gameplay\Levels</Filter>
+    </ClInclude>
+    <ClInclude Include="MapDefinition.hpp">
       <Filter>Gameplay\Levels</Filter>
     </ClInclude>
   </ItemGroup>

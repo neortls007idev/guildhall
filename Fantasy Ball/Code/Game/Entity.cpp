@@ -15,7 +15,7 @@ Entity::Entity( Game* owner , int health , eEntityType eEntityType ) :
 
 void Entity::Update( float deltaSeconds )
 {
-
+	UNUSED( deltaSeconds );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

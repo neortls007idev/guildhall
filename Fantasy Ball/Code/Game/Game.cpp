@@ -1,22 +1,23 @@
-#include "Game/GameCommon.hpp"
-#include "Game/TheApp.hpp"
-#include "Game/Game.hpp"
-#include "Game/TileDefinition.hpp"
-#include "Engine/Input/VirtualKeyboard.hpp"
-#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Audio/AudioSystem.hpp"
+#include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Core/SimpleTriangleFont.hpp"
 #include "Engine/Core/StringUtils.hpp"
-#include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Input/VirtualKeyboard.hpp"
+#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
-#include "Engine/Audio/AudioSystem.hpp"
-#include "Engine/Core/SimpleTriangleFont.hpp"
+#include "Engine/Renderer/SpriteAnimation.hpp"
 #include "Engine/Renderer/SpriteAnimation.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
-#include "Engine/Renderer/SpriteAnimation.hpp"
+#include "Game/Game.hpp"
+#include "Game/GameCommon.hpp"
 #include "Game/Map.hpp"
-#include "Engine/Core/EngineCommon.hpp"
+#include "Game/MapDefinition.hpp"
+#include "Game/TheApp.hpp"
+#include "Game/TileDefinition.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // GLOBAL VARIABLES
@@ -72,6 +73,27 @@ void Game::LoadAllSounds()
 void Game::LoadAllTextures()
 {
  	
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::CreateAllTileDefinitions()
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::CreateAllMapDefinitions()
+{
+// 	for( auto totalMaps = MapDefinition::s_definitions.cbegin(); totalMaps != MapDefinition::s_definitions.cend(); totalMaps++ )
+// 	{
+// 		Map* temp = new Map( this , totalMaps->second , totalMaps->second->m_name );
+// 		m_levels.push_back( temp );
+// 	}
+// 	
+// 	m_currentLevelNumber = 0;
+// 	m_currentLevel = m_levels[ m_currentLevelNumber ];
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

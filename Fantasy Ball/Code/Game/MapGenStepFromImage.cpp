@@ -3,6 +3,9 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include <string>
 
+#include "Game/Tile.hpp"
+#include "Game/TileDefinition.hpp"
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 MapGenStepFromImage::MapGenStepFromImage( const XMLElement& element ) : 

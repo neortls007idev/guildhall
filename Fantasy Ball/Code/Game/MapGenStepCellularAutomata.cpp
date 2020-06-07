@@ -1,5 +1,6 @@
 #include "Game/MapGenStepCellularAutomata.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Game/TileDefinition.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +25,7 @@ void MapGenStepCellularAutomata::RunStepOnce( Map& map )
 		return;
 	}
 	RandomNumberGenerator rng;
-
+	
 	int numberOfneighborsToCheckFor = m_numOfNeighbors.GetRandomInRange( rng );
 	float	chancePerTile = m_chancePerTile.GetRandomInRange( rng );
 	IntVec2 tileCoords;
@@ -53,7 +54,7 @@ void MapGenStepCellularAutomata::RunStepOnce( Map& map )
 	{
 		if ( hasTileChanged[index] )
 		{
-			map.m_tiles[ index ].SetTileType( m_setTile );
+			//map.m_tiles[ index ].SetTileType( m_setTile );
 		}
 	}
 }

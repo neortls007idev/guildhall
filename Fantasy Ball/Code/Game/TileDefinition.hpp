@@ -27,9 +27,9 @@ public:
 //	NamedStrings											m_tileProperties;
 //	NamedStrings											m_spriteSheet;
 	std::string												m_name					= "";
-	int														m_health				= 1.f;
-	int														m_solidAtHealth			= 0.f;
-	int														m_visibleAtHealth		= 0.f;
+	int														m_health				= 1;
+	int														m_solidAtHealth			= 0;
+	int														m_visibleAtHealth		= 0;
 	bool													m_isSolid				= false;
 	bool													m_isVisible				= false;
 	IntVec2													m_spriteCoords			= IntVec2::ZERO;

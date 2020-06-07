@@ -1,8 +1,7 @@
 #include "Game/MapGenStepMutate.hpp"
-
+#include "Game/Tile.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-
 
 MapGenStepMutate::MapGenStepMutate( const XMLElement& element ) : MapGenStep(element)
 {

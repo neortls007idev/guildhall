@@ -199,6 +199,9 @@
     <ClCompile Include="GameCommon.cpp" />
     <ClCompile Include="GamePhysicsSystem.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="MapDefinition.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="MapGenStep.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -254,6 +257,9 @@
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GamePhysicsSystem.hpp" />
     <ClInclude Include="Map.hpp" />
+    <ClInclude Include="MapDefinition.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="MapGenStep.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
