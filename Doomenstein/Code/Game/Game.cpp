@@ -55,7 +55,14 @@ Game::Game()
 	m_compassMeshTransform.SetScale( 0.01f , 0.01f , 0.01f );
 
 	std::string gameConfigData = g_gameConfigBlackboard.GetValue( "testkey" , "Invalid Value" );
-	g_theDevConsole->PrintString( gameConfigData , eDevConsoleMessageType::DEVCONSOLE_ERROR );
+	if( gameConfigData == "Invalid Value" )
+	{
+		g_theDevConsole->PrintString( gameConfigData , eDevConsoleMessageType::DEVCONSOLE_ERROR );
+	}
+	else
+	{
+		g_theDevConsole->PrintString( gameConfigData , eDevConsoleMessageType::DEVCONSOLE_SYTEMLOG );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -69,14 +76,18 @@ void Game::LoadShaders()
 
 void Game::LoadTextures()
 {
-	m_testTexture = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Test_StbiFlippedAndOpenGL.png" );
+	m_textures[ TEST_TEXTURE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Test_StbiFlippedAndOpenGL.png" );
+//	m_textures[ HUD_BASE ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Hud_Base.png" );
+	m_textures[ TERRAIN_SPRITE_SHEET ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Terrain_8x8.png" );
+	m_textures[ PLAYER_SPRITE_SHEET ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/ViewModelsSpriteSheet_8x8.png" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Game::LoadAudio()
 {
-	m_testSound = g_theAudioSystem->CreateOrGetSound( "Data/Audio/TestSound.mp3" );
+	m_sounds[ TEST_SOUND ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/TestSound.mp3" );
+	m_sounds[ TEST_SOUND ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/Teleporter.wav" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -163,25 +174,30 @@ void Game::InitializeCameras()
 void Game::Update( float deltaSeconds )
 {	
 	
-	if ( m_isHUDEnabled )
+	if ( m_debugDraw )
 	{
 		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.625f , 1.00f ) , Vec2::ONE , 20.f , RED , deltaSeconds ,
-			"[ H ] : HIDE HELP HUD" );
+			"[ F1 ] : SHOW DEBUG HUD" );
 		DebugDrawUI( deltaSeconds );
 	}
 	else
 	{
 		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.625f , 1.00f ) , Vec2::ONE , 20.f , RED , deltaSeconds ,
-			"[ H ] : SHOW HELP HUD" );
+			"[ F1 ] : SHOW DEBUG HUD" );
 	}
 
+	m_fps = 1.f / deltaSeconds;
+	
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1.00f ) , Vec2::ONE , 20.f , PURPLE , deltaSeconds ,
+						 "FPS = %.0f" , m_fps );
+	
 	UpdateFromKeyBoard( deltaSeconds );
 	
-	Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix();
+	Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix( X_IN_Y_LEFT_Z_UP );
 	Vec3 forwardVector = cameraTransform.GetIBasis3D();
 	m_compassMeshTransform.SetPosition( m_gameCamera.GetPosition() + 0.1f * forwardVector );
 	
-	UpdateAudioFromKeyBoard();
+	UpdateDebugDrawFromKeyBoard();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -238,7 +254,7 @@ void Game::Render() const
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	
 	g_theRenderer->BindShader( nullptr );
-	g_theRenderer->BindTexture( m_testTexture );
+	g_theRenderer->BindTexture( m_textures[ TEST_TEXTURE ] );
 			
 	g_theRenderer->SetModelMatrix( m_cubeMesh1Transform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_cubeMesh );
@@ -249,18 +265,21 @@ void Game::Render() const
 	g_theRenderer->SetModelMatrix( m_cubeMesh3Transform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
-	g_theRenderer->BindShader( nullptr );
-	g_theRenderer->BindTexture( nullptr );
+	if ( m_debugDraw )
+	{
+		g_theRenderer->BindShader( nullptr );
+		g_theRenderer->BindTexture( nullptr );
 
-	g_theRenderer->SetCullMode( CULL_NONE );
-	g_theRenderer->SetDepthTest( COMPARE_ALWAYS , false );
-	g_theRenderer->SetBlendMode( eBlendMode::SOLID );
-	g_theRenderer->SetModelMatrix( m_basisMeshTransform.GetAsMatrix() );
-	g_theRenderer->DrawMesh( m_basisMesh );
+		g_theRenderer->SetCullMode( CULL_NONE );
+		g_theRenderer->SetDepthTest( COMPARE_ALWAYS , false );
+		g_theRenderer->SetBlendMode( eBlendMode::SOLID );
+		g_theRenderer->SetModelMatrix( m_basisMeshTransform.GetAsMatrix() );
+		g_theRenderer->DrawMesh( m_basisMesh );
 
-	g_theRenderer->SetDepthTest( COMPARE_ALWAYS , false );
-	g_theRenderer->SetModelMatrix( m_compassMeshTransform.GetAsMatrix() );
-	g_theRenderer->DrawMesh( m_basisMesh );
+		g_theRenderer->SetDepthTest( COMPARE_ALWAYS , false );
+		g_theRenderer->SetModelMatrix( m_compassMeshTransform.GetAsMatrix() );
+		g_theRenderer->DrawMesh( m_basisMesh );
+	}
 	
 	g_theRenderer->EndCamera( m_gameCamera );
 
@@ -288,11 +307,6 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 		return;
 	}
 	
-	if ( g_theInput->WasKeyJustPressed( 'H' ) )
-	{
-		m_isHUDEnabled = !m_isHUDEnabled;
-	}
-
 	CameraPositionUpdateOnInput( deltaSeconds );
 
 	if ( g_theInput->WasKeyJustPressed( 'I' ) )
@@ -318,14 +332,11 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Game::UpdateAudioFromKeyBoard()
+void Game::UpdateDebugDrawFromKeyBoard()
 {
 	if ( g_theInput->WasKeyJustPressed( KEY_F1 ) )
 	{
-		float volume	= m_rng.RollRandomFloatInRange( 0.5f , 1.f );
-		float panning	= m_rng.RollRandomFloatInRange( -1.f , 1.f );
-		float speed		= m_rng.RollRandomFloatInRange( 0.5f , 2.f );
-		g_theAudioSystem->PlaySound( m_testSound , false , volume , panning , speed );
+		m_debugDraw = !m_debugDraw;
 	}
 }
 
@@ -400,9 +411,6 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	m_pitch += mousePos.y * speed * deltaSeconds;
 
 	m_pitch				= Clamp( m_pitch , -89.9f , 89.9f );
-	//m_yaw				= Clamp( m_yaw , -180.f , 180.f );
-	//float finalPitch	= fmodf( m_pitch , 360.f ) - 90.f;
-	//float finalYaw		= fmodf( m_yaw , 360.f ) - 180.f;
 	float finalRoll		= 0.f;
 
 	m_gameCamera.SetPitchYawRollRotation( m_pitch , m_yaw , finalRoll );	

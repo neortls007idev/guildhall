@@ -17,6 +17,28 @@ class GPUMesh;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+enum  eGameTextures
+{
+	TEST_TEXTURE,
+	HUD_BASE,
+	TERRAIN_SPRITE_SHEET,
+	PLAYER_SPRITE_SHEET,
+
+	NUM_TOTAL_GAME_TEX
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum  eGameSounds
+{
+	TEST_SOUND ,
+	TELEPORTER ,
+	
+	NUM_GAME_SOUNDS,
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 class Game
 {
 
@@ -40,14 +62,15 @@ private:
 //				METHODS TO HANDLE USER INPUT
 //--------------------------------------------------------------------------------------------------------------------------------------------
 			void UpdateFromKeyBoard( float deltaSeconds );
-			void UpdateAudioFromKeyBoard();
+			void UpdateDebugDrawFromKeyBoard();
 			void CameraPositionUpdateOnInput( float deltaSeconds );
 
 private:
 
 	int							m_controllerID										= -1;
 	float						m_screenShakeIntensity								= 0.f;
-
+	float						m_fps												= 0.f;
+	
 public:
 
 	GPUMesh*					m_cubeMesh;
@@ -59,9 +82,6 @@ public:
 	Transform					m_basisMeshTransform;
 	Transform					m_compassMeshTransform;
 	
-	uint						m_hCuts												= 32;		// slices
-	uint						m_vCuts												= 16;		// stacks
-
 	mutable Camera				m_gameCamera;
 	Camera						m_uiCamera;
 
@@ -69,12 +89,12 @@ public:
 	float						m_pitch												= 0.f;
 	float						m_yaw												= 0.f;
 	
-	bool						m_isHUDEnabled										= true;
+	bool						m_debugDraw											= false;
 
 	Shader*						m_imageEffectShader									= nullptr;
 	
-	Texture*					m_testTexture										= nullptr;
-	SoundPlaybackID				m_testSound;
+	Texture*					m_textures[ NUM_TOTAL_GAME_TEX ];
+	SoundPlaybackID				m_sounds[ NUM_GAME_SOUNDS ];
 	RandomNumberGenerator		m_rng;
 	
 	eDebugRenderMode			m_debugRenderMode									= DEBUG_RENDER_ALWAYS;
