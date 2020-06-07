@@ -30,6 +30,9 @@ void RotateDegreesPolygonAboutPoint( Polygon2D& polygon , Vec2 worldPosition , f
 void AppendIndexedVerts ( std::vector< Vertex_PCU >& sourceVerts , std::vector< uint >& sourceIndices ,
                           std::vector< Vertex_PCU >& destinationVerts , std::vector< uint >& destinationIndices );
 
+void AppendIndexedVerts( std::vector< VertexMaster >& sourceVerts , std::vector< uint >& sourceIndices ,
+						 std::vector< VertexMaster >& destinationVerts , std::vector< uint >& destinationIndices );
+
 void TransformAndAppendIndexedVerts ( std::vector< Vertex_PCU >& destinationVerts ,
                                       std::vector< uint >& destinationIndices , std::vector< Vertex_PCU >& sourceVerts ,
                                       std::vector< uint >& sourceIndices , Mat44 transformation = Mat44::IDENTITY );
