@@ -2,9 +2,9 @@
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/StringUtils.hpp"
-#include "Game/MapGenStepMutate.hpp"
-#include "Game/MapGenStepWorm.hpp"
-#include "Game/MapGenStepCellularAutomata.hpp"
+//#include "Game/MapGenStepMutate.hpp"
+//#include "Game/MapGenStepWorm.hpp"
+//#include "Game/MapGenStepCellularAutomata.hpp"
 #include "Game/MapGenStepFromImage.hpp"
 #include "Game/TileDefinition.hpp"
 
@@ -49,10 +49,10 @@ void MapGenStep::RunStep( Map& map )
 MapGenStep* MapGenStep::CreateMapGenStep( const XMLElement& generatorXMLElement )
 {
 	std::string generatorName = generatorXMLElement.Name();
-	if ( generatorName.compare( "Mutate" )			 == 0 )			 return new MapGenStepMutate( generatorXMLElement );
-	if ( generatorName.compare( "Worm" )			 == 0 )			 return new MapGenStepWorm( generatorXMLElement );
+// 	if ( generatorName.compare( "Mutate" )			 == 0 )			 return new MapGenStepMutate( generatorXMLElement );
+// 	if ( generatorName.compare( "Worm" )			 == 0 )			 return new MapGenStepWorm( generatorXMLElement );
+// 	if ( generatorName.compare( "CellularAutomata" ) == 0 )			 return new MapGenStepCellularAutomata( generatorXMLElement );
 	if ( generatorName.compare( "FromImage" )		 == 0 )			 return new MapGenStepFromImage( generatorXMLElement );
-	if ( generatorName.compare( "CellularAutomata" ) == 0 )			 return new MapGenStepCellularAutomata( generatorXMLElement );
 // 	if( generatorName == "PerlinNoise")			 return new
 // 	if( generatorName == "RoomsAndPaths")		 return new
 

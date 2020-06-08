@@ -3,7 +3,6 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-
 void GPUMesh::UpdateVertices( uint vcount , void const* vertexData , uint vertexStride , buffer_attribute_t const* layout )
 {
 	m_vertices->SetVertexBufferLayout( layout );
@@ -77,14 +76,18 @@ GPUMesh::~GPUMesh()
 
 void GPUMesh::AddVertices( uint vcount , void const* verts )
 {
-
+	// TODO - IMPLEMENT ME
+	UNUSED( vcount );
+	UNUSED( verts );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void GPUMesh::AddIndices( uint icount , uint const* indices )
 {
-
+	// TODO - IMPLEMENT ME
+	UNUSED( icount );
+	UNUSED( indices );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

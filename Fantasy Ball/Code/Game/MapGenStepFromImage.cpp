@@ -39,6 +39,8 @@ void MapGenStepFromImage::RunStepOnce( Map& map )
 	{
 		for ( tileCoords.x = 0;( tileCoords.x <  map.m_dimensions.x ) && ( tileCoords.y < m_mutationImage->GetDimensions().x ); tileCoords.x++ )
 		{
+			// TODO - FIX ME
+			/*
 			Tile& tile = *map.GetTileAtTileCoords( tileCoords );
 			TileDefinition* curTileTypeInImage = DoesRGBA8AtpixelCoordsMatchAnyTileDefinition( tileCoords );
 			if ( curTileTypeInImage )
@@ -47,7 +49,7 @@ void MapGenStepFromImage::RunStepOnce( Map& map )
 				//{
 					tile.SetTileType( curTileTypeInImage );
 				//}
-			}
+			}*/
 		}
 	}
 

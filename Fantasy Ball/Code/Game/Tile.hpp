@@ -30,8 +30,8 @@ protected:
 	Map*							m_owner											= nullptr;
 	IntVec2							m_tileCoords;
 	TileDefinition*					m_tileDef										= nullptr;
-	int								m_solidAtHealth									= 0.f;
-	int								m_visibleAtHealth								= 0.f;
+	int								m_solidAtHealth									= 0;
+	int								m_visibleAtHealth								= 0;
 	bool							m_isSolid										= false;
 	bool							m_isVisible										= false;
 	Rgba8							m_tileColor;

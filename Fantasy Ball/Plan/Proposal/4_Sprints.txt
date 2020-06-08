@@ -41,9 +41,10 @@ Task Id	|	Status 	|	Estimate  |	  Actual 	|	 Feature Area	  |	 Feature Id	 |	Des
 5		|	[0]		|	  2.0	  |	    0.0		|	Testing			  |		8		 |	Updating Test Level & Stress testing Physics system for performance.
 42		|	[0]		|	  1.0	  |	    0.0		|	Game - Level	  |		27		 |	Create a chroma key for creating levels using paint.
 46%		|	[0]%	|	  2.0%	  |	    1.33%	|	Game - Physics    |		7		 |  Gameplay Physics for collisions between ball and paddle and ball and the tiles.
-47%		|	[0]%	|	  2.0%	  |	    0.5%	|	Game - Level	  |		7		 |  Map generation using images
+47%		|	[0]%	|	  2.0%	  |	    1.0%	|	Game - Level	  |		7		 |  Map generation using images
+48%		|	[0]%	|	  1.0%	  |	    0.5%	|	Game - Data		  |		-		 |  Data Drving Gameplay Camera configuration
 --------------------|-------------|-------------|-------------------------------------------------------------------------------------------------------------
-Total 				|	  10.5	  |				|
+Total 				|	  10.5	  |		6.83	|
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ==============================================================================================================================================================

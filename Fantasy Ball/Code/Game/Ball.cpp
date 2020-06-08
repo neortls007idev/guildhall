@@ -8,7 +8,7 @@ extern RenderContext* g_theRenderer;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Ball::Ball( Game* owner , float health , float cosmeticRadius , float physicsRadius , Vec2 position , Vec2 velocity , eEntityType type /*= BALL */ ) :
+Ball::Ball( Game* owner , int health , float cosmeticRadius , float physicsRadius , Vec2 position , Vec2 velocity , eEntityType type /*= BALL */ ) :
 																								Entity( owner , health , type ),
 																								m_cosmeticRadius( cosmeticRadius ) ,
 																								m_physicsRadius( physicsRadius ) ,

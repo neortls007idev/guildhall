@@ -11,7 +11,7 @@ class Game;
 class Ball : public Entity
 {
 public:
-	Ball( Game* owner , float health , float cosmeticRadius , float physicsRadius , Vec2 position , Vec2 velocity , eEntityType type = BALL );
+	Ball( Game* owner , int health , float cosmeticRadius , float physicsRadius , Vec2 position , Vec2 velocity , eEntityType type = BALL );
 	~Ball(){};
 
 	void Update( float deltaSeconds ) override;

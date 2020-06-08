@@ -66,13 +66,23 @@ Map::Map( Game* owner , MapDefinition* mapDefinition , std::string mapName ) :
 
 void Map::LevelBounds()
 {
-	Vec2 cameraMins = m_owner->GetWorldCamera()->GetOrthoMin().GetXYComponents();
-	Vec2 cameraMaxs = m_owner->GetWorldCamera()->GetOrthoMax().GetXYComponents();
+	Camera* gameCamera		= m_owner->GetWorldCamera();
+	Vec2 cameraMins			= gameCamera->GetOrthoMin().GetXYComponents();
+	Vec2 cameraMaxs			= gameCamera->GetOrthoMax().GetXYComponents();
 
-	m_leftWall	= AABB2( cameraMins.x , cameraMins.y , cameraMins.x + 5.f , cameraMaxs.y );
-	m_rightWall = AABB2( cameraMaxs.x - 5.f , cameraMins.y , cameraMaxs.x , cameraMaxs.y );
-	m_topWall	= AABB2( cameraMins.x , cameraMaxs.y , cameraMaxs.x , cameraMaxs.y + 50.f );
-	m_pit		= AABB2( cameraMins.x , cameraMins.y , cameraMaxs.x , cameraMins.y - 50.f );
+	//float aspectRatio		= gameCamera->GetAspectRatio();
+	AABB2 cameraArea		= AABB2( cameraMins , cameraMaxs );
+	Vec2 cameraDimensions	= cameraArea.GetDimensions(); 
+
+	constexpr float sideWallPercentage = 0.119791667f;
+	float sideWallOffset	= sideWallPercentage * 0.5f * cameraDimensions.x;
+	float topWallOffset		= 0.125f * 0.75f * cameraDimensions.y;
+	float pitOffset			= 0.1f * cameraDimensions.y * 0.5f;
+	
+	m_leftWall				= AABB2( cameraMins.x , cameraMins.y , cameraMins.x + sideWallOffset , cameraMaxs.y );
+	m_rightWall				= AABB2( cameraMaxs.x - sideWallOffset , cameraMins.y , cameraMaxs.x , cameraMaxs.y );
+	m_topWall				= AABB2( cameraMins.x , cameraMaxs.y - topWallOffset , cameraMaxs.x , cameraMaxs.y + 50.f );
+	m_pit					= AABB2( cameraMins.x , cameraMins.y , cameraMaxs.x , cameraMins.y - pitOffset );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -140,7 +150,7 @@ void Map::SpawnNewEntity( eEntityType type , const Vec2& position , TileDefiniti
 							z = x->GetCollider().GetDimensions().y;
 							break;
 	case BALL:
-				newEntity = new Ball( m_owner , 1.f , 25.f , 25.f , Vec2::ZERO , Vec2(5.5,-3.f) );
+				newEntity = new Ball( m_owner , 1 , 25.f , 25.f , Vec2::ZERO , Vec2(5.5,-3.f) );
 							break;
 	case TILE:
 				newEntity = new Tile( this , IntVec2( position ) , tileDef );
