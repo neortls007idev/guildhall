@@ -64,7 +64,7 @@ void MapGenStepCellularAutomata::RunStepOnce( Map& map )
 int MapGenStepCellularAutomata::NumberOfMatchingNeighbor( Map& map , Tile* currentTile )
 {
 	int numMatchingNeighbors = 0;
-	IntVec2 currentTileCoords = currentTile->GetTileCoordinates();
+	IntVec2 currentTileCoords = currentTile->GetTileIndex();
 	Tile tempTile = *map.GetNorthTileForTileCoords( currentTileCoords );
 	if (tempTile.GetTileType() == m_neighborTileType )
 	{

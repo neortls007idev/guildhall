@@ -47,10 +47,19 @@ Game::Game()
 
 	m_worldCamera.SetOrthoView( cameraHalfHeight , cameraAspectRatio );
 	LoadAssets();
-	m_currentLevel				= new Map( this );
+	TileDefinition::CreateTileDefinitions( "Data/GamePlay/TileDefs.xml" );
 	
+	m_currentLevel				= new Map( this );
+
 	m_currentLevel->SpawnNewEntity( PADDLE , Vec2::ZERO );
 	m_currentLevel->SpawnNewEntity( BALL , Vec2::ZERO );
+
+	Vec2 testTilePos = Vec2( 100.f , 100.f );
+	
+	m_currentLevel->SpawnNewEntity( TILE , 0 * testTilePos , TileDefinition::s_definitions.at( "NormalYellow" ) );
+	m_currentLevel->SpawnNewEntity( TILE , 1 * testTilePos , TileDefinition::s_definitions.at( "NormalPurple" ) );
+	m_currentLevel->SpawnNewEntity( TILE , 2 * testTilePos , TileDefinition::s_definitions.at( "NormalOrange" ) );
+	m_currentLevel->SpawnNewEntity( TILE , 3 * testTilePos , TileDefinition::s_definitions.at( "SteelGrey" ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -109,10 +118,14 @@ void Game::Update( float deltaSeconds )
 void Game::Render() const
 {
 	m_currentLevel->Render();
-	Vec2 cameraMins = m_worldCamera.GetOrthoMin().GetXYComponents();
-	Vec2 cameraMaxs = m_worldCamera.GetOrthoMax().GetXYComponents();
-	g_theRenderer->DrawLine( Vec2( cameraMins.x , 0.f ) , Vec2( cameraMaxs.x , 0.f ) , MAGENTA , 5.f );
-	g_theRenderer->DrawLine( Vec2( 0.f , cameraMins.y ) , Vec2( 0.f , cameraMaxs.y ) , MAGENTA , 5.f );
+
+	if ( m_cameraAlignDebug )
+	{
+		Vec2 cameraMins = m_worldCamera.GetOrthoMin().GetXYComponents();
+		Vec2 cameraMaxs = m_worldCamera.GetOrthoMax().GetXYComponents();
+		g_theRenderer->DrawLine( Vec2( cameraMins.x , 0.f ) , Vec2( cameraMaxs.x , 0.f ) , MAGENTA , 5.f );
+		g_theRenderer->DrawLine( Vec2( 0.f , cameraMins.y ) , Vec2( 0.f , cameraMaxs.y ) , MAGENTA , 5.f );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

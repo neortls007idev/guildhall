@@ -34,10 +34,10 @@ BACKLOG
 ==============================================================================================================================================================
 Task Id	|	Status 	|	Estimate  |	  Actual 	|	 Feature Area	  |	 Feature Id	 |	Description
 --------|-----------|-------------|-------------|---------------------|--------------|------------------------------------------------------------------------
-1		|	[0]		|	  3.0	  |	    0.0		|	Game - Level	  |		27		 |	Initial Test Level Setup
-2		|	[0]		|	  2.0	  |	    0.0		|	Game - Data		  |		5		 |  Data driving Tiles, Paddle & Ball
-3		|	[0]		|	  2.0	  |	    0.0		|	Game - Physics    |		7		 |  Simpler Physics system for collisions between ball and paddle and ball and the tiles.
-4		|	[0]		|	  0.5	  |	    0.0		|	Input			  |		1		 |	Player controls Paddle with Mouse Movement.
+1		|	[0]		|	  3.0	  |	    2.0		|	Game - Level	  |		27		 |	Initial Test Level Setup
+2		|	[0]		|	  2.0	  |	    1.0		|	Game - Data		  |		5		 |  Data driving Tiles, Paddle & Ball
+3x		|	[0]x	|	  2.0x	  |	    0.5x	|	Game - Physics    |		7		 |  Simpler Physics system for collisions between ball and paddle and ball and the tiles.
+4		|	[0]		|	  0.5	  |	    0.5		|	Input			  |		1		 |	Player controls Paddle with Mouse Movement.
 5		|	[0]		|	  2.0	  |	    0.0		|	Testing			  |		8		 |	Updating Test Level & Stress testing Physics system for performance.
 6		|	[0]		|	  4.0	  |	    0.0		|	Engine			  |		-		 |  Basic UI System for Buttons and Labels.
 7		|	[0]		|	  1.5	  |	    0.0		| UI - Design & Setup |		4		 |  Main menu with the some sub menus like settings, controls ( only for display ).
@@ -79,6 +79,8 @@ Task Id	|	Status 	|	Estimate  |	  Actual 	|	 Feature Area	  |	 Feature Id	 |	Des
 43		|	[0]		|	  1.0	  |	    0.0		|	UI				  |		30		 |	Design Tutorials Menu dislaying various tile types and powers.
 44		|	[0]		|	  1.0	  |	    0.0		|	UI				  |		30		 |	Integrating Tutorials Menu with main menu & pause menu.
 45		|	[0]		|	  -		  |	    0.0		|	Game			  |		26		 |	Final polish and bug fixing.
+46%		|	[0]%	|	  2.0%	  |	    1.33%	|	Game - Physics    |		7		 |  Gameplay Physics for collisions between ball and paddle and ball and the tiles.
+47%		|	[0]%	|	  2.0%	  |	    0.5%	|	Game - Level	  |		7		 |  Map generation using images
 --------------------|-------------|-------------|-------------------------------------------------------------------------------------------------------------
 Total 				|	 58.0	  |				|
 --------------------------------------------------------------------------------------------------------------------------------------------------------------

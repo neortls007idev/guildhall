@@ -1,43 +1,112 @@
 <TileDefinitions spriteSheet="Terrain_32x32.png" spriteLayout="32,32">
+	<TileDefinition
+		name="NormalRed"
+		colorInImageFile="255,0,0,255"
+		spriteCoords="0,0"
+		health="1"
+		healthToSolid="0"
+		isSolid="false"
+		isVisible="true"
+		visibleAtHealth="1"
+	/>
 
 	<TileDefinition
-		name="Grass"
+		name="NormalGreen"
 		colorInImageFile="0,255,0,255"
-		spriteCoords="2,0"
-		allowsSight="true"
-		allowsWalk="true"
-		allowsSwim="false"
-		allowsFly="true"
+		spriteCoords="0,1"
+		health="1"
+		healthToSolid="0"
+		isSolid="false"
+		isVisible="true"
+		visibleAtHealth="1"
 	/>
 
 	<TileDefinition
-		name="Stone"
-		colorInImageFile="100,100,100"
-		spriteCoords="7,4"
-		allowsSight="false"
-		allowsWalk="false"
-		allowsSwim="false"
-		allowsFly="false"
+		name="NormalBlue"
+		colorInImageFile="0,0,255,255"
+		spriteCoords="0,2"
+		health="1"
+		healthToSolid="0"
+		isSolid="false"
+		isVisible="true"
+		visibleAtHealth="1"
 	/>
 
 	<TileDefinition
-		name="Water"
-		colorInImageFile="0,0,200"
-		spriteCoords="0,22"
-		allowsSight="true"
-		allowsWalk="false"
-		allowsSwim="true"
-		allowsFly="true"
+		name="NormalYellow"
+		colorInImageFile="255,255,0,255"
+		spriteCoords="0,3"
+		health="2"
+		healthToSolid="0"
+		isSolid="false"
+		isVisible="true"
+		visibleAtHealth="1"
 	/>
 
 	<TileDefinition
-		name="Lava"
-		colorInImageFile="200,25,5"
-		spriteCoords="21,3"
-		allowsSight="true"
-		allowsWalk="false"
-		allowsSwim="true"
-		allowsFly="true"
+		name="NormalMagenta"
+		colorInImageFile="255,0,255,255"
+		spriteCoords="0,4"
+		health="2"
+		healthToSolid="0"
+		isSolid="false"
+		isVisible="true"
+		visibleAtHealth="1"
+	/>
+
+	<TileDefinition
+		name="NormalCyan"
+		colorInImageFile="0,255,255,255"
+		spriteCoords="0,5"
+		health="2"
+		healthToSolid="0"
+		isSolid="false"
+		isVisible="false"
+		visibleAtHealth="1"
+	/>
+
+	<TileDefinition
+		name="NormalOrange"
+		colorInImageFile="255,127,0,255"
+		spriteCoords="0,6"
+		health="3"
+		healthToSolid="1"
+		isSolid="false"
+		isVisible="false"
+		visibleAtHealth="1"
+	/>
+
+	<TileDefinition
+		name="NormalPink"
+		colorInImageFile="255,0,127,255"
+		spriteCoords="0,7"
+		health="3"
+		healthToSolid="0"
+		isSolid="false"
+		isVisible="false"
+		visibleAtHealth="2"
+	/>
+
+	<TileDefinition
+		name="NormalPurple"
+		colorInImageFile="127,0,255,255"
+		spriteCoords="0,8"
+		health="3"
+		healthToSolid="1"
+		isSolid="false"
+		isVisible="false"
+		visibleAtHealth="2"
+	/>
+
+	<TileDefinition
+		name="SteelGrey"
+		colorInImageFile="127,127,127,255"
+		spriteCoords="0,9"
+		health="1"
+		healthToSolid="1"
+		isSolid="true"
+		isVisible="true"
+		visibleAtHealth="1"
 	/>
 
 </TileDefinitions>

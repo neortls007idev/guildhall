@@ -7,6 +7,7 @@
 
 class MapDefinition;
 class Game;
+class TileDefinition;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	typedef std::vector<Entity*> Entitylist;
@@ -27,13 +28,14 @@ public:
 	void Update( float deltaSeconds );
 	void Render();
 	
-	void SpawnNewEntity( eEntityType type , const Vec2& position );
+	void SpawnNewEntity( eEntityType type , const Vec2& position , TileDefinition* tileDef = nullptr );
 	void AddEntityToMap( Entity* entity );
 	void AddEntityToList( Entitylist& entityList , Entity* entity );
 
 	void ResolveCollisions();
 	void ResolveBallvBoundsCollisions();
 	void ResolveBallvPaddleCollisions();
+	void ResolveBallvTileCollisions();
 	
 public:
 	Game*							m_owner;

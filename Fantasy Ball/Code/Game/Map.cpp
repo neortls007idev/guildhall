@@ -1,12 +1,14 @@
-﻿#include "Ball.hpp"
-#include "Engine/Audio/AudioSystem.hpp"
+﻿#include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/StdExtensions.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Game//Game.hpp"
+#include "Game/Ball.hpp"
 #include "Game/Map.hpp"
 #include "Game/MapDefinition.hpp"
 #include "Game/Paddle.hpp"
+#include "Game/Tile.hpp"
+#include "Game/TileDefinition.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -118,10 +120,13 @@ void Map::Render()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Map::SpawnNewEntity( eEntityType type , const Vec2& position )
+void Map::SpawnNewEntity( eEntityType type , const Vec2& position , TileDefinition* tileDef )
 {
 	Entity* newEntity = nullptr;
 
+	Paddle* x = nullptr;
+	float y;
+	float z;
 	switch ( type )
 	{
 	case INVALID_ENTITY:
@@ -129,13 +134,16 @@ void Map::SpawnNewEntity( eEntityType type , const Vec2& position )
 	case PADDLE:
 		newEntity = new Paddle( m_owner , m_owner->GetPaddleHealth() ,
 				AABB2( -100.f , -25.f , 100.f , 25.f ) ,
-		                    Vec2( 0.f , m_pit.m_mins.y + 100.f ) );
+		                    Vec2( 0.f , m_pit.m_mins.y + 83.f ) );
+							x = (Paddle*)newEntity;
+							y = x->GetCollider().GetCenter().y;
+							z = x->GetCollider().GetDimensions().y;
 							break;
 	case BALL:
 				newEntity = new Ball( m_owner , 1.f , 25.f , 25.f , Vec2::ZERO , Vec2(5.5,-3.f) );
 							break;
 	case TILE:
-				//newEntity = Paddle( m_owner , m_owner->GetPaddleHealth() , AABB2() )
+				newEntity = new Tile( this , IntVec2( position ) , tileDef );
 							break;
 	default:
 							break;
@@ -165,6 +173,7 @@ void Map::ResolveCollisions()
 {
 	ResolveBallvBoundsCollisions();
 	ResolveBallvPaddleCollisions();
+	ResolveBallvTileCollisions();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -242,9 +251,46 @@ void Map::ResolveBallvPaddleCollisions()
 				paddle->GetCollider().GetClosestEdgeFromRefrerencePoint( ball->m_pos , outVert1 , outVert2 );
 				Vec2 edgeNormal = ( outVert2 - outVert1 ).GetRotated90Degrees().GetNormalized();
 
-				ball->m_velocity.Reflect( edgeNormal );
+				if ( edgeNormal.x <= -1.f && edgeNormal.x < 0.001f && edgeNormal.y <= 0.01f )
+				{
+					edgeNormal = -edgeNormal;
+					ball->m_velocity.Reflect( edgeNormal );
+				}
+				else if( edgeNormal.x <= 1.f && edgeNormal.x > 0.001f && edgeNormal.y <= 0.01f )
+				{
+					edgeNormal = edgeNormal;
+					ball->m_velocity.Reflect( edgeNormal );
+				}
+				else if ( /*edgeNormal.x <= 0.1f && edgeNormal.x >= 0.0f &&*/ edgeNormal.y >= 0.9f )
+				{
+					ball->m_velocity.Reflect( edgeNormal );
+				}
 				//ball->m_velocity.Reflect( Vec2::ZERO_ONE );
 				PushDiscOutOfAABB( ball->m_pos , ball->m_cosmeticRadius , paddle->GetCollider() );
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Map::ResolveBallvTileCollisions()
+{
+	Entitylist& currentList = m_entityListsByType[ BALL ];
+	for( int entityIndex = 0; entityIndex < ( int ) m_entityListsByType[ BALL ].size(); entityIndex++ )
+	{
+		if( nullptr != currentList[ entityIndex ] )
+		{
+			Ball* ball = ( Ball* ) currentList[ entityIndex ];
+			Tile* currentTile = nullptr;
+
+			for( size_t tileIndex = 0 ; tileIndex < m_entityListsByType[ TILE ].size() ; tileIndex++ )
+			{
+				currentTile = ( Tile* ) m_entityListsByType[ TILE ][ tileIndex ];
+				if ( nullptr != currentTile )
+				{
+					currentTile->TileCollisionResponse( ball );
+				}
 			}
 		}
 	}
