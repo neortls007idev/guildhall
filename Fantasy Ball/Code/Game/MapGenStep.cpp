@@ -24,11 +24,11 @@ MapGenStep::MapGenStep( const XMLElement& generatorXMLElement )
 
 void MapGenStep::RunStep( Map& map )
 {
-	RandomNumberGenerator rng = RandomNumberGenerator();
-	if ( !m_chanceToRun.GetRandomInRange( rng ) )
-	{
-		return;
-	}
+ 	RandomNumberGenerator rng = RandomNumberGenerator();
+// 	if ( !m_chanceToRun.GetRandomInRange( rng ) )
+// 	{
+// 		return;
+// 	}
 
 	int numIterations = m_numIterations.GetRandomInRange( rng );
 	for ( int iterationCount = 0; iterationCount < numIterations; iterationCount++ )

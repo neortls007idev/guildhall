@@ -19,11 +19,11 @@ MapDefinition::MapDefinition( const tinyxml2::XMLElement& definitionXMLElement )
 	m_width  = ParseXmlAttribute( definitionXMLElement , "width"  , 0 );
 	m_height = ParseXmlAttribute( definitionXMLElement , "height" , 0 );
 
-	std::string defaultTile = ParseXmlAttribute( definitionXMLElement , "fillTile" , "Grass" );
-	m_fillTile = TileDefinition::s_definitions[ defaultTile ];
-
-	std::string edgeTile = ParseXmlAttribute( definitionXMLElement , "edgeTile" , "Grass" );
-	m_edgeTile = TileDefinition::s_definitions[ edgeTile ];
+	//std::string defaultTile = ParseXmlAttribute( definitionXMLElement , "fillTile" , "Grass" );
+	//m_fillTile = TileDefinition::s_definitions[ defaultTile ];
+	//
+	//std::string edgeTile = ParseXmlAttribute( definitionXMLElement , "edgeTile" , "Grass" );
+	//m_edgeTile = TileDefinition::s_definitions[ edgeTile ];
 
 	const XMLElement* mapGenrationStep = definitionXMLElement.FirstChildElement();
 

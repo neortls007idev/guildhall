@@ -32,7 +32,9 @@ void Paddle::Update( float deltaSeconds )
 
 void Paddle::Render() const
 {
+	g_theRenderer->BindTexture( m_owner->m_gameTex[ TEX_PADDLE ] );
 	g_theRenderer->DrawAABB2( m_paddleCollider , ORANGE );
+	g_theRenderer->BindTexture( nullptr );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

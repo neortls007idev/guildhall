@@ -1,6 +1,7 @@
-﻿#include "Game/Ball.hpp"
-
-#include "Engine/Renderer/RenderContext.hpp"
+﻿#include "Engine/Renderer/RenderContext.hpp"
+#include "Game/Ball.hpp"
+#include "Game/Game.hpp"
+#include "Game/GameCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +31,9 @@ void Ball::Update( float deltaSeconds )
 
 void Ball::Render() const
 {
-	g_theRenderer->DrawDisc( m_pos , m_cosmeticRadius , GREEN );
+	g_theRenderer->BindTexture( m_owner->m_gameTex[ TEX_BALL_CYAN ] );
+	g_theRenderer->DrawDisc( m_pos , m_cosmeticRadius , WHITE );
+	g_theRenderer->BindTexture( nullptr );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

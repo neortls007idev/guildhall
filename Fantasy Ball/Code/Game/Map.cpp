@@ -5,6 +5,8 @@
 #include "Game//Game.hpp"
 #include "Game/Ball.hpp"
 #include "Game/Map.hpp"
+
+#include "GameCommon.hpp"
 #include "Game/MapDefinition.hpp"
 #include "Game/Paddle.hpp"
 #include "Game/Tile.hpp"
@@ -25,7 +27,7 @@ Map::Map( Game* owner ) :
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-/*
+
 Map::Map( Game* owner , MapDefinition* mapDefinition , std::string mapName ) :
 																				m_owner( owner ) ,
 																				m_name( mapName ) ,
@@ -42,17 +44,17 @@ Map::Map( Game* owner , MapDefinition* mapDefinition , std::string mapName ) :
 		}
 	}
 
-	RandomNumberGenerator rng;
+	//RandomNumberGenerator rng;
 
 	for( int mapGenSteps = 0; mapGenSteps < m_mapDefinition->m_generationSteps.size(); mapGenSteps++ )
 	{
-		FloatRange* chanceToRun = &m_mapDefinition->m_generationSteps[ mapGenSteps ]->m_chanceToRun;
-		float chanceToRunStep = chanceToRun->GetRandomInRange( rng );
-
-		if( rng.RollPercentChance( chanceToRunStep ) )
-		{
+// 		FloatRange* chanceToRun = &m_mapDefinition->m_generationSteps[ mapGenSteps ]->m_chanceToRun;
+// 		float chanceToRunStep = chanceToRun->GetRandomInRange( rng );
+// 
+// 		if( rng.RollPercentChance( chanceToRunStep ) )
+// 		{
+// 		}
 			m_mapDefinition->m_generationSteps[ mapGenSteps ]->RunStep( *this );
-		}
 	}
 
 	//SpawnWorms( 30 , TileDefinition::s_definitions[ "Stone" ] );
@@ -61,7 +63,7 @@ Map::Map( Game* owner , MapDefinition* mapDefinition , std::string mapName ) :
 
 	//m_player = new Actor( m_theGame , Vec2::ONE , 0.f , ActorDefinition::s_definitions[ "Player" ] );
 }
-*/
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Map::LevelBounds()
@@ -74,11 +76,11 @@ void Map::LevelBounds()
 	AABB2 cameraArea		= AABB2( cameraMins , cameraMaxs );
 	Vec2 cameraDimensions	= cameraArea.GetDimensions(); 
 
-	constexpr float sideWallPercentage = 0.119791667f;
-	float sideWallOffset	= sideWallPercentage * 0.5f * cameraDimensions.x;
+	float sideWallOffset	= LEVEL_SIDEWALL_PERCENTAGE * 0.5f * cameraDimensions.x;
 	float topWallOffset		= 0.125f * 0.75f * cameraDimensions.y;
 	float pitOffset			= 0.1f * cameraDimensions.y * 0.5f;
 	
+	m_backGround			= cameraArea;
 	m_leftWall				= AABB2( cameraMins.x , cameraMins.y , cameraMins.x + sideWallOffset , cameraMaxs.y );
 	m_rightWall				= AABB2( cameraMaxs.x - sideWallOffset , cameraMins.y , cameraMaxs.x , cameraMaxs.y );
 	m_topWall				= AABB2( cameraMins.x , cameraMaxs.y - topWallOffset , cameraMaxs.x , cameraMaxs.y + 50.f );
@@ -109,9 +111,16 @@ void Map::Update( float deltaSeconds )
 
 void Map::Render()
 {
+	g_theRenderer->BindTexture( m_owner->m_gameTex[ TEX_BACKGROUND_FOREST ] );
+	g_theRenderer->DrawAABB2( m_backGround	, WHITE );
+	
+	g_theRenderer->BindTexture( m_owner->m_gameTex[ TEX_LEFT_WALL ] );
 	g_theRenderer->DrawAABB2( m_leftWall	, WHITE );
+	g_theRenderer->BindTexture( m_owner->m_gameTex[ TEX_RIGHT_WALL ] );
 	g_theRenderer->DrawAABB2( m_rightWall	, WHITE );
+	g_theRenderer->BindTexture( m_owner->m_gameTex[ TEX_TOP_WALL_SECTION ] );
 	g_theRenderer->DrawAABB2( m_topWall		, WHITE );
+	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->DrawAABB2( m_pit			, WHITE );
 
 	for ( int Entitytype = 0; Entitytype < NUM_ENTITY_TYPES; Entitytype++ )
@@ -145,12 +154,12 @@ void Map::SpawnNewEntity( eEntityType type , const Vec2& position , TileDefiniti
 		newEntity = new Paddle( m_owner , m_owner->GetPaddleHealth() ,
 				AABB2( -100.f , -25.f , 100.f , 25.f ) ,
 		                    Vec2( 0.f , m_pit.m_mins.y + 83.f ) );
-							x = (Paddle*)newEntity;
-							y = x->GetCollider().GetCenter().y;
-							z = x->GetCollider().GetDimensions().y;
+// 							x = (Paddle*)newEntity;
+// 							y = x->GetCollider().GetCenter().y;
+// 							z = x->GetCollider().GetDimensions().y;
 							break;
 	case BALL:
-				newEntity = new Ball( m_owner , 1 , 25.f , 25.f , Vec2::ZERO , Vec2(5.5,-3.f) );
+				newEntity = new Ball( m_owner , 1 , 25.f , 25.f , Vec2::ZERO , Vec2::MakeFromPolarDegrees(15.f,6.f) );
 							break;
 	case TILE:
 				newEntity = new Tile( this , IntVec2( position ) , tileDef );

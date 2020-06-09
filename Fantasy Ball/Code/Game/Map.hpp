@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <vector>
 #include "Engine/Primitives/AABB2.hpp"
-#include "Entity.hpp"
+#include "Game/Entity.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -39,12 +39,13 @@ public:
 	
 public:
 	Game*							m_owner;
+	AABB2							m_backGround;
 	AABB2							m_leftWall;
 	AABB2							m_rightWall;
 	AABB2							m_topWall;
 	AABB2							m_pit;
 	IntVec2							m_dimensions;
-	//MapDefinition*					m_mapDefinition											= nullptr;
+	MapDefinition*					m_mapDefinition											= nullptr;
 	std::string						m_name;
 	Entitylist						m_entityListsByType[ NUM_ENTITY_TYPES ];
 };

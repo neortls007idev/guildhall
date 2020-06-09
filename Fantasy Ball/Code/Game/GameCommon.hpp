@@ -32,13 +32,32 @@ constexpr int   MAX_WORM_LENGTH											= 13;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-enum TextureType
+constexpr float LEVEL_SIDEWALL_PERCENTAGE = 0.119791667f;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum eGameTextures
 {
-	TEXTURE_NONE = -1 ,
-	TEXTURE_TERRAIN_32x32 ,
-	TEXTURE_CHARACTERS,
+	TEX_NONE = -1,
+	TEX_BACKGROUND_FOREST,
+
+	TEX_LEFT_WALL,
+	TEX_RIGHT_WALL,
+	TEX_TOP_WALL_SECTION,
+	TEX_PADDLE,
+
+	TEX_BALL_RED,
+	TEX_BALL_GREEN,
+	TEX_BALL_BLUE,
+	TEX_BALL_YELLOW,
+	TEX_BALL_MAGENTA,
+	TEX_BALL_CYAN,
+	TEX_BALL_PINK,
+	TEX_BALL_PURPLE,
+	TEX_BALL_ORANGE,
+	TEX_BALL_GREY,
 	
-	NUM_TOTAL_TEXTURES
+	NUM_GAME_TEX
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
