@@ -326,6 +326,9 @@ public:
 
 	// Draw Vertically Gradiented AABB2 in WorldSpace with UVs
 	void DrawAABB2( const AABB2& box , const Rgba8& startTint , const Rgba8& endTint , const Vec2& uvAtMins , const Vec2& uvAtMaxs );
+
+	// Draw Unfilled AABB2 in WorldSpace
+	void DrawUnfilledAABB2( const AABB2& box , const Rgba8& tint , float thickness = 1.f );
 	
 	// Draw OBB2 in WorldSpace
 	void DrawOBB2( const OBB2& box , const Rgba8& tint );

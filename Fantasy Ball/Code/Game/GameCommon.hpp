@@ -34,6 +34,9 @@ constexpr int   MAX_WORM_LENGTH											= 13;
 
 constexpr float LEVEL_SIDEWALL_PERCENTAGE = 0.119791667f;
 
+constexpr float TILE_LENGTH = 112.6667f;
+constexpr float TILE_HEIGHT = 32.f;
+const Vec2 halfTileDimensions = Vec2( TILE_LENGTH * 0.5f , TILE_HEIGHT * 0.5f );
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 enum eGameTextures

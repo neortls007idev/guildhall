@@ -259,6 +259,19 @@ void RenderContext::DrawAABB2( const AABB2& box , const Rgba8& startTint , const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void RenderContext::DrawUnfilledAABB2( const AABB2& box , const Rgba8& tint , float thickness /*= 1.f */ )
+{
+	Vec2 maxXminY( box.m_maxs.x , box.m_mins.y );
+	Vec2 minXmaxY( box.m_mins.x , box.m_maxs.y );
+	
+	DrawLine( box.m_mins , maxXminY , tint , thickness );
+	DrawLine( maxXminY , box.m_maxs , tint , thickness );
+	DrawLine( box.m_maxs, minXmaxY , tint , thickness );
+	DrawLine( minXmaxY , box.m_mins , tint , thickness );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void RenderContext::DrawQuad3D( Vec3 p0 , Vec3 p1 , Vec3 p2 , Vec3 p3 , AABB2 UVs , Rgba8 startColor , Rgba8 endColor )
 {
 	const Vertex_PCU quadVerts[ 6 ] = {

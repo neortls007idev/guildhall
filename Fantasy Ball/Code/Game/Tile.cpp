@@ -4,6 +4,8 @@
 #include "Game/Ball.hpp"
 #include "Game/Map.hpp"
 #include "Game/Tile.hpp"
+
+#include "GameCommon.hpp"
 #include "Game/TileDefinition.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -34,6 +36,7 @@ void Tile::Update( float deltaSeconds )
 void Tile::Render() const
 {
 	AABB2 tile = GetCollider();
+	g_theRenderer->DrawUnfilledAABB2( tile , WHITE , 5.f );
 	g_theRenderer->DrawAABB2( tile , m_tileColor );
 }
 
@@ -89,7 +92,9 @@ bool Tile::TileCollisionResponse( Ball* ball )
 
 AABB2 Tile::GetCollider() const
 {
-	AABB2 collider = AABB2( Vec2::ZERO , Vec2( 112.6667f , 32.f ) );
+	//Vec2 offset(halfTileDimensions.x*2.f,halfTileDimensions.y);
+	//AABB2 collider = AABB2( Vec2::ZERO , Vec2( TILE_LENGTH , TILE_HEIGHT ) );
+	AABB2 collider = AABB2( -halfTileDimensions , halfTileDimensions );
 	collider.SetCenter( Vec2( m_tileCoords ) );
 	return collider;
 }

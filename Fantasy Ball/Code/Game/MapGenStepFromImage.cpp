@@ -49,8 +49,10 @@ void MapGenStepFromImage::RunStepOnce( Map& map )
 	IntVec2 tileCoords;
 
 	Vec2 startpointatbottomleft( -845.f , -139.f );
-	const float xOffset = ( cameraDimensions.x * 0.5f ) / 15.f;
-	const float yOffset = ( cameraDimensions.y * 0.5f ) / 16.f;
+	//const float xOffset = ( ( cameraDimensions.x * 0.5f ) / 15.f ) + halfTileDimensions.x;
+	//const float yOffset = ( cameraDimensions.y * 0.5f ) / 17.f;
+	const float xOffset = TILE_LENGTH;
+	const float yOffset = TILE_HEIGHT;
 	
 	for ( tileCoords.y = 0; ( tileCoords.y < map.m_dimensions.y ) && ( tileCoords.y < m_mutationImage->GetDimensions().y ); tileCoords.y++ )
 	{

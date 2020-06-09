@@ -143,29 +143,23 @@ void Map::SpawnNewEntity( eEntityType type , const Vec2& position , TileDefiniti
 {
 	Entity* newEntity = nullptr;
 
-	Paddle* x = nullptr;
-	float y;
-	float z;
 	switch ( type )
 	{
-	case INVALID_ENTITY:
-							break;
-	case PADDLE:
-		newEntity = new Paddle( m_owner , m_owner->GetPaddleHealth() ,
-				AABB2( -100.f , -25.f , 100.f , 25.f ) ,
-		                    Vec2( 0.f , m_pit.m_mins.y + 83.f ) );
-// 							x = (Paddle*)newEntity;
-// 							y = x->GetCollider().GetCenter().y;
-// 							z = x->GetCollider().GetDimensions().y;
-							break;
-	case BALL:
-				newEntity = new Ball( m_owner , 1 , 25.f , 25.f , Vec2::ZERO , Vec2::MakeFromPolarDegrees(15.f,6.f) );
-							break;
-	case TILE:
-				newEntity = new Tile( this , IntVec2( position ) , tileDef );
-							break;
-	default:
-							break;
+		case INVALID_ENTITY:
+								break;
+		case PADDLE:
+			newEntity = new Paddle( m_owner , m_owner->GetPaddleHealth() ,
+					AABB2( -100.f , -25.f , 100.f , 25.f ) ,
+			                    Vec2( 0.f , m_pit.m_mins.y + 83.f ) );
+								break;
+		case BALL:
+					newEntity = new Ball( m_owner , 1 , 25.f , 25.f , Vec2::ZERO , Vec2::MakeFromPolarDegrees(15.f,6.f) );
+								break;
+		case TILE:
+					newEntity = new Tile( this , IntVec2( position ) , tileDef );
+								break;
+		default:
+								break;
 	}
 
 	AddEntityToMap( newEntity );

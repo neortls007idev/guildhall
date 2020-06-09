@@ -56,6 +56,9 @@ public:
 	// Draw AABB2 in WorldSpace
 	void DrawAABB2( const AABB2& box, const Rgba8& tint);
 
+	// Draw AABB2 in WorldSpace
+	void DrawUnfilledAABB2( const AABB2& box , const Rgba8& tint );
+	
 	// Draw AABB2 in WorldSpace with UVs
 	void DrawAABB2( const AABB2& box , const Rgba8& tint , const Vec2& uvAtMins , const Vec2& uvAtMaxs );
 	
