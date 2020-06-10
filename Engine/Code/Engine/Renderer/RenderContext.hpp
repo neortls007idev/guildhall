@@ -215,6 +215,7 @@ public:
 //			RENDERING PIPELINE CREATION METHODS
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+	Sampler*				GetOrCreateSampler( eSamplerType type );
 	Shader*					GetOrCreateShader( char const* shaderFilename );
 	ShaderState*			GetOrCreateShaderState( char const* shaderStateFilename );
 	Texture*				GetOrCreateTextureFromFile( const char* imageFilePath );
@@ -373,6 +374,7 @@ private:
 //			RENDERING PIPELINE CREATION METHODS ( TO BE ACCESSED BY THE RENDERER ONLY )
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+	Sampler*	CreateSamplerFromType( eSamplerType type );
 	Shader*		CreateShaderFromFile( char const* shaderFilePath );
 	ShaderState* CreateShaderStateFromFile( char const* shaderStateFilePath );
 	Texture*	CreateTextureFromFile( const char* imageFilePath );
@@ -425,6 +427,7 @@ private:
 	std::map<std::string , BitmapFont*>			m_LoadedBitMapFonts;								// LOOKUP TABLE OF FILEPATH & BITMAPFONT
 	std::map<std::string , Shader*>				m_LoadedShaders;									// LOOKUP TABLE OF FILEPATH & SHADERS
 	std::map<std::string , ShaderState*>		m_LoadedShaderStates;								// LOOKUP TABLE OF FILEPATH & SHADER STATES
+	std::vector< Sampler* >						m_samplers;											// LOOKUP TABLE OF SAMPLERTYPES & SAMPLERS
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

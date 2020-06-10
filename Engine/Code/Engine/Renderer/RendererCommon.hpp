@@ -11,3 +11,11 @@ enum eBlendMode
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum eSamplerType
+{
+	SAMPLER_POINT ,				//	pixelated llok ( also called nearest )
+	SAMPLER_BILINEAR ,			// smoother look - no mips
+
+	SAMPLER_TOTAL
+};

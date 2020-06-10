@@ -39,6 +39,8 @@ Sampler::Sampler( RenderContext* ctx , eSamplerType type )
 
 	std::string debugName = "RenderContext Resource";
 	SetDebugName( m_handle , &debugName );
+
+	m_type = type;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

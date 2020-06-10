@@ -20,8 +20,7 @@ public:
 	IntVec2				m_tileCoords	= IntVec2::ZERO;
 	//AABB2				m_bounds		= AABB2::ZERO_TO_ONE;
 	AABB3				m_bounds;
-	//bool 
-	
+	bool				IsSolid();
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -42,6 +41,7 @@ public:
 	virtual void		Render() const override;
 			void		AddVertsForTile( std::vector< VertexMaster >& destinationVerts , std::vector< uint >& destinationIndices , int tileIndex );
 			void		AddVertsForSolidTile( std::vector< VertexMaster >& destinationVerts , std::vector< uint >& destinationIndices , int tileIndex );
+			void		AddVertsForNonSolidTile( std::vector< VertexMaster >& destinationVerts , std::vector< uint >& destinationIndices , int tileIndex );
 			AABB3		GetTileBounds( int tileIndex );
 			IntVec2		GetTileCoordsForIndex( int index );
 private:

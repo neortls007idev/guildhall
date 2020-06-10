@@ -376,6 +376,11 @@
     <Xml Include="..\..\Run\Data\Gameconfig.xml" />
     <Xml Include="..\..\Run\Data\Materials\testMaterial.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Run\TaskList\C29 SDST Doomenstein Notes.docx">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

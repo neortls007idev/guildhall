@@ -39,23 +39,28 @@ Game::Game()
 	
 	InitializeCameras();
 	IntializeGameObjects();
-		
+	InitializeTransforms();
+
+	std::string gameConfigData = g_gameConfigBlackboard.GetValue( "testkey" , "Invalid Value" );
+	g_theDevConsole->PrintString( gameConfigData , eDevConsoleMessageType::DEVCONSOLE_SYTEMLOG );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::InitializeTransforms()
+{
 	m_cubeMesh1Transform.SetPosition( 2.5f , 0.5f , 0.5f );
 	m_cubeMesh1Transform.SetScale( 1.f , 1.f , 1.f );
 	m_cubeMesh2Transform.SetPosition( 0.5f , 2.5f , 0.5f );
 	m_cubeMesh1Transform.SetScale( 1.f , 1.f , 1.f );
 	m_cubeMesh3Transform.SetPosition( 2.5f , 2.5f , 0.5f );
 	m_cubeMesh1Transform.SetScale( 1.f , 1.f , 1.f );
-	//m_cubeMesh1Transform.SetRotation( -90.f , 0.0f , 0.0f );
 	m_basisMeshTransform.SetPosition( 0.f , 0.f , 0.f );
 
 	Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix();
 	Vec3 forwardVector = cameraTransform.GetIBasis3D();
 	m_compassMeshTransform.SetPosition( m_gameCamera.GetPosition() + 0.1f * forwardVector );
 	m_compassMeshTransform.SetScale( 0.01f , 0.01f , 0.01f );
-
-	std::string gameConfigData = g_gameConfigBlackboard.GetValue( "testkey" , "Invalid Value" );
-	g_theDevConsole->PrintString( gameConfigData , eDevConsoleMessageType::DEVCONSOLE_SYTEMLOG );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -150,12 +155,22 @@ Game::~Game()
 
 void Game::InitializeCameras()
 {
-		m_uiCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
+		//--------------------------------------------------------------------------------------------------------------------------------------------
+		//			GAME CAMERA
+		//--------------------------------------------------------------------------------------------------------------------------------------------
+	
 		m_gameCamera.SetWorldCoordinateSystem( X_IN_Y_LEFT_Z_UP );
 		m_gameCamera.SetProjectionPerspective( 40.f , CLIENT_ASPECT , -.09f , -100.f );
 		m_gameCamera.SetPosition( Vec3( 1.f , 1.f , 1.f ) );
 		m_gameCamera.SetPosition( Vec3( -10.f , 1.f , 1.f ) );
 		m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );
+
+		//--------------------------------------------------------------------------------------------------------------------------------------------
+		//			UI CAMERA
+		//--------------------------------------------------------------------------------------------------------------------------------------------
+			
+		m_uiCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
+		m_gameCamera.SetClearMode( CLEAR_NONE , BLACK , 1.f , 0 );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -277,6 +292,17 @@ void Game::Render() const
 
 	DebugRenderWorldToCamera( &m_gameCamera );
 	DebugRenderScreenTo( nullptr );
+	g_theRenderer->BindShader( nullptr );
+	g_theRenderer->BindTexture( nullptr );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::RenderUI() const
+{
+	Texture* backBuffer		= g_theRenderer->m_swapChain->GetBackBuffer();
+	Texture* colorTarget = g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+	m_uiCamera.SetColorTarget( 0 , colorTarget );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

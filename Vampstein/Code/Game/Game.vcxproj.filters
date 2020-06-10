@@ -20,6 +20,9 @@
     <Filter Include="Data\Materials">
       <UniqueIdentifier>{b9f5ec4c-4805-458f-b477-2b81d7e58d50}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Plan">
+      <UniqueIdentifier>{4918a239-cb10-44f9-800f-9c39c92fb963}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameCommon.cpp">
@@ -154,5 +157,10 @@
     <Xml Include="..\..\Run\Data\Gameconfig.xml">
       <Filter>Data</Filter>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Run\TaskList\C29 SDST Doomenstein Notes.docx">
+      <Filter>Plan</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -383,10 +383,10 @@ AABB2 AABB2::CarveBoxOffTop( float fractionOfHeight , float additionalHeight )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-AABB2 AABB2::GetBoxAtTop( float fractionOfWidth , float additionalWidth )
+AABB2 AABB2::GetBoxAtTop( float fractionOfHeight , float additionalHeight )
 {
 	float height = m_maxs.y - m_mins.y;
-	float carveHeight = ( fractionOfWidth * height ) + additionalWidth;
+	float carveHeight = ( fractionOfHeight * height ) + additionalHeight;
 	return AABB2( m_mins.x , m_mins.y + carveHeight , m_maxs.x , m_maxs.y );
 }
 
@@ -394,19 +394,22 @@ AABB2 AABB2::GetBoxAtTop( float fractionOfWidth , float additionalWidth )
 
 AABB2 AABB2::CarveBoxOffBottom( float fractionOfHeight , float additionalHeight )
 {
-	Vec2 dimensions = GetDimensions();
+	float height = m_maxs.y - m_mins.y;
+	float carveHeight = ( fractionOfHeight * height ) + additionalHeight;
+	
 	Vec2 min = m_mins;
-	Vec2 max = Vec2( m_maxs.x , m_mins.y + ( fractionOfHeight * dimensions.y ) + additionalHeight );
+	Vec2 max = Vec2( m_maxs.x , m_mins.y + ( fractionOfHeight * height ) + additionalHeight );
 	AABB2 newAAbb = AABB2( min , max );
+	m_mins.y += carveHeight;
 	return newAAbb;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-AABB2 AABB2::GetBoxAtBottom( float fractionOfWidth , float additionalWidth )
+AABB2 AABB2::GetBoxAtBottom( float fractionOfHeight , float additionalHeight )
 {
 	float height = m_maxs.y - m_mins.y;
-	float carveHeight = ( fractionOfWidth * height ) + additionalWidth;
+	float carveHeight = ( fractionOfHeight * height ) + additionalHeight;
 	return AABB2( m_mins.x , m_mins.y , m_maxs.x , m_maxs.y - carveHeight );
 }
 

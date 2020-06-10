@@ -23,11 +23,16 @@ class Game
 public:
 			Game();
 
+
+			//--------------------------------------------------------------------------------------------------------------------------------------------
+
+
 			void LoadShaders();
 			void LoadTextures();
 			void LoadAudio();
 			void InitializeCameras();
 			void IntializeGameObjects();
+			void InitializeTransforms();
 			
 			~Game();
 
@@ -35,6 +40,7 @@ public:
 			void DebugDrawUI( float deltaSeconds );
 				
 			void Render() const;
+			void RenderUI() const;
 private:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				METHODS TO HANDLE USER INPUT
@@ -63,7 +69,9 @@ public:
 	uint						m_vCuts												= 16;		// stacks
 
 	mutable Camera				m_gameCamera;
-	Camera						m_uiCamera;
+	mutable Camera				m_uiCamera;
+	AABB2						m_HUD;
+	AABB2						m_player;
 
 	Vec3						m_cameraPosition									= Vec3::ZERO;
 	float						m_pitch												= 0.f;

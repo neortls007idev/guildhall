@@ -45,8 +45,8 @@ public:
 	
 	AABB2 GetBoxAtRight( float fractionOfWidth , float additionalWidth );
 	AABB2 GetBoxAtLeft( float fractionOfWidth , float additionalWidth );
-	AABB2 GetBoxAtTop( float fractionOfWidth , float additionalWidth );
-	AABB2 GetBoxAtBottom( float fractionOfWidth , float additionalWidth );
+	AABB2 GetBoxAtTop( float fractionOfHeight , float additionalHeight );
+	AABB2 GetBoxAtBottom( float fractionOfHeight , float additionalHeight );
 
 	float GetOuterRadius() const;
 	float GetInnerRadius() const;
@@ -64,8 +64,8 @@ public:
 	
 	AABB2 CarveBoxOffRight( float fractionOfWidth , float additionalWidth );
 	AABB2 CarveBoxOffLeft( float fractionOfWidth , float additionalWidth );
-	AABB2 CarveBoxOffTop( float fractionOfWidth , float additionalWidth );
-	AABB2 CarveBoxOffBottom( float fractionOfWidth , float additionalWidth );
+	AABB2 CarveBoxOffTop( float fractionOfWidth , float additionalHeight );
+	AABB2 CarveBoxOffBottom( float fractionOfWidth , float additionalHeight );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // OPERATORS ( CONST )

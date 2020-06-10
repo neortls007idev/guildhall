@@ -15,6 +15,8 @@
 #include "Engine/Core/NamedProperties.hpp"
 #include "Engine/Time/Time.hpp"
 #include "TileMap.hpp"
+#include "Engine/Renderer/SpriteAnimation.hpp"
+#include "Engine/Renderer/SpriteSheet.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -40,21 +42,9 @@ Game::Game()
 	
 	InitializeCameras();
 	IntializeGameObjects();
-		
-	m_cubeMesh1Transform.SetPosition( 2.5f , 0.5f , 0.5f );
-	m_cubeMesh1Transform.SetScale( 1.f , 1.f , 1.f );
-	m_cubeMesh2Transform.SetPosition( 0.5f , 2.5f , 0.5f );
-	m_cubeMesh1Transform.SetScale( 1.f , 1.f , 1.f );
-	m_cubeMesh3Transform.SetPosition( 2.5f , 2.5f , 0.5f );
-	m_cubeMesh1Transform.SetScale( 1.f , 1.f , 1.f );
-	//m_cubeMesh1Transform.SetRotation( -90.f , 0.0f , 0.0f );
-	m_basisMeshTransform.SetPosition( 0.f , 0.f , 0.f );
-
-	Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix();
-	Vec3 forwardVector = cameraTransform.GetIBasis3D();
-	m_compassMeshTransform.SetPosition( m_gameCamera.GetPosition() + 0.1f * forwardVector );
-	m_compassMeshTransform.SetScale( 0.01f , 0.01f , 0.01f );
-
+	InitializeObjectTransforms();
+	InitializeHUDElements();
+	
 	std::string gameConfigData = g_gameConfigBlackboard.GetValue( "testkey" , "Invalid Value" );
 	if( gameConfigData == "Invalid Value" )
 	{
@@ -71,6 +61,24 @@ Game::Game()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Game::InitializeObjectTransforms()
+{
+	m_cubeMesh1Transform.SetPosition( 2.5f , 0.5f , 0.5f );
+	m_cubeMesh1Transform.SetScale( 1.f , 1.f , 1.f );
+	m_cubeMesh2Transform.SetPosition( 0.5f , 2.5f , 0.5f );
+	m_cubeMesh1Transform.SetScale( 1.f , 1.f , 1.f );
+	m_cubeMesh3Transform.SetPosition( 2.5f , 2.5f , 0.5f );
+	m_cubeMesh1Transform.SetScale( 1.f , 1.f , 1.f );
+	m_basisMeshTransform.SetPosition( 0.f , 0.f , 0.f );
+
+	Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix();
+	Vec3 forwardVector = cameraTransform.GetIBasis3D();
+	m_compassMeshTransform.SetPosition( m_gameCamera.GetPosition() + 0.1f * forwardVector );
+	m_compassMeshTransform.SetScale( 0.01f , 0.01f , 0.01f );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Game::LoadShaders()
 {
 	m_imageEffectShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/selectiveImageEffect.hlsl" );
@@ -81,7 +89,7 @@ void Game::LoadShaders()
 void Game::LoadTextures()
 {
 	m_textures[ TEST_TEXTURE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Test_StbiFlippedAndOpenGL.png" );
-//	m_textures[ HUD_BASE ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Hud_Base.png" );
+	m_textures[ HUD_BASE ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Hud_Base.png" );
 	m_textures[ TERRAIN_SPRITE_SHEET ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Terrain_8x8.png" );
 	m_textures[ PLAYER_SPRITE_SHEET ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/ViewModelsSpriteSheet_8x8.png" );
 }
@@ -112,10 +120,10 @@ void Game::IntializeGameObjects()
 
 // 	//----------------------------------------------------------------------------------------------------------
 
-	Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix();
-	Vec3 forwardVector = cameraTransform.GetIBasis3D();
-	Vec3 rightVector   = cameraTransform.GetJBasis3D();
-	Vec3 upVector	   = cameraTransform.GetKBasis3D();
+	Mat44 cameraTransform	= m_gameCamera.GetCameraTransform().GetAsMatrix();
+	Vec3 forwardVector		= cameraTransform.GetIBasis3D();
+	Vec3 rightVector		= cameraTransform.GetJBasis3D();
+	Vec3 upVector			= cameraTransform.GetKBasis3D();
 
 	constexpr float basisShaftRadius	= 0.01f;
 	constexpr float basisTipRadius		= 0.03f;
@@ -151,6 +159,14 @@ void Game::IntializeGameObjects()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Game::InitializeHUDElements()
+{
+	m_playerGun = AABB2( m_uiCamera.GetOrthoMin().GetXYComponents() , m_uiCamera.GetOrthoMax().GetXYComponents() );
+	m_HUD  = m_playerGun.CarveBoxOffBottom( 0.1f * CLIENT_ASPECT , 0.f );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Game::~Game()
 {
 	delete m_cubeMesh;
@@ -164,12 +180,22 @@ Game::~Game()
 
 void Game::InitializeCameras()
 {
-		m_uiCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//			GAME CAMERA
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	
 		m_gameCamera.SetWorldCoordinateSystem( X_IN_Y_LEFT_Z_UP );
 		m_gameCamera.SetProjectionPerspective( 40.f , CLIENT_ASPECT , -.09f , -100.f );
 		m_gameCamera.SetPosition( Vec3( 1.f , 1.f , 1.f ) );
 		m_gameCamera.SetPosition( Vec3( -10.f , 1.f , 1.f ) );
 		m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//			HUD CAMERA
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	
+		m_uiCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( UI_SIZE_X , UI_SIZE_Y ) );
+		m_uiCamera.SetClearMode( CLEAR_NONE , BLACK , 1.f , 0 );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -303,6 +329,30 @@ void Game::Render() const
 
 	DebugRenderWorldToCamera( &m_gameCamera );
 	DebugRenderScreenTo( nullptr );
+
+	RenderHUD();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::RenderHUD() const
+{
+	Texture* playerSpriteSheetTex = m_textures[ PLAYER_SPRITE_SHEET];
+	SpriteSheet playerSpriteSheet( *playerSpriteSheetTex , IntVec2( 8 , 8 ) );;
+	const SpriteDefinition& playerHand = playerSpriteSheet.GetSpriteDefinition( 0 );
+	Vec2 uvMins;
+	Vec2 uvMaxs;
+	playerHand.GetUVs( uvMins , uvMaxs );
+
+	g_theRenderer->BeginCamera( m_uiCamera );
+	g_theRenderer->BindShader( nullptr );
+	g_theRenderer->BindTexture( m_textures[ PLAYER_SPRITE_SHEET ] );
+	g_theRenderer->DrawAABB2( m_playerGun , WHITE , uvMins , uvMaxs );
+	
+	g_theRenderer->BindTexture( m_textures[ HUD_BASE ] );
+	g_theRenderer->DrawAABB2( m_HUD , WHITE );
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->EndCamera( m_uiCamera );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

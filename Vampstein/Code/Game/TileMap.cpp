@@ -1,12 +1,12 @@
-﻿#include "Game/TileMap.hpp"
-
-#include "TheApp.hpp"
-#include "Engine/Audio/AudioSystem.hpp"
+﻿#include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/VertexUtils.hpp"
+#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Primitives/AABB3.hpp"
 #include "Engine/Primitives/GPUMesh.hpp"
-#include "Engine/Renderer/Texture.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Renderer/Texture.hpp"
+#include "Game/TileMap.hpp"
+#include "TheApp.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -16,18 +16,18 @@ extern AudioSystem*			g_theAudioSystem;
 extern TheApp*				g_theApp;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+//			UTILITY FUNCTION FORWARD DECLARATIONS - DEFINED AT THE BOTTOM OF FILE
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-enum eCubeFaces
+void CreateTopAndBottomFaces( std::vector< VertexMaster >& cubeMeshVerts , std::vector< uint >& faceIndices ,
+							  const AABB3 box , const Rgba8& tint /*= WHITE */ , Vec2 minUVS , Vec2 maxUvs );
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Tile::IsSolid()
 {
-	FRONT_FACE,
-	BACK_FACE,
-	RIGHT_FACE,
-	LEFT_FACE,
-	TOP_FACE,
-	BOTTOM_FACE,
-
-	NUM_TOTAL_CUBE_FACES
-};
+	return false;
+}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -105,7 +105,14 @@ void TileMap::Render() const
 
 void TileMap::AddVertsForTile( std::vector< VertexMaster >& destinationVerts , std::vector< uint >& destinationIndices , int tileIndex )
 {
-	AddVertsForSolidTile( destinationVerts , destinationIndices , tileIndex );
+	if ( m_tiles[ tileIndex ].IsSolid() )
+	{
+		AddVertsForSolidTile( destinationVerts , destinationIndices , tileIndex );
+	}
+	else
+	{
+		AddVertsForNonSolidTile( destinationVerts , destinationIndices , tileIndex );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -118,7 +125,22 @@ void TileMap::AddVertsForSolidTile( std::vector< VertexMaster >& destinationVert
 	std::vector< uint >				tileMeshIndices;
 	CreateCuboidXInYLeftZUp( tileMeshVerts , tileMeshIndices , bounds , WHITE );
 
-	AppendIndexedVerts( tileMeshVerts , tileMeshIndices , destinationVerts , destinationIndices );
+	AppendIndexedVerts( tileMeshVerts , tileMeshIndices , 
+						destinationVerts , destinationIndices );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void TileMap::AddVertsForNonSolidTile( std::vector< VertexMaster >& destinationVerts , std::vector< uint >& destinationIndices , int tileIndex )
+{
+	AABB3 bounds = GetTileBounds( tileIndex );
+	m_tiles[ tileIndex ].m_bounds = bounds;
+	std::vector< VertexMaster >		tileMeshVerts;
+	std::vector< uint >				tileMeshIndices;
+	CreateTopAndBottomFaces( tileMeshVerts , tileMeshIndices , bounds , WHITE , Vec2::ZERO , Vec2::ONE );
+
+	AppendIndexedVerts( tileMeshVerts , tileMeshIndices ,
+						destinationVerts , destinationIndices );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -139,6 +161,98 @@ AABB3 TileMap::GetTileBounds( int tileIndex )
 IntVec2 TileMap::GetTileCoordsForIndex( int index )
 {
 	return m_tiles[ index ].m_tileCoords;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//			UTILITY FUNCTION - MAP CREATION
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void CreateTopAndBottomFaces( std::vector< VertexMaster >& faceMeshVerts , std::vector< uint >& faceIndices ,
+							  const AABB3 box , const Rgba8& tint /*= WHITE */ , Vec2 minUVS , Vec2 maxUvs )
+{
+//--------------------------------------------------------------------------------
+//			NOTES
+//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//
+//												(Z - Upwards(facing ceiling)/Height/ /Right hand - Middle Finger)
+//																				^
+//	(X - Inwards(point away from myself)/Depth-width/East/Right hand - Thumb)	|
+//																			  \	|
+//				   (Y - Left/Length/North/Right hand - Index Finger) <---------\|
+//				   
+//--------------------------------------------------------------------------------
+
+	Vec2 minXUVMaxYUV( minUVS.x , maxUvs.y );
+	Vec2 maxXUVMinYUV( maxUvs.x , minUVS.y );
+	
+	Vertex_PCU faceVerts[ 8 ] = {
+		
+		// TOP FACE VERTS
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,box.m_maxs.z ) , tint, maxUvs ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,box.m_maxs.z ) , tint, maxXUVMinYUV ),
+
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,box.m_maxs.z ) , tint, minUVS ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,box.m_maxs.z ) , tint, minXUVMaxYUV ),
+
+		// BOTTOM FACE VERTS
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,box.m_mins.z ) , tint, maxUvs ),
+						Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,box.m_mins.z ) , tint, maxXUVMinYUV ),
+
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,box.m_mins.z ) , tint, minUVS ),
+						Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,box.m_mins.z ) , tint, minXUVMaxYUV ),
+	};
+
+	std::vector<Vertex_PCU> faceVertPCUS;
+
+	for( uint index = 0; index < 8; index++ )
+	{
+		faceVertPCUS.push_back( faceVerts[ index ] );
+	}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//			FACE NORMALS
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	Vec3 topNormal = CrossProduct3D( faceVerts[ 1 ].m_position - faceVerts[ 0 ].m_position , faceVerts[ 3 ].m_position - faceVerts[ 0 ].m_position );
+	Vec3 bottomNormal = -topNormal;
+
+	Vec3 faceNormals[ 2 ] = { topNormal , bottomNormal };
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//			FACE TANGENTS
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+	Vec3 topTangent = faceVerts[ 1 ].m_position - faceVerts[ 0 ].m_position;
+	Vec3 bottomTangent = -topTangent;
+	
+	Vec3 faceTangents[ 2 ] = { topTangent , bottomTangent };
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	Vertex_PCU::ConvertVertexPCUToVertexMaster( faceMeshVerts , faceVertPCUS );
+
+	for( uint faces = 0 ; faces < 2 ; faces++ )
+	{
+		for( uint vert = 0 ; vert < 4 ; vert++ )
+		{
+			faceMeshVerts[ ( faces * 4 ) + vert ].m_normal	= faceNormals[ faces ];
+			faceMeshVerts[ ( faces * 4 ) + vert ].m_tangent = Vec4( faceTangents[ faces ] , 1.f );
+		}
+	}
+
+	uint FaceIndicesValues[ 12 ] = {
+								// TOP FACE INDICES
+									0,1,2,
+									2,3,0,
+								// BOTTOM FACE INDICES
+									4,5,6,
+									6,7,4,
+								};
+
+	for( uint index = 0; index < 12; index++ )
+	{
+		faceIndices.push_back( FaceIndicesValues[ index ] );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

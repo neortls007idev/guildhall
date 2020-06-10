@@ -46,11 +46,15 @@ class Game
 public:
 			Game();
 
+			//--------------------------------------------------------------------------------------------------------------------------------------------
+
 			void LoadShaders();
 			void LoadTextures();
 			void LoadAudio();
 			void InitializeCameras();
 			void IntializeGameObjects();
+			void InitializeHUDElements();
+			void InitializeObjectTransforms();
 			
 			~Game();
 
@@ -58,6 +62,7 @@ public:
 			void DebugDrawUI( float deltaSeconds );
 				
 			void Render() const;
+			void RenderHUD() const;
 private:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				METHODS TO HANDLE USER INPUT
@@ -84,8 +89,11 @@ public:
 	Transform					m_compassMeshTransform;
 	
 	mutable Camera				m_gameCamera;
-	Camera						m_uiCamera;
+			Camera				m_uiCamera;
 
+	AABB2						m_HUD;
+	AABB2						m_playerGun;
+	
 	Vec3						m_cameraPosition									= Vec3::ZERO;
 	float						m_pitch												= 0.f;
 	float						m_yaw												= 0.f;

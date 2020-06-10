@@ -117,7 +117,15 @@ RenderContext::~RenderContext()
 		}
 	}
 
-	delete m_defaultSampler;
+	for( auto& sampler : m_samplers )
+	{
+		if( sampler != nullptr )
+		{
+			delete sampler;
+			sampler = nullptr;
+		}
+	}
+
 	m_defaultSampler = nullptr;
 
 	delete m_immediateVBO;
@@ -232,8 +240,8 @@ void RenderContext::Startup( Window* window )
 	m_lightDataUBO		= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 	m_fogDataUBO		= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 	m_materialDataUBO	= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
-	
-	m_defaultSampler = new Sampler( this , SAMPLER_BILINEAR );
+
+	m_defaultSampler = GetOrCreateSampler( SAMPLER_BILINEAR );
 	m_textureDefault = CreateTextureFromColor( WHITE );
 
 	CreateBlendStates();
@@ -668,6 +676,15 @@ void RenderContext::SetInputLayoutForIA( buffer_attribute_t const* attribs )
 	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( attribs );
 	// do similar to last bound VBO
 	m_context->IASetInputLayout( inputLayout );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Sampler* RenderContext::CreateSamplerFromType( eSamplerType type  )
+{
+	Sampler* temp = new Sampler( this , type );
+	m_samplers.push_back( temp );
+	return temp;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1665,6 +1682,22 @@ void RenderContext::BindDepthStencil( Texture* depthStencilView )
 	m_context->OMSetRenderTargets( rtvCount ,          // One rendertarget view
 		rtvs.data() ,      // Render target view, created earlier
 		dsv->m_dsv );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Sampler* RenderContext::GetOrCreateSampler( eSamplerType type )
+{
+	Sampler* temp = nullptr;
+	for (  size_t index = 0 ; index < m_samplers.size() ; index++ )
+	{
+		if ( type == m_samplers[ index ]->GetType() )
+		{
+			return m_samplers[ index ];
+		}
+	}
+	temp = CreateSamplerFromType( type );
+	return temp;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
