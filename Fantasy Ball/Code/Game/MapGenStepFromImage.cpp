@@ -48,7 +48,8 @@ void MapGenStepFromImage::RunStepOnce( Map& map )
 	//float	chancePerTile = m_chancePerTile.GetRandomInRange( rng ); //TODO:- fix asap
 	IntVec2 tileCoords;
 
-	Vec2 startpointatbottomleft( -845.f , -139.f );
+	//Vec2 startpointatbottomleft( -845.f , -139.f );
+	Vec2 startpointatbottomleft( -845.f , -168.f );
 	//const float xOffset = ( ( cameraDimensions.x * 0.5f ) / 15.f ) + halfTileDimensions.x;
 	//const float yOffset = ( cameraDimensions.y * 0.5f ) / 17.f;
 	const float xOffset = TILE_LENGTH;
@@ -56,7 +57,7 @@ void MapGenStepFromImage::RunStepOnce( Map& map )
 	
 	for ( tileCoords.y = 0; ( tileCoords.y < map.m_dimensions.y ) && ( tileCoords.y < m_mutationImage->GetDimensions().y ); tileCoords.y++ )
 	{
-		for ( tileCoords.x = 0;( tileCoords.x <  map.m_dimensions.x ) && ( tileCoords.y < m_mutationImage->GetDimensions().x ); tileCoords.x++ )
+		for ( tileCoords.x = 0;( tileCoords.x <  map.m_dimensions.x ) && ( tileCoords.x < m_mutationImage->GetDimensions().x ); tileCoords.x++ )
 		{
 			// TODO - FIX ME
 			

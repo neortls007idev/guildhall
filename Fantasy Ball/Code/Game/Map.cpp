@@ -153,7 +153,7 @@ void Map::SpawnNewEntity( eEntityType type , const Vec2& position , TileDefiniti
 			                    Vec2( 0.f , m_pit.m_mins.y + 83.f ) );
 								break;
 		case BALL:
-					newEntity = new Ball( m_owner , 1 , 25.f , 25.f , Vec2::ZERO , Vec2::MakeFromPolarDegrees(15.f,6.f) );
+					newEntity = new Ball( m_owner , 1 , 25.f , 25.f , position , Vec2::MakeFromPolarDegrees(15.f,6.f) );
 								break;
 		case TILE:
 					newEntity = new Tile( this , IntVec2( position ) , tileDef );
@@ -258,27 +258,10 @@ void Map::ResolveBallvPaddleCollisions()
 			if ( DoDiscAndAABBOverlap( ball->m_pos , ball->m_cosmeticRadius , paddle->GetCollider() ) )
 			{
 				Vec2 refPoint = paddle->GetCollider().GetNearestPoint( ball->m_pos );
-				Vec2 outVert1;
-				Vec2 outVert2;
-
-				paddle->GetCollider().GetClosestEdgeFromRefrerencePoint( ball->m_pos , outVert1 , outVert2 );
-				Vec2 edgeNormal = ( outVert2 - outVert1 ).GetRotated90Degrees().GetNormalized();
-
-				if ( edgeNormal.x <= -1.f && edgeNormal.x < 0.001f && edgeNormal.y <= 0.01f )
-				{
-					edgeNormal = -edgeNormal;
-					ball->m_velocity.Reflect( edgeNormal );
-				}
-				else if( edgeNormal.x <= 1.f && edgeNormal.x > 0.001f && edgeNormal.y <= 0.01f )
-				{
-					edgeNormal = edgeNormal;
-					ball->m_velocity.Reflect( edgeNormal );
-				}
-				else if ( /*edgeNormal.x <= 0.1f && edgeNormal.x >= 0.0f &&*/ edgeNormal.y >= 0.9f )
-				{
-					ball->m_velocity.Reflect( edgeNormal );
-				}
-				//ball->m_velocity.Reflect( Vec2::ZERO_ONE );
+				
+				Vec2 edgeNormal = ( ball->m_pos - refPoint ).GetNormalized();
+				ball->m_velocity.Reflect( edgeNormal );
+				
 				PushDiscOutOfAABB( ball->m_pos , ball->m_cosmeticRadius , paddle->GetCollider() );
 			}
 		}

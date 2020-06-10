@@ -56,30 +56,9 @@ bool Tile::TileCollisionResponse( Ball* ball )
 	if( DoDiscAndAABBOverlap( ball->m_pos , ball->m_cosmeticRadius , GetCollider() ) )
 	{
 		Vec2 refPoint = GetCollider().GetNearestPoint( ball->m_pos );
-		Vec2 outVert1;
-		Vec2 outVert2;
-
-		GetCollider().GetClosestEdgeFromRefrerencePoint( ball->m_pos , outVert1 , outVert2 );
-		Vec2 edgeNormal = ( outVert2 - outVert1 ).GetRotated90Degrees().GetNormalized();
-
-		if( edgeNormal.x <= -1.f && edgeNormal.x < 0.001f && edgeNormal.y <= 0.01f )
-		{
-			edgeNormal = -edgeNormal;
-			ball->m_velocity.Reflect( edgeNormal );
-		}
-		else if( edgeNormal.x <= 1.f && edgeNormal.x > 0.001f && edgeNormal.y <= 0.01f )
-		{
-			edgeNormal = edgeNormal;
-			ball->m_velocity.Reflect( edgeNormal );
-		}
-		else if( /*edgeNormal.x <= 0.1f && edgeNormal.x >= 0.0f &&*/ edgeNormal.y >= 0.9f )
-		{
-			ball->m_velocity.Reflect( edgeNormal );
-		}
-		else
-		{
-			ball->m_velocity.Reflect( -edgeNormal );
-		}
+		
+		Vec2 edgeNormal = ( ball->m_pos - refPoint ).GetNormalized();
+		ball->m_velocity.Reflect( edgeNormal );
 		
 		PushDiscOutOfAABB( ball->m_pos , ball->m_cosmeticRadius , GetCollider() );
 

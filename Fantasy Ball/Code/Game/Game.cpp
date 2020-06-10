@@ -56,7 +56,7 @@ Game::Game()
 	m_currentLevel = m_levels[ 0 ];
 
 	m_currentLevel->SpawnNewEntity( PADDLE , Vec2::ZERO );
-	m_currentLevel->SpawnNewEntity( BALL , Vec2::ZERO );
+	m_currentLevel->SpawnNewEntity( BALL , -Vec2::ZERO_ONE * 300.f );
 
 	//Vec2 testTilePos = Vec2( 100.f , 100.f );
 	//
