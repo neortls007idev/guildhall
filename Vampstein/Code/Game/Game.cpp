@@ -1,22 +1,22 @@
 ﻿#include "Engine/Core/DebugRender.hpp"
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Core/NamedProperties.hpp"
+#include "Engine/Core/VertexMaster.hpp"
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Input/VirtualKeyboard.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Primitives/GPUMesh.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Renderer/Sampler.hpp"
+#include "Engine/Renderer/ShaderState.hpp"
+#include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Renderer/SwapChain.hpp"
+#include "Engine/Time/Time.hpp"
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
-#include "Engine/Core/VertexMaster.hpp"
-#include "Engine/Renderer/ShaderState.hpp"
-#include "Engine/Core/NamedProperties.hpp"
-#include "Engine/Time/Time.hpp"
-#include "TileMap.hpp"
-#include "Engine/Renderer/SpriteAnimation.hpp"
-#include "Engine/Renderer/SpriteSheet.hpp"
+#include "Game/TileMap.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -57,6 +57,8 @@ Game::Game()
 
 	//m_testMap = new TileMap( "Test" , IntVec2( 4 , 2 ) );
 	m_testMap = new TileMap( "Test" , IntVec2( 8 , 8 ) );
+
+	m_pointSampler = g_theRenderer->GetOrCreateSampler( SAMPLER_POINT );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -163,12 +165,25 @@ void Game::InitializeHUDElements()
 {
 	m_playerGun = AABB2( m_uiCamera.GetOrthoMin().GetXYComponents() , m_uiCamera.GetOrthoMax().GetXYComponents() );
 	m_HUD  = m_playerGun.CarveBoxOffBottom( 0.1f * CLIENT_ASPECT , 0.f );
+
+	m_pointSampler = g_theRenderer->GetOrCreateSampler( SAMPLER_POINT );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Game::~Game()
 {
+	m_pointSampler		= nullptr;
+	m_imageEffectShader = nullptr;
+
+	delete m_testMap;
+	m_testMap			= nullptr;
+
+	for ( size_t index = 0; index < NUM_TOTAL_GAME_TEX ; index++ )
+	{
+		m_textures[ index ] = nullptr;
+	}
+	
 	delete m_cubeMesh;
 	m_cubeMesh			= nullptr;
 
@@ -281,11 +296,12 @@ void Game::Render() const
 	g_theRenderer->BindDepthStencil( m_gameCamera.GetDepthStencilTarget() );
 
 	g_theRenderer->SetCullMode( CULL_BACK );
-	//g_theRenderer->SetWindingOrder( CLOCKWISE );
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( m_textures[ TEST_TEXTURE ] );
+	g_theRenderer->BindSampler( m_pointSampler );
+	m_testMap->Render();
 			
 // 	g_theRenderer->SetModelMatrix( m_cubeMesh1Transform.GetAsMatrix() );
 // 	g_theRenderer->DrawMesh( m_cubeMesh );
@@ -311,8 +327,9 @@ void Game::Render() const
 		g_theRenderer->SetModelMatrix( m_compassMeshTransform.GetAsMatrix() );
 		g_theRenderer->DrawMesh( m_basisMesh );
 	}
-
-	m_testMap->Render();
+	g_theRenderer->SetCullMode( CULL_BACK );
+	g_theRenderer->SetDepthTest( COMPARE_LESS , false );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	
 	g_theRenderer->EndCamera( m_gameCamera );
 
@@ -347,8 +364,11 @@ void Game::RenderHUD() const
 	g_theRenderer->BeginCamera( m_uiCamera );
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( m_textures[ PLAYER_SPRITE_SHEET ] );
-	g_theRenderer->DrawAABB2( m_playerGun , WHITE , uvMins , uvMaxs );
+	g_theRenderer->BindSampler( m_pointSampler );
 	
+	g_theRenderer->DrawAABB2( m_playerGun , WHITE , uvMins , uvMaxs );
+
+	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( m_textures[ HUD_BASE ] );
 	g_theRenderer->DrawAABB2( m_HUD , WHITE );
 	g_theRenderer->BindTexture( nullptr );
@@ -473,5 +493,23 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	m_gameCamera.SetPitchYawRollRotation( m_pitch , m_yaw , finalRoll );	
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateFromTestCodeKeyBoard( float deltaSeconds )
+{
+	if( g_theInput->WasKeyJustPressed( KEY_F2 ) )
+	{
+		m_isSamplerEnabled = !m_isSamplerEnabled;
+		
+		if( m_isSamplerEnabled )
+		{
+			m_pointSampler = g_theRenderer->GetOrCreateSampler( SAMPLER_POINT );
+		}
+		else
+		{
+			m_pointSampler = g_theRenderer->GetOrCreateSampler( SAMPLER_BILINEAR );
+		}
+	}
+}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

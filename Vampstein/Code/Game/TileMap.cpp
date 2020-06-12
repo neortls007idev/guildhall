@@ -23,10 +23,11 @@ void CreateTopAndBottomFaces( std::vector< VertexMaster >& cubeMeshVerts , std::
 							  const AABB3 box , const Rgba8& tint /*= WHITE */ , Vec2 minUVS , Vec2 maxUvs );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+RandomNumberGenerator rng;
 
 bool Tile::IsSolid()
 {
-	return false;
+	return m_isSolid;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -51,6 +52,14 @@ void TileMap::PopulateTiles()
 		{
 			Tile newTile = Tile();
 			newTile.m_tileCoords = IntVec2( tileXIndex , tileYIndex );
+
+			int x = rng.RollRandomIntInRange( 0 , 10 );
+
+			if( x > 7 )
+			{
+				newTile.m_isSolid = true;
+			}
+			
 			m_tiles.push_back( newTile );
 		}
 	}
@@ -242,11 +251,11 @@ void CreateTopAndBottomFaces( std::vector< VertexMaster >& faceMeshVerts , std::
 
 	uint FaceIndicesValues[ 12 ] = {
 								// TOP FACE INDICES
-									0,1,2,
-									2,3,0,
+									0,2,1,
+									3,2,0,
 								// BOTTOM FACE INDICES
-									4,5,6,
-									6,7,4,
+									4,6,5,
+									7,6,4,
 								};
 
 	for( uint index = 0; index < 12; index++ )

@@ -70,6 +70,7 @@ private:
 			void UpdateFromKeyBoard( float deltaSeconds );
 			void UpdateDebugDrawFromKeyBoard();
 			void CameraPositionUpdateOnInput( float deltaSeconds );
+			void UpdateFromTestCodeKeyBoard( float deltaSeconds );
 
 private:
 
@@ -101,7 +102,8 @@ public:
 	bool						m_debugDraw											= false;
 
 	Shader*						m_imageEffectShader									= nullptr;
-	
+
+	Sampler*					m_pointSampler										= nullptr;
 	Texture*					m_textures[ NUM_TOTAL_GAME_TEX ];
 	SoundPlaybackID				m_sounds[ NUM_GAME_SOUNDS ];
 	RandomNumberGenerator		m_rng;
@@ -114,4 +116,5 @@ public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	
 	TileMap*					m_testMap											= nullptr;
+	bool						m_isSamplerEnabled									= false;
 };

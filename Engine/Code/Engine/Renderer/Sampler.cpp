@@ -14,7 +14,8 @@ Sampler::Sampler( RenderContext* ctx , eSamplerType type )
 
 	if ( type == SAMPLER_POINT )
 	{
-		desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+		//desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+		desc.Filter = D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
 	}
 	else if ( type == SAMPLER_BILINEAR )
 	{

@@ -153,7 +153,7 @@ void Map::SpawnNewEntity( eEntityType type , const Vec2& position , TileDefiniti
 			                    Vec2( 0.f , m_pit.m_mins.y + 83.f ) );
 								break;
 		case BALL:
-					newEntity = new Ball( m_owner , 1 , 25.f , 25.f , position , Vec2::MakeFromPolarDegrees(15.f,6.f) );
+					newEntity = new Ball( m_owner , 1 , 25.f * 1.5f , 25.f * 1.5f , position , Vec2::MakeFromPolarDegrees(15.f,6.f) );
 								break;
 		case TILE:
 					newEntity = new Tile( this , IntVec2( position ) , tileDef );
