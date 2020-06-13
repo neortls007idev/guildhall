@@ -27,7 +27,7 @@ public:
 	AABB2					GetCollider() const;
 	
 protected:
-	Map*							m_owner											= nullptr;
+	Map*							m_ownerMap										= nullptr;
 	IntVec2							m_tileCoords;
 	TileDefinition*					m_tileDef										= nullptr;
 	int								m_solidAtHealth									= 0;

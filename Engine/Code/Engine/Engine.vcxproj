@@ -229,6 +229,9 @@
     <ClCompile Include="Math\Vec2.cpp" />
     <ClCompile Include="Math\Vec3.cpp" />
     <ClCompile Include="Math\Vec4.cpp" />
+    <ClCompile Include="ParticleSystem\Particle2D.cpp" />
+    <ClCompile Include="ParticleSystem\ParticleEmitter2D.cpp" />
+    <ClCompile Include="ParticleSystem\ParticleSystem2D.cpp" />
     <ClCompile Include="Physics\Collider2D.cpp" />
     <ClCompile Include="Physics\Collision2D.cpp" />
     <ClCompile Include="Physics\Manifold2D.cpp" />
@@ -344,6 +347,9 @@
     <ClInclude Include="Math\Vec2.hpp" />
     <ClInclude Include="Math\Vec3.hpp" />
     <ClInclude Include="Math\Vec4.hpp" />
+    <ClInclude Include="ParticleSystem\Particle2D.hpp" />
+    <ClInclude Include="ParticleSystem\ParticleEmitter2D.hpp" />
+    <ClInclude Include="ParticleSystem\ParticleSystem2D.hpp" />
     <ClInclude Include="Physics\Collider2D.hpp" />
     <ClInclude Include="Physics\Collision2D.hpp" />
     <ClInclude Include="Physics\Manifold2D.hpp" />

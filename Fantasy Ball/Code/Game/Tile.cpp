@@ -2,10 +2,10 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Game/Ball.hpp"
+#include "Game/Game.hpp"
+#include "Game/GameCommon.hpp"
 #include "Game/Map.hpp"
 #include "Game/Tile.hpp"
-
-#include "GameCommon.hpp"
 #include "Game/TileDefinition.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -18,7 +18,8 @@ extern AudioSystem*					g_theAudioSystem;
 Tile::Tile( Map* owner , IntVec2 tileCoordinates , TileDefinition* tileType ) :
 																								Entity( owner->m_owner , 0 , eEntityType::TILE ) ,
 																								m_tileDef( tileType ) ,
-																								m_tileCoords( tileCoordinates )
+																								m_tileCoords( tileCoordinates ) ,
+																								m_ownerMap( owner )
 {
 	SetHealth( m_tileDef->m_health );
 	m_tileColor = m_tileDef->m_tileColor;
@@ -36,15 +37,19 @@ void Tile::Update( float deltaSeconds )
 void Tile::Render() const
 {
 	AABB2 tile = GetCollider();
-	g_theRenderer->DrawUnfilledAABB2( tile , WHITE , 5.f );
 	g_theRenderer->DrawAABB2( tile , m_tileColor );
+
+	if ( m_owner->m_isDebugDraw  )
+	{
+		g_theRenderer->DrawUnfilledAABB2( tile , WHITE , 5.f );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 int Tile::GetTileIndex()
 {
-	IntVec2 mapDimensions = m_owner->m_dimensions;
+	IntVec2 mapDimensions = m_ownerMap->m_dimensions;
 
 	return m_tileCoords.y * mapDimensions.x + m_tileCoords.x; 
 }
@@ -62,6 +67,9 @@ bool Tile::TileCollisionResponse( Ball* ball )
 		
 		PushDiscOutOfAABB( ball->m_pos , ball->m_cosmeticRadius , GetCollider() );
 
+		--m_health;
+		ball->UpdateCurrentTexture( m_tileColor );
+		
 		return true;
 	}
 	return false;

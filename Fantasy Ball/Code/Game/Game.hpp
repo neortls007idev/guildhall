@@ -1,7 +1,8 @@
 #pragma once
 #include "Game/GameCommon.hpp"
-#include "Engine/Renderer/Camera.hpp"
 #include "Game/Map.hpp"
+#include "Engine/Audio/AudioSystem.hpp"
+#include "Engine/Renderer/Camera.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -13,6 +14,10 @@ public:
 	void LoadAssets();
 	void LoadAllSounds();
 	void LoadAllTextures();
+
+	void PostGameConstructDataOnce();
+	void PostGameConstruct();
+	
 	void CreateAllTileDefinitions();
 	void CreateAllMapDefinitions();
 	
@@ -25,6 +30,8 @@ public:
 
 	void Die();
 
+	SoundPlaybackID GetSFX( eGameAudioFX SFXid ) const;
+	
 	//----------------------------------------------------------------------------------------------------------
 	int GetPaddleHealth() const															{ return 3; }
 	Camera* GetWorldCamera()															{ return &m_worldCamera; }
@@ -50,7 +57,8 @@ public:
 	std::vector<Map*>			m_levels;
 	Map*						m_currentLevel									= nullptr;
 	Texture*					m_gameTex[ NUM_GAME_TEX ];
-	
+	SoundPlaybackID				m_sounds[ NUM_GAME_SFX ];
+
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	//			DEBUG CODE
 	//--------------------------------------------------------------------------------------------------------------------------------------------

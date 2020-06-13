@@ -77,6 +77,9 @@
     <Filter Include="Experimental\Raytracer">
       <UniqueIdentifier>{1a2ad2de-ea8f-45b3-a378-22cccb7a4d2a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ParticleSystem">
+      <UniqueIdentifier>{b7628568-2541-462c-97d0-1aee10d04125}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Rgba8.cpp">
@@ -366,6 +369,15 @@
     </ClCompile>
     <ClCompile Include="Renderer\DrawableObjects.cpp">
       <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem\Particle2D.cpp">
+      <Filter>ParticleSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem\ParticleEmitter2D.cpp">
+      <Filter>ParticleSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem\ParticleSystem2D.cpp">
+      <Filter>ParticleSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -698,6 +710,15 @@
     </ClInclude>
     <ClInclude Include="Renderer\DrawableObjects.hpp">
       <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem\Particle2D.hpp">
+      <Filter>ParticleSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem\ParticleEmitter2D.hpp">
+      <Filter>ParticleSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem\ParticleSystem2D.hpp">
+      <Filter>ParticleSystem</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

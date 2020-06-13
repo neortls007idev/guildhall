@@ -303,6 +303,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Paddle.hpp" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="TheApp.hpp" />
     <ClInclude Include="GameCommon.hpp" />
     <ClInclude Include="Tile.hpp" />
@@ -353,6 +354,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Icons.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\Run\Data\Icons\Cursors\BlueCursor.ico" />
+    <Image Include="..\..\Run\Data\Icons\Cursors\RedCursor.ico" />
+    <Image Include="..\..\Run\Data\Icons\TitleBar\titleBarIcon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

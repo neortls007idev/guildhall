@@ -3,6 +3,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Input/VirtualKeyboard.hpp"
+#include "Engine/ParticleSystem/ParticleSystem2D.hpp"
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Time/Clock.hpp"
@@ -10,39 +11,28 @@
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
 
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+#include "Game/resource.h"
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			GLOBAL VARIABLES
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-InputSystem*	g_theInput			= nullptr;
-RenderContext*  g_theRenderer		= nullptr;
-AudioSystem*    g_theAudioSystem	= nullptr;
-TheApp*		    g_theApp			= nullptr;
-Game*		    g_theGame			= nullptr;
-DevConsole*	    g_theDevConsole		= nullptr;
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-bool SunRise( EventArgs& args )
-{
-	UNUSED( args );
-	g_theDevConsole->PrintString( WHITE , "Sunrise has been called." );
-	return true;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void SunSet( EventArgs& args )
-{
-	UNUSED( args );
-	g_theDevConsole->PrintString( WHITE , "Sunrise has been called." );
-}
+InputSystem*				g_theInput						= nullptr;
+RenderContext*				g_theRenderer					= nullptr;
+AudioSystem*				g_theAudioSystem				= nullptr;
+TheApp*						g_theApp						= nullptr;
+Game*						g_theGame						= nullptr;
+DevConsole*					g_theDevConsole					= nullptr;
+ParticleSystem2D*			g_theParticleSystem2D			= nullptr;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 TheApp::TheApp()
 {
-
+	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -52,6 +42,9 @@ TheApp::~TheApp()
 	delete g_theGame;
 	g_theGame = nullptr;
 
+	delete g_theParticleSystem2D;
+	g_theParticleSystem2D = nullptr;
+	
 	delete g_theAudioSystem;
 	g_theAudioSystem = nullptr;
 	// 
@@ -87,6 +80,7 @@ void TheApp::Startup()
 	{
 		g_theWindow = new Window();
 	}
+	g_theWindow->Startup();
 
 	if ( g_theInput == nullptr )
 	{
@@ -101,10 +95,8 @@ void TheApp::Startup()
 	}
 	g_theRenderer->Startup( g_theWindow );
 
-	// 	if ( g_bitmapFont == nullptr )
-	// 	{
-	// 		g_bitmapFont = g_theRenderer->GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
-	// 	}
+	SetGameIconAndCursor();
+
 
 	if ( g_theDevConsole == nullptr )
 	{
@@ -132,11 +124,30 @@ void TheApp::Startup()
 		g_theAudioSystem->Startup();
 	}
 
+	if ( g_theParticleSystem2D == nullptr )
+	{
+		g_theParticleSystem2D = new ParticleSystem2D();
+		g_theParticleSystem2D->Startup();
+	}
+	
 	if ( g_theGame == nullptr )
 	{
 		g_theGame = new Game();
+		g_theGame->PostGameConstructDataOnce();
+		g_theGame->PostGameConstruct();
 		g_theDevConsole->PrintString( MAGENTA , "GAME HAS STARTED" );
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void TheApp::SetGameIconAndCursor()
+{
+	void* gameIcon = reinterpret_cast< HICON >( ::LoadImage( GetModuleHandle( NULL ) , MAKEINTRESOURCE( IDI_ICON1 ) , IMAGE_ICON , 0 , 0 , LR_DEFAULTCOLOR | LR_SHARED | LR_DEFAULTSIZE ) );
+	g_theWindow->SetNewIcon( gameIcon );
+
+	void* cursorIcon = reinterpret_cast< HCURSOR >( ::LoadImage( GetModuleHandle( NULL ) , MAKEINTRESOURCE( IDI_ICON2 ) , IMAGE_ICON , 0 , 0 , LR_DEFAULTCOLOR | LR_SHARED | LR_DEFAULTSIZE ) );
+	::SetCursor( reinterpret_cast< HCURSOR >( cursorIcon ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -166,7 +177,7 @@ void TheApp::BeginFrame()
 	g_theRenderer->BeginFrame();
 	g_theDevConsole->BeginFrame();
 	g_theAudioSystem->BeginFrame();
-	
+	g_theParticleSystem2D->BeginFrame();
 	g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
 }
 
@@ -176,6 +187,8 @@ void TheApp::Update( float deltaSeconds )
 {
 	UpdateFromKeyboard();
 
+	g_theParticleSystem2D->Update( deltaSeconds );
+	
 	if ( m_isPaused )								{ deltaSeconds = 0.f; }
 	else if ( m_isSloMo == true )					{ deltaSeconds /= 10.f; }
 	if ( m_isSpeedMo )								{ deltaSeconds = deltaSeconds * 4.0f; }
@@ -201,7 +214,6 @@ void TheApp::Render() const
 		
 		if ( g_theDevConsole->IsOpen() )
 		{
-			//g_theGame->m_worldCamera.SetOrthoView( Vec2( 5 , 5 ) , Vec2( 35 , 35 ) );
 			g_theDevConsole->Render( *g_theRenderer , *g_theDevConsole->GetDevConsoleCamera() , 14.f );
 		}
 }
@@ -212,6 +224,7 @@ void TheApp::EndFrame()
 {
 	// all engine things that must end at the end of the frame and not the game
 /*	g_currentManager->EndFrame();*/
+	g_theParticleSystem2D->EndFrame();
 	g_theAudioSystem->EndFrame();
 	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
@@ -227,13 +240,15 @@ void TheApp::Shutdown()
 	delete g_theGame;
 	g_theGame			= nullptr;
 
+	g_theParticleSystem2D->Shutdown();
+	
 	g_theAudioSystem->Shutdown();
 	// 	g_thePhysicsSystem->Shutdown();
 	// 	g_currentManager->Shutdown();
 	g_theDevConsole->Shutdown();
 	g_theRenderer->Shutdown();
 	g_theInput->Shutdown();
-	// TODO :- write me g_theWindow->Shutdown();
+	g_theWindow->Shutdown();
 	g_theEventSystem->Shutdown();
 	Clock::Shutdown();
 	g_theRenderer->Shutdown();
@@ -285,24 +300,12 @@ void TheApp::UpdateFromKeyboard()
 		delete g_theGame;
 		g_theGame = nullptr;
 		g_theGame = new Game();
+		g_theGame->PostGameConstruct();
 	}
 	
 	if ( g_theInput->GetButtonState( KEY_TILDE ).WasJustPressed() )
 	{
-		//m_isDevConsoleVisbile = !m_isDevConsoleVisbile;
-		//g_theDevConsole->SetIsOpen( m_isDevConsoleVisbile );
 		g_theDevConsole->ToggleVisibility();
-	}
-
-	if ( g_theInput->WasKeyJustPressed('S') )
-	{
-		g_theEventSystem->SubscribeToEvent( "sunrise" , SunRise );
-	}
-
-	if ( g_theInput->WasKeyJustPressed( 'F' ) )
-	{
-		EventArgs something;
-		g_theEventSystem->FireEvent( "sunrise" , something );
 	}
 }
 

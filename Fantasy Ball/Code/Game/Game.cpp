@@ -18,6 +18,7 @@
 #include "Game/MapDefinition.hpp"
 #include "Game/TheApp.hpp"
 #include "Game/TileDefinition.hpp"
+#include <utility>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // GLOBAL VARIABLES
@@ -33,42 +34,18 @@ extern InputSystem*		g_theInput;
 
 SpriteSheet* g_tileSpriteSheet		= nullptr;
 SpriteSheet* g_characterSpriteSheet = nullptr;
+extern	BallTexEnumRGBA8Map	g_theBallTexTable[ NUM_GAME_TEX ];
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Game::Game()
 {
-	g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
+	g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , true ) );
 	float cameraHalfHeight	= g_gameConfigBlackboard.GetValue( "cameraHalfHeight" , 540.f );
 	float cameraAspectRatio = g_gameConfigBlackboard.GetValue( "windowAspect" , 1.77f );
 	
 	m_worldCamera.SetOrthoView( cameraHalfHeight , cameraAspectRatio );
-	LoadAssets();
-	TileDefinition::CreateTileDefinitions( "Data/GamePlay/TileDefs.xml" );
-	MapDefinition::CreateMapDefinitions( "Data/GamePlay/MapDefs.xml" );
-	
-	for( auto totalMaps = MapDefinition::s_definitions.cbegin(); totalMaps != MapDefinition::s_definitions.cend(); totalMaps++ )
-	{
-		Map* temp = new Map( this , totalMaps->second , totalMaps->second->m_name );
-		m_levels.push_back( temp );
-	}
-	
-	m_currentLevel = m_levels[ 0 ];
-
-	m_currentLevel->SpawnNewEntity( PADDLE , Vec2::ZERO );
-	m_currentLevel->SpawnNewEntity( BALL , -Vec2::ZERO_ONE * 300.f );
-
-	//Vec2 testTilePos = Vec2( 100.f , 100.f );
-	//
-	//m_currentLevel->SpawnNewEntity( TILE , 0 * testTilePos , TileDefinition::s_definitions.at( "NormalYellow" ) );
-	//m_currentLevel->SpawnNewEntity( TILE , 1 * testTilePos , TileDefinition::s_definitions.at( "NormalPurple" ) );
-	//m_currentLevel->SpawnNewEntity( TILE , 2 * testTilePos , TileDefinition::s_definitions.at( "NormalOrange" ) );
-	//m_currentLevel->SpawnNewEntity( TILE , 3 * testTilePos , TileDefinition::s_definitions.at( "SteelGrey" ) );
-	
-	//--------------------------------------------------------------------------------------------------------------------------------------------
-	//			DebugTile
-	//--------------------------------------------------------------------------------------------------------------------------------------------
-	//m_currentLevel->SpawnNewEntity( TILE , Vec2::ZERO , TileDefinition::s_definitions.at( "NormalOrange" ) );
+	LoadAssets();	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -83,7 +60,15 @@ void Game::LoadAssets()
 
 void Game::LoadAllSounds()
 {
-
+	//m_sounds[ SFX_BACKGROUND_1 ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/WindsweptRealms.mp3" );
+	m_sounds[ SFX_BACKGROUND_2 ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/LSCrystallize.mp3" );
+	m_sounds[ SFX_BACKGROUND_3 ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/LSCelticCarol.mp3" );
+	m_sounds[ SFX_BACKGROUND_4 ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/LSSenbonzakura.mp3" );
+	
+	m_sounds[ SFX_LEAVES_RUSTLE ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/Rustle/rustle1.mp3" );
+	
+	m_sounds[ SFX_GLASS_BREAK_1 ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/Shatter/glassBreak1.mp3" );
+	m_sounds[ SFX_GLASS_BREAK_2 ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/Shatter/LightBulbBreaking.wav" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -111,23 +96,62 @@ void Game::LoadAllTextures()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Game::CreateAllTileDefinitions()
+void Game::PostGameConstructDataOnce()
 {
+	TileDefinition::CreateTileDefinitions( "Data/GamePlay/TileDefs.xml" );
+	MapDefinition::CreateMapDefinitions( "Data/GamePlay/MapDefs.xml" );
+	
+	g_theBallTexTable[ TEX_BALL_RED		].texture		= TEX_BALL_RED;
+	g_theBallTexTable[ TEX_BALL_GREEN	].texture		= TEX_BALL_GREEN;
+	g_theBallTexTable[ TEX_BALL_BLUE	].texture		= TEX_BALL_BLUE;
+	g_theBallTexTable[ TEX_BALL_YELLOW	].texture		= TEX_BALL_YELLOW;
+	g_theBallTexTable[ TEX_BALL_MAGENTA ].texture		= TEX_BALL_MAGENTA;
+	g_theBallTexTable[ TEX_BALL_CYAN	].texture		= TEX_BALL_CYAN;
+	g_theBallTexTable[ TEX_BALL_PINK	].texture		= TEX_BALL_PINK;
+	g_theBallTexTable[ TEX_BALL_PURPLE	].texture		= TEX_BALL_PURPLE;
+	g_theBallTexTable[ TEX_BALL_ORANGE	].texture		= TEX_BALL_ORANGE;
+	g_theBallTexTable[ TEX_BALL_GREY	].texture		= TEX_BALL_GREY;
 
+	g_theBallTexTable[ TEX_BALL_RED		].color			= RED;
+	g_theBallTexTable[ TEX_BALL_GREEN	].color			= GREEN;
+	g_theBallTexTable[ TEX_BALL_BLUE	].color			= BLUE;
+	g_theBallTexTable[ TEX_BALL_YELLOW	].color			= YELLOW;
+	g_theBallTexTable[ TEX_BALL_MAGENTA ].color			= MAGENTA;
+	g_theBallTexTable[ TEX_BALL_CYAN	].color			= CYAN;
+	g_theBallTexTable[ TEX_BALL_PINK	].color			= PINK;
+	g_theBallTexTable[ TEX_BALL_PURPLE	].color			= PURPLE;
+	g_theBallTexTable[ TEX_BALL_ORANGE	].color			= ORANGE;
+	g_theBallTexTable[ TEX_BALL_GREY	].color			= GRAY;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Game::CreateAllMapDefinitions()
+void Game::PostGameConstruct()
 {
-// 	for( auto totalMaps = MapDefinition::s_definitions.cbegin(); totalMaps != MapDefinition::s_definitions.cend(); totalMaps++ )
-// 	{
-// 		Map* temp = new Map( this , totalMaps->second , totalMaps->second->m_name );
-// 		m_levels.push_back( temp );
-// 	}
-// 	
-// 	m_currentLevelNumber = 0;
-// 	m_currentLevel = m_levels[ m_currentLevelNumber ];
+	for( auto totalMaps = MapDefinition::s_definitions.cbegin(); totalMaps != MapDefinition::s_definitions.cend(); totalMaps++ )
+	{
+		Map* temp = new Map( this , totalMaps->second , totalMaps->second->m_name );
+		m_levels.push_back( temp );
+	}
+
+	m_currentLevel = m_levels[ 0 ];
+
+	m_currentLevel->SpawnNewEntity( PADDLE , Vec2::ZERO );
+	m_currentLevel->SpawnNewEntity( BALL , Vec2::ZERO_ONE * 300.f );
+
+	//Vec2 testTilePos = Vec2( 100.f , 100.f );
+	//
+	//m_currentLevel->SpawnNewEntity( TILE , 0 * testTilePos , TileDefinition::s_definitions.at( "NormalYellow" ) );
+	//m_currentLevel->SpawnNewEntity( TILE , 1 * testTilePos , TileDefinition::s_definitions.at( "NormalPurple" ) );
+	//m_currentLevel->SpawnNewEntity( TILE , 2 * testTilePos , TileDefinition::s_definitions.at( "NormalOrange" ) );
+	//m_currentLevel->SpawnNewEntity( TILE , 3 * testTilePos , TileDefinition::s_definitions.at( "SteelGrey" ) );
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//			DebugTile
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//m_currentLevel->SpawnNewEntity( TILE , Vec2::ZERO , TileDefinition::s_definitions.at( "NormalOrange" ) );
+
+	g_theAudioSystem->PlaySound( m_sounds[ SFX_BACKGROUND_4 ] , true , 0.11f );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -188,6 +212,13 @@ void Game::AddScreenShakeIntensity( float deltaShakeIntensity )
 void Game::Die()
 {
 
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+SoundPlaybackID Game::GetSFX( eGameAudioFX SFXid ) const
+{
+	return m_sounds[ SFXid ];
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

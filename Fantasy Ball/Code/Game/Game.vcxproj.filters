@@ -35,6 +35,9 @@
     <Filter Include="Gameplay\Physics">
       <UniqueIdentifier>{8907f465-fb24-4c1e-81a8-2c82f9118f88}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Windows Resources">
+      <UniqueIdentifier>{e4fe4522-f092-4963-b87c-5499cb4b117c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameCommon.cpp">
@@ -153,6 +156,9 @@
     <ClInclude Include="MapDefinition.hpp">
       <Filter>Gameplay\Levels</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Windows Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\Plan\Proposal\1_Features.txt">
@@ -178,5 +184,17 @@
     <None Include="..\..\Plan\Proposal\Fantasy Ball Prosopal Presentation.pptx">
       <Filter>Plan\Proposal</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Icons.rc">
+      <Filter>Windows Resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\Run\Data\Icons\TitleBar\titleBarIcon.ico">
+      <Filter>Windows Resources</Filter>
+    </Image>
+    <Image Include="..\..\Run\Data\Icons\Cursors\BlueCursor.ico" />
+    <Image Include="..\..\Run\Data\Icons\Cursors\RedCursor.ico" />
   </ItemGroup>
 </Project>

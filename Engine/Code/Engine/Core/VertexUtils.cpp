@@ -261,7 +261,7 @@ uint* GetCubeIndices()
 
 void CreateQuad( std::vector< VertexMaster >& quadMeshVerts , std::vector< uint >& quadIndices , const AABB2 quad , const Rgba8& tint /*= WHITE */ )
 {
-	Vertex_PCU CubeVerts[ 4 ] = {
+	Vertex_PCU quadVerts[ 4 ] = {
 
 		// FRONT FACE VERTS
 						Vertex_PCU( Vec3( quad.m_mins.x, quad.m_mins.y , -1.f ) , tint, Vec2( 0.f, 0.f ) ),
@@ -278,15 +278,15 @@ void CreateQuad( std::vector< VertexMaster >& quadMeshVerts , std::vector< uint 
 
 						};
 
-	Vec3 quadNormal = CrossProduct3D( CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position ,
-	                                  CubeVerts[ 3 ].m_position - CubeVerts[ 0 ].m_position );
-	Vec4 quadTangent = Vec4( CubeVerts[ 1 ].m_position - CubeVerts[ 0 ].m_position , 1.f );
+	Vec3 quadNormal = CrossProduct3D( quadVerts[ 1 ].m_position - quadVerts[ 0 ].m_position ,
+	                                  quadVerts[ 3 ].m_position - quadVerts[ 0 ].m_position );
+	Vec4 quadTangent = Vec4( quadVerts[ 1 ].m_position - quadVerts[ 0 ].m_position , 1.f );
 
 	std::vector<Vertex_PCU> quadVertPCUS;
 
 	for ( uint index = 0; index < 4; index++ )
 	{
-		quadVertPCUS.push_back( CubeVerts[ index ] );
+		quadVertPCUS.emplace_back( quadVerts[ index ] );
 	}
 
 	Vertex_PCU::ConvertVertexPCUToVertexMaster( quadMeshVerts , quadVertPCUS );
@@ -305,7 +305,37 @@ void CreateQuad( std::vector< VertexMaster >& quadMeshVerts , std::vector< uint 
 
 	for ( uint index = 0; index < 6; index++ )
 	{
-		quadIndices.push_back( QuadIndices[ index ] );
+		quadIndices.emplace_back( QuadIndices[ index ] );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void CreateQuad( std::vector< Vertex_PCU >& quadMeshVerts , std::vector< uint >& quadIndices , const AABB2 quad , const Rgba8& tint /*= WHITE */ )
+{
+	Vertex_PCU quadVerts[ 4 ] = {
+
+						Vertex_PCU( Vec3( quad.m_mins.x, quad.m_mins.y , -1.f ) , tint, Vec2( 0.f, 0.f ) ),
+						Vertex_PCU( Vec3( quad.m_maxs.x, quad.m_mins.y , -1.f ) , tint, Vec2( 1.f, 0.f ) ),
+
+						Vertex_PCU( Vec3( quad.m_maxs.x, quad.m_maxs.y , -1.f ) , tint, Vec2( 1.f, 1.f ) ),
+						Vertex_PCU( Vec3( quad.m_mins.x, quad.m_maxs.y , -1.f ) , tint, Vec2( 0.f, 1.f ) ),
+	};
+
+	for( uint index = 0; index < 4; index++ )
+	{
+		quadMeshVerts.emplace_back( quadVerts[ index ] );
+	}
+	
+	uint QuadIndices[ 6 ] = {
+	// FRONT FACE INDICES
+		0,1,2,
+		2,3,0,
+	};
+	
+	for( uint index = 0; index < 6; index++ )
+	{
+		quadIndices.emplace_back( QuadIndices[ index ] );
 	}
 }
 

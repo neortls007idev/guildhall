@@ -1,12 +1,14 @@
 ﻿#include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/StdExtensions.hpp"
+#include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/ParticleSystem/ParticleSystem2D.hpp"
+#include "Engine/Primitives/GPUMesh.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Game//Game.hpp"
 #include "Game/Ball.hpp"
+#include "Game/GameCommon.hpp"
 #include "Game/Map.hpp"
-
-#include "GameCommon.hpp"
 #include "Game/MapDefinition.hpp"
 #include "Game/Paddle.hpp"
 #include "Game/Tile.hpp"
@@ -14,8 +16,9 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-extern RenderContext*	g_theRenderer;
-extern AudioSystem*		g_theAudioSystem;
+extern RenderContext*				g_theRenderer;
+extern AudioSystem*					g_theAudioSystem;
+extern ParticleSystem2D*			g_theParticleSystem2D;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -132,7 +135,6 @@ void Map::Render()
 			{
 				currentList[ entityIndex ]->Render();
 			}
-
 		}
 	}
 }
@@ -193,6 +195,12 @@ void Map::ResolveCollisions()
 
 void Map::ResolveBallvBoundsCollisions()
 {
+	std::vector<Vertex_PCU> particleVerts;
+	std::vector<uint> particleIndices;
+	Rgba8 color;
+	static RandomNumberGenerator rng;
+	color.RollRandomColor( rng );
+		
 	Entitylist& currentList = m_entityListsByType[ BALL ];
 	for ( int entityIndex = 0; entityIndex < ( int ) m_entityListsByType[ BALL ].size(); entityIndex++ )
 	{
@@ -212,6 +220,7 @@ void Map::ResolveBallvBoundsCollisions()
 				ball->m_velocity.Reflect( edgeNormal );
 				
 				PushDiscOutOfAABB( ball->m_pos , ball->m_cosmeticRadius , m_leftWall );
+				g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_LEAVES_RUSTLE ) , false , 0.1f , 0.f , 1.f );
 			}
 
 			if ( DoDiscAndAABBOverlap( ball->m_pos , ball->m_cosmeticRadius , m_rightWall ) )
@@ -226,16 +235,17 @@ void Map::ResolveBallvBoundsCollisions()
 				
 				ball->m_velocity.Reflect( edgeNormal );
 				PushDiscOutOfAABB( ball->m_pos , ball->m_cosmeticRadius , m_rightWall );
+				g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_LEAVES_RUSTLE ) , false , 0.33f , 0.f , 1.f );
 			}
 
 			if ( DoDiscAndAABBOverlap( ball->m_pos , ball->m_cosmeticRadius , m_topWall ) )
 			{
 				ball->m_velocity.Reflect( -Vec2::ZERO_ONE );
 				PushDiscOutOfAABB( ball->m_pos , ball->m_cosmeticRadius , m_topWall );
+				g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_LEAVES_RUSTLE ) , false , 0.33f , 0.f , 1.f );
 			}
 		}
 	}
-	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -285,7 +295,17 @@ void Map::ResolveBallvTileCollisions()
 				currentTile = ( Tile* ) m_entityListsByType[ TILE ][ tileIndex ];
 				if ( nullptr != currentTile )
 				{
-					currentTile->TileCollisionResponse( ball );
+					if ( currentTile->TileCollisionResponse( ball ) )
+					{
+						g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_GLASS_BREAK_2 ) , false , 0.1f );
+					}
+
+					if( currentTile->GetHealth() <= 0 )
+					{
+						delete currentTile;
+						m_entityListsByType[ TILE ][ tileIndex ] = nullptr;
+						currentTile = nullptr;
+					}
 				}
 			}
 		}

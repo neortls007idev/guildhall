@@ -190,6 +190,20 @@ Window::~Window()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Window::Startup()
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Window::Shutdown()
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 bool Window::Open( std::string const& title , float clientAspect , float maxClientFractionOfDesktop )
 {
 	// #SD1ToDo: Add support for fullscreen mode (requires different window style flags than windowed mode)
@@ -335,6 +349,13 @@ void Window::BeginFrame()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Window::EndFrame()
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 int Window::GetClientWidth()
 {
 	return m_ClientWidth;
@@ -454,6 +475,38 @@ void Window::SetProgress( eWindowProgressMode mode , float progress /*= 0.0f */ 
 									break;
 	default:
 		break;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Window::SetNewCursorIcon( void* const& icon )
+{
+	m_gameCursorIcon = icon;
+	
+	if( nullptr != m_gameCursorIcon )
+	{
+		::SetCursor( reinterpret_cast< HCURSOR >( m_gameCursorIcon ) );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Window::SetCursorIconToLoadedIcon()
+{
+	if ( nullptr != m_gameCursorIcon )
+	{
+		::SetCursor( reinterpret_cast< HCURSOR >( m_gameCursorIcon ) );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Window::DestroyCursorIcon()
+{
+	if ( nullptr != m_gameCursorIcon )
+	{
+		DestroyCursor( reinterpret_cast< HCURSOR >( m_gameCursorIcon ) );
 	}
 }
 

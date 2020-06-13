@@ -335,6 +335,8 @@ Vec2 InputSystem::GetMouseNormalizedClientPosition() const
 void InputSystem::ShowSystemCursor()
 {
 	while ( ShowCursor( TRUE ) <= 0 );
+
+	g_theWindow->SetCursorIconToLoadedIcon();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -64,3 +64,26 @@ enum eGameTextures
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum eGameAudioFX
+{
+	SFX_BACKGROUND_1,
+	SFX_BACKGROUND_2,
+	SFX_BACKGROUND_3,
+	SFX_BACKGROUND_4,
+	
+	SFX_LEAVES_RUSTLE,
+
+	SFX_GLASS_BREAK_1,
+	SFX_GLASS_BREAK_2,
+
+	NUM_GAME_SFX
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct BallTexEnumRGBA8Map
+{
+	Rgba8			color	= WHITE;
+	eGameTextures	texture = TEX_NONE;
+};

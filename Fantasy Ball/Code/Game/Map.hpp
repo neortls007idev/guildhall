@@ -1,7 +1,8 @@
 ﻿#pragma once
-#include <vector>
+
 #include "Engine/Primitives/AABB2.hpp"
 #include "Game/Entity.hpp"
+#include <vector>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

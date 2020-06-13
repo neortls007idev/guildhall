@@ -43,7 +43,10 @@ uint* GetCubeIndices();
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void CreateQuad( std::vector< VertexMaster >& quadMeshVerts , std::vector< uint >& quadIndices , const AABB2 quad ,
-	const Rgba8& tint = WHITE );
+				 const Rgba8& tint = WHITE );
+
+void CreateQuad( std::vector< Vertex_PCU >& quadMeshVerts , std::vector< uint >& quadIndices , const AABB2 quad ,
+				 const Rgba8& tint = WHITE );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

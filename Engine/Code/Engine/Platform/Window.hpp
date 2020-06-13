@@ -46,6 +46,9 @@ public:
 
 	//void SetInputSystem( InputSystem* inputSystem );
 
+	void Startup();
+	void Shutdown();
+	
 	bool Open( std::string const& title , float aspect , float maxClientFractionOfDesktop = 0.9f );
 	void Close();
 
@@ -53,7 +56,8 @@ public:
 	InputSystem* GetInputSytem() const { return m_inputSystem; }
 
 	void BeginFrame(); // process window messages
-
+	void EndFrame();
+	
 	int GetClientWidth();
 	int GetClientHeight();
 
@@ -69,6 +73,9 @@ public:
 	void DisplaySettings( eDisplaySettings settings );
 	void SetProgress( eWindowProgressMode mode , float progress = 0.0f );
 
+	void SetNewCursorIcon( void* const& icon );
+	void SetCursorIconToLoadedIcon();
+	void DestroyCursorIcon();
 
 public:
 	void*				m_hwnd = nullptr;
@@ -80,4 +87,6 @@ private:
 	bool				m_isQuitting		= false;
 	eDisplaySettings	m_windowStyleFlags	= REGULAR;
 	void*				m_icons[ TOTAL_ICONS ];
+
+	void*				m_gameCursorIcon;
 };
