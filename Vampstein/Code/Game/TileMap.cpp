@@ -170,7 +170,7 @@ void TileMap::AddVertsForTile( std::vector< VertexMaster >& destinationVerts , s
 void TileMap::AddVertsForSolidTile( std::vector< VertexMaster >& destinationVerts , std::vector< uint >& destinationIndices , int tileIndex )
 {
 	AABB3 bounds = GetTileBounds( tileIndex );
-	m_tiles[ tileIndex ].m_bounds = bounds;
+	//m_tiles[ tileIndex ].m_bounds = bounds;
 	std::vector< VertexMaster >		tileMeshVerts;
 	std::vector< uint >				tileMeshIndices;
 	bool result = false;
@@ -243,7 +243,7 @@ void TileMap::AddVertsForSolidTile( std::vector< VertexMaster >& destinationVert
 void TileMap::AddVertsForNonSolidTile( std::vector< VertexMaster >& destinationVerts , std::vector< uint >& destinationIndices , int tileIndex )
 {
 	AABB3 bounds = GetTileBounds( tileIndex );
-	m_tiles[ tileIndex ].m_bounds = bounds;
+	//m_tiles[ tileIndex ].m_bounds = bounds;
 	std::vector< VertexMaster >		tileMeshVerts;
 	std::vector< uint >				tileMeshIndices;
 	CreateTopFace( tileMeshVerts , tileMeshIndices , bounds , WHITE , Vec2::ZERO , Vec2::ONE );

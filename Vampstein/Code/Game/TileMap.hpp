@@ -19,7 +19,6 @@ class Tile
 public:
 	IntVec2				m_tileCoords	= IntVec2::ZERO;
 	//AABB2				m_bounds		= AABB2::ZERO_TO_ONE;
-	AABB3				m_bounds;
 	bool				m_isSolid		= false;
 	bool				IsSolid();
 };
