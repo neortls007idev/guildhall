@@ -23,6 +23,9 @@
     <Filter Include="Plan">
       <UniqueIdentifier>{4918a239-cb10-44f9-800f-9c39c92fb963}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Map">
+      <UniqueIdentifier>{f9b7ce24-7974-46c6-90d8-09c7879520c8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameCommon.cpp">
@@ -41,10 +44,16 @@
       <Filter>Gameplay</Filter>
     </ClCompile>
     <ClCompile Include="Map.cpp">
-      <Filter>Gameplay</Filter>
+      <Filter>Map</Filter>
     </ClCompile>
     <ClCompile Include="TileMap.cpp">
-      <Filter>Gameplay</Filter>
+      <Filter>Map</Filter>
+    </ClCompile>
+    <ClCompile Include="MapRegion.cpp">
+      <Filter>Map</Filter>
+    </ClCompile>
+    <ClCompile Include="MapMaterial.cpp">
+      <Filter>Map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -64,10 +73,16 @@
       <Filter>Gameplay</Filter>
     </ClInclude>
     <ClInclude Include="Map.hpp">
-      <Filter>Gameplay</Filter>
+      <Filter>Map</Filter>
     </ClInclude>
     <ClInclude Include="TileMap.hpp">
-      <Filter>Gameplay</Filter>
+      <Filter>Map</Filter>
+    </ClInclude>
+    <ClInclude Include="MapRegion.hpp">
+      <Filter>Map</Filter>
+    </ClInclude>
+    <ClInclude Include="MapMaterial.hpp">
+      <Filter>Map</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
