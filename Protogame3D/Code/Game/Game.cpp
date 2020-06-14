@@ -292,8 +292,6 @@ void Game::Render() const
 
 	DebugRenderWorldToCamera( &m_gameCamera );
 	DebugRenderScreenTo( nullptr );
-	g_theRenderer->BindShader( nullptr );
-	g_theRenderer->BindTexture( nullptr );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

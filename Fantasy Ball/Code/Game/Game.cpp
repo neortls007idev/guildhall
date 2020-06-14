@@ -1,16 +1,13 @@
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-#include "Engine/Core/EngineCommon.hpp"
-#include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/SimpleTriangleFont.hpp"
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Input/VirtualKeyboard.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
+#include "Engine/ParticleSystem/ParticleSystem2D.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
-#include "Engine/Renderer/SpriteAnimation.hpp"
-#include "Engine/Renderer/SpriteAnimation.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
@@ -18,17 +15,18 @@
 #include "Game/MapDefinition.hpp"
 #include "Game/TheApp.hpp"
 #include "Game/TileDefinition.hpp"
-#include <utility>
+//#include <utility>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // GLOBAL VARIABLES
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-extern RenderContext*	g_theRenderer;
-extern BitmapFont*		g_bitmapFont;
-extern AudioSystem*		g_theAudioSystem;
-extern TheApp*			g_theApp;
-extern InputSystem*		g_theInput;
+extern RenderContext*		g_theRenderer;
+extern BitmapFont*			g_bitmapFont;
+extern AudioSystem*			g_theAudioSystem;
+extern TheApp*				g_theApp;
+extern InputSystem*			g_theInput;
+extern ParticleSystem2D*	g_theParticleSystem2D;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -40,7 +38,7 @@ extern	BallTexEnumRGBA8Map	g_theBallTexTable[ NUM_GAME_TEX ];
 
 Game::Game()
 {
-	g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , true ) );
+	g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
 	float cameraHalfHeight	= g_gameConfigBlackboard.GetValue( "cameraHalfHeight" , 540.f );
 	float cameraAspectRatio = g_gameConfigBlackboard.GetValue( "windowAspect" , 1.77f );
 	
@@ -91,6 +89,17 @@ void Game::LoadAllTextures()
 	m_gameTex[ TEX_BALL_PURPLE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/09.png" );
 	m_gameTex[ TEX_BALL_ORANGE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/17.png" );
 	m_gameTex[ TEX_BALL_GREY ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/34.png" );
+
+	m_gameTex[ TEX_FLARE_RED ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/01.png" );
+	m_gameTex[ TEX_FLARE_GREEN ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/04_02.png" );
+	m_gameTex[ TEX_FLARE_BLUE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/08_01.png" );
+	m_gameTex[ TEX_FLARE_YELLOW ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/02.png" );
+	m_gameTex[ TEX_FLARE_MAGENTA ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/12.png" );
+	m_gameTex[ TEX_FLARE_CYAN ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/03_02.png" );
+	m_gameTex[ TEX_FLARE_PINK ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/07.png" );
+	m_gameTex[ TEX_FLARE_PURPLE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/05.png" );
+	m_gameTex[ TEX_FLARE_ORANGE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/06.png" );
+	m_gameTex[ TEX_FLARE_GREY ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/10_01.png" );
 	 
 }
 
@@ -169,6 +178,8 @@ void Game::Render() const
 {
 	m_currentLevel->Render();
 
+	g_theParticleSystem2D->Render();
+	
 	if ( m_isDebugDraw )
 	{
 		Vec2 cameraMins = m_worldCamera.GetOrthoMin().GetXYComponents();

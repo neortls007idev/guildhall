@@ -76,18 +76,16 @@ GPUMesh::~GPUMesh()
 
 void GPUMesh::AddVertices( uint vcount , void const* verts )
 {
-	// TODO - IMPLEMENT ME
-	UNUSED( vcount );
-	UNUSED( verts );
+	m_vertexCount += vcount;
+	m_vertices->Update( verts , m_vertexCount * m_vertices->GetVBOStride() , m_vertices->GetVBOStride() );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void GPUMesh::AddIndices( uint icount , uint const* indices )
 {
-	// TODO - IMPLEMENT ME
-	UNUSED( icount );
-	UNUSED( indices );
+	m_indexCount += icount;
+	m_indices->Update( m_indexCount , indices );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

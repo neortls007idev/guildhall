@@ -4,6 +4,9 @@
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Renderer/Camera.hpp"
 
+class ParticleEmitter2D;
+class SpriteSheet;
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 class Game
@@ -57,6 +60,7 @@ public:
 	std::vector<Map*>			m_levels;
 	Map*						m_currentLevel									= nullptr;
 	Texture*					m_gameTex[ NUM_GAME_TEX ];
+	SpriteSheet*				m_gameSS[ NUM_GAME_SS ];
 	SoundPlaybackID				m_sounds[ NUM_GAME_SFX ];
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------

@@ -7,6 +7,7 @@
 #include "Game/Map.hpp"
 #include "Game/Tile.hpp"
 #include "Game/TileDefinition.hpp"
+#include "Engine/ParticleSystem/ParticleEmitter2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -63,6 +64,10 @@ bool Tile::TileCollisionResponse( Ball* ball )
 		Vec2 refPoint = GetCollider().GetNearestPoint( ball->m_pos );
 		
 		Vec2 edgeNormal = ( ball->m_pos - refPoint ).GetNormalized();
+
+		m_ownerMap->m_testEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , Vec2::ONE * 50.f ) , refPoint , 0.f ,
+													 ball->m_velocity * 10.f, 0.0f , 2.0f , WHITE );
+
 		ball->m_velocity.Reflect( edgeNormal );
 		
 		PushDiscOutOfAABB( ball->m_pos , ball->m_cosmeticRadius , GetCollider() );

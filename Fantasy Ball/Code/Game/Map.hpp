@@ -9,6 +9,7 @@
 class MapDefinition;
 class Game;
 class TileDefinition;
+class ParticleEmitter2D;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	typedef std::vector<Entity*> Entitylist;
@@ -49,6 +50,7 @@ public:
 	MapDefinition*					m_mapDefinition											= nullptr;
 	std::string						m_name;
 	Entitylist						m_entityListsByType[ NUM_ENTITY_TYPES ];
+	ParticleEmitter2D*				m_testEmitter;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

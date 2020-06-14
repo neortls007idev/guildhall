@@ -59,6 +59,7 @@ Game::Game()
 	m_testMap = new TileMap( "Test" , IntVec2( 8 , 8 ) );
 
 	m_pointSampler = g_theRenderer->GetOrCreateSampler( SAMPLER_POINT );
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -346,7 +347,7 @@ void Game::Render() const
 
 	DebugRenderWorldToCamera( &m_gameCamera );
 	DebugRenderScreenTo( nullptr );
-
+	
 	RenderHUD();
 }
 

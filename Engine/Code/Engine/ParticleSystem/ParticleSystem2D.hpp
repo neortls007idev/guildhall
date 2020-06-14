@@ -1,8 +1,14 @@
 #pragma once
 #include <vector>
 
+#include "Engine/Renderer/RendererCommon.hpp"
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+class SpriteSheet;
+class Shader;
+class Texture;
+class RenderContext;
 class ParticleEmitter2D;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -25,8 +31,9 @@ public:
 	void EndFrame();
 
 	//----------------------------------------------------------------------------------------------------------
-
-	void CreateNewParticleEmitter();
+		
+	ParticleEmitter2D* CreateNewParticleEmitter( RenderContext* renderContext , Texture* tex , Shader* shader = nullptr , eBlendMode blendMode = ADDITIVE );
+	ParticleEmitter2D* CreateNewParticleEmitter( RenderContext* renderContext , SpriteSheet* spriteSheet , Shader* shader = nullptr , eBlendMode blendMode = ADDITIVE );
 	
 public:
 	std::vector<ParticleEmitter2D*> m_emitters;

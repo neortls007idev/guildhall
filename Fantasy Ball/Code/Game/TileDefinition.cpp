@@ -78,7 +78,6 @@ void TileDefinition::CreateTileDefinitions( const char* xmlFilePath )
 		s_definitions[ key ] = currentTileDefiniton;
 		tileDefinition = tileDefinition->NextSiblingElement();
 	}
-	int x;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -147,7 +147,7 @@ void TheApp::SetGameIconAndCursor()
 	g_theWindow->SetNewIcon( gameIcon );
 
 	void* cursorIcon = reinterpret_cast< HCURSOR >( ::LoadImage( GetModuleHandle( NULL ) , MAKEINTRESOURCE( IDI_ICON2 ) , IMAGE_ICON , 0 , 0 , LR_DEFAULTCOLOR | LR_SHARED | LR_DEFAULTSIZE ) );
-	::SetCursor( reinterpret_cast< HCURSOR >( cursorIcon ) );
+	g_theWindow->SetNewCursorIcon( cursorIcon );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -187,13 +187,14 @@ void TheApp::Update( float deltaSeconds )
 {
 	UpdateFromKeyboard();
 
-	g_theParticleSystem2D->Update( deltaSeconds );
 	
 	if ( m_isPaused )								{ deltaSeconds = 0.f; }
 	else if ( m_isSloMo == true )					{ deltaSeconds /= 10.f; }
 	if ( m_isSpeedMo )								{ deltaSeconds = deltaSeconds * 4.0f; }
 
 	g_theGame->Update( deltaSeconds );
+	
+	g_theParticleSystem2D->Update( deltaSeconds );
 
 	if ( g_theDevConsole->IsOpen() )
 	{

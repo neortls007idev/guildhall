@@ -46,7 +46,7 @@ public:
 	void Cleanup();
 
 	size_t GetBufferSize() const																					{ return m_bufferByteSize; }
-
+	
 private:
 	bool Create( size_t dataByteSize , size_t elementByteSize );
 

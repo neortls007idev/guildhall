@@ -59,8 +59,30 @@ enum eGameTextures
 	TEX_BALL_PURPLE,
 	TEX_BALL_ORANGE,
 	TEX_BALL_GREY,
+
+	TEX_FLARE_RED,
+	TEX_FLARE_GREEN,
+	TEX_FLARE_BLUE,
+	TEX_FLARE_YELLOW,
+	TEX_FLARE_MAGENTA,
+	TEX_FLARE_CYAN,
+	TEX_FLARE_PINK,
+	TEX_FLARE_PURPLE,
+	TEX_FLARE_ORANGE,
+	TEX_FLARE_GREY,
 	
 	NUM_GAME_TEX
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum eGameSpriteSheets
+{
+	SS_NONE = -1 ,
+	SS_BALL ,	
+	SS_VFX_FLARE ,
+
+	NUM_GAME_SS
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

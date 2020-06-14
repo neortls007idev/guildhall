@@ -1362,7 +1362,10 @@ void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes
 
 void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU>& vertexArray )
 {
-	DrawVertexArray( ( int ) vertexArray.size() , &vertexArray[ 0 ] );
+	if( vertexArray.size() > 0)
+	{
+		DrawVertexArray( ( int ) vertexArray.size() , &vertexArray[ 0 ] );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -13,6 +13,7 @@
 #include "Game/Paddle.hpp"
 #include "Game/Tile.hpp"
 #include "Game/TileDefinition.hpp"
+#include "Engine/ParticleSystem/ParticleSystem2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -39,6 +40,8 @@ Map::Map( Game* owner , MapDefinition* mapDefinition , std::string mapName ) :
 	m_dimensions.x = m_mapDefinition->m_width;
 	m_dimensions.y = m_mapDefinition->m_height;
 
+	LevelBounds();
+
 	for( int verticalIndex = 0; verticalIndex < m_dimensions.y; verticalIndex++ )
 	{
 		for( int horizontalIndex = 0; horizontalIndex < m_dimensions.x; horizontalIndex++ )
@@ -61,10 +64,10 @@ Map::Map( Game* owner , MapDefinition* mapDefinition , std::string mapName ) :
 	}
 
 	//SpawnWorms( 30 , TileDefinition::s_definitions[ "Stone" ] );
-	LevelBounds();
 	//InitializeTileVertices();
 
 	//m_player = new Actor( m_theGame , Vec2::ONE , 0.f , ActorDefinition::s_definitions[ "Player" ] );
+	m_testEmitter = g_theParticleSystem2D->CreateNewParticleEmitter( g_theRenderer , m_owner->m_gameTex[ TEX_FLARE_RED ] , nullptr , ALPHA );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -1,8 +1,11 @@
 #pragma once
 #include "Engine/Core/Rgba8.hpp"
+#include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Renderer/RendererCommon.hpp"
 #include <vector>
+
+#include "Engine/Primitives/AABB2.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -18,9 +21,11 @@ class ParticleEmitter2D
 {
 public:
 	ParticleEmitter2D( RenderContext* renderContext , Texture* tex , Shader* shader = nullptr , eBlendMode blendMode = ADDITIVE );
+	ParticleEmitter2D( RenderContext* renderContext , SpriteSheet* spriteSheet , Shader* shader = nullptr , eBlendMode blendMode = ADDITIVE );
 	~ParticleEmitter2D();
 
-	void SpawnNewParticle( Vec2 position , float orientation , Vec2 velocity , float age , float maxAge , Rgba8 color , IntVec2 spriteCoords );
+	void SpawnNewParticle( AABB2 cosmeticBounds , Vec2 position , float orientation , Vec2 velocity , float age , float maxAge , Rgba8 color , IntVec2 spriteCoords );
+	void SpawnNewParticle( AABB2 cosmeticBounds , Vec2 position , float orientation , Vec2 velocity , float age , float maxAge , Rgba8 color );
 
 	void Update( float deltaSeconds );
 	void Render();
@@ -28,15 +33,19 @@ public:
 public:
 	Texture*						m_texture				= nullptr;
 	SpriteSheet*					m_spriteSheet			= nullptr;
-	Vec2							m_minsUVs				= Vec2::ZERO;
-	Vec2							m_maxsUVs				= Vec2::ONE;
 	Shader*							m_shader				= nullptr;
+	RenderContext*					m_renderContext			= nullptr;
 	eBlendMode						m_blendMode				= ADDITIVE;
+
+ 	//AABB2							m_cosmeticBounds;
+ 	//Vec2							m_minsUVs			= Vec2::ZERO;
+ 	//Vec2							m_maxsUVs			= Vec2::ONE;
 
 	//Vec2 m_position;
 	//Vec2 m_velocity;
 	
 	std::vector<Particle2D*>		m_particles;
+	std::vector<Vertex_PCU>			m_particleVerts;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

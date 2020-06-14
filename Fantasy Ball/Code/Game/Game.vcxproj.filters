@@ -194,7 +194,11 @@
     <Image Include="..\..\Run\Data\Icons\TitleBar\titleBarIcon.ico">
       <Filter>Windows Resources</Filter>
     </Image>
-    <Image Include="..\..\Run\Data\Icons\Cursors\BlueCursor.ico" />
-    <Image Include="..\..\Run\Data\Icons\Cursors\RedCursor.ico" />
+    <Image Include="..\..\Run\Data\Icons\Cursors\BlueCursor.ico">
+      <Filter>Windows Resources</Filter>
+    </Image>
+    <Image Include="..\..\Run\Data\Icons\Cursors\RedCursor.ico">
+      <Filter>Windows Resources</Filter>
+    </Image>
   </ItemGroup>
 </Project>
