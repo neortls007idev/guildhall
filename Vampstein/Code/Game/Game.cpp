@@ -56,7 +56,8 @@ Game::Game()
 	}
 
 	//m_testMap = new TileMap( "Test" , IntVec2( 4 , 2 ) );
-	m_testMap = new TileMap( "Test" , IntVec2( 8 , 8 ) );
+	//m_testMap = new TileMap( "Test" , IntVec2( 8 , 8 ) );
+	m_testMap = new TileMap( "Test" , IntVec2( 5 , 5 ) );
 
 	m_pointSampler = g_theRenderer->GetOrCreateSampler( SAMPLER_POINT );
 
@@ -302,7 +303,9 @@ void Game::Render() const
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( m_textures[ TEST_TEXTURE ] );
 	g_theRenderer->BindSampler( m_pointSampler );
+	//g_theRenderer->SetCullMode( CULL_NONE );
 	m_testMap->Render();
+	//g_theRenderer->SetCullMode( CULL_BACK );
 			
 // 	g_theRenderer->SetModelMatrix( m_cubeMesh1Transform.GetAsMatrix() );
 // 	g_theRenderer->DrawMesh( m_cubeMesh );
