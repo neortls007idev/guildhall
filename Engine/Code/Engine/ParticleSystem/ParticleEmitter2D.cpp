@@ -53,12 +53,7 @@ void ParticleEmitter2D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec2 position 
                                            float maxAge , Rgba8 color , IntVec2 spriteCoords )
 {
 	if( m_spriteSheet != nullptr )
-	{
-		//int spriteSheetWidth = g_theGame->m_gameSS[ SS_BRICKS ]->GetSpriteDimension().x;
-		//int tileSpriteIndex = m_spriteCoords.x + ( spriteSheetWidth * m_spriteCoords.y );
-		//const SpriteDefinition& currentTileSprite = g_theGame->m_gameSS[ SS_BRICKS ]->GetSpriteDefinition( tileSpriteIndex );
-		//currentTileSprite.GetUVs( m_spriteUVs.m_mins , m_spriteUVs.m_maxs );
-		
+	{		
 		Particle2D* temp = new Particle2D( cosmeticBounds , position , orientation , velocity , age , maxAge , color );
 		int		spriteSheetWidth = m_spriteSheet->GetSpriteDimension().x;
 		int		spriteIndex = spriteCoords.x + ( spriteSheetWidth * spriteCoords.y );
@@ -67,8 +62,6 @@ void ParticleEmitter2D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec2 position 
 		currentParticleSprite.GetUVs( temp->m_minsUVs , temp->m_maxsUVs );
 
 		EmplaceBackAtEmptySpace( m_particles , temp );
-
-		//temp->m_cosmeticBounds = cosmeticBounds;
 	}
 	else
 	{
@@ -84,6 +77,27 @@ void ParticleEmitter2D::SpawnNewParticle( AABB2 cosmeticBounds , Vec2 position ,
 	EmplaceBackAtEmptySpace( m_particles , temp );
 
 	//temp->m_cosmeticBounds = cosmeticBounds;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void ParticleEmitter2D::SpawnNewParticle( AABB2 cosmeticBounds , Vec2 position , float orientation , float scale , float angularVelocity , Vec2 velocity , float age , float maxAge , Rgba8 color , IntVec2 spriteCoords )
+{
+	if( m_spriteSheet != nullptr )
+	{
+		Particle2D* temp = new Particle2D( cosmeticBounds , position , orientation , scale , angularVelocity , velocity , age , maxAge , color );
+		int		spriteSheetWidth = m_spriteSheet->GetSpriteDimension().x;
+		int		spriteIndex = spriteCoords.x + ( spriteSheetWidth * spriteCoords.y );
+
+		const SpriteDefinition& currentParticleSprite = m_spriteSheet->GetSpriteDefinition( spriteIndex );
+		currentParticleSprite.GetUVs( temp->m_minsUVs , temp->m_maxsUVs );
+
+		EmplaceBackAtEmptySpace( m_particles , temp );
+	}
+	else
+	{
+		SpawnNewParticle( cosmeticBounds , position , orientation , velocity , age , maxAge , color );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -111,7 +125,9 @@ void ParticleEmitter2D::Update( float deltaSeconds )
 		Particle2D* particle = m_particles[ index ];
 		if( particle != nullptr )
 		{
-			AppendVertsForAABB2( m_particleVerts , particle->m_cosmeticBounds , particle->m_color , particle->m_minsUVs , particle->m_maxsUVs );
+			TransformAndAppendVertsForAABB2( m_particleVerts , particle->m_cosmeticBounds , particle->m_color ,
+			                                 particle->m_minsUVs , particle->m_maxsUVs , particle->m_scale ,
+			                                 particle->m_orientation , particle->m_position );
 		}
 	}
 }

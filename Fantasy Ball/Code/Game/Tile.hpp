@@ -24,6 +24,12 @@ public:
 	TileDefinition*			GetTileType() const															{ return m_tileDef; }
 	void					SetTileType( TileDefinition* tileType )										{ m_tileDef = tileType; }
 	bool					TileCollisionResponse( Ball* ball );
+
+	void SpawnParticlesOnBallCollision( Ball* ball , Vec2 refPoint , uint num4XParticles );
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+
+
 	AABB2					GetCollider() const;
 	
 protected:

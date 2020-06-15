@@ -25,6 +25,7 @@ public:
 	~ParticleEmitter2D();
 
 	void SpawnNewParticle( AABB2 cosmeticBounds , Vec2 position , float orientation , Vec2 velocity , float age , float maxAge , Rgba8 color , IntVec2 spriteCoords );
+	void SpawnNewParticle( AABB2 cosmeticBounds , Vec2 position , float orientation , float scale , float angularVelocity ,  Vec2 velocity , float age , float maxAge , Rgba8 color , IntVec2 spriteCoords );
 	void SpawnNewParticle( AABB2 cosmeticBounds , Vec2 position , float orientation , Vec2 velocity , float age , float maxAge , Rgba8 color );
 
 	void Update( float deltaSeconds );

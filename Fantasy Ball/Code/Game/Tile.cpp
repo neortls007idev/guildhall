@@ -70,64 +70,13 @@ bool Tile::TileCollisionResponse( Ball* ball )
 		
 		Vec2 edgeNormal = ( ball->m_pos - refPoint ).GetNormalized();
 
-		float ballVelocityMagnitude = ball->m_velocity.GetLength();
-
-		Vec2 deviation = g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
+		uint numParticles = ( uint ) g_RNG->RollRandomIntInRange( 0 , 5 );
 		
-		m_ownerMap->m_testEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint , 0.f ,
-													 ( ball->m_velocity + deviation ) * PARTICLE_VELOCITY , 0.0f ,
-		                                             2.0f , WHITE , m_tileDef->m_VFXSpriteCoords );
+		SpawnParticlesOnBallCollision( ball , refPoint , numParticles );
 
-		deviation = g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
-
-		m_ownerMap->m_testEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint , 0.f ,
-													 ( ball->m_velocity.GetRotated90Degrees() + deviation ) *
-		                                             PARTICLE_VELOCITY , 0.0f , 2.0f , WHITE ,
-		                                             m_tileDef->m_VFXSpriteCoords );
-
-		deviation = g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
-
-		m_ownerMap->m_testEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint , 0.f ,
-													 ( ball->m_velocity.GetRotatedMinus90Degrees() + deviation ) *
-		                                             PARTICLE_VELOCITY , 0.0f , 2.0f , WHITE ,
-		                                             m_tileDef->m_VFXSpriteCoords );
-
-		deviation = g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
-		
-		m_ownerMap->m_testEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint , 0.f ,
-													 ( ball->m_velocity + deviation ) * -PARTICLE_VELOCITY , 0.0f ,
-		                                             2.0f , WHITE , m_tileDef->m_VFXSpriteCoords );
-
-		deviation = g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
-		
 		ball->m_velocity.Reflect( edgeNormal );
 
-
-		deviation = g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
-		
-		m_ownerMap->m_testEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint , 0.f ,
-													 ( ball->m_velocity + deviation ) * PARTICLE_VELOCITY , 0.0f ,
-		                                             2.0f , WHITE , m_tileDef->m_VFXSpriteCoords );
-
-		deviation = g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
-		
-		m_ownerMap->m_testEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint , 0.f ,
-													 ( ball->m_velocity.GetRotated90Degrees() + deviation ) *
-		                                             PARTICLE_VELOCITY , 0.0f , 2.0f , WHITE ,
-		                                             m_tileDef->m_VFXSpriteCoords );
-
-		deviation = g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
-		
-		m_ownerMap->m_testEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint , 0.f ,
-													 ( ball->m_velocity.GetRotatedMinus90Degrees() + deviation ) *
-		                                             PARTICLE_VELOCITY , 0.0f , 2.0f , WHITE ,
-		                                             m_tileDef->m_VFXSpriteCoords );
-
-		deviation = g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
-		
-		m_ownerMap->m_testEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint , 0.f ,
-													 ( ball->m_velocity + deviation ) * -PARTICLE_VELOCITY , 0.0f ,
-		                                             2.0f , WHITE , m_tileDef->m_VFXSpriteCoords );
+		SpawnParticlesOnBallCollision( ball , refPoint , numParticles );
 		
 		PushDiscOutOfAABB( ball->m_pos , ball->m_cosmeticRadius , GetCollider() );
 
@@ -138,6 +87,59 @@ bool Tile::TileCollisionResponse( Ball* ball )
 	}
 	return false;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Tile::SpawnParticlesOnBallCollision( Ball* ball , Vec2 refPoint , uint num4XParticles )
+{
+
+	for ( uint index = 0 ; index < num4XParticles ; index++ )
+	{
+		float ballVelocityMagnitude = ball->m_velocity.GetLength();
+
+		Vec2 deviation				= g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
+		float orientationDegrees	= g_RNG->RollRandomFloatInRange( -360.f , 360.f );
+		float angularVelocity		= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
+		float scale					= g_RNG->RollRandomFloatInRange(0.f,1.5f );		
+
+		
+		m_ownerMap->m_testEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint ,
+		                                             orientationDegrees , scale , angularVelocity ,
+		                                             ( ball->m_velocity + deviation ) * PARTICLE_VELOCITY , 0.0f ,
+		                                             2.0f , WHITE , m_tileDef->m_VFXSpriteCoords );
+
+		deviation				= g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
+		orientationDegrees		= g_RNG->RollRandomFloatInRange( -360.f , 360.f );
+		angularVelocity			= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
+		scale					= g_RNG->RollRandomFloatInRange(0.f,1.5f );	
+
+		m_ownerMap->m_testEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint ,
+													 orientationDegrees , scale , angularVelocity ,
+													 ( ball->m_velocity + deviation ) * PARTICLE_VELOCITY , 0.0f ,
+													 2.0f , WHITE , m_tileDef->m_VFXSpriteCoords );
+
+		deviation				= g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
+		orientationDegrees		= g_RNG->RollRandomFloatInRange( -360.f , 360.f );
+		angularVelocity			= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
+		scale					= g_RNG->RollRandomFloatInRange(0.f,1.5f );	
+
+		m_ownerMap->m_testEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint ,
+													 orientationDegrees , scale , angularVelocity ,
+													 ( ball->m_velocity + deviation ) * PARTICLE_VELOCITY , 0.0f ,
+													 2.0f , WHITE , m_tileDef->m_VFXSpriteCoords );
+
+		deviation				= g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
+		orientationDegrees		= g_RNG->RollRandomFloatInRange( -360.f , 360.f );
+		angularVelocity			= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
+		scale					= g_RNG->RollRandomFloatInRange(0.f,1.5f );	
+
+		m_ownerMap->m_testEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint ,
+													 orientationDegrees , scale , angularVelocity ,
+													 ( ball->m_velocity + deviation ) * PARTICLE_VELOCITY , 0.0f ,
+													 2.0f , WHITE , m_tileDef->m_VFXSpriteCoords );
+	}
+}
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

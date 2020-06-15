@@ -32,7 +32,10 @@ Ball::~Ball()
 
 void Ball::Update( float deltaSeconds )
 {
-	Move( deltaSeconds );
+	if ( !m_owner->m_isBallLaunchable )
+	{
+		Move( deltaSeconds );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -42,6 +45,12 @@ void Ball::Render() const
 	g_theRenderer->BindTexture( m_currentTexture );
 	g_theRenderer->DrawDisc( m_pos , m_cosmeticRadius , WHITE );
 	g_theRenderer->BindTexture( nullptr );
+
+	if ( m_owner->m_isDebugDraw )
+	{
+		g_theRenderer->DrawRing( m_pos , m_cosmeticRadius , CYAN , 2.5f );
+		g_theRenderer->DrawRing( m_pos , m_physicsRadius , MAGENTA , 2.5f );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

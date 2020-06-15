@@ -35,6 +35,11 @@ void Paddle::Render() const
 	g_theRenderer->BindTexture( m_owner->m_gameTex[ TEX_PADDLE ] );
 	g_theRenderer->DrawAABB2( m_paddleCollider , ORANGE );
 	g_theRenderer->BindTexture( nullptr );
+
+	if ( m_owner->m_isDebugDraw )
+	{
+		g_theRenderer->DrawUnfilledAABB2( m_paddleCollider , MAGENTA , 2.5f );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -46,11 +51,17 @@ void Paddle::UpdateFromUserInput( float deltaSeconds )
 	float speed = 100.f;
 
 	float paddleColliderLength = m_paddleCollider.GetDimensions().x;
+
+	Vec2 translate = Vec2::ZERO;
+	translate.x = mousePos.x * speed * deltaSeconds;
 	
-	m_position.x += mousePos.x * speed * deltaSeconds;
+	m_position.x += translate.x;
 	m_position.x = Clamp( m_position.x , m_owner->m_currentLevel->m_leftWall.m_maxs.x + paddleColliderLength * 0.5f,
 	                      m_owner->m_currentLevel->m_rightWall.m_mins.x - paddleColliderLength * 0.5f );
 
+	translate.x = m_position.x;
+	
+	m_owner->m_currentLevel->UpdateBallPosWhenGrabbed( translate.x );
 	
 	m_paddleCollider.SetCenter( m_position );
 

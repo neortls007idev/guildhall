@@ -34,6 +34,8 @@ public:
 	void AddEntityToMap( Entity* entity );
 	void AddEntityToList( Entitylist& entityList , Entity* entity );
 
+	void UpdateBallPosWhenGrabbed( float newPosX );
+	
 	void ResolveCollisions();
 	void ResolveBallvBoundsCollisions();
 	void ResolveBallvPaddleCollisions();
@@ -52,6 +54,7 @@ public:
 	Entitylist						m_entityListsByType[ NUM_ENTITY_TYPES ];
 	ParticleEmitter2D*				m_testEmitter;
 	int								m_backgroundIndex										= 0;
+	int								m_numAliveBalls											= 0;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

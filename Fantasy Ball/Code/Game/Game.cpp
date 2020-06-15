@@ -117,19 +117,7 @@ void Game::LoadAllTextures()
 	m_gameTex[ TEX_BALL_PINK ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/20.png" );
 	m_gameTex[ TEX_BALL_PURPLE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/09.png" );
 	m_gameTex[ TEX_BALL_ORANGE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/17.png" );
-	m_gameTex[ TEX_BALL_GREY ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/34.png" );
-
-	//m_gameTex[ TEX_FLARE_RED ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/01.png" );
-	//m_gameTex[ TEX_FLARE_GREEN ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/04_02.png" );
-	//m_gameTex[ TEX_FLARE_BLUE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/08_01.png" );
-	//m_gameTex[ TEX_FLARE_YELLOW ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/02.png" );
-	//m_gameTex[ TEX_FLARE_MAGENTA ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/12.png" );
-	//m_gameTex[ TEX_FLARE_CYAN ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/03_02.png" );
-	//m_gameTex[ TEX_FLARE_PINK ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/07.png" );
-	//m_gameTex[ TEX_FLARE_PURPLE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/05.png" );
-	//m_gameTex[ TEX_FLARE_ORANGE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/06.png" );
-	//m_gameTex[ TEX_FLARE_GREY ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/10_01.png" );
-	 
+	m_gameTex[ TEX_BALL_GREY ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/34.png" );	 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -176,17 +164,7 @@ void Game::PostGameConstruct()
 	}
 
 	m_currentLevel = m_levels[ 0 ];
-
-	m_currentLevel->SpawnNewEntity( PADDLE , Vec2::ZERO );
-	m_currentLevel->SpawnNewEntity( BALL , Vec2::ZERO_ONE * 300.f );
-
-	//Vec2 testTilePos = Vec2( 100.f , 100.f );
-	//
-	//m_currentLevel->SpawnNewEntity( TILE , 0 * testTilePos , TileDefinition::s_definitions.at( "NormalYellow" ) );
-	//m_currentLevel->SpawnNewEntity( TILE , 1 * testTilePos , TileDefinition::s_definitions.at( "NormalPurple" ) );
-	//m_currentLevel->SpawnNewEntity( TILE , 2 * testTilePos , TileDefinition::s_definitions.at( "NormalOrange" ) );
-	//m_currentLevel->SpawnNewEntity( TILE , 3 * testTilePos , TileDefinition::s_definitions.at( "SteelGrey" ) );
-
+	
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	//			DebugTile
 	//--------------------------------------------------------------------------------------------------------------------------------------------
@@ -270,6 +248,11 @@ SoundPlaybackID Game::GetSFX( eGameAudioFX SFXid ) const
 
 void Game::UpdateFromKeyBoard()
 {
+	if ( g_theInput->WasLeftMouseButtonJustPressed() )
+	{
+		m_isBallLaunchable = false;
+	}
+	
 	if( g_theInput->WasKeyJustPressed( KEY_F2 ) )
 	{
 		Entitylist& ballList = m_currentLevel->m_entityListsByType[ BALL ];

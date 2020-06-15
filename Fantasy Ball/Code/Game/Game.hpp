@@ -37,7 +37,7 @@ public:
 	SoundPlaybackID GetSFX( eGameAudioFX SFXid ) const;
 	
 	//----------------------------------------------------------------------------------------------------------
-	int GetPaddleHealth() const															{ return 3; }
+	int GetPaddleHealth() const															{ return m_playerHealth; }
 	Camera* GetWorldCamera()															{ return &m_worldCamera; }
 private:
 	void UpdateFromKeyBoard();
@@ -63,8 +63,11 @@ public:
 	Texture*					m_gameTex[ NUM_GAME_TEX ];
 	SpriteSheet*				m_gameSS[ NUM_GAME_SS ];
 	SoundPlaybackID				m_sounds[ NUM_GAME_SFX ];
-	SoundPlaybackID				m_currentBackgroundsound						= -1;
+	SoundPlaybackID				m_currentBackgroundsound						= 0;
 
+	int							m_playerHealth									= 3;
+	bool						m_isBallLaunchable								= true;
+	
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	//			DEBUG CODE
 	//--------------------------------------------------------------------------------------------------------------------------------------------

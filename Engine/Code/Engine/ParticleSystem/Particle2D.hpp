@@ -15,8 +15,16 @@ struct Particle2D
 public:
 	//Particle2D();
 	Particle2D( Vec2 position , float orientation , Vec2 velocity , float age , float maxAge , Rgba8 color );
+
 	Particle2D( AABB2 cosmeticBounds , Vec2 position , float orientation , Vec2 velocity , float age , float maxAge , Rgba8 color );
- 	Particle2D ( AABB2 cosmeticBounds , Vec2 minUVs , Vec2 maxUVs , Vec2 position , float orientation , Vec2 velocity ,
+
+	Particle2D ( AABB2 cosmeticBounds , Vec2 position , float orientation , float scale , float angularVelocity ,
+	             Vec2 velocity , float age , float maxAge , Rgba8 color );
+
+	Particle2D ( AABB2 cosmeticBounds , Vec2 minUVs , Vec2 maxUVs , Vec2 position , float orientation , float scale ,
+	             float angularVelocity , Vec2 velocity , float age , float maxAge , Rgba8 color );
+
+	Particle2D ( AABB2 cosmeticBounds , Vec2 minUVs , Vec2 maxUVs , Vec2 position , float orientation , Vec2 velocity ,
  	             float age , float maxAge , Rgba8 color );
 	~Particle2D();
 	
@@ -26,10 +34,11 @@ public:
 	void UpdateTransformation();
 	
 public:
-	Vec2		m_position;
-	float		m_orientation;
-	Vec2		m_scale;
+	Vec2		m_position			= Vec2::ZERO;
+	float		m_orientation		= 0.f;
+	float		m_scale				= 1.f;
 	Vec2		m_velocity;
+	float		m_angularVelocity	= 0.f;
 	float		m_age;
 	float		m_maxAge;
 	Rgba8		m_color;

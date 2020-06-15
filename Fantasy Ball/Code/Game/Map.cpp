@@ -68,6 +68,16 @@ Map::Map( Game* owner , MapDefinition* mapDefinition , std::string mapName ) :
 	//m_player = new Actor( m_theGame , Vec2::ONE , 0.f , ActorDefinition::s_definitions[ "Player" ] );
 	m_testEmitter = g_theParticleSystem2D->CreateNewParticleEmitter( g_theRenderer , m_owner->m_gameSS[ SS_VFX_FLARE ] , nullptr , ALPHA );
 
+	SpawnNewEntity( PADDLE , Vec2::ZERO );
+
+	Paddle* thePaddle = ( Paddle* ) m_entityListsByType[ PADDLE ][ 0 ];
+	AABB2	paddleBounds = thePaddle->GetCollider();
+	
+	SpawnNewEntity( BALL , paddleBounds.GetCenter() + Vec2::ZERO_ONE * 37.5f );
+	m_numAliveBalls++;
+	
+	ResolveBallvPaddleCollisions();
+	
 	m_backgroundIndex = g_RNG->RollRandomIntInRange( TEX_BACKGROUND_FOREST_1 , TEX_BACKGROUND_AURORA_1 );
 }
 
@@ -91,7 +101,7 @@ void Map::LevelBounds()
 	m_leftWall				= AABB2( cameraMins.x , cameraMins.y , cameraMins.x + sideWallOffset , cameraMaxs.y );
 	m_rightWall				= AABB2( cameraMaxs.x - sideWallOffset , cameraMins.y , cameraMaxs.x , cameraMaxs.y );
 	m_topWall				= AABB2( cameraMins.x , cameraMaxs.y - topWallOffset , cameraMaxs.x , cameraMaxs.y + 50.f );
-	m_pit					= AABB2( cameraMins.x , cameraMins.y , cameraMaxs.x , cameraMins.y - pitOffset );
+	m_pit					= AABB2( cameraMins.x * 10.f , cameraMins.y , cameraMaxs.x * 10.f, cameraMins.y + pitOffset );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -137,9 +147,17 @@ void Map::Render()
 	g_theRenderer->DrawAABB2( m_rightWall	, WHITE );
 	g_theRenderer->BindTexture( m_owner->m_gameTex[ TEX_TOP_WALL_SECTION ] );
 	g_theRenderer->DrawAABB2( m_topWall		, WHITE );
-	g_theRenderer->BindTexture( nullptr );
-	g_theRenderer->DrawAABB2( m_pit			, WHITE );
 
+	if ( m_owner->m_isDebugDraw )
+	{
+		g_theRenderer->BindTexture( nullptr );
+		g_theRenderer->DrawUnfilledAABB2( m_leftWall	, MAGENTA );
+		g_theRenderer->DrawUnfilledAABB2( m_rightWall	, MAGENTA );
+		g_theRenderer->DrawUnfilledAABB2( m_topWall		, MAGENTA );
+		g_theRenderer->DrawUnfilledAABB2( m_pit			, MAGENTA );
+	}
+
+	
 	for ( int Entitytype = 0; Entitytype < NUM_ENTITY_TYPES; Entitytype++ )
 	{
 		Entitylist& currentList = m_entityListsByType[ Entitytype ];
@@ -169,7 +187,7 @@ void Map::SpawnNewEntity( eEntityType type , const Vec2& position , TileDefiniti
 			                    Vec2( 0.f , m_pit.m_mins.y + 83.f ) );
 								break;
 		case BALL:
-					newEntity = new Ball( m_owner , 1 , 25.f * 1.5f , 25.f * 1.5f , position , Vec2::MakeFromPolarDegrees(15.f,6.f) );
+					newEntity = new Ball( m_owner , 1 , 25.f * 1.5f , 25.f * 1.5f , position , Vec2::MakeFromPolarDegrees(15.f,4.5f) );
 								break;
 		case TILE:
 					newEntity = new Tile( this , IntVec2( position ) , tileDef );
@@ -194,6 +212,21 @@ void Map::AddEntityToMap( Entity* entity )
 void Map::AddEntityToList( Entitylist& entityList , Entity* entity )
 {
 	PushBackAtEmptySpace( entityList , entity );	
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Map::UpdateBallPosWhenGrabbed( float newPosX )
+{
+	Entitylist& ballList = m_entityListsByType[ BALL ];
+	for( size_t index = 0 ; index < ballList.size() ; index++ )
+	{
+		if( ballList[ index ] != nullptr && m_owner->m_isBallLaunchable )
+		{
+			Ball* ball = ( Ball* ) ballList[ index ];
+			ball->m_pos.x = newPosX;
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -258,6 +291,28 @@ void Map::ResolveBallvBoundsCollisions()
 				PushDiscOutOfAABB( ball->m_pos , ball->m_cosmeticRadius , m_topWall );
 				g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_LEAVES_RUSTLE ) , false , 0.33f , 0.f , 1.f );
 			}
+
+			if( DoDiscAndAABBOverlap( ball->m_pos , ball->m_cosmeticRadius , m_pit ) )
+			{
+				Entity* ballEntity = ball;
+				delete ballEntity;
+				ballEntity = nullptr;
+				ball = nullptr;
+				currentList[ entityIndex ] = nullptr;
+
+				--m_numAliveBalls;
+
+				if ( m_numAliveBalls <= 0 && m_owner->GetPaddleHealth() > 0 )
+				{
+					m_owner->m_playerHealth = --m_owner->m_playerHealth;
+					m_owner->m_isBallLaunchable = true;
+					Paddle* thePaddle = ( Paddle* ) m_entityListsByType[ PADDLE ][ 0 ];
+					AABB2	paddleBounds = thePaddle->GetCollider();
+
+					SpawnNewEntity( BALL , paddleBounds.GetCenter() + Vec2::ZERO_ONE * 37.5f );
+					m_numAliveBalls++;
+				}
+			}
 		}
 	}
 }
@@ -281,23 +336,23 @@ void Map::ResolveBallvPaddleCollisions()
 			
 			if ( DoDiscAndAABBOverlap( ball->m_pos , ball->m_cosmeticRadius , paddle->GetCollider() ) )
 			{
-				Vec2 refPoint = paddle->GetCollider().GetNearestPoint( ball->m_pos );
-				
-				Vec2 edgeNormal = ( ball->m_pos - refPoint ).GetNormalized();
+				if ( !m_owner->m_isBallLaunchable )
+				{
+					Vec2 refPoint = paddle->GetCollider().GetNearestPoint( ball->m_pos );
+					
+					Vec2 edgeNormal = ( ball->m_pos - refPoint ).GetNormalized();
 
-				float deviationFactor = RangeMapFloat( paddle->GetCollider().m_mins.x , paddle->GetCollider().m_maxs.x ,
-				                                  -PADDLE_COLLISION_DEVIATION , PADDLE_COLLISION_DEVIATION , refPoint.x );
-				
-				//Vec2 deviationVector = Vec2::MakeFromPolarDegrees( ball->m_velocity.GetLength() , deviationFactor * PADDLE_COLLISION_DEVIATION );
-				//ball->m_velocity += deviationVector;
-
-				ball->m_velocity.Reflect( edgeNormal );
-				
-				float magnitude = ball->m_velocity.GetLength();
-					  magnitude *= 1.1f;
-				float angleDegrees = ball->m_velocity.GetAngleDegrees() - deviationFactor;
-				
-				ball->m_velocity = Vec2::MakeFromPolarDegrees( angleDegrees , magnitude );
+					float deviationFactor = RangeMapFloat( paddle->GetCollider().m_mins.x , paddle->GetCollider().m_maxs.x ,
+					                                  -PADDLE_COLLISION_DEVIATION , PADDLE_COLLISION_DEVIATION , refPoint.x );
+					
+					ball->m_velocity.Reflect( edgeNormal );
+					
+					float magnitude = ball->m_velocity.GetLength();
+						  magnitude *= 1.01f;
+					float angleDegrees = ball->m_velocity.GetAngleDegrees() - deviationFactor;
+					
+					ball->m_velocity = Vec2::MakeFromPolarDegrees( angleDegrees , magnitude );
+				}
 				
 				PushDiscOutOfAABB( ball->m_pos , ball->m_cosmeticRadius , paddle->GetCollider() );
 			}

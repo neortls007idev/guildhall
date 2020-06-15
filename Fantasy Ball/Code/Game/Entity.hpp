@@ -22,7 +22,7 @@ class Entity
 {
 public:
 	Entity( Game* owner, int health , eEntityType eEntityType );
-	~Entity(){};
+	virtual ~Entity();
 
 	//----------------------------------------------------------------------------------------------------------
 
