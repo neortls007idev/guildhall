@@ -301,6 +301,7 @@ void TheApp::UpdateFromKeyboard()
 		delete g_theGame;
 		g_theGame = nullptr;
 		g_theGame = new Game();
+		g_theGame->PostGameConstructDataOnce();
 		g_theGame->PostGameConstruct();
 	}
 	

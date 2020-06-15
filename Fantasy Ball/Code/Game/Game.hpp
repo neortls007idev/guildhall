@@ -13,7 +13,8 @@ class Game
 {
 public:
 	Game();
-
+	~Game();
+	
 	void LoadAssets();
 	void LoadAllSounds();
 	void LoadAllTextures();
@@ -62,6 +63,7 @@ public:
 	Texture*					m_gameTex[ NUM_GAME_TEX ];
 	SpriteSheet*				m_gameSS[ NUM_GAME_SS ];
 	SoundPlaybackID				m_sounds[ NUM_GAME_SFX ];
+	SoundPlaybackID				m_currentBackgroundsound						= -1;
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	//			DEBUG CODE

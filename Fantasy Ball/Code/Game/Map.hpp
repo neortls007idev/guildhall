@@ -51,6 +51,7 @@ public:
 	std::string						m_name;
 	Entitylist						m_entityListsByType[ NUM_ENTITY_TYPES ];
 	ParticleEmitter2D*				m_testEmitter;
+	int								m_backgroundIndex										= 0;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

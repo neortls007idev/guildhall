@@ -33,6 +33,7 @@ public:
 	bool													m_isSolid				= false;
 	bool													m_isVisible				= false;
 	IntVec2													m_spriteCoords			= IntVec2::ZERO;
+	IntVec2													m_VFXSpriteCoords		= IntVec2::ZERO;
 	Rgba8													m_tileColor				= Rgba8( 0 , 0 , 0 , 0 );
 	AABB2													m_spriteUVs				= AABB2::ZERO_TO_ONE;
 

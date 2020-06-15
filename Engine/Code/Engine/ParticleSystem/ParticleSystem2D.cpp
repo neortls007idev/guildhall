@@ -99,3 +99,17 @@ ParticleEmitter2D* ParticleSystem2D::CreateNewParticleEmitter( RenderContext* re
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+void ParticleSystem2D::DestroyParticleEmitter( ParticleEmitter2D* emitter )
+{
+	for( size_t index = 0; index < m_emitters.size() ; index++ )
+	{
+		if ( m_emitters[ index ] == emitter )
+		{
+			delete m_emitters[ index ];
+			m_emitters[ index ] = nullptr;
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

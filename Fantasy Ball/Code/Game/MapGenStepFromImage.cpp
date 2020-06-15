@@ -24,7 +24,7 @@ MapGenStepFromImage::MapGenStepFromImage( const XMLElement& element ) :
 	}
 	imageFilePath.append( imageFileName );
 	m_mutationImage = new Image( imageFilePath.c_str() );
-	//m_mutationImage->GetOrCreateImageFromFile( imageFilePath.c_str() );
+	m_mutationImage = m_mutationImage->GetOrCreateImageFromFile( imageFilePath.c_str() );
 	
 	m_rotations = ParseXmlAttribute( element , "Rotations" , m_rotations );
 	m_alignment = ParseXmlAttribute( element , "Alignment" , m_alignment );
@@ -42,7 +42,7 @@ void MapGenStepFromImage::RunStepOnce( Map& map )
 	AABB2 cameraArea		= AABB2( cameraMins , cameraMaxs );
 	Vec2 cameraDimensions	= cameraArea.GetDimensions();
 		
-	IntVec2 tileCoords;
+	IntVec2 tileCoords = IntVec2::ZERO;
 
 	//Vec2 startpointatbottomleft( -845.f , -139.f );
 	Vec2 startpointatbottomleft( -845.f , -168.f );

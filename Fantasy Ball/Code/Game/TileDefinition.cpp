@@ -26,6 +26,7 @@ TileDefinition::TileDefinition( const tinyxml2::XMLElement& definitionXMLElement
 	m_isVisible			= ParseXmlAttribute( definitionXMLElement , "isVisible"				, m_isVisible		);
 	m_visibleAtHealth	= ParseXmlAttribute( definitionXMLElement , "visibleAtHealth"		, m_visibleAtHealth );
 	m_spriteCoords		= ParseXmlAttribute( definitionXMLElement , "spriteCoords"			, m_spriteCoords	);
+	m_VFXSpriteCoords	= ParseXmlAttribute( definitionXMLElement , "VFXSpriteCoords"		, m_VFXSpriteCoords );
 	m_tileColor			= ParseXmlAttribute( definitionXMLElement , "colorInImageFile"		, m_tileColor		);
 
 	int spriteSheetWidth						= g_theGame->m_gameSS[ SS_BRICKS ]->GetSpriteDimension().x;
@@ -50,22 +51,36 @@ void TileDefinition::CreateTileDefinitions( const char* xmlFilePath )
 	}
 	 
 	tinyxml2::XMLElement* tileDefinition	= xmlDocument.RootElement();
-	std::string tileSheetFileName			= ParseXmlAttribute( *tileDefinition , "spriteSheet" , "" );
-	IntVec2 tileSpriteSheetDimensions	= ParseXmlAttribute( *tileDefinition , "spriteLayout" , IntVec2::ZERO );
+	std::string tileSheetFileName			= ParseXmlAttribute( *tileDefinition , "tileSpriteSheet" , "" );
+	IntVec2 tileSpriteSheetDimensions		= ParseXmlAttribute( *tileDefinition , "tileSpriteLayout" , IntVec2::ZERO );
+	
+	std::string tileVFXSheetFileName		= ParseXmlAttribute( *tileDefinition , "tileVFXSpriteSheet" , "" );
+	IntVec2 tileVFXSpriteSheetDimensions	= ParseXmlAttribute( *tileDefinition , "tileVFXSpriteLayout" , IntVec2::ZERO );
 	
 	if ( ( tileSheetFileName == "" ) || ( tileSpriteSheetDimensions.x == 0 && tileSpriteSheetDimensions.y == 0 ) )
 	{
 		ERROR_AND_DIE( "You forgot To mention the filePath for the TileSpreadSheet or it's Grid Layout" );
 	}
 	
-	
 	const char* filePath = tileSheetFileName.c_str();
 	
-if ( g_theGame->m_gameSS[ SS_BRICKS ] == nullptr )
-{
-	g_theGame->m_gameSS[ SS_BRICKS ] = new SpriteSheet( *( g_theRenderer->GetOrCreateTextureFromFile( filePath ) ) , tileSpriteSheetDimensions );	
-}
+	if( g_theGame->m_gameSS[ SS_BRICKS ] == nullptr )
+	{
+		g_theGame->m_gameSS[ SS_BRICKS ] = new SpriteSheet( *( g_theRenderer->GetOrCreateTextureFromFile( filePath ) ) , tileSpriteSheetDimensions );
+	}
 
+	if( ( tileSheetFileName == "" ) || ( tileSpriteSheetDimensions.x == 0 && tileSpriteSheetDimensions.y == 0 ) )
+	{
+		ERROR_AND_DIE( "You forgot To mention the filePath for the TileSpreadSheet or it's Grid Layout" );
+	}
+
+			filePath = tileVFXSheetFileName.c_str();
+
+	if( g_theGame->m_gameSS[ SS_VFX_FLARE ] == nullptr )
+	{
+		g_theGame->m_gameSS[ SS_VFX_FLARE ] = new SpriteSheet( *( g_theRenderer->GetOrCreateTextureFromFile( filePath ) ) , tileVFXSpriteSheetDimensions );
+	}
+	
 	tileDefinition = tileDefinition->FirstChildElement( "TileDefinition" );
 
 	while ( tileDefinition )

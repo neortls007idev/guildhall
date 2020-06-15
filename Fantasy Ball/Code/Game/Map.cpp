@@ -3,7 +3,6 @@
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/ParticleSystem/ParticleSystem2D.hpp"
-#include "Engine/Primitives/GPUMesh.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Game//Game.hpp"
 #include "Game/Ball.hpp"
@@ -13,7 +12,7 @@
 #include "Game/Paddle.hpp"
 #include "Game/Tile.hpp"
 #include "Game/TileDefinition.hpp"
-#include "Engine/ParticleSystem/ParticleSystem2D.hpp"
+#include "Engine/ParticleSystem/ParticleEmitter2D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -67,7 +66,9 @@ Map::Map( Game* owner , MapDefinition* mapDefinition , std::string mapName ) :
 	//InitializeTileVertices();
 
 	//m_player = new Actor( m_theGame , Vec2::ONE , 0.f , ActorDefinition::s_definitions[ "Player" ] );
-	m_testEmitter = g_theParticleSystem2D->CreateNewParticleEmitter( g_theRenderer , m_owner->m_gameTex[ TEX_FLARE_RED ] , nullptr , ALPHA );
+	m_testEmitter = g_theParticleSystem2D->CreateNewParticleEmitter( g_theRenderer , m_owner->m_gameSS[ SS_VFX_FLARE ] , nullptr , ALPHA );
+
+	m_backgroundIndex = g_RNG->RollRandomIntInRange( TEX_BACKGROUND_FOREST_1 , TEX_BACKGROUND_AURORA_1 );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -95,6 +96,16 @@ void Map::LevelBounds()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Map::~Map()
+{
+	g_theParticleSystem2D->DestroyParticleEmitter( m_testEmitter );
+	m_testEmitter = nullptr;
+
+	m_mapDefinition = nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Map::Update( float deltaSeconds )
 {
 	for ( int Entitytype = 0; Entitytype < NUM_ENTITY_TYPES; Entitytype++ )
@@ -117,7 +128,7 @@ void Map::Update( float deltaSeconds )
 
 void Map::Render()
 {
-	g_theRenderer->BindTexture( m_owner->m_gameTex[ TEX_BACKGROUND_FOREST ] );
+	g_theRenderer->BindTexture( m_owner->m_gameTex[ m_backgroundIndex ] );
 	g_theRenderer->DrawAABB2( m_backGround	, WHITE );
 	
 	g_theRenderer->BindTexture( m_owner->m_gameTex[ TEX_LEFT_WALL ] );
@@ -273,7 +284,20 @@ void Map::ResolveBallvPaddleCollisions()
 				Vec2 refPoint = paddle->GetCollider().GetNearestPoint( ball->m_pos );
 				
 				Vec2 edgeNormal = ( ball->m_pos - refPoint ).GetNormalized();
+
+				float deviationFactor = RangeMapFloat( paddle->GetCollider().m_mins.x , paddle->GetCollider().m_maxs.x ,
+				                                  -PADDLE_COLLISION_DEVIATION , PADDLE_COLLISION_DEVIATION , refPoint.x );
+				
+				//Vec2 deviationVector = Vec2::MakeFromPolarDegrees( ball->m_velocity.GetLength() , deviationFactor * PADDLE_COLLISION_DEVIATION );
+				//ball->m_velocity += deviationVector;
+
 				ball->m_velocity.Reflect( edgeNormal );
+				
+				float magnitude = ball->m_velocity.GetLength();
+					  magnitude *= 1.1f;
+				float angleDegrees = ball->m_velocity.GetAngleDegrees() - deviationFactor;
+				
+				ball->m_velocity = Vec2::MakeFromPolarDegrees( angleDegrees , magnitude );
 				
 				PushDiscOutOfAABB( ball->m_pos , ball->m_cosmeticRadius , paddle->GetCollider() );
 			}

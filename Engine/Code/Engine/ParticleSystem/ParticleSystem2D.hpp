@@ -34,6 +34,7 @@ public:
 		
 	ParticleEmitter2D* CreateNewParticleEmitter( RenderContext* renderContext , Texture* tex , Shader* shader = nullptr , eBlendMode blendMode = ADDITIVE );
 	ParticleEmitter2D* CreateNewParticleEmitter( RenderContext* renderContext , SpriteSheet* spriteSheet , Shader* shader = nullptr , eBlendMode blendMode = ADDITIVE );
+	void			   DestroyParticleEmitter( ParticleEmitter2D* emitter );
 	
 public:
 	std::vector<ParticleEmitter2D*> m_emitters;

@@ -15,6 +15,7 @@
 #include "Game/MapDefinition.hpp"
 #include "Game/TheApp.hpp"
 #include "Game/TileDefinition.hpp"
+#include "Ball.hpp"
 //#include <utility>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -48,6 +49,31 @@ Game::Game()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Game::~Game()
+{
+	for ( int index = 0 ; index < NUM_GAME_SS ; index++ )
+	{
+		delete m_gameSS[ index ];
+		m_gameSS[ index ] = nullptr;
+	}
+
+	for( int index = 0 ; index < NUM_GAME_TEX ; index++ )
+	{
+		m_gameTex[ index ] = nullptr;
+	}
+
+	for( int index = 0 ; index < m_levels.size() ; index++ )
+	{
+		delete m_levels[ index ];
+		m_levels[ index ] = nullptr;
+	}
+	
+	m_currentLevel = nullptr;
+	g_theAudioSystem->StopSound( m_currentBackgroundsound );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Game::LoadAssets()
 {
 	LoadAllTextures();
@@ -58,7 +84,7 @@ void Game::LoadAssets()
 
 void Game::LoadAllSounds()
 {
-	//m_sounds[ SFX_BACKGROUND_1 ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/WindsweptRealms.mp3" );
+	m_sounds[ SFX_BACKGROUND_1 ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/LSCarolOfTheBells.mp3" );
 	m_sounds[ SFX_BACKGROUND_2 ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/LSCrystallize.mp3" );
 	m_sounds[ SFX_BACKGROUND_3 ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/LSCelticCarol.mp3" );
 	m_sounds[ SFX_BACKGROUND_4 ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/LSSenbonzakura.mp3" );
@@ -73,7 +99,10 @@ void Game::LoadAllSounds()
 
 void Game::LoadAllTextures()
 {
-	m_gameTex[ TEX_BACKGROUND_FOREST ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Background/ParallaxForestBlue.png" );
+	m_gameTex[ TEX_BACKGROUND_FOREST_1 ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Background/ParallaxForestBlue.png" );
+	m_gameTex[ TEX_BACKGROUND_FOREST_2 ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Background/enchantedForest.png" );
+	m_gameTex[ TEX_BACKGROUND_AURORA_1 ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Background/aurora1.png" );
+	
 	m_gameTex[ TEX_PADDLE ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Paddle/Paddle.png" );
 	m_gameTex[ TEX_LEFT_WALL ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Bounds/LeftWall.png" );
 	m_gameTex[ TEX_RIGHT_WALL ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Bounds/RightWall.png" );
@@ -90,16 +119,16 @@ void Game::LoadAllTextures()
 	m_gameTex[ TEX_BALL_ORANGE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/17.png" );
 	m_gameTex[ TEX_BALL_GREY ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/34.png" );
 
-	m_gameTex[ TEX_FLARE_RED ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/01.png" );
-	m_gameTex[ TEX_FLARE_GREEN ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/04_02.png" );
-	m_gameTex[ TEX_FLARE_BLUE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/08_01.png" );
-	m_gameTex[ TEX_FLARE_YELLOW ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/02.png" );
-	m_gameTex[ TEX_FLARE_MAGENTA ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/12.png" );
-	m_gameTex[ TEX_FLARE_CYAN ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/03_02.png" );
-	m_gameTex[ TEX_FLARE_PINK ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/07.png" );
-	m_gameTex[ TEX_FLARE_PURPLE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/05.png" );
-	m_gameTex[ TEX_FLARE_ORANGE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/06.png" );
-	m_gameTex[ TEX_FLARE_GREY ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/10_01.png" );
+	//m_gameTex[ TEX_FLARE_RED ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/01.png" );
+	//m_gameTex[ TEX_FLARE_GREEN ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/04_02.png" );
+	//m_gameTex[ TEX_FLARE_BLUE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/08_01.png" );
+	//m_gameTex[ TEX_FLARE_YELLOW ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/02.png" );
+	//m_gameTex[ TEX_FLARE_MAGENTA ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/12.png" );
+	//m_gameTex[ TEX_FLARE_CYAN ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/03_02.png" );
+	//m_gameTex[ TEX_FLARE_PINK ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/07.png" );
+	//m_gameTex[ TEX_FLARE_PURPLE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/05.png" );
+	//m_gameTex[ TEX_FLARE_ORANGE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/06.png" );
+	//m_gameTex[ TEX_FLARE_GREY ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/VFX/GlareFlare/10_01.png" );
 	 
 }
 
@@ -107,6 +136,9 @@ void Game::LoadAllTextures()
 
 void Game::PostGameConstructDataOnce()
 {
+	TileDefinition::s_definitions.clear();
+	MapDefinition::s_definitions.clear();
+	
 	TileDefinition::CreateTileDefinitions( "Data/GamePlay/TileDefs.xml" );
 	MapDefinition::CreateMapDefinitions( "Data/GamePlay/MapDefs.xml" );
 	
@@ -160,7 +192,9 @@ void Game::PostGameConstruct()
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	//m_currentLevel->SpawnNewEntity( TILE , Vec2::ZERO , TileDefinition::s_definitions.at( "NormalOrange" ) );
 
-	g_theAudioSystem->PlaySound( m_sounds[ SFX_BACKGROUND_4 ] , true , 0.11f );
+	int backgroundSoundIndex = g_RNG->RollRandomIntInRange( SFX_BACKGROUND_1 , SFX_BACKGROUND_4 );
+	
+	m_currentBackgroundsound = g_theAudioSystem->PlaySound( m_sounds[ backgroundSoundIndex ] , true , 0.11f );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -176,8 +210,8 @@ void Game::Update( float deltaSeconds )
 
 void Game::Render() const
 {
+	
 	m_currentLevel->Render();
-
 	g_theParticleSystem2D->Render();
 	
 	if ( m_isDebugDraw )
@@ -236,6 +270,13 @@ SoundPlaybackID Game::GetSFX( eGameAudioFX SFXid ) const
 
 void Game::UpdateFromKeyBoard()
 {
+	if( g_theInput->WasKeyJustPressed( KEY_F2 ) )
+	{
+		Entitylist& ballList = m_currentLevel->m_entityListsByType[ BALL ];
+		Ball* theBall = ( Ball* ) ballList[ 0 ];
+		theBall->m_pos = Vec2::ZERO_ONE * 300.f;
+	}
+	
 	if( g_theInput->WasKeyJustPressed( KEY_F1 ) )
 	{
 		m_isDebugDraw = !m_isDebugDraw;

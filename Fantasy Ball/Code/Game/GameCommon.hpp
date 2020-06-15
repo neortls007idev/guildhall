@@ -39,12 +39,21 @@ constexpr float LEVEL_SIDEWALL_PERCENTAGE = 0.119791667f;
 constexpr float TILE_LENGTH = 112.6667f;
 constexpr float TILE_HEIGHT = 32.f;
 const Vec2 halfTileDimensions = Vec2( TILE_LENGTH * 0.5f , TILE_HEIGHT * 0.5f );
+
+constexpr float PARTICLE_HEIGHT = 80.f;
+const Vec2 particleDimensions = Vec2( 1.7777777f , 1.f ) * PARTICLE_HEIGHT;
+constexpr float PARTICLE_VELOCITY = 25.f;
+
+constexpr float PADDLE_COLLISION_DEVIATION = 10.f;
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 enum eGameTextures
 {
 	TEX_NONE = -1,
-	TEX_BACKGROUND_FOREST,
+	TEX_BACKGROUND_FOREST_1,
+	TEX_BACKGROUND_FOREST_2,
+	TEX_BACKGROUND_AURORA_1,
 
 	TEX_LEFT_WALL,
 	TEX_RIGHT_WALL,
@@ -62,16 +71,16 @@ enum eGameTextures
 	TEX_BALL_ORANGE,
 	TEX_BALL_GREY,
 
-	TEX_FLARE_RED,
-	TEX_FLARE_GREEN,
-	TEX_FLARE_BLUE,
-	TEX_FLARE_YELLOW,
-	TEX_FLARE_MAGENTA,
-	TEX_FLARE_CYAN,
-	TEX_FLARE_PINK,
-	TEX_FLARE_PURPLE,
-	TEX_FLARE_ORANGE,
-	TEX_FLARE_GREY,
+	//TEX_FLARE_RED,
+	//TEX_FLARE_GREEN,
+	//TEX_FLARE_BLUE,
+	//TEX_FLARE_YELLOW,
+	//TEX_FLARE_MAGENTA,
+	//TEX_FLARE_CYAN,
+	//TEX_FLARE_PINK,
+	//TEX_FLARE_PURPLE,
+	//TEX_FLARE_ORANGE,
+	//TEX_FLARE_GREY,
 	
 	NUM_GAME_TEX
 };
