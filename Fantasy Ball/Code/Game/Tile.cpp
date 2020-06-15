@@ -8,11 +8,13 @@
 #include "Game/Tile.hpp"
 #include "Game/TileDefinition.hpp"
 #include "Engine/ParticleSystem/ParticleEmitter2D.hpp"
+#include "Engine/Renderer/SpriteSheet.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 extern RenderContext*				g_theRenderer;
 extern AudioSystem*					g_theAudioSystem;
+extern Game*						g_theGame;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -38,7 +40,10 @@ void Tile::Update( float deltaSeconds )
 void Tile::Render() const
 {
 	AABB2 tile = GetCollider();
-	g_theRenderer->DrawAABB2( tile , m_tileColor );
+	const Texture* tex = &g_theGame->m_gameSS[ SS_BRICKS ]->GetTexture();
+	g_theRenderer->BindTexture( tex );
+	g_theRenderer->DrawAABB2( tile , WHITE , m_tileDef->m_spriteUVs.m_mins , m_tileDef->m_spriteUVs.m_maxs );
+	g_theRenderer->BindTexture( nullptr );
 
 	if ( m_owner->m_isDebugDraw  )
 	{

@@ -1,8 +1,8 @@
-<TileDefinitions spriteSheet="Terrain_32x32.png" spriteLayout="32,32">
+<TileDefinitions spriteSheet="Data/Images/bricksSpriteSheet112x32.png" spriteLayout="2,6">
 	<TileDefinition
 		name="NormalRed"
 		colorInImageFile="255,0,0,255"
-		spriteCoords="0,0"
+		spriteCoords="1,3"
 		health="1"
 		healthToSolid="0"
 		isSolid="false"
@@ -13,7 +13,7 @@
 	<TileDefinition
 		name="NormalGreen"
 		colorInImageFile="0,255,0,255"
-		spriteCoords="0,1"
+		spriteCoords="1,5"
 		health="1"
 		healthToSolid="0"
 		isSolid="false"
@@ -24,7 +24,7 @@
 	<TileDefinition
 		name="NormalBlue"
 		colorInImageFile="0,0,255,255"
-		spriteCoords="0,2"
+		spriteCoords="0,0"
 		health="1"
 		healthToSolid="0"
 		isSolid="false"
@@ -35,7 +35,7 @@
 	<TileDefinition
 		name="NormalYellow"
 		colorInImageFile="255,255,0,255"
-		spriteCoords="0,3"
+		spriteCoords="1,4"
 		health="2"
 		healthToSolid="0"
 		isSolid="false"
@@ -57,7 +57,7 @@
 	<TileDefinition
 		name="NormalCyan"
 		colorInImageFile="0,255,255,255"
-		spriteCoords="0,5"
+		spriteCoords="0,1"
 		health="2"
 		healthToSolid="0"
 		isSolid="false"
@@ -68,7 +68,7 @@
 	<TileDefinition
 		name="NormalOrange"
 		colorInImageFile="255,127,0,255"
-		spriteCoords="0,6"
+		spriteCoords="0,5"
 		health="3"
 		healthToSolid="1"
 		isSolid="false"
@@ -79,7 +79,7 @@
 	<TileDefinition
 		name="NormalPink"
 		colorInImageFile="255,0,127,255"
-		spriteCoords="0,7"
+		spriteCoords="1,0"
 		health="3"
 		healthToSolid="0"
 		isSolid="false"
@@ -90,7 +90,7 @@
 	<TileDefinition
 		name="NormalPurple"
 		colorInImageFile="127,0,255,255"
-		spriteCoords="0,8"
+		spriteCoords="1,2"
 		health="3"
 		healthToSolid="1"
 		isSolid="false"
@@ -101,7 +101,7 @@
 	<TileDefinition
 		name="SteelGrey"
 		colorInImageFile="127,127,127,255"
-		spriteCoords="0,9"
+		spriteCoords="0,2"
 		health="1"
 		healthToSolid="1"
 		isSolid="true"

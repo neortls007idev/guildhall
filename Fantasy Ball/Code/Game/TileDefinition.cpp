@@ -4,11 +4,12 @@
 #include "Engine/Core/XmlUtils.hpp"
 #include "Engine/Renderer/SpriteDefinition.hpp"
 #include "Game/Game.hpp"
+#include "Engine/Renderer/SpriteSheet.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-extern RenderContext* g_theRenderer;
-//extern SpriteSheet* g_tileSpriteSheet;
+extern RenderContext*	g_theRenderer;
+extern Game*			g_theGame;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -27,11 +28,10 @@ TileDefinition::TileDefinition( const tinyxml2::XMLElement& definitionXMLElement
 	m_spriteCoords		= ParseXmlAttribute( definitionXMLElement , "spriteCoords"			, m_spriteCoords	);
 	m_tileColor			= ParseXmlAttribute( definitionXMLElement , "colorInImageFile"		, m_tileColor		);
 
-	// TODO - below line of code needs further testing.
-	//int spriteSheetWidth = g_tileSpriteSheet->GetTexture().GetDimensions().x / g_tileSpriteSheet->GetSpriteDimension().x;
-	//int tileSpriteIndex = m_spriteCoords.x + ( spriteSheetWidth * m_spriteCoords.y );
-	//const SpriteDefinition& currentTileSprite = g_tileSpriteSheet->GetSpriteDefinition( tileSpriteIndex );
-	//currentTileSprite.GetUVs( m_spriteUVs.m_mins , m_spriteUVs.m_maxs );
+	int spriteSheetWidth						= g_theGame->m_gameSS[ SS_BRICKS ]->GetSpriteDimension().x;
+	int tileSpriteIndex							= m_spriteCoords.x + ( spriteSheetWidth * m_spriteCoords.y );
+	const SpriteDefinition& currentTileSprite	= g_theGame->m_gameSS[ SS_BRICKS ]->GetSpriteDefinition( tileSpriteIndex );
+	currentTileSprite.GetUVs( m_spriteUVs.m_mins , m_spriteUVs.m_maxs );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -48,26 +48,23 @@ void TileDefinition::CreateTileDefinitions( const char* xmlFilePath )
 		ERROR_AND_DIE( "XML FILE DID NOT LOAD" );
 		return;
 	}
-
-	std::string terrainTexturePath = "Data/Images/";
-
-	//g_tileSpriteSheet
 	 
 	tinyxml2::XMLElement* tileDefinition	= xmlDocument.RootElement();
 	std::string tileSheetFileName			= ParseXmlAttribute( *tileDefinition , "spriteSheet" , "" );
-	IntVec2 terrainSpriteSheetDimensions	= ParseXmlAttribute( *tileDefinition , "spriteLayout" , IntVec2::ZERO );
+	IntVec2 tileSpriteSheetDimensions	= ParseXmlAttribute( *tileDefinition , "spriteLayout" , IntVec2::ZERO );
 	
-	if ( ( tileSheetFileName == "" ) || ( terrainSpriteSheetDimensions.x == 0 && terrainSpriteSheetDimensions.y == 0 ) )
+	if ( ( tileSheetFileName == "" ) || ( tileSpriteSheetDimensions.x == 0 && tileSpriteSheetDimensions.y == 0 ) )
 	{
 		ERROR_AND_DIE( "You forgot To mention the filePath for the TileSpreadSheet or it's Grid Layout" );
 	}
 	
-	terrainTexturePath.append(tileSheetFileName);
-	const char* filePath = terrainTexturePath.c_str();
-	//if ( g_tileSpriteSheet == NULL )
-	//{
-	//	g_tileSpriteSheet = new SpriteSheet( *( g_theRenderer->GetOrCreateTextureFromFile( filePath ) ) , terrainSpriteSheetDimensions );
-	//}
+	
+	const char* filePath = tileSheetFileName.c_str();
+	
+if ( g_theGame->m_gameSS[ SS_BRICKS ] == nullptr )
+{
+	g_theGame->m_gameSS[ SS_BRICKS ] = new SpriteSheet( *( g_theRenderer->GetOrCreateTextureFromFile( filePath ) ) , tileSpriteSheetDimensions );	
+}
 
 	tileDefinition = tileDefinition->FirstChildElement( "TileDefinition" );
 
