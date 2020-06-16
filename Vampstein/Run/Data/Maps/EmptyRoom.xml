@@ -2,12 +2,13 @@
 
 	<Legend>
 		<Tile glyph="#" regionType="CobblestoneWall"/>
+		<Tile glyph="W" regionType="WoodWall"/>
 		<Tile glyph="." regionType="StoneFloor"/>
 	</Legend>
 	<MapRows>
 		<MapRow tiles="########"/>
 		<MapRow tiles="#......#"/>
-		<MapRow tiles="#......#"/>
+		<MapRow tiles="#..W...#"/>
 		<MapRow tiles="#......#"/>
 		<MapRow tiles="########"/>
 	</MapRows>
@@ -16,5 +17,3 @@
 	</Entities>
 
 </MapDefinition>
-
-

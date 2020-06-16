@@ -1,42 +1,47 @@
-﻿#pragma once
-#include <string>
-#include <vector>
+#pragma once
 #include "Engine/Math/IntVec2.hpp"
-#include "Engine/Renderer/SpriteSheet.hpp"
-#include "ThirdParty/TinyXML2/tinyxml2.h"
+#include "Engine/ThirdParty/tinyxml2.h"
+#include <string>
+#include <map>
+#include "Engine/Math/Vec2.hpp"
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
+class SpriteSheet;
 
-class Texture;
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
 
-struct MaterialType
+class MaterialSheet
 {
-public:
-	MaterialType( const tinyxml2::XMLElement& definitionXMLElement );
+	friend class MapMaterial;
 
 public:
-	std::string												m_name;
-	std::string												m_sheetName;
-	IntVec2													m_spriteCoords;
+	SpriteSheet* GetSpriteSheet() const { return m_diffuseSpriteSheet; };
+
+private:
+	MaterialSheet(tinyxml2::XMLElement* element);
+	static MaterialSheet* GetMaterialSheet( std::string sheetName );
+
+	std::string m_name;
+	IntVec2 m_layout;
+	SpriteSheet* m_diffuseSpriteSheet = nullptr;
+
+	static std::map<std::string , MaterialSheet*> s_MaterialSheets;
+
 };
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
 
 class MapMaterial
 {
-	static void  CreateMapMaterialDefinitions( const char* xmlFilePath );
-	friend MaterialType ParseXmlAttribute( const tinyxml2::XMLElement& element , const char* attributeName , MaterialType defaultValue );
-	~MapMaterial();
-	
-public:
-	static std::string									m_spriteSheetName;
-	static IntVec2										m_layout;
-	static Texture*										m_spriteSheet;
-	static MaterialType*								m_defaultMaterialType;
-	static std::vector<MaterialType>					s_definitions;
-	//std::vector<SpriteSheet*>								m_spriteSheets;
-};
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
+private:
+	IntVec2 m_spriteCoords;
+	std::string m_name;
+	std::string m_sheetName;
+
+	MapMaterial( tinyxml2::XMLElement* element );
+	static std::map<std::string , MapMaterial*> s_mapMaterails;
+
+public:
+	static void LoadDefinitions( const char* filePath );
+	static MapMaterial* GetDefinition( std::string materialName );
+	SpriteSheet* GetDiffuseSpriteSheet();
+	void GetUVCoords( Vec2& outMins , Vec2& outMax );
+};

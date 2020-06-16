@@ -1,85 +1,146 @@
-﻿#include "Game/MapMaterial.hpp"
-#include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Game/MapMaterial.hpp"
+#include "Game/GameCommon.hpp"
 #include "Engine/Core/XmlUtils.hpp"
-#include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Renderer/SpriteSheet.hpp"
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
+typedef tinyxml2::XMLDocument XMLDocument;
+typedef tinyxml2::XMLElement XMLElement;
 
-extern RenderContext* g_theRenderer;
+std::map<std::string , MaterialSheet*> MaterialSheet::s_MaterialSheets;
+std::map<std::string , MapMaterial*> MapMaterial::s_mapMaterails;
 
-STATIC std::string					MapMaterial::m_spriteSheetName;
-STATIC IntVec2						MapMaterial::m_layout;
-STATIC Texture*						MapMaterial::m_spriteSheet;
-STATIC MaterialType*				MapMaterial::m_defaultMaterialType;
-STATIC std::vector<MaterialType>	MapMaterial::s_definitions;
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void MapMaterial::CreateMapMaterialDefinitions( const char* xmlFilePath )
+void MapMaterial::GetUVCoords( Vec2& outMins , Vec2& outMax )
 {
-	std::string filePath = xmlFilePath;
-	tinyxml2::XMLDocument xmlDocument;
-	xmlDocument.LoadFile( xmlFilePath );
+	SpriteSheet* sheet = GetDiffuseSpriteSheet();
 
-	if( xmlDocument.ErrorID() != tinyxml2::XML_SUCCESS )
+	IntVec2 spriteSheetLayout = sheet->GetDimensions();
+	int spritrIndex = m_spriteCoords.y * spriteSheetLayout.x + m_spriteCoords.x;
+
+	sheet->GetSpriteUVs( outMins , outMax , spritrIndex );
+}
+
+MaterialSheet::MaterialSheet( tinyxml2::XMLElement* element )
+{
+	m_name = ParseXmlAttribute( *element , "name" , "NULL" );
+	if ( m_name == "NULL" )
 	{
-		ERROR_AND_DIE( "XML FILE = " + filePath + " DID NOT LOAD" );
-		return;
+		//Error
 	}
 
-	tinyxml2::XMLElement* mapMaterialTypes		= xmlDocument.RootElement();
-	std::string defaultMapMaterial				= ParseXmlAttribute( *mapMaterialTypes , "default" , "" );
-	
-	
-	tinyxml2::XMLElement* materialSheet			= mapMaterialTypes->FirstChildElement( "MaterialSheet" );
-	std::string spriteSheetName					= ParseXmlAttribute( *materialSheet , "name" , "" );
-	IntVec2		layout							= ParseXmlAttribute( *materialSheet , "layout" , IntVec2::ZERO );
-				m_spriteSheetName				= spriteSheetName;
-				m_layout						= layout;
-	
-	tinyxml2::XMLElement*	diffuseSheet		= mapMaterialTypes->FirstChildElement( "Diffuse" );
-	std::string				diffuseSheetPath	= ParseXmlAttribute( *diffuseSheet , "image" , "" );
-	Texture*				diffuseTexture		= g_theRenderer->GetOrCreateTextureFromFile( diffuseSheetPath.c_str() );
-							m_spriteSheet		= diffuseTexture;
-	
-	if( ( diffuseSheetPath == "" ) || ( layout.x == 0 && layout.y == 0 ) )
+	m_layout = ParseXmlAttribute( *element , "layout" , IntVec2( -1 , -1 ) );
+	if ( m_layout == IntVec2( -1 , -1 ) )
 	{
-		ERROR_AND_DIE( "You forgot To mention the filePath for the TileSpreadSheet or it's Grid Layout" );
+		//Error
 	}
 
-	tinyxml2::XMLElement* materialType = mapMaterialTypes->FirstChildElement( "MaterialType" );
+	XMLElement* diffuseElemet = element->FirstChildElement( "Diffuse" );
 
-	while( materialType )
+	if ( diffuseElemet != nullptr )
 	{
-		MaterialType* currentMaterialType = new MaterialType( *materialType );
-		//std::string key = ParseXmlAttribute( *materialType , "name" , "Invalid Name" );
-		s_definitions.emplace_back( currentMaterialType );
-		materialType = materialType->NextSiblingElement();
-	}
-
-	for ( size_t index = 0 ; index < s_definitions.size() ; index++ )
-	{
-		if ( s_definitions[index].m_name == defaultMapMaterial )
+		std::string diffuseFilePath = ParseXmlAttribute( *diffuseElemet ,"image", "NULL" );
+		if ( diffuseFilePath == "NULL" )
 		{
-			m_defaultMaterialType = &s_definitions[ index ];
+			//error
+		}
+		else
+		{
+			Texture* spriteSheetTexture=g_theRenderer->GetOrCreateTextureFromFile( diffuseFilePath.c_str() );
+			m_diffuseSpriteSheet = new SpriteSheet( *spriteSheetTexture , m_layout );
 		}
 	}
+
 }
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-MapMaterial::~MapMaterial()
+MaterialSheet* MaterialSheet::GetMaterialSheet( std::string sheetName )
 {
-	m_spriteSheet = nullptr;
+	auto found = MaterialSheet::s_MaterialSheets.find( sheetName );
+	if ( found != MaterialSheet::s_MaterialSheets.end() )
+	{
+		return found->second;
+	}
+
+	return nullptr;
 }
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
 
-MaterialType::MaterialType( const tinyxml2::XMLElement& definitionXMLElement )
+
+MapMaterial::MapMaterial( tinyxml2::XMLElement* element )
 {
-	m_name			= ParseXmlAttribute( definitionXMLElement , "name" , "Invalid Name" );
-	m_sheetName		= ParseXmlAttribute( definitionXMLElement , "sheet" , "Invalid Name" );
-	m_spriteCoords	= ParseXmlAttribute( definitionXMLElement , "spriteCoords" , IntVec2::ZERO );
+	m_name = ParseXmlAttribute( *element , "name" , "NULL" );
+	if ( m_name == "NULL" )
+	{
+		//error
+	}
+
+	m_sheetName = ParseXmlAttribute( *element , "sheet" , "NULL" );
+	if ( m_sheetName == "NULL" )
+	{
+		//error
+	}
+
+	m_spriteCoords = ParseXmlAttribute( *element , "spriteCoords" , IntVec2( -1 , -1 ) );
+	if ( m_spriteCoords == IntVec2( -1 , -1 ) )
+	{
+		//error
+	}
+	
 }
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
+void MapMaterial::LoadDefinitions( const char* filePath )
+{
+	XMLDocument doc;
+	doc.LoadFile( filePath );
+
+	XMLElement* root = doc.RootElement();
+
+	for ( XMLElement* ele = root->FirstChildElement("MaterialsSheet"); ele != nullptr; ele=ele->NextSiblingElement("MaterialSheet") )
+	{
+		MaterialSheet* newSheet = new MaterialSheet( ele );
+		auto found = MaterialSheet::s_MaterialSheets.find( newSheet->m_name );
+
+		if ( found != MaterialSheet::s_MaterialSheets.end() )
+		{
+			//error multiple definitions
+			continue;
+		}
+
+		MaterialSheet::s_MaterialSheets[ newSheet->m_name ] = newSheet;
+
+	}
+
+	for ( XMLElement* ele = root->FirstChildElement( "MaterialType" ); ele != nullptr; ele=ele->NextSiblingElement( "MaterialType" ) )
+	{
+		MapMaterial* newMaterial = new MapMaterial( ele );
+		auto found = MapMaterial::s_mapMaterails.find( newMaterial->m_name );
+
+		if ( found != MapMaterial::s_mapMaterails.end() )
+		{
+			//error multiple definitions
+			continue;
+		}
+
+		MapMaterial::s_mapMaterails[ newMaterial->m_name ] = newMaterial;
+
+	}
+}
+
+MapMaterial* MapMaterial::GetDefinition( std::string materialName )
+{
+	auto found = MapMaterial::s_mapMaterails.find( materialName );
+	if ( found != MapMaterial::s_mapMaterails.end() )
+	{
+		return found->second;
+	}
+
+	return nullptr;
+}
+
+SpriteSheet* MapMaterial::GetDiffuseSpriteSheet()
+{
+	SpriteSheet* sheet = nullptr;
+
+	sheet = MaterialSheet::GetMaterialSheet( m_sheetName )->GetSpriteSheet();
+	return sheet;
+}
+
+
