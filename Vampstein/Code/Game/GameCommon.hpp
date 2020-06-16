@@ -15,13 +15,14 @@ extern Window*		g_theWindow;
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 constexpr float CLIENT_ASPECT											= 16.f/9.f;
+constexpr float UI_CLIENT_ASPECT										= 2.f;
 
 constexpr float WORLD_SIZE_X											= 20.f;
 constexpr float WORLD_SIZE_Y											= 12.f;
 constexpr float WORLD_CAMERA_SIZE_X										= /*16.f;*/ WORLD_SIZE_Y*CLIENT_ASPECT;
 constexpr float WORLD_CAMERA_SIZE_Y										= /*9.f;*/WORLD_SIZE_Y;
-constexpr float UI_SIZE_Y												= 900.f;
-constexpr float UI_SIZE_X												= UI_SIZE_Y * CLIENT_ASPECT;
+constexpr float UI_SIZE_Y												= 800.f;
+constexpr float UI_SIZE_X												= UI_SIZE_Y * UI_CLIENT_ASPECT;
 constexpr float WORLD_CENTER_X											= WORLD_SIZE_X / 2.f;
 constexpr float WORLD_CENTER_Y											= WORLD_SIZE_Y / 2.f;
 

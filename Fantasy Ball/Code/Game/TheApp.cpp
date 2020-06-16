@@ -273,7 +273,7 @@ void TheApp::UpdateFromKeyboard()
 	if ( g_theInput->GetButtonState( 'Y' ).IsPressed() )					{ m_isSpeedMo = true; }
 	else																		{ m_isSpeedMo = false; }
 
-	if ( g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() )
+	if( g_theInput->WasKeyJustPressed( KEY_ESC ) )
 	{
 		HandleQuitRequested();
 		g_theWindow->HandleQuitRequested();

@@ -17,6 +17,7 @@
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
 #include "Game/TileMap.hpp"
+#include "World.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -61,6 +62,7 @@ Game::Game()
 
 	m_pointSampler = g_theRenderer->GetOrCreateSampler( SAMPLER_POINT );
 
+	m_world = new World( this , "TheWorld" , "Data/Maps" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -165,9 +167,12 @@ void Game::IntializeGameObjects()
 
 void Game::InitializeHUDElements()
 {
-	m_playerGun = AABB2( m_uiCamera.GetOrthoMin().GetXYComponents() , m_uiCamera.GetOrthoMax().GetXYComponents() );
-	m_HUD  = m_playerGun.CarveBoxOffBottom( 0.1f * CLIENT_ASPECT , 0.f );
-
+	m_HUD = AABB2( Vec2::ZERO , Vec2( UI_SIZE_X , 117.f ) );
+	//m_HUD  = m_playerGun.CarveBoxOffBottom( 0.1425f , 0.f );
+	//m_playerGun = m_playerGun.CarveBoxOffTop( 1.f - 0.1425f , 0.f );
+	m_playerGun = AABB2( Vec2( 330.f , 117.f ) , Vec2( 1270.f , 1057.f ) );
+	//m_playerGun.SetCenter( Vec2( 800.f , 400.f ) );
+		
 	m_pointSampler = g_theRenderer->GetOrCreateSampler( SAMPLER_POINT );
 }
 
@@ -235,7 +240,7 @@ void Game::Update( float deltaSeconds )
 	m_fps = 1.f / deltaSeconds;
 	
 	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1.00f ) , Vec2::ONE , 20.f , PURPLE , deltaSeconds ,
-						 "FPS = %.0f" , m_fps );
+						 "( ms/frame ) FPS = %.0f" , m_fps );
 
 	m_testMap->UpdateMeshes();
 	

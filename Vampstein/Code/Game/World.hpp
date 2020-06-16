@@ -12,10 +12,10 @@ class Map;
 class World
 {
 public:
-	World( Game* owner , char const* name );
+	World( Game* owner , char const* name , char const* mapsFolderPath );
 	~World();
 
-	void CreateMaps();
+	void CreateMaps( char const* mapsFolderPath );
 	void Update();
 	void Render() const;
 

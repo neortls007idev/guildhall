@@ -4,11 +4,11 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-World::World( Game* owner , char const* name ) :
-													m_owner( owner ) ,
-													m_name( name )
+World::World( Game* owner , char const* name , char const* mapsFolderPath ) :
+																		m_owner( owner ) ,
+																		m_name( name )
 {
-	CreateMaps();
+	CreateMaps( mapsFolderPath );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -20,23 +20,29 @@ World::~World()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void World::CreateMaps()
+void World::CreateMaps( char const* mapsFolderPath )
 {
-
+	Strings mapsPaths = GetFileNamesInfolder( mapsFolderPath , "*.xml" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void World::Update()
 {
-	m_currentMap->UpdateMeshes();
+	if( nullptr != m_currentMap )
+	{
+		m_currentMap->UpdateMeshes();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void World::Render() const
 {
-	m_currentMap->Render();
+	if ( nullptr != m_currentMap )
+	{
+		m_currentMap->Render();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

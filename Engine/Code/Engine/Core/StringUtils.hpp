@@ -66,3 +66,5 @@ std::vector<int>	StringConvertToValue( const char* text , const std::vector<int>
 FloatRange		 ParseXmlAttributeFloatRangefromIntRange( const char* text , IntRange defaultValue );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+Strings GetFileNamesInfolder( const std::string& folderpath , const char* filePattern );

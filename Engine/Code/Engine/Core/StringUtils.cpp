@@ -1,8 +1,12 @@
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/StringUtils.hpp"
 #include <stdarg.h>
-#include <windows.h>
 #include <vadefs.h>
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <corecrt_io.h>
+
 
 //-----------------------------------------------------------------------------------------------
 
@@ -307,6 +311,31 @@ float StringConvertToValue( const char* text , float defaultValue )
 		  value = static_cast< float >( atof( text ) );
 
 	return value;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Strings GetFileNamesInfolder( const std::string& folderpath , const char* filePattern )
+{
+	Strings fileNamesInFolder;
+
+#ifdef  _WIN32
+	std::string fileNamePattern = filePattern ? filePattern : "+";
+	std::string filePath		= folderpath + "/" + fileNamePattern;
+	_finddata_t fileInfo;
+	intptr_t searchHandle = _findfirst( filePath.c_str() , &fileInfo );
+	while ( searchHandle != -1 )
+	{
+		fileNamesInFolder.push_back( fileInfo.name );
+		int errorCode = _findnext( searchHandle , &fileInfo );
+		if( errorCode != 0 )
+			break;
+	}
+#else
+	ERROR_AND_DIE( Stringf( "Not yet implemented for platform" ) );
+#endif
+
+	return fileNamesInFolder;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
