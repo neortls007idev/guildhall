@@ -1,34 +1,44 @@
-#include "Game/MapMaterial.hpp"
-#include "Game/GameCommon.hpp"
 #include "Engine/Core/XmlUtils.hpp"
+#include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
+#include "Game/GameCommon.hpp"
+#include "Game/MapMaterial.hpp"
 
-typedef tinyxml2::XMLDocument XMLDocument;
-typedef tinyxml2::XMLElement XMLElement;
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-std::map<std::string , MaterialSheet*> MaterialSheet::s_MaterialSheets;
-std::map<std::string , MapMaterial*> MapMaterial::s_mapMaterails;
+extern RenderContext* g_theRenderer;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC std::map<std::string , MaterialSheet*>	MaterialSheet::s_materialSheets;
+STATIC std::map<std::string , MapMaterial*>		MapMaterial::s_mapMaterials;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void MapMaterial::GetUVCoords( Vec2& outMins , Vec2& outMax )
 {
 	SpriteSheet* sheet = GetDiffuseSpriteSheet();
 
-	IntVec2 spriteSheetLayout = sheet->GetDimensions();
-	int spritrIndex = m_spriteCoords.y * spriteSheetLayout.x + m_spriteCoords.x;
+	IntVec2 spriteSheetLayout = sheet->GetSpriteDimension();
+	int spriteIndex = m_spriteCoords.y * spriteSheetLayout.x + m_spriteCoords.x;
 
-	sheet->GetSpriteUVs( outMins , outMax , spritrIndex );
+	sheet->GetSpriteUVs( outMins , outMax , spriteIndex );
 }
 
-MaterialSheet::MaterialSheet( tinyxml2::XMLElement* element )
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+MaterialSheet::MaterialSheet( XMLElement* element )
 {
-	m_name = ParseXmlAttribute( *element , "name" , "NULL" );
+	m_name								= ParseXmlAttribute( *element , "name" , "NULL" );
+	
 	if ( m_name == "NULL" )
 	{
 		//Error
 	}
 
-	m_layout = ParseXmlAttribute( *element , "layout" , IntVec2( -1 , -1 ) );
-	if ( m_layout == IntVec2( -1 , -1 ) )
+	m_layout							= ParseXmlAttribute( *element , "layout" , -IntVec2::ONE );
+	
+	if ( m_layout == -IntVec2::ONE )
 	{
 		//Error
 	}
@@ -37,103 +47,116 @@ MaterialSheet::MaterialSheet( tinyxml2::XMLElement* element )
 
 	if ( diffuseElemet != nullptr )
 	{
-		std::string diffuseFilePath = ParseXmlAttribute( *diffuseElemet ,"image", "NULL" );
-		if ( diffuseFilePath == "NULL" )
+		std::string diffuseSSFilePath	= ParseXmlAttribute( *diffuseElemet ,"image", "NULL" );
+		
+		if ( diffuseSSFilePath == "NULL" )
 		{
 			//error
 		}
 		else
 		{
-			Texture* spriteSheetTexture=g_theRenderer->GetOrCreateTextureFromFile( diffuseFilePath.c_str() );
-			m_diffuseSpriteSheet = new SpriteSheet( *spriteSheetTexture , m_layout );
+			Texture* diffuseSSTexture	= g_theRenderer->GetOrCreateTextureFromFile( diffuseSSFilePath.c_str() );
+			m_diffuseSpriteSheet		= new SpriteSheet( *diffuseSSTexture , m_layout );
 		}
 	}
-
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 MaterialSheet* MaterialSheet::GetMaterialSheet( std::string sheetName )
 {
-	auto found = MaterialSheet::s_MaterialSheets.find( sheetName );
-	if ( found != MaterialSheet::s_MaterialSheets.end() )
+	auto materialSheet = MaterialSheet::s_materialSheets.find( sheetName );
+	
+	if ( materialSheet != MaterialSheet::s_materialSheets.end() )
 	{
-		return found->second;
+		return materialSheet->second;
 	}
 
 	return nullptr;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-
-MapMaterial::MapMaterial( tinyxml2::XMLElement* element )
+MapMaterial::MapMaterial( XMLElement* element )
 {
-	m_name = ParseXmlAttribute( *element , "name" , "NULL" );
+	m_name	= ParseXmlAttribute( *element , "name" , "NULL" );
+	
 	if ( m_name == "NULL" )
 	{
 		//error
 	}
 
 	m_sheetName = ParseXmlAttribute( *element , "sheet" , "NULL" );
+	
 	if ( m_sheetName == "NULL" )
 	{
 		//error
 	}
 
-	m_spriteCoords = ParseXmlAttribute( *element , "spriteCoords" , IntVec2( -1 , -1 ) );
-	if ( m_spriteCoords == IntVec2( -1 , -1 ) )
+	m_spriteCoords = ParseXmlAttribute( *element , "spriteCoords" , -IntVec2::ONE );
+	
+	if ( m_spriteCoords == -IntVec2::ONE )
 	{
 		//error
-	}
-	
+	}	
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void MapMaterial::LoadDefinitions( const char* filePath )
 {
-	XMLDocument doc;
+	tinyxml2::XMLDocument doc;
 	doc.LoadFile( filePath );
 
 	XMLElement* root = doc.RootElement();
 
-	for ( XMLElement* ele = root->FirstChildElement("MaterialsSheet"); ele != nullptr; ele=ele->NextSiblingElement("MaterialSheet") )
+	for( XMLElement* element = root->FirstChildElement( "MaterialsSheet" ); element != nullptr; element = element->NextSiblingElement( "MaterialSheet" ) )
 	{
-		MaterialSheet* newSheet = new MaterialSheet( ele );
-		auto found = MaterialSheet::s_MaterialSheets.find( newSheet->m_name );
+		MaterialSheet* newSheet		= new MaterialSheet( element );
 
-		if ( found != MaterialSheet::s_MaterialSheets.end() )
+		auto materialSheet	= MaterialSheet::s_materialSheets.find( newSheet->m_name );
+
+		if ( materialSheet != MaterialSheet::s_materialSheets.end() )
 		{
 			//error multiple definitions
 			continue;
 		}
 
-		MaterialSheet::s_MaterialSheets[ newSheet->m_name ] = newSheet;
-
+		MaterialSheet::s_materialSheets[ newSheet->m_name ] = newSheet;
 	}
 
-	for ( XMLElement* ele = root->FirstChildElement( "MaterialType" ); ele != nullptr; ele=ele->NextSiblingElement( "MaterialType" ) )
+	for( XMLElement* element = root->FirstChildElement( "MaterialType" ); element != nullptr; element = element->NextSiblingElement( "MaterialType" ) )
 	{
-		MapMaterial* newMaterial = new MapMaterial( ele );
-		auto found = MapMaterial::s_mapMaterails.find( newMaterial->m_name );
+		MapMaterial* newMaterial			= new MapMaterial( element );
+		
+		auto mapMaterial	= MapMaterial::s_mapMaterials.find( newMaterial->m_name );
 
-		if ( found != MapMaterial::s_mapMaterails.end() )
+		if ( mapMaterial != MapMaterial::s_mapMaterials.end() )
 		{
 			//error multiple definitions
 			continue;
 		}
 
-		MapMaterial::s_mapMaterails[ newMaterial->m_name ] = newMaterial;
+		MapMaterial::s_mapMaterials[ newMaterial->m_name ] = newMaterial;
 
 	}
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 MapMaterial* MapMaterial::GetDefinition( std::string materialName )
 {
-	auto found = MapMaterial::s_mapMaterails.find( materialName );
-	if ( found != MapMaterial::s_mapMaterails.end() )
+	auto mapMaterial = MapMaterial::s_mapMaterials.find( materialName );
+	
+	if ( mapMaterial != MapMaterial::s_mapMaterials.end() )
 	{
-		return found->second;
+		return mapMaterial->second;
 	}
 
 	return nullptr;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 SpriteSheet* MapMaterial::GetDiffuseSpriteSheet()
 {
@@ -143,4 +166,4 @@ SpriteSheet* MapMaterial::GetDiffuseSpriteSheet()
 	return sheet;
 }
 
-
+//--------------------------------------------------------------------------------------------------------------------------------------------

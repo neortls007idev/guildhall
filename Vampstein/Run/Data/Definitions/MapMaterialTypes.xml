@@ -22,7 +22,7 @@
 	<MaterialType
 		name="Grass"
 		sheet="TestTerrain"
-		spriteCoords="0,1"
+		spriteCoords="1,0"
 		/>
 
 	<MaterialType
@@ -30,23 +30,23 @@
 		sheet="TestTerrain"
 		spriteCoords="4,3"
 		/>
-<!--spriteCoords="4,3"-->
+
 	<MaterialType
 		name="Cobblestone"
 		sheet="TestTerrain"
 		spriteCoords="7,4"
-	/>
+		/>
 
 	<MaterialType
 		name="StoneBrick"
 		sheet="TestTerrain"
 		spriteCoords="0,4"
 		/>
-<!--spriteCoords="0,4"-->
+
 	<MaterialType
 		name="Wood"
 		sheet="TestTerrain"
 		spriteCoords="0,6"
 		/>
-<!--spriteCoords="0,6"-->
+
 </MapMaterialTypes>

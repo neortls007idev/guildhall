@@ -14,6 +14,9 @@
 #include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Time/Time.hpp"
 #include "Game/Game.hpp"
+
+#include "MapMaterial.hpp"
+#include "MapRegion.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
 #include "Game/TileMap.hpp"
@@ -56,10 +59,14 @@ Game::Game()
 		g_theDevConsole->PrintString( gameConfigData , eDevConsoleMessageType::DEVCONSOLE_SYTEMLOG );
 	}
 
-	//m_testMap = new TileMap( "Test" , IntVec2( 4 , 2 ) );
-	//m_testMap = new TileMap( "Test" , IntVec2( 8 , 8 ) );
-	m_testMap = new TileMap( "Test" , IntVec2( 5 , 5 ) );
-
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//			WORLD/MAP CONSTRUCTION
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	MapMaterial::LoadDefinitions( "Data/Definitions/MapMaterialTypes.xml" );
+	MapRegion::LoadDefinitions( "Data/Definitions/MapRegionTypes.xml" );
+			
+	//m_testMap = new TileMap( "Test" , IntVec2( 5 , 5 ) );
+	m_testMap =	TileMap::CreateTileMapFromXml( "TestXMLMap" , "Data/Maps/TestRoom.xml" );
 	m_pointSampler = g_theRenderer->GetOrCreateSampler( SAMPLER_POINT );
 
 	m_world = new World( this , "TheWorld" , "Data/Maps" );
@@ -105,7 +112,7 @@ void Game::LoadTextures()
 void Game::LoadAudio()
 {
 	m_sounds[ TEST_SOUND ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/TestSound.mp3" );
-	m_sounds[ TEST_SOUND ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/Teleporter.wav" );
+	m_sounds[ TELEPORTER ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/Teleporter.wav" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -167,13 +174,10 @@ void Game::IntializeGameObjects()
 
 void Game::InitializeHUDElements()
 {
-	m_HUD = AABB2( Vec2::ZERO , Vec2( UI_SIZE_X , 117.f ) );
-	//m_HUD  = m_playerGun.CarveBoxOffBottom( 0.1425f , 0.f );
-	//m_playerGun = m_playerGun.CarveBoxOffTop( 1.f - 0.1425f , 0.f );
-	m_playerGun = AABB2( Vec2( 330.f , 117.f ) , Vec2( 1270.f , 1057.f ) );
-	//m_playerGun.SetCenter( Vec2( 800.f , 400.f ) );
-		
-	m_pointSampler = g_theRenderer->GetOrCreateSampler( SAMPLER_POINT );
+	m_HUD			= AABB2( Vec2::ZERO , Vec2( UI_SIZE_X , 117.f ) );
+	m_playerGun		= AABB2( Vec2( 330.f , 117.f ) , Vec2( 1270.f , 1057.f ) );
+			
+	m_pointSampler	= g_theRenderer->GetOrCreateSampler( SAMPLER_POINT );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -308,19 +312,9 @@ void Game::Render() const
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( m_textures[ TEST_TEXTURE ] );
 	g_theRenderer->BindSampler( m_pointSampler );
-	//g_theRenderer->SetCullMode( CULL_NONE );
+	
 	m_testMap->Render();
-	//g_theRenderer->SetCullMode( CULL_BACK );
 			
-// 	g_theRenderer->SetModelMatrix( m_cubeMesh1Transform.GetAsMatrix() );
-// 	g_theRenderer->DrawMesh( m_cubeMesh );
-// 
-// 	g_theRenderer->SetModelMatrix( m_cubeMesh2Transform.GetAsMatrix() );
-// 	g_theRenderer->DrawMesh( m_cubeMesh );
-// 
-// 	g_theRenderer->SetModelMatrix( m_cubeMesh3Transform.GetAsMatrix() );
-// 	g_theRenderer->DrawMesh( m_cubeMesh );
-
 	if ( m_debugDraw )
 	{
 		g_theRenderer->BindShader( nullptr );
@@ -336,6 +330,7 @@ void Game::Render() const
 		g_theRenderer->SetModelMatrix( m_compassMeshTransform.GetAsMatrix() );
 		g_theRenderer->DrawMesh( m_basisMesh );
 	}
+	
 	g_theRenderer->SetCullMode( CULL_BACK );
 	g_theRenderer->SetDepthTest( COMPARE_LESS , false );
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );

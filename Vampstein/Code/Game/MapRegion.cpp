@@ -1,47 +1,53 @@
-#include "Game/MapRegionType.hpp"
-#include "Game/MapMaterial.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/XmlUtils.hpp"
+#include "Game/MapMaterial.hpp"
+#include "Game/MapRegion.hpp"
 
-typedef tinyxml2::XMLDocument XMLDocument;
-typedef tinyxml2::XMLElement XMLElement;
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-std::map<std::string , MapRegionType*> MapRegionType::s_regionTypes;
+STATIC std::map<std::string , MapRegion*>		MapRegion::s_mapRegions;
 
-void MapRegionType::LoadDefinitions( char const* dataFilePath )
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void MapRegion::LoadDefinitions( char const* regionDataFilePath )
 {
-	XMLDocument doc;
-	doc.LoadFile( dataFilePath );
+	tinyxml2::XMLDocument regionDataDocument;
+	regionDataDocument.LoadFile( regionDataFilePath );
 
-	XMLElement* root = doc.RootElement();
+	XMLElement* root = regionDataDocument.RootElement();
 
-	for ( XMLElement* ele = root->FirstChildElement( "RegionType" ); ele != nullptr; ele = ele->NextSiblingElement( "RegionType" ) )
+	for( XMLElement* element = root->FirstChildElement( "RegionType" ); element != nullptr; element = element->NextSiblingElement( "RegionType" ) )
 	{
-		MapRegionType* newMapRegion = new MapRegionType( ele );
-		auto found = MapRegionType::s_regionTypes.find( newMapRegion->m_name );
+		MapRegion* newMapRegion = new MapRegion( element );
+		auto mapRegion = MapRegion::s_mapRegions.find( newMapRegion->m_name );
 
-		if ( found != MapRegionType::s_regionTypes.end() )
+		if ( mapRegion != MapRegion::s_mapRegions.end() )
 		{
 			//error multiple definitions
 			continue;
 		}
 
-		MapRegionType::s_regionTypes[ newMapRegion->m_name ] = newMapRegion;
+		MapRegion::s_mapRegions[ newMapRegion->m_name ] = newMapRegion;
 	}
 }
 
-MapRegionType const* MapRegionType::GetDefinition( std::string const& name )
-{
-	auto found = s_regionTypes.find( name );
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-	if ( found != s_regionTypes.end() )
+MapRegion const* MapRegion::GetDefinition( std::string const& name )
+{
+	auto mapRegion = s_mapRegions.find( name );
+
+	if ( mapRegion != s_mapRegions.end() )
 	{
-		return found->second;
+		return mapRegion->second;
 	}
 
 	return nullptr;
 }
 
-MapRegionType::MapRegionType( tinyxml2::XMLElement* materialDef )
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+MapRegion::MapRegion( XMLElement* materialDef )
 {
 	m_name = ParseXmlAttribute( *materialDef , "name" , "NULL" );
 
@@ -67,27 +73,29 @@ MapRegionType::MapRegionType( tinyxml2::XMLElement* materialDef )
 
 	if ( m_isSolid )
 	{
-		tinyxml2::XMLElement* ele = materialDef->FirstChildElement( "Side" );
-		if ( ele == nullptr )
+		tinyxml2::XMLElement* element = materialDef->FirstChildElement( "Side" );
+		if ( element == nullptr )
 		{
 			//Error
 		}
 		else
 		{
-			std::string sideMaterial = ParseXmlAttribute( *ele , "material" , "NULL" );
+			std::string sideMaterial = ParseXmlAttribute( *element , "material" , "NULL" );
 			m_sideMaterial = MapMaterial::GetDefinition( sideMaterial );
 		}
 	}
 	else
 	{
-		tinyxml2::XMLElement* ele1 = materialDef->FirstChildElement( "Floor" );
-		tinyxml2::XMLElement* ele2 = materialDef->FirstChildElement( "Ceiling" );
+		tinyxml2::XMLElement* firstElement	= materialDef->FirstChildElement( "Floor" );
+		tinyxml2::XMLElement* secondElement = materialDef->FirstChildElement( "Ceiling" );
 
-		std::string floorMaterial = ParseXmlAttribute( *ele1 , "material" , "NULL" );
+		std::string floorMaterial = ParseXmlAttribute( *firstElement , "material" , "NULL" );
 		m_floorMaterial = MapMaterial::GetDefinition( floorMaterial );
 
-		std::string celilingMaterial = ParseXmlAttribute( *ele2 , "material" , "NULL" );
+		std::string celilingMaterial = ParseXmlAttribute( *secondElement , "material" , "NULL" );
 		m_ceilingMaterial = MapMaterial::GetDefinition( celilingMaterial );
 
 	}
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

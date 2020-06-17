@@ -12,7 +12,7 @@
 		<MapRow tiles="C.WWW..C"/>
 		<MapRow tiles="C.W,W..C"/>
 		<MapRow tiles="C.,,,..C"/>
-		<MapRow tiles="CCC..W.,"/>
+		<MapRow tiles="CCC..W.C"/>
 		<MapRow tiles="C......C"/>
 		<MapRow tiles="CCCCCCCC"/>
 	</MapRows>
@@ -21,3 +21,5 @@
 	</Entities>
 
 </MapDefinition>
+
+

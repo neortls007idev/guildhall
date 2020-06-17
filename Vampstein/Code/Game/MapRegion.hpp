@@ -1,35 +1,38 @@
 #pragma once
-#include "Engine/ThirdParty/tinyxml2.h"
+#include "Engine/Core/NamedStrings.hpp"
+#include "ThirdParty/TinyXML2/tinyxml2.h"
 #include <string>
 #include <map>
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 class MapMaterial;
 
-class MapRegionType
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+class MapRegion
 {
 public:
-	static void LoadDefinitions( char const* dataFilePath );
-	static MapRegionType const* GetDefinition( std::string const& name );
+	static void							LoadDefinitions( char const* regionDataFilePath );
+	static MapRegion const*				GetDefinition( std::string const& name );
 
-	bool IsSolid() const { return m_isSolid; };
-	MapMaterial* GetSideMaterial() const { return m_sideMaterial; };
-	MapMaterial* GetFloorMaterial() const { return m_floorMaterial; };
-	MapMaterial* GetCelingMaterial() const { return m_ceilingMaterial; };
-
-	
-
-	static std::map<std::string , MapRegionType*> s_regionTypes;
+	bool								IsSolid() const											{ return m_isSolid; }
+	MapMaterial*						GetSideMaterial() const									{ return m_sideMaterial; }
+	MapMaterial*						GetFloorMaterial() const								{ return m_floorMaterial; }
+	MapMaterial*						GetCelingMaterial() const								{ return m_ceilingMaterial; }
 
 private:
-	MapRegionType( tinyxml2::XMLElement* materialDef );
+	MapRegion( XMLElement* materialDefinition );
 
 private:
-	
-	std::string m_name;
-	bool m_isSolid = true;
-	MapMaterial* m_sideMaterial = nullptr;
-	MapMaterial* m_floorMaterial = nullptr;
-	MapMaterial* m_ceilingMaterial = nullptr;
+	std::string										m_name;
+	bool											m_isSolid							= true;
+	MapMaterial*									m_sideMaterial						= nullptr;
+	MapMaterial*									m_floorMaterial						= nullptr;
+	MapMaterial*									m_ceilingMaterial					= nullptr;
 
+public:
+	static std::map<std::string , MapRegion*>		s_mapRegions;
 };
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

@@ -6,7 +6,9 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/Texture.hpp"
 #include "Game/TileMap.hpp"
-#include "TheApp.hpp"
+#include "Game/TheApp.hpp"
+#include "Game/MapRegion.hpp"
+#include "Game/MapMaterial.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -41,11 +43,6 @@ void CreateEast_RightFace( std::vector< VertexMaster >& cubeMeshVerts , std::vec
 //--------------------------------------------------------------------------------------------------------------------------------------------
 RandomNumberGenerator rng;
 
-bool Tile::IsSolid()
-{
-	return m_isSolid;
-}
-
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 TileMap::TileMap( char const* mapName , IntVec2 dimensions ) :
@@ -55,6 +52,97 @@ TileMap::TileMap( char const* mapName , IntVec2 dimensions ) :
 	m_worldMesh = new GPUMesh( g_theRenderer );
 
 	PopulateTiles();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void TileMap::ParseLegend( XMLElement* legendElement )
+{
+	for( XMLElement* element = legendElement->FirstChildElement( "Tile" ); element != nullptr; element = element->NextSiblingElement( "Tile" ) )
+	{
+		const char* glyph = element->Attribute( "glyph" );
+		std::string regionName = ParseXmlAttribute( *element , "regionType" , "NULL" );
+
+		auto found = m_legendMap.find( *glyph );
+
+		if( found == m_legendMap.end() )
+		{
+			m_legendMap[ *glyph ] = regionName;
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void TileMap::ParseMapRows( XMLElement* rowElement )
+{
+	int numRows = 0;
+
+	for( XMLElement* element = rowElement->LastChildElement( "MapRow" ); element != nullptr; element = element->PreviousSiblingElement( "MapRow" ) )
+	{
+		std::string rowString = ParseXmlAttribute( *element , "tiles" , "NULL" );
+
+		if( rowString == "NULL" )
+		{
+			//error cant parse 
+		}
+
+		if( rowString.size() != m_dimensions.x )
+		{
+			//error not enough tiles
+		}
+
+		for( int mapRowIndex = 0; mapRowIndex < rowString.size(); mapRowIndex++ )
+		{
+			char rowCharacter = rowString[ mapRowIndex ];
+			auto region = m_legendMap.find( rowCharacter );
+			std::string regionName = "";
+
+			if( region != m_legendMap.end() )
+			{
+				regionName = region->second;
+			}
+
+			const MapRegion* mapRegion = MapRegion::GetDefinition( regionName );
+			m_tiles[ numRows ].m_region = mapRegion;
+			m_tiles[ numRows ].m_isSolid = mapRegion->IsSolid();
+			numRows++;
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC TileMap* TileMap::CreateTileMapFromXml( char const* mapName , char const* filepath )
+{
+	tinyxml2::XMLDocument mapDocument;
+	mapDocument.LoadFile( filepath );
+
+	tinyxml2::XMLElement* root = mapDocument.RootElement();
+
+	IntVec2 dimensions = ParseXmlAttribute( *root , "dimensions" , IntVec2( -1 , -1 ) );
+
+	if( dimensions == IntVec2( -1 , -1 ) )
+	{
+		//error 
+	}
+
+	TileMap* newTileMap = new TileMap( mapName , dimensions );
+
+	tinyxml2::XMLElement* legendElement = root->FirstChildElement( "Legend" );
+	tinyxml2::XMLElement* mapRowElement = root->FirstChildElement( "MapRows" );
+
+	if( legendElement != nullptr )
+	{
+		newTileMap->ParseLegend( legendElement );
+	}
+
+	if( mapRowElement != nullptr )
+	{
+		newTileMap->ParseMapRows( mapRowElement );
+	}
+
+	return newTileMap;
 
 }
 
@@ -75,31 +163,6 @@ void TileMap::PopulateTiles()
 			}
 			m_tiles.push_back( newTile );
 		}
-	}
-
-	SetOuterTilesToSolid();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void TileMap::SetOuterTilesToSolid()
-{
-	for( int horizontalIndex = 0; horizontalIndex < m_dimensions.x; horizontalIndex++ )
-	{
-		m_tiles[ horizontalIndex ].m_isSolid = true;
-	}
-	for( int verticalIndex = 1; verticalIndex < m_dimensions.y; verticalIndex++ )
-	{
-		int index = verticalIndex * m_dimensions.x ;
-		int index2 = index - 1;
-		m_tiles[ index2 ].m_isSolid = true;
-		m_tiles[ index ].m_isSolid = true;
-	}
-
-	for( int horizontalIndex = 0; horizontalIndex < m_dimensions.x; horizontalIndex++ )
-	{
-		int index = ( ( m_dimensions.y - 1 ) * m_dimensions.x ) + horizontalIndex;
-		m_tiles[ index ].m_isSolid = true;
 	}
 }
 
@@ -140,7 +203,9 @@ void TileMap::UpdateMeshes()
 void TileMap::Render() const
 {
 	
-	Texture* tex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Test_StbiFlippedAndOpenGL.png" );
+	//Texture* tex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Test_StbiFlippedAndOpenGL.png" );
+	Texture* tex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Terrain_8x8.png" );
+	
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( tex );
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
@@ -157,7 +222,13 @@ void TileMap::AddVertsForTile( std::vector< VertexMaster >& destinationVerts , s
 	
 	if ( tile->IsSolid() )
 	{
-		AddVertsForSolidTile( destinationVerts , destinationIndices , tileIndex );
+		Vec2 minUVs;
+		Vec2 maxUVs;
+		
+		const MapRegion* sideRegion = tile->m_region;
+		sideRegion->GetSideMaterial()->GetUVCoords( minUVs , maxUVs );
+		
+		AddVertsForSolidTile( destinationVerts , destinationIndices , tileIndex , minUVs , maxUVs );
 	}
 	else
 	{
@@ -167,13 +238,14 @@ void TileMap::AddVertsForTile( std::vector< VertexMaster >& destinationVerts , s
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void TileMap::AddVertsForSolidTile( std::vector< VertexMaster >& destinationVerts , std::vector< uint >& destinationIndices , int tileIndex )
+void TileMap::AddVertsForSolidTile ( std::vector< VertexMaster >& destinationVerts ,
+                                     std::vector< uint >& destinationIndices , int tileIndex ,
+                                     Vec2 minUVs /*= Vec2::ZERO*/ , Vec2 maxUvs /*= Vec2::ONE*/ )
 {
 	AABB3 bounds = GetTileBounds( tileIndex );
-	//m_tiles[ tileIndex ].m_bounds = bounds;
+
 	std::vector< VertexMaster >		tileMeshVerts;
 	std::vector< uint >				tileMeshIndices;
-	bool result = false;
 
 	IntVec2 currTileCoords	= GetTileCoordsForIndex( tileIndex );
 	IntVec2 northTileCoords( -1 , 0 );
@@ -181,17 +253,13 @@ void TileMap::AddVertsForSolidTile( std::vector< VertexMaster >& destinationVert
 	IntVec2 eastTileCoords( 0 , -1 );
 	IntVec2 westTileCoords( 0 , 1 );
 
-	//Tile* northTile = GetTileAtCoords( currTileCoords + northTileCoords );
-	//if ( northTile == nullptr )
+
 	if ( !IsTileSolid( currTileCoords + northTileCoords ) )
 	{
-	//	int newindex = GetIndexForTileCoords( currTileCoords + northTileCoords );
-	//	AABB3 bounds = GetTileBounds( newindex );
-		CreateNorth_FrontFace( tileMeshVerts , tileMeshIndices , bounds , WHITE , Vec2::ZERO , Vec2::ONE );
+		CreateNorth_FrontFace( tileMeshVerts , tileMeshIndices , bounds , WHITE , minUVs , maxUvs );
 
 		AppendIndexedVerts( tileMeshVerts , tileMeshIndices ,
 							destinationVerts , destinationIndices );
-		result = true;
 	}
 
 	tileMeshVerts.clear();
@@ -199,43 +267,31 @@ void TileMap::AddVertsForSolidTile( std::vector< VertexMaster >& destinationVert
 
 	if( !IsTileSolid( currTileCoords + southTileCoords ) )
 	{
-	//	int newindex = GetIndexForTileCoords( currTileCoords + southTileCoords );
-	//	AABB3 bounds = GetTileBounds( newindex );
-		CreateSouth_BackFace( tileMeshVerts , tileMeshIndices , bounds , WHITE , Vec2::ZERO , Vec2::ONE );
+		CreateSouth_BackFace( tileMeshVerts , tileMeshIndices , bounds , WHITE , minUVs , maxUvs );
 		
 		AppendIndexedVerts( tileMeshVerts , tileMeshIndices ,
 							destinationVerts , destinationIndices );
-
-		result = true;
 	}
 		tileMeshVerts.clear();
 		tileMeshIndices.clear();
 
 	if( !IsTileSolid( currTileCoords + eastTileCoords ) )
 	{
-	//	int newindex = GetIndexForTileCoords( currTileCoords + eastTileCoords );
-	//	AABB3 bounds = GetTileBounds( newindex );
-		CreateEast_RightFace( tileMeshVerts , tileMeshIndices , bounds , WHITE , Vec2::ZERO , Vec2::ONE );
+		CreateEast_RightFace( tileMeshVerts , tileMeshIndices , bounds , WHITE , minUVs , maxUvs );
 
 		AppendIndexedVerts( tileMeshVerts , tileMeshIndices ,
 							destinationVerts , destinationIndices );
-		result = true;
 	}
 		tileMeshVerts.clear();
 		tileMeshIndices.clear();
 	
 	if( !IsTileSolid( currTileCoords + westTileCoords ) )
 	{
-	//	int newindex = GetIndexForTileCoords( currTileCoords + westTileCoords );
-	//	AABB3 bounds = GetTileBounds( newindex );
-		CreateWest_LeftFace( tileMeshVerts , tileMeshIndices , bounds , WHITE , Vec2::ZERO , Vec2::ONE );
+		CreateWest_LeftFace( tileMeshVerts , tileMeshIndices , bounds , WHITE , minUVs , maxUvs );
 
 		AppendIndexedVerts( tileMeshVerts , tileMeshIndices ,
 							destinationVerts , destinationIndices );
-		result = true;
 	}
-
-	//return result;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -246,15 +302,31 @@ void TileMap::AddVertsForNonSolidTile( std::vector< VertexMaster >& destinationV
 	//m_tiles[ tileIndex ].m_bounds = bounds;
 	std::vector< VertexMaster >		tileMeshVerts;
 	std::vector< uint >				tileMeshIndices;
-	CreateTopFace( tileMeshVerts , tileMeshIndices , bounds , WHITE , Vec2::ZERO , Vec2::ONE );
+
+	IntVec2 curTileCoords	= GetTileCoordsForIndex( tileIndex );
+	Tile* tile				= GetTileAtCoords( curTileCoords );
+
+	Vec2 ceilingMinUVS;
+	Vec2 ceilingMaxUVS;
+
+	const MapRegion* ceilingRegion = tile->m_region;
+	ceilingRegion->GetCelingMaterial()->GetUVCoords( ceilingMinUVS , ceilingMaxUVS );
+	
+	CreateTopFace( tileMeshVerts , tileMeshIndices , bounds , WHITE , ceilingMinUVS , ceilingMaxUVS );
 
 	AppendIndexedVerts( tileMeshVerts , tileMeshIndices ,
 						destinationVerts , destinationIndices );
 	
 	tileMeshVerts.clear();
 	tileMeshIndices.clear();
+
+	Vec2 floorMinUVS;
+	Vec2 floorMaxUVS;
+
+	const MapRegion* floorRegion = tile->m_region;
+	floorRegion->GetFloorMaterial()->GetUVCoords( floorMinUVS , floorMaxUVS );
 	
-	CreateBottomFace( tileMeshVerts , tileMeshIndices , bounds , WHITE , Vec2::ZERO , Vec2::ONE );
+	CreateBottomFace( tileMeshVerts , tileMeshIndices , bounds , WHITE , floorMinUVS , floorMaxUVS );
 
 	AppendIndexedVerts( tileMeshVerts , tileMeshIndices ,
 						destinationVerts , destinationIndices );
