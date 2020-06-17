@@ -19,7 +19,7 @@ public:
 	void Render() const;
 
 	void EndFrame();
-		
+			
 private :
 	bool				m_isSloMo				= false;
 	bool				m_isSpeedMo				= false;

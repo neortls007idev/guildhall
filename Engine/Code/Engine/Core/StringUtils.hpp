@@ -63,8 +63,9 @@ std::string			StringConvertToValue( const char* text , const char* defaultValue 
 Strings				StringConvertToValue( const char* text , const Strings& defaultValues );
 std::vector<int>	StringConvertToValue( const char* text , const std::vector<int>& defaultValue );
 
-FloatRange		 ParseXmlAttributeFloatRangefromIntRange( const char* text , IntRange defaultValue );
+FloatRange			ParseXmlAttributeFloatRangefromIntRange( const char* text , IntRange defaultValue );
+std::string			GetAsSingleString( Strings strings );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Strings GetFileNamesInfolder( const std::string& folderpath , const char* filePattern );
+Strings				GetFileNamesInfolder( const std::string& folderpath , const char* filePattern );

@@ -29,7 +29,12 @@ extern RenderContext*	g_theRenderer;
 extern TheApp*			g_theApp;
 extern DevConsole*		g_theDevConsole;
 
-bool   s_wasDataLoaded = false;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC	World*				Game::s_world;
+STATIC SoundPlaybackID		Game::m_sounds[ NUM_GAME_SOUNDS ];
+		bool				s_wasDataLoaded = false;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -37,11 +42,14 @@ Game::Game()
 {
 	g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
 	
+	m_pointSampler = g_theRenderer->GetOrCreateSampler( SAMPLER_POINT );
+
 	if ( !s_wasDataLoaded )
 	{
 		LoadShaders();
 		LoadTextures();
 		LoadAudio();
+		AddDevConsoleCommands( g_theDevConsole );
 	}
 	
 	InitializeCameras();
@@ -65,11 +73,29 @@ Game::Game()
 	MapMaterial::LoadDefinitions( "Data/Definitions/MapMaterialTypes.xml" );
 	MapRegion::LoadDefinitions( "Data/Definitions/MapRegionTypes.xml" );
 			
-	//m_testMap = new TileMap( "Test" , IntVec2( 5 , 5 ) );
-	m_testMap =	TileMap::CreateTileMapFromXml( "TestXMLMap" , "Data/Maps/TestRoom.xml" );
-	m_pointSampler = g_theRenderer->GetOrCreateSampler( SAMPLER_POINT );
 
-	m_world = new World( this , "TheWorld" , "Data/Maps" );
+	s_world = new World( this , "TheWorld" , "Data/Maps" );
+
+	std::string startMap = g_gameConfigBlackboard.GetValue( "startMap" , "Invalid Value" );
+	
+	if( startMap == "Invalid Value" )
+	{
+		g_theDevConsole->PrintString( startMap , eDevConsoleMessageType::DEVCONSOLE_ERROR );
+	}
+	else 
+	{
+		s_world->m_currentMap = s_world->GetMapByName( startMap );
+
+		if( nullptr == s_world->m_currentMap )
+		{
+			g_theDevConsole->PrintString( startMap , eDevConsoleMessageType::DEVCONSOLE_ERROR );
+		}
+		else
+		{
+			g_theDevConsole->PrintString( startMap , eDevConsoleMessageType::DEVCONSOLE_SYTEMLOG );
+			g_theAudioSystem->PlaySound( m_sounds[ TELEPORTER ] );
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -187,8 +213,8 @@ Game::~Game()
 	m_pointSampler		= nullptr;
 	m_imageEffectShader = nullptr;
 
-	delete m_testMap;
-	m_testMap			= nullptr;
+	delete s_world;
+	s_world				= nullptr;
 
 	for ( size_t index = 0; index < NUM_TOTAL_GAME_TEX ; index++ )
 	{
@@ -246,7 +272,7 @@ void Game::Update( float deltaSeconds )
 	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1.00f ) , Vec2::ONE , 20.f , PURPLE , deltaSeconds ,
 						 "( ms/frame ) FPS = %.0f" , m_fps );
 
-	m_testMap->UpdateMeshes();
+	s_world->m_currentMap->UpdateMeshes();
 	
 	UpdateFromKeyBoard( deltaSeconds );
 	
@@ -313,7 +339,7 @@ void Game::Render() const
 	g_theRenderer->BindTexture( m_textures[ TEST_TEXTURE ] );
 	g_theRenderer->BindSampler( m_pointSampler );
 	
-	m_testMap->Render();
+	s_world->m_currentMap->Render();
 			
 	if ( m_debugDraw )
 	{
@@ -514,6 +540,58 @@ void Game::UpdateFromTestCodeKeyBoard( float deltaSeconds )
 			m_pointSampler = g_theRenderer->GetOrCreateSampler( SAMPLER_BILINEAR );
 		}
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::AddDevConsoleCommands( DevConsole* devConsole )
+{
+	EventArgs consoleArgs;
+	devConsole->CreateCommand( "map" , "map <mapName>" , consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "map" , GameMapCommand );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Game::GameMapCommand( EventArgs& args )
+{
+	size_t		numMaps		= s_world->GetNumMaps();
+	Strings		allMapNames = s_world->GetAllMapNames();
+	
+	if ( args.GetKeyValuePairSize() == 0 )
+	{
+		g_theDevConsole->PrintString( DEVCONSOLE_USERERROR , "ERROR: Map command misuse; usage is: map <mapName>" );
+		g_theDevConsole->PrintString( ORANGE , DEVCONSOLE_USERLOG , "There are currently %u Valid Maps:" , numMaps );
+		for ( size_t index = 0 ; index < allMapNames.size() ; index++  )
+		{
+			g_theDevConsole->PrintString( ORANGE , DEVCONSOLE_USERLOG , "%s" , allMapNames[ index ].c_str() );
+		}
+	}
+	else
+	{
+		Strings functionArgs = args.GetAllKeysOnly();
+		std::string mapName = GetAsSingleString( functionArgs );
+		Map* newMap = s_world->GetMapByName( mapName );
+		
+		if ( nullptr == newMap )
+		{
+			std::string quote = R"(")" ;
+			g_theDevConsole->PrintString( DEVCONSOLE_USERERROR , "ERROR: No Such Map %s%s%s :", quote.c_str() , mapName.c_str() , quote.c_str()  );
+			g_theDevConsole->PrintString( ORANGE , DEVCONSOLE_USERLOG , "There are currently %u Valid Maps:" , numMaps );
+			for( size_t index = 0 ; index < allMapNames.size() ; index++ )
+			{
+				g_theDevConsole->PrintString( ORANGE , DEVCONSOLE_USERLOG , "%s" , allMapNames[ index ].c_str() );
+			}
+		}
+		else
+		{
+			s_world->m_currentMap = newMap;
+			g_theDevConsole->ToggleVisibility();
+			g_theAudioSystem->PlaySound( m_sounds[ TELEPORTER ] );
+		}
+	}
+
+	return false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

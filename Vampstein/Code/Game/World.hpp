@@ -1,6 +1,9 @@
 ﻿#pragma once
+#include <map>
 #include <string>
 #include <vector>
+
+#include "Engine/Core/NamedStrings.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -15,16 +18,21 @@ public:
 	World( Game* owner , char const* name , char const* mapsFolderPath );
 	~World();
 
-	void CreateMaps( char const* mapsFolderPath );
-	void Update();
-	void Render() const;
-
+	void	CreateMaps( std::string mapsFolderPath );
+	void	Update();
+	void	Render() const;
+	
+	Map*	GetMapByName( std::string mapName );
+	size_t	GetNumMaps() const															{ return m_maps.size(); }
+	Strings	GetAllMapNames() const;
+	
 public:
 	Game*								m_owner							= nullptr;
 	Map* 								m_currentMap					= nullptr;
-	std::string							m_name;
-	std::vector< Map* >					m_maps;
 	
+private:
+	std::string							m_name;
+	std::map< std::string ,  Map* >		m_maps;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

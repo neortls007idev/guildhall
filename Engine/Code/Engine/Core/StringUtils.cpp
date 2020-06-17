@@ -315,6 +315,19 @@ float StringConvertToValue( const char* text , float defaultValue )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+std::string GetAsSingleString( Strings strings )
+{
+	std::string data;
+	
+	for ( size_t index = 0 ; index < strings.size() ; index++  )
+	{
+		data += strings[ index ];
+	}
+	return data;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Strings GetFileNamesInfolder( const std::string& folderpath , const char* filePattern )
 {
 	Strings fileNamesInFolder;

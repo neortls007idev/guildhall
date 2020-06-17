@@ -73,6 +73,12 @@ private:
 			void CameraPositionUpdateOnInput( float deltaSeconds );
 			void UpdateFromTestCodeKeyBoard( float deltaSeconds );
 
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//			GAME DEVCONSOLE COMMANDS
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+			void AddDevConsoleCommands( DevConsole* devConsole );
+	static	bool GameMapCommand( EventArgs& args );
+
 private:
 
 	int							m_controllerID										= -1;
@@ -106,17 +112,16 @@ public:
 
 	Sampler*					m_pointSampler										= nullptr;
 	Texture*					m_textures[ NUM_TOTAL_GAME_TEX ];
-	SoundPlaybackID				m_sounds[ NUM_GAME_SOUNDS ];
+	static SoundPlaybackID		m_sounds[ NUM_GAME_SOUNDS ];
 	RandomNumberGenerator		m_rng;
 	
 	eDebugRenderMode			m_debugRenderMode									= DEBUG_RENDER_ALWAYS;
 
-	World*						m_world												= nullptr;
+	static World*				s_world;
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	//			TEST CODE
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	
-	TileMap*					m_testMap											= nullptr;
 	bool						m_isSamplerEnabled									= false;
 };

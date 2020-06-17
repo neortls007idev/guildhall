@@ -246,6 +246,34 @@ Vec3 NamedStrings::GetValue( const std::string& keyName , const Vec3& defaultVal
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Strings NamedStrings::GetAllKeysOnly()
+{
+	Strings keys;
+
+	for( auto it = m_keyValuePairs.begin(); it != m_keyValuePairs.end(); ++it )
+	{
+		keys.push_back( it->first );
+	}
+	
+	return keys;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Strings NamedStrings::GetAllValuesOnly()
+{
+	Strings values;
+
+	for( auto it = m_keyValuePairs.begin(); it != m_keyValuePairs.end(); ++it )
+	{
+		values.push_back( it->first );
+	}
+
+	return values;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void NamedStrings::SetValue( const std::string& keyName , const std::string& newValue )
 {
 	if ( m_keyValuePairs.find( keyName ) == m_keyValuePairs.end() )

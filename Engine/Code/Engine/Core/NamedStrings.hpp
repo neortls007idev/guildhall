@@ -6,7 +6,7 @@
 #include "Engine/Math/IntVec2.hpp"
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Math/Vec3.hpp"
-
+#include "Engine/Core/StringUtils.hpp"
 #include "ThirdParty/TinyXML2/tinyxml2.h"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -37,7 +37,9 @@ public:
 	//FloatRange		GetValue( const std::string& keyName , const FloatRange& defaultValue ) const;
 	//IntRange		GetValue( const std::string& keyName , const IntRange& defaultValue ) const;
 
-
+	size_t			GetKeyValuePairSize()															{ return m_keyValuePairs.size(); }
+	Strings			GetAllKeysOnly();
+	Strings			GetAllValuesOnly();
 private:
 
 

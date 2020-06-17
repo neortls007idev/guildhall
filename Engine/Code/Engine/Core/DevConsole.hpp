@@ -15,6 +15,7 @@ enum eDevConsoleMessageType
 	DEVCONSOLE_WARNING,
 	DEVCONSOLE_SYTEMLOG,
 	DEVCONSOLE_USERLOG ,
+	DEVCONSOLE_USERERROR,
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -64,6 +65,10 @@ public:
 								eDevConsoleMessageType messageType= DEVCONSOLE_USERINPUT );
 
 	static void PrintString( const std::string& devConsolePrintString = "INVALID STRING" , eDevConsoleMessageType messageType= DEVCONSOLE_USERINPUT );
+
+	static void PrintString( eDevConsoleMessageType messageType , char const* format , ... );
+
+	static void PrintString( const Rgba8& textColor , eDevConsoleMessageType messageType , char const* format , ... );
 
 	void ProcessInput();
 	void OnKeyPress( char character );

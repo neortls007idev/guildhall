@@ -134,9 +134,9 @@ void DevConsole::PrintString( const Rgba8& textColor , const std::string& devCon
 	newLineText.messageType = messageType;
 	m_consoleText.push_back( newLineText );
 
-	if ( DEVCONSOLE_ERROR == messageType )
+	if ( ( DEVCONSOLE_USERERROR == messageType ) || ( DEVCONSOLE_ERROR  == messageType ) )
 	{
-		ToggleVisibility();
+		//ToggleVisibility();
 		SetIsOpen( true );
 	}
 }
@@ -151,21 +151,52 @@ void DevConsole::PrintString( const std::string& devConsolePrintString /*= "INVA
 
 	switch (messageType)
 	{
-	case DEVCONSOLE_ERROR:			newLineText.lineColor = RED;
-									ToggleVisibility();
-									SetIsOpen( true );
-									break;
-	case DEVCONSOLE_USERLOG:		newLineText.lineColor = PURPLE;
-									break;
-	case DEVCONSOLE_USERINPUT:		newLineText.lineColor = GREEN;
-									break;
-	case DEVCONSOLE_WARNING:		newLineText.lineColor = YELLOW;
-									break;
-	case DEVCONSOLE_SYTEMLOG:		newLineText.lineColor = CYAN;
-		break;
+		case DEVCONSOLE_ERROR:			newLineText.lineColor = RED;
+										//ToggleVisibility();
+										SetIsOpen( true );
+										break;
+		
+		case DEVCONSOLE_USERLOG:		newLineText.lineColor = PURPLE;
+										break;
+		
+		case DEVCONSOLE_USERINPUT:		newLineText.lineColor = GREEN;
+										break;
+		
+		case DEVCONSOLE_WARNING:		newLineText.lineColor = YELLOW;
+										break;
+		
+		case DEVCONSOLE_SYTEMLOG:		newLineText.lineColor = CYAN;
+										break;
+		
+		case DEVCONSOLE_USERERROR:		newLineText.lineColor = RED;
+										//ToggleVisibility();
+										SetIsOpen( true );
+										break;
 	}
 
 	m_consoleText.push_back( newLineText );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC void DevConsole::PrintString( const Rgba8& textColor , eDevConsoleMessageType messageType , char const* format , ... )
+{
+	va_list args;
+	va_start( args , format );
+	std::string message = Stringv( format , args );
+
+	PrintString( textColor , message , messageType );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC void DevConsole::PrintString( eDevConsoleMessageType messageType , char const* format , ... )
+{
+	va_list args;
+	va_start( args , format );
+	std::string message = Stringv( format , args );
+
+	PrintString( message , messageType );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -320,6 +351,11 @@ void DevConsole::ProcessCommand()
 	for ( size_t argsIndex = 0 ; argsIndex < args.size() ; argsIndex++ )
 	{
 		Strings argValuePair = SplitStringOnceAtGivenDelimiter( args[ argsIndex ] , '=' );
+
+		if( argValuePair.size() == 1 )
+		{
+			currentCommandArgs.SetValue( argValuePair[ 0 ] , argValuePair[ 0 ] );
+		}
 		
 		if ( argValuePair.size() == 2 )
 		{
@@ -338,7 +374,7 @@ void DevConsole::ProcessCommand()
 	
 	if ( !commandFireResult )
 	{
-		PrintString( RED , "Invalid Console Command :- Use \"help\" command  ", DEVCONSOLE_ERROR );
+		PrintString( RED , "Invalid Console Command :- Use \"help\" command  ", DEVCONSOLE_USERERROR );
 	}
 	
 	m_currentText = "";
@@ -435,7 +471,7 @@ STATIC void DevConsole::ToggleVisibility()
 	EventArgs temp;
 	ClearConsoleMessagesOfType( temp ,DEVCONSOLE_USERINPUT );
 	ClearConsoleMessagesOfType( temp ,DEVCONSOLE_USERLOG );
-	ClearConsoleMessagesOfType( temp ,DEVCONSOLE_USERLOG );
+	ClearConsoleMessagesOfType( temp ,DEVCONSOLE_USERERROR );
 
 	m_isConsoleOpen = !m_isConsoleOpen;
 
