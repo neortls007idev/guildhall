@@ -405,14 +405,9 @@ AABB2 AABB2::CarveBoxOffBottom( float fractionOfHeight , float additionalHeight 
 
 AABB2 AABB2::GetBoxAtBottom( float fractionOfHeight , float additionalHeight )
 {
-	//float height = m_maxs.y - m_mins.y;
-	//float carveHeight = ( fractionOfHeight * height ) + additionalHeight;
-	//return AABB2( m_mins.x , m_mins.y , m_maxs.x , m_maxs.y - carveHeight );
-	Vec2 dimensions = GetDimensions();
-	Vec2 min = m_mins;
-	Vec2 max = Vec2( m_maxs.x , m_mins.y + ( fractionOfHeight * dimensions.y ) + additionalHeight );
-	AABB2 newAAbb = AABB2( min , max );
-	return newAAbb;
+	float height = m_maxs.y - m_mins.y;
+	float carveHeight = ( fractionOfHeight * height ) + additionalHeight;
+	return AABB2( m_mins.x , m_mins.y , m_maxs.x , m_maxs.y - carveHeight );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
