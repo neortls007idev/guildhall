@@ -120,6 +120,7 @@ public:
 	float						m_yaw												= 0.f;
 	
 	bool						m_debugDraw											= false;
+	static bool					m_hasMapChanged;
 
 	Shader*						m_imageEffectShader									= nullptr;
 

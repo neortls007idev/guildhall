@@ -6,6 +6,8 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/Texture.hpp"
 #include "Game/TileMap.hpp"
+
+#include "Engine/Core/DevConsole.hpp"
 #include "Game/TheApp.hpp"
 #include "Game/MapRegion.hpp"
 #include "Game/MapMaterial.hpp"
@@ -65,9 +67,14 @@ TileMap::TileMap( char const* mapName , XMLElement* rootElement ) :
 
 	if( m_dimensions == IntVec2( -1 , -1 ) )
 	{
-		//error 
+		g_theDevConsole->PrintString( eDevConsoleMessageType::DEVCONSOLE_ERROR ,
+									  "ERROR: MAP: %s has INVALID dimensions )" );
 	}
-
+	else
+	{
+		g_theDevConsole->PrintString( eDevConsoleMessageType::DEVCONSOLE_SYTEMLOG ,
+									  "LOG: MAP: %s has %d rows , %d columns" , mapName , m_dimensions.x , m_dimensions.y );
+	}
 	PopulateTiles();
 	
 	XMLElement* legendElement = root->FirstChildElement( "Legend" );
@@ -86,6 +93,37 @@ TileMap::TileMap( char const* mapName , XMLElement* rootElement ) :
 	}
 	
 	m_worldMesh = new GPUMesh( g_theRenderer );
+
+	XMLElement* entityElement = rootElement->FirstChildElement( "Entities" );
+	tinyxml2::XMLElement* playerStart = entityElement->FirstChildElement( "PlayerStart" );
+
+	if( playerStart != nullptr )
+	{
+		Vec2 pos = ParseXmlAttribute( *playerStart , "pos" , Vec2::ZERO );
+		m_playerStartPos = Vec3( pos , 0.65f );
+
+		if( m_playerStartPos.GetLengthSquared() < 0.1f )
+		{
+			g_theDevConsole->PrintString( eDevConsoleMessageType::DEVCONSOLE_WARNING ,
+										  "WARNING: MAP: %s has Player start position - 0 , 0 , 0 )" , mapName );
+		}
+
+		float startYaw = ParseXmlAttribute( *playerStart , "yaw" , -1.f );
+		m_playerStartYawDegrees = startYaw;
+
+		if( startYaw <= -0.98f && startYaw >= -1.01 )
+		{
+			g_theDevConsole->PrintString( eDevConsoleMessageType::DEVCONSOLE_WARNING ,
+										  "WARNING: MAP: %s has Player start yaw = %.2f )" , mapName , startYaw );
+		}
+		else
+		{
+			g_theDevConsole->PrintString( eDevConsoleMessageType::DEVCONSOLE_SYTEMLOG ,
+										  "WARNING: MAP: %s has Player start yaw = %.2f )" , mapName , startYaw );
+		}
+		
+	}
+	m_parsedSuccessfully = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -101,6 +139,11 @@ void TileMap::ParseLegend( XMLElement* legendElement , std::map<char , std::stri
 		if( found == legendMap.end() )
 		{
 			legendMap[ *glyph ] = regionName;
+		}
+		else
+		{
+			g_theDevConsole->PrintString( eDevConsoleMessageType::DEVCONSOLE_ERROR ,
+										  "ERROR: GLYPH : %c Was not found" , glyph );
 		}
 	}
 }

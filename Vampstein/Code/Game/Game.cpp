@@ -33,6 +33,9 @@ extern DevConsole*		g_theDevConsole;
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 STATIC	World*				Game::s_world;
+
+bool Game::m_hasMapChanged;
+
 STATIC SoundPlaybackID		Game::m_sounds[ NUM_GAME_SOUNDS ];
 		bool				s_wasDataLoaded = false;
 
@@ -111,6 +114,11 @@ Game::Game()
 					m_validation[ CURRENT_MAP ] = true;
 					g_theDevConsole->PrintString( eDevConsoleMessageType::DEVCONSOLE_SYTEMLOG ,
 					                              "MAP: %s Loaded Successfully" , startMap.c_str() );
+					
+					m_gameCamera.SetPosition( s_world->m_currentMap->m_playerStartPos );
+					m_gameCamera.SetPitchYawRollRotation( 200.f , s_world->m_currentMap->m_playerStartYawDegrees , 0.f );
+					m_yaw = s_world->m_currentMap->m_playerStartYawDegrees;
+					
 					g_theAudioSystem->PlaySound( m_sounds[ TELEPORTER ] );
 				}
 			}
@@ -269,7 +277,6 @@ void Game::InitializeCameras()
 		m_gameCamera.SetWorldCoordinateSystem( X_IN_Y_LEFT_Z_UP );
 		m_gameCamera.SetProjectionPerspective( 40.f , CLIENT_ASPECT , -.09f , -100.f );
 		m_gameCamera.SetPosition( Vec3( 1.f , 1.f , 1.f ) );
-		m_gameCamera.SetPosition( Vec3( -10.f , 1.f , 1.f ) );
 		m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
@@ -299,12 +306,20 @@ void Game::Update( float deltaSeconds )
 
 	m_fps = 1.f / deltaSeconds;
 	
-	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1.00f ) , Vec2::ONE , 20.f , PURPLE , deltaSeconds ,
+	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1.00f ) , Vec2::ONE , 20.f , PURPLE , deltaSeconds * 0.5f ,
 						 "( ms/frame ) FPS = %.0f" , m_fps );
 
 	if( m_validation[ CURRENT_MAP ] )
 	{
 		s_world->m_currentMap->UpdateMeshes();
+	}
+
+	if ( m_hasMapChanged )
+	{
+		m_gameCamera.SetPosition( s_world->m_currentMap->m_playerStartPos );
+		m_gameCamera.SetPitchYawRollRotation( 200.f , s_world->m_currentMap->m_playerStartYawDegrees , 0.f );
+		m_yaw = s_world->m_currentMap->m_playerStartYawDegrees;
+		m_hasMapChanged = false;
 	}
 	
 	UpdateFromKeyBoard( deltaSeconds );
@@ -624,6 +639,7 @@ bool Game::GameMapCommand( EventArgs& args )
 		{
 			s_world->m_currentMap = newMap;
 			g_theDevConsole->ToggleVisibility();
+			m_hasMapChanged = true;
 			g_theAudioSystem->PlaySound( m_sounds[ TELEPORTER ] );
 		}
 	}

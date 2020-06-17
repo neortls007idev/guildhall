@@ -20,9 +20,9 @@ public:
 
 public:
 	std::string		m_name;
-	Vec3			m_playerStartPos = Vec3( 1.5f , 1.5f , 0.65f );
-	float			m_playerstartYawDegrees = 0.f;
-
+	Vec3			m_playerStartPos;
+	float			m_playerStartYawDegrees;
+	bool			m_parsedSuccessfully;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

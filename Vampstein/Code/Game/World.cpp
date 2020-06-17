@@ -37,13 +37,21 @@ void World::CreateMaps( std::string mapsFolderPath )
 
 		if( nullptr == mapRoot )
 		{
-			// ERROR
+			g_theDevConsole->PrintString( eDevConsoleMessageType::DEVCONSOLE_ERROR ,
+										  "ERROR: MAP Root Element in file %s is invalid; Not Parsing this Map" , mapFilePath.c_str() );
 			continue;
 		}
 		
 		std::string mapType = ParseXmlAttribute( *mapRoot , "type" , "NULL" );
 		Map* temp =  Map::CreateNewMapOfType( mapType , mapFileNames[ index ].c_str() , mapRoot );
 
+		if( nullptr == temp )
+		{
+			g_theDevConsole->PrintString( eDevConsoleMessageType::DEVCONSOLE_ERROR ,
+										  "ERROR: MAP file %s is ill formed; Parsing this Map Failed" , mapFilePath.c_str() );
+			continue;
+		}
+		
 		if ( nullptr != temp )
 		{
 			m_maps[ mapFileNames[ index ] ] = temp;

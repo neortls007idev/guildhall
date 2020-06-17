@@ -401,6 +401,12 @@
     <Xml Include="..\..\Run\Data\Materials\testMaterial.xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Run\TaskList\C29 SDST A2 - Doomenstein Foundation.docx">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
     <None Include="..\..\Run\TaskList\C29 SDST Doomenstein Notes.docx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>

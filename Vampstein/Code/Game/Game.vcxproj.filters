@@ -177,5 +177,8 @@
     <None Include="..\..\Run\TaskList\C29 SDST Doomenstein Notes.docx">
       <Filter>Plan</Filter>
     </None>
+    <None Include="..\..\Run\TaskList\C29 SDST A2 - Doomenstein Foundation.docx">
+      <Filter>Plan</Filter>
+    </None>
   </ItemGroup>
 </Project>
