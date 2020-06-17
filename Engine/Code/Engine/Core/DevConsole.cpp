@@ -152,7 +152,8 @@ void DevConsole::PrintString( const std::string& devConsolePrintString /*= "INVA
 	switch (messageType)
 	{
 		case DEVCONSOLE_ERROR:			newLineText.lineColor = RED;
-										//ToggleVisibility();
+										ToggleVisibility();
+										ToggleVisibility();
 										SetIsOpen( true );
 										break;
 		
@@ -169,7 +170,8 @@ void DevConsole::PrintString( const std::string& devConsolePrintString /*= "INVA
 										break;
 		
 		case DEVCONSOLE_USERERROR:		newLineText.lineColor = RED;
-										//ToggleVisibility();
+										ToggleVisibility();
+										ToggleVisibility();
 										SetIsOpen( true );
 										break;
 	}

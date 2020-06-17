@@ -13,7 +13,7 @@ class MapMaterial;
 class MapRegion
 {
 public:
-	static void							LoadDefinitions( char const* regionDataFilePath );
+	static bool							LoadDefinitions( char const* regionDataFilePath );
 	static MapRegion const*				GetDefinition( std::string const& name );
 
 	bool								IsSolid() const											{ return m_isSolid; }

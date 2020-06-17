@@ -70,31 +70,61 @@ Game::Game()
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	//			WORLD/MAP CONSTRUCTION
 	//--------------------------------------------------------------------------------------------------------------------------------------------
-	MapMaterial::LoadDefinitions( "Data/Definitions/MapMaterialTypes.xml" );
-	MapRegion::LoadDefinitions( "Data/Definitions/MapRegionTypes.xml" );
-			
+	m_validation[ MAP_MATERIALS ] = MapMaterial::LoadDefinitions( "Data/Definitions/MapMaterialTypes.xml" );
 
-	s_world = new World( this , "TheWorld" , "Data/Maps" );
-
-	std::string startMap = g_gameConfigBlackboard.GetValue( "startMap" , "Invalid Value" );
-	
-	if( startMap == "Invalid Value" )
+	if ( m_validation[ MAP_MATERIALS ] )
 	{
-		g_theDevConsole->PrintString( startMap , eDevConsoleMessageType::DEVCONSOLE_ERROR );
-	}
-	else 
-	{
-		s_world->m_currentMap = s_world->GetMapByName( startMap );
+		m_validation[ MAP_REGIONS ]	  =	MapRegion::LoadDefinitions( "Data/Definitions/MapRegionTypes.xml" );
 
-		if( nullptr == s_world->m_currentMap )
+		if ( m_validation[ MAP_REGIONS ] )
 		{
-			g_theDevConsole->PrintString( startMap , eDevConsoleMessageType::DEVCONSOLE_ERROR );
+			s_world = new World( this , "TheWorld" , "Data/Maps" );
+
+			if ( s_world->GetNumMaps() > 0 )
+			{
+				m_validation[ WORLD ] = true;
+			}
+
+			if( m_validation[ WORLD ] )
+			{
+				std::string startMap = g_gameConfigBlackboard.GetValue( "startMap" , "Invalid Value" );
+
+				s_world->m_currentMap = s_world->GetMapByName( startMap );
+
+				if( nullptr == s_world->m_currentMap )
+				{
+					g_theDevConsole->PrintString( eDevConsoleMessageType::DEVCONSOLE_ERROR ,
+					                              "ERROR: startMap: %s specified in game Config is not present" ,
+					                              startMap.c_str() );
+
+					if( s_world->GetNumMaps() != 0 )
+					{
+						s_world->m_currentMap = s_world->GetFirstMap();
+						m_validation[ CURRENT_MAP ] = true;
+						g_theDevConsole->PrintString( eDevConsoleMessageType::DEVCONSOLE_WARNING ,
+													  "WARNING:( Using Map: %s as Fallback )" , s_world->m_currentMap->m_name.c_str() );
+						g_theAudioSystem->PlaySound( m_sounds[ TELEPORTER ] );
+					}
+				}
+				else
+				{
+					m_validation[ CURRENT_MAP ] = true;
+					g_theDevConsole->PrintString( eDevConsoleMessageType::DEVCONSOLE_SYTEMLOG ,
+					                              "MAP: %s Loaded Successfully" , startMap.c_str() );
+					g_theAudioSystem->PlaySound( m_sounds[ TELEPORTER ] );
+				}
+			}
 		}
 		else
 		{
-			g_theDevConsole->PrintString( startMap , eDevConsoleMessageType::DEVCONSOLE_SYTEMLOG );
-			g_theAudioSystem->PlaySound( m_sounds[ TELEPORTER ] );
+			g_theDevConsole->PrintString( DEVCONSOLE_WARNING , "WARNING: (FURTHER PARSING STOPPED FIX THIS FIRST !!!)" );
 		}
+	}
+	else
+	{
+		g_theDevConsole->PrintString( DEVCONSOLE_WARNING , "WARNING: (FURTHER PARSING STOPPED FIX THIS FIRST !!!)" );
+		g_theDevConsole->PrintString( DEVCONSOLE_ERROR ,
+									  "ERROR: Will Not Create Maps" );
 	}
 }
 
@@ -272,7 +302,10 @@ void Game::Update( float deltaSeconds )
 	DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1.00f ) , Vec2::ONE , 20.f , PURPLE , deltaSeconds ,
 						 "( ms/frame ) FPS = %.0f" , m_fps );
 
-	s_world->m_currentMap->UpdateMeshes();
+	if( m_validation[ CURRENT_MAP ] )
+	{
+		s_world->m_currentMap->UpdateMeshes();
+	}
 	
 	UpdateFromKeyBoard( deltaSeconds );
 	
@@ -338,9 +371,12 @@ void Game::Render() const
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindTexture( m_textures[ TEST_TEXTURE ] );
 	g_theRenderer->BindSampler( m_pointSampler );
-	
-	s_world->m_currentMap->Render();
-			
+
+	if( m_validation[ CURRENT_MAP ] )
+	{
+		s_world->m_currentMap->Render();
+	}
+				
 	if ( m_debugDraw )
 	{
 		g_theRenderer->BindShader( nullptr );
@@ -527,6 +563,7 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 
 void Game::UpdateFromTestCodeKeyBoard( float deltaSeconds )
 {
+	UNUSED( deltaSeconds );
 	if( g_theInput->WasKeyJustPressed( KEY_F2 ) )
 	{
 		m_isSamplerEnabled = !m_isSamplerEnabled;

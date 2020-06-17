@@ -91,6 +91,7 @@ public:
 	// TODO :- Move commands to XML;
 	
 	static void SetIsOpen( bool isOpen );
+	static void ErrorLoggedPushCursorSettings();
 	static void ToggleVisibility();
 	void Close();
 	bool IsOpen() const;

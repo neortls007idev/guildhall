@@ -2,6 +2,7 @@
 #include "Game/Game.hpp"
 #include "Game/Map.hpp"
 #include "TileMap.hpp"
+#include "Engine/Core/DevConsole.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -28,8 +29,30 @@ void World::CreateMaps( std::string mapsFolderPath )
 	for ( size_t index = 0 ; index < mapFileNames.size() ; index++ )
 	{
 		std::string mapFilePath = mapsFolderPath + "/" + mapFileNames[ index ];
-		TileMap* temp = TileMap::CreateTileMapFromXml( mapFileNames[ index ].c_str() , mapFilePath.c_str() );
-		m_maps[ mapFileNames[ index ] ] = temp;
+
+		tinyxml2::XMLDocument mapDocument;
+		mapDocument.LoadFile( mapFilePath.c_str() );
+
+		XMLElement* mapRoot = mapDocument.RootElement();
+
+		if( nullptr == mapRoot )
+		{
+			// ERROR
+			continue;
+		}
+		
+		std::string mapType = ParseXmlAttribute( *mapRoot , "type" , "NULL" );
+		Map* temp =  Map::CreateNewMapOfType( mapType , mapFileNames[ index ].c_str() , mapRoot );
+
+		if ( nullptr != temp )
+		{
+			m_maps[ mapFileNames[ index ] ] = temp;
+		}	
+	}
+
+	if ( m_maps.size() == 0 )
+	{
+		g_theDevConsole->PrintString( eDevConsoleMessageType::DEVCONSOLE_ERROR , "ERROR: No maps! were loaded cannot start Game" );
 	}
 }
 
@@ -55,7 +78,7 @@ void World::Render() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Map* World::GetMapByName( std::string mapName )
+Map* World::GetMapByName( std::string mapName ) const
 {
 	std::string mapFileName = mapName + ".xml";
 	for ( auto it = m_maps.begin(); it != m_maps.end() ; ++it )
@@ -64,6 +87,17 @@ Map* World::GetMapByName( std::string mapName )
 		{
 			return it->second;
 		}
+	}
+	return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Map* World::GetFirstMap() const
+{
+	if ( m_maps.size() > 0 )
+	{
+		return m_maps.begin()->second;
 	}
 	return nullptr;
 }

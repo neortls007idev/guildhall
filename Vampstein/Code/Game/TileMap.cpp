@@ -56,25 +56,58 @@ TileMap::TileMap( char const* mapName , IntVec2 dimensions ) :
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void TileMap::ParseLegend( XMLElement* legendElement )
+TileMap::TileMap( char const* mapName , XMLElement* rootElement ) :
+																	Map( mapName ) 
 {
+	XMLElement* root = rootElement;
+
+	m_dimensions = ParseXmlAttribute( *root , "dimensions" , IntVec2( -1 , -1 ) );
+
+	if( m_dimensions == IntVec2( -1 , -1 ) )
+	{
+		//error 
+	}
+
+	PopulateTiles();
+	
+	XMLElement* legendElement = root->FirstChildElement( "Legend" );
+	XMLElement* mapRowElement = root->FirstChildElement( "MapRows" );
+
+	std::map<char , std::string>	legendMap;
+	
+	if( legendElement != nullptr )
+	{
+		ParseLegend( legendElement , legendMap );
+	}
+
+	if( mapRowElement != nullptr )
+	{
+		ParseMapRows( mapRowElement , legendMap );
+	}
+	
+	m_worldMesh = new GPUMesh( g_theRenderer );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void TileMap::ParseLegend( XMLElement* legendElement , std::map<char , std::string>& legendMap )
+{	
 	for( XMLElement* element = legendElement->FirstChildElement( "Tile" ); element != nullptr; element = element->NextSiblingElement( "Tile" ) )
 	{
 		const char* glyph = element->Attribute( "glyph" );
 		std::string regionName = ParseXmlAttribute( *element , "regionType" , "NULL" );
+		auto found = legendMap.find( *glyph );
 
-		auto found = m_legendMap.find( *glyph );
-
-		if( found == m_legendMap.end() )
+		if( found == legendMap.end() )
 		{
-			m_legendMap[ *glyph ] = regionName;
+			legendMap[ *glyph ] = regionName;
 		}
 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void TileMap::ParseMapRows( XMLElement* rowElement )
+void TileMap::ParseMapRows( XMLElement* rowElement , std::map<char , std::string>& legendMap )
 {
 	int numRows = 0;
 
@@ -91,14 +124,14 @@ void TileMap::ParseMapRows( XMLElement* rowElement )
 		{
 			//error not enough tiles
 		}
-
+		
 		for( int mapRowIndex = 0; mapRowIndex < rowString.size(); mapRowIndex++ )
 		{
 			char rowCharacter = rowString[ mapRowIndex ];
-			auto region = m_legendMap.find( rowCharacter );
+			auto region = legendMap.find( rowCharacter );
 			std::string regionName = "";
 
-			if( region != m_legendMap.end() )
+			if( region != legendMap.end() )
 			{
 				regionName = region->second;
 			}
@@ -113,12 +146,12 @@ void TileMap::ParseMapRows( XMLElement* rowElement )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-STATIC TileMap* TileMap::CreateTileMapFromXml( char const* mapName , char const* filepath )
+TileMap* TileMap:: CreateTileMapFromXml( char const* mapName , char const* filepath )
 {
 	tinyxml2::XMLDocument mapDocument;
 	mapDocument.LoadFile( filepath );
 
-	tinyxml2::XMLElement* root = mapDocument.RootElement();
+	XMLElement* root = mapDocument.RootElement();
 
 	IntVec2 dimensions = ParseXmlAttribute( *root , "dimensions" , IntVec2( -1 , -1 ) );
 
@@ -129,17 +162,19 @@ STATIC TileMap* TileMap::CreateTileMapFromXml( char const* mapName , char const*
 
 	TileMap* newTileMap = new TileMap( mapName , dimensions );
 
-	tinyxml2::XMLElement* legendElement = root->FirstChildElement( "Legend" );
-	tinyxml2::XMLElement* mapRowElement = root->FirstChildElement( "MapRows" );
+	XMLElement* legendElement = root->FirstChildElement( "Legend" );
+	XMLElement* mapRowElement = root->FirstChildElement( "MapRows" );
+
+	std::map<char , std::string>	legendMap;
 
 	if( legendElement != nullptr )
 	{
-		newTileMap->ParseLegend( legendElement );
+		newTileMap->ParseLegend( legendElement , legendMap );
 	}
 
 	if( mapRowElement != nullptr )
 	{
-		newTileMap->ParseMapRows( mapRowElement );
+		newTileMap->ParseMapRows( mapRowElement , legendMap );
 	}
 
 	return newTileMap;
@@ -156,11 +191,6 @@ void TileMap::PopulateTiles()
 		{
 			Tile newTile = Tile();
 			newTile.m_tileCoords = IntVec2( tileXIndex , tileYIndex );
-			int x = GetIndexForTileCoords( newTile.m_tileCoords );
-			if ( x == 12 )
-			{
-				newTile.m_isSolid = true;
-			}
 			m_tiles.push_back( newTile );
 		}
 	}

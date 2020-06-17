@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Math/IntVec2.hpp"
-#include "Engine/Primitives/AABB2.hpp"
+#include "Engine/Primitives/AABB3.hpp"
 #include "Game/Map.hpp"
 #include <vector>
 
@@ -32,8 +32,9 @@ class TileMap : public Map
 {
 public:
 	TileMap( char const* mapName , IntVec2 dimensions );
-	void					ParseLegend( XMLElement* legendElement );
-	void					ParseMapRows( XMLElement* rowElement );
+	TileMap( char const* mapName , XMLElement* rootElement );
+	void					ParseLegend( XMLElement* legendElement , std::map<char , std::string>& legendMap );
+	void					ParseMapRows( XMLElement* rowElement , std::map<char , std::string>& legendMap );
 	static TileMap*			CreateTileMapFromXml( char const* mapName , char const* filepath );
 
 	virtual ~TileMap() override;
@@ -70,7 +71,7 @@ private:
 	IntVec2									m_dimensions									= IntVec2::ZERO;
 	std::vector< Tile >						m_tiles;
 	GPUMesh*								m_worldMesh;
-	std::map<char , std::string>			m_legendMap;
+	//std::map<char , std::string>			m_legendMap;
 	
 };
 

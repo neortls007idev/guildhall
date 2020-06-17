@@ -4,6 +4,8 @@
 #include "Game/GameCommon.hpp"
 #include "Game/MapMaterial.hpp"
 
+#include "Engine/Core/DevConsole.hpp"
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 extern RenderContext* g_theRenderer;
@@ -33,30 +35,42 @@ MaterialSheet::MaterialSheet( XMLElement* element )
 	
 	if ( m_name == "NULL" )
 	{
-		//Error
+		g_theDevConsole->PrintString( DEVCONSOLE_ERROR ,
+									  "ERROR: MaterialsSheet name : %s; is not present or invalid." ,
+									  m_name.c_str() );
 	}
 
+	g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG ,"MaterialsSheet name : %s was found." , m_name.c_str() );
+	
 	m_layout							= ParseXmlAttribute( *element , "layout" , -IntVec2::ONE );
 	
 	if ( m_layout == -IntVec2::ONE )
 	{
-		//Error
+		g_theDevConsole->PrintString( DEVCONSOLE_ERROR ,
+									  "ERROR: MaterialsSheet layout : ( %d , %d ) is not present or invalid." ,
+									  m_layout.x , m_layout.y );
 	}
 
-	XMLElement* diffuseElemet = element->FirstChildElement( "Diffuse" );
+	g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG ,"MaterialsSheet layout : ( %d , %d ) was found." , m_layout.x , m_layout.y );
 
-	if ( diffuseElemet != nullptr )
+	XMLElement* diffuseElement = element->FirstChildElement( "Diffuse" );
+
+	if ( diffuseElement != nullptr )
 	{
-		std::string diffuseSSFilePath	= ParseXmlAttribute( *diffuseElemet ,"image", "NULL" );
+		std::string diffuseSSFilePath	= ParseXmlAttribute( *diffuseElement ,"image", "NULL" );
 		
 		if ( diffuseSSFilePath == "NULL" )
 		{
-			//error
+			g_theDevConsole->PrintString( DEVCONSOLE_ERROR ,
+										  "ERROR: Diffuse sprite sheet name : %s; is not present or invalid." ,
+										  diffuseSSFilePath.c_str() );
 		}
 		else
 		{
 			Texture* diffuseSSTexture	= g_theRenderer->GetOrCreateTextureFromFile( diffuseSSFilePath.c_str() );
 			m_diffuseSpriteSheet		= new SpriteSheet( *diffuseSSTexture , m_layout );
+
+			g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Diffuse Materials Sheet : %s was found." , diffuseSSFilePath.c_str() );
 		}
 	}
 }
@@ -83,42 +97,73 @@ MapMaterial::MapMaterial( XMLElement* element )
 	
 	if ( m_name == "NULL" )
 	{
-		//error
+		g_theDevConsole->PrintString( DEVCONSOLE_ERROR ,
+									  "ERROR: Material name : %s; is not present or invalid." ,
+									  m_name.c_str() );
 	}
 
 	m_sheetName = ParseXmlAttribute( *element , "sheet" , "NULL" );
 	
 	if ( m_sheetName == "NULL" )
 	{
-		//error
+		g_theDevConsole->PrintString( DEVCONSOLE_ERROR ,
+									  "ERROR: Material Sheet name : %s; is not present or invalid." ,
+									  m_sheetName.c_str() );
 	}
 
 	m_spriteCoords = ParseXmlAttribute( *element , "spriteCoords" , -IntVec2::ONE );
 	
 	if ( m_spriteCoords == -IntVec2::ONE )
 	{
-		//error
+		g_theDevConsole->PrintString( DEVCONSOLE_ERROR ,
+									  "ERROR: Material sprite coords : ( %d , %d ); is not present or invalid." ,
+									  m_spriteCoords.x , m_spriteCoords.y );
 	}	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void MapMaterial::LoadDefinitions( const char* filePath )
+bool MapMaterial::LoadDefinitions( const char* filePath )
 {
 	tinyxml2::XMLDocument doc;
-	doc.LoadFile( filePath );
+	bool loadFile = doc.LoadFile( filePath );
 
+	std::string materialfilePath = filePath;
+	if( loadFile != tinyxml2::XMLError::XML_SUCCESS )
+	{
+		g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "ERROR: Map Material Types file at path: %s not present." ,
+		                              materialfilePath.c_str() );
+		return false;
+	}
+	
 	XMLElement* root = doc.RootElement();
+	std::string rootElementName = root->Name();
+	if( rootElementName != "MapMaterialTypes" )
+	{
+		g_theDevConsole->PrintString( DEVCONSOLE_ERROR ,
+		                              "ERROR: Map Material Types at path: %s is not using MapMaterialTypes as Root Element." ,
+		                              materialfilePath.c_str() );
+		return false;
+	}
 
+	g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG ,
+								  "LOG: Map Material Types at path: %s now parsing ..." ,
+								  materialfilePath.c_str() );
+	
 	for( XMLElement* element = root->FirstChildElement( "MaterialsSheet" ); element != nullptr; element = element->NextSiblingElement( "MaterialSheet" ) )
 	{
-		MaterialSheet* newSheet		= new MaterialSheet( element );
+		MaterialSheet* newSheet				= new MaterialSheet( element );
 
 		auto materialSheet	= MaterialSheet::s_materialSheets.find( newSheet->m_name );
 
 		if ( materialSheet != MaterialSheet::s_materialSheets.end() )
 		{
-			//error multiple definitions
+			g_theDevConsole->PrintString( DEVCONSOLE_ERROR ,
+										  "ERROR: Map Material Sheet : %s has multiple Definitions." ,
+										  newSheet->m_name.c_str() );
+			g_theDevConsole->PrintString( DEVCONSOLE_WARNING ,
+										  "WARNING: (Using the First Definition)." ,
+										  newSheet->m_name.c_str() );
 			continue;
 		}
 
@@ -133,13 +178,18 @@ void MapMaterial::LoadDefinitions( const char* filePath )
 
 		if ( mapMaterial != MapMaterial::s_mapMaterials.end() )
 		{
-			//error multiple definitions
+			g_theDevConsole->PrintString( DEVCONSOLE_ERROR ,
+										  "ERROR: Map Material : %s has multiple Definitions." ,
+										  newMaterial->m_name.c_str() );
+			g_theDevConsole->PrintString( DEVCONSOLE_WARNING ,
+										  "WARNING: (Using the First Definition)." ,
+										  newMaterial->m_name.c_str() );
 			continue;
 		}
 
 		MapMaterial::s_mapMaterials[ newMaterial->m_name ] = newMaterial;
-
 	}
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

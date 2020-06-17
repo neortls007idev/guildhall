@@ -1,13 +1,18 @@
 #pragma once
+#include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Math/Vec3.hpp"
 #include <string>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+
+
 class Map
 {
 public:
 	Map( char const* mapName );
+	Map( char const* mapName , XMLElement* rootElement );
+	static Map* CreateNewMapOfType( std::string mapType , char const* mapName , XMLElement* rootElement );
 	virtual ~Map();
 
 	virtual void UpdateMeshes() = 0;

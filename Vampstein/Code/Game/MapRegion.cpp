@@ -3,19 +3,28 @@
 #include "Game/MapMaterial.hpp"
 #include "Game/MapRegion.hpp"
 
+#include "Engine/Core/DevConsole.hpp"
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 STATIC std::map<std::string , MapRegion*>		MapRegion::s_mapRegions;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void MapRegion::LoadDefinitions( char const* regionDataFilePath )
+bool MapRegion::LoadDefinitions( char const* regionDataFilePath )
 {
 	tinyxml2::XMLDocument regionDataDocument;
 	regionDataDocument.LoadFile( regionDataFilePath );
 
 	XMLElement* root = regionDataDocument.RootElement();
 
+	if ( nullptr == root )
+	{
+		std::string filePath = regionDataFilePath;
+		g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "ERROR: Map Region Types file at path: %s not present." , filePath.c_str() );
+		return false;
+	}
+		
 	for( XMLElement* element = root->FirstChildElement( "RegionType" ); element != nullptr; element = element->NextSiblingElement( "RegionType" ) )
 	{
 		MapRegion* newMapRegion = new MapRegion( element );
@@ -29,6 +38,8 @@ void MapRegion::LoadDefinitions( char const* regionDataFilePath )
 
 		MapRegion::s_mapRegions[ newMapRegion->m_name ] = newMapRegion;
 	}
+
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

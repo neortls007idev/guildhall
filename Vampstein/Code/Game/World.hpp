@@ -22,7 +22,8 @@ public:
 	void	Update();
 	void	Render() const;
 	
-	Map*	GetMapByName( std::string mapName );
+	Map*	GetMapByName( std::string mapName ) const;
+	Map*	GetFirstMap() const;
 	size_t	GetNumMaps() const															{ return m_maps.size(); }
 	Strings	GetAllMapNames() const;
 	

@@ -46,7 +46,7 @@ private:
 	MapMaterial( XMLElement* element );
 	
 public:
-	static void			LoadDefinitions( const char* filePath );
+	static bool			LoadDefinitions( const char* filePath );
 	static MapMaterial* GetDefinition( std::string materialName );
 	SpriteSheet*		GetDiffuseSpriteSheet();
 	void				GetUVCoords( Vec2& outMins , Vec2& outMax );

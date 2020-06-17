@@ -41,6 +41,18 @@ enum  eGameSounds
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+enum eGameDataValidation
+{
+	MAP_REGIONS,
+	MAP_MATERIALS,
+
+	WORLD,
+	CURRENT_MAP,
+	NUM_TOTAL_VALIDATIONS,
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 class Game
 {
 
@@ -86,7 +98,8 @@ private:
 	float						m_fps												= 0.f;
 	
 public:
-
+		
+	bool						m_validation[ NUM_TOTAL_VALIDATIONS ];
 	GPUMesh*					m_cubeMesh;
 	GPUMesh*					m_basisMesh;
 	
