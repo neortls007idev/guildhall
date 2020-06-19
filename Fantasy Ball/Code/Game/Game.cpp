@@ -78,6 +78,7 @@ void Game::LoadAssets()
 {
 	LoadAllTextures();
 	LoadAllSounds();
+	LoadAllShaders();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -117,7 +118,22 @@ void Game::LoadAllTextures()
 	m_gameTex[ TEX_BALL_PINK ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/20.png" );
 	m_gameTex[ TEX_BALL_PURPLE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/09.png" );
 	m_gameTex[ TEX_BALL_ORANGE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/17.png" );
-	m_gameTex[ TEX_BALL_GREY ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/34.png" );	 
+	m_gameTex[ TEX_BALL_GREY ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/34.png" );
+
+	Texture* FlowersTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/FlowerSpriteSheet.png" );
+	m_gameSS[ SS_VFX_FLOWERS ] = new SpriteSheet( *FlowersTex , IntVec2( 2 , 2 ) );
+
+	Texture* LeavesTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/LeavesSpriteSheet.png" );
+	m_gameSS[ SS_VFX_LEAVES ] = new SpriteSheet( *LeavesTex , IntVec2( 3 , 3 ) );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::LoadAllShaders()
+{
+	m_gameShader[ GSHADER_VMOVE ]		= g_theRenderer->GetOrCreateShader( "Data/Shaders/vMovementEffect.hlsl" );
+	m_gameShader[ GSHADER_HMOVE ]		= g_theRenderer->GetOrCreateShader( "Data/Shaders/hMovementEffect.hlsl" );
+	m_gameShader[ GSHADER_COMBINEIMG ]	= g_theRenderer->GetOrCreateShader( "Data/Shaders/combineImage.hlsl" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -188,8 +204,11 @@ void Game::Update( float deltaSeconds )
 
 void Game::Render() const
 {
-	
+	g_theRenderer->BeginCamera( m_worldCamera );
+	g_theRenderer->SetBlendMode( ALPHA );
+
 	m_currentLevel->Render();
+
 	g_theParticleSystem2D->Render();
 	
 	if ( m_isDebugDraw )
@@ -199,6 +218,8 @@ void Game::Render() const
 		g_theRenderer->DrawLine( Vec2( cameraMins.x , 0.f ) , Vec2( cameraMaxs.x , 0.f ) , MAGENTA , 5.f );
 		g_theRenderer->DrawLine( Vec2( 0.f , cameraMins.y ) , Vec2( 0.f , cameraMaxs.y ) , MAGENTA , 5.f );
 	}
+
+	g_theRenderer->EndCamera( m_worldCamera );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -38,6 +38,15 @@
     <Filter Include="Windows Resources">
       <UniqueIdentifier>{e4fe4522-f092-4963-b87c-5499cb4b117c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameplaySystems">
+      <UniqueIdentifier>{c21bc7a5-d8ed-48f0-9be9-9ee8e8c4f71d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{9a37ba18-d9b6-4752-ba3d-44f06266dc82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data Files">
+      <UniqueIdentifier>{73a1804a-ba90-4ba7-9d01-cb36b5828f60}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameCommon.cpp">
@@ -96,6 +105,9 @@
     </ClCompile>
     <ClCompile Include="MapDefinition.cpp">
       <Filter>Gameplay\Levels</Filter>
+    </ClCompile>
+    <ClCompile Include="UISystem.cpp">
+      <Filter>GameplaySystems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -159,6 +171,9 @@
     <ClInclude Include="resource.h">
       <Filter>Windows Resources</Filter>
     </ClInclude>
+    <ClInclude Include="UISystem.hpp">
+      <Filter>GameplaySystems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\Plan\Proposal\1_Features.txt">
@@ -200,5 +215,60 @@
     <Image Include="..\..\Run\Data\Icons\Cursors\RedCursor.ico">
       <Filter>Windows Resources</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\..\Run\Data\GamePlay\MapDefs.xml">
+      <Filter>Data Files</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\GamePlay\TileDefs.xml">
+      <Filter>Data Files</Filter>
+    </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\Run\Data\Shaders\blur.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\branchlessComparison.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\combineImage.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\ConstantBuffers.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\default.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\defaultLitStageStructs.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\dissolve.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\fog.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\fresnel.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\InvertColor.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\projection.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\ShaderMathUtils.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\toneMap.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\uvDebugger.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\vMovementEffect.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

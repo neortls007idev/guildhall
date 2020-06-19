@@ -6,6 +6,7 @@
 
 class ParticleEmitter2D;
 class SpriteSheet;
+class Shader;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -18,13 +19,11 @@ public:
 	void LoadAssets();
 	void LoadAllSounds();
 	void LoadAllTextures();
+	void LoadAllShaders();
 
 	void PostGameConstructDataOnce();
 	void PostGameConstruct();
-	
-	void CreateAllTileDefinitions();
-	void CreateAllMapDefinitions();
-	
+		
 	void Update( float deltaSeconds );
 	void UpdateCamera();
 	
@@ -65,6 +64,8 @@ public:
 	SoundPlaybackID				m_sounds[ NUM_GAME_SFX ];
 	SoundPlaybackID				m_currentBackgroundsound						= 0;
 
+	Shader*						m_gameShader[ NUM_GAME_SHADERS ];			
+	
 	int							m_playerHealth									= 3;
 	bool						m_isBallLaunchable								= true;
 	

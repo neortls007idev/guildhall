@@ -4,8 +4,8 @@
 
 enum eEntityType
 {
-	PADDLE,
 	BALL,
+	PADDLE,
 	TILE,
 
 	NUM_ENTITY_TYPES,

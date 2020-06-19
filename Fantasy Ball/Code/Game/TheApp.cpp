@@ -208,10 +208,7 @@ void TheApp::Update( float deltaSeconds )
 
 void TheApp::Render() const
 {
-		g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
-		g_theRenderer->SetBlendMode( ALPHA );
 		g_theGame->Render();
-		g_theRenderer->EndCamera( g_theGame->m_worldCamera );
 		
 		if ( g_theDevConsole->IsOpen() )
 		{

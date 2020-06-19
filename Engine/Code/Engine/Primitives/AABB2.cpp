@@ -347,7 +347,7 @@ AABB2 AABB2::GetBoxAtRight( float fractionOfWidth , float additionalWidth )
 {
 	float width = m_maxs.x - m_mins.x;
 	float carveWidth = ( fractionOfWidth * width ) + additionalWidth;
-	return AABB2( m_maxs.x - carveWidth , m_mins.y , m_maxs.x , m_maxs.y );
+	return AABB2( m_mins.x + carveWidth , m_mins.y , m_maxs.x , m_maxs.y );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -47,7 +47,8 @@ void MapGenStepFromImage::RunStepOnce( Map& map )
 	//Vec2 startpointatbottomleft( -845.f , -139.f );
 	Vec2 startpointatbottomleft( -845.f , -168.f );
 	startpointatbottomleft.x += halfTileDimensions.x;
-	const float xOffset = ( float )RoundDownToInt( ( ( cameraDimensions.x * 0.5f - map.m_leftWall.GetDimensions().x ) / map.m_dimensions.x ) + halfTileDimensions.x );
+	const float xOffset = ( float )RoundDownToInt( ( ( cameraDimensions.x * 0.5f - map.m_leftWallCosmeticBounds.GetDimensions().x ) / map.m_dimensions.x ) + halfTileDimensions.x );
+	const float xHalfOffset = xOffset * 0.5f;
 	const float yOffset = ( cameraDimensions.y * 0.5f ) / map.m_dimensions.y;
 	//const float xOffset = TILE_LENGTH;
 	//const float yOffset = TILE_HEIGHT;

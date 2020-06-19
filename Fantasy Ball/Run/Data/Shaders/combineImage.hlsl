@@ -66,8 +66,11 @@ VertexToFragment_t VertexFunction( vs_input_t input )
    return v2f;
 }
 
-Texture2D<float4> blurDiffuse : register( t8 );
-Texture2D<float4> colorDiffuse : register( t9 );
+//--------------------------------------------------------------------------------------
+
+Texture2D<float4> tSecondImageDiffuse : register( t8 );
+
+//--------------------------------------------------------------------------------------
 
 float4 FragmentFunction( VertexToFragment_t input ) : SV_Target0
 {
@@ -76,22 +79,13 @@ float4 FragmentFunction( VertexToFragment_t input ) : SV_Target0
 //              SAMPLE THE TEXTURES
 //--------------------------------------------------------------------------------------    
   
-    float4 imageColor   = colorDiffuse.Sample( sSampler , input.uv );
-    float4 blurColor    = blurDiffuse.Sample( sSampler , input.uv );
-    
-    //if( blurColor.a == 0.0 )
-    //{
-    //    return imageColor;
-    //}
-    
+    float4 firstImage   = tDiffuse.Sample( sSampler , input.uv );
+    float4 secondImage  = tSecondImageDiffuse.Sample( sSampler , input.uv );
+        
     float4 finalColor;
-    //finalColor = lerp( blurColor , imageColor , imageColor.a - blurColor.a );
-    //finalColor = blurColor * ( blurColor.a ) + imageColor * imageColor.a;
-    finalColor = blurColor + imageColor;
-    //finalColor = blurColor * ( 1 - imageColor.a ) + imageColor * imageColor.a;
-    //return float4( blurColor * ( 1 - imageColor.a ) );
-    //return float4( ( 1 - imageColor.a ).xxx , 1 );
-    //return float4( ( 1 - imageColor.a ).xxx , 1 );
+
+    finalColor = firstImage + secondImage;
+
     return finalColor;
 }
 

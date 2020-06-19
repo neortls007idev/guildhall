@@ -3,9 +3,11 @@
 #include "Engine/Primitives/AABB2.hpp"
 #include "Game/Entity.hpp"
 #include <vector>
+#include "Engine/Core/EngineCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+class Ball;
 class MapDefinition;
 class Game;
 class TileDefinition;
@@ -24,12 +26,17 @@ public:
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
-
 	~Map();
 
 	void Update( float deltaSeconds );
 	void Render();
-	
+
+	void UpdateSideCosmeticBounds();
+	void UpdateTopCosmeticBounds();
+	void RenderLevelBounds();
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+
 	void SpawnNewEntity( eEntityType type , const Vec2& position , TileDefinition* tileDef = nullptr );
 	void AddEntityToMap( Entity* entity );
 	void AddEntityToList( Entitylist& entityList , Entity* entity );
@@ -41,18 +48,29 @@ public:
 	void ResolveBallvPaddleCollisions();
 	void ResolveBallvTileCollisions();
 	
+	void SpawnLeafParticlesOnBallCollision( Ball* ball , Vec2 refPoint , uint num4XParticles );
+	void SpawnFlowerParticlesOnBallCollision( Ball* ball , Vec2 refPoint , uint num4XParticles );
 public:
 	Game*							m_owner;
 	AABB2							m_backGround;
-	AABB2							m_leftWall;
-	AABB2							m_rightWall;
-	AABB2							m_topWall;
-	AABB2							m_pit;
+
+	AABB2							m_leftWallPhysicalBounds;
+	AABB2							m_rightWallPhysicalBounds;
+	AABB2							m_topWallPhysicalBounds;
+	AABB2							m_pitPhysicalBounds;
+
+	AABB2							m_leftWallCosmeticBounds;
+	AABB2							m_rightWallCosmeticBounds;
+	AABB2							m_topWallCosmeticBounds;
+	AABB2							m_pitCosmeticBounds;
+	
 	IntVec2							m_dimensions;
 	MapDefinition*					m_mapDefinition											= nullptr;
 	std::string						m_name;
 	Entitylist						m_entityListsByType[ NUM_ENTITY_TYPES ];
-	ParticleEmitter2D*				m_testEmitter;
+	ParticleEmitter2D*				m_tileEmitter;
+	ParticleEmitter2D*				m_boundsEmitter;
+	ParticleEmitter2D*				m_paddleEmitter;
 	int								m_backgroundIndex										= 0;
 	int								m_numAliveBalls											= 0;
 };

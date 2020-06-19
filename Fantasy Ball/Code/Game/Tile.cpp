@@ -14,7 +14,6 @@
 
 extern RenderContext*				g_theRenderer;
 extern AudioSystem*					g_theAudioSystem;
-extern Game*						g_theGame;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -26,6 +25,7 @@ Tile::Tile( Map* owner , IntVec2 tileCoordinates , TileDefinition* tileType ) :
 {
 	SetHealth( m_tileDef->m_health );
 	m_tileColor = m_tileDef->m_tileColor;
+	m_bounds = CreateColliderFromCoords();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -33,21 +33,39 @@ Tile::Tile( Map* owner , IntVec2 tileCoordinates , TileDefinition* tileType ) :
 void Tile::Update( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
+
+	m_animTime += deltaSeconds;
+
+
+//  	float sideMovement = RangeMapFloat( 0.f , 10.f , -TILE_DEVIATION , TILE_DEVIATION , m_animTime );
+//  	m_bounds.Translate( Vec2( sideMovement , 0.f ) );
+//  	
+//  	if ( m_animTime >= 10.f )
+//  	{
+//  		m_animTime = 0.f;
+//  	}
+	if( m_animTime <= 1.0f )						{ m_tileAnim = MOVE_UP; }
+	if ( m_animTime >= 1.0f )						{ m_tileAnim = MOVE_DOWN; }
+	if ( m_animTime >= 2.0f )						{ m_tileAnim = MOVE_LEFT; }
+	if ( m_animTime >= 3.0f )						{ m_tileAnim = MOVE_RIGHT; }
+	if( m_animTime >= 4.0f )						{ m_tileAnim = MOVE_CENTER; m_animTime = 0.f; }
+	
+	UpdateCollider();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Tile::Render() const
 {
-	AABB2 tile = GetCollider();
+	//AABB2 tile = CreateColliderFromCoords();
 	const Texture* tex = &g_theGame->m_gameSS[ SS_BRICKS ]->GetTexture();
 	g_theRenderer->BindTexture( tex );
-	g_theRenderer->DrawAABB2( tile , WHITE , m_tileDef->m_spriteUVs.m_mins , m_tileDef->m_spriteUVs.m_maxs );
+	g_theRenderer->DrawAABB2( m_bounds , WHITE , m_tileDef->m_spriteUVs.m_mins , m_tileDef->m_spriteUVs.m_maxs );
 	g_theRenderer->BindTexture( nullptr );
 
 	if ( m_owner->m_isDebugDraw  )
 	{
-		g_theRenderer->DrawUnfilledAABB2( tile , WHITE , 5.f );
+		g_theRenderer->DrawUnfilledAABB2( m_bounds , WHITE , 5.f );
 	}
 }
 
@@ -64,13 +82,13 @@ int Tile::GetTileIndex()
 
 bool Tile::TileCollisionResponse( Ball* ball )
 {
-	if( DoDiscAndAABBOverlap( ball->m_pos , ball->m_cosmeticRadius , GetCollider() ) )
+	if( DoDiscAndAABBOverlap( ball->m_pos , ball->m_physicsRadius , m_bounds ) )
 	{
-		Vec2 refPoint = GetCollider().GetNearestPoint( ball->m_pos );
+		Vec2 refPoint = m_bounds.GetNearestPoint( ball->m_pos );
 		
 		Vec2 edgeNormal = ( ball->m_pos - refPoint ).GetNormalized();
 
-		uint numParticles = ( uint ) g_RNG->RollRandomIntInRange( 0 , 5 );
+		uint numParticles = ( uint ) g_RNG->RollRandomIntInRange( 5 , 10 );
 		
 		SpawnParticlesOnBallCollision( ball , refPoint , numParticles );
 
@@ -78,7 +96,7 @@ bool Tile::TileCollisionResponse( Ball* ball )
 
 		SpawnParticlesOnBallCollision( ball , refPoint , numParticles );
 		
-		PushDiscOutOfAABB( ball->m_pos , ball->m_cosmeticRadius , GetCollider() );
+		PushDiscOutOfAABB( ball->m_pos , ball->m_physicsRadius , m_bounds );
 
 		--m_health;
 		ball->UpdateCurrentTexture( m_tileColor );
@@ -103,7 +121,7 @@ void Tile::SpawnParticlesOnBallCollision( Ball* ball , Vec2 refPoint , uint num4
 		float scale					= g_RNG->RollRandomFloatInRange(0.f,1.5f );		
 
 		
-		m_ownerMap->m_testEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint ,
+		m_ownerMap->m_tileEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint ,
 		                                             orientationDegrees , scale , angularVelocity ,
 		                                             ( ball->m_velocity + deviation ) * PARTICLE_VELOCITY , 0.0f ,
 		                                             2.0f , WHITE , m_tileDef->m_VFXSpriteCoords );
@@ -113,7 +131,7 @@ void Tile::SpawnParticlesOnBallCollision( Ball* ball , Vec2 refPoint , uint num4
 		angularVelocity			= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
 		scale					= g_RNG->RollRandomFloatInRange(0.f,1.5f );	
 
-		m_ownerMap->m_testEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint ,
+		m_ownerMap->m_tileEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint ,
 													 orientationDegrees , scale , angularVelocity ,
 													 ( ball->m_velocity + deviation ) * PARTICLE_VELOCITY , 0.0f ,
 													 2.0f , WHITE , m_tileDef->m_VFXSpriteCoords );
@@ -123,7 +141,7 @@ void Tile::SpawnParticlesOnBallCollision( Ball* ball , Vec2 refPoint , uint num4
 		angularVelocity			= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
 		scale					= g_RNG->RollRandomFloatInRange(0.f,1.5f );	
 
-		m_ownerMap->m_testEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint ,
+		m_ownerMap->m_tileEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint ,
 													 orientationDegrees , scale , angularVelocity ,
 													 ( ball->m_velocity + deviation ) * PARTICLE_VELOCITY , 0.0f ,
 													 2.0f , WHITE , m_tileDef->m_VFXSpriteCoords );
@@ -133,7 +151,7 @@ void Tile::SpawnParticlesOnBallCollision( Ball* ball , Vec2 refPoint , uint num4
 		angularVelocity			= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
 		scale					= g_RNG->RollRandomFloatInRange(0.f,1.5f );	
 
-		m_ownerMap->m_testEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint ,
+		m_ownerMap->m_tileEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint ,
 													 orientationDegrees , scale , angularVelocity ,
 													 ( ball->m_velocity + deviation ) * PARTICLE_VELOCITY , 0.0f ,
 													 2.0f , WHITE , m_tileDef->m_VFXSpriteCoords );
@@ -143,13 +161,54 @@ void Tile::SpawnParticlesOnBallCollision( Ball* ball , Vec2 refPoint , uint num4
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-AABB2 Tile::GetCollider() const
+AABB2 Tile::CreateColliderFromCoords() const
 {
 	//Vec2 offset(halfTileDimensions.x*2.f,halfTileDimensions.y);
 	//AABB2 collider = AABB2( Vec2::ZERO , Vec2( TILE_LENGTH , TILE_HEIGHT ) );
 	AABB2 collider = AABB2( -halfTileDimensions , halfTileDimensions );
 	collider.SetCenter( Vec2( m_tileCoords ) );
 	return collider;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Tile::UpdateCollider()
+{
+	switch ( m_tileAnim )
+	{
+		case MOVE_UP :
+							{
+								Vec2 m_boundsDim = m_bounds.GetDimensions();
+								m_boundsDim -= Vec2( 0.f , TILE_DEVIATION );
+								//m_bounds.Translate( Vec2( 0.f , TILE_DEVIATION ) );
+								m_bounds.SetDimensions( m_boundsDim );
+							}break;
+		case MOVE_DOWN :
+							{
+								Vec2 m_boundsDim = m_bounds.GetDimensions();
+								m_boundsDim += Vec2( 0.f , TILE_DEVIATION );
+								//m_bounds.Translate( Vec2( 0.f , -TILE_DEVIATION ) );
+								m_bounds.SetDimensions( m_boundsDim );
+							}break;
+		case MOVE_LEFT :
+							{
+								Vec2 m_boundsDim = m_bounds.GetDimensions();
+								m_boundsDim -= Vec2( TILE_DEVIATION , 0.f );
+								//m_bounds.Translate( Vec2( -TILE_DEVIATION , 0.f ) );
+								m_bounds.SetDimensions( m_boundsDim );
+							}break;
+		case MOVE_RIGHT :
+							{
+								Vec2 m_boundsDim = m_bounds.GetDimensions();
+								m_boundsDim += Vec2( TILE_DEVIATION , 0.f );
+								//m_bounds.Translate( Vec2( TILE_DEVIATION , 0.f ) );
+								m_bounds.SetDimensions( m_boundsDim );
+							}break;
+		case MOVE_CENTER :
+							{
+								//m_bounds = CreateColliderFromCoords();
+							}break;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

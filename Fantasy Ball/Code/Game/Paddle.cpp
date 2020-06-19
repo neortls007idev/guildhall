@@ -56,8 +56,8 @@ void Paddle::UpdateFromUserInput( float deltaSeconds )
 	translate.x = mousePos.x * speed * deltaSeconds;
 	
 	m_position.x += translate.x;
-	m_position.x = Clamp( m_position.x , m_owner->m_currentLevel->m_leftWall.m_maxs.x + paddleColliderLength * 0.5f,
-	                      m_owner->m_currentLevel->m_rightWall.m_mins.x - paddleColliderLength * 0.5f );
+	m_position.x = Clamp( m_position.x , m_owner->m_currentLevel->m_leftWallPhysicalBounds.m_maxs.x + paddleColliderLength * 0.5f,
+	                      m_owner->m_currentLevel->m_rightWallPhysicalBounds.m_mins.x - paddleColliderLength * 0.5f );
 
 	translate.x = m_position.x;
 	

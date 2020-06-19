@@ -27,9 +27,6 @@ constexpr float MIN_CAMERA_SHAKE										= -2.5f;
 constexpr float MAX_CAMERA_SHAKE										=  2.5f;
 constexpr float SCREEN_SHAKE_ABLATION_PER_SECOND						=  0.05f;
 
-constexpr int   MIN_WORM_LENGTH											= 3;
-constexpr int   MAX_WORM_LENGTH											= 13;
-
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 constexpr float LEVEL_SIDEWALL_PERCENTAGE = 0.119791667f;
@@ -37,14 +34,30 @@ constexpr float LEVEL_SIDEWALL_PERCENTAGE = 0.119791667f;
 //constexpr float TILE_LENGTH = 112.6667f;
 //constexpr float TILE_HEIGHT = 32.f;
 constexpr float TILE_LENGTH = 112.6667f;
+//constexpr float TILE_LENGTH = 110.f;
 constexpr float TILE_HEIGHT = 32.f;
 const Vec2 halfTileDimensions = Vec2( TILE_LENGTH * 0.5f , TILE_HEIGHT * 0.5f );
+
+constexpr float BALL_INITIAL_VELOCITY_MAGNITUDE = 4.5f;
+constexpr float BALL_INITIAL_LAUNCH_ORIENTATION_DEG = 107.f;
+const Vec2 BALL_INITIAL_VELOCITY = Vec2::MakeFromPolarDegrees( BALL_INITIAL_LAUNCH_ORIENTATION_DEG , BALL_INITIAL_VELOCITY_MAGNITUDE );
 
 constexpr float PARTICLE_HEIGHT = 80.f;
 const Vec2 particleDimensions = Vec2( 1.7777777f , 1.f ) * PARTICLE_HEIGHT;
 constexpr float PARTICLE_VELOCITY = 25.f;
 
+constexpr float LEAVES_PARTICLE_HEIGHT = 20.f;
+const Vec2 LEAVES_PARTICLE_DIMENSIONS = Vec2( 1.f , 1.f ) * LEAVES_PARTICLE_HEIGHT;
+
+constexpr float LEAVES_PARTICLE_VELOCITY = 0.5f * PARTICLE_VELOCITY;
+
+constexpr float FLOWER_PARTICLE_HEIGHT = 20.f;
+const Vec2		FLOWER_PARTICLE_DIMENSIONS = Vec2( 1.f , 1.f ) * FLOWER_PARTICLE_HEIGHT;
+constexpr float FLOWER_PARTICLE_VELOCITY = 0.5f * PARTICLE_VELOCITY;
+
 constexpr float PADDLE_COLLISION_DEVIATION = 10.f;
+
+constexpr float TILE_DEVIATION = .6667f * 0.1f;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -70,17 +83,6 @@ enum eGameTextures
 	TEX_BALL_PURPLE,
 	TEX_BALL_ORANGE,
 	TEX_BALL_GREY,
-
-	//TEX_FLARE_RED,
-	//TEX_FLARE_GREEN,
-	//TEX_FLARE_BLUE,
-	//TEX_FLARE_YELLOW,
-	//TEX_FLARE_MAGENTA,
-	//TEX_FLARE_CYAN,
-	//TEX_FLARE_PINK,
-	//TEX_FLARE_PURPLE,
-	//TEX_FLARE_ORANGE,
-	//TEX_FLARE_GREY,
 	
 	NUM_GAME_TEX
 };
@@ -93,8 +95,22 @@ enum eGameSpriteSheets
 	SS_BRICKS,
 	SS_BALL,	
 	SS_VFX_FLARE,
+	SS_VFX_FLOWERS,
+	SS_VFX_LEAVES,
 
 	NUM_GAME_SS
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum eGameShaders
+{
+	GSHADER_NONE = 0 ,
+	GSHADER_VMOVE,
+	GSHADER_HMOVE,
+	GSHADER_COMBINEIMG,
+
+	NUM_GAME_SHADERS,
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
