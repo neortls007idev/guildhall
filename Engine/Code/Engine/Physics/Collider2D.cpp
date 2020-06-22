@@ -272,7 +272,7 @@ void Collider2D::AddEventToTriggerExit( Subscription subscription )
 
 void Collider2D::FireOverLapStartEvents( int otherColliderId )
 {
-	for ( int i = 0; i < m_overlapStartSubscriptions.size(); i++ )
+	for ( size_t i = 0; i < m_overlapStartSubscriptions.size(); i++ )
 	{
 		EventArgs args = m_overlapStartSubscriptions[ i ].args;
 		args.SetValue( "MyColliderId" , std::to_string( colliderId ) );
@@ -284,7 +284,7 @@ void Collider2D::FireOverLapStartEvents( int otherColliderId )
 
 void Collider2D::FireOverLapEndEvents( int otherColliderId )
 {
-	for ( int i = 0; i < m_overlapEndSubscriptions.size(); i++ )
+	for ( size_t i = 0; i < m_overlapEndSubscriptions.size(); i++ )
 	{
 		EventArgs args = m_overlapEndSubscriptions[ i ].args;
 		args.SetValue( "MyColliderId" , std::to_string( colliderId ) );
@@ -296,7 +296,7 @@ void Collider2D::FireOverLapEndEvents( int otherColliderId )
 
 void Collider2D::FireOverLapStayEvents( int otherColliderId )
 {
-	for ( int i = 0; i < m_overlapStaySubscriptions.size(); i++ )
+	for ( size_t i = 0; i < m_overlapStaySubscriptions.size(); i++ )
 	{
 		EventArgs args = m_overlapStaySubscriptions[ i ].args;
 		args.SetValue( "MyColliderId" , std::to_string( colliderId ) );
@@ -308,7 +308,7 @@ void Collider2D::FireOverLapStayEvents( int otherColliderId )
 
 void Collider2D::FireTriggerStartEvents( int otherColliderId )
 {
-	for ( int i = 0; i < m_triggerEnterSubscriptions.size(); i++ )
+	for ( size_t i = 0; i < m_triggerEnterSubscriptions.size(); i++ )
 	{
 		EventArgs args = m_triggerEnterSubscriptions[ i ].args;
 		args.SetValue( "MyColliderId" , std::to_string( colliderId ) );
@@ -320,7 +320,7 @@ void Collider2D::FireTriggerStartEvents( int otherColliderId )
 
 void Collider2D::FireTiggerEndEvents( int otherColliderId )
 {
-	for ( int i = 0; i < m_triggerExitSubscriptions.size(); i++ )
+	for ( size_t i = 0; i < m_triggerExitSubscriptions.size(); i++ )
 	{
 		EventArgs args = m_triggerExitSubscriptions[ i ].args;
 		args.SetValue( "MyColliderId" , std::to_string( colliderId ) );
@@ -332,7 +332,7 @@ void Collider2D::FireTiggerEndEvents( int otherColliderId )
 
 void Collider2D::FireTriggerStayEvents( int otherColliderId )
 {
-	for ( int i = 0; i < m_triggerStaySubscriptions.size(); i++ )
+	for ( size_t i = 0; i < m_triggerStaySubscriptions.size(); i++ )
 	{
 		EventArgs args = m_triggerStaySubscriptions[ i ].args;
 		args.SetValue( "MyColliderId" , std::to_string( colliderId ) );

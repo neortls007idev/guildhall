@@ -33,31 +33,37 @@ constexpr float LEVEL_SIDEWALL_PERCENTAGE = 0.119791667f;
 
 //constexpr float TILE_LENGTH = 112.6667f;
 //constexpr float TILE_HEIGHT = 32.f;
-constexpr float TILE_LENGTH = 112.6667f;
 //constexpr float TILE_LENGTH = 110.f;
-constexpr float TILE_HEIGHT = 32.f;
-const Vec2 halfTileDimensions = Vec2( TILE_LENGTH * 0.5f , TILE_HEIGHT * 0.5f );
+constexpr float TILE_LENGTH					= 112.6667f;
+constexpr float TILE_HEIGHT					= 32.f;
+const Vec2 halfTileDimensions				= Vec2( TILE_LENGTH * 0.5f , TILE_HEIGHT * 0.5f );
 
 constexpr float BALL_INITIAL_VELOCITY_MAGNITUDE = 4.5f;
 constexpr float BALL_INITIAL_LAUNCH_ORIENTATION_DEG = 107.f;
-const Vec2 BALL_INITIAL_VELOCITY = Vec2::MakeFromPolarDegrees( BALL_INITIAL_LAUNCH_ORIENTATION_DEG , BALL_INITIAL_VELOCITY_MAGNITUDE );
+const Vec2 BALL_INITIAL_VELOCITY			= Vec2::MakeFromPolarDegrees( BALL_INITIAL_LAUNCH_ORIENTATION_DEG , BALL_INITIAL_VELOCITY_MAGNITUDE );
 
-constexpr float PARTICLE_HEIGHT = 80.f;
-const Vec2 particleDimensions = Vec2( 1.7777777f , 1.f ) * PARTICLE_HEIGHT;
-constexpr float PARTICLE_VELOCITY = 25.f;
+constexpr float VFX_PARTICLE_HEIGHT			= 40.f;
+const Vec2		VFX_PARTICLE_DIMENSIONS		= Vec2( 1.7777777f , 1.f ) * VFX_PARTICLE_HEIGHT;
+constexpr float VFX_PARTICLE_VELOCITY		= 25.f;
+constexpr float VFX_PARTICLE_MIN_AGE		= 40.f;
+constexpr float VFX_PARTICLE_MAX_AGE		= 70.f;
 
-constexpr float LEAVES_PARTICLE_HEIGHT = 20.f;
-const Vec2 LEAVES_PARTICLE_DIMENSIONS = Vec2( 1.f , 1.f ) * LEAVES_PARTICLE_HEIGHT;
+constexpr float LEAVES_PARTICLE_HEIGHT		= 20.f;
+const Vec2 LEAVES_PARTICLE_DIMENSIONS		= Vec2( 1.f , 1.f ) * LEAVES_PARTICLE_HEIGHT;
 
-constexpr float LEAVES_PARTICLE_VELOCITY = 0.5f * PARTICLE_VELOCITY;
+constexpr float LEAVES_PARTICLE_VELOCITY	= 0.5f * VFX_PARTICLE_VELOCITY;
+constexpr float LEAVES_PARTICLE_MIN_AGE		= 35.f;
+constexpr float LEAVES_PARTICLE_MAX_AGE		= 50.f;
 
-constexpr float FLOWER_PARTICLE_HEIGHT = 20.f;
-const Vec2		FLOWER_PARTICLE_DIMENSIONS = Vec2( 1.f , 1.f ) * FLOWER_PARTICLE_HEIGHT;
-constexpr float FLOWER_PARTICLE_VELOCITY = 0.5f * PARTICLE_VELOCITY;
+constexpr float FLOWER_PARTICLE_HEIGHT		= 20.f;
+const Vec2		FLOWER_PARTICLE_DIMENSIONS	= Vec2( 1.f , 1.f ) * FLOWER_PARTICLE_HEIGHT;
+constexpr float FLOWER_PARTICLE_VELOCITY	= 0.35f * VFX_PARTICLE_VELOCITY;
+constexpr float FLOWER_PARTICLE_MIN_AGE		= 22.5f;
+constexpr float FLOWER_PARTICLE_MAX_AGE		= 30.f;
 
-constexpr float PADDLE_COLLISION_DEVIATION = 10.f;
+constexpr float PADDLE_COLLISION_DEVIATION	= 10.f;
 
-constexpr float TILE_DEVIATION = .6667f * 0.1f;
+constexpr float TILE_DEVIATION				= .6667f * 0.1f;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

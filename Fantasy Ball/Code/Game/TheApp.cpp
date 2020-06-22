@@ -189,7 +189,7 @@ void TheApp::Update( float deltaSeconds )
 
 	
 	if ( m_isPaused )								{ deltaSeconds = 0.f; }
-	else if ( m_isSloMo == true )					{ deltaSeconds /= 10.f; }
+	else if ( m_isSloMo == true )					{ deltaSeconds /= 50.f; }
 	if ( m_isSpeedMo )								{ deltaSeconds = deltaSeconds * 4.0f; }
 
 	g_theGame->Update( deltaSeconds );

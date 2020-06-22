@@ -178,9 +178,9 @@ void RenderContext::Startup( Window* window )
 
 	IDXGISwapChain* swapchain = nullptr;  // Create Swap Chain
 
-	UINT flags = D3D11_CREATE_DEVICE_SINGLETHREADED;
+	UINT flags = 0; /*D3D11_CREATE_DEVICE_SINGLETHREADED;*/
 #if defined(RENDER_DEBUG)
-	flags |= D3D11_CREATE_DEVICE_DEBUG;
+	//flags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
@@ -408,12 +408,12 @@ void RenderContext::BeginCamera( const Camera& camera )
 	m_context->ClearState();
 #endif
 
-	int rtvCount = camera.GetColorTargetCount();
+	size_t rtvCount = camera.GetColorTargetCount();
 	std::vector<ID3D11RenderTargetView*> rtvs;
 
 	rtvs.resize( rtvCount );
 
-	for ( int i = 0; i < rtvCount; i++ )
+	for ( size_t i = 0; i < rtvCount; i++ )
 	{
 		rtvs[ i ] = nullptr;
 
@@ -811,7 +811,7 @@ Texture* RenderContext::GetOrCreatematchingRenderTarget( Texture* texture )
 {
 	IntVec2 size = texture->GetDimensions();
 
-	for ( int index = 0; index < m_renderTargetPool.size(); index++ )
+	for ( size_t index = 0; index < m_renderTargetPool.size(); index++ )
 	{
 		Texture* renderTarget = m_renderTargetPool[ index ];
 		
@@ -919,12 +919,12 @@ void RenderContext::CreateBlendStates()
 	additiveDesc.IndependentBlendEnable = false;
 	additiveDesc.RenderTarget[ 0 ].BlendEnable = true;
 	additiveDesc.RenderTarget[ 0 ].BlendOp = D3D11_BLEND_OP_ADD;
-	additiveDesc.RenderTarget[ 0 ].SrcBlend = D3D11_BLEND_ONE;
+	additiveDesc.RenderTarget[ 0 ].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 	additiveDesc.RenderTarget[ 0 ].DestBlend = D3D11_BLEND_ONE;
 
 	additiveDesc.RenderTarget[ 0 ].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-	additiveDesc.RenderTarget[ 0 ].SrcBlendAlpha = D3D11_BLEND_ONE;
-	additiveDesc.RenderTarget[ 0 ].DestBlendAlpha = D3D11_BLEND_ZERO;
+	additiveDesc.RenderTarget[ 0 ].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
+	additiveDesc.RenderTarget[ 0 ].DestBlendAlpha = D3D11_BLEND_ONE;
 
 	// render all output
 	additiveDesc.RenderTarget[ 0 ].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;

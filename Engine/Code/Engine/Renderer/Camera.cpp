@@ -249,7 +249,7 @@ void Camera::SetColorTarget( Texture* texture )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Camera::SetColorTarget( int index , Texture* texture )
+void Camera::SetColorTarget( size_t index , Texture* texture )
 {
 	if ( index >= m_colorTargets.size() )
 	{
@@ -328,7 +328,7 @@ Texture* Camera::GetColorTarget() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Texture* Camera::GetColorTarget( int index ) const
+Texture* Camera::GetColorTarget( size_t index ) const
 {
 	if ( index < m_colorTargets.size() )
 	{

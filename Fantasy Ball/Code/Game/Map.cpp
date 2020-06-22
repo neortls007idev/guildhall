@@ -44,14 +44,14 @@ Map::Map( Game* owner , MapDefinition* mapDefinition , std::string mapName ) :
 
 	LevelBounds();
 
-	for( int mapGenSteps = 0; mapGenSteps < m_mapDefinition->m_generationSteps.size(); mapGenSteps++ )
+	for( size_t mapGenSteps = 0; mapGenSteps < m_mapDefinition->m_generationSteps.size(); mapGenSteps++ )
 	{
 		m_mapDefinition->m_generationSteps[ mapGenSteps ]->RunStep( *this );
 	}
 
-	m_tileEmitter	= g_theParticleSystem2D->CreateNewParticleEmitter( g_theRenderer , m_owner->m_gameSS[ SS_VFX_FLARE ] , nullptr , ALPHA );
-	m_boundsEmitter = g_theParticleSystem2D->CreateNewParticleEmitter( g_theRenderer , m_owner->m_gameSS[ SS_VFX_LEAVES ] , nullptr , ALPHA );
-	m_paddleEmitter = g_theParticleSystem2D->CreateNewParticleEmitter( g_theRenderer , m_owner->m_gameSS[ SS_VFX_FLOWERS ] , nullptr , ALPHA );
+	m_tileEmitter	= g_theParticleSystem2D->CreateNewParticleEmitter( g_theRenderer , m_owner->m_gameSS[ SS_VFX_FLARE ] , nullptr , ADDITIVE );
+	m_boundsEmitter = g_theParticleSystem2D->CreateNewParticleEmitter( g_theRenderer , m_owner->m_gameSS[ SS_VFX_LEAVES ] , nullptr , ADDITIVE );
+	m_paddleEmitter = g_theParticleSystem2D->CreateNewParticleEmitter( g_theRenderer , m_owner->m_gameSS[ SS_VFX_FLOWERS ] , nullptr , ADDITIVE );
 
 	SpawnNewEntity( PADDLE , Vec2::ZERO );
 
@@ -165,65 +165,37 @@ void Map::Render()
 
 void Map::UpdateSideCosmeticBounds()
 {
-	float offset = RangeMapFloat( -1.f , 1.f , -5.f , 5.f ,
+	float positionY = RangeMapFloat( -1.f , 1.f , -50.f , 50.f ,
 								  SinDegrees( 100.f * ( float ) GetCurrentTimeSeconds() ) );
-	Vec2 movement = Vec2( 0.0f , SinDegrees( 300.f * ( float ) GetCurrentTimeSeconds() ) );
-	m_leftWallCosmeticBounds.Translate( movement );
-	m_rightWallCosmeticBounds.Translate( movement );
+
+	Vec2 leftWallCenter = m_leftWallCosmeticBounds.GetCenter();
+	m_leftWallCosmeticBounds.SetCenter( Vec2( leftWallCenter.x , positionY ) );
+
+	Vec2 rightWallCenter = m_rightWallCosmeticBounds.GetCenter();
+	m_rightWallCosmeticBounds.SetCenter( Vec2( rightWallCenter.x , positionY ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Map::UpdateTopCosmeticBounds()
 {
-	float offset = RangeMapFloat( -1.f , 1.f , -5.f , 5.f ,
+	float positionX = RangeMapFloat( -1.f , 1.f , -50.f , 50.f ,
 								  SinDegrees( 100.f * ( float ) GetCurrentTimeSeconds() ) );
 	Vec2 movement = Vec2( CosDegrees( 300.f * ( float ) GetCurrentTimeSeconds() ) , 0.0f );
-	m_topWallCosmeticBounds.Translate( movement );
+	Vec2 topWallCenter = m_topWallCosmeticBounds.GetCenter();
+	m_topWallCosmeticBounds.SetCenter( Vec2( positionX , topWallCenter.y ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Map::RenderLevelBounds()
 {
-	//g_theRenderer->EndCamera( m_owner->m_worldCamera );
-	//
-	//Texture* originalCameraTarget	= m_owner->m_worldCamera.GetColorTarget( 0 );
-	//Texture* originalCameraRTV		= g_theRenderer->GetOrCreatematchingRenderTarget( originalCameraTarget );
-	//Texture* colorTarget			= g_theRenderer->GetOrCreatematchingRenderTarget( originalCameraRTV );
-	//Texture* colorTargetMorphedV	= g_theRenderer->GetOrCreatematchingRenderTarget( originalCameraRTV );
-	//
-	//m_owner->m_worldCamera.SetColorTarget( 0 , colorTarget );
-	//uint cameraClearMode = m_owner->m_worldCamera.GetClearMode();
-	//m_owner->m_worldCamera.SetClearMode( CLEAR_NONE , BLACK );
-		
-	//->BeginCamera( m_owner->m_worldCamera );
-	//->SetBlendMode( ALPHA );
 	g_theRenderer->BindTexture( m_owner->m_gameTex[ TEX_LEFT_WALL ] );
 	g_theRenderer->DrawAABB2( m_leftWallCosmeticBounds , WHITE );
 	g_theRenderer->BindTexture( m_owner->m_gameTex[ TEX_RIGHT_WALL ] );
 	g_theRenderer->DrawAABB2( m_rightWallCosmeticBounds , WHITE );
 	g_theRenderer->BindTexture( m_owner->m_gameTex[ TEX_TOP_WALL_SECTION ] );
 	g_theRenderer->DrawAABB2( m_topWallCosmeticBounds , WHITE );
-
-	//g_theRenderer->StartEffect( colorTargetMorphedV , colorTarget , m_owner->m_gameShader[ GSHADER_VMOVE ] );
-	//g_theRenderer->BindTexture( colorTarget , TEX_USER_TYPE );
-	//g_theRenderer->EndEffect();
-	//
-	//g_theRenderer->StartEffect( originalCameraRTV , colorTargetMorphedV , m_owner->m_gameShader[ GSHADER_COMBINEIMG ] );
-	//g_theRenderer->BindTexture( originalCameraRTV );
-	//g_theRenderer->BindTexture( colorTargetMorphedV , TEX_USER_TYPE );
-	//g_theRenderer->EndEffect();
-
-	//g_theRenderer->EndCamera( m_owner->m_worldCamera );
-	//m_owner->m_worldCamera.SetColorTarget( 0 , originalCameraRTV );
-	//g_theRenderer->BeginCamera( m_owner->m_worldCamera );
-	//g_theRenderer->SetBlendMode( ALPHA );
-	//m_owner->m_worldCamera.SetClearMode( cameraClearMode , BLACK );
-	//g_theRenderer->CopyTexture( g_theRenderer->m_swapChain->GetBackBuffer() , originalCameraRTV );
-	//g_theRenderer->ReleaseRenderTarget( colorTarget );
-	//g_theRenderer->ReleaseRenderTarget( colorTargetMorphedV );
-	//g_theRenderer->ReleaseRenderTarget( originalCameraRTV );
 	
 	if( m_owner->m_isDebugDraw )
 	{
@@ -249,20 +221,20 @@ void Map::SpawnNewEntity( eEntityType type , const Vec2& position , TileDefiniti
 	switch ( type )
 	{
 		case INVALID_ENTITY:
-								break;
+			break;
 		case PADDLE:
 			newEntity = new Paddle( m_owner , m_owner->GetPaddleHealth() ,
-					AABB2( -100.f , -25.f , 100.f , 25.f ) ,
-			                    Vec2( 0.f , m_pitPhysicalBounds.m_mins.y + 83.f ) );
-								break;
+			AABB2( -100.f , -25.f , 100.f , 25.f ) ,
+			Vec2( 0.f , m_pitPhysicalBounds.m_mins.y + 83.f ) );
+			break;
 		case BALL:
-					newEntity = new Ball( m_owner , 1 , 25.f * 1.5f , 25.f , position , BALL_INITIAL_VELOCITY );
-								break;
+			newEntity = new Ball( m_owner , 1 , 25.f * 1.5f , 25.f , position , BALL_INITIAL_VELOCITY );
+			break;
 		case TILE:
-					newEntity = new Tile( this , IntVec2( position ) , tileDef );
-								break;
+			newEntity = new Tile( this , IntVec2( position ) , tileDef );
+			break;
 		default:
-								break;
+			break;
 	}
 
 	AddEntityToMap( newEntity );
@@ -478,6 +450,31 @@ void Map::ResolveBallvTileCollisions()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Map::ResolvePaddlevPowerUpCollisions()
+{
+	Entitylist& currentList = m_entityListsByType[ POWERUP ];
+	for( int entityIndex = 0; entityIndex < ( int ) m_entityListsByType[ POWERUP ].size(); entityIndex++ )
+	{
+		if( currentList[ entityIndex ] )
+		{
+			Paddle* paddle = nullptr;
+			if( m_entityListsByType[ PADDLE ].data() )
+			{
+				paddle = ( Paddle* ) m_entityListsByType[ PADDLE ][ 0 ];
+			}
+
+			__debugbreak();
+			// TODO:- FIX THIS SHIT BRUH... YOU NEED IT NOW!!
+			if ( DoAABBsOverlap(paddle->GetCollider() , AABB2::ZERO_TO_ONE) )
+			{
+				
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Map::SpawnLeafParticlesOnBallCollision( Ball* ball , Vec2 refPoint , uint num4XParticles )
 {
 	for( uint index = 0 ; index < num4XParticles ; index++ )
@@ -489,61 +486,64 @@ void Map::SpawnLeafParticlesOnBallCollision( Ball* ball , Vec2 refPoint , uint n
 
 		float ballVelocityMagnitude = ball->m_velocity.GetLength();
 
-		Vec2 deviation = g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
-		float orientationDegrees = g_RNG->RollRandomFloatInRange( -360.f , 360.f );
-		float angularVelocity = g_RNG->RollRandomFloatInRange( -45.f , 45.f );
-		float scale = g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
-
+		Vec2 deviation				= g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
+		float orientationDegrees	= g_RNG->RollRandomFloatInRange( -360.f , 360.f );
+		float angularVelocity		= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
+		float scale					= g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
+		float maxAge				= g_RNG->RollRandomFloatInRange( LEAVES_PARTICLE_MIN_AGE , LEAVES_PARTICLE_MAX_AGE );
 
 		m_boundsEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , LEAVES_PARTICLE_DIMENSIONS ) , refPoint ,
-													 orientationDegrees , scale , angularVelocity ,
-													 ( ball->m_velocity + deviation ) * LEAVES_PARTICLE_VELOCITY , 0.0f ,
-													 2.0f , WHITE , spriteCoords );
+											orientationDegrees , scale , angularVelocity ,
+											( ball->m_velocity + deviation ) * LEAVES_PARTICLE_VELOCITY , 0.0f ,
+										   maxAge , WHITE , spriteCoords );
 
-		deviation = g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
-		orientationDegrees = g_RNG->RollRandomFloatInRange( -360.f , 360.f );
-		angularVelocity = g_RNG->RollRandomFloatInRange( -45.f , 45.f );
-		scale = g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
+		deviation					= g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
+		orientationDegrees			= g_RNG->RollRandomFloatInRange( -360.f , 360.f );
+		angularVelocity				= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
+		scale						= g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
+		maxAge						= g_RNG->RollRandomFloatInRange( LEAVES_PARTICLE_MIN_AGE , LEAVES_PARTICLE_MAX_AGE );
+		
+		spriteCoordX				= g_RNG->RollRandomIntInRange( 0 , 2 );
+		spriteCoordY				= g_RNG->RollRandomIntInRange( 0 , 2 );
 
-		spriteCoordX = g_RNG->RollRandomIntInRange( 0 , 2 );
-		spriteCoordY = g_RNG->RollRandomIntInRange( 0 , 2 );
-
-		spriteCoords = IntVec2( spriteCoordX , spriteCoordY );
+		spriteCoords				= IntVec2( spriteCoordX , spriteCoordY );
 		
 		m_boundsEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , LEAVES_PARTICLE_DIMENSIONS ) , refPoint ,
-													 orientationDegrees , scale , angularVelocity ,
-													 ( ball->m_velocity + deviation ) * LEAVES_PARTICLE_VELOCITY , 0.0f ,
-													 2.0f , WHITE , spriteCoords );
+										   orientationDegrees , scale , angularVelocity ,
+										   ( ball->m_velocity + deviation ) * LEAVES_PARTICLE_VELOCITY , 0.0f ,
+										   maxAge , WHITE , spriteCoords );
 
-		deviation = g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
-		orientationDegrees = g_RNG->RollRandomFloatInRange( -360.f , 360.f );
-		angularVelocity = g_RNG->RollRandomFloatInRange( -45.f , 45.f );
-		scale = g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
+		deviation					= g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
+		orientationDegrees			= g_RNG->RollRandomFloatInRange( -360.f , 360.f );
+		angularVelocity				= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
+		scale						= g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
+		maxAge						= g_RNG->RollRandomFloatInRange( LEAVES_PARTICLE_MIN_AGE , LEAVES_PARTICLE_MAX_AGE );
 
-		spriteCoordX = g_RNG->RollRandomIntInRange( 0 , 2 );
-		spriteCoordY = g_RNG->RollRandomIntInRange( 0 , 2 );
+		spriteCoordX				= g_RNG->RollRandomIntInRange( 0 , 2 );
+		spriteCoordY				= g_RNG->RollRandomIntInRange( 0 , 2 );
 
-		spriteCoords = IntVec2( spriteCoordX , spriteCoordY );
+		spriteCoords				= IntVec2( spriteCoordX , spriteCoordY );
 		
 		m_boundsEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , LEAVES_PARTICLE_DIMENSIONS ) , refPoint ,
-													 orientationDegrees , scale , angularVelocity ,
-													 ( ball->m_velocity + deviation ) * LEAVES_PARTICLE_VELOCITY , 0.0f ,
-													 2.0f , WHITE , spriteCoords );
+										   orientationDegrees , scale , angularVelocity ,
+										   ( ball->m_velocity + deviation ) * LEAVES_PARTICLE_VELOCITY , 0.0f ,
+										   maxAge , WHITE , spriteCoords );
 
-		deviation = g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
-		orientationDegrees = g_RNG->RollRandomFloatInRange( -360.f , 360.f );
-		angularVelocity = g_RNG->RollRandomFloatInRange( -45.f , 45.f );
-		scale = g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
+		deviation					= g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
+		orientationDegrees			= g_RNG->RollRandomFloatInRange( -360.f , 360.f );
+		angularVelocity				= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
+		scale						= g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
+		maxAge						= g_RNG->RollRandomFloatInRange( LEAVES_PARTICLE_MIN_AGE , LEAVES_PARTICLE_MAX_AGE );
+		
+		spriteCoordX				= g_RNG->RollRandomIntInRange( 0 , 2 );
+		spriteCoordY				= g_RNG->RollRandomIntInRange( 0 , 2 );
 
-		spriteCoordX = g_RNG->RollRandomIntInRange( 0 , 2 );
-		spriteCoordY = g_RNG->RollRandomIntInRange( 0 , 2 );
-
-		spriteCoords = IntVec2( spriteCoordX , spriteCoordY );
+		spriteCoords				= IntVec2( spriteCoordX , spriteCoordY );
 		
 		m_boundsEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , LEAVES_PARTICLE_DIMENSIONS ) , refPoint ,
-													 orientationDegrees , scale , angularVelocity ,
-													 ( ball->m_velocity + deviation ) * LEAVES_PARTICLE_VELOCITY , 0.0f ,
-													 2.0f , WHITE , spriteCoords );
+										   orientationDegrees , scale , angularVelocity ,
+										   ( ball->m_velocity + deviation ) * LEAVES_PARTICLE_VELOCITY , 0.0f ,
+										   maxAge , WHITE , spriteCoords );
 	}
 }
 
@@ -553,67 +553,71 @@ void Map::SpawnFlowerParticlesOnBallCollision( Ball* ball , Vec2 refPoint , uint
 {
 	for( uint index = 0 ; index < num4XParticles ; index++ )
 	{
-		int spriteCoordX = g_RNG->RollRandomIntInRange( 0 , 1 );
-		int spriteCoordY = g_RNG->RollRandomIntInRange( 0 , 1 );
+		int spriteCoordX			= g_RNG->RollRandomIntInRange( 0 , 1 );
+		int spriteCoordY			= g_RNG->RollRandomIntInRange( 0 , 1 );
 
 		IntVec2 spriteCoords( spriteCoordX , spriteCoordY );
 
 		float ballVelocityMagnitude = ball->m_velocity.GetLength();
 
-		Vec2 deviation = g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
-		float orientationDegrees = g_RNG->RollRandomFloatInRange( -360.f , 360.f );
-		float angularVelocity = g_RNG->RollRandomFloatInRange( -45.f , 45.f );
-		float scale = g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
+		Vec2 deviation				= g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
+		float orientationDegrees	= g_RNG->RollRandomFloatInRange( -360.f , 360.f );
+		float angularVelocity		= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
+		float scale					= g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
+		float maxAge				= g_RNG->RollRandomFloatInRange( FLOWER_PARTICLE_MIN_AGE , FLOWER_PARTICLE_MAX_AGE );
+		
+		m_paddleEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , FLOWER_PARTICLE_DIMENSIONS ) , refPoint ,
+										   orientationDegrees , scale , angularVelocity ,
+										   ( ball->m_velocity + deviation ) * FLOWER_PARTICLE_VELOCITY , 0.0f ,
+										   maxAge , WHITE , spriteCoords );
+
+		deviation					= g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
+		orientationDegrees			= g_RNG->RollRandomFloatInRange( -360.f , 360.f );
+		angularVelocity				= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
+		scale						= g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
+		maxAge						= g_RNG->RollRandomFloatInRange( FLOWER_PARTICLE_MIN_AGE , FLOWER_PARTICLE_MAX_AGE );
+		
+		spriteCoordX				= g_RNG->RollRandomIntInRange( 0 , 1 );
+		spriteCoordY				= g_RNG->RollRandomIntInRange( 0 , 1 );
+
+		spriteCoords				= IntVec2( spriteCoordX , spriteCoordY );
 
 		m_paddleEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , FLOWER_PARTICLE_DIMENSIONS ) , refPoint ,
 										   orientationDegrees , scale , angularVelocity ,
 										   ( ball->m_velocity + deviation ) * FLOWER_PARTICLE_VELOCITY , 0.0f ,
-										   2.0f , WHITE , spriteCoords );
+										   maxAge , WHITE , spriteCoords );
 
-		deviation = g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
-		orientationDegrees = g_RNG->RollRandomFloatInRange( -360.f , 360.f );
-		angularVelocity = g_RNG->RollRandomFloatInRange( -45.f , 45.f );
-		scale = g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
+		deviation					= g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
+		orientationDegrees			= g_RNG->RollRandomFloatInRange( -360.f , 360.f );
+		angularVelocity				= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
+		scale						= g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
+		maxAge						= g_RNG->RollRandomFloatInRange( FLOWER_PARTICLE_MIN_AGE , FLOWER_PARTICLE_MAX_AGE );
+		
+		spriteCoordX				= g_RNG->RollRandomIntInRange( 0 , 1 );
+		spriteCoordY				= g_RNG->RollRandomIntInRange( 0 , 1 );
 
-		spriteCoordX = g_RNG->RollRandomIntInRange( 0 , 1 );
-		spriteCoordY = g_RNG->RollRandomIntInRange( 0 , 1 );
-
-		spriteCoords = IntVec2( spriteCoordX , spriteCoordY );
-
-		m_paddleEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , FLOWER_PARTICLE_DIMENSIONS ) , refPoint ,
-										   orientationDegrees , scale , angularVelocity ,
-										   ( ball->m_velocity + deviation ) * FLOWER_PARTICLE_VELOCITY , 0.0f ,
-										   2.0f , WHITE , spriteCoords );
-
-		deviation = g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
-		orientationDegrees = g_RNG->RollRandomFloatInRange( -360.f , 360.f );
-		angularVelocity = g_RNG->RollRandomFloatInRange( -45.f , 45.f );
-		scale = g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
-
-		spriteCoordX = g_RNG->RollRandomIntInRange( 0 , 1 );
-		spriteCoordY = g_RNG->RollRandomIntInRange( 0 , 1 );
-
-		spriteCoords = IntVec2( spriteCoordX , spriteCoordY );
+		spriteCoords				= IntVec2( spriteCoordX , spriteCoordY );
 
 		m_paddleEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , FLOWER_PARTICLE_DIMENSIONS ) , refPoint ,
 										   orientationDegrees , scale , angularVelocity ,
 										   ( ball->m_velocity + deviation ) * FLOWER_PARTICLE_VELOCITY , 0.0f ,
-										   2.0f , WHITE , spriteCoords );
+										   maxAge , WHITE , spriteCoords );
 
-		deviation = g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
-		orientationDegrees = g_RNG->RollRandomFloatInRange( -360.f , 360.f );
-		angularVelocity = g_RNG->RollRandomFloatInRange( -45.f , 45.f );
-		scale = g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
+		deviation					= g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
+		orientationDegrees			= g_RNG->RollRandomFloatInRange( -360.f , 360.f );
+		angularVelocity				= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
+		scale						= g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
+		maxAge						= g_RNG->RollRandomFloatInRange( FLOWER_PARTICLE_MIN_AGE , FLOWER_PARTICLE_MAX_AGE );
+		
+		spriteCoordX				= g_RNG->RollRandomIntInRange( 0 , 1 );
+		spriteCoordY				= g_RNG->RollRandomIntInRange( 0 , 1 );
 
-		spriteCoordX = g_RNG->RollRandomIntInRange( 0 , 1 );
-		spriteCoordY = g_RNG->RollRandomIntInRange( 0 , 1 );
-
-		spriteCoords = IntVec2( spriteCoordX , spriteCoordY );
+		spriteCoords				= IntVec2( spriteCoordX , spriteCoordY );
 
 		m_paddleEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , FLOWER_PARTICLE_DIMENSIONS ) , refPoint ,
 										   orientationDegrees , scale , angularVelocity ,
 										   ( ball->m_velocity + deviation ) * FLOWER_PARTICLE_VELOCITY , 0.0f ,
-										   2.0f , WHITE , spriteCoords );
+										   maxAge , WHITE , spriteCoords );
 	}
 }
 

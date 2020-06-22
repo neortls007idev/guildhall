@@ -47,7 +47,7 @@ void EventSystem::SubscribeToEvent( const std::string& eventName , EventCallback
 
 bool EventSystem::FireEvent( const std::string& eventName , EventArgs& defaultArguments )
 {
-	for ( int eventIndex = 0; eventIndex < ( int ) m_eventSubscriptions.size(); eventIndex++ )
+	for ( size_t eventIndex = 0; eventIndex < m_eventSubscriptions.size(); eventIndex++ )
 	{
 		EventSubscription* subscription = m_eventSubscriptions[ eventIndex ];
 		if ( subscription->m_eventName == eventName )
@@ -57,11 +57,11 @@ bool EventSystem::FireEvent( const std::string& eventName , EventArgs& defaultAr
 		}
 	}
 
-	for(int i=0; i<m_methodSubscriptions.size(); i++ )
+	for( size_t i = 0; i < m_methodSubscriptions.size(); i++ )
 	{
-		if(m_methodSubscriptions[i]!=nullptr )
+		if( m_methodSubscriptions[ i ] != nullptr )
 		{
-			if(m_methodSubscriptions[i]->eventName == eventName )
+			if( m_methodSubscriptions[ i ]->eventName == eventName )
 			{
 				m_methodSubscriptions[ i ]->func( defaultArguments );
 			}

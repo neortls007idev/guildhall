@@ -77,7 +77,7 @@ void Physics2D::Startup()
 
 void Physics2D::BeginFrame()
 {
-	for ( int index = 0; index < m_collissionInfo.size(); index++ )
+	for ( size_t index = 0; index < m_collissionInfo.size(); index++ )
 	{
 		if ( m_collissionInfo[ index ] == nullptr )
 		{
@@ -324,7 +324,7 @@ void Physics2D::HandleCollissionInfo( int colliderId1 , int colliderId2 )
 
 Collider2D* Physics2D::GetColliderForID( int id )
 {
-	for ( int i = 0; i < m_colliders2D.size(); i++ )
+	for ( size_t i = 0; i < m_colliders2D.size(); i++ )
 	{
 		if ( m_colliders2D[ i ] == nullptr )
 		{
@@ -756,7 +756,7 @@ void Physics2D::CleanupDestroyedColliders()
 
 void Physics2D::EndFrame()
 {
-	for(int rigidBodyIndex=0; rigidBodyIndex<m_rigidBodies2D.size(); rigidBodyIndex++ )
+	for( size_t rigidBodyIndex = 0; rigidBodyIndex < m_rigidBodies2D.size(); rigidBodyIndex++ )
 	{
 		if ( !m_rigidBodies2D[ rigidBodyIndex ] )
 		{

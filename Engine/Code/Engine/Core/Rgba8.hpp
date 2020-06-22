@@ -38,6 +38,7 @@ public:
 	void CycleRGBChannelsAntiClockwise();
 
 	void LerpColorOverTime( Rgba8 startColor , Rgba8 endColor , float lerpDuration , Timer* timer );
+	void LerpColorOverTime( Rgba8 startColor , Rgba8 endColor , float maxDuration , float currentTime );
 	Vec4 GetAsNormalizedFloat4() const;
 	Vec3 GetAsNormalizedFloat3() const;
 
@@ -76,5 +77,6 @@ constexpr Rgba8 ORANGE  = Rgba8( 255 , 127 , 0   , 255 );
 constexpr Rgba8 PINK	= Rgba8( 255 , 0   , 127 , 255 );
 constexpr Rgba8 PURPLE  = Rgba8( 127 , 0   , 255 , 255 );
 constexpr Rgba8 GRAY	= Rgba8( 127 , 127 , 127 , 255 );
+constexpr Rgba8 CLEAR	= Rgba8( 255 , 255 , 255 , 0 );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

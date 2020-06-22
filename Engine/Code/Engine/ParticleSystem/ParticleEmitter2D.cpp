@@ -85,7 +85,8 @@ void ParticleEmitter2D::SpawnNewParticle( AABB2 cosmeticBounds , Vec2 position ,
 {
 	if( m_spriteSheet != nullptr )
 	{
-		Particle2D* temp = new Particle2D( cosmeticBounds , position , orientation , scale , angularVelocity , velocity , age , maxAge , color );
+		Particle2D* temp = new Particle2D( cosmeticBounds , position , orientation , scale , angularVelocity ,
+		                                   velocity , age , maxAge , color );
 		int		spriteSheetWidth = m_spriteSheet->GetSpriteDimension().x;
 		int		spriteIndex = spriteCoords.x + ( spriteSheetWidth * spriteCoords.y );
 

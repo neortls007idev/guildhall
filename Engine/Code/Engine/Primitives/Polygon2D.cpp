@@ -143,7 +143,7 @@ Vec2 Polygon2D::GetClosestPointOnEdges( const Vec2 point ) const
 	std::vector<Vec2> closestPointsOnEachEdge;
 	Vec2 currentEdgeStart = m_points[ 0 ];
 	Vec2 currentEdgeEnd = m_points[ 1 ];
-	int counter = 0;
+	size_t counter = 0;
 	size_t start = 0;
 	size_t end = 1;
 	while ( counter < m_points.size() )
@@ -160,7 +160,7 @@ Vec2 Polygon2D::GetClosestPointOnEdges( const Vec2 point ) const
 	float nearestDistance = ( point - closestPointsOnEachEdge[ 0 ] ).GetLength();
 	Vec2 nearestPoint = closestPointsOnEachEdge[ 0 ];
 
-	for ( int index = 0; index < closestPointsOnEachEdge.size(); index++ )
+	for ( size_t index = 0; index < closestPointsOnEachEdge.size(); index++ )
 	{
 		float distance = ( point - closestPointsOnEachEdge[ index ] ).GetLength();
 		if ( distance < nearestDistance )
@@ -209,7 +209,7 @@ void Polygon2D::SetNewCenter( Vec2 newCenter )
 
 	Vec2 centre = GetCenter();
 	Vec2 moveVec = newCenter - centre;
-	for ( int i = 0; i < m_points.size(); i++ )
+	for ( size_t i = 0; i < m_points.size(); i++ )
 	{
 		m_points[ i ] += moveVec;
 	}
@@ -264,7 +264,7 @@ Polygon2D Polygon2D::MakeFromLineLoop( Vec2 const* points , uint pointCount )
 
 	Vec2 center = Vec2( 0.f , 0.f );
 
-	for ( int index = 0; index < temp.m_points.size(); index++ )
+	for ( size_t index = 0; index < temp.m_points.size(); index++ )
 	{
 		center += points[ index ];
 	}
@@ -320,7 +320,7 @@ Vec2 Polygon2D::GetClosestPointOnEdgeAndIndicesOfTheEdge( Vec2 point , size_t& o
 	std::vector<Vec2> closestPointsOnEachEdge;
 	Vec2 currentEdgeStart	= m_points[ 0 ];
 	Vec2 currentEdgeEnd		= m_points[ 1 ];
-	int counter				= 0;
+	size_t counter			= 0;
 	size_t start			= 0;
 	size_t end				= 1;
 

@@ -165,6 +165,35 @@ void Rgba8::LerpColorOverTime( Rgba8 startColor , Rgba8 endColor , float lerpDur
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Rgba8::LerpColorOverTime( Rgba8 startColor , Rgba8 endColor , float maxDuration , float currentTime )
+{
+	if( maxDuration <= 0.f )
+	{
+		r = endColor.r;
+		g = endColor.g;
+		b = endColor.b;
+		a = endColor.a;
+		return;
+	}
+
+	if( *this == endColor )
+	{
+		return;
+	}
+
+	if( startColor == endColor )
+	{
+		return;
+	}
+
+	r = ( uchar ) RangeMapFloat( 0.f , maxDuration , ( float ) startColor.r , ( float ) endColor.r , currentTime );
+	g = ( uchar ) RangeMapFloat( 0.f , maxDuration , ( float ) startColor.g , ( float ) endColor.g , currentTime );
+	b = ( uchar ) RangeMapFloat( 0.f , maxDuration , ( float ) startColor.b , ( float ) endColor.b , currentTime );
+	a = ( uchar ) RangeMapFloat( 0.f , maxDuration , ( float ) startColor.a , ( float ) endColor.a , currentTime );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Vec4 Rgba8::GetAsNormalizedFloat4() const
 {
 	Vec4 normalizedColor;

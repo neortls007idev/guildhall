@@ -2,7 +2,7 @@
 
 	<MapDefinition name="Island" width="15" height="17">
 		<GenerationSteps>
-			<FromImage iterations="1" ImageFileName="testMap2.png" uAlignment="0.0" vAlignment="0.0" rotations="0"/>
+			<FromImage iterations="1" ImageFileName="testMap4.png" uAlignment="0.0" vAlignment="0.0" rotations="0"/>
 		</GenerationSteps>
 	</MapDefinition>
 

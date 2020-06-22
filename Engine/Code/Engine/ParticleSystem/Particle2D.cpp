@@ -102,6 +102,7 @@ void Particle2D::Update( float deltaSeconds )
 	{
 		m_age += deltaSeconds;
 		Move( deltaSeconds );
+		m_color.LerpColorOverTime( m_color , CLEAR , m_maxAge , m_age );
 	}
 }
 

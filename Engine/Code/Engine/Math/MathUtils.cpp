@@ -1397,7 +1397,7 @@ Vec2 GetSupportPoint( const Vec2* vertices , size_t count , Vec2 direction )
 {
 	float maxProduct = DotProduct2D( direction , vertices[ 0 ] );
 	int index = 0;
-	for ( int i = 1; i < count; i++ )
+	for ( size_t i = 1; i < count; i++ )
 	{
 		float product = DotProduct2D( direction , vertices[ i ] );
 		if ( product > maxProduct )
@@ -1642,7 +1642,7 @@ void GetContactPoints( Polygon2D minkowskiPoly , Polygon2D poly1 , Polygon2D pol
 
 	std::vector<Temp> pointsAndDistance;
 	
-	for ( int i = 0; i < poly2.m_points.size(); i++ )
+	for ( size_t i = 0; i < poly2.m_points.size(); i++ )
 	{
 		float distaceFromPlane = referencePlane.GetSignedDistanceFromPlane( poly2.m_points[ i ] );
 		if ( abs( distaceFromPlane ) <= eps )
@@ -1674,7 +1674,7 @@ void GetContactPoints( Polygon2D minkowskiPoly , Polygon2D poly1 , Polygon2D pol
 
 	Vec2 tangent = normal.GetRotatedMinus90Degrees();
 
-	for ( int i = 0; i < pointsAndDistance.size(); i++ )
+	for ( size_t i = 0; i < pointsAndDistance.size(); i++ )
 	{
 		pointsAndDistance[ i ].distace = DotProduct2D( tangent , pointsAndDistance[ i ].point );
 	}

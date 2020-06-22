@@ -55,7 +55,7 @@ public:
 	Rgba8			GetClearColor() const																					{ return m_clearColor; }
 	unsigned int	GetClearMode() const																					{ return m_clearMode; }
 	Texture*		GetColorTarget() const;
-	Texture*		GetColorTarget( int index ) const;
+	Texture*		GetColorTarget( size_t index ) const;
 	uint			GetColorTargetCount() const;
 	Vec2			GetColorTargetSize() const;
 	Texture*		GetDepthStencilTarget() const																			{ return m_depthStencilTarget; }
@@ -76,7 +76,7 @@ public:
 	void			SetOrthoView( const float& halfHeight , const float& aspectRatio );
 	void			SetClearMode( unsigned int clearFlags , Rgba8 color , float depth = 0.f , unsigned int stencil = 0 );
 	void			SetColorTarget( Texture* texture );
-	void			SetColorTarget( int index , Texture* texture );
+	void			SetColorTarget( size_t index , Texture* texture );
 	void			CreateMatchingDepthStencilTarget();
 	void			SetDepthStencilTarget( Texture* texture );
 	void			SetDepthStencilTargetFromAnotherCamera( Camera* camera );

@@ -7,7 +7,8 @@ enum eEntityType
 	BALL,
 	PADDLE,
 	TILE,
-
+	POWERUP,
+	
 	NUM_ENTITY_TYPES,
 	INVALID_ENTITY,
 };

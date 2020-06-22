@@ -18,7 +18,7 @@ Strings GetTrimmedStrings( std::string& stringData )
 	Strings temp = SplitStringAtGivenDelimiter( stringData , ' ' );
 	Strings toReturn;
 
-	for ( int index = 0; index < temp.size(); index++ )
+	for ( size_t index = 0; index < temp.size(); index++ )
 	{
 		if ( temp[ index ] != "" )
 		{
@@ -72,7 +72,7 @@ GPUMesh* LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::string objFil
 	std::vector<uint>					indices;
 	uint currentVert					= 0;
 	
-	for ( long i = 0; i < linesOfObjFile.size(); i++ )
+	for ( size_t i = 0; i < linesOfObjFile.size(); i++ )
 	{
 		if ( linesOfObjFile[ i ] == "" )
 		{
@@ -169,7 +169,7 @@ GPUMesh* LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::string objFil
 		}
 	}
 	
-	for ( int i = 0; i < iForVerts.size(); i++ )
+	for ( size_t i = 0; i < iForVerts.size(); i++ )
 	{
 		if ( iForVerts[ i ].size() == 4 )
 		{
@@ -329,7 +329,7 @@ GPUMesh* LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::string objFil
 	
 	if ( options.generateNormals )
 	{
-		for ( int i = 0; i < finalVerts.size(); i += 3 )
+		for ( size_t i = 0; i < finalVerts.size(); i += 3 )
 		{
 			Vec3 normal = CrossProduct3D( finalVerts[ i + 1 ].m_position - finalVerts[ i ].m_position , finalVerts[ i + 2 ].m_position - finalVerts[ i ].m_position );
 			finalVerts[ i ].m_normal = normal;

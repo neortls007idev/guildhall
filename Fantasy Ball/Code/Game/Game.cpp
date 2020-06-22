@@ -62,7 +62,7 @@ Game::~Game()
 		m_gameTex[ index ] = nullptr;
 	}
 
-	for( int index = 0 ; index < m_levels.size() ; index++ )
+	for( size_t index = 0 ; index < m_levels.size() ; index++ )
 	{
 		delete m_levels[ index ];
 		m_levels[ index ] = nullptr;

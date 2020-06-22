@@ -47,6 +47,7 @@ public:
 	void ResolveBallvBoundsCollisions();
 	void ResolveBallvPaddleCollisions();
 	void ResolveBallvTileCollisions();
+	void ResolvePaddlevPowerUpCollisions();
 	
 	void SpawnLeafParticlesOnBallCollision( Ball* ball , Vec2 refPoint , uint num4XParticles );
 	void SpawnFlowerParticlesOnBallCollision( Ball* ball , Vec2 refPoint , uint num4XParticles );

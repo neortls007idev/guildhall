@@ -26,6 +26,11 @@ Tile::Tile( Map* owner , IntVec2 tileCoordinates , TileDefinition* tileType ) :
 	SetHealth( m_tileDef->m_health );
 	m_tileColor = m_tileDef->m_tileColor;
 	m_bounds = CreateColliderFromCoords();
+
+	m_solidAtHealth		= tileType->m_solidAtHealth;
+	m_visibleAtHealth	= tileType->m_visibleAtHealth;
+	m_isSolid			= tileType->m_isSolid;
+	m_isVisible			= tileType->m_isVisible;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -44,29 +49,33 @@ void Tile::Update( float deltaSeconds )
 //  	{
 //  		m_animTime = 0.f;
 //  	}
-	if( m_animTime <= 1.0f )						{ m_tileAnim = MOVE_UP; }
-	if ( m_animTime >= 1.0f )						{ m_tileAnim = MOVE_DOWN; }
-	if ( m_animTime >= 2.0f )						{ m_tileAnim = MOVE_LEFT; }
-	if ( m_animTime >= 3.0f )						{ m_tileAnim = MOVE_RIGHT; }
-	if( m_animTime >= 4.0f )						{ m_tileAnim = MOVE_CENTER; m_animTime = 0.f; }
-	
-	UpdateCollider();
+// 	if( m_animTime <= 1.0f )						{ m_tileAnim = MOVE_UP; }
+// 	if ( m_animTime >= 1.0f )						{ m_tileAnim = MOVE_DOWN; }
+// 	if ( m_animTime >= 2.0f )						{ m_tileAnim = MOVE_LEFT; }
+// 	if ( m_animTime >= 3.0f )						{ m_tileAnim = MOVE_RIGHT; }
+// 	if( m_animTime >= 4.0f )						{ m_tileAnim = MOVE_CENTER; m_animTime = 0.f; }
+// 	
+// 	UpdateCollider();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Tile::Render() const
 {
-	//AABB2 tile = CreateColliderFromCoords();
-	const Texture* tex = &g_theGame->m_gameSS[ SS_BRICKS ]->GetTexture();
-	g_theRenderer->BindTexture( tex );
-	g_theRenderer->DrawAABB2( m_bounds , WHITE , m_tileDef->m_spriteUVs.m_mins , m_tileDef->m_spriteUVs.m_maxs );
-	g_theRenderer->BindTexture( nullptr );
-
 	if ( m_owner->m_isDebugDraw  )
 	{
 		g_theRenderer->DrawUnfilledAABB2( m_bounds , WHITE , 5.f );
 	}
+
+	if( !m_isVisible )
+	{
+		return;
+	}
+	
+	const Texture* tex = &g_theGame->m_gameSS[ SS_BRICKS ]->GetTexture();
+	g_theRenderer->BindTexture( tex );
+	g_theRenderer->DrawAABB2( m_bounds , WHITE , m_tileDef->m_spriteUVs.m_mins , m_tileDef->m_spriteUVs.m_maxs );
+	g_theRenderer->BindTexture( nullptr );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -98,7 +107,21 @@ bool Tile::TileCollisionResponse( Ball* ball )
 		
 		PushDiscOutOfAABB( ball->m_pos , ball->m_physicsRadius , m_bounds );
 
-		--m_health;
+		if ( !m_isSolid )
+		{
+			--m_health;
+		}
+		
+		if ( m_health <= m_solidAtHealth )
+		{
+			m_isSolid = true;
+		}
+
+		if ( m_health <= m_visibleAtHealth )
+		{
+			m_isVisible = true;
+		}
+		
 		ball->UpdateCurrentTexture( m_tileColor );
 		
 		return true;
@@ -119,42 +142,45 @@ void Tile::SpawnParticlesOnBallCollision( Ball* ball , Vec2 refPoint , uint num4
 		float orientationDegrees	= g_RNG->RollRandomFloatInRange( -360.f , 360.f );
 		float angularVelocity		= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
 		float scale					= g_RNG->RollRandomFloatInRange(0.f,1.5f );		
-
+		float maxAge				= g_RNG->RollRandomFloatInRange( VFX_PARTICLE_MIN_AGE , VFX_PARTICLE_MAX_AGE );
 		
-		m_ownerMap->m_tileEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint ,
+		m_ownerMap->m_tileEmitter->SpawnNewParticle( AABB2( -VFX_PARTICLE_DIMENSIONS , VFX_PARTICLE_DIMENSIONS ) , refPoint ,
 		                                             orientationDegrees , scale , angularVelocity ,
-		                                             ( ball->m_velocity + deviation ) * PARTICLE_VELOCITY , 0.0f ,
-		                                             2.0f , WHITE , m_tileDef->m_VFXSpriteCoords );
+		                                             ( ball->m_velocity + deviation ) * VFX_PARTICLE_VELOCITY , 0.0f ,
+													 maxAge , WHITE , m_tileDef->m_VFXSpriteCoords );
 
 		deviation				= g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
 		orientationDegrees		= g_RNG->RollRandomFloatInRange( -360.f , 360.f );
 		angularVelocity			= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
 		scale					= g_RNG->RollRandomFloatInRange(0.f,1.5f );	
-
-		m_ownerMap->m_tileEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint ,
+		maxAge					= g_RNG->RollRandomFloatInRange( VFX_PARTICLE_MIN_AGE , VFX_PARTICLE_MAX_AGE );
+		
+		m_ownerMap->m_tileEmitter->SpawnNewParticle( AABB2( -VFX_PARTICLE_DIMENSIONS , VFX_PARTICLE_DIMENSIONS ) , refPoint ,
 													 orientationDegrees , scale , angularVelocity ,
-													 ( ball->m_velocity + deviation ) * PARTICLE_VELOCITY , 0.0f ,
-													 2.0f , WHITE , m_tileDef->m_VFXSpriteCoords );
+													 ( ball->m_velocity + deviation ) * VFX_PARTICLE_VELOCITY , 0.0f ,
+													 maxAge , WHITE , m_tileDef->m_VFXSpriteCoords );
+
+		deviation				= g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
+		orientationDegrees		= g_RNG->RollRandomFloatInRange( -360.f , 360.f );
+		angularVelocity			= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
+		scale					= g_RNG->RollRandomFloatInRange(0.f,1.5f );
+		maxAge					= g_RNG->RollRandomFloatInRange( VFX_PARTICLE_MIN_AGE , VFX_PARTICLE_MAX_AGE );
+
+		m_ownerMap->m_tileEmitter->SpawnNewParticle( AABB2( -VFX_PARTICLE_DIMENSIONS , VFX_PARTICLE_DIMENSIONS ) , refPoint ,
+													 orientationDegrees , scale , angularVelocity ,
+													 ( ball->m_velocity + deviation ) * VFX_PARTICLE_VELOCITY , 0.0f ,
+													 maxAge , WHITE , m_tileDef->m_VFXSpriteCoords );
 
 		deviation				= g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
 		orientationDegrees		= g_RNG->RollRandomFloatInRange( -360.f , 360.f );
 		angularVelocity			= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
 		scale					= g_RNG->RollRandomFloatInRange(0.f,1.5f );	
-
-		m_ownerMap->m_tileEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint ,
+		maxAge					= g_RNG->RollRandomFloatInRange( VFX_PARTICLE_MIN_AGE , VFX_PARTICLE_MAX_AGE );
+		
+		m_ownerMap->m_tileEmitter->SpawnNewParticle( AABB2( -VFX_PARTICLE_DIMENSIONS , VFX_PARTICLE_DIMENSIONS ) , refPoint ,
 													 orientationDegrees , scale , angularVelocity ,
-													 ( ball->m_velocity + deviation ) * PARTICLE_VELOCITY , 0.0f ,
-													 2.0f , WHITE , m_tileDef->m_VFXSpriteCoords );
-
-		deviation				= g_RNG->RollRandomDirection2D() * ballVelocityMagnitude;
-		orientationDegrees		= g_RNG->RollRandomFloatInRange( -360.f , 360.f );
-		angularVelocity			= g_RNG->RollRandomFloatInRange( -45.f , 45.f );
-		scale					= g_RNG->RollRandomFloatInRange(0.f,1.5f );	
-
-		m_ownerMap->m_tileEmitter->SpawnNewParticle( AABB2( Vec2::ZERO , particleDimensions ) , refPoint ,
-													 orientationDegrees , scale , angularVelocity ,
-													 ( ball->m_velocity + deviation ) * PARTICLE_VELOCITY , 0.0f ,
-													 2.0f , WHITE , m_tileDef->m_VFXSpriteCoords );
+													 ( ball->m_velocity + deviation ) * VFX_PARTICLE_VELOCITY , 0.0f ,
+													 maxAge , WHITE , m_tileDef->m_VFXSpriteCoords );
 	}
 }
 

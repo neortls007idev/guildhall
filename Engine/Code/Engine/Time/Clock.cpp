@@ -61,7 +61,7 @@ void Clock::Update( double deltaSeconds )
 	m_lastFrameDeltaSeconds	 = deltaTime;
 	m_totalTimeElapsed		+= m_lastFrameDeltaSeconds;
 
-	for ( int index = 0; index < m_children.size(); index++ )
+	for ( size_t index = 0; index < m_children.size(); index++ )
 	{
 		m_children[ index ]->Update( deltaSeconds );
 	}
