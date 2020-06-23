@@ -15,6 +15,7 @@ public:
 	void LoadUIFonts();
 	void InitalizeMainMenuLabels();
 	void InitalizeMainMenuButtons();
+	void InitalizeHUDLabels();
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -24,13 +25,18 @@ public:
 	void Update( float deltaSeconds );
 	bool LoadingState();
 	void MainMenuState();
+	void GameOverState();
+	void SettingsMenuState();
 	void UpdateBackGroundBranches();
 	
 	void Render() const;
 	void RenderLoadingScreen() const;
 	void RenderMainMenuScreen() const;
+	void RenderHUD() const;
 	void RenderDebugMouse() const;
 
+	void SetGameState( const eUISTATE state )																			{ m_systemState = state; }
+	
 public:
 	bool							m_UIDebugDraw				= false;
 	

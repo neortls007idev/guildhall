@@ -10,6 +10,8 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Game/Game.hpp"
+
+#include "UISystem.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/Map.hpp"
 #include "Game/MapDefinition.hpp"
@@ -28,6 +30,7 @@ extern AudioSystem*			g_theAudioSystem;
 extern TheApp*				g_theApp;
 extern InputSystem*			g_theInput;
 extern ParticleSystem2D*	g_theParticleSystem2D;
+extern UISystem*			g_theGamplayUISystem;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -198,6 +201,11 @@ void Game::Update( float deltaSeconds )
 //	UpdateCamera();
 	m_currentLevel->Update( deltaSeconds );
 	UpdateFromKeyBoard();
+	if( m_playerHealth == 0 )
+	{
+		g_theGamplayUISystem->SetGameState( GAME_OVER_STATE );
+	}
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

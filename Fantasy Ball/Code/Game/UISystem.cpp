@@ -57,6 +57,8 @@ void UISystem::LoadUITextures()
 	m_UITextures[ UI_SETTINGS ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Settings1.png" );
 	m_UITextures[ UI_EXIT ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Exit1.png" );
 	m_UITextures[ UI_MM_BRANCH_TEX ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Branches/branchT4.png" );
+
+	m_UITextures[ HUD_HEALTH ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HUD/health.png" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -139,6 +141,18 @@ void UISystem::InitalizeMainMenuButtons()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void UISystem::InitalizeHUDLabels()
+{
+	Vec2 HUDHalfDimensions	= g_theGame->m_worldCamera.GetOrthoDimensions().GetXYComponents() * 0.5f;
+	Vec2 healthDimensions	= Vec2( m_UITextures[ HUD_HEALTH ]->GetDimensions() );
+	Vec2 healthStartPos		= HUDHalfDimensions - healthDimensions;
+
+	m_labels[ HUD_HEALTHBOX ].SetDimensions( Vec2( healthDimensions ) );
+	m_labels[ HUD_HEALTHBOX ].SetCenter( Vec2( -healthStartPos.x , healthStartPos.y ) );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 UISystem::~UISystem()
 {
 
@@ -148,6 +162,8 @@ UISystem::~UISystem()
 
 void UISystem::Update( float deltaSeconds )
 {
+	m_UICamera->SetClearMode( CLEAR_COLOR_BIT , BLACK );
+	
 	switch ( m_systemState )
 	{
 		case LOADING_STATE :
@@ -157,11 +173,15 @@ void UISystem::Update( float deltaSeconds )
 			MainMenuState();
 			break;
 		case HUD_STATE :
+			m_UICamera->SetClearMode( CLEAR_NONE , BLACK );
 			g_theGame->Update( deltaSeconds );
 			break;
 		case PAUSE_STATE :
+			m_UICamera->SetClearMode( CLEAR_NONE , BLACK );
 			break;
 		case GAME_OVER_STATE :
+			m_UICamera->SetClearMode( CLEAR_NONE , BLACK );
+			GameOverState();
 			break;
 		case HIGHSCORE_MENU :
 			break;
@@ -195,6 +215,7 @@ bool UISystem::LoadingState()
 				g_theGame->PostGameConstructDataOnce();
 				g_theGame->PostGameConstruct();
 				g_theDevConsole->PrintString( MAGENTA , "GAME HAS STARTED" );
+				InitalizeHUDLabels();
 			}
 			return false;
 		}
@@ -249,6 +270,13 @@ void UISystem::MainMenuState()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void UISystem::GameOverState()
+{
+	g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void UISystem::UpdateBackGroundBranches()
 {
 	
@@ -292,11 +320,24 @@ void UISystem::Render() const
 			RenderMainMenuScreen();
 			break;
 		case HUD_STATE:
+			g_theRenderer->EndCamera( *m_UICamera );
 			g_theGame->Render();
+			g_theRenderer->BeginCamera( *m_UICamera );
+			g_theRenderer->SetBlendMode( ALPHA );
+			g_theRenderer->BindShader( nullptr );
+			g_theRenderer->BindTexture( nullptr );
+			RenderHUD();
 			break;
 		case PAUSE_STATE:
 			break;
 		case GAME_OVER_STATE:
+			g_theRenderer->EndCamera( *m_UICamera );
+			g_theGame->Render();
+			g_theRenderer->BeginCamera( *m_UICamera );
+			g_theRenderer->SetBlendMode( ALPHA );
+			g_theRenderer->BindShader( nullptr );
+			g_theRenderer->BindTexture( nullptr );
+			RenderHUD();
 			break;
 		case HIGHSCORE_MENU:
 			break;
@@ -403,6 +444,25 @@ void UISystem::RenderMainMenuScreen() const
 		g_theRenderer->DrawUnfilledAABB2( m_buttons[ EXIT_BUTTON ]			, CYAN	  , 2.f );
 
 		RenderDebugMouse();
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void UISystem::RenderHUD() const
+{
+	AABB2 healthbox = m_labels[ HUD_HEALTHBOX ];
+	Vec2 healthDimensions = Vec2( m_UITextures[ HUD_HEALTH ]->GetDimensions() ) * 1.f;
+	healthDimensions.y = 0.f;
+	
+	int playerHealth = g_theGame->GetPaddleHealth();
+
+	g_theRenderer->BindTexture( m_UITextures[ HUD_HEALTH ] );
+	
+	for( int health = 0 ; health < playerHealth ; health++ )
+	{
+		g_theRenderer->DrawAABB2( healthbox , WHITE );
+		healthbox.Translate( healthDimensions );
 	}
 }
 

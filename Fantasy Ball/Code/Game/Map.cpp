@@ -367,8 +367,11 @@ void Map::ResolveBallvBoundsCollisions()
 					Paddle* thePaddle = ( Paddle* ) m_entityListsByType[ PADDLE ][ 0 ];
 					AABB2	paddleBounds = thePaddle->GetCollider();
 
-					SpawnNewEntity( BALL , paddleBounds.GetCenter() + Vec2::ZERO_ONE * 37.5f );
-					m_numAliveBalls++;
+					if ( m_owner->GetPaddleHealth() > 0 )
+					{
+						SpawnNewEntity( BALL , paddleBounds.GetCenter() + Vec2::ZERO_ONE * 37.5f );
+						m_numAliveBalls++;
+					}
 				}
 			}
 		}
