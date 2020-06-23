@@ -180,7 +180,7 @@ void RenderContext::Startup( Window* window )
 
 	UINT flags = 0; /*D3D11_CREATE_DEVICE_SINGLETHREADED;*/
 #if defined(RENDER_DEBUG)
-	//flags |= D3D11_CREATE_DEVICE_DEBUG;
+	flags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};

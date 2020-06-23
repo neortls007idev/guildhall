@@ -190,10 +190,7 @@ void Map::UpdateTopCosmeticBounds()
 
 void Map::RenderLevelBounds()
 {
-	g_theRenderer->BindTexture( m_owner->m_gameTex[ TEX_LEFT_WALL ] );
-	g_theRenderer->DrawAABB2( m_leftWallCosmeticBounds , WHITE );
-	g_theRenderer->BindTexture( m_owner->m_gameTex[ TEX_RIGHT_WALL ] );
-	g_theRenderer->DrawAABB2( m_rightWallCosmeticBounds , WHITE );
+	RenderLevelSideBounds();
 	g_theRenderer->BindTexture( m_owner->m_gameTex[ TEX_TOP_WALL_SECTION ] );
 	g_theRenderer->DrawAABB2( m_topWallCosmeticBounds , WHITE );
 	
@@ -210,6 +207,17 @@ void Map::RenderLevelBounds()
 		g_theRenderer->DrawUnfilledAABB2( m_topWallCosmeticBounds , CYAN );
 		g_theRenderer->DrawUnfilledAABB2( m_pitCosmeticBounds , CYAN );
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Map::RenderLevelSideBounds() const
+{
+	g_theRenderer->BindTexture( m_owner->m_gameTex[ TEX_LEFT_WALL ] );
+	g_theRenderer->DrawAABB2( m_leftWallCosmeticBounds , WHITE );
+	g_theRenderer->BindTexture( m_owner->m_gameTex[ TEX_RIGHT_WALL ] );
+	g_theRenderer->DrawAABB2( m_rightWallCosmeticBounds , WHITE );
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

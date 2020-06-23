@@ -14,6 +14,8 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+
+#include "UISystem.hpp"
 #include "Game/resource.h"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -27,6 +29,7 @@ TheApp*						g_theApp						= nullptr;
 Game*						g_theGame						= nullptr;
 DevConsole*					g_theDevConsole					= nullptr;
 ParticleSystem2D*			g_theParticleSystem2D			= nullptr;
+UISystem*					g_theGamplayUISystem			= nullptr;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -42,6 +45,9 @@ TheApp::~TheApp()
 	delete g_theGame;
 	g_theGame = nullptr;
 
+	delete g_theGamplayUISystem;
+	g_theGamplayUISystem = nullptr;
+	
 	delete g_theParticleSystem2D;
 	g_theParticleSystem2D = nullptr;
 	
@@ -129,14 +135,19 @@ void TheApp::Startup()
 		g_theParticleSystem2D = new ParticleSystem2D();
 		g_theParticleSystem2D->Startup();
 	}
-	
-	if ( g_theGame == nullptr )
+
+	if ( g_theGamplayUISystem == nullptr )
 	{
-		g_theGame = new Game();
-		g_theGame->PostGameConstructDataOnce();
-		g_theGame->PostGameConstruct();
-		g_theDevConsole->PrintString( MAGENTA , "GAME HAS STARTED" );
+		g_theGamplayUISystem = new UISystem();
 	}
+	
+// 	if ( g_theGame == nullptr )
+// 	{
+// 		g_theGame = new Game();
+// 		g_theGame->PostGameConstructDataOnce();
+// 		g_theGame->PostGameConstruct();
+// 		g_theDevConsole->PrintString( MAGENTA , "GAME HAS STARTED" );
+// 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -178,7 +189,7 @@ void TheApp::BeginFrame()
 	g_theDevConsole->BeginFrame();
 	g_theAudioSystem->BeginFrame();
 	g_theParticleSystem2D->BeginFrame();
-	g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
+	//g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -187,12 +198,12 @@ void TheApp::Update( float deltaSeconds )
 {
 	UpdateFromKeyboard();
 
-	
 	if ( m_isPaused )								{ deltaSeconds = 0.f; }
 	else if ( m_isSloMo == true )					{ deltaSeconds /= 50.f; }
 	if ( m_isSpeedMo )								{ deltaSeconds = deltaSeconds * 4.0f; }
 
-	g_theGame->Update( deltaSeconds );
+	//g_theGame->Update( deltaSeconds );
+	g_theGamplayUISystem->Update( deltaSeconds );
 	
 	g_theParticleSystem2D->Update( deltaSeconds );
 
@@ -208,12 +219,13 @@ void TheApp::Update( float deltaSeconds )
 
 void TheApp::Render() const
 {
-		g_theGame->Render();
-		
-		if ( g_theDevConsole->IsOpen() )
-		{
-			g_theDevConsole->Render( *g_theRenderer , *g_theDevConsole->GetDevConsoleCamera() , 14.f );
-		}
+	//g_theGame->Render();
+	g_theGamplayUISystem->Render();
+	
+	if ( g_theDevConsole->IsOpen() )
+	{
+		g_theDevConsole->Render( *g_theRenderer , *g_theDevConsole->GetDevConsoleCamera() , 14.f );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -292,7 +304,12 @@ void TheApp::UpdateFromKeyboard()
 		
 		}
 	}
-		
+
+	if( g_theInput->WasKeyJustPressed( KEY_F1 ) )
+	{
+		g_theGamplayUISystem->m_UIDebugDraw = !g_theGamplayUISystem->m_UIDebugDraw;
+	}
+	
 	if ( g_theInput->GetButtonState( KEY_F8 ).WasJustPressed() ) 
 	{
 		delete g_theGame;

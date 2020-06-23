@@ -35,6 +35,11 @@ public:
 	void UpdateTopCosmeticBounds();
 	void RenderLevelBounds();
 
+	void RenderLevelSideBounds() const;
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+
+
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
 	void SpawnNewEntity( eEntityType type , const Vec2& position , TileDefinition* tileDef = nullptr );

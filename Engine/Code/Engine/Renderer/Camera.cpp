@@ -216,6 +216,14 @@ Vec3 Camera::GetOrthoMax() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Vec3 Camera::GetOrthoDimensions() const
+{
+	Vec3 dimensions = GetOrthoMax() - GetOrthoMin();
+	return dimensions;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Camera::SetClearMode( unsigned int clearFlags , Rgba8 color , float depth /*= 0.f */ , unsigned int stencil /*= 0 */ )
 {
 	m_clearMode = ( eCameraClearBitFlag ) clearFlags;

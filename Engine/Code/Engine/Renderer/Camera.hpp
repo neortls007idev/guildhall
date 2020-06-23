@@ -51,6 +51,7 @@ public:
 	Vec3			GetPosition() const;
 	Vec3			GetOrthoMin() const;
 	Vec3			GetOrthoMax() const;
+	Vec3			GetOrthoDimensions() const;
 
 	Rgba8			GetClearColor() const																					{ return m_clearColor; }
 	unsigned int	GetClearMode() const																					{ return m_clearMode; }

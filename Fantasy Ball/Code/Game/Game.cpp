@@ -15,7 +15,7 @@
 #include "Game/MapDefinition.hpp"
 #include "Game/TheApp.hpp"
 #include "Game/TileDefinition.hpp"
-#include "Ball.hpp"
+#include "Game/Ball.hpp"
 //#include <utility>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ extern	BallTexEnumRGBA8Map	g_theBallTexTable[ NUM_GAME_TEX ];
 
 Game::Game()
 {
-	g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
+	//g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
 	float cameraHalfHeight	= g_gameConfigBlackboard.GetValue( "cameraHalfHeight" , 540.f );
 	float cameraAspectRatio = g_gameConfigBlackboard.GetValue( "windowAspect" , 1.77f );
 	
@@ -104,21 +104,21 @@ void Game::LoadAllTextures()
 	m_gameTex[ TEX_BACKGROUND_FOREST_2 ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Background/enchantedForest.png" );
 	m_gameTex[ TEX_BACKGROUND_AURORA_1 ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Background/aurora1.png" );
 	
-	m_gameTex[ TEX_PADDLE ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Paddle/Paddle.png" );
-	m_gameTex[ TEX_LEFT_WALL ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Bounds/LeftWall.png" );
-	m_gameTex[ TEX_RIGHT_WALL ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Bounds/RightWall.png" );
-	m_gameTex[ TEX_TOP_WALL_SECTION ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Bounds/TopWallSection.png" );
+	m_gameTex[ TEX_PADDLE ]					= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Paddle/Paddle.png" );
+	m_gameTex[ TEX_LEFT_WALL ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Bounds/LeftWall.png" );
+	m_gameTex[ TEX_RIGHT_WALL ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Bounds/RightWall.png" );
+	m_gameTex[ TEX_TOP_WALL_SECTION ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Bounds/TopWallSection.png" );
 
-	m_gameTex[ TEX_BALL_RED ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/02.png" );
-	m_gameTex[ TEX_BALL_GREEN ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/06.png" );
-	m_gameTex[ TEX_BALL_BLUE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/35.png" );
-	m_gameTex[ TEX_BALL_YELLOW ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/07.png" );
-	m_gameTex[ TEX_BALL_MAGENTA ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/04.png" );
-	m_gameTex[ TEX_BALL_CYAN ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/25.png" );
-	m_gameTex[ TEX_BALL_PINK ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/20.png" );
-	m_gameTex[ TEX_BALL_PURPLE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/09.png" );
-	m_gameTex[ TEX_BALL_ORANGE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/17.png" );
-	m_gameTex[ TEX_BALL_GREY ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/34.png" );
+	m_gameTex[ TEX_BALL_RED ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/02.png" );
+	m_gameTex[ TEX_BALL_GREEN ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/06.png" );
+	m_gameTex[ TEX_BALL_BLUE ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/35.png" );
+	m_gameTex[ TEX_BALL_YELLOW ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/07.png" );
+	m_gameTex[ TEX_BALL_MAGENTA ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/04.png" );
+	m_gameTex[ TEX_BALL_CYAN ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/25.png" );
+	m_gameTex[ TEX_BALL_PINK ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/20.png" );
+	m_gameTex[ TEX_BALL_PURPLE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/09.png" );
+	m_gameTex[ TEX_BALL_ORANGE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/17.png" );
+	m_gameTex[ TEX_BALL_GREY ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/34.png" );
 
 	Texture* FlowersTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/FlowerSpriteSheet.png" );
 	m_gameSS[ SS_VFX_FLOWERS ] = new SpriteSheet( *FlowersTex , IntVec2( 2 , 2 ) );

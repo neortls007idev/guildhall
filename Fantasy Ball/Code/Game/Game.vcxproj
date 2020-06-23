@@ -310,6 +310,7 @@
     <ClInclude Include="Tile.hpp" />
     <ClInclude Include="TileDefinition.hpp" />
     <ClInclude Include="UISystem.hpp" />
+    <ClInclude Include="UISystemStructs.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\Plan\Proposal\1_Features.txt">

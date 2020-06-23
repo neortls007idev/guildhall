@@ -1,29 +1,8 @@
 #pragma once
+#include "Game/UISystemStructs.hpp"
 #include "Engine/Primitives/AABB2.hpp"
 
 class Camera;
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-enum  eUISTATE
-{
-	INVALID_STATE = -1 ,
-	LOADING_STATE ,
-	MAIN_MENU_STATE ,
-	HUD_STATE ,
-	PAUSE_STATE ,
-	GAME_OVER_STATE ,
-	HIGHSCORE_MENU ,
-	SETTINGS_MENU ,
-	TUTORIAL_MENU ,
-};
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-enum  eUIButtons
-{
-	
-};
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -31,16 +10,40 @@ class UISystem
 {
 public:
 	UISystem();
+
+	void LoadUITextures();
+	void LoadUIFonts();
+	void InitalizeMainMenuLabels();
+	void InitalizeMainMenuButtons();
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+
+
 	~UISystem();
 
-	void CreateOnFocusEvent();
-	void CreateOnClickEvent();
+	void Update( float deltaSeconds );
+	bool LoadingState();
+	void MainMenuState();
+	void UpdateBackGroundBranches();
+	
+	void Render() const;
+	void RenderLoadingScreen() const;
+	void RenderMainMenuScreen() const;
+	void RenderDebugMouse() const;
+
+public:
+	bool							m_UIDebugDraw				= false;
 	
 private:
+	eUISTATE						m_systemState				= INVALID_STATE;
 	Camera*							m_UICamera					= nullptr;
-	std::vector<AABB2>				m_buttons;
-	std::vector<AABB2>				m_labels;
-	std::vector<AABB2>				m_containers;
+	AABB2							m_screenSpace				= AABB2::ZERO_TO_ONE;
+	bool							m_state[ NUM_UI_STATE ];
+	Texture*						m_UITextures[ NUM_UI_TEX ];
+	BitmapFont*						m_UIFonts[ NUM_UI_FONTS ];
+
+	AABB2							m_labels[ NUM_UI_LABELS ];
+	AABB2							m_buttons[ NUM_UI_BUTTONS ];
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
