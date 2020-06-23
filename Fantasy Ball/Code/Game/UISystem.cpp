@@ -153,6 +153,84 @@ void UISystem::InitalizeHUDLabels()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void UISystem::InitalizeHighScoreData()
+{
+	m_highScores.reserve( MAX_HIGHSCORE_ENTRIES );
+	tinyxml2::XMLDocument xmlDocument;
+	xmlDocument.LoadFile( "Data/Gameplay/HighScores.xml" );
+
+	if( xmlDocument.ErrorID() != tinyxml2::XML_SUCCESS )
+	{
+		//ERROR_RECOVERABLE( "XML FILE FOR HIGHSCORES AT PATH Data/Gameplay/HighScores.xml DID NOT LOAD" );
+
+		XMLElement* element = xmlDocument.NewElement( "HighScores" );
+		xmlDocument.LinkEndChild( element );
+
+		float scoreValue	= 75000.f;
+		
+		for( long index = MAX_HIGHSCORE_ENTRIES; index > 0; index-- )
+		{
+			XMLElement* highscoreElement = xmlDocument.NewElement( "HighScore" );
+			tinyxml2::XMLText* highscoreElementText = xmlDocument.NewText( "" );
+
+			highscoreElement->SetAttribute( "Name" , "Caught Cheating" );
+			highscoreElement->SetAttribute( "Score" , scoreValue * index );
+
+			element->LinkEndChild( highscoreElement );
+			highscoreElement->LinkEndChild( highscoreElementText );
+		}
+
+		xmlDocument.SaveFile( "Data/Gameplay/HighScores.xml" );
+	}
+
+	tinyxml2::XMLElement* highScoreRoot = xmlDocument.RootElement();
+	int					  numHighScores = 0;
+
+	tinyxml2::XMLElement* highScore = highScoreRoot->FirstChildElement( "HighScore" );
+	while ( highScore != nullptr )
+	{
+		numHighScores++;
+		highScore = highScore->NextSiblingElement( "HighScore" );
+	}
+
+	if ( numHighScores < MAX_HIGHSCORE_ENTRIES )
+	{
+		xmlDocument.Clear();
+
+		XMLElement* element = xmlDocument.NewElement( "HighScores" );
+		xmlDocument.LinkEndChild( element );
+
+		float scoreValue = 75000.f;
+
+		for( long index = MAX_HIGHSCORE_ENTRIES; index > 0; index-- )
+		{
+			XMLElement* highscoreElement = xmlDocument.NewElement( "HighScore" );
+			tinyxml2::XMLText* highscoreElementText = xmlDocument.NewText( "" );
+
+			highscoreElement->SetAttribute( "Name" , "Caught Cheating" );
+			highscoreElement->SetAttribute( "Score" , scoreValue * ( index /*+ 1*/ ) );
+
+			element->LinkEndChild( highscoreElement );
+			highscoreElement->LinkEndChild( highscoreElementText );
+		}
+
+		xmlDocument.SaveFile( "Data/Gameplay/HighScores.xml" );
+	}
+	
+	highScore = highScoreRoot->FirstChildElement( "HighScore" );
+	numHighScores = MAX_HIGHSCORE_ENTRIES;
+	while( numHighScores > 0 )
+	{
+		numHighScores--;
+		std::string name = ParseXmlAttribute( *highScore , "Name" , "Caught Cheating" );
+		float score		 = ParseXmlAttribute( *highScore , "Score" , numHighScores * 75000.f );
+		m_highScores.push_back( HighscoreData( name , ( size_t ) score ) );
+		highScore = highScore->NextSiblingElement( "HighScore" );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 UISystem::~UISystem()
 {
 
@@ -216,6 +294,7 @@ bool UISystem::LoadingState()
 				g_theGame->PostGameConstruct();
 				g_theDevConsole->PrintString( MAGENTA , "GAME HAS STARTED" );
 				InitalizeHUDLabels();
+				InitalizeHighScoreData();
 			}
 			return false;
 		}
