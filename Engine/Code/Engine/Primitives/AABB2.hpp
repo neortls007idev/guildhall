@@ -58,6 +58,7 @@ public:
 
 	void Translate( const Vec2& translation );
 	void SetCenter( const Vec2& newCenter );
+	void SetCenter( const float& xCenter , const float& yCenter );
 	void SetDimensions( const Vec2& newDimesions );
 	void StretchToIncludePoint( Vec2 point ); 
 	void StretchAABB2( Vec2 newMin , Vec2 newMax );

@@ -204,6 +204,7 @@ void Game::Update( float deltaSeconds )
 	if( m_playerHealth == 0 )
 	{
 		g_theGamplayUISystem->SetGameState( GAME_OVER_STATE );
+		m_isGameDirty = true;
 	}
 
 }
@@ -292,6 +293,13 @@ void Game::UpdateFromKeyBoard()
 	if( g_theInput->WasKeyJustPressed( KEY_F1 ) )
 	{
 		m_isDebugDraw = !m_isDebugDraw;
+	}
+
+	if( g_theInput->WasKeyJustPressed( KEY_ESC ) )
+	{
+		g_theGamplayUISystem->SetGameState( MAIN_MENU_STATE );
+		m_isGameDirty = true;
+		g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
 	}
 }
 

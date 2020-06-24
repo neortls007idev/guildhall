@@ -8,6 +8,8 @@
 #include "Engine/Time/Time.hpp"
 #include "Game/TheApp.hpp"
 #include "Game/UISystem.hpp"
+
+#include "Engine/Input/VirtualKeyboard.hpp"
 #include "Engine/Platform/Window.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -43,6 +45,7 @@ UISystem::UISystem()
 	LoadUIFonts();
 	InitalizeMainMenuLabels();
 	InitalizeMainMenuButtons();
+	InitializeBackButton();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -51,13 +54,20 @@ void UISystem::LoadUITextures()
 {
 	m_UITextures[ UI_BACKGROUND ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/UIBackground.png" );
 	m_UITextures[ UI_WOODBARK_T1 ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/WoodBarkT2.jpg" );
-	m_UITextures[ UI_TITLE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/titleTex2.png" );
+	m_UITextures[ UI_TITLE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/titleTex3.png" );
 	m_UITextures[ UI_PLAY ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Play1.png" );
 	m_UITextures[ UI_HIGHSCORES ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScore1.png" );
 	m_UITextures[ UI_SETTINGS ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Settings1.png" );
 	m_UITextures[ UI_EXIT ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Exit1.png" );
 	m_UITextures[ UI_MM_BRANCH_TEX ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Branches/branchT4.png" );
 
+	m_UITextures[ UI_HS_TITLE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/HighScoresTitle3.png" );
+	m_UITextures[ UI_HS_HBORDER ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/HighScoreBorder3.png" );
+	m_UITextures[ UI_HS_NAME_HEADER ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/NameHeader.png" );
+	m_UITextures[ UI_HS_SCORE_HEADER ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/scoreHeader.png" );
+	
+	m_UITextures[ GEN_BACK_BTN ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Back1.png" );
+	
 	m_UITextures[ HUD_HEALTH ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HUD/health.png" );
 }
 
@@ -65,8 +75,8 @@ void UISystem::LoadUITextures()
 
 void UISystem::LoadUIFonts()
 {
-	m_UIFonts[ UI_FONT_WOOD1 ] = g_theRenderer->GetOrCreateBitmapFontFromFile( "Data/Fonts/RahulFixedFont2" );
-	m_UIFonts[ UI_FONT_TITLE ] = g_theRenderer->GetOrCreateBitmapFontFromFile( "Data/Fonts/FantasyBallFont_Title" );
+	m_UIFonts[ UI_FONT_WOOD1 ] = g_theRenderer->GetOrCreateBitmapFontFromFile( "Data/Fonts/FomaFlibustier" );
+	//m_UIFonts[ UI_FONT_TITLE ] = g_theRenderer->GetOrCreateBitmapFontFromFile( "Data/Fonts/FantasyBallFont_Title" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -231,6 +241,53 @@ void UISystem::InitalizeHighScoreData()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void UISystem::InitalizeHighScoreLabels()
+{
+	Vec2 HSTitleBoxPosition( 0.f , 350.f );
+	m_labels[ HS_TITLE ].SetDimensions( Vec2( m_UITextures[ UI_HS_TITLE ]->GetDimensions() ) );
+	m_labels[ HS_TITLE ].SetCenter( HSTitleBoxPosition );
+
+	Vec2 HSBorderDim		= Vec2( m_UITextures[ UI_HS_HBORDER ]->GetDimensions() );
+	Vec2 HSTopBorder( 0.f , 175.f );
+	m_labels[ HS_TOPBORDER ].SetDimensions( HSBorderDim );
+	m_labels[ HS_TOPBORDER ].SetCenter( HSTopBorder );
+
+	m_labels[ HS_BOTTOMBORDER ].SetDimensions( HSBorderDim );
+	m_labels[ HS_BOTTOMBORDER ].SetCenter( 0.f , 075.f );
+
+	Vec2 HSNameHeaderPos	= Vec2( m_UITextures[ UI_HS_NAME_HEADER ]->GetDimensions() );
+	m_labels[ HS_THEADER_NAME ].SetDimensions( HSNameHeaderPos );
+	HSNameHeaderPos.x		= -HSNameHeaderPos.x * 0.65f;
+	m_labels[ HS_THEADER_NAME ].SetCenter( HSNameHeaderPos.x , 125.f  );
+
+	Vec2 HSScoreHeaderPos	= Vec2( m_UITextures[ UI_HS_SCORE_HEADER ]->GetDimensions() );
+	HSScoreHeaderPos.x		= HSScoreHeaderPos.x * 0.65f;
+	
+	m_labels[ HS_THEADER_SCORE ].SetDimensions( Vec2( m_UITextures[ UI_HS_SCORE_HEADER ]->GetDimensions() ) );
+	m_labels[ HS_THEADER_SCORE ].SetCenter( HSScoreHeaderPos.x , 125.f );
+
+	Vec2 entryDimensions( 720.f , 48.f );
+	m_labels[ HS_ENTRY_NAME ].SetDimensions( entryDimensions );
+	m_labels[ HS_ENTRY_NAME ].SetCenter( -360.f , 16.f );
+	m_labels[ HS_ENTRY_SCORE ].SetDimensions( entryDimensions );
+	m_labels[ HS_ENTRY_SCORE ].SetCenter( 360.f , 16.f );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void UISystem::InitializeBackButton()
+{
+	Vec2 backButtonCosmeticPos( 0.f , -425.f );
+	m_labels[ UI_BACK_BUTTON ].SetDimensions( Vec2( m_UITextures[ GEN_BACK_BTN ]->GetDimensions() ) );
+	m_labels[ UI_BACK_BUTTON ].SetCenter( backButtonCosmeticPos );
+
+	constexpr float dimensionRatio = 0.91f;
+	m_buttons[ BACK_BUTTON ].SetDimensions( Vec2( m_UITextures[ GEN_BACK_BTN ]->GetDimensions() ) * dimensionRatio );
+	m_buttons[ BACK_BUTTON ].SetCenter( backButtonCosmeticPos );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 UISystem::~UISystem()
 {
 
@@ -262,8 +319,10 @@ void UISystem::Update( float deltaSeconds )
 			GameOverState();
 			break;
 		case HIGHSCORE_MENU :
+			HighScoreMenuState();
 			break;
 		case SETTINGS_MENU :
+			SettingsMenuState();
 			break;
 		case TUTORIAL_MENU :
 			break;
@@ -308,10 +367,10 @@ void UISystem::MainMenuState()
 {
 	UpdateBackGroundBranches();
 
-	Vec2 normalizedPos	= g_theInput->GetMouseNormalizedClientPosition();
-	float mouseClientPosX = RangeMapFloatNormalizedInput( m_screenSpace.m_mins.x , m_screenSpace.m_maxs.x , normalizedPos.x );
-	float mouseClientPosY = RangeMapFloatNormalizedInput( m_screenSpace.m_mins.y , m_screenSpace.m_maxs.y , normalizedPos.y );
-	Vec2 mouseClientPos( mouseClientPosX , mouseClientPosY );
+	Vec2	normalizedPos	= g_theInput->GetMouseNormalizedClientPosition();
+	float	mouseClientPosX = RangeMapFloatNormalizedInput( m_screenSpace.m_mins.x , m_screenSpace.m_maxs.x , normalizedPos.x );
+	float	mouseClientPosY = RangeMapFloatNormalizedInput( m_screenSpace.m_mins.y , m_screenSpace.m_maxs.y , normalizedPos.y );
+	Vec2	mouseClientPos( mouseClientPosX , mouseClientPosY );
 
 	if( IsPointInsideAABB2D( mouseClientPos , m_buttons[ PLAY_BUTTON ] ) )
 	{
@@ -335,8 +394,10 @@ void UISystem::MainMenuState()
 		if( g_theInput->WasLeftMouseButtonJustPressed() )
 		{
 			m_systemState = HIGHSCORE_MENU;
+			InitalizeHighScoreLabels();
 		}
 	}
+	
 	if( IsPointInsideAABB2D( mouseClientPos , m_buttons[ EXIT_BUTTON ] ) )
 	{
 		if ( g_theInput->WasLeftMouseButtonJustPressed() )
@@ -345,6 +406,21 @@ void UISystem::MainMenuState()
 			g_theWindow->HandleQuitRequested();
 		}
 	}
+
+	if( g_theInput->WasKeyJustPressed( KEY_ESC ) )
+	{
+		g_theApp->HandleQuitRequested();
+		g_theWindow->HandleQuitRequested();
+	}
+
+	if ( g_theGame->m_isGameDirty )
+	{
+		delete g_theGame;
+		g_theGame = nullptr;
+		g_theGame = new Game();
+		g_theGame->PostGameConstructDataOnce();
+		g_theGame->PostGameConstruct();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -352,6 +428,52 @@ void UISystem::MainMenuState()
 void UISystem::GameOverState()
 {
 	g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void UISystem::HighScoreMenuState()
+{
+	Vec2	normalizedPos	= g_theInput->GetMouseNormalizedClientPosition();
+	float	mouseClientPosX = RangeMapFloatNormalizedInput( m_screenSpace.m_mins.x , m_screenSpace.m_maxs.x , normalizedPos.x );
+	float	mouseClientPosY = RangeMapFloatNormalizedInput( m_screenSpace.m_mins.y , m_screenSpace.m_maxs.y , normalizedPos.y );
+	Vec2	mouseClientPos( mouseClientPosX , mouseClientPosY );
+
+	if( IsPointInsideAABB2D( mouseClientPos , m_buttons[ BACK_BUTTON ] ) )
+	{
+		if( g_theInput->WasLeftMouseButtonJustPressed() )
+		{
+			m_systemState = MAIN_MENU_STATE;
+		}
+	}
+
+	if( g_theInput->WasKeyJustPressed( KEY_ESC ) )
+	{
+		m_systemState = MAIN_MENU_STATE;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void UISystem::SettingsMenuState()
+{
+	Vec2	normalizedPos = g_theInput->GetMouseNormalizedClientPosition();
+	float	mouseClientPosX = RangeMapFloatNormalizedInput( m_screenSpace.m_mins.x , m_screenSpace.m_maxs.x , normalizedPos.x );
+	float	mouseClientPosY = RangeMapFloatNormalizedInput( m_screenSpace.m_mins.y , m_screenSpace.m_maxs.y , normalizedPos.y );
+	Vec2	mouseClientPos( mouseClientPosX , mouseClientPosY );
+
+	if( IsPointInsideAABB2D( mouseClientPos , m_buttons[ BACK_BUTTON ] ) )
+	{
+		if( g_theInput->WasLeftMouseButtonJustPressed() )
+		{
+			m_systemState = MAIN_MENU_STATE;
+		}
+	}
+	
+	if( g_theInput->WasKeyJustPressed( KEY_ESC ) )
+	{
+		m_systemState = MAIN_MENU_STATE;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -419,8 +541,10 @@ void UISystem::Render() const
 			RenderHUD();
 			break;
 		case HIGHSCORE_MENU:
+			RenderHighScoreMenuScreen();
 			break;
 		case SETTINGS_MENU:
+			RenderSettingsMenuScreen();
 			break;
 		case TUTORIAL_MENU:
 			break;
@@ -524,6 +648,120 @@ void UISystem::RenderMainMenuScreen() const
 
 		RenderDebugMouse();
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void UISystem::RenderSettingsMenuScreen() const
+{
+	g_theRenderer->BindTexture( m_UITextures[ UI_BACKGROUND ] );
+	g_theRenderer->DrawAABB2( m_screenSpace , WHITE );
+	g_theRenderer->BindTexture( nullptr );
+
+	g_theRenderer->BindTexture( m_UITextures[ GEN_BACK_BTN ] );
+	g_theRenderer->DrawAABB2( m_labels[ UI_BACK_BUTTON ] , WHITE );
+	g_theRenderer->BindTexture( nullptr );
+
+	if( m_UIDebugDraw )
+	{
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_BACK_BUTTON ]	, MAGENTA , 2.f );
+		
+		g_theRenderer->DrawUnfilledAABB2( m_buttons[ BACK_BUTTON ]		, CYAN , 2.f );
+	}
+
+	g_theGame->m_currentLevel->RenderLevelSideBounds();
+	g_theRenderer->BindTexture( nullptr );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void UISystem::RenderHighScoreMenuScreen() const
+{
+	g_theRenderer->BindTexture( m_UITextures[ UI_BACKGROUND ] );
+	g_theRenderer->DrawAABB2( m_screenSpace , WHITE );
+	g_theRenderer->BindTexture( nullptr );
+	
+	g_theRenderer->BindTexture( m_UITextures[ UI_HS_HBORDER ] );
+	g_theRenderer->DrawAABB2( m_labels[ HS_TOPBORDER ] , WHITE );
+	g_theRenderer->DrawAABB2( m_labels[ HS_BOTTOMBORDER ] , WHITE );
+	
+	g_theRenderer->BindTexture( m_UITextures[ UI_HS_TITLE ] );
+	g_theRenderer->DrawAABB2( m_labels[ HS_TITLE ] , WHITE );
+
+	g_theRenderer->BindTexture( m_UITextures[ UI_HS_NAME_HEADER ] );
+	g_theRenderer->DrawAABB2( m_labels[ HS_THEADER_NAME ] , WHITE );
+
+	g_theRenderer->BindTexture( m_UITextures[ UI_HS_SCORE_HEADER ] );
+	g_theRenderer->DrawAABB2( m_labels[ HS_THEADER_SCORE ] , WHITE );
+
+	g_theRenderer->BindTexture( m_UITextures[ GEN_BACK_BTN ] );
+	g_theRenderer->DrawAABB2( m_labels[ UI_BACK_BUTTON ] , WHITE );
+	
+	g_theRenderer->BindTexture( nullptr );
+
+	/*
+	std::vector<Vertex_PCU> textVerts;
+	Vec2	camDimensions	= m_UICamera->GetOrthoDimensions().GetXYComponents();
+	float	cameraAspect	= ( camDimensions.x / camDimensions.y );
+	float	cellHeight		= cameraAspect * 100.f;
+	float	offsetX			= camDimensions.x * 0.5f;
+	m_UIFonts[ UI_FONT_WOOD1 ]->AddVertsForText2D( textVerts , Vec2(-offsetX * 0.5f, 0.f ) , cellHeight , "LOADING..." , WHITE , 0.6f );
+	//DrawTextTriangles2D( *g_theRenderer , "LOADING..." , Vec2( -offsetX * 0.5f , 0.f ) , 45.f , WHITE , cameraAspect );
+	g_theRenderer->BindTexture( m_UIFonts[ UI_FONT_WOOD1 ]->GetTexture() );
+	g_theRenderer->DrawVertexArray( textVerts );
+
+	*/
+
+	g_theRenderer->BindTexture( m_UIFonts[ UI_FONT_WOOD1 ]->GetTexture() );
+	
+	Vec2	entryDimensions = m_labels[ HS_ENTRY_NAME ].GetDimensions();
+	AABB2	nameEntry = m_labels[ HS_ENTRY_NAME ];
+	AABB2	scoreEntry = m_labels[ HS_ENTRY_SCORE ];
+	for( int index = 0 ; index < MAX_HIGHSCORE_ENTRIES ; index++ )
+	{
+		std::vector<Vertex_PCU> nameVerts;
+		std::vector<Vertex_PCU> scoreVerts;
+
+		m_UIFonts[ UI_FONT_WOOD1 ]->AddVertsForTextInBox2D( nameVerts , nameEntry , entryDimensions.y ,
+		                                                    m_highScores[ index ].name , WHITE , 0.875f ,
+		                                                    ALIGN_CENTERED_LEFT );
+		m_UIFonts[ UI_FONT_WOOD1 ]->AddVertsForTextInBox2D( scoreVerts , scoreEntry , entryDimensions.y ,
+															std::to_string( m_highScores[ index ].score ) , WHITE , 0.875f ,
+															ALIGN_CENTERED_RIGHT );
+		g_theRenderer->DrawVertexArray( nameVerts );
+		g_theRenderer->DrawVertexArray( scoreVerts );
+		
+		nameEntry.Translate( Vec2( 0.f , -entryDimensions.y ) );
+		scoreEntry.Translate( Vec2( 0.f , -entryDimensions.y ) );
+	}
+
+	g_theRenderer->BindTexture( nullptr );
+	
+	if( m_UIDebugDraw )
+	{
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ HS_TITLE ]			, MAGENTA , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ HS_TOPBORDER ]		, MAGENTA , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ HS_BOTTOMBORDER ]	, MAGENTA , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ HS_THEADER_NAME ]	, MAGENTA , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ HS_THEADER_SCORE ]	, MAGENTA , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_BACK_BUTTON ]	, MAGENTA , 2.f );
+
+		g_theRenderer->DrawUnfilledAABB2( m_buttons[ BACK_BUTTON ]		, CYAN , 2.f );
+
+		entryDimensions		= m_labels[ HS_ENTRY_NAME ].GetDimensions();
+		nameEntry			= m_labels[ HS_ENTRY_NAME ];
+		scoreEntry			= m_labels[ HS_ENTRY_SCORE ];
+		for ( int index = 0 ; index < MAX_HIGHSCORE_ENTRIES ; index++ )
+		{
+			g_theRenderer->DrawUnfilledAABB2( nameEntry		, MAGENTA , 2.f );
+			g_theRenderer->DrawUnfilledAABB2( scoreEntry	, MAGENTA , 2.f );
+			nameEntry.Translate( Vec2( 0.f , -entryDimensions.y ) );
+			scoreEntry.Translate( Vec2( 0.f , -entryDimensions.y ) );
+		}
+	}
+
+	g_theGame->m_currentLevel->RenderLevelSideBounds();
+	g_theRenderer->BindTexture( nullptr );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

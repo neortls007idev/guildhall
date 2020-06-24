@@ -224,6 +224,15 @@ void AABB2::SetCenter( const Vec2& newCenter )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void AABB2::SetCenter( const float& xCenter , const float& yCenter )
+{
+	Vec2 center = GetCenter();
+	Vec2 displacementBetweenCenters = center - Vec2( xCenter , yCenter );
+	Translate( -displacementBetweenCenters );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void AABB2::SetDimensions( const Vec2& newDimesions )
 {
 	Vec2 oldDimensions = m_maxs - m_mins;

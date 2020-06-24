@@ -18,6 +18,8 @@ public:
 	void InitalizeMainMenuButtons();
 	void InitalizeHUDLabels();
 	void InitalizeHighScoreData();
+	void InitalizeHighScoreLabels();
+	void InitializeBackButton();
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -35,13 +37,15 @@ public:
 	void Render() const;
 	void RenderLoadingScreen() const;
 	void RenderMainMenuScreen() const;
+	void RenderSettingsMenuScreen() const;
+	void RenderHighScoreMenuScreen() const;
 	void RenderHUD() const;
 	void RenderDebugMouse() const;
 
 	void SetGameState( const eUISTATE state )																			{ m_systemState = state; }
 	
 public:
-	bool							m_UIDebugDraw				= false;
+	bool										m_UIDebugDraw				= false;
 	
 private:
 	eUISTATE									m_systemState				= INVALID_STATE;
