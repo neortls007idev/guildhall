@@ -109,6 +109,9 @@
     <ClCompile Include="UISystem.cpp">
       <Filter>GameplaySystems</Filter>
     </ClCompile>
+    <ClCompile Include="UISystemStructs.cpp">
+      <Filter>GameplaySystems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">

@@ -1,6 +1,10 @@
 #pragma once
 #include <string>
 
+#include "Engine/Primitives/AABB2.hpp"
+
+class Texture;
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 enum eUIFONTS
@@ -39,6 +43,11 @@ enum eUITEX
 
 	GEN_BACK_BTN ,
 	
+	GEN_SLIDER_BASE , 
+	GEN_SLIDER_FILLBAR , 
+	GEN_SLIDER_BORDER , 
+	GEN_SLIDER_BUTTON , 
+	
 	NUM_UI_TEX
 };
 
@@ -72,6 +81,11 @@ enum  eUILABLES
 	HUD_HEALTHBOX ,
 
 	UI_BACK_BUTTON ,
+
+	UI_SLIDER ,
+	UI_SLIDER_FILLBAR ,
+	UI_SLIDER_BUTTON ,
+	
 	NUM_UI_LABELS
 };
 
@@ -102,6 +116,10 @@ enum  eUIButtons
 	EXIT_BUTTON ,
 	BACK_BUTTON ,
 
+	SLIDER_SFX_BUTTON ,
+	SLIDER_MUSIC_BUTTON ,
+	SLIDER_PADDLE_SPEED_BUTTON ,
+	
 	NUM_UI_BUTTONS
 };
 
@@ -117,6 +135,21 @@ struct HighscoreData
 	
 	std::string name;
 	size_t		score;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct UISlider
+{
+			AABB2		m_cosmeticBase;
+			AABB2		m_cosmeticFillBar;
+			AABB2		m_cosmeticButton;
+			AABB2		m_physicalButton;
+	
+	static	Texture*	m_Base;
+	static	Texture*	m_Border;
+	static	Texture*	m_fillBar;
+	static	Texture*	m_button;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

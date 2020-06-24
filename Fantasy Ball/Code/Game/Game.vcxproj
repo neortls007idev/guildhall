@@ -250,6 +250,7 @@
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TileDefinition.cpp" />
     <ClCompile Include="UISystem.cpp" />
+    <ClCompile Include="UISystemStructs.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.hpp" />

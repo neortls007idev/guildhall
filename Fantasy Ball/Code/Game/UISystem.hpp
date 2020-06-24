@@ -20,6 +20,7 @@ public:
 	void InitalizeHighScoreData();
 	void InitalizeHighScoreLabels();
 	void InitializeBackButton();
+	void InitializeSliders();
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 

@@ -46,6 +46,7 @@ UISystem::UISystem()
 	InitalizeMainMenuLabels();
 	InitalizeMainMenuButtons();
 	InitializeBackButton();
+	InitializeSliders();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -67,6 +68,11 @@ void UISystem::LoadUITextures()
 	m_UITextures[ UI_HS_SCORE_HEADER ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/scoreHeader.png" );
 	
 	m_UITextures[ GEN_BACK_BTN ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Back1.png" );
+
+	m_UITextures[ GEN_SLIDER_BASE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/SliderBase.png" );
+	m_UITextures[ GEN_SLIDER_FILLBAR ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/fillBar.png" );
+	m_UITextures[ GEN_SLIDER_BORDER ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/sliderBorder.png" );
+	m_UITextures[ GEN_SLIDER_BUTTON ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/SliderButton.png" );
 	
 	m_UITextures[ HUD_HEALTH ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HUD/health.png" );
 }
@@ -284,6 +290,15 @@ void UISystem::InitializeBackButton()
 	constexpr float dimensionRatio = 0.91f;
 	m_buttons[ BACK_BUTTON ].SetDimensions( Vec2( m_UITextures[ GEN_BACK_BTN ]->GetDimensions() ) * dimensionRatio );
 	m_buttons[ BACK_BUTTON ].SetCenter( backButtonCosmeticPos );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void UISystem::InitializeSliders()
+{
+	m_labels[ UI_SLIDER ].SetDimensions( Vec2( m_UITextures[ GEN_SLIDER_BASE ]->GetDimensions() ) );
+	m_labels[ UI_SLIDER_FILLBAR ].SetDimensions( Vec2( m_UITextures[ GEN_SLIDER_FILLBAR ]->GetDimensions() ) );
+	m_labels[ UI_SLIDER_BUTTON ].SetDimensions( Vec2( m_UITextures[ GEN_SLIDER_BUTTON ]->GetDimensions() ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -662,9 +677,23 @@ void UISystem::RenderSettingsMenuScreen() const
 	g_theRenderer->DrawAABB2( m_labels[ UI_BACK_BUTTON ] , WHITE );
 	g_theRenderer->BindTexture( nullptr );
 
+	g_theRenderer->BindTexture( m_UITextures[ GEN_SLIDER_BASE ] );
+	g_theRenderer->DrawAABB2( m_labels[ UI_SLIDER ] , WHITE );
+	g_theRenderer->BindTexture( m_UITextures[ GEN_SLIDER_FILLBAR ] );
+	g_theRenderer->DrawAABB2( m_labels[ UI_SLIDER_FILLBAR ] , WHITE );
+	g_theRenderer->BindTexture( m_UITextures[ GEN_SLIDER_BORDER ] );
+	g_theRenderer->DrawAABB2( m_labels[ UI_SLIDER ] , WHITE );
+	g_theRenderer->BindTexture( m_UITextures[ GEN_SLIDER_BUTTON ] );
+	g_theRenderer->DrawAABB2( m_labels[ UI_SLIDER_BUTTON ] , WHITE );
+	g_theRenderer->BindTexture( nullptr );
+	
 	if( m_UIDebugDraw )
 	{
 		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_BACK_BUTTON ]	, MAGENTA , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_SLIDER ]			, MAGENTA , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_SLIDER_FILLBAR ]	, MAGENTA , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ GEN_SLIDER_BORDER ]	, MAGENTA , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_SLIDER_BUTTON ]	, MAGENTA , 2.f );
 		
 		g_theRenderer->DrawUnfilledAABB2( m_buttons[ BACK_BUTTON ]		, CYAN , 2.f );
 	}
@@ -699,34 +728,22 @@ void UISystem::RenderHighScoreMenuScreen() const
 	
 	g_theRenderer->BindTexture( nullptr );
 
-	/*
-	std::vector<Vertex_PCU> textVerts;
-	Vec2	camDimensions	= m_UICamera->GetOrthoDimensions().GetXYComponents();
-	float	cameraAspect	= ( camDimensions.x / camDimensions.y );
-	float	cellHeight		= cameraAspect * 100.f;
-	float	offsetX			= camDimensions.x * 0.5f;
-	m_UIFonts[ UI_FONT_WOOD1 ]->AddVertsForText2D( textVerts , Vec2(-offsetX * 0.5f, 0.f ) , cellHeight , "LOADING..." , WHITE , 0.6f );
-	//DrawTextTriangles2D( *g_theRenderer , "LOADING..." , Vec2( -offsetX * 0.5f , 0.f ) , 45.f , WHITE , cameraAspect );
-	g_theRenderer->BindTexture( m_UIFonts[ UI_FONT_WOOD1 ]->GetTexture() );
-	g_theRenderer->DrawVertexArray( textVerts );
-
-	*/
-
 	g_theRenderer->BindTexture( m_UIFonts[ UI_FONT_WOOD1 ]->GetTexture() );
 	
 	Vec2	entryDimensions = m_labels[ HS_ENTRY_NAME ].GetDimensions();
 	AABB2	nameEntry = m_labels[ HS_ENTRY_NAME ];
 	AABB2	scoreEntry = m_labels[ HS_ENTRY_SCORE ];
+	
 	for( int index = 0 ; index < MAX_HIGHSCORE_ENTRIES ; index++ )
 	{
 		std::vector<Vertex_PCU> nameVerts;
 		std::vector<Vertex_PCU> scoreVerts;
-
+		
 		m_UIFonts[ UI_FONT_WOOD1 ]->AddVertsForTextInBox2D( nameVerts , nameEntry , entryDimensions.y ,
-		                                                    m_highScores[ index ].name , WHITE , 0.875f ,
+		                                                    m_highScores[ index ].name , WHITE , 0.75 ,
 		                                                    ALIGN_CENTERED_LEFT );
 		m_UIFonts[ UI_FONT_WOOD1 ]->AddVertsForTextInBox2D( scoreVerts , scoreEntry , entryDimensions.y ,
-															std::to_string( m_highScores[ index ].score ) , WHITE , 0.875f ,
+															std::to_string( m_highScores[ index ].score ) , WHITE , 0.775f ,
 															ALIGN_CENTERED_RIGHT );
 		g_theRenderer->DrawVertexArray( nameVerts );
 		g_theRenderer->DrawVertexArray( scoreVerts );
