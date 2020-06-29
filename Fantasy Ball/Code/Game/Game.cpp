@@ -24,13 +24,14 @@
 // GLOBAL VARIABLES
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-extern RenderContext*		g_theRenderer;
-extern BitmapFont*			g_bitmapFont;
-extern AudioSystem*			g_theAudioSystem;
-extern TheApp*				g_theApp;
-extern InputSystem*			g_theInput;
-extern ParticleSystem2D*	g_theParticleSystem2D;
-extern UISystem*			g_theGamplayUISystem;
+extern RenderContext*			g_theRenderer;
+extern BitmapFont*				g_bitmapFont;
+extern AudioSystem*				g_theAudioSystem;
+extern TheApp*					g_theApp;
+extern InputSystem*				g_theInput;
+extern ParticleSystem2D*		g_theParticleSystem2D;
+extern UISystem*				g_theGamplayUISystem;
+extern RandomNumberGenerator*	g_RNG;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -43,10 +44,10 @@ extern	BallTexEnumRGBA8Map	g_theBallTexTable[ NUM_GAME_TEX ];
 Game::Game()
 {
 	//g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
-	float cameraHalfHeight	= g_gameConfigBlackboard.GetValue( "cameraHalfHeight" , 540.f );
-	float cameraAspectRatio = g_gameConfigBlackboard.GetValue( "windowAspect" , 1.77f );
+	m_cameraHalfHeight	= g_gameConfigBlackboard.GetValue( "cameraHalfHeight" , 540.f );
+	m_cameraAspectRatio	= g_gameConfigBlackboard.GetValue( "windowAspect" , 1.77f );
 	
-	m_worldCamera.SetOrthoView( cameraHalfHeight , cameraAspectRatio );
+	m_worldCamera.SetOrthoView( m_cameraHalfHeight , m_cameraAspectRatio );
 	LoadAssets();	
 }
 
@@ -198,7 +199,7 @@ void Game::PostGameConstruct()
 
 void Game::Update( float deltaSeconds )
 {
-//	UpdateCamera();
+	UpdateCamera();
 	m_currentLevel->Update( deltaSeconds );
 	UpdateFromKeyBoard();
 	if( m_playerHealth == 0 )
@@ -207,6 +208,35 @@ void Game::Update( float deltaSeconds )
 		m_isGameDirty = true;
 	}
 
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateCamera()
+{
+//	RandomNumberGenerator rng;
+
+	m_screenShakeIntensity -= SCREEN_SHAKE_ABLATION_PER_SECOND;
+	m_screenShakeIntensity = Clamp( m_screenShakeIntensity , 0.f , 1.f );
+
+	float maxShakeDist = m_screenShakeIntensity * MAX_CAMERA_SHAKE;
+	float cameraShakeX = static_cast< float >( g_RNG->RollRandomIntInRange( ( int ) -maxShakeDist , ( int ) maxShakeDist ) );
+	float cameraShakeY = static_cast< float >( g_RNG->RollRandomIntInRange( ( int ) -maxShakeDist , ( int ) maxShakeDist ) );
+
+	//Vec2 camDimensions = m_worldCamera.GetOrthoDimensions().GetXYComponents();
+	m_worldCamera.SetOrthoView( m_cameraHalfHeight , m_cameraAspectRatio );
+	//m_worldCamera.SetOrthoView( -camDimensions , camDimensions );
+	m_worldCamera.Translate2D( Vec2( cameraShakeX , cameraShakeY ) );
+
+
+	//-----------------------------------------------------------------------------------------------------------------
+	//Updating UI Camera
+	//-----------------------------------------------------------------------------------------------------------------
+
+	// 	for(int healthIcons = m_Ship->m_health; healthIcons > 0; healthIcons--)
+	// 	{
+	// 		RenderUI();
+	// 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -233,28 +263,7 @@ void Game::Render() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Game::UpdateCamera()
-{
-//--------------------------------------------------------------------------------------------------------------------------------------------
-//					CLAMPING THE CAMERA 
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-	Vec2 cameraCoords;
-
-	m_screenShakeIntensity -= SCREEN_SHAKE_ABLATION_PER_SECOND;
-	m_screenShakeIntensity = ClampZeroToOne( m_screenShakeIntensity );
-
-	float maxShakeDist = m_screenShakeIntensity * MAX_CAMERA_SHAKE;
-	float cameraShakeX = static_cast< float > ( g_RNG->RollRandomIntInRange( ( int ) -maxShakeDist , ( int ) maxShakeDist ) );
-	float cameraShakeY = static_cast< float > ( g_RNG->RollRandomIntInRange( ( int ) -maxShakeDist , ( int ) maxShakeDist ) );
-	
-	m_worldCamera.Translate2D( Vec2( cameraShakeX , cameraShakeY ) );
-
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Game::AddScreenShakeIntensity( float deltaShakeIntensity )
+void Game::AddScreenShakeIntensity( float deltaShakeIntensity /* = 1.f */ )
 {
 	m_screenShakeIntensity += deltaShakeIntensity;
 	//clamp it!

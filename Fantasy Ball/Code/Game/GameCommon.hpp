@@ -24,7 +24,7 @@ constexpr float CLIENT_ASPECT											=  16.f / 9.f; // We are requesting a 2:
 constexpr float UI_SIZE_X												=  1600.f;
 constexpr float UI_SIZE_Y												=  900.f;
 constexpr float MIN_CAMERA_SHAKE										= -2.5f;
-constexpr float MAX_CAMERA_SHAKE										=  2.5f;
+constexpr float MAX_CAMERA_SHAKE										=  5.5f;
 constexpr float SCREEN_SHAKE_ABLATION_PER_SECOND						=  0.05f;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

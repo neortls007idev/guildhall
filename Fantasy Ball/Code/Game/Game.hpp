@@ -29,7 +29,7 @@ public:
 	
 	void Render() const;
 
-	void AddScreenShakeIntensity( float deltaShakeIntensity );
+	void AddScreenShakeIntensity( float deltaShakeIntensity = 1.f );
 
 	void Die();
 
@@ -46,7 +46,8 @@ private:
 private:
 	int							m_controllerID									= -1;
 	float						m_screenShakeIntensity							= 0.f;
-
+	float						m_cameraHalfHeight								= 0.f;
+	float						m_cameraAspectRatio								= 0.f;
 	Rgba8						m_fadeColor;
 	bool						m_hasLoadingStateStarted						= true;
 

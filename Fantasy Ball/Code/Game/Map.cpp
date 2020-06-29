@@ -323,6 +323,7 @@ void Map::ResolveBallvBoundsCollisions()
 				uint numParticles = ( uint ) g_RNG->RollRandomIntInRange( 5 , 10 );
 				SpawnLeafParticlesOnBallCollision( ball , ball->m_pos , numParticles );
 				g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_LEAVES_RUSTLE ) , false , 0.1f , 0.f , 1.f );
+				m_owner->AddScreenShakeIntensity();
 			}
 
 			if ( DoDiscAndAABBOverlap( ball->m_pos , ball->m_physicsRadius , m_rightWallPhysicalBounds ) )
@@ -341,6 +342,7 @@ void Map::ResolveBallvBoundsCollisions()
 				uint numParticles = ( uint ) g_RNG->RollRandomIntInRange( 5 , 10 );
 				SpawnLeafParticlesOnBallCollision( ball , ball->m_pos , numParticles );
 				g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_LEAVES_RUSTLE ) , false , 0.33f , 0.f , 1.f );
+				m_owner->AddScreenShakeIntensity();
 			}
 
 			if ( DoDiscAndAABBOverlap( ball->m_pos , ball->m_physicsRadius , m_topWallPhysicalBounds ) )
@@ -351,6 +353,7 @@ void Map::ResolveBallvBoundsCollisions()
 				uint numParticles = ( uint ) g_RNG->RollRandomIntInRange( 5 , 10 );
 				SpawnLeafParticlesOnBallCollision( ball , ball->m_pos , numParticles );
 				g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_LEAVES_RUSTLE ) , false , 0.33f , 0.f , 1.f );
+				m_owner->AddScreenShakeIntensity();
 			}
 
 			if( DoDiscAndAABBOverlap( ball->m_pos , ball->m_physicsRadius , m_pitPhysicalBounds ) )
@@ -448,6 +451,7 @@ void Map::ResolveBallvTileCollisions()
 					if ( currentTile->TileCollisionResponse( ball ) )
 					{
 						g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_GLASS_BREAK_2 ) , false , 0.1f );
+						m_owner->AddScreenShakeIntensity();
 					}
 
 					if( currentTile->GetHealth() <= 0 )
