@@ -101,6 +101,10 @@ void Map::LevelBounds()
 	m_rightWallPhysicalBounds			= m_rightWallCosmeticBounds.GetBoxAtRight( 0.85f , 0.f );
 	m_topWallPhysicalBounds				= m_topWallCosmeticBounds.GetBoxAtTop( 0.15f , 0.f );
 	m_pitPhysicalBounds					= m_pitCosmeticBounds.GetBoxAtBottom( 0.9f , 0.f );
+	m_leftWallPhysicalBounds.m_mins.x	*= 50.f;
+	m_rightWallPhysicalBounds.m_maxs.x	*= 50.f;
+	m_topWallPhysicalBounds.m_maxs.y	*= 50.f;
+	m_pitPhysicalBounds.m_mins.y		*= 1000.f;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -200,15 +204,15 @@ void Map::RenderLevelBounds()
 	if( m_owner->m_isDebugDraw )
 	{
 		g_theRenderer->BindTexture( nullptr );
-		g_theRenderer->DrawUnfilledAABB2( m_leftWallPhysicalBounds , MAGENTA , 5.f );
-		g_theRenderer->DrawUnfilledAABB2( m_rightWallPhysicalBounds , MAGENTA , 5.f );
-		g_theRenderer->DrawUnfilledAABB2( m_topWallPhysicalBounds , MAGENTA , 5.f );
-		g_theRenderer->DrawUnfilledAABB2( m_pitPhysicalBounds , MAGENTA , 5.f );
+		g_theRenderer->DrawUnfilledAABB2( m_leftWallPhysicalBounds	, CYAN , 5.f );
+		g_theRenderer->DrawUnfilledAABB2( m_rightWallPhysicalBounds , CYAN , 5.f );
+		g_theRenderer->DrawUnfilledAABB2( m_topWallPhysicalBounds	, CYAN , 5.f );
+		g_theRenderer->DrawUnfilledAABB2( m_pitPhysicalBounds		, CYAN , 5.f );
 
-		g_theRenderer->DrawUnfilledAABB2( m_leftWallCosmeticBounds , CYAN );
-		g_theRenderer->DrawUnfilledAABB2( m_rightWallCosmeticBounds , CYAN );
-		g_theRenderer->DrawUnfilledAABB2( m_topWallCosmeticBounds , CYAN );
-		g_theRenderer->DrawUnfilledAABB2( m_pitCosmeticBounds , CYAN );
+		g_theRenderer->DrawUnfilledAABB2( m_leftWallCosmeticBounds	, MAGENTA );
+		g_theRenderer->DrawUnfilledAABB2( m_rightWallCosmeticBounds , MAGENTA );
+		g_theRenderer->DrawUnfilledAABB2( m_topWallCosmeticBounds	, MAGENTA );
+		g_theRenderer->DrawUnfilledAABB2( m_pitCosmeticBounds		, MAGENTA );
 	}
 }
 
@@ -236,7 +240,7 @@ void Map::SpawnNewEntity( eEntityType type , const Vec2& position , TileDefiniti
 		case PADDLE:
 			newEntity = new Paddle( m_owner , m_owner->GetPaddleHealth() ,
 			AABB2( -100.f , -25.f , 100.f , 25.f ) ,
-			Vec2( 0.f , m_pitPhysicalBounds.m_mins.y + 83.f ) );
+			Vec2( 0.f , m_pitPhysicalBounds.m_maxs.y + 83.f ) );
 			break;
 		case BALL:
 			newEntity = new Ball( m_owner , 1 , 25.f * 1.5f , 25.f , position , BALL_INITIAL_VELOCITY );
@@ -420,6 +424,7 @@ void Map::ResolveBallvPaddleCollisions()
 					
 					float magnitude = ball->m_velocity.GetLength();
 						  magnitude *= 1.01f;
+						  magnitude = Clamp( magnitude , BALL_INITIAL_VELOCITY_MAGNITUDE , MAX_BALL_VELOCITY_MAGNITUDE );
 					float angleDegrees = ball->m_velocity.GetAngleDegrees() - deviationFactor;
 					
 					ball->m_velocity = Vec2::MakeFromPolarDegrees( angleDegrees , magnitude );
