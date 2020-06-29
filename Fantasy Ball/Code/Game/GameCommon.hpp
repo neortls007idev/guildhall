@@ -23,7 +23,7 @@ extern Window*		g_theWindow;
 constexpr float CLIENT_ASPECT											=  16.f / 9.f; // We are requesting a 2:1 aspect (square) window area
 constexpr float UI_SIZE_X												=  1600.f;
 constexpr float UI_SIZE_Y												=  900.f;
-constexpr float MIN_CAMERA_SHAKE										= -2.5f;
+constexpr float MIN_CAMERA_SHAKE										= -5.5f;
 constexpr float MAX_CAMERA_SHAKE										=  5.5f;
 constexpr float SCREEN_SHAKE_ABLATION_PER_SECOND						=  0.05f;
 
@@ -40,7 +40,7 @@ const Vec2 halfTileDimensions											= Vec2( TILE_LENGTH * 0.5f , TILE_HEIGHT
 constexpr float BALL_INITIAL_VELOCITY_MAGNITUDE							= 4.5f;
 constexpr float BALL_INITIAL_LAUNCH_ORIENTATION_DEG						= 107.f;
 constexpr float MAX_BALL_VELOCITY_MAGNITUDE								= 2.3f * BALL_INITIAL_VELOCITY_MAGNITUDE;
-const Vec2 BALL_INITIAL_VELOCITY										= Vec2::MakeFromPolarDegrees( BALL_INITIAL_LAUNCH_ORIENTATION_DEG , MAX_BALL_VELOCITY_MAGNITUDE );
+const Vec2 BALL_INITIAL_VELOCITY										= Vec2::MakeFromPolarDegrees( BALL_INITIAL_LAUNCH_ORIENTATION_DEG , BALL_INITIAL_VELOCITY_MAGNITUDE );
 
 constexpr float VFX_PARTICLE_HEIGHT										= 40.f;
 const Vec2		VFX_PARTICLE_DIMENSIONS									= Vec2( 1.7777777f , 1.f ) * VFX_PARTICLE_HEIGHT;

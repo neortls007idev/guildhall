@@ -310,6 +310,16 @@ void Game::UpdateFromKeyBoard()
 		m_isGameDirty = true;
 		g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
 	}
+
+	if( g_theInput->WasKeyJustPressed( 'N' ) )
+	{
+		m_currentLevelNumber++;
+		if( m_currentLevelNumber == ( ( int ) m_levels.size() ) )
+		{
+			m_currentLevelNumber = 0;
+		}
+		m_currentLevel = m_levels[ m_currentLevelNumber ];
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

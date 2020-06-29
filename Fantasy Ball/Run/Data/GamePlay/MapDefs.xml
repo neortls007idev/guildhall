@@ -1,6 +1,24 @@
 <MapDefinitions>
 
-	<MapDefinition name="Island" width="15" height="17">
+	<MapDefinition name="1NewtonsApple" width="15" height="17">
+		<GenerationSteps>
+			<FromImage iterations="1" ImageFileName="PLVL1.png" uAlignment="0.0" vAlignment="0.0" rotations="0"/>
+		</GenerationSteps>
+	</MapDefinition>
+
+	<MapDefinition name="2Mountains" width="15" height="17">
+		<GenerationSteps>
+			<FromImage iterations="1" ImageFileName="PLVL2.png" uAlignment="0.0" vAlignment="0.0" rotations="0"/>
+		</GenerationSteps>
+	</MapDefinition>
+
+	<MapDefinition name="3GoldRush1" width="15" height="17">
+		<GenerationSteps>
+			<FromImage iterations="1" ImageFileName="PLVL3.png" uAlignment="0.0" vAlignment="0.0" rotations="0"/>
+		</GenerationSteps>
+	</MapDefinition>
+
+	<MapDefinition name="777Debug1" width="15" height="17">
 		<GenerationSteps>
 			<FromImage iterations="1" ImageFileName="testMap4.png" uAlignment="0.0" vAlignment="0.0" rotations="0"/>
 		</GenerationSteps>
