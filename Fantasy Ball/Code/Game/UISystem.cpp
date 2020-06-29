@@ -67,8 +67,8 @@ void UISystem::LoadUITextures()
 
 	m_UITextures[ UI_HS_TITLE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/HighScoresTitle3.png" );
 	m_UITextures[ UI_HS_HBORDER ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/HighScoreBorder4.png" );
-	m_UITextures[ UI_HS_NAME_HEADER ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/NameHeader.png" );
-	m_UITextures[ UI_HS_SCORE_HEADER ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/scoreHeader1.png" );
+	m_UITextures[ UI_HS_NAME_HEADER ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/NameHeader2.png" );
+	m_UITextures[ UI_HS_SCORE_HEADER ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/scoreHeader3.png" );
 	
 	m_UITextures[ GEN_BACK_BTN ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Back1.png" );
 
