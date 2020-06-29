@@ -38,7 +38,8 @@ void Paddle::Render() const
 
 	if ( m_owner->m_isDebugDraw )
 	{
-		g_theRenderer->DrawUnfilledAABB2( m_paddleCollider , MAGENTA , 2.5f );
+		g_theRenderer->DrawUnfilledAABB2( m_paddleCollider , MAGENTA	, 2.5f );
+		g_theRenderer->DrawUnfilledAABB2( m_paddleCollider , CYAN		, 2.5f );
 	}
 }
 

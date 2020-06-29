@@ -36,6 +36,16 @@ void Ball::Update( float deltaSeconds )
 	{
 		Move( deltaSeconds );
 	}
+
+	if ( m_isInCooldown )
+	{
+		m_ballPaddleMaxCoolDownTime -= deltaSeconds;
+	}
+
+	if ( m_ballPaddleMaxCoolDownTime <= 0.f )
+	{
+		m_isInCooldown = false;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -48,8 +58,8 @@ void Ball::Render() const
 
 	if ( m_owner->m_isDebugDraw )
 	{
-		g_theRenderer->DrawRing( m_pos , m_cosmeticRadius , CYAN , 2.5f );
-		g_theRenderer->DrawRing( m_pos , m_physicsRadius , MAGENTA , 2.5f );
+		g_theRenderer->DrawRing( m_pos , m_cosmeticRadius	, MAGENTA	, 2.5f );
+		g_theRenderer->DrawRing( m_pos , m_physicsRadius	, CYAN		, 2.5f );
 	}
 }
 

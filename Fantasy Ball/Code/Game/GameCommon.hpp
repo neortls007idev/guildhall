@@ -62,6 +62,7 @@ constexpr float FLOWER_PARTICLE_MIN_AGE									= 22.5f;
 constexpr float FLOWER_PARTICLE_MAX_AGE									= 30.f;
 
 constexpr float PADDLE_COLLISION_DEVIATION								= 10.f;
+constexpr float BALL_PADDLE_MAX_COLLISION_COOLDOWN_TIME					= 0.33f;
 
 constexpr float TILE_DEVIATION											= .6667f * 0.1f;
 

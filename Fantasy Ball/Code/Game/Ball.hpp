@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "GameCommon.hpp"
 #include "Engine/Math/Vec2.hpp"
 #include "Game/Entity.hpp"
 
@@ -26,7 +27,9 @@ public:
 	float			m_physicsRadius;
 	Vec2			m_pos;
 	Vec2			m_velocity;
-	Texture*		m_currentTexture = nullptr;
+	Texture*		m_currentTexture				= nullptr;
+	float			m_ballPaddleMaxCoolDownTime		= BALL_PADDLE_MAX_COLLISION_COOLDOWN_TIME;
+	bool			m_isInCooldown					= false;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

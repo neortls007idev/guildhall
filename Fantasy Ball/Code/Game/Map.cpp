@@ -405,7 +405,7 @@ void Map::ResolveBallvPaddleCollisions()
 				paddle = ( Paddle* ) m_entityListsByType[ PADDLE ][ 0 ];
 			}
 			
-			if ( DoDiscAndAABBOverlap( ball->m_pos , ball->m_physicsRadius , paddle->GetCollider() ) )
+			if ( DoDiscAndAABBOverlap( ball->m_pos , ball->m_physicsRadius , paddle->GetCollider() ) && !ball->m_isInCooldown )
 			{
 				if ( !m_owner->m_isBallLaunchable )
 				{
@@ -428,6 +428,8 @@ void Map::ResolveBallvPaddleCollisions()
 					float angleDegrees = ball->m_velocity.GetAngleDegrees() - deviationFactor;
 					
 					ball->m_velocity = Vec2::MakeFromPolarDegrees( angleDegrees , magnitude );
+
+					ball->m_isInCooldown = true;
 				}
 				
 				PushDiscOutOfAABB( ball->m_pos , ball->m_physicsRadius , paddle->GetCollider() );

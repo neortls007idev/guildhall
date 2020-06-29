@@ -459,6 +459,7 @@ void UISystem::MainMenuState( float deltaSeconds )
 void UISystem::GameOverState()
 {
 	g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
+	m_systemState = MAIN_MENU_STATE;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
