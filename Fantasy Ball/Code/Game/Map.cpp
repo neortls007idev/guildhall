@@ -49,9 +49,12 @@ Map::Map( Game* owner , MapDefinition* mapDefinition , std::string mapName ) :
 		m_mapDefinition->m_generationSteps[ mapGenSteps ]->RunStep( *this );
 	}
 
-	m_tileEmitter	= g_theParticleSystem2D->CreateNewParticleEmitter( g_theRenderer , m_owner->m_gameSS[ SS_VFX_FLARE ] , nullptr , ADDITIVE );
-	m_boundsEmitter = g_theParticleSystem2D->CreateNewParticleEmitter( g_theRenderer , m_owner->m_gameSS[ SS_VFX_LEAVES ] , nullptr , ADDITIVE );
-	m_paddleEmitter = g_theParticleSystem2D->CreateNewParticleEmitter( g_theRenderer , m_owner->m_gameSS[ SS_VFX_FLOWERS ] , nullptr , ADDITIVE );
+	m_tileEmitter = g_theParticleSystem2D->CreateNewParticleEmitter( g_theRenderer , m_owner->m_gameSS[ SS_VFX_FLARE ] ,
+	                                                                 10000 , nullptr , ADDITIVE );
+	m_boundsEmitter = g_theParticleSystem2D->CreateNewParticleEmitter( g_theRenderer , m_owner->m_gameSS[ SS_VFX_LEAVES ] ,
+																	   2500 , nullptr , ADDITIVE );
+	m_paddleEmitter = g_theParticleSystem2D->CreateNewParticleEmitter( g_theRenderer , m_owner->m_gameSS[ SS_VFX_FLOWERS ] ,
+																	   2000 , nullptr , ADDITIVE );
 
 	SpawnNewEntity( PADDLE , Vec2::ZERO );
 

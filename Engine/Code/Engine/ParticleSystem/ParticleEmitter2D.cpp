@@ -10,7 +10,7 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-ParticleEmitter2D::ParticleEmitter2D ( RenderContext* renderContext , Texture* tex , Shader* shader /*= nullptr */ ,
+ParticleEmitter2D::ParticleEmitter2D ( RenderContext* renderContext , Texture* tex , size_t intialArraySize , Shader* shader /*= nullptr */ ,
                                        eBlendMode blendMode /*= ADDITIVE */ )											:
 																															m_renderContext( renderContext ) ,
 																															m_texture( tex ) ,
@@ -18,11 +18,12 @@ ParticleEmitter2D::ParticleEmitter2D ( RenderContext* renderContext , Texture* t
 																															m_blendMode( blendMode )
 {
 	m_spriteSheet = nullptr;
+	m_particles.resize( intialArraySize );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-ParticleEmitter2D::ParticleEmitter2D ( RenderContext* renderContext , SpriteSheet* spriteSheet ,
+ParticleEmitter2D::ParticleEmitter2D ( RenderContext* renderContext , SpriteSheet* spriteSheet , size_t intialArraySize ,
 									   Shader* shader /*= nullptr */ , eBlendMode blendMode /*= ADDITIVE */ ) :
 																												m_renderContext( renderContext ) ,
 																												m_spriteSheet( spriteSheet ) ,
@@ -32,6 +33,7 @@ ParticleEmitter2D::ParticleEmitter2D ( RenderContext* renderContext , SpriteShee
 	
 	m_texture = const_cast< Texture* >( &spriteSheet->GetTexture() );
 	//m_texture = const_cast< Texture* >( &( spriteSheet->GetTexture() ) );
+	m_particles.resize( intialArraySize );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

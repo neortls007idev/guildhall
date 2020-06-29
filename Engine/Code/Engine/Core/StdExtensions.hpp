@@ -4,7 +4,7 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 template <  typename vectorObject >
-void PushBackAtEmptySpace( std::vector<vectorObject*>& vectorOfPointers , vectorObject* objPointer )
+void PushBackAtEmptySpace( std::vector<vectorObject>& vectorOfPointers , vectorObject objPointer )
 {
 	for ( size_t index = 0 ; index < vectorOfPointers.size() ; index++ )
 	{
@@ -20,7 +20,7 @@ void PushBackAtEmptySpace( std::vector<vectorObject*>& vectorOfPointers , vector
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 template <  typename vectorObject >
-void EmplaceBackAtEmptySpace( std::vector<vectorObject*>& vectorOfPointers , vectorObject* objPointer )
+void EmplaceBackAtEmptySpace( std::vector<vectorObject>& vectorOfPointers , vectorObject objPointer )
 {
 	for( size_t index = 0 ; index < vectorOfPointers.size() ; index++ )
 	{

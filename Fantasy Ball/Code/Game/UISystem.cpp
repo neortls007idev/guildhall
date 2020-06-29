@@ -9,8 +9,11 @@
 #include "Game/TheApp.hpp"
 #include "Game/UISystem.hpp"
 
+
+#include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Input/VirtualKeyboard.hpp"
 #include "Engine/Platform/Window.hpp"
+#include "Engine/Renderer/SpriteAnimation.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // GLOBAL VARIABLES
@@ -63,9 +66,9 @@ void UISystem::LoadUITextures()
 	m_UITextures[ UI_MM_BRANCH_TEX ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Branches/branchT4.png" );
 
 	m_UITextures[ UI_HS_TITLE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/HighScoresTitle3.png" );
-	m_UITextures[ UI_HS_HBORDER ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/HighScoreBorder3.png" );
+	m_UITextures[ UI_HS_HBORDER ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/HighScoreBorder4.png" );
 	m_UITextures[ UI_HS_NAME_HEADER ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/NameHeader.png" );
-	m_UITextures[ UI_HS_SCORE_HEADER ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/scoreHeader.png" );
+	m_UITextures[ UI_HS_SCORE_HEADER ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/scoreHeader1.png" );
 	
 	m_UITextures[ GEN_BACK_BTN ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Back1.png" );
 
@@ -75,6 +78,13 @@ void UISystem::LoadUITextures()
 	m_UITextures[ GEN_SLIDER_BUTTON ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/SliderButton.png" );
 	
 	m_UITextures[ HUD_HEALTH ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HUD/health.png" );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void UISystem::LoadMainMenuAnimTex()
+{
+	m_UITextures[ UI_BACKGROUNDANIM ] = g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/BackGround/waterwall1.png" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -320,7 +330,7 @@ void UISystem::Update( float deltaSeconds )
 			LoadingState();
 			break;
 		case MAIN_MENU_STATE :
-			MainMenuState();
+			MainMenuState( deltaSeconds );
 			break;
 		case HUD_STATE :
 			m_UICamera->SetClearMode( CLEAR_NONE , BLACK );
@@ -361,6 +371,7 @@ bool UISystem::LoadingState()
 		else
 		{
 			m_systemState = MAIN_MENU_STATE;
+			LoadMainMenuAnimTex();
 			if( g_theGame == nullptr )
 			{
 				g_theGame = new Game();
@@ -378,8 +389,13 @@ bool UISystem::LoadingState()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void UISystem::MainMenuState()
+void UISystem::MainMenuState( float deltaSeconds )
 {
+		m_currentBGAnimFrame += deltaSeconds;
+	if( m_currentBGAnimFrame >= m_BGAnimationDuration )
+	{
+		m_currentBGAnimFrame = 0.f;
+	}
 	UpdateBackGroundBranches();
 
 	Vec2	normalizedPos	= g_theInput->GetMouseNormalizedClientPosition();
@@ -598,11 +614,26 @@ void UISystem::RenderMainMenuScreen() const
 	g_theRenderer->DrawAABB2( m_screenSpace , WHITE );
 	g_theRenderer->BindTexture( nullptr );
 
+	SpriteSheet spriteSheet( *m_UITextures[ UI_BACKGROUNDANIM ] , IntVec2( 9 , 15 ) );
+	SpriteAnimDefinition anim = SpriteAnimDefinition( spriteSheet , 0 , 126 , m_BGAnimationDuration , SpriteAnimPlaybackType::LOOP );
+	const SpriteDefinition& devConsoleAnim = anim.GetSpriteDefAtTime( m_currentBGAnimFrame );
+	Vec2 uvMins;
+	Vec2 uvMaxs;
+	devConsoleAnim.GetUVs( uvMins , uvMaxs );
+	std::vector<Vertex_PCU> tempDevConsoleAnim;
+	AppendVertsForAABB2( tempDevConsoleAnim , m_screenSpace , WHITE , uvMins , uvMaxs );
+
+	g_theRenderer->BindTexture( m_UITextures[ UI_BACKGROUNDANIM ] );
+	//g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->DrawVertexArray( tempDevConsoleAnim );
+	//g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->BindTexture( nullptr );
+	
 	g_theRenderer->BindTexture( m_UITextures[ UI_MM_BRANCH_TEX ] );
-	g_theRenderer->DrawAABB2( m_labels[ UI_MM_BRANCH1 ] , ORANGE );
-	g_theRenderer->DrawAABB2( m_labels[ UI_MM_BRANCH2 ] , ORANGE );
-	g_theRenderer->DrawAABB2( m_labels[ UI_MM_BRANCH3 ] , ORANGE );
-	g_theRenderer->DrawAABB2( m_labels[ UI_MM_BRANCH4 ] , ORANGE );
+	//g_theRenderer->DrawAABB2( m_labels[ UI_MM_BRANCH1 ] , ORANGE );
+	//g_theRenderer->DrawAABB2( m_labels[ UI_MM_BRANCH2 ] , ORANGE );
+	//g_theRenderer->DrawAABB2( m_labels[ UI_MM_BRANCH3 ] , ORANGE );
+	//g_theRenderer->DrawAABB2( m_labels[ UI_MM_BRANCH4 ] , ORANGE );
 	g_theRenderer->BindTexture( nullptr );
 	
 	g_theGame->m_currentLevel->RenderLevelSideBounds();

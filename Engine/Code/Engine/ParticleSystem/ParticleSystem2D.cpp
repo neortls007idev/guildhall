@@ -82,18 +82,23 @@ void ParticleSystem2D::EndFrame()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-ParticleEmitter2D* ParticleSystem2D::CreateNewParticleEmitter( RenderContext* renderContext , SpriteSheet* spriteSheet , Shader* shader /*= nullptr */ , eBlendMode blendMode /*= ADDITIVE */ )
+ParticleEmitter2D* ParticleSystem2D::CreateNewParticleEmitter ( RenderContext* renderContext ,
+                                                                SpriteSheet* spriteSheet , size_t intialArraySize ,
+                                                                Shader* shader /*= nullptr */ ,
+                                                                eBlendMode blendMode /*= ADDITIVE */ )
 {
-	ParticleEmitter2D* temp = new ParticleEmitter2D( renderContext , spriteSheet , shader , blendMode );
+	ParticleEmitter2D* temp = new ParticleEmitter2D( renderContext , spriteSheet , intialArraySize , shader , blendMode );
 	EmplaceBackAtEmptySpace( m_emitters , temp );
 	return temp;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-ParticleEmitter2D* ParticleSystem2D::CreateNewParticleEmitter( RenderContext* renderContext , Texture* tex , Shader* shader /*= nullptr */ , eBlendMode blendMode /*= ADDITIVE */ )
+ParticleEmitter2D* ParticleSystem2D::CreateNewParticleEmitter ( RenderContext* renderContext , Texture* tex ,
+                                                                size_t intialArraySize , Shader* shader /*= nullptr */ ,
+                                                                eBlendMode blendMode /*= ADDITIVE */ )
 {
-	ParticleEmitter2D* temp = new ParticleEmitter2D( renderContext , tex , shader , blendMode );
+	ParticleEmitter2D* temp = new ParticleEmitter2D( renderContext , tex , intialArraySize , shader , blendMode );
 	EmplaceBackAtEmptySpace( m_emitters , temp );
 	return temp;
 }

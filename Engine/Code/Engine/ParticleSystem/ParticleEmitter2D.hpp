@@ -20,8 +20,8 @@ class Shader;
 class ParticleEmitter2D
 {
 public:
-	ParticleEmitter2D( RenderContext* renderContext , Texture* tex , Shader* shader = nullptr , eBlendMode blendMode = ADDITIVE );
-	ParticleEmitter2D( RenderContext* renderContext , SpriteSheet* spriteSheet , Shader* shader = nullptr , eBlendMode blendMode = ADDITIVE );
+	ParticleEmitter2D( RenderContext* renderContext , Texture* tex , size_t intialArraySize ,Shader* shader = nullptr , eBlendMode blendMode = ADDITIVE );
+	ParticleEmitter2D( RenderContext* renderContext , SpriteSheet* spriteSheet , size_t intialArraySize , Shader* shader = nullptr , eBlendMode blendMode = ADDITIVE );
 	~ParticleEmitter2D();
 
 	void SpawnNewParticle( AABB2 cosmeticBounds , Vec2 position , float orientation , Vec2 velocity , float age , float maxAge , Rgba8 color , IntVec2 spriteCoords );

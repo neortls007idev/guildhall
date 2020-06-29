@@ -13,6 +13,7 @@ public:
 	UISystem();
 
 	void LoadUITextures();
+	void LoadMainMenuAnimTex();
 	void LoadUIFonts();
 	void InitalizeMainMenuLabels();
 	void InitalizeMainMenuButtons();
@@ -29,7 +30,7 @@ public:
 
 	void Update( float deltaSeconds );
 	bool LoadingState();
-	void MainMenuState();
+	void MainMenuState( float deltaSeconds );
 	void GameOverState();
 	void HighScoreMenuState();
 	void SettingsMenuState();
@@ -58,6 +59,9 @@ private:
 
 	AABB2										m_labels[ NUM_UI_LABELS ];
 	AABB2										m_buttons[ NUM_UI_BUTTONS ];
+
+	float										m_BGAnimationDuration		= 2.1f;
+	float										m_currentBGAnimFrame		= 0.f;
 
 	std::vector< HighscoreData >				m_highScores;
 };

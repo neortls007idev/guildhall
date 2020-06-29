@@ -67,10 +67,10 @@ void Tile::Render() const
 		g_theRenderer->DrawUnfilledAABB2( m_bounds , WHITE , 5.f );
 	}
 
-	if( !m_isVisible )
-	{
-		return;
-	}
+// 	if( !m_isVisible )
+// 	{
+// 		return;
+// 	}
 	
 	const Texture* tex = &g_theGame->m_gameSS[ SS_BRICKS ]->GetTexture();
 	g_theRenderer->BindTexture( tex );
