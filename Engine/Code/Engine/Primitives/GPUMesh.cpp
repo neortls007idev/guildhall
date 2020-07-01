@@ -5,16 +5,27 @@
 
 void GPUMesh::UpdateVertices( uint vcount , void const* vertexData , uint vertexStride , buffer_attribute_t const* layout )
 {
+	m_vertexCount = vcount;
+	
+	if ( vcount == 0 )
+	{
+		return;
+	}
+	
 	m_vertices->SetVertexBufferLayout( layout );
 	m_vertices->SetVBOStide( vertexStride );
 	m_vertices->Update( vertexData , vcount * vertexStride , vertexStride );
-	m_vertexCount = vcount;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void GPUMesh::UpdateVertices( std::vector<Vertex_PCU> const& vertices )
 {
+	if ( vertices.size() == 0  )
+	{
+		m_vertexCount = 0;
+		return;
+	}
 	UpdateVertices( ( uint ) vertices.size() ,
 		&vertices[ 0 ] ,
 		sizeof( Vertex_PCU ) ,
@@ -27,15 +38,26 @@ void GPUMesh::UpdateVertices( std::vector<Vertex_PCU> const& vertices )
 
 void GPUMesh::UpdateIndices( uint icount , uint const* indices )
 {
-	m_indices->Update( icount , indices );
-
 	m_indexCount = icount;
+	
+	if ( icount == 0 )
+	{
+		return;
+	}
+	
+	m_indices->Update( icount , indices );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void GPUMesh::UpdateIndices( std::vector<uint> const& indices )
 {
+	if ( indices.size() == 0 )
+	{
+		m_indexCount = 0;
+		return;
+	}
+	
 	UpdateIndices( ( uint ) indices.size() , &indices[ 0 ] );
 }
 

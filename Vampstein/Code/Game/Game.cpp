@@ -80,6 +80,8 @@ Game::Game()
 	{
 		m_validation[ MAP_REGIONS ]	  =	MapRegion::LoadDefinitions( "Data/Definitions/MapRegionTypes.xml" );
 
+		EntityDef::CreateDefinitions( "Data/Definitions/EntityTypes.xml" );
+
 		if ( m_validation[ MAP_REGIONS ] )
 		{
 			s_world = new World( this , "TheWorld" , "Data/Maps" );
@@ -139,8 +141,6 @@ Game::Game()
 	test.SetRotation( 90.f , 0.f , 0.f );
 	m_test = new BillBoard( AABB2( Vec2( -.25f , -.25f ) , Vec2( .25f , .25f ) ) , test.GetAsMatrix(X_IN_Y_LEFT_Z_UP) ,
 	                        Vec3(1.f,1.f,0.5f ) , Vec2::ZERO , Vec2::ONE , nullptr , CAMERA_OPPOSED_XY );
-
-	EntityDef::CreateDefinitions( "Data/Definitions/EntityTypes.xml" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -322,6 +322,7 @@ void Game::Update( float deltaSeconds )
 	if( m_validation[ CURRENT_MAP ] )
 	{
 		s_world->m_currentMap->UpdateMeshes();
+		s_world->m_currentMap->Update( deltaSeconds );
 	}
 
 	if ( m_hasMapChanged )
@@ -400,6 +401,11 @@ void Game::Render() const
 	if( m_validation[ CURRENT_MAP ] )
 	{
 		s_world->m_currentMap->Render();
+		
+		Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix();
+		Vec3 forwardVector = cameraTransform.GetIBasis3D();
+		TileMap* map = ( TileMap* ) s_world->m_currentMap;
+		map->DebugRenderRaycasts( Vec2( m_gameCamera.GetCameraTransform().GetPostion().GetXYComponents() ) , forwardVector.GetXYComponents().GetNormalized() , 5.f );
 	}
 
 	m_test->Render();
@@ -511,13 +517,18 @@ void Game::UpdateGhostCameraFromKeyBoard( float deltaSeconds )
 
 void Game::UpdatePossesingEntityFromKeyBoard()
 {
-	if( g_theInput->WasKeyJustPressed( KEY_F3 ) )
+	if( m_player != nullptr && g_theInput->WasKeyJustPressed( KEY_F3 ) )
 	{
 		m_player = nullptr;
 	}
+	else if ( m_player == nullptr && g_theInput->WasKeyJustPressed( KEY_F3 ) )
+	{
+		Mat44 cameraTransform	= m_gameCamera.GetCameraTransform().GetAsMatrix();
+		Vec3 forwardVector		= cameraTransform.GetIBasis3D();
+		Vec3 cameraPos			= m_gameCamera.GetCameraTransform().GetPostion();
+		
+	}
 }
-
-
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

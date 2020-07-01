@@ -65,18 +65,32 @@ constexpr Rgba8::Rgba8( uchar r , uchar g , uchar b , uchar a )
 // RGBA8 Colors
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-constexpr Rgba8 RED		= Rgba8( 255 , 0   , 0   , 255 );
-constexpr Rgba8 GREEN	= Rgba8( 0   , 255 , 0   , 255 );
-constexpr Rgba8 BLUE	= Rgba8( 0   , 0   , 255 , 255 );
-constexpr Rgba8 WHITE	= Rgba8( 255 , 255 , 255 , 255 );
-constexpr Rgba8 BLACK	= Rgba8( 0   , 0   , 0   , 255 );
-constexpr Rgba8 MAGENTA = Rgba8( 255 , 0   , 255 , 255 );
-constexpr Rgba8 YELLOW	= Rgba8( 255 , 255 , 0   , 255 );
-constexpr Rgba8 CYAN	= Rgba8( 0	 , 255 , 255 , 255 );
-constexpr Rgba8 ORANGE  = Rgba8( 255 , 127 , 0   , 255 );
-constexpr Rgba8 PINK	= Rgba8( 255 , 0   , 127 , 255 );
-constexpr Rgba8 PURPLE  = Rgba8( 127 , 0   , 255 , 255 );
-constexpr Rgba8 GRAY	= Rgba8( 127 , 127 , 127 , 255 );
-constexpr Rgba8 CLEAR	= Rgba8( 255 , 255 , 255 , 0 );
+constexpr Rgba8 RED					= Rgba8( 255 , 0   , 0   , 255 );
+constexpr Rgba8 GREEN				= Rgba8( 0   , 255 , 0   , 255 );
+constexpr Rgba8 BLUE				= Rgba8( 0   , 0   , 255 , 255 );
+constexpr Rgba8 WHITE				= Rgba8( 255 , 255 , 255 , 255 );
+constexpr Rgba8 BLACK				= Rgba8( 0   , 0   , 0   , 255 );
+constexpr Rgba8 MAGENTA				= Rgba8( 255 , 0   , 255 , 255 );
+constexpr Rgba8 YELLOW				= Rgba8( 255 , 255 , 0   , 255 );
+constexpr Rgba8 CYAN				= Rgba8( 0	 , 255 , 255 , 255 );
+constexpr Rgba8 ORANGE				= Rgba8( 255 , 127 , 0   , 255 );
+constexpr Rgba8 PINK				= Rgba8( 255 , 0   , 127 , 255 );
+constexpr Rgba8 PURPLE				= Rgba8( 127 , 0   , 255 , 255 );
+constexpr Rgba8 GRAY				= Rgba8( 127 , 127 , 127 , 255 );
+
+constexpr Rgba8 CLEAR				= Rgba8( 255 , 255 , 255 , 0 );
+
+constexpr Rgba8 HALF_ALPHA_RED		= Rgba8( 255 , 0   , 0   , 127 );
+constexpr Rgba8 HALF_ALPHA_GREEN	= Rgba8( 0   , 255 , 0   , 127 );
+constexpr Rgba8 HALF_ALPHA_BLUE		= Rgba8( 0   , 0   , 255 , 127 );
+constexpr Rgba8 HALF_ALPHA_WHITE	= Rgba8( 255 , 255 , 255 , 127 );
+constexpr Rgba8 HALF_ALPHA_BLACK	= Rgba8( 0   , 0   , 0   , 127 );
+constexpr Rgba8 HALF_ALPHA_MAGENTA	= Rgba8( 255 , 0   , 255 , 127 );
+constexpr Rgba8 HALF_ALPHA_YELLOW	= Rgba8( 255 , 255 , 0   , 127 );
+constexpr Rgba8 HALF_ALPHA_CYAN		= Rgba8( 0   , 255 , 255 , 127 );
+constexpr Rgba8 HALF_ALPHA_ORANGE	= Rgba8( 255 , 127 , 0   , 127 );
+constexpr Rgba8 HALF_ALPHA_PINK		= Rgba8( 255 , 0   , 127 , 127 );
+constexpr Rgba8 HALF_ALPHA_PURPLE	= Rgba8( 127 , 0   , 255 , 127 );
+constexpr Rgba8 HALF_ALPHA_GRAY		= Rgba8( 127 , 127 , 127 , 127 );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

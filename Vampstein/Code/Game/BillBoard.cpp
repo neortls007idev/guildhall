@@ -6,7 +6,6 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Game/Game.hpp"
 
-
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 extern RenderContext* g_theRenderer;
@@ -47,13 +46,14 @@ void BillBoard::Update()
 
 void BillBoard::Render()
 {
-	//g_theRenderer->BindTexture( m_spriteTex );
 	if( !g_theGame->m_debugDraw )
 	{
-		g_theRenderer->BindTexture( g_theGame->m_textures[ TEST_TEXTURE ] );
+		//g_theRenderer->BindTexture( g_theGame->m_textures[ TEST_TEXTURE ] );
+		g_theRenderer->BindTexture( m_spriteTex );
 		g_theRenderer->SetModelMatrix( m_transform );
 		g_theRenderer->DrawAABB2( m_bounds , WHITE , m_minUVs , m_maxUVs );
 		g_theRenderer->BindTexture( nullptr );
+		g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 	}
 	
 	if ( g_theGame->m_debugDraw )
@@ -62,6 +62,7 @@ void BillBoard::Render()
 		g_theRenderer->SetModelMatrix( m_transform );
 		g_theRenderer->DrawAABB2( m_bounds , WHITE );
 		g_theRenderer->BindShader( nullptr );
+		g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 	}
 }
 

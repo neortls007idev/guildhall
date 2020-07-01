@@ -44,7 +44,7 @@ public:
 	virtual void			UpdateMeshes() override;
 	virtual void			Render() const override;
 	
-			void			AddVertsForTile ( std::vector< VertexMaster >& destinationVerts ,
+			void			AddVertsForTile( std::vector< VertexMaster >& destinationVerts ,
 							                  std::vector< uint >& destinationIndices , int tileIndex );
 	
 			void			AddVertsForSolidTile ( std::vector< VertexMaster >& destinationVerts ,
@@ -53,6 +53,11 @@ public:
 	
 			void			AddVertsForNonSolidTile ( std::vector< VertexMaster >& destinationVerts ,
 							                          std::vector< uint >& destinationIndices , int tileIndex );
+	
+			RayCastResult	RayCastToEntities( Vec2 start , Vec2 direction , float dist );
+			RayCastResult	RayCastToTiles( Vec2 start , Vec2 direction , float distace );
+
+			void			DebugRenderRaycasts( Vec2 start , Vec2 direction , float distance );
 	
 			AABB3			GetTileBounds( int tileIndex );
 
@@ -71,6 +76,8 @@ private:
 	IntVec2									m_dimensions									= IntVec2::ZERO;
 	std::vector< Tile >						m_tiles;
 	GPUMesh*								m_worldMesh;
+	GPUMesh*								m_entitesDebugMesh;
+	GPUMesh*								m_raytraceDebugMesh;
 	//std::map<char , std::string>			m_legendMap;
 	
 };

@@ -18,6 +18,9 @@
 	</MapRows>
 	<Entities>
 		<PlayerStart pos="6.5,1.5" yaw="150"/>
+		<Actor type="Pinky" pos="2.5,1.5" yaw="180" />
+		<Actor type="Marine" pos="5.5,6.5" yaw="180" />
+		<Actor type="Pinky" pos="3.5,6.5" yaw="180" />
 	</Entities>
 
 </MapDefinition>

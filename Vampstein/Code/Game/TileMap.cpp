@@ -1,16 +1,17 @@
 ﻿#include "Engine/Audio/AudioSystem.hpp"
+#include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Primitives/AABB3.hpp"
 #include "Engine/Primitives/GPUMesh.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/Texture.hpp"
+#include "Game.hpp"
+#include "Game/MapMaterial.hpp"
+#include "Game/MapRegion.hpp"
+#include "Game/TheApp.hpp"
 #include "Game/TileMap.hpp"
 
-#include "Engine/Core/DevConsole.hpp"
-#include "Game/TheApp.hpp"
-#include "Game/MapRegion.hpp"
-#include "Game/MapMaterial.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -51,8 +52,9 @@ TileMap::TileMap( char const* mapName , IntVec2 dimensions ) :
 																Map( mapName ) ,
 																m_dimensions( dimensions )
 {
-	m_worldMesh = new GPUMesh( g_theRenderer );
-
+	m_worldMesh			= new GPUMesh( g_theRenderer );
+	m_entitesDebugMesh	= new GPUMesh( g_theRenderer );
+	m_raytraceDebugMesh = new GPUMesh( g_theRenderer );
 	PopulateTiles();
 }
 
@@ -93,37 +95,11 @@ TileMap::TileMap( char const* mapName , XMLElement* rootElement ) :
 	}
 	
 	m_worldMesh = new GPUMesh( g_theRenderer );
-
-	XMLElement* entityElement = rootElement->FirstChildElement( "Entities" );
-	tinyxml2::XMLElement* playerStart = entityElement->FirstChildElement( "PlayerStart" );
-
-	if( playerStart != nullptr )
-	{
-		Vec2 pos = ParseXmlAttribute( *playerStart , "pos" , Vec2::ZERO );
-		m_playerStartPos = Vec3( pos , 0.65f );
-
-		if( m_playerStartPos.GetLengthSquared() < 0.1f )
-		{
-			g_theDevConsole->PrintString( eDevConsoleMessageType::DEVCONSOLE_WARNING ,
-										  "WARNING: MAP: %s has Player start position - 0 , 0 , 0 )" , mapName );
-		}
-
-		float startYaw = ParseXmlAttribute( *playerStart , "yaw" , -1.f );
-		m_playerStartYawDegrees = startYaw;
-
-		if( startYaw <= -0.98f && startYaw >= -1.01 )
-		{
-			g_theDevConsole->PrintString( eDevConsoleMessageType::DEVCONSOLE_WARNING ,
-										  "WARNING: MAP: %s has Player start yaw = %.2f )" , mapName , startYaw );
-		}
-		else
-		{
-			g_theDevConsole->PrintString( eDevConsoleMessageType::DEVCONSOLE_SYTEMLOG ,
-										  "WARNING: MAP: %s has Player start yaw = %.2f )" , mapName , startYaw );
-		}
-		
-	}
+	m_entitesDebugMesh = new GPUMesh( g_theRenderer );
+	m_raytraceDebugMesh = new GPUMesh( g_theRenderer );
 	m_parsedSuccessfully = true;
+
+	ParseAllMapEntities( rootElement , mapName );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -245,6 +221,9 @@ TileMap::~TileMap()
 {
 	delete m_worldMesh;
 	m_worldMesh				= nullptr;
+
+	delete m_entitesDebugMesh;
+	m_entitesDebugMesh = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -268,15 +247,13 @@ void TileMap::UpdateMeshes()
 	VertexMaster::ConvertVertexMasterToVertexPCU( WorldMeshVerts , tempWorldMeshVerts );
 
 	m_worldMesh->UpdateVertices( WorldMeshVerts );
-	m_worldMesh->UpdateIndices( worldMeshIndices );	
+	m_worldMesh->UpdateIndices( worldMeshIndices );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TileMap::Render() const
 {
-	
-	//Texture* tex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Test_StbiFlippedAndOpenGL.png" );
 	Texture* tex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Terrain_8x8.png" );
 	
 	g_theRenderer->BindShader( nullptr );
@@ -284,6 +261,79 @@ void TileMap::Render() const
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 	g_theRenderer->DrawMesh( m_worldMesh );
 	g_theRenderer->BindTexture( nullptr );
+
+	std::vector<Vertex_PCU> debug3DMeshVerts;
+	std::vector<uint>		debug3DIndices;
+	for( size_t index = 0 ; index < m_allEntities.size() ; index++ )
+	{
+		if( m_allEntities[ index ] != nullptr )
+		{
+			Entity* entity = m_allEntities[ index ];
+			entity->Render();
+				
+			if( g_theGame->m_debugDraw )
+			{
+				if( entity->m_entityType != PLAYER )
+				{
+					std::vector<Vertex_PCU> line3DMeshVerts;
+					std::vector<uint>		line3DIndices;
+					CreateCylinder( line3DMeshVerts , line3DIndices , entity->m_physicsRadius , entity->m_pos ,
+									entity->m_pos + Vec3( 0.f , 0.f , entity->m_height ) , CYAN , CYAN );
+
+					AppendIndexedVerts( line3DMeshVerts , line3DIndices , debug3DMeshVerts , debug3DIndices );
+				}
+			}
+		}
+		if( g_theGame->m_debugDraw )
+		{
+			g_theRenderer->SetRasterState( WIREFRAME );
+			m_entitesDebugMesh->UpdateVertices( debug3DMeshVerts );
+			m_entitesDebugMesh->UpdateIndices( debug3DIndices );
+			g_theRenderer->DrawMesh( m_entitesDebugMesh );
+			g_theRenderer->SetRasterState( FILL_SOLID );
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void TileMap::DebugRenderRaycasts( Vec2 start , Vec2 direction , float distance )
+{
+	RayCastResult resultEntity  = RayCastToEntities( start , direction , distance );
+	Vec2 end = start + direction * distance;
+
+	std::vector<Vertex_PCU> raytraceVerts;
+	std::vector<uint>		raytraceIndices;
+	CreateCylinder( raytraceVerts , raytraceIndices , 0.005f , Vec3( start , 0.5f ) ,
+					Vec3( end , 0.5f ) , HALF_ALPHA_YELLOW , HALF_ALPHA_YELLOW );
+	
+	if( resultEntity .didImpact )
+	{
+		std::vector<Vertex_PCU> penetrationVerts;
+		std::vector<uint>		penetrationIndices;
+		CreateCylinder( penetrationVerts , penetrationIndices , 0.015f , Vec3( resultEntity.startHitPoint , 0.5f ) ,
+		                Vec3( resultEntity.endHitPoint , 0.5f ) , ORANGE , ORANGE );
+		AppendIndexedVerts( penetrationVerts , penetrationIndices , raytraceVerts , raytraceIndices );
+	}
+	
+	RayCastResult resultTiles = RayCastToTiles( start , direction , distance );
+	std::vector<Vertex_PCU> resultTilesVerts;
+	std::vector<uint>		resultTilesIndices;
+	CreateCylinder( resultTilesVerts , resultTilesIndices , 0.005f , Vec3( start , 0.7f ) ,
+					Vec3( end , 0.7f ) , HALF_ALPHA_YELLOW , HALF_ALPHA_YELLOW );
+	AppendIndexedVerts( resultTilesVerts , resultTilesIndices , raytraceVerts , raytraceIndices );
+	
+	if( resultTiles.didImpact )
+	{
+		std::vector<Vertex_PCU> tileImpactPointVerts;
+		std::vector<uint>		tileImpactPointIndices;
+		CreateUVSphere( 8 , 16 , tileImpactPointVerts , tileImpactPointIndices , 0.1f , Vec3( resultTiles.startHitPoint , 0.7f ) , RED );
+		AppendIndexedVerts( tileImpactPointVerts , tileImpactPointIndices , raytraceVerts , raytraceIndices );
+	}
+	m_raytraceDebugMesh->UpdateVertices( raytraceVerts );
+	m_raytraceDebugMesh->UpdateIndices( raytraceIndices );
+	
+	g_theRenderer->DrawMesh( m_raytraceDebugMesh );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -404,6 +454,146 @@ void TileMap::AddVertsForNonSolidTile( std::vector< VertexMaster >& destinationV
 	AppendIndexedVerts( tileMeshVerts , tileMeshIndices ,
 						destinationVerts , destinationIndices );
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+RayCastResult TileMap::RayCastToEntities( Vec2 start , Vec2 direction , float dist )
+{
+	std::vector<RayCastResult> results;
+	RayCastResult toReturn;
+	
+	for( size_t index = 0; index < m_allEntities.size(); index++ )
+	{
+		if( m_allEntities[ index ] != nullptr )
+		{
+			Vec2 neartstPoint	= GetNearestPointOnLineSegment2D( m_allEntities[ index ]->m_pos.GetXYComponents() , start , start + ( direction * dist ) );
+			float distance		= ( neartstPoint - m_allEntities[ index ]->m_pos.GetXYComponents() ).GetLength();
+			
+			if( distance > m_allEntities[ index ]->m_physicsRadius )
+			{
+				continue;
+			}
+			
+			float distanceAlongRay = sqrtf( ( m_allEntities[ index ]->m_physicsRadius * m_allEntities[ index ]->m_physicsRadius ) - ( distance * distance ) );
+
+			Vec2 startPoint = m_allEntities[ index ]->m_pos.GetXYComponents() + ( neartstPoint - m_allEntities[ index ]->m_pos.GetXYComponents() ).GetNormalized() * distance;
+			RayCastResult result;
+
+			result.didImpact		= true;
+			result.startHitPoint	= startPoint - ( direction * distanceAlongRay );
+			result.endHitPoint		= startPoint + ( direction * distanceAlongRay );
+			result.impactNormal		= ( result.startHitPoint - m_allEntities[ index ]->m_pos.GetXYComponents() ).GetRotated90Degrees().GetNormalized();
+			results.push_back( result );
+		}
+	}
+
+	if( results.size() > 0 )
+	{
+		if( results.size() > 1 )
+		{
+			float minDistanceSq = INFINITY;
+			size_t resultIndex	= 0;
+			
+			for ( size_t index = 0 ; index < results.size() ; index++  )
+			{
+				float distanceSq = ( start - results[ index ].startHitPoint ).GetLengthSquared();
+
+				if ( distanceSq < minDistanceSq )
+				{
+					resultIndex = index;
+					minDistanceSq = distanceSq;
+				}
+			}
+			return results[ resultIndex ];
+		}
+		else
+		{
+			return results[ 0 ];
+		}
+	}
+	return toReturn;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+RayCastResult TileMap::RayCastToTiles( Vec2 start , Vec2 direction , float distace )
+{
+	RayCastResult toReturn;
+	IntVec2 currentTileCoords = IntVec2( ( int ) ( floor( start.x ) ) , ( int ) ( floor( start.y ) ) );
+
+	if( IsTileSolid( currentTileCoords ) )
+	{
+		toReturn.didImpact		= true;
+		toReturn.startHitPoint	= start;
+		toReturn.endHitPoint	= start;
+		toReturn.impactNormal	= -direction;
+		return toReturn;
+	}
+	
+	Vec2	displacement				= direction * distace;
+	float	xDeltaT						= 1 / abs( displacement.x );
+	int		tileStepX					= direction.x > 0.f ? 1 : -1;
+	int		offsetToLeadingEdgeX		= ( tileStepX + 1 ) / 2;
+	float	firstVerticalIntersectionX	= ( float ) ( currentTileCoords.x + offsetToLeadingEdgeX );
+	float	tOfNextXCrossing			= abs( firstVerticalIntersectionX - start.x ) * xDeltaT;
+	float	yDeltaT						= 1 / abs( displacement.y );
+	int		tileStepY					= direction.y > 0.f ? 1 : -1;
+	int		offsetToLeadingEdgeY		= ( tileStepY + 1 ) / 2;
+	float	firstVerticalIntersectionY	= ( float ) ( currentTileCoords.y + offsetToLeadingEdgeY );
+	float	tOfNextYCrossing			= abs( firstVerticalIntersectionY - start.y ) * yDeltaT;
+	int		tileX						= currentTileCoords.x;
+	int		tileY						= currentTileCoords.y;
+	
+	while( true )
+	{
+		if( tOfNextXCrossing < tOfNextYCrossing )
+		{
+			if( tOfNextXCrossing > 1.f )
+			{
+				toReturn.didImpact		= false;
+				toReturn.startHitPoint	= start;
+				toReturn.endHitPoint	= start + direction * distace;
+				return toReturn;
+			}
+			
+			tileX += tileStepX;
+
+			if( IsTileSolid( IntVec2( tileX , tileY ) ) )
+			{
+				toReturn.didImpact		= true;
+				toReturn.startHitPoint	= start + ( displacement * tOfNextXCrossing );
+				toReturn.endHitPoint	= toReturn.startHitPoint;
+				toReturn.impactNormal	= Vec2( ( float ) -tileStepX , 0.f );
+				return toReturn;
+			}
+
+			tOfNextXCrossing += xDeltaT;
+		}
+		else
+		{
+			if( tOfNextYCrossing > 1.f )
+			{
+				toReturn.didImpact		= false;
+				toReturn.startHitPoint	= start;
+				toReturn.endHitPoint	= start + direction * distace;
+				return toReturn;
+			}
+
+			tileY += tileStepY;
+			if( IsTileSolid( IntVec2( tileX , tileY ) ) )
+			{
+				toReturn.didImpact		= true;
+				toReturn.startHitPoint	= start + ( displacement * tOfNextYCrossing );
+				toReturn.endHitPoint	= toReturn.startHitPoint;
+				toReturn.impactNormal	= Vec2( 0.f , ( float ) -tileStepY );
+				return toReturn;
+			}
+			tOfNextYCrossing += yDeltaT;
+		}
+	}
+	return toReturn;
+}
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

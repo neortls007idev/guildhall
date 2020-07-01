@@ -36,7 +36,6 @@ public:
 	~EntityDef() {};
 
 	static void		  CreateDefinitions( char const* dataFilePath );
-
 	static void		  ParseAllActors( tinyxml2::XMLElement* root );
 	static int		  GetIndexForAnimName( std::string animName );
 	static void		  ParseEntityAnim( tinyxml2::XMLElement* animElement , EntityDef* newDef , int index , std::string animName );
@@ -45,7 +44,6 @@ public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
 	static EntityDef* GetDefinition( std::string const& entityDefName );
-	//static EntityDef const* GetDefinition( std::string defName );
 
 public:
 	static std::map<std::string , EntityDef*>		s_entityDefs;

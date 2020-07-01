@@ -44,7 +44,8 @@ void World::CreateMaps( std::string mapsFolderPath )
 		
 		std::string mapType = ParseXmlAttribute( *mapRoot , "type" , "NULL" );
 		Map* temp =  Map::CreateNewMapOfType( mapType , mapFileNames[ index ].c_str() , mapRoot );
-
+		//Map* temp = new Map( mapFileNames[ index ].c_str() , mapRoot );
+		
 		if( nullptr == temp )
 		{
 			g_theDevConsole->PrintString( eDevConsoleMessageType::DEVCONSOLE_ERROR ,

@@ -5,6 +5,8 @@
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Game/EntityDef.hpp"
 
+#include "Engine/Core/DevConsole.hpp"
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 extern RenderContext*					  g_theRenderer;
@@ -19,7 +21,7 @@ EntityDef::EntityDef()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void EntityDef::CreateDefinitions( char const* dataFilePath )
+STATIC void EntityDef::CreateDefinitions( char const* dataFilePath )
 {
 	tinyxml2::XMLDocument doc;
 	doc.LoadFile( dataFilePath );
@@ -27,14 +29,36 @@ void EntityDef::CreateDefinitions( char const* dataFilePath )
 	tinyxml2::XMLElement* root = doc.RootElement();
 
 	ParseAllActors( root );
-	ParseAllEntitiesOfName( root , "Entity" );
-	ParseAllEntitiesOfName( root , "Projectile" );
-	ParseAllEntitiesOfName( root , "Portal" );
+
+	tinyxml2::XMLElement* entityElement = root->FirstChildElement();
+
+	std::vector<std::string> entityTypes;
+	entityTypes.push_back( "Actor" );
+	
+	while ( nullptr != entityElement )
+	{
+		std::string entityName = entityElement->Name();
+
+		size_t index = 0;
+		for ( index = 0 ; index < entityTypes.size() ; index++ )
+		{
+			if( entityName == entityTypes[ index ] )
+			{
+				entityElement = entityElement->NextSiblingElement();
+				break;
+			}
+		}
+		if ( index == entityTypes.size() )
+		{
+			ParseAllEntitiesOfName( root , entityName );
+			entityTypes.push_back( entityName );
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void EntityDef::ParseAllEntitiesOfName( tinyxml2::XMLElement* root , std::string elementName )
+STATIC void EntityDef::ParseAllEntitiesOfName( tinyxml2::XMLElement* root , std::string elementName )
 {
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	//			PARSING ALL ENTITIES WITH NAME
@@ -46,7 +70,8 @@ void EntityDef::ParseAllEntitiesOfName( tinyxml2::XMLElement* root , std::string
 
 		if( name == "invalid" )
 		{
-			//error
+			g_theDevConsole->PrintString( DEVCONSOLE_ERROR ,
+										  "ERROR: Enttiy name attribute missing, skipping this Entity." );
 			continue;
 		}
 
@@ -76,41 +101,7 @@ void EntityDef::ParseAllEntitiesOfName( tinyxml2::XMLElement* root , std::string
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-/*
-void EntityDef::ParseAllEntities( tinyxml2::XMLElement* root )
-{
-	//--------------------------------------------------------------------------------------------------------------------------------------------
-	//			PARSING ALL ENTITIES
-	//--------------------------------------------------------------------------------------------------------------------------------------------
-
-	for( tinyxml2::XMLElement* entityElement = root->FirstChildElement( "Entity" ); entityElement != nullptr; entityElement = entityElement->NextSiblingElement( "Entity" ) )
-	{
-		std::string name			= ParseXmlAttribute( *entityElement , "name" , "invalid" );
-
-		if( name == "invalid" )
-		{
-			//error
-			continue;
-		}
-
-		EntityDef* newDef = new EntityDef();
-		tinyxml2::XMLElement* physicsEle = entityElement->FirstChildElement( "Physics" );
-
-		if( physicsEle != nullptr )
-		{
-			newDef->m_physicsRadius = ParseXmlAttribute( *physicsEle , "radius" , 0.0f );
-			newDef->m_height		= ParseXmlAttribute( *physicsEle , "height" , 0.0f );
-		}
-		newDef->m_className			= "Entity";
-		newDef->m_typeName			= name;
-
-		s_entityDefs[ name ] = newDef;
-	}
-}
-*/
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void EntityDef::ParseAllActors( tinyxml2::XMLElement* root )
+STATIC void EntityDef::ParseAllActors( tinyxml2::XMLElement* root )
 {
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	//			PARSING ALL ACTORS
@@ -206,7 +197,7 @@ void EntityDef::ParseAllActors( tinyxml2::XMLElement* root )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void EntityDef::ParseEntityAnim( tinyxml2::XMLElement* animElement , EntityDef* newDef , int index , std::string animName )
+STATIC void EntityDef::ParseEntityAnim( tinyxml2::XMLElement* animElement , EntityDef* newDef , int index , std::string animName )
 {
 	std::string animationName = ParseXmlAttribute( *animElement , animName.c_str() , "invalid" );
 
@@ -214,19 +205,24 @@ void EntityDef::ParseEntityAnim( tinyxml2::XMLElement* animElement , EntityDef* 
 	{
 		Strings nums = SplitStringAtGivenDelimiter( animationName , ',' );
 
-		newDef->m_entityAnims[ index ][ animName ] = new SpriteAnimDefinition( *( newDef->m_spriteSheet ) , atoi( nums[ 0 ].c_str() ) , atoi( nums[ nums.size() - 1 ].c_str() ) , 1.f );
+		newDef->m_entityAnims[ index ][ animName ] = new SpriteAnimDefinition(*( newDef->m_spriteSheet ) ,
+																   StringConvertToValue( nums[ 0 ].c_str() , 0 ) ,
+																	 StringConvertToValue( nums[ nums.size() - 1 ].c_str() , 0 ) ,
+																	1.f );
 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-int EntityDef::GetIndexForAnimName( std::string animName )
+STATIC int EntityDef::GetIndexForAnimName( std::string animName )
 {
 	if ( animName == "Walk" )																{ return ( int ) ENTITY_WALK_ANIM; }
 	if ( animName == "Attack" )																{ return ( int ) ENTITY_ATTACK_ANIM; }
 	if ( animName == "Pain" )																{ return ( int ) ENTITY_PAIN_ANIM; }
 	if ( animName == "Death" )																{ return ( int ) ENTITY_DEATH_ANIM; }
 
+	g_theDevConsole->PrintString( DEVCONSOLE_ERROR ,
+								  "ERROR: Parsing animset %s | PLEASE USE - Walk,Attack,Pain or-and Death Only" , animName.c_str() );
 	return (int) ENTITY_INVALID_ANIM;
 }
 
@@ -234,7 +230,13 @@ int EntityDef::GetIndexForAnimName( std::string animName )
 
 STATIC EntityDef* EntityDef::GetDefinition( std::string const& entityDefName )
 {
-	// TODO :- SDST FIX ME
+	EntityDef* entityDef = s_entityDefs[ entityDefName ];
+	
+	if ( nullptr != entityDef )
+	{
+		return s_entityDefs[ entityDefName ];
+	}
+	
 	return nullptr;
 }
 
