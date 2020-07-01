@@ -1403,7 +1403,7 @@ Vec2 GetSupportPoint( const Vec2* vertices , size_t count , Vec2 direction )
 		if ( product > maxProduct )
 		{
 			maxProduct = product;
-			index = i;
+			index = ( int ) i;
 		}
 	}
 	return vertices[ index ];

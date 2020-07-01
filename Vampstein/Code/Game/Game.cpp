@@ -12,15 +12,16 @@
 #include "Engine/Renderer/ShaderState.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Renderer/SwapChain.hpp"
-#include "Engine/Time/Time.hpp"
+#include "Game/Entity.hpp"
 #include "Game/Game.hpp"
 
-#include "MapMaterial.hpp"
-#include "MapRegion.hpp"
+#include "Engine/Time/Time.hpp"
 #include "Game/GameCommon.hpp"
+#include "Game/MapMaterial.hpp"
+#include "Game/MapRegion.hpp"
 #include "Game/TheApp.hpp"
 #include "Game/TileMap.hpp"
-#include "World.hpp"
+#include "Game/World.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -42,7 +43,7 @@ STATIC SoundPlaybackID		Game::m_sounds[ NUM_GAME_SOUNDS ];
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Game::Game()
-{
+{	
 	g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
 	
 	m_pointSampler = g_theRenderer->GetOrCreateSampler( SAMPLER_POINT );
@@ -134,6 +135,10 @@ Game::Game()
 		g_theDevConsole->PrintString( DEVCONSOLE_ERROR ,
 									  "ERROR: Will Not Create Maps" );
 	}
+	Transform test;
+	test.SetRotation( 90.f , 0.f , 0.f );
+	m_test = new BillBoard( AABB2( Vec2( -.25f , -.25f ) , Vec2( .25f , .25f ) ) , test.GetAsMatrix(X_IN_Y_LEFT_Z_UP) ,
+	                        Vec3(1.f,1.f,0.5f ) , Vec2::ZERO , Vec2::ONE , nullptr , CAMERA_OPPOSED_XY );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -158,7 +163,8 @@ void Game::InitializeObjectTransforms()
 
 void Game::LoadShaders()
 {
-	m_imageEffectShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/selectiveImageEffect.hlsl" );
+	m_shaders[ IMAGE_EFFECT ]	= g_theRenderer->GetOrCreateShader( "Data/Shaders/selectiveImageEffect.hlsl" );
+	m_shaders[ UV_DEBBUGER ]	= g_theRenderer->GetOrCreateShader( "Data/Shaders/uvDebugger.hlsl" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -248,11 +254,12 @@ void Game::InitializeHUDElements()
 
 Game::~Game()
 {
-	m_pointSampler		= nullptr;
-	m_imageEffectShader = nullptr;
+	m_pointSampler				= nullptr;
+	m_shaders[ IMAGE_EFFECT ]	= nullptr;
+	m_shaders[ UV_DEBBUGER ]	= nullptr;
 
 	delete s_world;
-	s_world				= nullptr;
+	s_world						= nullptr;
 
 	for ( size_t index = 0; index < NUM_TOTAL_GAME_TEX ; index++ )
 	{
@@ -290,7 +297,8 @@ void Game::InitializeCameras()
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Game::Update( float deltaSeconds )
-{	
+{
+	m_test->Update();
 	
 	if ( m_debugDraw )
 	{
@@ -391,7 +399,9 @@ void Game::Render() const
 	{
 		s_world->m_currentMap->Render();
 	}
-				
+
+	m_test->Render();
+	
 	if ( m_debugDraw )
 	{
 		g_theRenderer->BindShader( nullptr );
@@ -414,7 +424,7 @@ void Game::Render() const
 	
 	g_theRenderer->EndCamera( m_gameCamera );
 
-	g_theRenderer->StartEffect( finalImage , colorTarget , m_imageEffectShader );
+	g_theRenderer->StartEffect( finalImage , colorTarget , m_shaders[ IMAGE_EFFECT ] );
 	g_theRenderer->EndEffect();
 
 	g_theRenderer->CopyTexture( backBuffer , finalImage );
@@ -487,6 +497,25 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 		g_theInput->ClipSystemCursor( MOUSE_IS_UNLOCKED );
 	}
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateGhostCameraFromKeyBoard( float deltaSeconds )
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdatePossesingEntityFromKeyBoard()
+{
+	if( g_theInput->WasKeyJustPressed( KEY_F3 ) )
+	{
+		m_player = nullptr;
+	}
+}
+
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

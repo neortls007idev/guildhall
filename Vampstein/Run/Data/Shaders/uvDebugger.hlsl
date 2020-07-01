@@ -14,8 +14,6 @@ struct vs_input_t
     float3 position : POSITION;
     float4 color : COLOR;
     float2 uv : TEXCOORD;
-
-    float3 normal : NORMAL;
 };
 
 
@@ -114,17 +112,10 @@ v2f_t VertexFunction(vs_input_t input)
     float4 camera_pos   = mul(VIEW, world_pos);
     float4 clip_pos     = mul(PROJECTION, camera_pos);
 
-   // normal is currently in model/local space
-    float4 local_normal = float4(input.normal, 0.0f);
-    float4 world_normal = mul(MODEL, local_normal);
-
-   // tangent & bitangent
-
     v2f.position        = clip_pos; // we want to output the clip position to raster (a perspective point)
     v2f.color           = input.color * TINT;
     v2f.uv              = input.uv;
     v2f.world_position  = world_pos.xyz;
-    v2f.world_normal    = world_normal.xyz;
 
     return v2f;
 }

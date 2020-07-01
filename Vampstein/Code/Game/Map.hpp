@@ -21,9 +21,11 @@ public:
 
 	virtual void	UpdateMeshes() = 0;
 	virtual void	Render() const = 0;
+	
 	virtual Entity* SpawnNewEntityOfType( std::string const& entityDefName );
 	virtual Entity* SpawnNewEntityOfType( EntityDef const& entityDef );
-		
+			void	AddEntityToMap( Entity* entity );
+			void	AddEntityToList( Entity* entity , Entitylist& eList );
 public:
 	std::string		m_name;
 	Vec3			m_playerStartPos;
@@ -31,6 +33,9 @@ public:
 	bool			m_parsedSuccessfully;
 
 	Entitylist		m_allEntities;
+	Entitylist		m_players;
+	Entitylist		m_projectiles;
+	Entitylist		m_NPCs;
 	
 };
 

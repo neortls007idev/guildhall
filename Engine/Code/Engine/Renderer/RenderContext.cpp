@@ -505,9 +505,9 @@ void RenderContext::BeginCamera( const Camera& camera )
 	//ID3D11RenderTargetView* rtv = m_textureTarget->GetOrCreateRenderTargetView()->GetRTVHandle();
 	//BindDepthStencil( m_textureTarget );
 		
-	m_context->OMSetRenderTargets( rtvCount ,          // One rendertarget view
-		rtvs.data() ,      // Render target view, created earlier
-		nullptr );
+	m_context->OMSetRenderTargets( ( UINT ) rtvCount ,          // One rendertarget view
+											rtvs.data() ,		// Render target view, created earlier
+							 nullptr );
 
 // 	DepthStencilTargetView* dsv = new DepthStencilTargetView( this );
 // 	dsv->CreateDepthStencilState();

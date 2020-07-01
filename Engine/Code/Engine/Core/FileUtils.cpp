@@ -15,20 +15,22 @@ void* FileReadToNewBuffer( std::string const& filename , size_t* out_size )
 	// TODO :- ADD ASSERT OR DIE IF FILE DOES NOT EXIST
 
 	fseek( filePath , 0 , SEEK_END );
-	long fileSize = ftell( filePath );
+	const long fileSize = ftell( filePath );
 
 	uchar* buffer = new uchar[ fileSize + 1 ];
+	//memset( buffer , 0 , fileSize );
+	size_t bytesRead = 0;
 	if ( nullptr != buffer )
 	{
 		fseek( filePath , 0 , SEEK_SET );
-		size_t bytesRead = fread( buffer , 1 , fileSize , filePath );
-		buffer[ bytesRead ] = NULL;
+		bytesRead = fread( buffer , 1 , fileSize , filePath );
+		buffer[ bytesRead + 1 ] = NULL;
 		UNUSED( bytesRead );
 	}
 
 	if ( out_size != nullptr )
 	{
-		*out_size = ( size_t ) fileSize;
+		*out_size = ( size_t ) bytesRead;
 	}
 
 	fclose( filePath );

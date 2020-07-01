@@ -795,7 +795,7 @@ DRO_text3D::DRO_text3D ( std::string text , Mat44 basis , Vec2 pivot , Rgba8 sta
                          eDebugRenderMode mode /*= DEBUG_RENDER_ALWAYS */ , bool isBillBoarded /*= false*/ ) :
 																								DebugRenderObject( DRO_TEXT3D , mode , duration , isBillBoarded )
 {
-	m_position = Vec3::ZERO;
+	m_position				= Vec3::ZERO;
 
 	m_text					= text;
 	m_model					= basis;

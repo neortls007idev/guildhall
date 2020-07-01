@@ -1,4 +1,5 @@
 #pragma once
+#include "BillBoard.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/DebugRenderObject.hpp"
 #include "Engine/Math/Vec3.hpp"
@@ -16,6 +17,7 @@ class Texture;
 class GPUMesh;
 class TileMap;
 class World;
+class Entity;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -38,6 +40,17 @@ enum  eGameSounds
 	
 	NUM_GAME_SOUNDS,
 };
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum  eGameShaders
+{
+	IMAGE_EFFECT ,
+	UV_DEBBUGER ,
+
+	NUM_GAME_SHADERS ,
+};
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -81,6 +94,8 @@ private:
 //				METHODS TO HANDLE USER INPUT
 //--------------------------------------------------------------------------------------------------------------------------------------------
 			void UpdateFromKeyBoard( float deltaSeconds );
+			void UpdateGhostCameraFromKeyBoard( float deltaSeconds );
+			void UpdatePossesingEntityFromKeyBoard();
 			void UpdateDebugDrawFromKeyBoard();
 			void CameraPositionUpdateOnInput( float deltaSeconds );
 			void UpdateFromTestCodeKeyBoard( float deltaSeconds );
@@ -122,12 +137,14 @@ public:
 	bool						m_debugDraw											= false;
 	static bool					m_hasMapChanged;
 
-	Shader*						m_imageEffectShader									= nullptr;
+	Shader*						m_shaders[ NUM_GAME_SHADERS ];
 
 	Sampler*					m_pointSampler										= nullptr;
 	Texture*					m_textures[ NUM_TOTAL_GAME_TEX ];
 	static SoundPlaybackID		m_sounds[ NUM_GAME_SOUNDS ];
 	RandomNumberGenerator		m_rng;
+
+	Entity*						m_player											= nullptr;
 	
 	eDebugRenderMode			m_debugRenderMode									= DEBUG_RENDER_ALWAYS;
 
@@ -136,6 +153,6 @@ public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	//			TEST CODE
 	//--------------------------------------------------------------------------------------------------------------------------------------------
-	
+	BillBoard*					m_test;
 	bool						m_isSamplerEnabled									= false;
 };

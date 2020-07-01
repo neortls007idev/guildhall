@@ -70,6 +70,9 @@
     <ClCompile Include="Projectile.cpp">
       <Filter>Gameplay\Entities</Filter>
     </ClCompile>
+    <ClCompile Include="BillBoard.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">
@@ -113,6 +116,9 @@
     </ClInclude>
     <ClInclude Include="Projectile.hpp">
       <Filter>Gameplay\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="BillBoard.hpp">
+      <Filter>Gameplay</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
