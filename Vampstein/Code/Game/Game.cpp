@@ -139,6 +139,8 @@ Game::Game()
 	test.SetRotation( 90.f , 0.f , 0.f );
 	m_test = new BillBoard( AABB2( Vec2( -.25f , -.25f ) , Vec2( .25f , .25f ) ) , test.GetAsMatrix(X_IN_Y_LEFT_Z_UP) ,
 	                        Vec3(1.f,1.f,0.5f ) , Vec2::ZERO , Vec2::ONE , nullptr , CAMERA_OPPOSED_XY );
+
+	EntityDef::CreateDefinitions( "Data/Definitions/EntityTypes.xml" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
