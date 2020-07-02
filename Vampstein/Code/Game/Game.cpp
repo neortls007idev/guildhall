@@ -145,7 +145,7 @@ Game::Game()
 	Transform test;
 	test.SetRotation( 90.f , 0.f , 0.f );
 	m_test = new BillBoard( AABB2( Vec2( -.25f , -.25f ) , Vec2( .25f , .25f ) ) , test.GetAsMatrix(X_IN_Y_LEFT_Z_UP) ,
-	                        Vec3(1.f,1.f,0.5f ) , Vec2::ZERO , Vec2::ONE , nullptr , CAMERA_OPPOSED_XY );
+	                        Vec3::ZERO , Vec2::ZERO , Vec2::ONE , nullptr , CAMERA_OPPOSED_XY );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -378,12 +378,32 @@ void Game::DebugDrawUI( float deltaSeconds )
 	if ( nullptr == m_player )
 	{
 		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 6 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , PINK , deltaSeconds ,
-							 "GHOST CAMERA MODE : NO ENTITY POSSESSED" , upVector.x , upVector.y , upVector.z );
+							 "GHOST CAMERA MODE : NO ENTITY POSSESSED" );
 	}
 	else
 	{
 		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 6 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , PINK , deltaSeconds ,
-							 "GHOST CAMERA MODE : AN ENTITY POSSESSED" , upVector.x , upVector.y , upVector.z );
+							 "GHOST CAMERA MODE : AN ENTITY POSSESSED" );
+	}
+	if( m_test->m_type == CAMERA_FACING_XY )
+	{
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 7 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , PINK , deltaSeconds ,
+							 "Test Billboard Type : CAMERA FACING XY" );
+	}
+	else if( m_test->m_type == CAMERA_FACING_XYZ )
+	{
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 7 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , PINK , deltaSeconds ,
+							 "Test Billboard Type : CAMERA FACING XYZ" );
+	}
+	else if( m_test->m_type == CAMERA_OPPOSED_XY )
+	{
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 7 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , PINK , deltaSeconds ,
+							 "Test Billboard Type : CAMERA OPPOSED XY" );
+	}
+	else if( m_test->m_type == CAMERA_OPPOSED_XYZ )
+	{
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 7 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , PINK , deltaSeconds ,
+							 "Test Billboard Type : CAMERA OPPOSED XYZ" );
 	}
 	
 	Mat44 basis = m_gameCamera.GetCameraTransform().GetAsMatrix();
@@ -418,16 +438,17 @@ void Game::Render() const
 	{
 		s_world->m_currentMap->Render();
 		
-		Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix();
-		Vec3 forwardVector = cameraTransform.GetIBasis3D();
-		TileMap* map = ( TileMap* ) s_world->m_currentMap;
-		map->DebugRenderRaycasts( Vec2( m_gameCamera.GetCameraTransform().GetPostion().GetXYComponents() ) , forwardVector.GetXYComponents().GetNormalized() , 5.f );
 	}
 
 	m_test->Render();
 	
 	if ( m_debugDraw )
 	{
+		Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix();
+		Vec3 forwardVector = cameraTransform.GetIBasis3D();
+		TileMap* map = ( TileMap* ) s_world->m_currentMap;
+		map->DebugRenderRaycasts( Vec2( m_gameCamera.GetCameraTransform().GetPostion().GetXYComponents() ) , forwardVector.GetXYComponents().GetNormalized() , 5.f );
+
 		g_theRenderer->BindShader( nullptr );
 		g_theRenderer->BindTexture( nullptr );
 
@@ -522,6 +543,7 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	}
 
 	UpdatePossesingEntityFromKeyBoard();
+	UpdateFromTestCodeKeyBoard( deltaSeconds );
 }
 
 
@@ -674,18 +696,25 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 void Game::UpdateFromTestCodeKeyBoard( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
-	if( g_theInput->WasKeyJustPressed( KEY_F2 ) )
+	
+	if( g_theInput->WasKeyJustPressed( '1' ) )
 	{
-		m_isSamplerEnabled = !m_isSamplerEnabled;
-		
-		if( m_isSamplerEnabled )
-		{
-			m_pointSampler = g_theRenderer->GetOrCreateSampler( SAMPLER_POINT );
-		}
-		else
-		{
-			m_pointSampler = g_theRenderer->GetOrCreateSampler( SAMPLER_BILINEAR );
-		}
+		m_test->m_type = CAMERA_FACING_XY;
+	}
+	
+	if( g_theInput->WasKeyJustPressed( '2' ) )
+	{
+		m_test->m_type = CAMERA_FACING_XYZ;
+	}
+
+	if( g_theInput->WasKeyJustPressed( '3' ) )
+	{
+		m_test->m_type = CAMERA_OPPOSED_XY;
+	}
+
+	if( g_theInput->WasKeyJustPressed( '4' ) )
+	{
+		m_test->m_type = CAMERA_OPPOSED_XYZ;
 	}
 }
 

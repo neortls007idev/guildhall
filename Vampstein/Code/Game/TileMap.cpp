@@ -617,6 +617,11 @@ RayCastResult TileMap::RayCastToEntities( Vec2 start , Vec2 direction , float di
 		{
 			Vec2 neartstPoint	= GetNearestPointOnLineSegment2D( m_allEntities[ index ]->m_pos.GetXYComponents() , start , start + ( direction * dist ) );
 			float distance		= ( neartstPoint - m_allEntities[ index ]->m_pos.GetXYComponents() ).GetLength();
+
+			if ( m_allEntities[index] == g_theGame->m_player )
+			{
+				continue;
+			}
 			
 			if( distance > m_allEntities[ index ]->m_physicsRadius )
 			{
