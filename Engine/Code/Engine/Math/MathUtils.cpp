@@ -194,26 +194,33 @@ bool DoSpheresOverlap( const Vec3& CenterA, float RadiusA, const Vec3& CenterB, 
 
 bool DoDiscAndAABBOverlap( const Vec2& center , const float radius , const AABB2& box )
 {
-	Vec2 displacementBetweenCenters ;
-	Vec2 dimensionsOfAABB2D = box.GetDimensions();
+//	Vec2 displacementBetweenCenters ;
+//	Vec2 dimensionsOfAABB2D = box.GetDimensions();
+//
+// // COLLAPSING THE AABB2 AND THE CIRCLE TO THE FIRST QUADRANT
+// 
+// 	displacementBetweenCenters.x = abs( center.x - box.GetCenter().x );
+// 	displacementBetweenCenters.y = abs( center.y - box.GetCenter().y );
+// 
+// // FOR THE EDGES OF THE AABB2
+// 
+// 	if ( displacementBetweenCenters.x > ( ( dimensionsOfAABB2D.x * 0.5f ) + radius ) ) { return false; }
+// 	if ( displacementBetweenCenters.y > ( ( dimensionsOfAABB2D.y * 0.5f ) + radius ) ) { return false; }
+// 
+// 	if ( displacementBetweenCenters.x <= ( dimensionsOfAABB2D.x * 0.5f ) ) { return true; }
+// 	if ( displacementBetweenCenters.y <= ( dimensionsOfAABB2D.y * 0.5f ) ) { return true; }
+// 
+// 	float cornerDistanceSquared = ( displacementBetweenCenters.x - ( dimensionsOfAABB2D.x * 0.5f ) ) * ( displacementBetweenCenters.x - ( dimensionsOfAABB2D.x * 0.5f ) ) +
+// 								  ( displacementBetweenCenters.y - ( dimensionsOfAABB2D.y * 0.5f ) ) * ( displacementBetweenCenters.y - ( dimensionsOfAABB2D.y * 0.5f ) );
+//
+//	return ( cornerDistanceSquared <= ( radius * radius ) );
 
-// COLLAPSING THE AABB2 AND THE CIRCLE TO THE FIRST QUADRANT
+	Vec2 nearestPoint = box.GetNearestPoint( center );
 
-	displacementBetweenCenters.x = abs( center.x - box.GetCenter().x );
-	displacementBetweenCenters.y = abs( center.y - box.GetCenter().y );
+	float distanceSq = ( nearestPoint - center ).GetLengthSquared();
+	float radiusSquare = radius * radius;
 
-// FOR THE EDGES OF THE AABB2
-
-	if ( displacementBetweenCenters.x > ( ( dimensionsOfAABB2D.x * 0.5f ) + radius ) ) { return false; }
-	if ( displacementBetweenCenters.y > ( ( dimensionsOfAABB2D.y * 0.5f ) + radius ) ) { return false; }
-
-	if ( displacementBetweenCenters.x <= ( dimensionsOfAABB2D.x * 0.5f ) ) { return true; }
-	if ( displacementBetweenCenters.y <= ( dimensionsOfAABB2D.y * 0.5f ) ) { return true; }
-
-	float cornerDistanceSquared = ( displacementBetweenCenters.x - ( dimensionsOfAABB2D.x * 0.5f ) ) * ( displacementBetweenCenters.x - ( dimensionsOfAABB2D.x * 0.5f ) ) +
-								  ( displacementBetweenCenters.y - ( dimensionsOfAABB2D.y * 0.5f ) ) * ( displacementBetweenCenters.y - ( dimensionsOfAABB2D.y * 0.5f ) );
-
-	return ( cornerDistanceSquared <= ( radius * radius ) );
+	return ( distanceSq <= radiusSquare );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

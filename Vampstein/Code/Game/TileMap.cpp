@@ -210,6 +210,7 @@ void TileMap::PopulateTiles()
 		{
 			Tile newTile = Tile();
 			newTile.m_tileCoords = IntVec2( tileXIndex , tileYIndex );
+			newTile.m_bounds = AABB2( tileXIndex , tileYIndex , tileXIndex + 1 , tileYIndex + 1 );
 			m_tiles.push_back( newTile );
 		}
 	}
@@ -262,6 +263,21 @@ void TileMap::Render() const
 	g_theRenderer->DrawMesh( m_worldMesh );
 	g_theRenderer->BindTexture( nullptr );
 
+	if ( g_theGame->m_debugDraw )
+	{
+		for( size_t index = 0 ; index < m_tiles.size() ; index++ )
+		{
+			if( m_tiles[index].IsSolid() )
+			{
+				g_theRenderer->DrawUnfilledAABB2( m_tiles[ index ].m_bounds , MAGENTA , 0.1f );
+			}
+			else
+			{
+				g_theRenderer->DrawUnfilledAABB2( m_tiles[ index ].m_bounds , GREEN , 0.1f );
+			}
+		}
+	}
+	
 	std::vector<Vertex_PCU> debug3DMeshVerts;
 	std::vector<uint>		debug3DIndices;
 	for( size_t index = 0 ; index < m_allEntities.size() ; index++ )
@@ -273,7 +289,7 @@ void TileMap::Render() const
 				
 			if( g_theGame->m_debugDraw )
 			{
-				if( entity->m_entityType != PLAYER )
+				if( entity != g_theGame->m_player )
 				{
 					std::vector<Vertex_PCU> line3DMeshVerts;
 					std::vector<uint>		line3DIndices;
@@ -312,7 +328,7 @@ void TileMap::DebugRenderRaycasts( Vec2 start , Vec2 direction , float distance 
 		std::vector<Vertex_PCU> penetrationVerts;
 		std::vector<uint>		penetrationIndices;
 		CreateCylinder( penetrationVerts , penetrationIndices , 0.015f , Vec3( resultEntity.startHitPoint , 0.5f ) ,
-		                Vec3( resultEntity.endHitPoint , 0.5f ) , ORANGE , ORANGE );
+		                Vec3( resultEntity.endHitPoint , 0.5f ) , MAGENTA , MAGENTA );
 		AppendIndexedVerts( penetrationVerts , penetrationIndices , raytraceVerts , raytraceIndices );
 	}
 	
@@ -334,6 +350,139 @@ void TileMap::DebugRenderRaycasts( Vec2 start , Vec2 direction , float distance 
 	m_raytraceDebugMesh->UpdateIndices( raytraceIndices );
 	
 	g_theRenderer->DrawMesh( m_raytraceDebugMesh );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void TileMap::ResolveCollisions()
+{
+	Map::ResolveCollisions();
+	
+	for( size_t index = 0 ; index < m_allEntities.size() ; index++ )
+	{
+		Entity* entity = m_allEntities[ index ];
+
+		if( nullptr == entity )
+		{
+			continue;
+		}
+		
+		if( entity->m_canBePushedByWalls )
+		{
+			IntVec2 currTileCoords = IntVec2( RoundDownToInt( entity->m_pos.x ) , RoundDownToInt( entity->m_pos.y ) );
+			ResolveEntityVsTileCollisions( entity , currTileCoords );
+		}
+	}	
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void TileMap::ResolveEntityVsTileCollisions( Entity* entity , IntVec2 currTileCoords )
+{
+	IntVec2 northTileCoords( 1 , 0 );
+	IntVec2 southTileCoords( -1 , 0 );
+	IntVec2 westTileCoords( 0 , 1 );
+	IntVec2 eastTileCoords( 0 , -1 );
+	IntVec2 southEastTileCoords( -1 , -1 );
+	IntVec2 southWestTileCoords( -1 , 1 );
+	IntVec2 northEastTileCoords( 1 , -1 );
+	IntVec2 northWestTileCoords( 1 , 1 );
+
+	Vec2	entityPos	= entity->m_pos.GetXYComponents();
+	float	radius		= entity->m_physicsRadius;
+	Tile* tile			= GetTileAtCoords( currTileCoords );
+
+	if ( tile != nullptr )
+	{
+		if( IsTileSolid( currTileCoords ) )
+		{
+			PushDiscOutOfAABB( entityPos , radius , tile->m_bounds );
+		}
+	}
+	
+	tile = GetTileAtCoords( currTileCoords + northTileCoords );
+
+	if( tile != nullptr )
+	{
+		if( IsTileSolid( currTileCoords + northTileCoords ) )
+		{
+			PushDiscOutOfAABB( entityPos , radius , tile->m_bounds );
+		}
+	}
+
+	tile = GetTileAtCoords( currTileCoords + southTileCoords );
+
+	if( tile != nullptr )
+	{
+		if( IsTileSolid( currTileCoords + southTileCoords ) )
+		{
+			PushDiscOutOfAABB( entityPos , radius , tile->m_bounds );
+		}
+	}
+
+	tile = GetTileAtCoords( currTileCoords + westTileCoords );
+
+	if( tile != nullptr )
+	{
+		if( IsTileSolid( currTileCoords + westTileCoords ) )
+		{
+			PushDiscOutOfAABB( entityPos , radius , tile->m_bounds );
+		}
+	}
+	
+	tile = GetTileAtCoords( currTileCoords + eastTileCoords );
+
+	if ( tile != nullptr )
+	{
+		if( IsTileSolid( currTileCoords + eastTileCoords ) )
+		{
+			PushDiscOutOfAABB( entityPos , radius , tile->m_bounds );
+		}
+	}
+
+	//----------------------------------------------------------------------------------------------------------
+
+	tile = GetTileAtCoords( currTileCoords + southEastTileCoords );
+
+	if( tile != nullptr )
+	{
+		if( IsTileSolid( currTileCoords + southEastTileCoords ) )
+		{
+			PushDiscOutOfAABB( entityPos , radius , tile->m_bounds );
+		}
+	}
+
+	tile = GetTileAtCoords( currTileCoords + southWestTileCoords );
+
+	if( tile != nullptr )
+	{
+		if( IsTileSolid( currTileCoords + southWestTileCoords ) )
+		{
+			PushDiscOutOfAABB( entityPos , radius , tile->m_bounds );
+		}
+	}
+
+	tile = GetTileAtCoords( currTileCoords + northEastTileCoords );
+
+	if( tile != nullptr )
+	{
+		if( IsTileSolid( currTileCoords + northEastTileCoords ) )
+		{
+			PushDiscOutOfAABB( entityPos , radius , tile->m_bounds );
+		}
+	}
+
+	tile = GetTileAtCoords( currTileCoords + northWestTileCoords );
+
+	if( tile != nullptr )
+	{
+		if( IsTileSolid( currTileCoords + northWestTileCoords ) )
+		{
+			PushDiscOutOfAABB( entityPos , radius , tile->m_bounds );
+		}
+	}
+
+	entity->m_pos = Vec3( entityPos , entity->m_pos.z );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

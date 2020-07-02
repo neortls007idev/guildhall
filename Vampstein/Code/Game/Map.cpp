@@ -1,6 +1,7 @@
 #include "Game/Actor.hpp"
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/StdExtensions.hpp"
+#include "Engine/Math/MathUtils.hpp"
 #include "Game/Map.hpp"
 #include "Game/TileMap.hpp"
 #include "Game/Portal.hpp"
@@ -155,6 +156,8 @@ void Map::Update( float deltaSeconds )
 			m_allEntities[ index ]->Update( deltaSeconds );
 		}
 	}
+
+	ResolveCollisions();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -244,6 +247,93 @@ void Map::AddEntityToMap( Entity* entity )
 void Map::AddEntityToList( Entity* entity , Entitylist& eList )
 {
 	EmplaceBackAtEmptySpace( eList , entity );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Map::ResolveCollisions()
+{
+	ResolveEntityVsEntityCollisions();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Map::ResolveEntityVsEntityCollisions()
+{
+	for ( size_t firstEntityIndex = 0 ; firstEntityIndex < m_allEntities.size() ; firstEntityIndex ++ )
+	{
+		for ( size_t secondEntityIndex = firstEntityIndex ; secondEntityIndex < m_allEntities.size() ; secondEntityIndex++ )
+		{
+			if( nullptr != m_allEntities[ firstEntityIndex ] && nullptr != m_allEntities[ secondEntityIndex ] )
+			{
+				Entity* firstEntity		= m_allEntities[ firstEntityIndex ];
+				Entity* secondEntity	= m_allEntities[ secondEntityIndex ];
+
+				Vec2	firstPos		= firstEntity->m_pos.GetXYComponents();
+				float	firstRadius		= firstEntity->m_physicsRadius;
+
+				Vec2	secondPos		= secondEntity->m_pos.GetXYComponents();
+				float	secondRadius	= secondEntity->m_physicsRadius;
+				
+				if( DoDiscsOverlap( firstPos , firstRadius , secondPos , secondRadius ) )
+				{
+					if( firstEntity->m_canPushEntities && secondEntity->m_canBePushedByEntities &&
+						firstEntity->m_canBePushedByEntities && secondEntity->m_canPushEntities )
+					{
+						float firstEntityMass		= firstEntity->m_mass;
+						float secondEntityMass		= secondEntity->m_mass;
+
+						float	massRatioFirst		= secondEntityMass / ( firstEntityMass + secondEntityMass );
+						float	massRatioSecond		= firstEntityMass / ( firstEntityMass + secondEntityMass );
+
+						Vec2	displacementBetweenCenters = Vec2( firstPos - secondPos );
+						float	distanceBetweenCenters = displacementBetweenCenters.GetLength();
+
+						float	overlap		= firstRadius + secondRadius - distanceBetweenCenters;
+						Vec2	normal		= ( firstPos - secondPos ).GetNormalized();
+						Vec2	firstDisp	= overlap * massRatioFirst * normal;
+						Vec2	secondDisp	= overlap * massRatioSecond * -normal;
+						
+						firstEntity->m_pos += Vec3( firstDisp , 0.f );
+						secondEntity->m_pos += Vec3( secondDisp , 0.f );
+					}
+
+					if( firstEntity->m_canPushEntities && !secondEntity->m_canBePushedByEntities &&
+						firstEntity->m_canBePushedByEntities && !secondEntity->m_canPushEntities )
+					{
+						Vec2	displacementBetweenCenters = Vec2( firstPos - secondPos );
+						float	distanceBetweenCenters = displacementBetweenCenters.GetLength();
+
+						float	overlap = firstRadius + secondRadius - distanceBetweenCenters;
+						Vec2	normal = ( firstPos - secondPos ).GetNormalized();
+						Vec2	firstDisp = overlap * normal;
+						
+						firstEntity->m_pos += Vec3( firstDisp , 0.f );
+					}
+
+					if( !firstEntity->m_canPushEntities && secondEntity->m_canBePushedByEntities &&
+						!firstEntity->m_canBePushedByEntities && secondEntity->m_canPushEntities )
+					{
+						float firstEntityMass = firstEntity->m_mass;
+						float secondEntityMass = secondEntity->m_mass;
+
+						float	massRatioFirst = 1.f / ( firstEntityMass + secondEntityMass );
+						
+						Vec2	displacementBetweenCenters = Vec2( firstPos - secondPos );
+						float	distanceBetweenCenters = displacementBetweenCenters.GetLength();
+
+						float	overlap = firstRadius + secondRadius - distanceBetweenCenters;
+						Vec2	normal = ( firstPos - secondPos ).GetNormalized();
+						Vec2	firstDisp = overlap * massRatioFirst * normal;
+						Vec2	secondDisp = overlap * -normal;
+
+						secondEntity->m_pos += Vec3( secondDisp , 0.f );
+					}
+				}
+				
+			}
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

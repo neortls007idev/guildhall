@@ -121,6 +121,11 @@ Game::Game()
 					m_gameCamera.SetPosition( s_world->m_currentMap->m_playerStartPos );
 					m_gameCamera.SetPitchYawRollRotation( 200.f , s_world->m_currentMap->m_playerStartYawDegrees , 0.f );
 					m_yaw = s_world->m_currentMap->m_playerStartYawDegrees;
+
+					if ( s_world->m_currentMap->m_players.size() > 0  )
+					{
+						m_player = s_world->m_currentMap->m_players[ 0 ];
+					}
 					
 					g_theAudioSystem->PlaySound( m_sounds[ TELEPORTER ] );
 				}
@@ -370,6 +375,17 @@ void Game::DebugDrawUI( float deltaSeconds )
 	DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 5 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , BLUE , deltaSeconds ,
 		"kBasis (up, +world-up when identity) = (%.2f , %.2f , %.2f)" , upVector.x , upVector.y , upVector.z );
 
+	if ( nullptr == m_player )
+	{
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 6 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , PINK , deltaSeconds ,
+							 "GHOST CAMERA MODE : NO ENTITY POSSESSED" , upVector.x , upVector.y , upVector.z );
+	}
+	else
+	{
+		DebugAddScreenTextf( Vec4( 0.f , 0.f , 0.0f , 1 - ( 6 * normalizedOffset ) ) , Vec2::ZERO_ONE , fontSize , PINK , deltaSeconds ,
+							 "GHOST CAMERA MODE : AN ENTITY POSSESSED" , upVector.x , upVector.y , upVector.z );
+	}
+	
 	Mat44 basis = m_gameCamera.GetCameraTransform().GetAsMatrix();
 	basis.SetTranslation3D( m_gameCamera.GetPosition() + 3.f * forwardVector );
 	
@@ -504,29 +520,54 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	{
 		g_theInput->ClipSystemCursor( MOUSE_IS_UNLOCKED );
 	}
+
+	UpdatePossesingEntityFromKeyBoard();
 }
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Game::UpdateGhostCameraFromKeyBoard( float deltaSeconds )
-{
-
-}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Game::UpdatePossesingEntityFromKeyBoard()
 {
-	if( m_player != nullptr && g_theInput->WasKeyJustPressed( KEY_F3 ) )
-	{
-		m_player = nullptr;
-	}
-	else if ( m_player == nullptr && g_theInput->WasKeyJustPressed( KEY_F3 ) )
+	if ( m_player == nullptr && g_theInput->WasKeyJustPressed( KEY_F3 ) )
 	{
 		Mat44 cameraTransform	= m_gameCamera.GetCameraTransform().GetAsMatrix();
 		Vec3 forwardVector		= cameraTransform.GetIBasis3D();
 		Vec3 cameraPos			= m_gameCamera.GetCameraTransform().GetPostion();
-		
+
+		if ( s_world->m_currentMap != nullptr )
+		{
+			Entitylist& allEntities		= s_world->m_currentMap->m_allEntities;
+			float		minDistanceSq	= 4.f;
+			int			resultIndex		= -1;
+
+			if ( allEntities.size() > 0  )
+			{
+				for( size_t index = 0 ; index < allEntities.size() ; index++ )
+				{
+					float distanceSq = DotProduct3D( cameraPos - allEntities[ index ]->m_pos , forwardVector );
+					
+					if( distanceSq < minDistanceSq )
+					{
+						resultIndex = ( int ) index;
+						minDistanceSq = distanceSq;
+					}
+				}
+
+				if ( resultIndex == -1 )
+				{
+					m_player = nullptr;
+				}
+				else
+				{
+					m_player = allEntities[ resultIndex ];
+				}
+			}
+		}
+	}
+	else if( m_player != nullptr && g_theInput->WasKeyJustPressed( KEY_F3 ) )
+	{
+		m_player = nullptr;
 	}
 }
 
@@ -613,7 +654,19 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	m_pitch				= Clamp( m_pitch , -89.9f , 89.9f );
 	float finalRoll		= 0.f;
 
-	m_gameCamera.SetPitchYawRollRotation( m_pitch , m_yaw , finalRoll );	
+	m_gameCamera.SetPitchYawRollRotation( m_pitch , m_yaw , finalRoll );
+
+	if ( m_player != nullptr )
+	{
+		m_player->m_pos = m_gameCamera.GetCameraTransform().GetPostion();
+		m_player->m_pos.z = 0.f;
+		
+		m_player->m_startYawDegrees = m_gameCamera.GetCameraTransform().GetYaw();
+
+		//m_gameCamera.SetPosition( Vec3( m_player->m_pos.GetXYComponents() , m_player->m_eyeHeight ) );
+		//
+		//m_player->m_startYawDegrees = m_gameCamera.GetCameraTransform().GetYaw();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

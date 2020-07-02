@@ -1,8 +1,7 @@
 ﻿#pragma once
+#include "BillBoard.hpp"
 #include "Engine/Math/Vec3.hpp"
 #include <vector>
-
-#include "BillBoard.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -36,6 +35,7 @@ public:
 
 	void Update( float deltaSeconds );
 	void Render() const;
+	void UpdateBillboardSprites();
 	
 	//----------------------------------------------------------------------------------------------------------
 	
@@ -52,9 +52,9 @@ public:
 	bool											m_canBePushedByEntities		= true;
 	bool											m_canPushEntities			= true;
 
-	float											m_physicsRadius				= 0.0f;
-	float											m_height					= 0.0f;
-	float											m_eyeHeight					= 0.0f;
+	float											m_physicsRadius				= 0.3f;
+	float											m_height					= 0.6f;
+	float											m_eyeHeight					= 0.55f;
 	Vec2											m_spriteSize				= Vec2::ONE;
 	float											m_mass						= 1.f;
 	IntVec2											m_damage					= IntVec2::ZERO;
@@ -63,6 +63,8 @@ public:
 	BillBoard*										m_billBoard					= nullptr;
 	EntityDef*										m_entityDef					= nullptr;
 	bool											m_isPossessed				= false;
+	Vec2											m_entityforwardVector					= Vec2::ZERO_ONE;
+	float											m_time						= 0.f;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

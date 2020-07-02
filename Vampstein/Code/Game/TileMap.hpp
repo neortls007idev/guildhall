@@ -21,7 +21,7 @@ public:
 	
 public:
 	IntVec2				m_tileCoords	= IntVec2::ZERO;
-	//AABB2				m_bounds		= AABB2::ZERO_TO_ONE;
+	AABB2				m_bounds		= AABB2::ZERO_TO_ONE;
 	bool				m_isSolid		= false;
 	const MapRegion*	m_region		= nullptr;
 };
@@ -59,7 +59,8 @@ public:
 
 			void			DebugRenderRaycasts( Vec2 start , Vec2 direction , float distance );
 	
-			AABB3			GetTileBounds( int tileIndex );
+	virtual	void			ResolveCollisions() override;
+			void			ResolveEntityVsTileCollisions( Entity* entity , IntVec2 currTileCoords );
 
 			//--------------------------------------------------------------------------------------------------------------------------------------------
 			//			UTILITY METHODS
@@ -68,7 +69,8 @@ public:
 			int				GetIndexForTileCoords( IntVec2 tileCoords );
 			Tile*			GetTileAtCoords( IntVec2 tileCoords );
 			bool			IsTileSolid( IntVec2 tileCoords );
-
+			AABB3			GetTileBounds( int tileIndex );
+	
 private:
 			MapMaterial*	GetMaterialForLegend( const char glyph );
 			

@@ -41,6 +41,9 @@ public:
 	virtual Entity*		SpawnNewEntityOfType( EntityDef const& entityDef );
 			void		AddEntityToMap( Entity* entity );
 			void		AddEntityToList( Entity* entity , Entitylist& eList );
+
+	virtual	void		ResolveCollisions();
+			void		ResolveEntityVsEntityCollisions();
 public:
 	std::string			m_name;
 	Vec3				m_playerStartPos;
