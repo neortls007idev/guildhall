@@ -22,40 +22,46 @@ public:
 	Map( Game* owner );
 	Map( Game* owner , MapDefinition* mapDefinition , std::string mapName );
 
-	void LevelBounds();
+	void	InitializeLevelBounds();
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
 	~Map();
 
-	void Update( float deltaSeconds );
-	void Render();
+	void	Update( float deltaSeconds );
+	void	Render();
 
-	void UpdateSideCosmeticBounds();
-	void UpdateTopCosmeticBounds();
-	void RenderLevelBounds();
-
-	void RenderLevelSideBounds() const;
-
-	//--------------------------------------------------------------------------------------------------------------------------------------------
-
+	void	UpdateSideCosmeticBounds();
+	void	UpdateTopCosmeticBounds();
+	void	RenderLevelBounds();
+	void	RenderLevelSideBounds() const;
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
-	void SpawnNewEntity( eEntityType type , const Vec2& position , TileDefinition* tileDef = nullptr );
-	void AddEntityToMap( Entity* entity );
-	void AddEntityToList( Entitylist& entityList , Entity* entity );
+	void	SpawnNewEntity( eEntityType type , const Vec2& position , TileDefinition* tileDef = nullptr );
+	void	AddEntityToMap( Entity* entity );
+	void	AddEntityToList( Entitylist& entityList , Entity* entity );
 
-	void UpdateBallPosWhenGrabbed( float newPosX );
+	void	UpdateBallPosWhenGrabbed( float newPosX );
 	
-	void ResolveCollisions();
-	void ResolveBallvBoundsCollisions();
-	void ResolveBallvPaddleCollisions();
-	void ResolveBallvTileCollisions();
-	void ResolvePaddlevPowerUpCollisions();
+	void	ResolveCollisions();
+	void	ResolveBallvBoundsCollisions();
+	void	ResolveBallvPaddleCollisions();
+	void	ResolveBallvTileCollisions();
+	void	ResolvePaddlevPowerUpCollisions();
 	
-	void SpawnLeafParticlesOnBallCollision( Ball* ball , Vec2 refPoint , uint num4XParticles );
-	void SpawnFlowerParticlesOnBallCollision( Ball* ball , Vec2 refPoint , uint num4XParticles );
+	void	SpawnParticlesOnBallCollisionUsingEmitter( Ball* ball , Vec2 refPoint , uint num4XParticles , ParticleEmitter2D* emitter ,
+													   float minLifeTime , float maxLifeTime , Vec2 dimensions , float velocityMultiplier );
+
+	void	SpawnRandomParticleUsingEmitter ( Ball* ball , Vec2 refPoint , float minLifeTime , float maxLifeTime ,
+				                              Vec2 dimensions , float velocityMultiplier , ParticleEmitter2D* emmiter );
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+	Entity* GetFirstValidEntryInList( eEntityType type );
+
+	void	GarbageCollection();
+	
 public:
 	Game*							m_owner;
 	AABB2							m_backGround;

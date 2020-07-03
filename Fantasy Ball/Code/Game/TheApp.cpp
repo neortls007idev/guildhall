@@ -232,6 +232,10 @@ void TheApp::Render() const
 
 void TheApp::EndFrame()
 {
+	if ( g_theGamplayUISystem->GetGameState() == HUD_STATE )
+	{
+		g_theGame->GarbageCollection();
+	}
 	// all engine things that must end at the end of the frame and not the game
 /*	g_currentManager->EndFrame();*/
 	g_theParticleSystem2D->EndFrame();

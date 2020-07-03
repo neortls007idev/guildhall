@@ -11,7 +11,7 @@
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Game/Game.hpp"
 
-#include "UISystem.hpp"
+#include "Game/UISystem.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/Map.hpp"
 #include "Game/MapDefinition.hpp"
@@ -271,9 +271,9 @@ void Game::AddScreenShakeIntensity( float deltaShakeIntensity /* = 1.f */ )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Game::Die()
+void Game::GarbageCollection()
 {
-
+	m_currentLevel->GarbageCollection();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

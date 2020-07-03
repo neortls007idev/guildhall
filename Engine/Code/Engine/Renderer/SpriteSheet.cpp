@@ -1,4 +1,9 @@
 #include "Engine/Renderer/SpriteSheet.hpp"
+#include "Engine/Math/RandomNumberGenerator.hpp"
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+extern RandomNumberGenerator* g_RNG;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -74,6 +79,17 @@ void SpriteSheet::GetSpriteUVs( Vec2& out_uvAtMins , Vec2& out_uvAtMaxs , int sp
 	m_spriteDefs[ spriteIndex ].GetUVs( out_uvAtMins , out_uvAtMaxs );
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const IntVec2 SpriteSheet::RollRandomSpriteCoordsInSpriteSheet() const
+{
+	IntVec2 randomSpriteCoords;
+	randomSpriteCoords.x = g_RNG->RollRandomIntInRange( 0 , m_spriteGridLayout.x - 1 );
+	randomSpriteCoords.y = g_RNG->RollRandomIntInRange( 0 , m_spriteGridLayout.y - 1 );
+	return randomSpriteCoords;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 SpriteSheet::~SpriteSheet()
 {

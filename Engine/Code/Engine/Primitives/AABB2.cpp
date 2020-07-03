@@ -251,6 +251,13 @@ void AABB2::SetDimensions( const Vec2& newDimesions )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void AABB2::SetDimensions( const float& length , const float& height )
+{
+	SetDimensions( Vec2( length , height ) );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void AABB2::StretchToIncludePoint( Vec2 point )
 {
 	if ( IsPointInside( point ) )

@@ -12,39 +12,40 @@ class UISystem
 public:
 	UISystem();
 
-	void LoadUITextures();
-	void LoadMainMenuAnimTex();
-	void LoadUIFonts();
-	void InitalizeMainMenuLabels();
-	void InitalizeMainMenuButtons();
-	void InitalizeHUDLabels();
-	void InitalizeHighScoreData();
-	void InitalizeHighScoreLabels();
-	void InitializeBackButton();
-	void InitializeSliders();
+	void		LoadUITextures();
+	void		LoadMainMenuAnimTex();
+	void		LoadUIFonts();
+	void		InitalizeMainMenuLabels();
+	void		InitalizeMainMenuButtons();
+	void		InitalizeHUDLabels();
+	void		InitalizeHighScoreData();
+	void		InitalizeHighScoreLabels();
+	void		InitializeBackButton();
+	void		InitializeSliders();
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
 
 	~UISystem();
 
-	void Update( float deltaSeconds );
-	bool LoadingState();
-	void MainMenuState( float deltaSeconds );
-	void GameOverState();
-	void HighScoreMenuState();
-	void SettingsMenuState();
-	void UpdateBackGroundBranches();
+	void		Update( float deltaSeconds );
+	bool		LoadingState();
+	void		MainMenuState( float deltaSeconds );
+	void		GameOverState();
+	void		HighScoreMenuState();
+	void		SettingsMenuState();
+	void		UpdateBackGroundBranches();
 	
-	void Render() const;
-	void RenderLoadingScreen() const;
-	void RenderMainMenuScreen() const;
-	void RenderSettingsMenuScreen() const;
-	void RenderHighScoreMenuScreen() const;
-	void RenderHUD() const;
-	void RenderDebugMouse() const;
+	void		Render() const;
+	void		RenderLoadingScreen() const;
+	void		RenderMainMenuScreen() const;
+	void		RenderSettingsMenuScreen() const;
+	void		RenderHighScoreMenuScreen() const;
+	void		RenderHUD() const;
+	void		RenderDebugMouse() const;
 
-	void SetGameState( const eUISTATE state )																			{ m_systemState = state; }
+	void		SetGameState( const eUISTATE state )																			{ m_systemState = state; }
+	eUISTATE	GetGameState()const																								{ return m_systemState; }
 	
 public:
 	bool										m_UIDebugDraw				= false;

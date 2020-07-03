@@ -63,7 +63,7 @@ void ParticleEmitter2D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec2 position 
 		const SpriteDefinition& currentParticleSprite = m_spriteSheet->GetSpriteDefinition( spriteIndex );
 		currentParticleSprite.GetUVs( temp->m_minsUVs , temp->m_maxsUVs );
 
-		EmplaceBackAtEmptySpace( m_particles , temp );
+		EmplaceBackNewParticle( temp );
 	}
 	else
 	{
@@ -83,7 +83,9 @@ void ParticleEmitter2D::SpawnNewParticle( AABB2 cosmeticBounds , Vec2 position ,
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void ParticleEmitter2D::SpawnNewParticle( AABB2 cosmeticBounds , Vec2 position , float orientation , float scale , float angularVelocity , Vec2 velocity , float age , float maxAge , Rgba8 color , IntVec2 spriteCoords )
+void ParticleEmitter2D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec2 position , float orientation , float scale ,
+                                           float angularVelocity , Vec2 velocity , float age , float maxAge ,
+                                           Rgba8 color , IntVec2 spriteCoords )
 {
 	if( m_spriteSheet != nullptr )
 	{
@@ -95,12 +97,44 @@ void ParticleEmitter2D::SpawnNewParticle( AABB2 cosmeticBounds , Vec2 position ,
 		const SpriteDefinition& currentParticleSprite = m_spriteSheet->GetSpriteDefinition( spriteIndex );
 		currentParticleSprite.GetUVs( temp->m_minsUVs , temp->m_maxsUVs );
 
-		EmplaceBackAtEmptySpace( m_particles , temp );
+		EmplaceBackNewParticle( temp );
 	}
 	else
 	{
 		SpawnNewParticle( cosmeticBounds , position , orientation , velocity , age , maxAge , color );
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void ParticleEmitter2D::EmplaceBackNewParticle( Particle2D* temp )
+{
+	for( size_t index = m_lastSpawnPointPos ; index < m_particles.size() ; index++ )
+	{
+		if( nullptr == m_particles[ index ] )
+		{
+			m_particles[ index ] = temp;
+			m_lastSpawnPointPos = index;
+			return;
+		}
+	}
+	m_particles.push_back( temp );
+	m_lastSpawnPointPos = m_particles.size();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void ParticleEmitter2D::SpawnNewRandomParticleFromSpriteSheet ( AABB2 cosmeticBounds , Vec2 position ,
+                                                                float orientation , float scale ,
+                                                                float angularVelocity , Vec2 velocity , float age ,
+                                                                float maxAge , Rgba8 color )
+{
+	if ( m_spriteSheet != nullptr )
+	{
+		IntVec2 randSprite = m_spriteSheet->RollRandomSpriteCoordsInSpriteSheet();
+		SpawnNewParticle( cosmeticBounds , position , orientation , scale , angularVelocity , velocity , age , maxAge , color , randSprite );
+	}
+	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

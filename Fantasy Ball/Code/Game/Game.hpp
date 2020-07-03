@@ -31,7 +31,7 @@ public:
 
 	void AddScreenShakeIntensity( float deltaShakeIntensity = 1.f );
 
-	void Die();
+	void GarbageCollection();
 
 	SoundPlaybackID GetSFX( eGameAudioFX SFXid ) const;
 	

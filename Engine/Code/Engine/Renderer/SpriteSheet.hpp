@@ -19,6 +19,8 @@ public:
 	const SpriteDefinition& GetSpriteDefinition( int spriteIndex ) const;
 	const IntVec2			GetSpriteDimension() const; // DO NOT CONFUSE WITH SPRITESHEET DIMENSIONS
 	void					GetSpriteUVs( Vec2& out_uvAtMins , Vec2& out_uvAtMaxs , int spriteIndex ) const;
+	const IntVec2			RollRandomSpriteCoordsInSpriteSheet() const;
+	
 	~SpriteSheet();
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

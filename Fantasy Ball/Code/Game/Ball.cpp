@@ -10,15 +10,16 @@ extern RenderContext*		g_theRenderer;
 extern BallTexEnumRGBA8Map	g_theBallTexTable[ NUM_GAME_TEX ];
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Ball::Ball( Game* owner , int health , float cosmeticRadius , float physicsRadius , Vec2 position , Vec2 velocity , eEntityType type /*= BALL */ ) :
+Ball::Ball( Game* owner , int health , float physicsRadius , Vec2 position , Vec2 velocity , eEntityType type /*= BALL */ ) :
 																								Entity( owner , health , type ),
-																								m_cosmeticRadius( cosmeticRadius ) ,
 																								m_physicsRadius( physicsRadius ) ,
 																								m_pos( position ),
 																								m_velocity( velocity )
 																														
 {
 	m_currentTexture = m_owner->m_gameTex[ TEX_BALL_CYAN ];
+	m_cosmeticRadius.SetDimensions( Vec2 ( physicsRadius , physicsRadius ) * 3.f );
+	m_cosmeticRadius.SetCenter( m_pos.x , m_pos.y );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -35,6 +36,7 @@ void Ball::Update( float deltaSeconds )
 	if ( !m_owner->m_isBallLaunchable )
 	{
 		Move( deltaSeconds );
+		m_cosmeticRadius.SetCenter( m_pos );
 	}
 
 	if ( m_isInCooldown )
@@ -53,12 +55,12 @@ void Ball::Update( float deltaSeconds )
 void Ball::Render() const
 {
 	g_theRenderer->BindTexture( m_currentTexture );
-	g_theRenderer->DrawDisc( m_pos , m_cosmeticRadius , WHITE );
+	g_theRenderer->DrawAABB2( m_cosmeticRadius , WHITE );
 	g_theRenderer->BindTexture( nullptr );
 
 	if ( m_owner->m_isDebugDraw )
 	{
-		g_theRenderer->DrawRing( m_pos , m_cosmeticRadius	, MAGENTA	, 2.5f );
+		g_theRenderer->DrawUnfilledAABB2( m_cosmeticRadius	, MAGENTA	, 2.5f );
 		g_theRenderer->DrawRing( m_pos , m_physicsRadius	, CYAN		, 2.5f );
 	}
 }

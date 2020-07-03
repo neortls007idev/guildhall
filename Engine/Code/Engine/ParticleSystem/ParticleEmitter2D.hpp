@@ -28,6 +28,15 @@ public:
 	void SpawnNewParticle( AABB2 cosmeticBounds , Vec2 position , float orientation , float scale , float angularVelocity ,  Vec2 velocity , float age , float maxAge , Rgba8 color , IntVec2 spriteCoords );
 	void SpawnNewParticle( AABB2 cosmeticBounds , Vec2 position , float orientation , Vec2 velocity , float age , float maxAge , Rgba8 color );
 
+	void EmplaceBackNewParticle( Particle2D* temp );
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+	void SpawnNewRandomParticleFromSpriteSheet ( AABB2 cosmeticBounds , Vec2 position , float orientation ,
+	                                             float scale , float angularVelocity , Vec2 velocity , float age ,
+	                                             float maxAge , Rgba8 color );
+	
 	void Update( float deltaSeconds );
 	void Render();
 	
@@ -44,7 +53,7 @@ public:
 
 	//Vec2 m_position;
 	//Vec2 m_velocity;
-	
+	size_t							m_lastSpawnPointPos = 0;
 	std::vector<Particle2D*>		m_particles;
 	std::vector<Vertex_PCU>			m_particleVerts;
 };

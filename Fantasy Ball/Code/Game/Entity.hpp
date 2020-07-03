@@ -48,6 +48,8 @@ public:
 	Game*							m_owner;
 	int								m_health				=	0;
 	eEntityType						m_entityType			=	INVALID_ENTITY;
+
+	bool							m_isGarbage				= false;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
