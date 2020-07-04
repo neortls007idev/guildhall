@@ -67,6 +67,16 @@ const SpriteDefinition& SpriteSheet::GetSpriteDefinition( int spriteIndex ) cons
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+const SpriteDefinition& SpriteSheet::GetSpriteDefinition( IntVec2 spriteCoords ) const
+{
+	int spriteSheetWidth = GetSpriteDimension().x;
+	int spriteIndex = spriteCoords.x + ( spriteSheetWidth * spriteCoords.y );
+	const SpriteDefinition& currenteSprite = GetSpriteDefinition( spriteIndex );
+	return currenteSprite;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 const IntVec2 SpriteSheet::GetSpriteDimension() const
 {
 	return m_spriteGridLayout;

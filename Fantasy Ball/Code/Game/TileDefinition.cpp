@@ -27,11 +27,10 @@ TileDefinition::TileDefinition( const tinyxml2::XMLElement& definitionXMLElement
 	m_visibleAtHealth	= ParseXmlAttribute( definitionXMLElement , "visibleAtHealth"		, m_visibleAtHealth );
 	m_spriteCoords		= ParseXmlAttribute( definitionXMLElement , "spriteCoords"			, m_spriteCoords	);
 	m_VFXSpriteCoords	= ParseXmlAttribute( definitionXMLElement , "VFXSpriteCoords"		, m_VFXSpriteCoords );
+	m_ballSpriteCoords	= ParseXmlAttribute( definitionXMLElement , "BallSpriteCoords"		, m_ballSpriteCoords );
 	m_tileColor			= ParseXmlAttribute( definitionXMLElement , "colorInImageFile"		, m_tileColor		);
 
-	int spriteSheetWidth						= g_theGame->m_gameSS[ SS_BRICKS ]->GetSpriteDimension().x;
-	int tileSpriteIndex							= m_spriteCoords.x + ( spriteSheetWidth * m_spriteCoords.y );
-	const SpriteDefinition& currentTileSprite	= g_theGame->m_gameSS[ SS_BRICKS ]->GetSpriteDefinition( tileSpriteIndex );
+	const SpriteDefinition& currentTileSprite	= g_theGame->m_gameSS[ SS_BRICKS ]->GetSpriteDefinition( m_spriteCoords );
 	currentTileSprite.GetUVs( m_spriteUVs.m_mins , m_spriteUVs.m_maxs );
 }
 
@@ -56,10 +55,14 @@ void TileDefinition::CreateTileDefinitions( const char* xmlFilePath )
 	
 	std::string tileVFXSheetFileName		= ParseXmlAttribute( *tileDefinition , "tileVFXSpriteSheet" , "" );
 	IntVec2 tileVFXSpriteSheetDimensions	= ParseXmlAttribute( *tileDefinition , "tileVFXSpriteLayout" , IntVec2::ZERO );
+
+	std::string ballSheetFileName			= ParseXmlAttribute( *tileDefinition , "BallSpriteSheet" , "" );
+	IntVec2 ballSpriteSheetDimensions		= ParseXmlAttribute( *tileDefinition , "BallSpriteLayout" , IntVec2::ZERO );
+	IntVec2 defaultBallSpriteCoOrds			= ParseXmlAttribute( *tileDefinition , "BallDefaultSpriteCoords" , -IntVec2::ONE );
 	
 	if ( ( tileSheetFileName == "" ) || ( tileSpriteSheetDimensions.x == 0 && tileSpriteSheetDimensions.y == 0 ) )
 	{
-		ERROR_AND_DIE( "You forgot To mention the filePath for the TileSpreadSheet or it's Grid Layout" );
+		ERROR_AND_DIE( "You forgot To mention the filePath for the TileSpriteSheet or it's Grid Layout" );
 	}
 	
 	const char* filePath = tileSheetFileName.c_str();
@@ -69,9 +72,9 @@ void TileDefinition::CreateTileDefinitions( const char* xmlFilePath )
 		g_theGame->m_gameSS[ SS_BRICKS ] = new SpriteSheet( *( g_theRenderer->GetOrCreateTextureFromFile( filePath ) ) , tileSpriteSheetDimensions );
 	}
 
-	if( ( tileSheetFileName == "" ) || ( tileSpriteSheetDimensions.x == 0 && tileSpriteSheetDimensions.y == 0 ) )
+	if( ( tileVFXSheetFileName == "" ) || ( tileVFXSpriteSheetDimensions.x == 0 && tileVFXSpriteSheetDimensions.y == 0 ) )
 	{
-		ERROR_AND_DIE( "You forgot To mention the filePath for the TileSpreadSheet or it's Grid Layout" );
+		ERROR_AND_DIE( "You forgot To mention the filePath for the TileVFXSpriteSheet or it's Grid Layout" );
 	}
 
 			filePath = tileVFXSheetFileName.c_str();
@@ -80,6 +83,25 @@ void TileDefinition::CreateTileDefinitions( const char* xmlFilePath )
 	{
 		g_theGame->m_gameSS[ SS_VFX_FLARE ] = new SpriteSheet( *( g_theRenderer->GetOrCreateTextureFromFile( filePath ) ) , tileVFXSpriteSheetDimensions );
 	}
+
+	if( ( ballSheetFileName == "" ) || ( ballSpriteSheetDimensions.x == 0 && ballSpriteSheetDimensions.y == 0 ) )
+	{
+		ERROR_AND_DIE( "You forgot To mention the filePath for the BallSpriteSheet or it's Grid Layout" );
+	}
+
+	filePath = ballSheetFileName.c_str();
+
+	if( g_theGame->m_gameSS[ SS_BALL ] == nullptr )
+	{
+		g_theGame->m_gameSS[ SS_BALL ] = new SpriteSheet( *( g_theRenderer->GetOrCreateTextureFromFile( filePath ) ) , ballSpriteSheetDimensions );
+	}
+
+	if( defaultBallSpriteCoOrds.x == -1 && defaultBallSpriteCoOrds.y == -1 )
+	{
+		ERROR_AND_DIE( "You forgot To mention the default Ball Sprite." );
+	}
+	
+	g_theGame->m_ballDefaultSpriteCoords = defaultBallSpriteCoOrds;
 	
 	tileDefinition = tileDefinition->FirstChildElement( "TileDefinition" );
 

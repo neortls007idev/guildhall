@@ -32,9 +32,6 @@
     <Filter Include="Gameplay\Powerups">
       <UniqueIdentifier>{26809449-66f9-44fd-9ee3-b9e6ce32dabe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Gameplay\Physics">
-      <UniqueIdentifier>{8907f465-fb24-4c1e-81a8-2c82f9118f88}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Windows Resources">
       <UniqueIdentifier>{e4fe4522-f092-4963-b87c-5499cb4b117c}</UniqueIdentifier>
     </Filter>
@@ -90,9 +87,6 @@
     </ClCompile>
     <ClCompile Include="Entity.cpp">
       <Filter>Gameplay\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="GamePhysicsSystem.cpp">
-      <Filter>Framework</Filter>
     </ClCompile>
     <ClCompile Include="Paddle.cpp">
       <Filter>Gameplay\Entities</Filter>
@@ -155,9 +149,6 @@
     </ClInclude>
     <ClInclude Include="Entity.hpp">
       <Filter>Gameplay\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="GamePhysicsSystem.hpp">
-      <Filter>Gameplay\Physics</Filter>
     </ClInclude>
     <ClInclude Include="Paddle.hpp">
       <Filter>Gameplay\Entities</Filter>

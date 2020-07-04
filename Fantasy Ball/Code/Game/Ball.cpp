@@ -1,32 +1,33 @@
 ﻿#include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Renderer/SpriteSheet.hpp"
 #include "Game/Ball.hpp"
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 #include <map>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-
 extern RenderContext*		g_theRenderer;
 extern BallTexEnumRGBA8Map	g_theBallTexTable[ NUM_GAME_TEX ];
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Ball::Ball( Game* owner , int health , float physicsRadius , Vec2 position , Vec2 velocity , eEntityType type /*= BALL */ ) :
+Ball::Ball( Game* owner , int health , float physicsRadius , Vec2 position , Vec2 velocity , IntVec2 spriteCoords , eEntityType type /*= BALL */ ) :
 																								Entity( owner , health , type ),
 																								m_physicsRadius( physicsRadius ) ,
 																								m_pos( position ),
-																								m_velocity( velocity )
-																														
+																								m_velocity( velocity ),
+																								m_spriteCoords( spriteCoords )
 {
-	m_currentTexture = m_owner->m_gameTex[ TEX_BALL_CYAN ];
+	m_currentSpriteSheet = m_owner->m_gameSS[ SS_BALL ];
 	m_cosmeticRadius.SetDimensions( Vec2 ( physicsRadius , physicsRadius ) * 3.f );
 	m_cosmeticRadius.SetCenter( m_pos.x , m_pos.y );
+	UpdateCurrentTexture( spriteCoords );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Ball::~Ball()
 {
-	m_currentTexture = nullptr;
+	m_currentSpriteSheet = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -54,8 +55,8 @@ void Ball::Update( float deltaSeconds )
 
 void Ball::Render() const
 {
-	g_theRenderer->BindTexture( m_currentTexture );
-	g_theRenderer->DrawAABB2( m_cosmeticRadius , WHITE );
+	g_theRenderer->BindTexture( const_cast< Texture* >( &m_currentSpriteSheet->GetTexture() ) );
+	g_theRenderer->DrawAABB2( m_cosmeticRadius , WHITE , m_minUVs , m_maxUVs );
 	g_theRenderer->BindTexture( nullptr );
 
 	if ( m_owner->m_isDebugDraw )
@@ -83,6 +84,15 @@ void Ball::AddVelocityNudge()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Ball::UpdateCurrentTexture( IntVec2 spriteCoords )
+{
+	const SpriteDefinition& currentBallSprite = g_theGame->m_gameSS[ SS_BALL ]->GetSpriteDefinition( spriteCoords );
+	currentBallSprite.GetUVs( m_minUVs , m_maxUVs );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+/*
 void Ball::UpdateCurrentTexture( Rgba8 newColor )
 {
 	eGameTextures newTex = TEX_BALL_CYAN;
@@ -97,6 +107,6 @@ void Ball::UpdateCurrentTexture( Rgba8 newColor )
 	}
 	
 	m_currentTexture = m_owner->m_gameTex[ newTex ];
-}
+}*/
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -113,22 +113,11 @@ void Game::LoadAllTextures()
 	m_gameTex[ TEX_RIGHT_WALL ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Bounds/RightWall.png" );
 	m_gameTex[ TEX_TOP_WALL_SECTION ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Bounds/TopWallSection.png" );
 
-	m_gameTex[ TEX_BALL_RED ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/02.png" );
-	m_gameTex[ TEX_BALL_GREEN ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/06.png" );
-	m_gameTex[ TEX_BALL_BLUE ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/35.png" );
-	m_gameTex[ TEX_BALL_YELLOW ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/07.png" );
-	m_gameTex[ TEX_BALL_MAGENTA ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/04.png" );
-	m_gameTex[ TEX_BALL_CYAN ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/25.png" );
-	m_gameTex[ TEX_BALL_PINK ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/20.png" );
-	m_gameTex[ TEX_BALL_PURPLE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/09.png" );
-	m_gameTex[ TEX_BALL_ORANGE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/17.png" );
-	m_gameTex[ TEX_BALL_GREY ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Balls/34.png" );
+	Texture* FlowersTex			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/FlowerSpriteSheet.png" );
+	m_gameSS[ SS_VFX_FLOWERS ]	= new SpriteSheet( *FlowersTex , IntVec2( 2 , 2 ) );
 
-	Texture* FlowersTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/FlowerSpriteSheet.png" );
-	m_gameSS[ SS_VFX_FLOWERS ] = new SpriteSheet( *FlowersTex , IntVec2( 2 , 2 ) );
-
-	Texture* LeavesTex = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/LeavesSpriteSheet.png" );
-	m_gameSS[ SS_VFX_LEAVES ] = new SpriteSheet( *LeavesTex , IntVec2( 3 , 3 ) );
+	Texture* LeavesTex			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/LeavesSpriteSheet.png" );
+	m_gameSS[ SS_VFX_LEAVES ]	= new SpriteSheet( *LeavesTex , IntVec2( 3 , 3 ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -149,28 +138,6 @@ void Game::PostGameConstructDataOnce()
 	
 	TileDefinition::CreateTileDefinitions( "Data/GamePlay/TileDefs.xml" );
 	MapDefinition::CreateMapDefinitions( "Data/GamePlay/MapDefs.xml" );
-	
-	g_theBallTexTable[ TEX_BALL_RED		].texture		= TEX_BALL_RED;
-	g_theBallTexTable[ TEX_BALL_GREEN	].texture		= TEX_BALL_GREEN;
-	g_theBallTexTable[ TEX_BALL_BLUE	].texture		= TEX_BALL_BLUE;
-	g_theBallTexTable[ TEX_BALL_YELLOW	].texture		= TEX_BALL_YELLOW;
-	g_theBallTexTable[ TEX_BALL_MAGENTA ].texture		= TEX_BALL_MAGENTA;
-	g_theBallTexTable[ TEX_BALL_CYAN	].texture		= TEX_BALL_CYAN;
-	g_theBallTexTable[ TEX_BALL_PINK	].texture		= TEX_BALL_PINK;
-	g_theBallTexTable[ TEX_BALL_PURPLE	].texture		= TEX_BALL_PURPLE;
-	g_theBallTexTable[ TEX_BALL_ORANGE	].texture		= TEX_BALL_ORANGE;
-	g_theBallTexTable[ TEX_BALL_GREY	].texture		= TEX_BALL_GREY;
-
-	g_theBallTexTable[ TEX_BALL_RED		].color			= RED;
-	g_theBallTexTable[ TEX_BALL_GREEN	].color			= GREEN;
-	g_theBallTexTable[ TEX_BALL_BLUE	].color			= BLUE;
-	g_theBallTexTable[ TEX_BALL_YELLOW	].color			= YELLOW;
-	g_theBallTexTable[ TEX_BALL_MAGENTA ].color			= MAGENTA;
-	g_theBallTexTable[ TEX_BALL_CYAN	].color			= CYAN;
-	g_theBallTexTable[ TEX_BALL_PINK	].color			= PINK;
-	g_theBallTexTable[ TEX_BALL_PURPLE	].color			= PURPLE;
-	g_theBallTexTable[ TEX_BALL_ORANGE	].color			= ORANGE;
-	g_theBallTexTable[ TEX_BALL_GREY	].color			= GRAY;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -214,8 +181,6 @@ void Game::Update( float deltaSeconds )
 
 void Game::UpdateCamera()
 {
-//	RandomNumberGenerator rng;
-
 	m_screenShakeIntensity -= SCREEN_SHAKE_ABLATION_PER_SECOND;
 	m_screenShakeIntensity = Clamp( m_screenShakeIntensity , 0.f , 1.f );
 
@@ -223,20 +188,9 @@ void Game::UpdateCamera()
 	float cameraShakeX = static_cast< float >( g_RNG->RollRandomIntInRange( ( int ) -maxShakeDist , ( int ) maxShakeDist ) );
 	float cameraShakeY = static_cast< float >( g_RNG->RollRandomIntInRange( ( int ) -maxShakeDist , ( int ) maxShakeDist ) );
 
-	//Vec2 camDimensions = m_worldCamera.GetOrthoDimensions().GetXYComponents();
 	m_worldCamera.SetOrthoView( m_cameraHalfHeight , m_cameraAspectRatio );
-	//m_worldCamera.SetOrthoView( -camDimensions , camDimensions );
 	m_worldCamera.Translate2D( Vec2( cameraShakeX , cameraShakeY ) );
 
-
-	//-----------------------------------------------------------------------------------------------------------------
-	//Updating UI Camera
-	//-----------------------------------------------------------------------------------------------------------------
-
-	// 	for(int healthIcons = m_Ship->m_health; healthIcons > 0; healthIcons--)
-	// 	{
-	// 		RenderUI();
-	// 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

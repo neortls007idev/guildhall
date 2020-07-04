@@ -122,7 +122,8 @@ bool Tile::TileCollisionResponse( Ball* ball )
 			m_isVisible = true;
 		}
 		
-		ball->UpdateCurrentTexture( m_tileColor );
+		//ball->UpdateCurrentTexture( m_tileColor );
+		ball->UpdateCurrentTexture( m_tileDef->m_ballSpriteCoords );
 		
 		return true;
 	}
