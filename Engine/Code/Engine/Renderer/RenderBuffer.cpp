@@ -175,19 +175,19 @@ bool RenderBuffer::Create( size_t dataByteSize , size_t elementByteSize )
 	 
 	if ( m_handle )
 	{
-		std::string debugName;
+		std::string debugName = "Render buffer";
 		
-		if ( ( bufferType ^ VERTEX_BUFFER_BIT ) == 0 )
+		if( bufferType == ( int ) VERTEX_BUFFER_BIT )
 		{
 			debugName = " Unreleased Vertex Buffer ";
 		}
 			
-		if ( ( bufferType ^ INDEX_BUFFER_BIT ) == 0 )
+		if ( bufferType == ( int ) INDEX_BUFFER_BIT )
 		{
 			debugName = " Unreleased Index Buffer ";
 		}
 
-		if ( ( bufferType ^ UNIFORM_BUFFER_BIT ) == 0 )
+		if ( bufferType == ( int ) UNIFORM_BUFFER_BIT )
 		{
 			debugName = " Unreleased Uniform Buffer ";
 		}

@@ -642,18 +642,10 @@ void UISystem::RenderMainMenuScreen() const
 	g_theRenderer->BindTexture( m_UITextures[ UI_TITLE ] );
 	std::vector<Vertex_PCU> textVerts;
 	Vec2	camDimensions = m_UICamera->GetOrthoDimensions().GetXYComponents();
-	float	cameraAspect = ( camDimensions.x / camDimensions.y );
-	float	cellHeight = cameraAspect * 100.f;
-	float	offsetX = camDimensions.x * 0.5f;
+//	float	cameraAspect = ( camDimensions.x / camDimensions.y );
+//	float	cellHeight = cameraAspect * 100.f;
+//	float	offsetX = camDimensions.x * 0.5f;
 	
-//	DrawTextTriangles2D( *g_theRenderer , "FANTASY BALL" , Vec2( -offsetX * 0.65f , camDimensions.y * 0.25f ) , 45.f , WHITE , cameraAspect );
-// 	m_UIFonts[ UI_FONT_WOOD1 ]->AddVertsForText2D( textVerts , Vec2(-offsetX * 0.5f, 0.f ) , cellHeight ,
-// 	                                 "FANTASY BALL" , WHITE , 0.6f );
-// 	g_theRenderer->BindTexture( m_UIFonts[ UI_FONT_WOOD1 ]->GetTexture() );
-// 	
-// 	g_theRenderer->DrawVertexArray( textVerts );
-// 	g_theRenderer->BindTexture( nullptr );
-
 	g_theRenderer->BindTexture( m_UITextures[ UI_TITLE ] );
 	g_theRenderer->DrawAABB2( m_labels[ UI_TITLEBOX ] , WHITE );
 
@@ -842,6 +834,13 @@ void UISystem::RenderDebugMouse() const
 	Vec2 mouseClientPos( mouseClientPosX , mouseClientPosY );
 
 	g_theRenderer->DrawDisc( mouseClientPos , 5.f , RED );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void UISystem::EndFrame()
+{
+	g_theGame->EndFrame();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

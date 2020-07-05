@@ -111,11 +111,11 @@ bool Tile::TileCollisionResponse( Ball* ball )
 		}
 
 		float powerupSpawnPrabablity = g_RNG->RollRandomFloatBetweenZerotoOne();
-		if( powerupSpawnPrabablity > 0.9f )
-		{
-			m_ownerMap->SpawnNewEntity( POWERUP , refPoint , 50.f * ball->m_velocity , nullptr , PT_BRICK_THROUGH );
-		}
-
+		//if( powerupSpawnPrabablity > 0.9f )
+		//{
+		//	m_ownerMap->SpawnNewEntity( POWERUP , refPoint , 50.f * ball->m_velocity , nullptr , PT_BRICK_THROUGH );
+		//}
+		//
 		powerupSpawnPrabablity = g_RNG->RollRandomFloatBetweenZerotoOne();
 		if( powerupSpawnPrabablity > 0.9f )
 		{

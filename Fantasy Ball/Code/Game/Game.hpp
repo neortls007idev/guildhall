@@ -32,6 +32,7 @@ public:
 	
 	void			Render() const;
 	void			GarbageCollection();
+	void			EndFrame();
 
 	SoundPlaybackID GetSFX( eGameAudioFX SFXid ) const;
 	

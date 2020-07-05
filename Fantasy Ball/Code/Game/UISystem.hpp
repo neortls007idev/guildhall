@@ -44,6 +44,8 @@ public:
 	void		RenderHUD() const;
 	void		RenderDebugMouse() const;
 
+	void		EndFrame();
+
 	void		SetGameState( const eUISTATE state )																			{ m_systemState = state; }
 	eUISTATE	GetGameState()const																								{ return m_systemState; }
 	void		ResetAnimTime()																									{ m_currentBGAnimFrame = 0.f; }

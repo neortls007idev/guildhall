@@ -43,7 +43,7 @@ SpriteSheet* g_characterSpriteSheet = nullptr;
 Game::Game()
 {
 	//g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
-	m_cameraHalfHeight	= g_gameConfigBlackboard.GetValue( "cameraHalfHeight" , 540.f );
+	m_cameraHalfHeight	= g_gameConfigBlackboard.GetValue( "cameraHalHeight" , 540.f );
 	m_cameraAspectRatio	= g_gameConfigBlackboard.GetValue( "windowAspect" , 1.77f );
 	
 	m_worldCamera.SetOrthoView( m_cameraHalfHeight , m_cameraAspectRatio );
@@ -174,7 +174,7 @@ void Game::Update( float deltaSeconds )
 		g_theGamplayUISystem->SetGameState( GAME_OVER_STATE );
 		m_isGameDirty = true;
 	}
-
+	
 	UpdateMoveToNextMap();
 }
 
@@ -194,6 +194,7 @@ void Game::UpdateMoveToNextMap()
 			g_theGamplayUISystem->ResetAnimTime();
 			m_isGameDirty = true;
 			g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
+			return;
 		}
 		m_currentLevel = m_levels[ m_currentLevelNumber ];
 	}
@@ -254,6 +255,13 @@ void Game::GarbageCollection()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Game::EndFrame()
+{
+	//UpdateMoveToNextMap();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 SoundPlaybackID Game::GetSFX( eGameAudioFX SFXid ) const
 {
 	return m_sounds[ SFXid ];
@@ -270,7 +278,7 @@ void Game::UpdateFromKeyBoard()
 	
 	if( g_theInput->WasKeyJustPressed( KEY_F2 ) )
 	{
-		Entitylist& ballList = m_currentLevel->m_entityListsByType[ BALL ];
+		//Entitylist& ballList = m_currentLevel->m_entityListsByType[ BALL ];
 		Ball* theBall = nullptr;
 			  theBall = ( Ball* ) m_currentLevel->GetFirstValidEntryInList( BALL );
 		theBall->m_pos = Vec2::ZERO_ONE * 300.f;

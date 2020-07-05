@@ -130,7 +130,7 @@ void Map::Update( float deltaSeconds )
 		Entitylist& currentList = m_entityListsByType[ Entitytype ];
 		for ( int entityIndex = 0; entityIndex < ( int ) m_entityListsByType[ Entitytype ].size(); entityIndex++ )
 		{
-			if ( currentList[ entityIndex ] )
+			if ( currentList[ entityIndex ] != nullptr )
 			{
 				currentList[ entityIndex ]->Update( deltaSeconds );
 			}
@@ -260,6 +260,7 @@ Entity* Map::SpawnNewEntity ( eEntityType type , const Vec2& position , const Ve
 	}
 
 	AddEntityToMap( newEntity );
+	return newEntity;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -315,14 +316,17 @@ void Map::ResolveBallvBoundsCollisions()
 	Entitylist& currentList = m_entityListsByType[ BALL ];
 	for ( int entityIndex = 0; entityIndex < ( int ) m_entityListsByType[ BALL ].size(); entityIndex++ )
 	{
-		if ( currentList[ entityIndex ] )
+		if ( nullptr != currentList[ entityIndex ] )
 		{
 			Ball* ball = ( Ball* ) currentList[ entityIndex ];
 			
 			ResolveBallvSingleSideBoundCollision( ball , m_leftWallPhysicalBounds );
 			ResolveBallvSingleSideBoundCollision( ball , m_rightWallPhysicalBounds );
 			ResolveBallvSingleSideBoundCollision( ball , m_topWallPhysicalBounds );
-
+			
+			ball->m_pos.x = Clamp( ball->m_pos.x , m_leftWallPhysicalBounds.m_maxs.x , m_rightWallPhysicalBounds.m_mins.x );
+			ball->m_pos.y = Clamp( ball->m_pos.y , m_pitPhysicalBounds.m_mins.y , m_topWallPhysicalBounds.m_mins.y );
+			
 			if( DoDiscAndAABBOverlap( ball->m_pos , ball->m_physicsRadius , m_pitPhysicalBounds ) )
 			{
 				ball->m_isGarbage = true;
@@ -462,6 +466,11 @@ void Map::ResolveBallvTileCollisions()
 				currentTile = ( Tile* ) m_entityListsByType[ TILE ][ tileIndex ];
 				if ( nullptr != currentTile )
 				{
+					if ( currentTile->m_isGarbage == true )
+					{
+						continue;
+					}
+					
 					if ( currentTile->TileCollisionResponse( ball ) )
 					{
 						g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_GLASS_BREAK_2 ) , false , 0.1f );
@@ -598,7 +607,7 @@ Entity* Map::GetFirstValidEntryInList( eEntityType type )
 			return m_entityListsByType[ type ][ index ];
 		}
 	}
-	//return nullptr;
+	return nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

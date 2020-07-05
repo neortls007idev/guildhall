@@ -40,8 +40,8 @@ ParticleEmitter2D::ParticleEmitter2D ( RenderContext* renderContext , SpriteShee
 
 ParticleEmitter2D::~ParticleEmitter2D()
 {
-	m_particles.clear();
-	m_particleVerts.clear();
+	//m_particles.clear();
+	//m_particleVerts.clear();
 
 	m_texture		= nullptr;
 	m_spriteSheet	= nullptr;
