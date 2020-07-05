@@ -39,6 +39,7 @@ public:
 	
 	void Update( float deltaSeconds );
 	void Render();
+	void Destroy();
 	
 public:
 	Texture*						m_texture				= nullptr;

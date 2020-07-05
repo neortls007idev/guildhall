@@ -12,7 +12,7 @@ public:
 	MapGenStepFromImage( const XMLElement& element );
 	~MapGenStepFromImage() {};
 
-	virtual void RunStepOnce( Map& map ) override;
+	virtual void	RunStepOnce( Map& map ) override;
 	TileDefinition* DoesRGBA8AtpixelCoordsMatchAnyTileDefinition( IntVec2 pixelCoords );
 
 private:

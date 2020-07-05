@@ -6,8 +6,9 @@
 #include <map>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
 extern RenderContext*		g_theRenderer;
-extern BallTexEnumRGBA8Map	g_theBallTexTable[ NUM_GAME_TEX ];
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Ball::Ball( Game* owner , int health , float physicsRadius , Vec2 position , Vec2 velocity , IntVec2 spriteCoords , eEntityType type /*= BALL */ ) :
@@ -88,6 +89,14 @@ void Ball::UpdateCurrentTexture( IntVec2 spriteCoords )
 {
 	const SpriteDefinition& currentBallSprite = g_theGame->m_gameSS[ SS_BALL ]->GetSpriteDefinition( spriteCoords );
 	currentBallSprite.GetUVs( m_minUVs , m_maxUVs );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Ball::UpdateBounds( float scale )
+{
+	m_physicsRadius *= scale;
+	m_cosmeticRadius.SetDimensions( m_cosmeticRadius.GetDimensions() );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

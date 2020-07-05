@@ -37,7 +37,6 @@ extern RandomNumberGenerator*	g_RNG;
 
 SpriteSheet* g_tileSpriteSheet		= nullptr;
 SpriteSheet* g_characterSpriteSheet = nullptr;
-extern	BallTexEnumRGBA8Map	g_theBallTexTable[ NUM_GAME_TEX ];
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -169,12 +168,35 @@ void Game::Update( float deltaSeconds )
 	UpdateCamera();
 	m_currentLevel->Update( deltaSeconds );
 	UpdateFromKeyBoard();
+	
 	if( m_playerHealth == 0 )
 	{
 		g_theGamplayUISystem->SetGameState( GAME_OVER_STATE );
 		m_isGameDirty = true;
 	}
 
+	UpdateMoveToNextMap();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateMoveToNextMap()
+{
+	if ( m_currentLevel->m_numAliveTiles == 0 )
+	{
+		m_currentLevelNumber++;
+		m_isBallLaunchable = true;
+		m_currentLevel->DestroyEmitters();
+		
+		if( m_currentLevelNumber == ( ( int ) m_levels.size() ) )
+		{
+			g_theGamplayUISystem->SetGameState( MAIN_MENU_STATE );
+			g_theGamplayUISystem->ResetAnimTime();
+			m_isGameDirty = true;
+			g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
+		}
+		m_currentLevel = m_levels[ m_currentLevelNumber ];
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -249,7 +271,8 @@ void Game::UpdateFromKeyBoard()
 	if( g_theInput->WasKeyJustPressed( KEY_F2 ) )
 	{
 		Entitylist& ballList = m_currentLevel->m_entityListsByType[ BALL ];
-		Ball* theBall = ( Ball* ) ballList[ 0 ];
+		Ball* theBall = nullptr;
+			  theBall = ( Ball* ) m_currentLevel->GetFirstValidEntryInList( BALL );
 		theBall->m_pos = Vec2::ZERO_ONE * 300.f;
 	}
 	
@@ -261,6 +284,7 @@ void Game::UpdateFromKeyBoard()
 	if( g_theInput->WasKeyJustPressed( KEY_ESC ) )
 	{
 		g_theGamplayUISystem->SetGameState( MAIN_MENU_STATE );
+		g_theGamplayUISystem->ResetAnimTime();
 		m_isGameDirty = true;
 		g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
 	}

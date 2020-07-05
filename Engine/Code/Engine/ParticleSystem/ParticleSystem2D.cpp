@@ -52,7 +52,10 @@ void ParticleSystem2D::Update( float deltaSeconds )
 {
 	for ( size_t index = 0; index < m_emitters.size() ; index++ )
 	{
-		m_emitters[ index ]->Update( deltaSeconds );
+		if( nullptr != m_emitters[ index ] )
+		{
+			m_emitters[ index ]->Update( deltaSeconds );
+		}
 	}
 }
 
@@ -69,7 +72,10 @@ void ParticleSystem2D::Render() const
 {
 	for( size_t index = 0; index < m_emitters.size() ; index++ )
 	{
-		m_emitters[ index ]->Render();
+		if( nullptr != m_emitters[ index ] )
+		{
+			m_emitters[ index ]->Render();
+		}
 	}
 }
 
@@ -111,6 +117,7 @@ void ParticleSystem2D::DestroyParticleEmitter( ParticleEmitter2D* emitter )
 	{
 		if ( m_emitters[ index ] == emitter )
 		{
+			emitter->Destroy();
 			delete m_emitters[ index ];
 			m_emitters[ index ] = nullptr;
 		}

@@ -44,14 +44,11 @@ void MapGenStepFromImage::RunStepOnce( Map& map )
 		
 	IntVec2 tileCoords = IntVec2::ZERO;
 
-	//Vec2 startpointatbottomleft( -845.f , -139.f );
 	Vec2 startpointatbottomleft( -845.f , -168.f );
 	startpointatbottomleft.x += halfTileDimensions.x;
 	const float xOffset = ( float )RoundDownToInt( ( ( cameraDimensions.x * 0.5f - map.m_leftWallCosmeticBounds.GetDimensions().x ) / map.m_dimensions.x ) + halfTileDimensions.x );
 	const float xHalfOffset = xOffset * 0.5f;
 	const float yOffset = ( cameraDimensions.y * 0.5f ) / map.m_dimensions.y;
-	//const float xOffset = TILE_LENGTH;
-	//const float yOffset = TILE_HEIGHT;
 	
 	for ( tileCoords.y = 0; ( tileCoords.y < map.m_dimensions.y ) && ( tileCoords.y < m_mutationImage->GetDimensions().y ); tileCoords.y++ )
 	{
@@ -62,11 +59,12 @@ void MapGenStepFromImage::RunStepOnce( Map& map )
 			{
 				map.SpawnNewEntity( eEntityType::TILE ,
 				                    startpointatbottomleft + Vec2( tileCoords.x * xOffset , tileCoords.y * yOffset ) ,
+									Vec2::ZERO ,
 				                    curTileTypeInImage );
+				map.m_numAliveTiles++;
 			}
 		}
 	}
-
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

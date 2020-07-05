@@ -23,18 +23,21 @@ public:
 	void AddVelocityNudge();
 	void UpdateCurrentTexture( Rgba8 newColor );
 	void UpdateCurrentTexture( IntVec2 spriteCoords );
+	void UpdateBounds( float scale );
 	
 public:
 	float			m_physicsRadius;
 	Vec2			m_pos;
 	Vec2			m_velocity;
 	SpriteSheet*	m_currentSpriteSheet				= nullptr;
-	float			m_ballPaddleMaxCoolDownTime		= BALL_PADDLE_MAX_COLLISION_COOLDOWN_TIME;
-	bool			m_isInCooldown					= false;
+	float			m_ballPaddleMaxCoolDownTime			= BALL_PADDLE_MAX_COLLISION_COOLDOWN_TIME;
+	bool			m_isInCooldown						= false;
 	AABB2			m_cosmeticRadius;
 	IntVec2			m_spriteCoords;
 	Vec2			m_minUVs;
 	Vec2			m_maxUVs;
+
+	bool			m_brickThrough						= false;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

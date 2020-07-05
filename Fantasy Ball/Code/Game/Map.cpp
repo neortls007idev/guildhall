@@ -5,13 +5,11 @@
 #include "Engine/ParticleSystem/ParticleEmitter2D.hpp"
 #include "Engine/ParticleSystem/ParticleSystem2D.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
-#include "Engine/Renderer/SwapChain.hpp"
+#include "Engine/Time/Time.hpp"
 #include "Game//Game.hpp"
 #include "Game/Ball.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/Map.hpp"
-
-#include "Engine/Time/Time.hpp"
 #include "Game/MapDefinition.hpp"
 #include "Game/Paddle.hpp"
 #include "Game/Tile.hpp"
@@ -61,7 +59,7 @@ Map::Map( Game* owner , MapDefinition* mapDefinition , std::string mapName ) :
 	Paddle* thePaddle = ( Paddle* ) m_entityListsByType[ PADDLE ][ 0 ];
 	AABB2	paddleBounds = thePaddle->GetCollider();
 	
-	SpawnNewEntity( BALL , paddleBounds.GetCenter() + Vec2::ZERO_ONE * 37.5f );
+	SpawnNewEntity( BALL , paddleBounds.GetCenter() + Vec2::ZERO_ONE * 37.5f , BALL_INITIAL_VELOCITY );
 	m_numAliveBalls++;
 	
 	ResolveBallvPaddleCollisions();
@@ -101,10 +99,10 @@ void Map::InitializeLevelBounds()
 	m_rightWallPhysicalBounds			= m_rightWallCosmeticBounds.GetBoxAtRight( 0.85f , 0.f );
 	m_topWallPhysicalBounds				= m_topWallCosmeticBounds.GetBoxAtTop( 0.15f , 0.f );
 	m_pitPhysicalBounds					= m_pitCosmeticBounds.GetBoxAtBottom( 0.9f , 0.f );
-	m_leftWallPhysicalBounds.m_mins.x	*= 50.f;
-	m_rightWallPhysicalBounds.m_maxs.x	*= 50.f;
-	m_topWallPhysicalBounds.m_maxs.y	*= 50.f;
-	m_pitPhysicalBounds.m_mins.y		*= 1000.f;
+	m_leftWallPhysicalBounds.m_mins.x	*= 5000.f;
+	m_rightWallPhysicalBounds.m_maxs.x	*= 5000.f;
+	m_topWallPhysicalBounds.m_maxs.y	*= 5000.f;
+	m_pitPhysicalBounds.m_mins.y		*= 10000.f;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -229,7 +227,8 @@ void Map::RenderLevelSideBounds() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Map::SpawnNewEntity( eEntityType type , const Vec2& position , TileDefinition* tileDef )
+Entity* Map::SpawnNewEntity ( eEntityType type , const Vec2& position , const Vec2& velocity /*= Vec2::ZERO */ ,
+                           TileDefinition* tileDef /*= nullptr */ , ePowerUpType powerUpType /*= PT_INVALID */ )
 {
 	Entity* newEntity = nullptr;
 
@@ -243,10 +242,18 @@ void Map::SpawnNewEntity( eEntityType type , const Vec2& position , TileDefiniti
 			Vec2( 0.f , m_pitPhysicalBounds.m_maxs.y + 83.f ) );
 			break;
 		case BALL:
-			newEntity = new Ball( m_owner , 1 /*, 25.f * 1.5f */, 25.f , position , BALL_INITIAL_VELOCITY , m_owner->m_ballDefaultSpriteCoords );
+			if ( m_numAliveBalls >= 8 )
+			{
+				return nullptr;
+			}
+			newEntity = new Ball( m_owner , 1 , BALL_DEFAULT_PHYSICAL_RADIUS , position , velocity , m_owner->m_ballDefaultSpriteCoords );
+			m_numAliveBalls++;
 			break;
 		case TILE:
 			newEntity = new Tile( this , IntVec2( position ) , tileDef );
+			break;
+		case POWERUP:
+			newEntity = new PowerUps( m_owner , position , velocity , powerUpType );
 			break;
 		default:
 			break;
@@ -267,7 +274,7 @@ void Map::AddEntityToMap( Entity* entity )
 
 void Map::AddEntityToList( Entitylist& entityList , Entity* entity )
 {
-	PushBackAtEmptySpace( entityList , entity );	
+	EmplaceBackAtEmptySpace( entityList , entity );	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -293,6 +300,9 @@ void Map::ResolveCollisions()
 	ResolveBallvBoundsCollisions();
 	ResolveBallvPaddleCollisions();
 	ResolveBallvTileCollisions();
+
+	ResolvePowerUpvBoundsCollisions();
+	ResolvePaddlevPowerUpCollisions();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -301,9 +311,6 @@ void Map::ResolveBallvBoundsCollisions()
 {
 	std::vector<Vertex_PCU> particleVerts;
 	std::vector<uint>		particleIndices;
-	Rgba8 color;
-	static RandomNumberGenerator rng;
-	color.RollRandomColor( rng );
 		
 	Entitylist& currentList = m_entityListsByType[ BALL ];
 	for ( int entityIndex = 0; entityIndex < ( int ) m_entityListsByType[ BALL ].size(); entityIndex++ )
@@ -311,84 +318,79 @@ void Map::ResolveBallvBoundsCollisions()
 		if ( currentList[ entityIndex ] )
 		{
 			Ball* ball = ( Ball* ) currentList[ entityIndex ];
-
-			if ( DoDiscAndAABBOverlap( ball->m_pos , ball->m_physicsRadius , m_leftWallPhysicalBounds ) )
-			{
-				Vec2 refPoint = m_leftWallPhysicalBounds.GetNearestPoint( ball->m_pos );
-				Vec2 outVert1;
-				Vec2 outVert2;
-								
-				m_leftWallPhysicalBounds.GetClosestEdgeFromRefrerencePoint( refPoint , outVert1 , outVert2 );
-				Vec2 edgeNormal = ( outVert2 - outVert1 ).GetNormalized();
-				
-				ball->m_velocity.Reflect( edgeNormal );
-				
-				PushDiscOutOfAABB( ball->m_pos , ball->m_physicsRadius , m_leftWallPhysicalBounds );
-
-				uint numParticles = ( uint ) g_RNG->RollRandomIntInRange( 5 , 10 );
-				SpawnParticlesOnBallCollisionUsingEmitter( ball , ball->m_pos , numParticles , m_boundsEmitter ,
-														   LEAVES_PARTICLE_MIN_AGE		, LEAVES_PARTICLE_MAX_AGE ,
-														   LEAVES_PARTICLE_DIMENSIONS	, LEAVES_PARTICLE_VELOCITY );
-
-				g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_LEAVES_RUSTLE ) , false , 0.1f , 0.f , 1.f );
-				m_owner->AddScreenShakeIntensity();
-			}
-
-			if ( DoDiscAndAABBOverlap( ball->m_pos , ball->m_physicsRadius , m_rightWallPhysicalBounds ) )
-			{
-				Vec2 refPoint = m_rightWallPhysicalBounds.GetNearestPoint( ball->m_pos );
-				Vec2 outVert1;
-				Vec2 outVert2;
-
-				m_rightWallPhysicalBounds.GetClosestEdgeFromRefrerencePoint( refPoint , outVert1 , outVert2 );
-				Vec2 edgeNormal = ( outVert2 - outVert1 )/*.GetRotated90Degrees()*/.GetNormalized();
-				
-				ball->m_velocity.Reflect( edgeNormal );
-				PushDiscOutOfAABB( ball->m_pos , ball->m_physicsRadius , m_rightWallPhysicalBounds );
-
-				uint numParticles = ( uint ) g_RNG->RollRandomIntInRange( 5 , 10 );
-				SpawnParticlesOnBallCollisionUsingEmitter( ball , ball->m_pos , numParticles , m_boundsEmitter ,
-														   LEAVES_PARTICLE_MIN_AGE		, LEAVES_PARTICLE_MAX_AGE ,
-														   LEAVES_PARTICLE_DIMENSIONS	, LEAVES_PARTICLE_VELOCITY );
-				
-				g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_LEAVES_RUSTLE ) , false , 0.33f , 0.f , 1.f );
-				m_owner->AddScreenShakeIntensity();
-			}
-
-			if ( DoDiscAndAABBOverlap( ball->m_pos , ball->m_physicsRadius , m_topWallPhysicalBounds ) )
-			{
-				ball->m_velocity.Reflect( -Vec2::ZERO_ONE );
-				PushDiscOutOfAABB( ball->m_pos , ball->m_physicsRadius , m_topWallPhysicalBounds );
-
-				uint numParticles = ( uint ) g_RNG->RollRandomIntInRange( 5 , 10 );
-				SpawnParticlesOnBallCollisionUsingEmitter( ball , ball->m_pos , numParticles , m_boundsEmitter ,
-														   LEAVES_PARTICLE_MIN_AGE		, LEAVES_PARTICLE_MAX_AGE ,
-														   LEAVES_PARTICLE_DIMENSIONS	, LEAVES_PARTICLE_VELOCITY );
-
-				g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_LEAVES_RUSTLE ) , false , 0.33f , 0.f , 1.f );
-				m_owner->AddScreenShakeIntensity();
-			}
+			
+			ResolveBallvSingleSideBoundCollision( ball , m_leftWallPhysicalBounds );
+			ResolveBallvSingleSideBoundCollision( ball , m_rightWallPhysicalBounds );
+			ResolveBallvSingleSideBoundCollision( ball , m_topWallPhysicalBounds );
 
 			if( DoDiscAndAABBOverlap( ball->m_pos , ball->m_physicsRadius , m_pitPhysicalBounds ) )
 			{
 				ball->m_isGarbage = true;
 				--m_numAliveBalls;
 
-				if ( m_numAliveBalls <= 0 && m_owner->GetPaddleHealth() > 0 )
+				if ( m_numAliveBalls <= 1 && m_owner->GetPaddleHealth() > 0 )
 				{
 					m_owner->m_playerHealth = --m_owner->m_playerHealth;
 					m_owner->m_isBallLaunchable = true;
-					Paddle* thePaddle = ( Paddle* ) GetFirstValidEntryInList( PADDLE );
+					Paddle* thePaddle = nullptr;
+							thePaddle = ( Paddle* ) GetFirstValidEntryInList( PADDLE );
 					AABB2	paddleBounds = thePaddle->GetCollider();
 
 					if ( m_owner->GetPaddleHealth() > 0 )
 					{
-						SpawnNewEntity( BALL , paddleBounds.GetCenter() + Vec2::ZERO_ONE * 37.5f );
-						m_numAliveBalls++;
+						SpawnNewEntity( BALL , paddleBounds.GetCenter() + Vec2::ZERO_ONE * 37.5f , BALL_INITIAL_VELOCITY );
 					}
 				}
 			}
 		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Map::ResolveBallvSingleSideBoundCollision( Ball* ball , AABB2 bounds )
+{
+	if( DoDiscAndAABBOverlap( ball->m_pos , ball->m_physicsRadius , bounds ) )
+	{
+		Vec2 refPoint = bounds.GetNearestPoint( ball->m_pos );
+
+		Vec2 edgeNormal = ( ball->m_pos - refPoint ).GetNormalized();
+		
+		ball->m_velocity.Reflect( edgeNormal );
+
+		PushDiscOutOfAABB( ball->m_pos , ball->m_physicsRadius , bounds );
+
+		uint numParticles = ( uint ) g_RNG->RollRandomIntInRange( 5 , 10 );
+		SpawnParticlesOnBallCollisionUsingEmitter( ball , ball->m_pos , numParticles , m_boundsEmitter ,
+												   LEAVES_PARTICLE_MIN_AGE , LEAVES_PARTICLE_MAX_AGE ,
+												   LEAVES_PARTICLE_DIMENSIONS , LEAVES_PARTICLE_VELOCITY );
+
+		g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_LEAVES_RUSTLE ) , false , 0.1f , 0.f , 1.f );
+		m_owner->AddScreenShakeIntensity();
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Map::ResolveBallvSingleSideBoundCollision( PowerUps* powerUps , AABB2 bounds )
+{
+	if( DoDiscAndAABBOverlap( powerUps->m_pos , powerUps->m_physicsRadius , bounds ) )
+	{
+		Vec2 refPoint = bounds.GetNearestPoint( powerUps->m_pos );
+
+		Vec2 edgeNormal = ( powerUps->m_pos - refPoint ).GetNormalized();
+
+		powerUps->m_velocity.Reflect( edgeNormal );
+
+		PushDiscOutOfAABB( powerUps->m_pos , powerUps->m_physicsRadius , bounds );
+
+		//uint numParticles = ( uint ) g_RNG->RollRandomIntInRange( 5 , 10 );
+		//SpawnParticlesOnBallCollisionUsingEmitter( ball , ball->m_pos , numParticles , m_boundsEmitter ,
+		//										   LEAVES_PARTICLE_MIN_AGE , LEAVES_PARTICLE_MAX_AGE ,
+		//										   LEAVES_PARTICLE_DIMENSIONS , LEAVES_PARTICLE_VELOCITY );
+
+		g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_LEAVES_RUSTLE ) , false , 0.1f , 0.f , 1.f );
+		m_owner->AddScreenShakeIntensity();
 	}
 }
 
@@ -486,16 +488,64 @@ void Map::ResolvePaddlevPowerUpCollisions()
 		if( currentList[ entityIndex ] )
 		{
 			Paddle* paddle = nullptr;
+
 			if( m_entityListsByType[ PADDLE ].data() )
 			{
 				paddle = ( Paddle* ) GetFirstValidEntryInList( PADDLE );
 			}
-
-			__debugbreak();
 			// TODO:- FIX THIS SHIT BRUH... YOU NEED IT NOW!!
-			if ( DoAABBsOverlap(paddle->GetCollider() , AABB2::ZERO_TO_ONE) )
+
+			PowerUps* powerUp = ( PowerUps* ) currentList[ entityIndex ];
+			
+			if( DoDiscAndAABBOverlap( powerUp->m_pos , powerUp->m_physicsRadius , paddle->GetCollider() ) )
 			{
-				
+					
+//					uint numParticles = ( uint ) g_RNG->RollRandomIntInRange( 5 , 10 );
+//
+// 					SpawnParticlesOnBallCollisionUsingEmitter( ball , refPoint , numParticles , m_paddleEmitter ,
+// 															   FLOWER_PARTICLE_MIN_AGE , FLOWER_PARTICLE_MAX_AGE ,
+// 															   FLOWER_PARTICLE_DIMENSIONS , FLOWER_PARTICLE_VELOCITY );
+				powerUp->PowerUpEffects();
+				powerUp->m_isGarbage = true;
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Map::ResolvePowerUpvBoundsCollisions()
+{
+	Entitylist& currentList = m_entityListsByType[ POWERUP ];
+	for ( int entityIndex = 0; entityIndex < ( int ) m_entityListsByType[ POWERUP ].size(); entityIndex++ )
+	{
+		if ( currentList[ entityIndex ] )
+		{
+			PowerUps* powerup = ( PowerUps* ) currentList[ entityIndex ];
+
+			ResolveBallvSingleSideBoundCollision( powerup , m_leftWallPhysicalBounds );
+			ResolveBallvSingleSideBoundCollision( powerup , m_rightWallPhysicalBounds );
+			ResolveBallvSingleSideBoundCollision( powerup , m_topWallPhysicalBounds );
+			
+			if( DoDiscAndAABBOverlap( powerup->m_pos , powerup->m_physicsRadius , m_pitPhysicalBounds ) )
+			{
+				powerup->m_isGarbage = true;
+
+				/*
+				if ( m_numAliveBalls <= 0 && m_owner->GetPaddleHealth() > 0 )
+				{
+					m_owner->m_playerHealth = --m_owner->m_playerHealth;
+					m_owner->m_isBallLaunchable = true;
+					Paddle* thePaddle = ( Paddle* ) GetFirstValidEntryInList( PADDLE );
+					AABB2	paddleBounds = thePaddle->GetCollider();
+
+					if ( m_owner->GetPaddleHealth() > 0 )
+					{
+						SpawnNewEntity( BALL , paddleBounds.GetCenter() + Vec2::ZERO_ONE * 37.5f , BALL_INITIAL_VELOCITY );
+						m_numAliveBalls++;
+					}
+				}
+				*/
 			}
 		}
 	}
@@ -548,6 +598,14 @@ Entity* Map::GetFirstValidEntryInList( eEntityType type )
 			return m_entityListsByType[ type ][ index ];
 		}
 	}
+	//return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Entitylist* Map::GetEntityList( eEntityType type )
+{
+	return &m_entityListsByType[ type ];
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -565,6 +623,15 @@ void Map::GarbageCollection()
 			}
 		}
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Map::DestroyEmitters()
+{
+	g_theParticleSystem2D->DestroyParticleEmitter( m_boundsEmitter );
+	g_theParticleSystem2D->DestroyParticleEmitter( m_tileEmitter );
+	g_theParticleSystem2D->DestroyParticleEmitter( m_paddleEmitter );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

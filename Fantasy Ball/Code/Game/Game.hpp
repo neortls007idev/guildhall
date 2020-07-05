@@ -1,4 +1,5 @@
 #pragma once
+#include "PowerUps.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/Map.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
@@ -16,30 +17,29 @@ public:
 	Game();
 	~Game();
 	
-	void LoadAssets();
-	void LoadAllSounds();
-	void LoadAllTextures();
-	void LoadAllShaders();
+	void			LoadAssets();
+	void			LoadAllSounds();
+	void			LoadAllTextures();
+	void			LoadAllShaders();
 
-	void PostGameConstructDataOnce();
-	void PostGameConstruct();
+	void			PostGameConstructDataOnce();
+	void			PostGameConstruct();
 		
-	void Update( float deltaSeconds );
-	void UpdateCamera();
+	void			Update( float deltaSeconds );
+	void			UpdateMoveToNextMap();
+	void			UpdateCamera();
+	void			AddScreenShakeIntensity( float deltaShakeIntensity = 1.f );
 	
-	void Render() const;
-
-	void AddScreenShakeIntensity( float deltaShakeIntensity = 1.f );
-
-	void GarbageCollection();
+	void			Render() const;
+	void			GarbageCollection();
 
 	SoundPlaybackID GetSFX( eGameAudioFX SFXid ) const;
 	
 	//----------------------------------------------------------------------------------------------------------
-	int GetPaddleHealth() const															{ return m_playerHealth; }
-	Camera* GetWorldCamera()															{ return &m_worldCamera; }
+	int				GetPaddleHealth() const														{ return m_playerHealth; }
+	Camera*			GetWorldCamera()															{ return &m_worldCamera; }
 private:
-	void UpdateFromKeyBoard();
+	void			UpdateFromKeyBoard();
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -68,6 +68,8 @@ public:
 	Shader*						m_gameShader[ NUM_GAME_SHADERS ];			
 	
 	int							m_playerHealth									= 3;
+	ePowerUpType				m_currentPowerUps								= PT_INVALID;
+	
 	bool						m_isBallLaunchable								= true;
 	bool						m_isGameDirty									= false;
 

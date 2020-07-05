@@ -173,12 +173,39 @@ void ParticleEmitter2D::Update( float deltaSeconds )
 
 void ParticleEmitter2D::Render()
 {
+	if ( nullptr == m_renderContext )
+	{
+		return;
+	}
+	
 	m_renderContext->BindShader( m_shader );
 	m_renderContext->BindTexture( m_texture );
 	
 	m_renderContext->SetBlendMode( m_blendMode );
     m_renderContext->DrawVertexArray( m_particleVerts );
 	m_renderContext->SetBlendMode( eBlendMode::ALPHA );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void ParticleEmitter2D::Destroy()
+{
+	m_texture				= nullptr;
+	m_spriteSheet			= nullptr;
+	m_shader				= nullptr;
+	m_renderContext			= nullptr;
+
+	m_particles.clear();
+	m_particleVerts.clear();
+	
+	//for( size_t index = 0; index < m_particles.size() ; index++ )
+	//{
+	//	if( nullptr != m_particles[ index ] )
+	//	{
+	//		delete m_particles[ index ];
+	//		m_particles[ index ] = nullptr;
+	//	}
+	//}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

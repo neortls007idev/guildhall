@@ -101,12 +101,27 @@ bool Tile::TileCollisionResponse( Ball* ball )
 		
 		SpawnParticlesOnBallCollision( ball , refPoint , numParticles );
 
-		ball->m_velocity.Reflect( edgeNormal );
+		if ( !ball->m_brickThrough )
+		{
+			ball->m_velocity.Reflect( edgeNormal );
 
-		SpawnParticlesOnBallCollision( ball , refPoint , numParticles );
+			SpawnParticlesOnBallCollision( ball , refPoint , numParticles );
+			
+			PushDiscOutOfAABB( ball->m_pos , ball->m_physicsRadius , m_bounds );
+		}
+
+		float powerupSpawnPrabablity = g_RNG->RollRandomFloatBetweenZerotoOne();
+		if( powerupSpawnPrabablity > 0.9f )
+		{
+			m_ownerMap->SpawnNewEntity( POWERUP , refPoint , 50.f * ball->m_velocity , nullptr , PT_BRICK_THROUGH );
+		}
+
+		powerupSpawnPrabablity = g_RNG->RollRandomFloatBetweenZerotoOne();
+		if( powerupSpawnPrabablity > 0.9f )
+		{
+			m_ownerMap->SpawnNewEntity( POWERUP , refPoint , 50.f * ball->m_velocity , nullptr , PT_BALLX8 );
+		}
 		
-		PushDiscOutOfAABB( ball->m_pos , ball->m_physicsRadius , m_bounds );
-
 		if ( !m_isSolid )
 		{
 			--m_health;
@@ -124,6 +139,17 @@ bool Tile::TileCollisionResponse( Ball* ball )
 		
 		//ball->UpdateCurrentTexture( m_tileColor );
 		ball->UpdateCurrentTexture( m_tileDef->m_ballSpriteCoords );
+
+		if ( ball->m_brickThrough )
+		{
+			m_health = 0;
+		}
+
+		if ( m_health == 0 )
+		{
+			m_isGarbage = true;
+			m_ownerMap->m_numAliveTiles--;
+		}
 		
 		return true;
 	}

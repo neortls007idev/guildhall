@@ -343,6 +343,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Paddle.cpp" />
+    <ClCompile Include="PowerUps.cpp" />
     <ClCompile Include="TheApp.cpp" />
     <ClCompile Include="Main_Windows.cpp" />
     <ClCompile Include="Tile.cpp" />
@@ -417,6 +418,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Paddle.hpp" />
+    <ClInclude Include="PowerUps.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="TheApp.hpp" />
     <ClInclude Include="GameCommon.hpp" />
