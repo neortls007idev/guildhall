@@ -246,7 +246,7 @@ Entity* Map::SpawnNewEntity ( eEntityType type , const Vec2& position , const Ve
 			{
 				return nullptr;
 			}
-			newEntity = new Ball( m_owner , 1 , BALL_DEFAULT_PHYSICAL_RADIUS , position , velocity , m_owner->m_ballDefaultSpriteCoords );
+			newEntity = new Ball( m_owner , 1 , BALL_DEFAULT_MIN_RADIUS , position , velocity , m_owner->m_ballDefaultSpriteCoords );
 			m_numAliveBalls++;
 			break;
 		case TILE:

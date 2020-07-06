@@ -1,7 +1,8 @@
 ﻿#include "Engine/Renderer/RenderContext.hpp"
 #include "Game/Game.hpp"
 #include "Game/PowerUps.hpp"
-#include "Ball.hpp"
+#include "Game/Ball.hpp"
+#include "Game/PowerUpDefinition.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -16,6 +17,8 @@ PowerUps::PowerUps( Game* owner , Vec2 position , Vec2 velocity , ePowerUpType t
 	m_type( type )
 {
 	m_cosmeticBounds.SetCenter( m_pos );
+
+	m_definition = PowerUpDefinition::GetPowerUpDefinitionForPowerUp( type );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -46,7 +49,10 @@ void PowerUps::Move( float deltaSeconds )
 
 void PowerUps::Render() const
 {
-	g_theRenderer->DrawAABB2( m_cosmeticBounds , WHITE );
+	if( nullptr != m_definition )
+	{
+		g_theRenderer->DrawAABB2( m_cosmeticBounds , m_definition->m_color );
+	}
 
 	if( m_owner->m_isDebugDraw )
 	{

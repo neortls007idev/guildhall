@@ -649,8 +649,6 @@ void UISystem::RenderMainMenuScreen() const
 	g_theRenderer->BindTexture( m_UITextures[ UI_TITLE ] );
 	g_theRenderer->DrawAABB2( m_labels[ UI_TITLEBOX ] , WHITE );
 
-	
-	
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	//			MAIN MENU BUTTON COSMETIC RENDER
 	//--------------------------------------------------------------------------------------------------------------------------------------------

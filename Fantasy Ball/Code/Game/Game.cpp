@@ -11,6 +11,8 @@
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Game/Game.hpp"
 
+
+#include "PowerUpDefinition.hpp"
 #include "Game/UISystem.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/Map.hpp"
@@ -134,9 +136,11 @@ void Game::PostGameConstructDataOnce()
 {
 	TileDefinition::s_definitions.clear();
 	MapDefinition::s_definitions.clear();
+	PowerUpDefinition::s_definitions.clear();
 	
 	TileDefinition::CreateTileDefinitions( "Data/GamePlay/TileDefs.xml" );
 	MapDefinition::CreateMapDefinitions( "Data/GamePlay/MapDefs.xml" );
+	PowerUpDefinition::CreatePowerUpDefinitions( "Data/GamePlay/PowerUpDefs.xml" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -291,10 +295,10 @@ void Game::UpdateFromKeyBoard()
 
 	if( g_theInput->WasKeyJustPressed( KEY_ESC ) )
 	{
-		g_theGamplayUISystem->SetGameState( MAIN_MENU_STATE );
-		g_theGamplayUISystem->ResetAnimTime();
+		g_theGamplayUISystem->SetGameState( GAME_OVER_STATE );
+		//g_theGamplayUISystem->ResetAnimTime();
 		m_isGameDirty = true;
-		g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
+		//g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
 	}
 
 	if( g_theInput->WasKeyJustPressed( 'N' ) )

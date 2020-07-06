@@ -281,34 +281,25 @@ bool TheApp::HandleQuitRequested()
 
 void TheApp::UpdateFromKeyboard()
 {
-	if ( g_theInput->GetButtonState( 'T' ).IsPressed() )					{ m_isSloMo = true; }
+	if ( g_theInput->IsKeyHeldDown( 'T' ) )										{ m_isSloMo = true; }
 	else																		{ m_isSloMo = false; }
 	
-	if ( g_theInput->GetButtonState( 'Y' ).IsPressed() )					{ m_isSpeedMo = true; }
+	if ( g_theInput->IsKeyHeldDown( 'Y' ) )								{ m_isSpeedMo = true; }
 	else																		{ m_isSpeedMo = false; }
-
-// 	if( g_theInput->WasKeyJustPressed( KEY_ESC ) )
-// 	{
-// 		HandleQuitRequested();
-// 		g_theWindow->HandleQuitRequested();
+		
+// 	if ( ( g_theInput->GetButtonState( 'P' ).WasJustPressed() || g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() ) ) 
+// 	{ 
+// 		m_isPaused = !m_isPaused; 
+// 		
+// 		if ( m_isPaused == true )
+// 		{
+// 		
+// 		}
+// 		if ( m_isPaused == false  )
+// 		{
+// 		
+// 		}
 // 	}
-	
-	if ( m_isPaused && g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() )
-	{			}
-	
-	if ( ( g_theInput->GetButtonState( 'P' ).WasJustPressed() || g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() ) ) 
-	{ 
-		m_isPaused = !m_isPaused; 
-		
-		if ( m_isPaused == true )
-		{
-		
-		}
-		if ( m_isPaused == false  )
-		{
-		
-		}
-	}
 
 	if( g_theInput->WasKeyJustPressed( KEY_F1 ) )
 	{

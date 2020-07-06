@@ -1,14 +1,15 @@
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/ParticleSystem/ParticleEmitter2D.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Renderer/SpriteSheet.hpp"
 #include "Game/Ball.hpp"
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/Map.hpp"
+#include "Game/PowerUpDefinition.hpp"
 #include "Game/Tile.hpp"
 #include "Game/TileDefinition.hpp"
-#include "Engine/ParticleSystem/ParticleEmitter2D.hpp"
-#include "Engine/Renderer/SpriteSheet.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -110,18 +111,19 @@ bool Tile::TileCollisionResponse( Ball* ball )
 			PushDiscOutOfAABB( ball->m_pos , ball->m_physicsRadius , m_bounds );
 		}
 
-		float powerupSpawnPrabablity = g_RNG->RollRandomFloatBetweenZerotoOne();
-		//if( powerupSpawnPrabablity > 0.9f )
-		//{
-		//	m_ownerMap->SpawnNewEntity( POWERUP , refPoint , 50.f * ball->m_velocity , nullptr , PT_BRICK_THROUGH );
-		//}
-		//
-		powerupSpawnPrabablity = g_RNG->RollRandomFloatBetweenZerotoOne();
-		if( powerupSpawnPrabablity > 0.9f )
+		int powerUpSpawnType = g_RNG->RollRandomIntInRange( PT_INVALID + 1 , NUM_POWERUP_TYPES - 1 );
+		PowerUpDefinition* powerupDef = PowerUpDefinition::GetPowerUpDefinitionForPowerUp( ( ePowerUpType ) powerUpSpawnType );
+		float powerupSpawnProbablity = g_RNG->RollRandomFloatBetweenZerotoOne();
+
+		if( nullptr != powerupDef )
 		{
-			m_ownerMap->SpawnNewEntity( POWERUP , refPoint , 50.f * ball->m_velocity , nullptr , PT_BALLX8 );
+			if( powerupSpawnProbablity > powerupDef->m_spawnProbablityRequirement )
+			{
+				m_ownerMap->SpawnNewEntity( POWERUP , refPoint , POWERUP_VELOCITY_MULTIPLIER * ball->m_velocity ,
+				                            nullptr , ( ePowerUpType )powerUpSpawnType );
+			}
 		}
-		
+				
 		if ( !m_isSolid )
 		{
 			--m_health;

@@ -347,6 +347,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Paddle.cpp" />
+    <ClCompile Include="PowerUpDefinition.cpp" />
     <ClCompile Include="PowerUps.cpp" />
     <ClCompile Include="TheApp.cpp" />
     <ClCompile Include="Main_Windows.cpp" />
@@ -422,6 +423,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Paddle.hpp" />
+    <ClInclude Include="PowerUpDefinition.hpp" />
     <ClInclude Include="PowerUps.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="TheApp.hpp" />
@@ -500,7 +502,9 @@
     <Image Include="..\..\Run\Data\Icons\TitleBar\titleBarIcon.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Xml Include="..\..\Run\Data\GamePlay\HighScores.xml" />
     <Xml Include="..\..\Run\Data\GamePlay\MapDefs.xml" />
+    <Xml Include="..\..\Run\Data\GamePlay\PowerUpDefs.xml" />
     <Xml Include="..\..\Run\Data\GamePlay\TileDefs.xml" />
   </ItemGroup>
   <ItemGroup>

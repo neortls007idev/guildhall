@@ -69,9 +69,13 @@ constexpr float TILE_DEVIATION											= .6667f * 0.1f;
 constexpr float POWERUP_PHYSICS_RADIUS									= 32.f;
 const	  Vec2	POWERUP_DIMENSIONS										= Vec2( POWERUP_PHYSICS_RADIUS , POWERUP_PHYSICS_RADIUS ) * 2.f;
 const	  Vec2	POWERUP_HALF_DIMENSIONS									= Vec2( POWERUP_PHYSICS_RADIUS , POWERUP_PHYSICS_RADIUS );
+constexpr float	POWERUP_VELOCITY_MULTIPLIER								= 50.f;
 
 const	  Vec2	GRAVITY													= Vec2( 0.f , 9.8f );
 
+const	  float BALL_DEFAULT_RADIUS										= 25.f;
+const	  float BALL_DEFAULT_MIN_RADIUS									= BALL_DEFAULT_RADIUS / 2.f;
+const	  float BALL_DEFAULT_MAX_RADIUS									= BALL_DEFAULT_RADIUS * 3.f;
 const	  float BALL_DEFAULT_PHYSICAL_RADIUS							= 25.f;
 const	  float BALL_MAX_PHYSICAL_RADIUS_FACTOR							= 1.5f;
 const	  float BALL_MIN_PHYSICAL_RADIUS_FACTOR							= 0.5f;
@@ -109,6 +113,7 @@ enum eGameSpriteSheets
 	SS_VFX_FLARE,
 	SS_VFX_FLOWERS,
 	SS_VFX_LEAVES,
+	SS_POWERUPS,
 
 	NUM_GAME_SS
 };

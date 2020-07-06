@@ -11,9 +11,6 @@
     <Filter Include="Gameplay\Entities">
       <UniqueIdentifier>{3329ea6d-c86e-48d3-8692-1cbaaabb7222}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Gameplay\XML Data">
-      <UniqueIdentifier>{9136a33b-bc11-432d-a278-33908f08f95c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Gameplay\Map Generation">
       <UniqueIdentifier>{d72f5b69-4c21-4f26-ab21-b91603de6fbc}</UniqueIdentifier>
     </Filter>
@@ -29,9 +26,6 @@
     <Filter Include="Gameplay\Levels">
       <UniqueIdentifier>{f51155d9-7e07-4b37-9c01-b0998b1e4a40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Gameplay\Powerups">
-      <UniqueIdentifier>{26809449-66f9-44fd-9ee3-b9e6ce32dabe}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Windows Resources">
       <UniqueIdentifier>{e4fe4522-f092-4963-b87c-5499cb4b117c}</UniqueIdentifier>
     </Filter>
@@ -43,6 +37,9 @@
     </Filter>
     <Filter Include="Data Files">
       <UniqueIdentifier>{73a1804a-ba90-4ba7-9d01-cb36b5828f60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data Files\XML Data">
+      <UniqueIdentifier>{9136a33b-bc11-432d-a278-33908f08f95c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -107,6 +104,9 @@
       <Filter>GameplaySystems</Filter>
     </ClCompile>
     <ClCompile Include="PowerUps.cpp">
+      <Filter>Gameplay\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="PowerUpDefinition.cpp">
       <Filter>Gameplay\Entities</Filter>
     </ClCompile>
   </ItemGroup>
@@ -177,6 +177,9 @@
     <ClInclude Include="PowerUps.hpp">
       <Filter>Gameplay\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="PowerUpDefinition.hpp">
+      <Filter>Gameplay\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\Plan\Proposal\1_Features.txt">
@@ -220,11 +223,17 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
+    <Xml Include="..\..\Run\Data\GamePlay\HighScores.xml">
+      <Filter>Data Files\XML Data</Filter>
+    </Xml>
     <Xml Include="..\..\Run\Data\GamePlay\MapDefs.xml">
-      <Filter>Data Files</Filter>
+      <Filter>Data Files\XML Data</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\GamePlay\PowerUpDefs.xml">
+      <Filter>Data Files\XML Data</Filter>
     </Xml>
     <Xml Include="..\..\Run\Data\GamePlay\TileDefs.xml">
-      <Filter>Data Files</Filter>
+      <Filter>Data Files\XML Data</Filter>
     </Xml>
   </ItemGroup>
   <ItemGroup>
