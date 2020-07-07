@@ -1,8 +1,10 @@
 ﻿#include "Engine/Renderer/RenderContext.hpp"
-#include "Game/Game.hpp"
-#include "Game/PowerUps.hpp"
+#include "Engine/Renderer/SpriteSheet.hpp"
+#include "Engine/Renderer/Texture.hpp"
 #include "Game/Ball.hpp"
+#include "Game/Game.hpp"
 #include "Game/PowerUpDefinition.hpp"
+#include "Game/PowerUps.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -51,7 +53,9 @@ void PowerUps::Render() const
 {
 	if( nullptr != m_definition )
 	{
-		g_theRenderer->DrawAABB2( m_cosmeticBounds , m_definition->m_color );
+		const Texture* tex = &g_theGame->m_gameSS[ SS_POWERUPS ]->GetTexture();
+		g_theRenderer->BindTexture( tex );
+		g_theRenderer->DrawAABB2( m_cosmeticBounds , /*m_definition->m_color*/WHITE , m_definition->m_spriteUVs.m_mins , m_definition->m_spriteUVs.m_maxs );
 	}
 
 	if( m_owner->m_isDebugDraw )

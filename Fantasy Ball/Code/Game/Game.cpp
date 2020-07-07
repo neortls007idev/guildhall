@@ -90,15 +90,21 @@ void Game::LoadAssets()
 
 void Game::LoadAllSounds()
 {
-	m_sounds[ SFX_BACKGROUND_1 ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/LSCarolOfTheBells.mp3" );
-	m_sounds[ SFX_BACKGROUND_2 ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/LSCrystallize.mp3" );
-	m_sounds[ SFX_BACKGROUND_3 ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/LSCelticCarol.mp3" );
-	m_sounds[ SFX_BACKGROUND_4 ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/LSSenbonzakura.mp3" );
+	m_sounds[ SFX_BACKGROUND_1 ]	= g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/LSCarolOfTheBells.mp3" );
+	m_sounds[ SFX_BACKGROUND_2 ]	= g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/LSCrystallize.mp3" );
+	m_sounds[ SFX_BACKGROUND_3 ]	= g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/LSCelticCarol.mp3" );
+	m_sounds[ SFX_BACKGROUND_4 ]	= g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/LSSenbonzakura.mp3" );
+	m_sounds[ SFX_BACKGROUND_5 ]	= g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/KSHMRKashmir.mp3" );
+	m_sounds[ SFX_BACKGROUND_6 ]	= g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/PiratesoftheCaribbean.mp3" );
+	m_sounds[ SFX_BACKGROUND_7 ]	= g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/HesAPirate.mp3" );
+	m_sounds[ SFX_BACKGROUND_8 ]	= g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/ArabianNights.mp3" );
+	m_sounds[ SFX_BACKGROUND_9 ]	= g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/GenieInALamp.mp3" );
+	m_sounds[ SFX_BACKGROUND_10 ]	= g_theAudioSystem->CreateOrGetSound( "Data/Audio/BackgroundMusic/FaolanPrincessofPersia.mp3" );
 	
-	m_sounds[ SFX_LEAVES_RUSTLE ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/Rustle/rustle1.mp3" );
+	m_sounds[ SFX_LEAVES_RUSTLE ]	= g_theAudioSystem->CreateOrGetSound( "Data/Audio/Rustle/rustle1.mp3" );
 	
-	m_sounds[ SFX_GLASS_BREAK_1 ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/Shatter/glassBreak1.mp3" );
-	m_sounds[ SFX_GLASS_BREAK_2 ] = g_theAudioSystem->CreateOrGetSound( "Data/Audio/Shatter/LightBulbBreaking.wav" );
+	m_sounds[ SFX_GLASS_BREAK_1 ]	= g_theAudioSystem->CreateOrGetSound( "Data/Audio/Shatter/glassBreak1.mp3" );
+	m_sounds[ SFX_GLASS_BREAK_2 ]	= g_theAudioSystem->CreateOrGetSound( "Data/Audio/Shatter/LightBulbBreaking.wav" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -160,9 +166,21 @@ void Game::PostGameConstruct()
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	//m_currentLevel->SpawnNewEntity( TILE , Vec2::ZERO , TileDefinition::s_definitions.at( "NormalOrange" ) );
 
-	int backgroundSoundIndex = g_RNG->RollRandomIntInRange( SFX_BACKGROUND_1 , SFX_BACKGROUND_4 );
-	
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::PlayRandomGameBackgroundMusic()
+{
+	int backgroundSoundIndex = g_RNG->RollRandomIntInRange( SFX_BACKGROUND_1 , SFX_BACKGROUND_7 );
 	m_currentBackgroundsound = g_theAudioSystem->PlaySound( m_sounds[ backgroundSoundIndex ] , true , 0.11f );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::StopGameBackgroundMusic()
+{
+	g_theAudioSystem->StopSound( m_currentBackgroundsound );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -296,6 +314,7 @@ void Game::UpdateFromKeyBoard()
 	if( g_theInput->WasKeyJustPressed( KEY_ESC ) )
 	{
 		g_theGamplayUISystem->SetGameState( GAME_OVER_STATE );
+		//StopGameBackgroundMusic();
 		//g_theGamplayUISystem->ResetAnimTime();
 		m_isGameDirty = true;
 		//g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );

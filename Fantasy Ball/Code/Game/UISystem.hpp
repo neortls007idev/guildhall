@@ -25,11 +25,15 @@ public:
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
-
 	~UISystem();
 
 	void		Update( float deltaSeconds );
 	bool		LoadingState();
+
+	void		PlayRandomUIBackgroundMusic();
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+
 	void		MainMenuState( float deltaSeconds );
 	void		GameOverState();
 	void		HighScoreMenuState();
@@ -67,6 +71,8 @@ private:
 	float										m_currentBGAnimFrame		= 0.f;
 
 	std::vector< HighscoreData >				m_highScores;
+
+	SoundPlaybackID								m_currentBackgroundsound	= 0;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

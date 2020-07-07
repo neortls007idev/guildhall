@@ -25,8 +25,8 @@ PowerUpDefinition::PowerUpDefinition( const tinyxml2::XMLElement& definitionXMLE
 	m_color							= ParseXmlAttribute( definitionXMLElement , "color"							, m_color		);
 	m_spawnProbablityRequirement	= ParseXmlAttribute( definitionXMLElement , "spawnProbablityRequirement"		, m_spawnProbablityRequirement );
 
-	//const SpriteDefinition& currentTileSprite	= g_theGame->m_gameSS[ SS_POWERUPS ]->GetSpriteDefinition( m_spriteCoords );
-	//currentTileSprite.GetUVs( m_spriteUVs.m_mins , m_spriteUVs.m_maxs );
+	const SpriteDefinition& currentTileSprite	= g_theGame->m_gameSS[ SS_POWERUPS ]->GetSpriteDefinition( m_spriteCoords );
+	currentTileSprite.GetUVs( m_spriteUVs.m_mins , m_spriteUVs.m_maxs );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ void PowerUpDefinition::CreatePowerUpDefinitions( const char* xmlFilePath )
 		
 	if ( ( powerUpSheetFileName == "" ) || ( powerUpSpriteSheetDimensions.x == 0 && powerUpSpriteSheetDimensions.y == 0 ) )
 	{
-		//ERROR_AND_DIE( "You forgot To mention the filePath for the Powerup SpriteSheet or it's Grid Layout" );
+		ERROR_AND_DIE( "You forgot To mention the filePath for the Powerup SpriteSheet or it's Grid Layout" );
 	}
 	
 	const char* filePath = powerUpSheetFileName.c_str();

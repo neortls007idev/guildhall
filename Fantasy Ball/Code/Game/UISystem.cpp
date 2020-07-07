@@ -315,7 +315,20 @@ void UISystem::InitializeSliders()
 
 UISystem::~UISystem()
 {
+	m_currentBackgroundsound = 0;
 
+	delete m_UICamera;
+	m_UICamera				 = nullptr;
+
+	for ( int index = 0 ; index < NUM_UI_TEX ; index++ )
+	{
+		m_UITextures[ index ] = nullptr;
+	}
+
+	for ( int index = 0 ; index < NUM_UI_FONTS ; index++ )
+	{
+		m_UIFonts[ index ] = nullptr;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -335,6 +348,7 @@ void UISystem::Update( float deltaSeconds )
 		case HUD_STATE :
 			m_UICamera->SetClearMode( CLEAR_NONE , BLACK );
 			g_theGame->Update( deltaSeconds );
+			g_theAudioSystem->StopSound( m_currentBackgroundsound );
 			break;
 		case PAUSE_STATE :
 			m_UICamera->SetClearMode( CLEAR_NONE , BLACK );
@@ -381,10 +395,20 @@ bool UISystem::LoadingState()
 				InitalizeHUDLabels();
 				InitalizeHighScoreData();
 			}
+			PlayRandomUIBackgroundMusic();
+
 			return false;
 		}
 	}
 	return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void UISystem::PlayRandomUIBackgroundMusic()
+{
+	int backgroundSoundIndex = g_RNG->RollRandomIntInRange( SFX_BACKGROUND_6 , SFX_BACKGROUND_10 );
+	m_currentBackgroundsound = g_theAudioSystem->PlaySound( g_theGame->m_sounds[ backgroundSoundIndex ] , true , 0.11f );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -409,6 +433,7 @@ void UISystem::MainMenuState( float deltaSeconds )
 		{
 			m_systemState = HUD_STATE;
 			g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
+			g_theGame->PlayRandomGameBackgroundMusic();
 		}
 	}
 
@@ -440,6 +465,7 @@ void UISystem::MainMenuState( float deltaSeconds )
 
 	if( g_theInput->WasKeyJustPressed( KEY_ESC ) )
 	{
+		g_theAudioSystem->StopSound( m_currentBackgroundsound );
 		g_theApp->HandleQuitRequested();
 		g_theWindow->HandleQuitRequested();
 	}
@@ -460,6 +486,9 @@ void UISystem::GameOverState()
 {
 	g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
 	m_systemState = MAIN_MENU_STATE;
+	g_theGame->StopGameBackgroundMusic();
+
+	PlayRandomUIBackgroundMusic();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

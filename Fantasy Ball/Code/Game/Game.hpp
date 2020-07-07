@@ -24,7 +24,14 @@ public:
 
 	void			PostGameConstructDataOnce();
 	void			PostGameConstruct();
-		
+
+	void			PlayRandomGameBackgroundMusic();
+	void			StopGameBackgroundMusic();
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
 	void			Update( float deltaSeconds );
 	void			UpdateMoveToNextMap();
 	void			UpdateCamera();
