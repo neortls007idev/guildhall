@@ -307,6 +307,8 @@
     <ClCompile Include="Math\Vec2.cpp" />
     <ClCompile Include="Math\Vec3.cpp" />
     <ClCompile Include="Math\Vec4.cpp" />
+    <ClCompile Include="Memory\Job.cpp" />
+    <ClCompile Include="Memory\JobSystem.cpp" />
     <ClCompile Include="ParticleSystem\Particle2D.cpp" />
     <ClCompile Include="ParticleSystem\ParticleEmitter2D.cpp" />
     <ClCompile Include="ParticleSystem\ParticleSystem2D.cpp" />
@@ -427,6 +429,8 @@
     <ClInclude Include="Math\Vec2.hpp" />
     <ClInclude Include="Math\Vec3.hpp" />
     <ClInclude Include="Math\Vec4.hpp" />
+    <ClInclude Include="Memory\Job.hpp" />
+    <ClInclude Include="Memory\JobSystem.hpp" />
     <ClInclude Include="ParticleSystem\Particle2D.hpp" />
     <ClInclude Include="ParticleSystem\ParticleEmitter2D.hpp" />
     <ClInclude Include="ParticleSystem\ParticleSystem2D.hpp" />

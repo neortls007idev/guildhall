@@ -80,6 +80,9 @@
     <Filter Include="ParticleSystem">
       <UniqueIdentifier>{b7628568-2541-462c-97d0-1aee10d04125}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Memory">
+      <UniqueIdentifier>{75f8c939-47db-4589-9410-630b828b69f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Rgba8.cpp">
@@ -378,6 +381,12 @@
     </ClCompile>
     <ClCompile Include="ParticleSystem\ParticleSystem2D.cpp">
       <Filter>ParticleSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\JobSystem.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\Job.cpp">
+      <Filter>Memory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -719,6 +728,12 @@
     </ClInclude>
     <ClInclude Include="ParticleSystem\ParticleSystem2D.hpp">
       <Filter>ParticleSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\JobSystem.hpp">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\Job.hpp">
+      <Filter>Memory</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
