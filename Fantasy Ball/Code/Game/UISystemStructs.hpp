@@ -42,6 +42,11 @@ enum eUITEX
 		
 	HUD_HEALTH ,
 
+	SETTINGS_TITLE,
+	SETTINGS_SFX_VOL,
+	SETTINGS_BGM_VOL,
+	SETTINGS_PADDLE_SENSE,
+	
 	GEN_BACK_BTN ,
 	
 	GEN_SLIDER_BASE , 
@@ -81,6 +86,11 @@ enum  eUILABLES
 	
 	HUD_HEALTHBOX ,
 
+	SETT_MENU_TITLE ,
+	SETT_MENU_SFX_VOL ,
+	SETT_MENU_BGM_VOL ,
+	SETT_MENU_PADDLE_SENSE ,
+	
 	UI_BACK_BUTTON ,
 
 	UI_SLIDER ,
@@ -124,6 +134,20 @@ enum  eUIButtons
 	NUM_UI_BUTTONS
 };
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum eSettingsSliders
+{
+	SFX_SLIDER,
+	BGM_SLIDER,
+	CURSOR_SENSITIVITY_SLIDER,
+
+	NUM_SLIDERS
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -143,15 +167,27 @@ struct HighscoreData
 
 struct UISlider
 {
-			AABB2		m_cosmeticBase;
-			AABB2		m_cosmeticFillBar;
-			AABB2		m_cosmeticButton;
-			AABB2		m_physicalButton;
+public:
+	UISlider( AABB2	cosmeticBase , AABB2 cosmeticFillBar , AABB2 cosmeticButton , Vec2 centerPos , float minValue , float maxValue , float value );
+	void Update();
+	void Render();
+
+public:
+	AABB2		m_cosmeticBase;
+	AABB2		m_cosmeticFillBar;
+	AABB2		m_cosmeticButton;
+	AABB2		m_physicalButton;
+	Vec2		m_centerPos;
+	Vec2		m_buttonMovementRange;
 	
-	static	Texture*	m_Base;
-	static	Texture*	m_Border;
-	static	Texture*	m_fillBar;
-	static	Texture*	m_button;
+	float		m_minRange;
+	float		m_maxRange;
+	float		m_value;
+	
+	//static	Texture*	m_Base;
+	//static	Texture*	m_Border;
+	//static	Texture*	m_fillBar;
+	//static	Texture*	m_button;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

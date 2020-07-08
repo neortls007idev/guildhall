@@ -1,4 +1,6 @@
 #pragma once
+#include <thread>
+
 #include "PowerUps.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/Map.hpp"
@@ -8,6 +10,7 @@
 class ParticleEmitter2D;
 class SpriteSheet;
 class Shader;
+class LoadAudioJob;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -86,7 +89,10 @@ public:
 	//			DEBUG CODE
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
-	bool						m_isDebugDraw = false;
+	bool						m_isDebugDraw									= false;
+	
+	std::thread*				m_loadAudio										= nullptr;
+	std::thread*				m_loadTextures;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

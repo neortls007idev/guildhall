@@ -1,9 +1,11 @@
 #pragma once
-#include "Game/UISystemStructs.hpp"
+#include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Primitives/AABB2.hpp"
+#include "Game/UISystemStructs.hpp"
 #include <vector>
 
 class Camera;
+namespace std { class thread; }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -20,6 +22,7 @@ public:
 	void		InitalizeHUDLabels();
 	void		InitalizeHighScoreData();
 	void		InitalizeHighScoreLabels();
+	void		InitalizeSettingsMenuLabels();
 	void		InitializeBackButton();
 	void		InitializeSliders();
 
@@ -53,6 +56,11 @@ public:
 	void		SetGameState( const eUISTATE state )																			{ m_systemState = state; }
 	eUISTATE	GetGameState()const																								{ return m_systemState; }
 	void		ResetAnimTime()																									{ m_currentBGAnimFrame = 0.f; }
+	Texture*	GetUITexture( eUITEX texType ) const																			{ return m_UITextures[ texType ]; }
+	AABB2		GetUIButton( eUIButtons buttonType ) const																		{ return m_buttons[ buttonType ]; }
+	AABB2		GetUILabel( eUILABLES labelType ) const																			{ return m_labels[ labelType ]; }
+	AABB2		GetUIScreenSpace() const																						{ return m_screenSpace; }
+	
 public:
 	bool										m_UIDebugDraw				= false;
 	
@@ -66,13 +74,15 @@ private:
 
 	AABB2										m_labels[ NUM_UI_LABELS ];
 	AABB2										m_buttons[ NUM_UI_BUTTONS ];
-
+	UISlider*									m_settingsSliders[ NUM_SLIDERS ];
+	
 	float										m_BGAnimationDuration		= 2.1f;
 	float										m_currentBGAnimFrame		= 0.f;
 
 	std::vector< HighscoreData >				m_highScores;
 
 	SoundPlaybackID								m_currentBackgroundsound	= 0;
+	std::thread*								m_loadMainMenuTex;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

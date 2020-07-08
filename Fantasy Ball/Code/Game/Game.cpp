@@ -6,20 +6,19 @@
 #include "Engine/Input/VirtualKeyboard.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
+#include "Engine/Memory/JobSystem.hpp"
 #include "Engine/ParticleSystem/ParticleSystem2D.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
+#include "Game/Ball.hpp"
 #include "Game/Game.hpp"
-
-
-#include "PowerUpDefinition.hpp"
-#include "Game/UISystem.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/Map.hpp"
 #include "Game/MapDefinition.hpp"
+#include "Game/PowerUpDefinition.hpp"
 #include "Game/TheApp.hpp"
 #include "Game/TileDefinition.hpp"
-#include "Game/Ball.hpp"
+#include "Game/UISystem.hpp"
 //#include <utility>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -34,6 +33,7 @@ extern InputSystem*				g_theInput;
 extern ParticleSystem2D*		g_theParticleSystem2D;
 extern UISystem*				g_theGamplayUISystem;
 extern RandomNumberGenerator*	g_RNG;
+extern JobSystem*				g_theJobSystem;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -44,12 +44,21 @@ SpriteSheet* g_characterSpriteSheet = nullptr;
 
 Game::Game()
 {
+	
+	m_loadAudio		= new std::thread( &Game::LoadAllSounds , this );
+	m_loadTextures	= new std::thread( &Game::LoadAllTextures , this );
+	m_loadTextures->join();
+	m_loadAudio->join();
+	
+	//m_loadAudioJob = new LoadAudioJob();
+	//g_theJobSystem->PostJob( *m_loadAudioJob );
+	
 	//g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
 	m_cameraHalfHeight	= g_gameConfigBlackboard.GetValue( "cameraHalHeight" , 540.f );
 	m_cameraAspectRatio	= g_gameConfigBlackboard.GetValue( "windowAspect" , 1.77f );
 	
 	m_worldCamera.SetOrthoView( m_cameraHalfHeight , m_cameraAspectRatio );
-	LoadAssets();	
+	// LoadAssets();	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -75,15 +84,24 @@ Game::~Game()
 	
 	m_currentLevel = nullptr;
 	g_theAudioSystem->StopSound( m_currentBackgroundsound );
+
+	delete m_loadAudio;
+	m_loadAudio = nullptr;
+	
+	delete m_loadTextures;
+	m_loadTextures = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Game::LoadAssets()
 {
-	LoadAllTextures();
-	LoadAllSounds();
-	LoadAllShaders();
+//	LoadAllTextures();
+
+//	g_theJobSystem->
+	
+//	LoadAllSounds();
+//	LoadAllShaders();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -120,11 +138,11 @@ void Game::LoadAllTextures()
 	m_gameTex[ TEX_RIGHT_WALL ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Bounds/RightWall.png" );
 	m_gameTex[ TEX_TOP_WALL_SECTION ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Bounds/TopWallSection.png" );
 
-	Texture* FlowersTex			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/FlowerSpriteSheet.png" );
-	m_gameSS[ SS_VFX_FLOWERS ]	= new SpriteSheet( *FlowersTex , IntVec2( 2 , 2 ) );
+	Texture* FlowersTex						= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/FlowerSpriteSheet.png" );
+	m_gameSS[ SS_VFX_FLOWERS ]				= new SpriteSheet( *FlowersTex , IntVec2( 2 , 2 ) );
 
-	Texture* LeavesTex			= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/LeavesSpriteSheet.png" );
-	m_gameSS[ SS_VFX_LEAVES ]	= new SpriteSheet( *LeavesTex , IntVec2( 3 , 3 ) );
+	Texture* LeavesTex						= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/LeavesSpriteSheet.png" );
+	m_gameSS[ SS_VFX_LEAVES ]				= new SpriteSheet( *LeavesTex , IntVec2( 3 , 3 ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

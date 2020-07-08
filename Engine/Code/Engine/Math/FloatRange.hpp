@@ -33,6 +33,6 @@ public:
 //						MUTATORS
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	
-	void Set( float newMinimum , float newMaximum );
-	bool SetFromText( const char* asText );
+	void		Set( float newMinimum , float newMaximum );
+	bool		SetFromText( const char* asText );
 };

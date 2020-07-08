@@ -16,6 +16,7 @@
 
 
 #include "UISystem.hpp"
+#include "Engine/Memory/JobSystem.hpp"
 #include "Game/resource.h"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -30,6 +31,7 @@ Game*						g_theGame						= nullptr;
 DevConsole*					g_theDevConsole					= nullptr;
 ParticleSystem2D*			g_theParticleSystem2D			= nullptr;
 UISystem*					g_theGamplayUISystem			= nullptr;
+JobSystem*					g_theJobSystem					= nullptr;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -68,6 +70,9 @@ TheApp::~TheApp()
 
 	delete g_theEventSystem;
 	g_theEventSystem = nullptr;
+
+	delete g_theJobSystem;
+	g_theJobSystem = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -76,6 +81,11 @@ void TheApp::Startup()
 {
 	Clock::Startup();
 
+	if ( g_theJobSystem == nullptr )
+	{
+		g_theJobSystem = new JobSystem();
+	}
+	
 	if ( g_theEventSystem == nullptr )
 	{
 		g_theEventSystem = new EventSystem();

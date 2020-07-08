@@ -50,34 +50,44 @@ UISystem::UISystem()
 	InitalizeMainMenuButtons();
 	InitializeBackButton();
 	InitializeSliders();
+
+	m_loadMainMenuTex = new std::thread( &UISystem::LoadMainMenuAnimTex , this );
+	m_loadMainMenuTex->join();
+	delete m_loadMainMenuTex;
+	m_loadMainMenuTex = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void UISystem::LoadUITextures()
 {
-	m_UITextures[ UI_BACKGROUND ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/UIBackground.png" );
-	m_UITextures[ UI_WOODBARK_T1 ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/WoodBarkT2.jpg" );
-	m_UITextures[ UI_TITLE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/titleTex3.png" );
-	m_UITextures[ UI_PLAY ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Play1.png" );
-	m_UITextures[ UI_HIGHSCORES ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScore1.png" );
-	m_UITextures[ UI_SETTINGS ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Settings1.png" );
-	m_UITextures[ UI_EXIT ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Exit1.png" );
-	m_UITextures[ UI_MM_BRANCH_TEX ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Branches/branchT4.png" );
+	m_UITextures[ UI_BACKGROUND ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/UIBackground.png" );
+	m_UITextures[ UI_WOODBARK_T1 ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/WoodBarkT2.jpg" );
+	m_UITextures[ UI_TITLE ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/titleTex3.png" );
+	m_UITextures[ UI_PLAY ]					= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Play1.png" );
+	m_UITextures[ UI_HIGHSCORES ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScore1.png" );
+	m_UITextures[ UI_SETTINGS ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Settings1.png" );
+	m_UITextures[ UI_EXIT ]					= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Exit1.png" );
+	m_UITextures[ UI_MM_BRANCH_TEX ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Branches/branchT4.png" );
 
-	m_UITextures[ UI_HS_TITLE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/HighScoresTitle3.png" );
-	m_UITextures[ UI_HS_HBORDER ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/HighScoreBorder4.png" );
-	m_UITextures[ UI_HS_NAME_HEADER ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/NameHeader2.png" );
-	m_UITextures[ UI_HS_SCORE_HEADER ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/scoreHeader3.png" );
-	
-	m_UITextures[ GEN_BACK_BTN ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Back1.png" );
+	m_UITextures[ UI_HS_TITLE ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/HighScoresTitle3.png" );
+	m_UITextures[ UI_HS_HBORDER ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/HighScoreBorder4.png" );
+	m_UITextures[ UI_HS_NAME_HEADER ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/NameHeader2.png" );
+	m_UITextures[ UI_HS_SCORE_HEADER ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HighScores/scoreHeader3.png" );
 
-	m_UITextures[ GEN_SLIDER_BASE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/SliderBase.png" );
-	m_UITextures[ GEN_SLIDER_FILLBAR ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/fillBar.png" );
-	m_UITextures[ GEN_SLIDER_BORDER ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/sliderBorder.png" );
-	m_UITextures[ GEN_SLIDER_BUTTON ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/SliderButton.png" );
+	m_UITextures[ SETTINGS_TITLE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Settings/SettingsTitle.png" );
+	m_UITextures[ SETTINGS_SFX_VOL ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Settings/SFXVolume1.png" );
+	m_UITextures[ SETTINGS_BGM_VOL ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Settings/BGMVolume1.png" );
+	m_UITextures[ SETTINGS_PADDLE_SENSE ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Settings/PaddleSensitivity.png" );
+		
+	m_UITextures[ GEN_BACK_BTN ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Back1.png" );
+
+	m_UITextures[ GEN_SLIDER_BASE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/SliderBase.png" );
+	m_UITextures[ GEN_SLIDER_FILLBAR ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/fillBar1.png" );
+	m_UITextures[ GEN_SLIDER_BORDER ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/sliderBorder.png" );
+	m_UITextures[ GEN_SLIDER_BUTTON ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/SliderButton.png" );
 	
-	m_UITextures[ HUD_HEALTH ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HUD/health.png" );
+	m_UITextures[ HUD_HEALTH ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HUD/health.png" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -291,6 +301,30 @@ void UISystem::InitalizeHighScoreLabels()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void UISystem::InitalizeSettingsMenuLabels()
+{	
+	Vec2 SMTitleBoxPosition( 0.f , 350.f );
+	m_labels[ SETT_MENU_TITLE ].SetDimensions( Vec2( m_UITextures[ SETTINGS_TITLE ]->GetDimensions() ) );
+	m_labels[ SETT_MENU_TITLE ].SetCenter( SMTitleBoxPosition );
+
+	float posX = 300.f;
+	float posY = 50.f;
+
+	int	texIndex	= ( int ) SETTINGS_SFX_VOL;
+	int	labelIndex	= ( int ) SETT_MENU_SFX_VOL;
+
+	
+	for( int index = 0 ; index < NUM_SLIDERS ; index++ , texIndex++ , labelIndex++ )
+	{
+		Vec2 sliderTitleDimensions = Vec2( m_UITextures[ texIndex ]->GetDimensions() );
+		Vec2 pos = Vec2( -sliderTitleDimensions.x /** 0.5f*/ , posY - ( index * 150.f ) );
+		m_labels[ labelIndex ].SetDimensions( sliderTitleDimensions );
+		m_labels[ labelIndex ].SetCenter( pos );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void UISystem::InitializeBackButton()
 {
 	Vec2 backButtonCosmeticPos( 0.f , -425.f );
@@ -309,6 +343,17 @@ void UISystem::InitializeSliders()
 	m_labels[ UI_SLIDER ].SetDimensions( Vec2( m_UITextures[ GEN_SLIDER_BASE ]->GetDimensions() ) );
 	m_labels[ UI_SLIDER_FILLBAR ].SetDimensions( Vec2( m_UITextures[ GEN_SLIDER_FILLBAR ]->GetDimensions() ) );
 	m_labels[ UI_SLIDER_BUTTON ].SetDimensions( Vec2( m_UITextures[ GEN_SLIDER_BUTTON ]->GetDimensions() ) );
+
+	float posX = 300.f;
+	float posY = 50.f;
+	
+	for( int index = 0 ; index < NUM_SLIDERS ; index++ )
+	{
+		Vec2 pos = Vec2( posX , posY - ( index * 150.f ) );
+		
+		m_settingsSliders[ index ] = new UISlider( m_labels[ UI_SLIDER ] , m_labels[ UI_SLIDER_FILLBAR ] ,
+												   m_labels[ UI_SLIDER_BUTTON ] , pos , 0.f , 1.f , 1.f );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -385,7 +430,8 @@ bool UISystem::LoadingState()
 		else
 		{
 			m_systemState = MAIN_MENU_STATE;
-			LoadMainMenuAnimTex();
+			
+			//LoadMainMenuAnimTex();
 			if( g_theGame == nullptr )
 			{
 				g_theGame = new Game();
@@ -442,6 +488,7 @@ void UISystem::MainMenuState( float deltaSeconds )
 		if( g_theInput->WasLeftMouseButtonJustPressed() )
 		{
 			m_systemState = SETTINGS_MENU;
+			InitalizeSettingsMenuLabels();
 		}
 	}
 
@@ -534,6 +581,11 @@ void UISystem::SettingsMenuState()
 	if( g_theInput->WasKeyJustPressed( KEY_ESC ) )
 	{
 		m_systemState = MAIN_MENU_STATE;
+	}
+
+	for( int index = 0 ; index < NUM_SLIDERS ; index++ )
+	{
+		m_settingsSliders[ index ]->Update();
 	}
 }
 
@@ -724,30 +776,34 @@ void UISystem::RenderSettingsMenuScreen() const
 	g_theRenderer->DrawAABB2( m_screenSpace , WHITE );
 	g_theRenderer->BindTexture( nullptr );
 
+	int labelId		= ( int ) SETT_MENU_TITLE;
+	for ( int index = ( int ) SETTINGS_TITLE ; index <= SETTINGS_PADDLE_SENSE ; index++ , labelId++ )
+	{
+		g_theRenderer->BindTexture( m_UITextures[ index ] );
+		g_theRenderer->DrawAABB2( m_labels[ labelId ] , WHITE );	
+	}
+	
 	g_theRenderer->BindTexture( m_UITextures[ GEN_BACK_BTN ] );
 	g_theRenderer->DrawAABB2( m_labels[ UI_BACK_BUTTON ] , WHITE );
 	g_theRenderer->BindTexture( nullptr );
 
-	g_theRenderer->BindTexture( m_UITextures[ GEN_SLIDER_BASE ] );
-	g_theRenderer->DrawAABB2( m_labels[ UI_SLIDER ] , WHITE );
-	g_theRenderer->BindTexture( m_UITextures[ GEN_SLIDER_FILLBAR ] );
-	g_theRenderer->DrawAABB2( m_labels[ UI_SLIDER_FILLBAR ] , WHITE );
-	g_theRenderer->BindTexture( m_UITextures[ GEN_SLIDER_BORDER ] );
-	g_theRenderer->DrawAABB2( m_labels[ UI_SLIDER ] , WHITE );
-	g_theRenderer->BindTexture( m_UITextures[ GEN_SLIDER_BUTTON ] );
-	g_theRenderer->DrawAABB2( m_labels[ UI_SLIDER_BUTTON ] , WHITE );
-	g_theRenderer->BindTexture( nullptr );
-	
-	if( m_UIDebugDraw )
+	for( int index = 0 ; index < NUM_SLIDERS ; index++ )
 	{
-		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_BACK_BUTTON ]	, MAGENTA , 2.f );
-		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_SLIDER ]			, MAGENTA , 2.f );
-		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_SLIDER_FILLBAR ]	, MAGENTA , 2.f );
-		g_theRenderer->DrawUnfilledAABB2( m_labels[ GEN_SLIDER_BORDER ]	, MAGENTA , 2.f );
-		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_SLIDER_BUTTON ]	, MAGENTA , 2.f );
-		
-		g_theRenderer->DrawUnfilledAABB2( m_buttons[ BACK_BUTTON ]		, CYAN , 2.f );
+		m_settingsSliders[ index ]->Render();
 	}
+	 	
+ 	if( m_UIDebugDraw )
+ 	{
+ 		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_BACK_BUTTON ]	, MAGENTA , 2.f ); 		
+ 		g_theRenderer->DrawUnfilledAABB2( m_buttons[ BACK_BUTTON ]		, CYAN , 2.f );
+
+		int labelId	   = ( int ) SETT_MENU_TITLE;
+		for( int index = ( int ) SETTINGS_TITLE ; index <= SETTINGS_PADDLE_SENSE ; index++ , labelId++ )
+		{
+			g_theRenderer->DrawUnfilledAABB2( m_labels[ labelId ] , MAGENTA , 2.f );
+
+		}
+ 	}
 
 	g_theGame->m_currentLevel->RenderLevelSideBounds();
 	g_theRenderer->BindTexture( nullptr );
