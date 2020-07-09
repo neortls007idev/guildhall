@@ -1,19 +1,17 @@
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/SimpleTriangleFont.hpp"
+#include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Input/InputSystem.hpp"
+#include "Engine/Input/VirtualKeyboard.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/ParticleSystem/ParticleSystem2D.hpp"
+#include "Engine/Platform/Window.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
+#include "Engine/Renderer/SpriteAnimation.hpp"
 #include "Engine/Time/Time.hpp"
 #include "Game/TheApp.hpp"
 #include "Game/UISystem.hpp"
-
-
-#include "Engine/Core/VertexUtils.hpp"
-#include "Engine/Input/VirtualKeyboard.hpp"
-#include "Engine/Platform/Window.hpp"
-#include "Engine/Renderer/SpriteAnimation.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // GLOBAL VARIABLES
@@ -26,6 +24,7 @@ extern TheApp*				g_theApp;
 extern InputSystem*			g_theInput;
 extern ParticleSystem2D*	g_theParticleSystem2D;
 extern DevConsole*			g_theDevConsole;
+extern TheApp*				g_theApp;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -49,8 +48,10 @@ UISystem::UISystem()
 	InitalizeMainMenuLabels();
 	InitalizeMainMenuButtons();
 	InitializeBackButton();
+	InitalizeHighScoreLabels();
 	InitializeSliders();
-
+	InitalizeSettingsMenuLabels();
+	
 	m_loadMainMenuTex = new std::thread( &UISystem::LoadMainMenuAnimTex , this );
 	m_loadMainMenuTex->join();
 	delete m_loadMainMenuTex;
@@ -61,7 +62,8 @@ UISystem::UISystem()
 
 void UISystem::LoadUITextures()
 {
-	m_UITextures[ UI_BACKGROUND ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/UIBackground.png" );
+	m_UITextures[ UI_BACKGROUND ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/UIBackground1.png" );
+	m_UITextures[ UI_BACKGROUND_BORDER ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/UIBackgroundBorder2.png" );
 	m_UITextures[ UI_WOODBARK_T1 ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/WoodBarkT2.jpg" );
 	m_UITextures[ UI_TITLE ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/titleTex3.png" );
 	m_UITextures[ UI_PLAY ]					= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Play1.png" );
@@ -80,7 +82,11 @@ void UISystem::LoadUITextures()
 	m_UITextures[ SETTINGS_BGM_VOL ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Settings/BGMVolume1.png" );
 	m_UITextures[ SETTINGS_PADDLE_SENSE ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Settings/PaddleSensitivity.png" );
 		
+	m_UITextures[ PAUSE_TITLE ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Pause/PauseTitle1.png" );
+	m_UITextures[ MM_BUTTON ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/MainMenuButton.png" );
+
 	m_UITextures[ GEN_BACK_BTN ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Back1.png" );
+	m_UITextures[ GEN_RESUME_BTN ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/ResumeButton.png" );
 
 	m_UITextures[ GEN_SLIDER_BASE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/SliderBase.png" );
 	m_UITextures[ GEN_SLIDER_FILLBAR ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/fillBar1.png" );
@@ -307,7 +313,6 @@ void UISystem::InitalizeSettingsMenuLabels()
 	m_labels[ SETT_MENU_TITLE ].SetDimensions( Vec2( m_UITextures[ SETTINGS_TITLE ]->GetDimensions() ) );
 	m_labels[ SETT_MENU_TITLE ].SetCenter( SMTitleBoxPosition );
 
-	float posX = 300.f;
 	float posY = 50.f;
 
 	int	texIndex	= ( int ) SETTINGS_SFX_VOL;
@@ -354,6 +359,9 @@ void UISystem::InitializeSliders()
 		m_settingsSliders[ index ] = new UISlider( m_labels[ UI_SLIDER ] , m_labels[ UI_SLIDER_FILLBAR ] ,
 												   m_labels[ UI_SLIDER_BUTTON ] , pos , 0.f , 1.f , 1.f );
 	}
+	m_settingsSliders[ CURSOR_SENSITIVITY_SLIDER ]->m_minRange	= 0.1f;
+	m_settingsSliders[ CURSOR_SENSITIVITY_SLIDER ]->m_maxRange	= 5.f;
+	m_settingsSliders[ CURSOR_SENSITIVITY_SLIDER ]->SetValue ( 1.f );	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -397,6 +405,15 @@ void UISystem::Update( float deltaSeconds )
 			break;
 		case PAUSE_STATE :
 			m_UICamera->SetClearMode( CLEAR_NONE , BLACK );
+			PauseState();
+			break;
+		case PAUSE_STATE_SETTINGS :
+			m_UICamera->SetClearMode( CLEAR_NONE , BLACK );
+			SettingsMenuState();
+			break;
+		case PAUSE_STATE_HIGHSCORE :
+			m_UICamera->SetClearMode( CLEAR_NONE , BLACK );
+			HighScoreMenuState();
 			break;
 		case GAME_OVER_STATE :
 			m_UICamera->SetClearMode( CLEAR_NONE , BLACK );
@@ -454,7 +471,7 @@ bool UISystem::LoadingState()
 void UISystem::PlayRandomUIBackgroundMusic()
 {
 	int backgroundSoundIndex = g_RNG->RollRandomIntInRange( SFX_BACKGROUND_6 , SFX_BACKGROUND_10 );
-	m_currentBackgroundsound = g_theAudioSystem->PlaySound( g_theGame->m_sounds[ backgroundSoundIndex ] , true , 0.11f );
+	m_currentBackgroundsound = g_theAudioSystem->PlaySound( g_theGame->m_sounds[ backgroundSoundIndex ] , true , m_backgroundMusicVol );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -480,6 +497,9 @@ void UISystem::MainMenuState( float deltaSeconds )
 			m_systemState = HUD_STATE;
 			g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
 			g_theGame->PlayRandomGameBackgroundMusic();
+			m_settingsSliders[ BGM_SLIDER ]->SetValue( g_theGame->m_backgroundMusicVol );
+			m_settingsSliders[ SFX_SLIDER ]->SetValue( g_theGame->m_sfxVol );
+			m_settingsSliders[ CURSOR_SENSITIVITY_SLIDER ]->SetValue( g_theGame->m_paddleSensitivity );
 		}
 	}
 
@@ -488,7 +508,7 @@ void UISystem::MainMenuState( float deltaSeconds )
 		if( g_theInput->WasLeftMouseButtonJustPressed() )
 		{
 			m_systemState = SETTINGS_MENU;
-			InitalizeSettingsMenuLabels();
+			m_settingsSliders[ BGM_SLIDER ]->SetValue( m_backgroundMusicVol );
 		}
 	}
 
@@ -497,7 +517,7 @@ void UISystem::MainMenuState( float deltaSeconds )
 		if( g_theInput->WasLeftMouseButtonJustPressed() )
 		{
 			m_systemState = HIGHSCORE_MENU;
-			InitalizeHighScoreLabels();
+			//InitalizeHighScoreLabels();
 		}
 	}
 	
@@ -540,6 +560,59 @@ void UISystem::GameOverState()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void UISystem::PauseState()
+{
+	Vec2	normalizedPos = g_theInput->GetMouseNormalizedClientPosition();
+	float	mouseClientPosX = RangeMapFloatNormalizedInput( m_screenSpace.m_mins.x , m_screenSpace.m_maxs.x , normalizedPos.x );
+	float	mouseClientPosY = RangeMapFloatNormalizedInput( m_screenSpace.m_mins.y , m_screenSpace.m_maxs.y , normalizedPos.y );
+	Vec2	mouseClientPos( mouseClientPosX , mouseClientPosY );
+
+	g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
+	
+	if( IsPointInsideAABB2D( mouseClientPos , m_buttons[ PLAY_BUTTON ] ) )
+	{
+		if( g_theInput->WasLeftMouseButtonJustPressed() )
+		{
+			m_systemState = HUD_STATE;
+			g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) ); 
+			g_theApp->m_isPaused = false;
+			//g_theGame->PlayRandomGameBackgroundMusic();
+		}
+	}
+
+	if( IsPointInsideAABB2D( mouseClientPos , m_buttons[ SETTINGS_BUTTON ] ) )
+	{
+		if( g_theInput->WasLeftMouseButtonJustPressed() )
+		{
+			m_systemState = PAUSE_STATE_SETTINGS;
+			//InitalizeSettingsMenuLabels();
+		}
+	}
+
+	if( IsPointInsideAABB2D( mouseClientPos , m_buttons[ HIGHSCORE_BUTTON ] ) )
+	{
+		if( g_theInput->WasLeftMouseButtonJustPressed() )
+		{
+			m_systemState = PAUSE_STATE_HIGHSCORE;
+			//InitalizeHighScoreLabels();
+		}
+	}
+
+	if( IsPointInsideAABB2D( mouseClientPos , m_buttons[ EXIT_BUTTON ] ) )
+	{
+		if( g_theInput->WasLeftMouseButtonJustPressed() )
+		{
+			m_systemState = MAIN_MENU_STATE;
+			g_theGame->m_isGameDirty = true;
+			g_theAudioSystem->StopSound( g_theGame->m_currentBackgroundsound );
+			PlayRandomUIBackgroundMusic();
+			g_theApp->m_isPaused = false;
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void UISystem::HighScoreMenuState()
 {
 	Vec2	normalizedPos	= g_theInput->GetMouseNormalizedClientPosition();
@@ -549,15 +622,25 @@ void UISystem::HighScoreMenuState()
 
 	if( IsPointInsideAABB2D( mouseClientPos , m_buttons[ BACK_BUTTON ] ) )
 	{
-		if( g_theInput->WasLeftMouseButtonJustPressed() )
+		if( g_theInput->WasLeftMouseButtonJustPressed() && m_systemState == HIGHSCORE_MENU )
 		{
 			m_systemState = MAIN_MENU_STATE;
 		}
+
+		if( g_theInput->WasLeftMouseButtonJustPressed() && m_systemState == PAUSE_STATE_HIGHSCORE )
+		{
+			m_systemState = PAUSE_STATE;
+		}
 	}
 
-	if( g_theInput->WasKeyJustPressed( KEY_ESC ) )
+	if( g_theInput->WasKeyJustPressed( KEY_ESC ) && m_systemState == HIGHSCORE_MENU )
 	{
 		m_systemState = MAIN_MENU_STATE;
+	}
+
+	if( g_theInput->WasKeyJustPressed( KEY_ESC ) && m_systemState == PAUSE_STATE_HIGHSCORE )
+	{
+		m_systemState = PAUSE_STATE;
 	}
 }
 
@@ -570,22 +653,61 @@ void UISystem::SettingsMenuState()
 	float	mouseClientPosY = RangeMapFloatNormalizedInput( m_screenSpace.m_mins.y , m_screenSpace.m_maxs.y , normalizedPos.y );
 	Vec2	mouseClientPos( mouseClientPosX , mouseClientPosY );
 
-	if( IsPointInsideAABB2D( mouseClientPos , m_buttons[ BACK_BUTTON ] ) )
+	if ( m_systemState == SETTINGS_MENU )
 	{
-		if( g_theInput->WasLeftMouseButtonJustPressed() )
-		{
-			m_systemState = MAIN_MENU_STATE;
-		}
+		m_backgroundMusicVol = m_settingsSliders[ BGM_SLIDER ]->GetValue();
+		g_theAudioSystem->SetSoundPlaybackVolume( m_currentBackgroundsound , m_backgroundMusicVol );
+
+		g_theGame->m_sfxVol = m_settingsSliders[ SFX_SLIDER ]->GetValue();
+
+		g_theGame->m_paddleSensitivity = m_settingsSliders[ CURSOR_SENSITIVITY_SLIDER ]->GetValue();
 	}
-	
-	if( g_theInput->WasKeyJustPressed( KEY_ESC ) )
+
+	if( m_systemState == PAUSE_STATE_SETTINGS )
 	{
-		m_systemState = MAIN_MENU_STATE;
+		g_theGame->m_backgroundMusicVol = m_settingsSliders[ BGM_SLIDER ]->GetValue();
+		g_theAudioSystem->SetSoundPlaybackVolume( g_theGame->m_currentBackgroundsound , g_theGame->m_backgroundMusicVol );
+
+		g_theGame->m_sfxVol = m_settingsSliders[ SFX_SLIDER ]->GetValue();
+		
+		g_theGame->m_paddleSensitivity = m_settingsSliders[ CURSOR_SENSITIVITY_SLIDER ]->GetValue();
 	}
 
 	for( int index = 0 ; index < NUM_SLIDERS ; index++ )
 	{
 		m_settingsSliders[ index ]->Update();
+	}
+	
+	if ( m_systemState == SETTINGS_MENU )
+	{
+		if( IsPointInsideAABB2D( mouseClientPos , m_buttons[ BACK_BUTTON ] ) )
+		{
+			if( g_theInput->WasLeftMouseButtonJustPressed() )
+			{
+				m_systemState = MAIN_MENU_STATE;
+			}
+		}
+		
+		if( g_theInput->WasKeyJustPressed( KEY_ESC ) )
+		{
+			m_systemState = MAIN_MENU_STATE;
+		}
+	}
+
+	if( m_systemState == PAUSE_STATE_SETTINGS )
+	{
+		if( IsPointInsideAABB2D( mouseClientPos , m_buttons[ BACK_BUTTON ] ) )
+		{
+			if( g_theInput->WasLeftMouseButtonJustPressed() )
+			{
+				m_systemState = PAUSE_STATE;
+			}
+		}
+
+		if( g_theInput->WasKeyJustPressed( KEY_ESC ) )
+		{
+			m_systemState = PAUSE_STATE;
+		}
 	}
 }
 
@@ -643,7 +765,37 @@ void UISystem::Render() const
 			RenderHUD();
 			break;
 		case PAUSE_STATE:
+			g_theRenderer->EndCamera( *m_UICamera );
+			g_theGame->Render();
+			g_theRenderer->BeginCamera( *m_UICamera );
+			g_theRenderer->SetBlendMode( ALPHA );
+			g_theRenderer->BindShader( nullptr );
+			g_theRenderer->BindTexture( nullptr );
+			RenderHUD();
+			RenderPauseMenuScreen();
 			break;
+		case PAUSE_STATE_HIGHSCORE:
+			g_theRenderer->EndCamera( *m_UICamera );
+			g_theGame->Render();
+			g_theRenderer->BeginCamera( *m_UICamera );
+			g_theRenderer->SetBlendMode( ALPHA );
+			g_theRenderer->BindShader( nullptr );
+			g_theRenderer->BindTexture( nullptr );
+			RenderHUD();
+			RenderHighScoreMenuScreen();
+			break;
+
+		case PAUSE_STATE_SETTINGS:
+			g_theRenderer->EndCamera( *m_UICamera );
+			g_theGame->Render();
+			g_theRenderer->BeginCamera( *m_UICamera );
+			g_theRenderer->SetBlendMode( ALPHA );
+			g_theRenderer->BindShader( nullptr );
+			g_theRenderer->BindTexture( nullptr );
+			RenderHUD();
+			RenderSettingsMenuScreen();
+			break;
+		
 		case GAME_OVER_STATE:
 			g_theRenderer->EndCamera( *m_UICamera );
 			g_theGame->Render();
@@ -675,6 +827,10 @@ void UISystem::RenderLoadingScreen() const
 {
 	g_theRenderer->BindTexture( m_UITextures[ UI_BACKGROUND ] );
 	g_theRenderer->DrawAABB2( m_screenSpace , WHITE );
+
+	g_theRenderer->BindTexture( m_UITextures[ UI_BACKGROUND_BORDER ] );
+	g_theRenderer->DrawAABB2( m_screenSpace , WHITE );
+	
 	g_theRenderer->BindTexture( m_UITextures[ UI_WOODBARK_T1 ] );
 	std::vector<Vertex_PCU> textVerts;
 	Vec2	camDimensions	= m_UICamera->GetOrthoDimensions().GetXYComponents();
@@ -718,7 +874,9 @@ void UISystem::RenderMainMenuScreen() const
 	//g_theRenderer->DrawAABB2( m_labels[ UI_MM_BRANCH4 ] , ORANGE );
 	g_theRenderer->BindTexture( nullptr );
 	
-	g_theGame->m_currentLevel->RenderLevelSideBounds();
+	g_theRenderer->BindTexture( m_UITextures[ UI_BACKGROUND_BORDER ] );
+	g_theRenderer->DrawAABB2( m_screenSpace , WHITE );
+	g_theRenderer->BindTexture( nullptr );
 	
 	g_theRenderer->BindTexture( m_UITextures[ UI_TITLE ] );
 	std::vector<Vertex_PCU> textVerts;
@@ -773,7 +931,15 @@ void UISystem::RenderMainMenuScreen() const
 void UISystem::RenderSettingsMenuScreen() const
 {
 	g_theRenderer->BindTexture( m_UITextures[ UI_BACKGROUND ] );
-	g_theRenderer->DrawAABB2( m_screenSpace , WHITE );
+
+	if ( m_systemState == SETTINGS_MENU )
+	{
+		g_theRenderer->DrawAABB2( m_screenSpace , WHITE );
+	}
+	else if ( m_systemState == PAUSE_STATE_SETTINGS )
+	{
+		g_theRenderer->DrawAABB2( m_screenSpace , HALF_ALPHA_WHITE );
+	}
 	g_theRenderer->BindTexture( nullptr );
 
 	int labelId		= ( int ) SETT_MENU_TITLE;
@@ -797,15 +963,16 @@ void UISystem::RenderSettingsMenuScreen() const
  		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_BACK_BUTTON ]	, MAGENTA , 2.f ); 		
  		g_theRenderer->DrawUnfilledAABB2( m_buttons[ BACK_BUTTON ]		, CYAN , 2.f );
 
-		int labelId	   = ( int ) SETT_MENU_TITLE;
-		for( int index = ( int ) SETTINGS_TITLE ; index <= SETTINGS_PADDLE_SENSE ; index++ , labelId++ )
+			labelId	   = ( int ) SETT_MENU_TITLE;
+		for( int index = ( int ) SETTINGS_TITLE ; index <= SETTINGS_PADDLE_SENSE ; index++ )
 		{
 			g_theRenderer->DrawUnfilledAABB2( m_labels[ labelId ] , MAGENTA , 2.f );
-
+			labelId++;
 		}
  	}
 
-	g_theGame->m_currentLevel->RenderLevelSideBounds();
+	g_theRenderer->BindTexture( m_UITextures[ UI_BACKGROUND_BORDER ] );
+	g_theRenderer->DrawAABB2( m_screenSpace , WHITE );
 	g_theRenderer->BindTexture( nullptr );
 }
 
@@ -814,7 +981,15 @@ void UISystem::RenderSettingsMenuScreen() const
 void UISystem::RenderHighScoreMenuScreen() const
 {
 	g_theRenderer->BindTexture( m_UITextures[ UI_BACKGROUND ] );
-	g_theRenderer->DrawAABB2( m_screenSpace , WHITE );
+	if ( m_systemState == HIGHSCORE_MENU )
+	{
+		g_theRenderer->DrawAABB2( m_screenSpace , WHITE );
+	}
+	else if ( m_systemState == PAUSE_STATE_HIGHSCORE )
+	{
+		g_theRenderer->DrawAABB2( m_screenSpace , HALF_ALPHA_WHITE );
+	}
+	
 	g_theRenderer->BindTexture( nullptr );
 	
 	g_theRenderer->BindTexture( m_UITextures[ UI_HS_HBORDER ] );
@@ -884,7 +1059,61 @@ void UISystem::RenderHighScoreMenuScreen() const
 		}
 	}
 
-	g_theGame->m_currentLevel->RenderLevelSideBounds();
+	g_theRenderer->BindTexture( m_UITextures[ UI_BACKGROUND_BORDER ] );
+	g_theRenderer->DrawAABB2( m_screenSpace , WHITE );
+	g_theRenderer->BindTexture( nullptr );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void UISystem::RenderPauseMenuScreen() const
+{
+	g_theRenderer->BindTexture( m_UITextures[ UI_BACKGROUND ] );
+	g_theRenderer->DrawAABB2( m_screenSpace , HALF_ALPHA_WHITE );
+	g_theRenderer->BindTexture( nullptr );
+	
+	g_theRenderer->BindTexture( m_UITextures[ PAUSE_TITLE ] );
+	g_theRenderer->DrawAABB2( m_labels[ HS_TITLE ] , WHITE );
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//			MAIN MENU BUTTON COSMETIC RENDER
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+
+	g_theRenderer->BindTexture( m_UITextures[ GEN_RESUME_BTN ] );
+	g_theRenderer->DrawAABB2( m_labels[ MM_PLAY_BUTTON ] , WHITE );
+
+	g_theRenderer->BindTexture( m_UITextures[ UI_HIGHSCORES ] );
+	g_theRenderer->DrawAABB2( m_labels[ MM_HIGHSCORE_BUTTON ] , WHITE );
+
+	g_theRenderer->BindTexture( m_UITextures[ UI_SETTINGS ] );
+	g_theRenderer->DrawAABB2( m_labels[ MM_SETTINGS_BUTTON ] , WHITE );
+
+	g_theRenderer->BindTexture( m_UITextures[ MM_BUTTON ] );
+	g_theRenderer->DrawAABB2( m_labels[ MM_EXIT_BUTTON ] , WHITE );
+	g_theRenderer->BindTexture( nullptr );
+
+	if( m_UIDebugDraw )
+	{
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_TITLEBOX ] , MAGENTA , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_MM_BRANCH1 ] , MAGENTA , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_MM_BRANCH2 ] , MAGENTA , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_MM_BRANCH3 ] , MAGENTA , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_MM_BRANCH4 ] , MAGENTA , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ MM_PLAY_BUTTON ] , MAGENTA , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ MM_HIGHSCORE_BUTTON ] , MAGENTA , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ MM_SETTINGS_BUTTON ] , MAGENTA , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ MM_EXIT_BUTTON ] , MAGENTA , 2.f );
+
+		g_theRenderer->DrawUnfilledAABB2( m_buttons[ PLAY_BUTTON ] , CYAN , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_buttons[ HIGHSCORE_BUTTON ] , CYAN , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_buttons[ SETTINGS_BUTTON ] , CYAN , 2.f );
+		g_theRenderer->DrawUnfilledAABB2( m_buttons[ EXIT_BUTTON ] , CYAN , 2.f );
+
+		RenderDebugMouse();
+	}
+
+	g_theRenderer->BindTexture( m_UITextures[ UI_BACKGROUND_BORDER ] );
+	g_theRenderer->DrawAABB2( m_screenSpace , WHITE );
 	g_theRenderer->BindTexture( nullptr );
 }
 

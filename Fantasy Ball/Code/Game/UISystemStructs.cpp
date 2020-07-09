@@ -21,14 +21,17 @@ UISlider::UISlider( AABB2 cosmeticBase , AABB2 cosmeticFillBar , AABB2 cosmeticB
 																													m_maxRange( maxValue ) ,
 																													m_value( value )
 {
+	
 	m_cosmeticBase.SetCenter( centerPos );
 	m_cosmeticFillBar.SetCenter( centerPos );
-	m_cosmeticButton.SetCenter( centerPos );
 
 	m_physicalButton.SetDimensions( m_cosmeticButton.GetDimensions() * 0.9f );
-	m_physicalButton.SetCenter( centerPos );
 
 	m_buttonMovementRange = Vec2( m_cosmeticFillBar.m_mins.x , m_cosmeticFillBar.m_maxs.x );
+	float buttonPosX = RangeMapFloat( m_minRange , m_maxRange , m_buttonMovementRange.x , m_buttonMovementRange.y , value );
+
+	m_cosmeticButton.SetCenter( buttonPosX , centerPos.y );
+	m_physicalButton.SetCenter( buttonPosX , centerPos.y );
 	
 	//m_cosmeticFillBar.m_mins.x = m_cosmeticBase.m_mins.x + m_cosmeticButton.GetDimensions().x * 1.5f;
 }
@@ -43,18 +46,19 @@ void UISlider::Update()
 	float	mouseClientPosY = RangeMapFloatNormalizedInput( screenSpace.m_mins.y , screenSpace.m_maxs.y , normalizedPos.y );
 	Vec2	mouseClientPos( mouseClientPosX , mouseClientPosY );
 
+
 	if( IsPointInsideAABB2D( mouseClientPos , m_physicalButton ) )
 	{
 		if( g_theInput->IsLeftMouseButtonHeldDown() )
 		{
-			//float newXPos = Clamp( mouseClientPosX , m_cosmeticBase.m_mins.x + 32.f, m_cosmeticBase.m_maxs.x - 32.f);
 			float newXPos = Clamp( mouseClientPosX , m_buttonMovementRange.x , m_buttonMovementRange.y );
+			//float newXPos = Clamp( mouseClientPosX , m_cosmeticBase.m_mins.x + 32.f, m_cosmeticBase.m_maxs.x - 32.f);
 			m_physicalButton.SetCenter( newXPos , m_physicalButton.GetCenter().y );			
 			m_cosmeticButton.SetCenter( newXPos , m_cosmeticButton.GetCenter().y );
 		}
 	}
-
-	//m_cosmeticFillBar.m_maxs.x = m_cosmeticButton.m_maxs.x;
+	float value = m_cosmeticButton.GetCenter().x;
+	m_value = RangeMapFloat( m_buttonMovementRange.x , m_buttonMovementRange.y , m_minRange , m_maxRange , value );
 	m_cosmeticFillBar.m_maxs.x = m_cosmeticButton.GetCenter().x;
 }
 
@@ -81,6 +85,18 @@ void UISlider::Render()
 												  
 		g_theRenderer->DrawUnfilledAABB2( m_physicalButton	, CYAN , 2.f );
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void UISlider::SetValue( const float value )
+{
+	m_value = Clamp( value , m_minRange , m_maxRange );
+	//m_buttonMovementRange = Vec2( m_cosmeticFillBar.m_mins.x , m_cosmeticFillBar.m_maxs.x );
+	float buttonPosX = RangeMapFloat( m_minRange , m_maxRange , m_buttonMovementRange.x , m_buttonMovementRange.y , value );
+	float buttonPosY = m_physicalButton.GetCenter().y;
+	m_cosmeticButton.SetCenter( buttonPosX , buttonPosY );
+	m_physicalButton.SetCenter( buttonPosX , buttonPosY );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

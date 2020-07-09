@@ -369,7 +369,7 @@ void Map::ResolveBallvSingleSideBoundCollision( Ball* ball , AABB2 bounds )
 												   LEAVES_PARTICLE_MIN_AGE , LEAVES_PARTICLE_MAX_AGE ,
 												   LEAVES_PARTICLE_DIMENSIONS , LEAVES_PARTICLE_VELOCITY );
 
-		g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_LEAVES_RUSTLE ) , false , 0.1f , 0.f , 1.f );
+		g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_LEAVES_RUSTLE ) , false , m_owner->m_sfxVol );
 		m_owner->AddScreenShakeIntensity();
 	}
 }
@@ -393,7 +393,7 @@ void Map::ResolveBallvSingleSideBoundCollision( PowerUps* powerUps , AABB2 bound
 		//										   LEAVES_PARTICLE_MIN_AGE , LEAVES_PARTICLE_MAX_AGE ,
 		//										   LEAVES_PARTICLE_DIMENSIONS , LEAVES_PARTICLE_VELOCITY );
 
-		g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_LEAVES_RUSTLE ) , false , 0.1f , 0.f , 1.f );
+		g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_LEAVES_RUSTLE ) , false , m_owner->m_sfxVol );
 		m_owner->AddScreenShakeIntensity();
 	}
 }
@@ -473,7 +473,7 @@ void Map::ResolveBallvTileCollisions()
 					
 					if ( currentTile->TileCollisionResponse( ball ) )
 					{
-						g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_GLASS_BREAK_2 ) , false , 0.1f );
+						g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_GLASS_BREAK_2 ) , false , m_owner->m_sfxVol );
 						m_owner->AddScreenShakeIntensity();
 					}
 

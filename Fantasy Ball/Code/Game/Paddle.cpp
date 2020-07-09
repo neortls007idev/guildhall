@@ -49,7 +49,7 @@ void Paddle::UpdateFromUserInput( float deltaSeconds )
 {
 	Vec2 mousePos = g_theInput->GetRelativeMovement();
 
-	float speed = 100.f;
+	float speed = 20.f * g_theGame->m_paddleSensitivity;
 
 	float paddleColliderLength = m_paddleCollider.GetDimensions().x;
 

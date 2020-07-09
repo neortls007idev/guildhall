@@ -76,6 +76,10 @@ public:
 	SoundPlaybackID				m_sounds[ NUM_GAME_SFX ];
 	SoundPlaybackID				m_currentBackgroundsound						= 0;
 
+	float						m_backgroundMusicVol							= 0.11f;
+	float						m_sfxVol										= 0.1f;
+	float						m_paddleSensitivity								= 1.f;
+	
 	Shader*						m_gameShader[ NUM_GAME_SHADERS ];			
 	
 	int							m_playerHealth									= 3;
@@ -93,6 +97,7 @@ public:
 	
 	std::thread*				m_loadAudio										= nullptr;
 	std::thread*				m_loadTextures;
+
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

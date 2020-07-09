@@ -191,7 +191,7 @@ void Game::PostGameConstruct()
 void Game::PlayRandomGameBackgroundMusic()
 {
 	int backgroundSoundIndex = g_RNG->RollRandomIntInRange( SFX_BACKGROUND_1 , SFX_BACKGROUND_7 );
-	m_currentBackgroundsound = g_theAudioSystem->PlaySound( m_sounds[ backgroundSoundIndex ] , true , 0.11f );
+	m_currentBackgroundsound = g_theAudioSystem->PlaySound( m_sounds[ backgroundSoundIndex ] , true , m_backgroundMusicVol );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -331,10 +331,10 @@ void Game::UpdateFromKeyBoard()
 
 	if( g_theInput->WasKeyJustPressed( KEY_ESC ) )
 	{
-		g_theGamplayUISystem->SetGameState( GAME_OVER_STATE );
+		//g_theGamplayUISystem->SetGameState( GAME_OVER_STATE );
 		//StopGameBackgroundMusic();
 		//g_theGamplayUISystem->ResetAnimTime();
-		m_isGameDirty = true;
+		//m_isGameDirty = true;
 		//g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
 	}
 

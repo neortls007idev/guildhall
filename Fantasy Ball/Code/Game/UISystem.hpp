@@ -39,6 +39,7 @@ public:
 
 	void		MainMenuState( float deltaSeconds );
 	void		GameOverState();
+	void		PauseState();
 	void		HighScoreMenuState();
 	void		SettingsMenuState();
 	void		UpdateBackGroundBranches();
@@ -48,6 +49,7 @@ public:
 	void		RenderMainMenuScreen() const;
 	void		RenderSettingsMenuScreen() const;
 	void		RenderHighScoreMenuScreen() const;
+	void		RenderPauseMenuScreen() const;
 	void		RenderHUD() const;
 	void		RenderDebugMouse() const;
 
@@ -82,6 +84,8 @@ private:
 	std::vector< HighscoreData >				m_highScores;
 
 	SoundPlaybackID								m_currentBackgroundsound	= 0;
+	float										m_backgroundMusicVol		= 0.11f;
+	
 	std::thread*								m_loadMainMenuTex;
 };
 

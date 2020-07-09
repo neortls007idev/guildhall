@@ -212,6 +212,16 @@ void TheApp::Update( float deltaSeconds )
 	else if ( m_isSloMo == true )					{ deltaSeconds /= 50.f; }
 	if ( m_isSpeedMo )								{ deltaSeconds = deltaSeconds * 4.0f; }
 
+	if ( m_isPaused && g_theGamplayUISystem->GetGameState() == HUD_STATE )
+	{
+		g_theGamplayUISystem->SetGameState( PAUSE_STATE );
+	}
+	else if( !m_isPaused && g_theGamplayUISystem->GetGameState() == PAUSE_STATE )
+	{
+		g_theGamplayUISystem->SetGameState( HUD_STATE );
+	}
+
+	
 	//g_theGame->Update( deltaSeconds );
 	g_theGamplayUISystem->Update( deltaSeconds );
 	
@@ -297,19 +307,19 @@ void TheApp::UpdateFromKeyboard()
 	if ( g_theInput->IsKeyHeldDown( 'Y' ) )								{ m_isSpeedMo = true; }
 	else																		{ m_isSpeedMo = false; }
 		
-// 	if ( ( g_theInput->GetButtonState( 'P' ).WasJustPressed() || g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() ) ) 
-// 	{ 
-// 		m_isPaused = !m_isPaused; 
-// 		
-// 		if ( m_isPaused == true )
-// 		{
-// 		
-// 		}
-// 		if ( m_isPaused == false  )
-// 		{
-// 		
-// 		}
-// 	}
+	if ( g_theGamplayUISystem->GetGameState() == HUD_STATE &&
+	   ( g_theInput->GetButtonState( 'P' ).WasJustPressed() || g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() ) ) 
+	{ 
+		m_isPaused = true; 
+		g_theGamplayUISystem->SetGameState( PAUSE_STATE );
+		
+	}
+	else if( g_theGamplayUISystem->GetGameState() == PAUSE_STATE &&
+		( g_theInput->GetButtonState( 'P' ).WasJustPressed() || g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() ) )
+	{
+		m_isPaused = false;	
+		g_theGamplayUISystem->SetGameState( HUD_STATE );
+	}
 
 	if( g_theInput->WasKeyJustPressed( KEY_F1 ) )
 	{

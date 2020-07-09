@@ -20,6 +20,7 @@ enum eUIFONTS
 enum eUITEX
 {
 	UI_BACKGROUND ,
+	UI_BACKGROUND_BORDER ,
 	UI_BACKGROUNDANIM ,
 	UI_WOODBARK_T1 ,
 	UI_TITLE ,
@@ -39,21 +40,25 @@ enum eUITEX
 	UI_HS_VBORDER ,
 	UI_HS_NAME_HEADER ,
 	UI_HS_SCORE_HEADER ,
-		
+
 	HUD_HEALTH ,
 
-	SETTINGS_TITLE,
-	SETTINGS_SFX_VOL,
-	SETTINGS_BGM_VOL,
-	SETTINGS_PADDLE_SENSE,
+	SETTINGS_TITLE ,
+	SETTINGS_SFX_VOL ,
+	SETTINGS_BGM_VOL ,
+	SETTINGS_PADDLE_SENSE ,
+
+	PAUSE_TITLE ,
+	MM_BUTTON,
 	
 	GEN_BACK_BTN ,
-	
-	GEN_SLIDER_BASE , 
-	GEN_SLIDER_FILLBAR , 
-	GEN_SLIDER_BORDER , 
-	GEN_SLIDER_BUTTON , 
-	
+	GEN_RESUME_BTN ,
+		
+	GEN_SLIDER_BASE ,
+	GEN_SLIDER_FILLBAR ,
+	GEN_SLIDER_BORDER ,
+	GEN_SLIDER_BUTTON ,
+
 	NUM_UI_TEX
 };
 
@@ -109,6 +114,8 @@ enum  eUISTATE
 	MAIN_MENU_STATE ,
 	HUD_STATE ,
 	PAUSE_STATE ,
+	PAUSE_STATE_SETTINGS ,
+	PAUSE_STATE_HIGHSCORE , 
 	GAME_OVER_STATE ,
 	HIGHSCORE_MENU ,
 	SETTINGS_MENU ,
@@ -147,10 +154,6 @@ enum eSettingsSliders
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 struct HighscoreData
 {
 	HighscoreData( std::string nameVal, size_t scoreVal )
@@ -169,9 +172,11 @@ struct UISlider
 {
 public:
 	UISlider( AABB2	cosmeticBase , AABB2 cosmeticFillBar , AABB2 cosmeticButton , Vec2 centerPos , float minValue , float maxValue , float value );
-	void Update();
-	void Render();
-
+	void	Update();
+	void	Render();
+	float	GetValue() const																								{ return m_value;  }
+	void	SetValue( const float value );
+	
 public:
 	AABB2		m_cosmeticBase;
 	AABB2		m_cosmeticFillBar;
