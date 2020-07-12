@@ -1,9 +1,10 @@
 #pragma once
+#include "Engine/Core/PromotedWarnings.hpp"
+
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/EventSystem.hpp"
 #include <string>
-//#pragma warning ( 2816:error);
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

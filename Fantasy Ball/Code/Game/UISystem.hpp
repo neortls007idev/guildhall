@@ -4,6 +4,8 @@
 #include "Game/UISystemStructs.hpp"
 #include <vector>
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 class Camera;
 namespace std { class thread; }
 
@@ -25,6 +27,7 @@ public:
 	void		InitalizeSettingsMenuLabels();
 	void		InitializeBackButton();
 	void		InitializeSliders();
+	void		InitializeGameOverLabels();
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -38,7 +41,9 @@ public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
 	void		MainMenuState( float deltaSeconds );
-	void		GameOverState();
+	void		GameOverState( float deltaSeconds );
+	void		GameOverInputState();
+	void		GameOverHighScoreState( float deltaSeconds );
 	void		PauseState();
 	void		HighScoreMenuState();
 	void		SettingsMenuState();
@@ -51,6 +56,8 @@ public:
 	void		RenderHighScoreMenuScreen() const;
 	void		RenderPauseMenuScreen() const;
 	void		RenderHUD() const;
+	void		RenderGameOver() const;
+	void		RenderGameOverInput() const;
 	void		RenderDebugMouse() const;
 
 	void		EndFrame();
@@ -85,7 +92,10 @@ private:
 
 	SoundPlaybackID								m_currentBackgroundsound	= 0;
 	float										m_backgroundMusicVol		= 0.11f;
-	
+
+	float										m_gameOverHighScoreTimer	= 0.f;
+	float										m_gameOverTimer				= 0.f;
+
 	std::thread*								m_loadMainMenuTex;
 };
 

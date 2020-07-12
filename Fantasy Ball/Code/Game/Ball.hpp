@@ -38,6 +38,8 @@ public:
 	Vec2			m_maxUVs;
 
 	bool			m_brickThrough						= false;
+	float			m_currentScore						= 0.f;
+	size_t			m_currentScoreMultiplier				= 0;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

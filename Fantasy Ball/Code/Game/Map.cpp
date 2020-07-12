@@ -324,11 +324,12 @@ void Map::ResolveBallvBoundsCollisions()
 			ResolveBallvSingleSideBoundCollision( ball , m_rightWallPhysicalBounds );
 			ResolveBallvSingleSideBoundCollision( ball , m_topWallPhysicalBounds );
 			
-			ball->m_pos.x = Clamp( ball->m_pos.x , m_leftWallPhysicalBounds.m_maxs.x , m_rightWallPhysicalBounds.m_mins.x );
-			ball->m_pos.y = Clamp( ball->m_pos.y , m_pitPhysicalBounds.m_mins.y , m_topWallPhysicalBounds.m_mins.y );
+			ball->m_pos.x = Clamp( ball->m_pos.x , m_leftWallPhysicalBounds.m_maxs.x + ball->m_physicsRadius , m_rightWallPhysicalBounds.m_mins.x - ball->m_physicsRadius );
+			ball->m_pos.y = Clamp( ball->m_pos.y , m_pitPhysicalBounds.m_mins.y , m_topWallPhysicalBounds.m_mins.y - ball->m_physicsRadius );
 			
 			if( DoDiscAndAABBOverlap( ball->m_pos , ball->m_physicsRadius , m_pitPhysicalBounds ) )
 			{
+				m_owner->m_highScore += ball->m_currentScore;
 				ball->m_isGarbage = true;
 				--m_numAliveBalls;
 
@@ -364,6 +365,8 @@ void Map::ResolveBallvSingleSideBoundCollision( Ball* ball , AABB2 bounds )
 
 		PushDiscOutOfAABB( ball->m_pos , ball->m_physicsRadius , bounds );
 
+		ball->m_currentScore *= WORLDBOUNDS_SCORE_ABLATION;
+		
 		uint numParticles = ( uint ) g_RNG->RollRandomIntInRange( 5 , 10 );
 		SpawnParticlesOnBallCollisionUsingEmitter( ball , ball->m_pos , numParticles , m_boundsEmitter ,
 												   LEAVES_PARTICLE_MIN_AGE , LEAVES_PARTICLE_MAX_AGE ,
@@ -431,6 +434,11 @@ void Map::ResolveBallvPaddleCollisions()
 					SpawnParticlesOnBallCollisionUsingEmitter( ball , refPoint , numParticles , m_paddleEmitter ,
 					                                           FLOWER_PARTICLE_MIN_AGE , FLOWER_PARTICLE_MAX_AGE ,
 					                                           FLOWER_PARTICLE_DIMENSIONS , FLOWER_PARTICLE_VELOCITY );
+
+					m_owner->m_highScore += ball->m_currentScore;
+					ball->m_currentScore = 0.f;
+					ball->m_currentScoreMultiplier = 0;
+					
 					ball->m_velocity.Reflect( edgeNormal );
 					
 					float magnitude = ball->m_velocity.GetLength();

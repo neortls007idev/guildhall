@@ -448,10 +448,14 @@ Vec2 InputSystem::GetRelativeMovement() const
 
 void InputSystem::PushCharacter( char character )
 {
-	if ( character == 8 && g_theDevConsole->GetCurrentInputLength() <= 0 )
+	if ( g_theDevConsole->IsOpen() )
 	{
-		return;
+		if ( character == 8 && g_theDevConsole->GetCurrentInputLength() <= 0 )
+		{
+			return;
+		}
 	}
+	
 	m_characters.push( character );
 }
 

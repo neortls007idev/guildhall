@@ -18,6 +18,7 @@
 #include "UISystem.hpp"
 #include "Engine/Memory/JobSystem.hpp"
 #include "Game/resource.h"
+#include "Engine/Time/Timer.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			GLOBAL VARIABLES
@@ -73,6 +74,9 @@ TheApp::~TheApp()
 
 	delete g_theJobSystem;
 	g_theJobSystem = nullptr;
+
+	delete m_timer;
+	m_timer = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -81,6 +85,9 @@ void TheApp::Startup()
 {
 	Clock::Startup();
 
+	m_timer = new Timer();
+	m_timer->SetSeconds( &Clock::g_theMasterClock , FRAME_RATE );
+	
 	if ( g_theJobSystem == nullptr )
 	{
 		g_theJobSystem = new JobSystem();
@@ -175,13 +182,18 @@ void TheApp::SetGameIconAndCursor()
 
 void TheApp::RunFrame()
 {
-	static double timeLastFrameStarted = GetCurrentTimeSeconds();
-	double        timeThisFrameStarted = GetCurrentTimeSeconds();
-	double		  deltaSeconds		   = timeThisFrameStarted - timeLastFrameStarted;
-	timeLastFrameStarted			   = timeThisFrameStarted;
+	//static double timeLastFrameStarted = GetCurrentTimeSeconds();
+	//double        timeThisFrameStarted = GetCurrentTimeSeconds();
+	//double		  deltaSeconds		   = timeThisFrameStarted - timeLastFrameStarted;
+	//timeLastFrameStarted			   = timeThisFrameStarted;
 	
 	BeginFrame();                        // all engine system and not game systems
-	Update( ( float ) deltaSeconds );	
+
+	while( m_timer->CheckAndDecrement() )
+	{
+		Update( FRAME_RATE );
+	}
+	
 	Render();
 	EndFrame();
 }
@@ -319,6 +331,7 @@ void TheApp::UpdateFromKeyboard()
 	{
 		m_isPaused = false;	
 		g_theGamplayUISystem->SetGameState( HUD_STATE );
+		g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
 	}
 
 	if( g_theInput->WasKeyJustPressed( KEY_F1 ) )

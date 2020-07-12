@@ -51,6 +51,7 @@ UISystem::UISystem()
 	InitalizeHighScoreLabels();
 	InitializeSliders();
 	InitalizeSettingsMenuLabels();
+	InitializeGameOverLabels();
 	
 	m_loadMainMenuTex = new std::thread( &UISystem::LoadMainMenuAnimTex , this );
 	m_loadMainMenuTex->join();
@@ -92,6 +93,10 @@ void UISystem::LoadUITextures()
 	m_UITextures[ GEN_SLIDER_FILLBAR ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/fillBar1.png" );
 	m_UITextures[ GEN_SLIDER_BORDER ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/sliderBorder.png" );
 	m_UITextures[ GEN_SLIDER_BUTTON ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/SliderButton.png" );
+
+	m_UITextures[ GAME_OVER_TITLE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/GameOver/GameOverTitle.png" );
+	m_UITextures[ GAME_OVER_MESSAGE ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/GameOver/MessageBox.png" );
+	m_UITextures[ GAME_OVER_INPUTBOX ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/GameOver/NameInputBox.png" );
 	
 	m_UITextures[ HUD_HEALTH ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/HUD/health.png" );
 }
@@ -366,6 +371,23 @@ void UISystem::InitializeSliders()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void UISystem::InitializeGameOverLabels()
+{
+	Vec2 GOMessageBoxPos = m_labels[ HS_TITLE ].GetCenter() - m_labels[ HS_TITLE ].GetDimensions();
+	m_labels[ GO_MESSAGEBOX ].SetDimensions( Vec2( m_UITextures[ GAME_OVER_MESSAGE ]->GetDimensions() ) );
+	m_labels[ GO_MESSAGEBOX ].SetCenter( m_labels[ HS_TITLE ].GetCenter().x , GOMessageBoxPos.y );
+
+	Vec2 GOInputBoxDim		= Vec2( m_UITextures[ GAME_OVER_INPUTBOX ]->GetDimensions() );
+	Vec2 GOInputBoxPos		= GOMessageBoxPos - ( m_labels[ HS_TITLE ].GetDimensions() + GOMessageBoxPos ) * 0.5f;
+	m_labels[ GO_INPUTBOX ].SetDimensions( GOInputBoxDim );
+	m_labels[ GO_INPUTBOX ].SetCenter( m_labels[ GO_MESSAGEBOX ].GetCenter().x , GOInputBoxPos.y );
+
+	m_labels[ GO_OKBUTTON ] = m_labels[ MM_EXIT_BUTTON ];
+	m_labels[ GO_OKBUTTON ].Translate( Vec2( 0.f , -100.f ) );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 UISystem::~UISystem()
 {
 	m_currentBackgroundsound = 0;
@@ -417,7 +439,15 @@ void UISystem::Update( float deltaSeconds )
 			break;
 		case GAME_OVER_STATE :
 			m_UICamera->SetClearMode( CLEAR_NONE , BLACK );
-			GameOverState();
+			GameOverState( deltaSeconds );
+			break;
+		case GAME_OVER_INPUT:
+			m_UICamera->SetClearMode( CLEAR_NONE , BLACK );
+			GameOverInputState();
+			break;
+		case GAME_OVER_HIGHSCORE:
+			m_UICamera->SetClearMode( CLEAR_NONE , BLACK );
+			GameOverHighScoreState( deltaSeconds );
 			break;
 		case HIGHSCORE_MENU :
 			HighScoreMenuState();
@@ -478,6 +508,7 @@ void UISystem::PlayRandomUIBackgroundMusic()
 
 void UISystem::MainMenuState( float deltaSeconds )
 {
+
 		m_currentBGAnimFrame += deltaSeconds;
 	if( m_currentBGAnimFrame >= m_BGAnimationDuration )
 	{
@@ -500,6 +531,9 @@ void UISystem::MainMenuState( float deltaSeconds )
 			m_settingsSliders[ BGM_SLIDER ]->SetValue( g_theGame->m_backgroundMusicVol );
 			m_settingsSliders[ SFX_SLIDER ]->SetValue( g_theGame->m_sfxVol );
 			m_settingsSliders[ CURSOR_SENSITIVITY_SLIDER ]->SetValue( g_theGame->m_paddleSensitivity );
+
+			m_gameOverHighScoreTimer	= 0.f;
+			m_gameOverTimer				= 0.f;
 		}
 	}
 
@@ -549,13 +583,139 @@ void UISystem::MainMenuState( float deltaSeconds )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void UISystem::GameOverState()
+void UISystem::GameOverState( float deltaSeconds )
 {
-	g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
-	m_systemState = MAIN_MENU_STATE;
-	g_theGame->StopGameBackgroundMusic();
+	size_t playerScore = ( size_t ) g_theGame->m_highScore;
+	bool wasAnyHighScoreBroken = false;
 
-	PlayRandomUIBackgroundMusic();
+	size_t index = 0;
+
+	for( index = 0; index < MAX_HIGHSCORE_ENTRIES ; index++ )
+	{
+		if( playerScore >= m_highScores[ index ].score )
+		{
+			wasAnyHighScoreBroken = true;
+			break;
+		}
+	}
+
+	if( wasAnyHighScoreBroken )
+	{
+		m_highScores[ index ].name = g_theGame->m_playerName;
+		m_highScores[ index ].score = playerScore;
+
+		m_systemState = GAME_OVER_INPUT;
+		g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
+	}
+	else
+	{
+		if ( m_gameOverTimer < 3.f )
+		{
+			m_gameOverTimer += deltaSeconds;
+		}
+		if ( m_gameOverTimer > 3.f )
+		{
+			g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
+			m_systemState = GAME_OVER_HIGHSCORE;
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void UISystem::GameOverInputState()
+{
+	std::string playerName = g_theGame->m_playerName;
+	char character = '\0';
+
+	g_theInput->PopCharacter( &character );
+
+	bool range  = ( character >= '0' && character <= '1' );
+		 range |= ( character >= 'A' && character <= 'Z' );
+		 range |= ( character >= 'a' && character <= 'z' );
+	
+	if ( playerName.length() < 15 && range )
+	{
+		playerName += character;
+		g_theGame->m_playerName = playerName;
+	}
+	
+	if ( playerName.length() > 0 && character == EASCII_BACKSPACE )
+	{
+		g_theGame->m_playerName.pop_back();
+	}
+
+	Vec2	normalizedPos	= g_theInput->GetMouseNormalizedClientPosition();
+	float	mouseClientPosX = RangeMapFloatNormalizedInput( m_screenSpace.m_mins.x , m_screenSpace.m_maxs.x , normalizedPos.x );
+	float	mouseClientPosY = RangeMapFloatNormalizedInput( m_screenSpace.m_mins.y , m_screenSpace.m_maxs.y , normalizedPos.y );
+	Vec2	mouseClientPos( mouseClientPosX , mouseClientPosY );
+	
+	if( IsPointInsideAABB2D( mouseClientPos , m_labels[ GO_OKBUTTON ] ) )
+	{
+		if( g_theInput->WasLeftMouseButtonJustPressed() )
+		{
+			size_t playerScore = ( size_t ) g_theGame->m_highScore;
+
+			tinyxml2::XMLDocument xmlDocument;
+			xmlDocument.LoadFile( "Data/Gameplay/HighScores.xml" );
+
+			if( xmlDocument.ErrorID() != tinyxml2::XML_SUCCESS )
+			{
+				ERROR_AND_DIE( "SMARTY PANTS DID YOU JUST DELETE THE HIGHSCORE DATA FILE WHILE THE GAME WAS RUNNING!" );
+			}
+
+			XMLElement* highscoreElement = xmlDocument.RootElement()->FirstChildElement( "HighScore" );
+			bool wasAnyHighScoreBroken = false;
+
+			size_t index = 0;
+
+			for( index = 0; index < MAX_HIGHSCORE_ENTRIES ; index++ )
+			{
+				if( playerScore >= m_highScores[ index ].score )
+				{
+					wasAnyHighScoreBroken = true;
+					break;
+				}
+
+				highscoreElement = highscoreElement->NextSiblingElement( "HighScore" );
+			}
+
+			if( wasAnyHighScoreBroken )
+			{
+				highscoreElement->SetAttribute( "Name" , g_theGame->m_playerName.c_str() );
+				highscoreElement->SetAttribute( "Score" , playerScore );
+				xmlDocument.SaveFile( "Data/Gameplay/HighScores.xml" );
+
+				m_highScores[ index ].name = g_theGame->m_playerName;
+				m_highScores[ index ].score = playerScore;
+
+				m_systemState = GAME_OVER_HIGHSCORE;
+				g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void UISystem::GameOverHighScoreState( float deltaSeconds )
+{
+	if ( m_gameOverHighScoreTimer < 5.f )
+	{
+		m_gameOverHighScoreTimer += deltaSeconds;
+	}
+	else
+	{
+		m_gameOverHighScoreTimer = 0.f;
+		m_systemState = MAIN_MENU_STATE;
+
+		g_theGame->StopGameBackgroundMusic();
+		PlayRandomUIBackgroundMusic();
+		
+		ResetAnimTime();
+		g_theGame->m_isGameDirty = true;
+		g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -752,9 +912,11 @@ void UISystem::Render() const
 		case LOADING_STATE:
 			RenderLoadingScreen();
 			break;
+
 		case MAIN_MENU_STATE:
 			RenderMainMenuScreen();
 			break;
+
 		case HUD_STATE:
 			g_theRenderer->EndCamera( *m_UICamera );
 			g_theGame->Render();
@@ -764,6 +926,7 @@ void UISystem::Render() const
 			g_theRenderer->BindTexture( nullptr );
 			RenderHUD();
 			break;
+
 		case PAUSE_STATE:
 			g_theRenderer->EndCamera( *m_UICamera );
 			g_theGame->Render();
@@ -774,6 +937,7 @@ void UISystem::Render() const
 			RenderHUD();
 			RenderPauseMenuScreen();
 			break;
+
 		case PAUSE_STATE_HIGHSCORE:
 			g_theRenderer->EndCamera( *m_UICamera );
 			g_theGame->Render();
@@ -804,15 +968,43 @@ void UISystem::Render() const
 			g_theRenderer->BindShader( nullptr );
 			g_theRenderer->BindTexture( nullptr );
 			RenderHUD();
+			RenderGameOver();
 			break;
+
+		case GAME_OVER_INPUT:
+			g_theRenderer->EndCamera( *m_UICamera );
+			g_theGame->Render();
+			g_theRenderer->BeginCamera( *m_UICamera );
+			g_theRenderer->SetBlendMode( ALPHA );
+			g_theRenderer->BindShader( nullptr );
+			g_theRenderer->BindTexture( nullptr );
+			RenderHUD();
+			RenderGameOver();
+			RenderGameOverInput();
+			break;
+
+		case GAME_OVER_HIGHSCORE:
+			g_theRenderer->EndCamera( *m_UICamera );
+			g_theGame->Render();
+			g_theRenderer->BeginCamera( *m_UICamera );
+			g_theRenderer->SetBlendMode( ALPHA );
+			g_theRenderer->BindShader( nullptr );
+			g_theRenderer->BindTexture( nullptr );
+			RenderHUD();
+			RenderHighScoreMenuScreen();
+			break;
+		
 		case HIGHSCORE_MENU:
 			RenderHighScoreMenuScreen();
 			break;
+
 		case SETTINGS_MENU:
 			RenderSettingsMenuScreen();
 			break;
+
 		case TUTORIAL_MENU:
 			break;
+
 		default:
 			ERROR_AND_DIE( "YOU BROKE THE UI SYSTEM" );
 			break;
@@ -985,7 +1177,7 @@ void UISystem::RenderHighScoreMenuScreen() const
 	{
 		g_theRenderer->DrawAABB2( m_screenSpace , WHITE );
 	}
-	else if ( m_systemState == PAUSE_STATE_HIGHSCORE )
+	else if ( m_systemState == PAUSE_STATE_HIGHSCORE || m_systemState == GAME_OVER_HIGHSCORE )
 	{
 		g_theRenderer->DrawAABB2( m_screenSpace , HALF_ALPHA_WHITE );
 	}
@@ -1005,8 +1197,11 @@ void UISystem::RenderHighScoreMenuScreen() const
 	g_theRenderer->BindTexture( m_UITextures[ UI_HS_SCORE_HEADER ] );
 	g_theRenderer->DrawAABB2( m_labels[ HS_THEADER_SCORE ] , WHITE );
 
-	g_theRenderer->BindTexture( m_UITextures[ GEN_BACK_BTN ] );
-	g_theRenderer->DrawAABB2( m_labels[ UI_BACK_BUTTON ] , WHITE );
+	if ( m_systemState == HIGHSCORE_MENU || m_systemState == PAUSE_STATE_HIGHSCORE )
+	{
+		g_theRenderer->BindTexture( m_UITextures[ GEN_BACK_BTN ] );
+		g_theRenderer->DrawAABB2( m_labels[ UI_BACK_BUTTON ] , WHITE );
+	}
 	
 	g_theRenderer->BindTexture( nullptr );
 
@@ -1043,10 +1238,13 @@ void UISystem::RenderHighScoreMenuScreen() const
 		g_theRenderer->DrawUnfilledAABB2( m_labels[ HS_BOTTOMBORDER ]	, MAGENTA , 2.f );
 		g_theRenderer->DrawUnfilledAABB2( m_labels[ HS_THEADER_NAME ]	, MAGENTA , 2.f );
 		g_theRenderer->DrawUnfilledAABB2( m_labels[ HS_THEADER_SCORE ]	, MAGENTA , 2.f );
-		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_BACK_BUTTON ]	, MAGENTA , 2.f );
 
-		g_theRenderer->DrawUnfilledAABB2( m_buttons[ BACK_BUTTON ]		, CYAN , 2.f );
-
+		if( m_systemState == HIGHSCORE_MENU || m_systemState == PAUSE_STATE_HIGHSCORE )
+		{
+			g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_BACK_BUTTON ] , MAGENTA , 2.f );
+			g_theRenderer->DrawUnfilledAABB2( m_buttons[ BACK_BUTTON ]	 , CYAN		, 2.f );
+		}
+		
 		entryDimensions		= m_labels[ HS_ENTRY_NAME ].GetDimensions();
 		nameEntry			= m_labels[ HS_ENTRY_NAME ];
 		scoreEntry			= m_labels[ HS_ENTRY_SCORE ];
@@ -1133,6 +1331,86 @@ void UISystem::RenderHUD() const
 	{
 		g_theRenderer->DrawAABB2( healthbox , WHITE );
 		healthbox.Translate( healthDimensions );
+	}
+
+	AABB2 scoreBox = m_screenSpace;
+		  scoreBox = scoreBox.GetBoxAtTop( 0.9f , 0.f );
+		  scoreBox = scoreBox.GetBoxAtRight( 0.75f , 0.f );
+
+	std::string scoreValue = ToString( RoundDownToInt( g_theGame->m_highScore ) );
+
+	g_theRenderer->BindTexture( m_UITextures[ UI_WOODBARK_T1 ] );
+	std::vector<Vertex_PCU> scoreTextVerts;
+
+	m_UIFonts[ UI_FONT_WOOD1 ]->AddVertsForTextInBox2D( scoreTextVerts , scoreBox , scoreBox.GetDimensions().y * 0.75f , scoreValue , WHITE , 0.6f , ALIGN_CENTERED_RIGHT );
+	
+	g_theRenderer->BindTexture( m_UIFonts[ UI_FONT_WOOD1 ]->GetTexture() );
+	g_theRenderer->DrawVertexArray( scoreTextVerts );
+	g_theRenderer->BindTexture( nullptr );
+
+	if ( m_UIDebugDraw )
+	{
+		g_theRenderer->DrawUnfilledAABB2( scoreBox , MAGENTA );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void UISystem::RenderGameOver() const
+{
+	g_theRenderer->BindTexture( m_UITextures[ UI_BACKGROUND ] );
+	g_theRenderer->DrawAABB2( m_screenSpace , HALF_ALPHA_WHITE );
+	g_theRenderer->BindTexture( nullptr );
+
+	g_theRenderer->BindTexture( m_UITextures[ GAME_OVER_TITLE ] );
+	g_theRenderer->DrawAABB2( m_labels[ HS_TITLE ] , WHITE );
+
+	if( m_UIDebugDraw )
+	{
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ UI_TITLEBOX ] , MAGENTA , 2.f );
+	}
+
+	g_theRenderer->BindTexture( m_UITextures[ UI_BACKGROUND_BORDER ] );
+	g_theRenderer->DrawAABB2( m_screenSpace , WHITE );
+	g_theRenderer->BindTexture( nullptr );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void UISystem::RenderGameOverInput() const
+{
+	g_theRenderer->BindTexture( m_UITextures[ GAME_OVER_MESSAGE ] );
+	g_theRenderer->DrawAABB2( m_labels[ GO_MESSAGEBOX ] , WHITE );
+	g_theRenderer->BindTexture( nullptr );
+
+	g_theRenderer->BindTexture( m_UITextures[ GAME_OVER_INPUTBOX ] );
+	g_theRenderer->DrawAABB2( m_labels[ GO_INPUTBOX ] , WHITE );
+
+	Vec2 dimensions = m_labels[ GO_INPUTBOX ].GetDimensions();
+	AABB2 textBox	= AABB2::ZERO_TO_ONE;
+	textBox.SetDimensions( dimensions.x * 0.875f , dimensions.y * 0.875f );
+	textBox.SetCenter( m_labels[ GO_INPUTBOX ].GetCenter() );
+	
+	g_theRenderer->BindTexture( m_UITextures[ UI_WOODBARK_T1 ] );
+	std::vector<Vertex_PCU> playerNameTextVerts;
+
+	m_UIFonts[ UI_FONT_WOOD1 ]->AddVertsForTextInBox2D( playerNameTextVerts , textBox , textBox.GetDimensions().y * 0.55f ,
+	                                                    g_theGame->m_playerName , WHITE , 0.4125f , ALIGN_CENTERED );
+
+	g_theRenderer->BindTexture( m_UIFonts[ UI_FONT_WOOD1 ]->GetTexture() );
+	g_theRenderer->DrawVertexArray( playerNameTextVerts );
+	g_theRenderer->BindTexture( nullptr );
+
+	g_theRenderer->BindTexture( m_UITextures[ MM_BUTTON ] );
+	g_theRenderer->DrawAABB2( m_labels[ GO_OKBUTTON ] , WHITE );
+	g_theRenderer->BindTexture( nullptr );
+	
+	if( m_UIDebugDraw )
+	{
+		g_theRenderer->DrawUnfilledAABB2( textBox						, MAGENTA , 5.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ GO_MESSAGEBOX ]		, MAGENTA , 5.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ GO_INPUTBOX ]		, MAGENTA , 5.f );
+		g_theRenderer->DrawUnfilledAABB2( m_labels[ MM_EXIT_BUTTON ]	, MAGENTA , 5.f );
 	}
 }
 

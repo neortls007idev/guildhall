@@ -1,4 +1,6 @@
 #pragma once
+#include "Engine/Core/PromotedWarnings.hpp"
+
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Core/Rgba8.hpp"
@@ -16,6 +18,9 @@ extern Game*		g_theGame;
 extern Window*		g_theWindow;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+constexpr float FRAME_RATE												= 1.f / 60.f;
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //  GENERAL GAME CONSTANTS
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -73,12 +78,16 @@ constexpr float	POWERUP_VELOCITY_MULTIPLIER								= 50.f;
 
 const	  Vec2	GRAVITY													= Vec2( 0.f , 9.8f );
 
-const	  float BALL_DEFAULT_RADIUS										= 25.f;
+const	  float BALL_DEFAULT_RADIUS										= 15.f;
 const	  float BALL_DEFAULT_MIN_RADIUS									= BALL_DEFAULT_RADIUS / 2.f;
 const	  float BALL_DEFAULT_MAX_RADIUS									= BALL_DEFAULT_RADIUS * 3.f;
 const	  float BALL_DEFAULT_PHYSICAL_RADIUS							= 25.f;
 const	  float BALL_MAX_PHYSICAL_RADIUS_FACTOR							= 1.5f;
 const	  float BALL_MIN_PHYSICAL_RADIUS_FACTOR							= 0.5f;
+
+const	  float MAX_HIGHSCORE_VALUE										= 99999999.f;
+const	  float PER_TILE_SCORE											= 100.f;
+const	  float WORLDBOUNDS_SCORE_ABLATION								= 0.75f;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			UI SYSTEM DATA

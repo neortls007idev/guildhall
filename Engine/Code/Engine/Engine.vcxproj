@@ -390,6 +390,7 @@
     </ClInclude>
     <ClInclude Include="Core\NamedStrings.hpp" />
     <ClInclude Include="Core\OBJUtils.hpp" />
+    <ClInclude Include="Core\PromotedWarnings.hpp" />
     <ClInclude Include="Core\Rgba8.hpp" />
     <ClInclude Include="Core\SimpleTriangleFont.hpp" />
     <ClInclude Include="Core\StdExtensions.hpp" />

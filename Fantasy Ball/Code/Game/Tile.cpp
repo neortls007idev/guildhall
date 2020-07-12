@@ -101,7 +101,7 @@ bool Tile::TileCollisionResponse( Ball* ball )
 		uint numParticles = ( uint ) g_RNG->RollRandomIntInRange( 5 , 10 );
 		
 		SpawnParticlesOnBallCollision( ball , refPoint , numParticles );
-
+		
 		if ( !ball->m_brickThrough )
 		{
 			ball->m_velocity.Reflect( edgeNormal );
@@ -109,6 +109,7 @@ bool Tile::TileCollisionResponse( Ball* ball )
 			SpawnParticlesOnBallCollision( ball , refPoint , numParticles );
 			
 			PushDiscOutOfAABB( ball->m_pos , ball->m_physicsRadius , m_bounds );
+			ball->m_currentScore += ball->m_currentScoreMultiplier * PER_TILE_SCORE;
 		}
 
 		int powerUpSpawnType = g_RNG->RollRandomIntInRange( PT_INVALID + 1 , NUM_POWERUP_TYPES - 1 );
@@ -123,9 +124,18 @@ bool Tile::TileCollisionResponse( Ball* ball )
 				                            nullptr , ( ePowerUpType )powerUpSpawnType );
 			}
 		}
-				
+
+		//if ( powerupSpawnProbablity > 0.85f )
+		//{
+		//	powerupDef = PowerUpDefinition::GetPowerUpDefinitionForPowerUp( ePowerUpType::PT_BALLX8  );
+		//	m_ownerMap->SpawnNewEntity( POWERUP , refPoint , POWERUP_VELOCITY_MULTIPLIER * ball->m_velocity ,
+		//							nullptr , ( ePowerUpType ) powerUpSpawnType );
+		//}
+		
 		if ( !m_isSolid )
 		{
+			ball->m_currentScoreMultiplier++;
+			ball->m_currentScore += ball->m_currentScoreMultiplier * PER_TILE_SCORE;
 			--m_health;
 		}
 		
@@ -144,11 +154,14 @@ bool Tile::TileCollisionResponse( Ball* ball )
 
 		if ( ball->m_brickThrough )
 		{
+			ball->m_currentScoreMultiplier++;
+			ball->m_currentScore += ball->m_currentScoreMultiplier * PER_TILE_SCORE * ( float ) m_health * 0.631f;
 			m_health = 0;
 		}
 
 		if ( m_health == 0 )
 		{
+			ball->m_currentScore += ball->m_currentScoreMultiplier * PER_TILE_SCORE * 1.25f;
 			m_isGarbage = true;
 			m_ownerMap->m_numAliveTiles--;
 		}

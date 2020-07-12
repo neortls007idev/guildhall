@@ -230,7 +230,7 @@ void Game::UpdateMoveToNextMap()
 		
 		if( m_currentLevelNumber == ( ( int ) m_levels.size() ) )
 		{
-			g_theGamplayUISystem->SetGameState( MAIN_MENU_STATE );
+			g_theGamplayUISystem->SetGameState( GAME_OVER_STATE );
 			g_theGamplayUISystem->ResetAnimTime();
 			m_isGameDirty = true;
 			g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );

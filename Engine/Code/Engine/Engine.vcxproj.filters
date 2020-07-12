@@ -735,5 +735,8 @@
     <ClInclude Include="Memory\Job.hpp">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="Core\PromotedWarnings.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
