@@ -91,6 +91,18 @@ void SpriteSheet::GetSpriteUVs( Vec2& out_uvAtMins , Vec2& out_uvAtMaxs , int sp
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void SpriteSheet::RollRandomSpriteUVs( Vec2& out_uvAtMins , Vec2& out_uvAtMaxs ) const
+{
+	IntVec2 spriteCoords = RollRandomSpriteCoordsInSpriteSheet();
+	int		spriteSheetWidth = GetSpriteDimension().x;
+	int		spriteIndex = spriteCoords.x + ( spriteSheetWidth * spriteCoords.y );
+
+	const SpriteDefinition& currentParticleSprite = GetSpriteDefinition( spriteIndex );
+	currentParticleSprite.GetUVs( out_uvAtMins , out_uvAtMaxs );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 const IntVec2 SpriteSheet::RollRandomSpriteCoordsInSpriteSheet() const
 {
 	IntVec2 randomSpriteCoords;

@@ -19,7 +19,7 @@
 	<PowerUpDefinition
 		name="8xBall"
 		color="0,0,255,255"
-		spriteCoords="1,0"
+		spriteCoords="0,1"
 		spawnProbablityRequirement="0.975"
 	/>
 

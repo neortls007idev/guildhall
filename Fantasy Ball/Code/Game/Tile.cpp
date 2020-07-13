@@ -118,18 +118,24 @@ bool Tile::TileCollisionResponse( Ball* ball )
 
 		if( nullptr != powerupDef )
 		{
-			if( powerupSpawnProbablity > powerupDef->m_spawnProbablityRequirement )
+			if( powerupSpawnProbablity >= powerupDef->m_spawnProbablityRequirement )
 			{
 				m_ownerMap->SpawnNewEntity( POWERUP , refPoint , POWERUP_VELOCITY_MULTIPLIER * ball->m_velocity ,
 				                            nullptr , ( ePowerUpType )powerUpSpawnType );
+				m_owner->AddScreenShakeIntensity();
 			}
 		}
 
+		float scrrenShake = g_RNG->RollRandomFloatBetweenZerotoOne();
+		if ( scrrenShake >= m_tileDef->m_screenshakeMinProbablity )
+		{
+			m_owner->AddScreenShakeIntensity();
+		}
 		//if ( powerupSpawnProbablity > 0.85f )
 		//{
-		//	powerupDef = PowerUpDefinition::GetPowerUpDefinitionForPowerUp( ePowerUpType::PT_BALLX8  );
-		//	m_ownerMap->SpawnNewEntity( POWERUP , refPoint , POWERUP_VELOCITY_MULTIPLIER * ball->m_velocity ,
-		//							nullptr , ( ePowerUpType ) powerUpSpawnType );
+			//powerupDef = PowerUpDefinition::GetPowerUpDefinitionForPowerUp( ePowerUpType::PT_BALLX8  );
+			//m_ownerMap->SpawnNewEntity( POWERUP , refPoint , POWERUP_VELOCITY_MULTIPLIER * ball->m_velocity ,
+			//						nullptr , ( ePowerUpType ) PT_BALLX8 );
 		//}
 		
 		if ( !m_isSolid )

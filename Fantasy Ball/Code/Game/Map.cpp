@@ -482,7 +482,6 @@ void Map::ResolveBallvTileCollisions()
 					if ( currentTile->TileCollisionResponse( ball ) )
 					{
 						g_theAudioSystem->PlaySound( m_owner->GetSFX( SFX_GLASS_BREAK_2 ) , false , m_owner->m_sfxVol );
-						m_owner->AddScreenShakeIntensity();
 					}
 
 					if( currentTile->GetHealth() <= 0 )
@@ -510,8 +509,7 @@ void Map::ResolvePaddlevPowerUpCollisions()
 			{
 				paddle = ( Paddle* ) GetFirstValidEntryInList( PADDLE );
 			}
-			// TODO:- FIX THIS SHIT BRUH... YOU NEED IT NOW!!
-
+			
 			PowerUps* powerUp = ( PowerUps* ) currentList[ entityIndex ];
 			
 			if( DoDiscAndAABBOverlap( powerUp->m_pos , powerUp->m_physicsRadius , paddle->GetCollider() ) )
@@ -601,8 +599,6 @@ void Map::SpawnRandomParticleUsingEmitter ( Ball* ball , Vec2 refPoint , float m
 															( ball->m_velocity + deviation ) * velocityMultiplier , 0.0f ,
 															maxAge , WHITE );
 }
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

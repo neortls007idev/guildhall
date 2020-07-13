@@ -123,7 +123,8 @@ enum eGameSpriteSheets
 	SS_VFX_FLOWERS,
 	SS_VFX_LEAVES,
 	SS_POWERUPS,
-
+	SS_BALLGRAB,
+	
 	NUM_GAME_SS
 };
 

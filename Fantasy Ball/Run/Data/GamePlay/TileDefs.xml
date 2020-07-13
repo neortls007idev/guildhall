@@ -18,6 +18,7 @@
 		isSolid="false"
 		isVisible="true"
 		visibleAtHealth="1"
+		screenshakeMinProbablity = "0.5"
 	/>
 
 	<TileDefinition
@@ -31,6 +32,7 @@
 		isSolid="false"
 		isVisible="true"
 		visibleAtHealth="1"
+		screenshakeMinProbablity = "0.55"
 	/>
 
 	<TileDefinition
@@ -44,6 +46,7 @@
 		isSolid="false"
 		isVisible="true"
 		visibleAtHealth="1"
+		screenshakeMinProbablity = "0.6"
 	/>
 
 	<TileDefinition
@@ -57,6 +60,7 @@
 		isSolid="false"
 		isVisible="true"
 		visibleAtHealth="1"
+		screenshakeMinProbablity = "0.625"
 	/>
 
 	<TileDefinition
@@ -70,6 +74,7 @@
 		isSolid="false"
 		isVisible="true"
 		visibleAtHealth="1"
+		screenshakeMinProbablity = "0.675"
 	/>
 
 	<TileDefinition
@@ -83,6 +88,7 @@
 		isSolid="false"
 		isVisible="false"
 		visibleAtHealth="1"
+		screenshakeMinProbablity = "0.725"
 	/>
 
 	<TileDefinition
@@ -96,6 +102,7 @@
 		isSolid="false"
 		isVisible="false"
 		visibleAtHealth="1"
+		screenshakeMinProbablity = "0.775"
 	/>
 
 	<TileDefinition
@@ -109,6 +116,7 @@
 		isSolid="false"
 		isVisible="false"
 		visibleAtHealth="2"
+		screenshakeMinProbablity = "0.825"
 	/>
 
 	<TileDefinition
@@ -122,6 +130,7 @@
 		isSolid="false"
 		isVisible="false"
 		visibleAtHealth="2"
+		screenshakeMinProbablity = "0.85"
 	/>
 
 	<TileDefinition
@@ -135,6 +144,7 @@
 		isSolid="true"
 		isVisible="true"
 		visibleAtHealth="1"
+		screenshakeMinProbablity = "0.8"
 	/>
 
 </TileDefinitions>

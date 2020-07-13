@@ -19,17 +19,18 @@ std::map< std::string , TileDefinition* > TileDefinition::s_definitions;
 
 TileDefinition::TileDefinition( const tinyxml2::XMLElement& definitionXMLElement )
 {
-	m_name				= ParseXmlAttribute( definitionXMLElement , "name"					, m_name );
-	m_health			= ParseXmlAttribute( definitionXMLElement , "health"					, m_health	);
-	m_solidAtHealth		= ParseXmlAttribute( definitionXMLElement , "healthToSolid"			, m_solidAtHealth);
-	m_isSolid			= ParseXmlAttribute( definitionXMLElement , "isSolid"				, m_isSolid		);
-	m_isVisible			= ParseXmlAttribute( definitionXMLElement , "isVisible"				, m_isVisible		);
-	m_visibleAtHealth	= ParseXmlAttribute( definitionXMLElement , "visibleAtHealth"		, m_visibleAtHealth );
-	m_spriteCoords		= ParseXmlAttribute( definitionXMLElement , "spriteCoords"			, m_spriteCoords	);
-	m_VFXSpriteCoords	= ParseXmlAttribute( definitionXMLElement , "VFXSpriteCoords"		, m_VFXSpriteCoords );
-	m_ballSpriteCoords	= ParseXmlAttribute( definitionXMLElement , "BallSpriteCoords"		, m_ballSpriteCoords );
-	m_tileColor			= ParseXmlAttribute( definitionXMLElement , "colorInImageFile"		, m_tileColor		);
-
+	m_name				= ParseXmlAttribute( definitionXMLElement , "name"											, m_name );
+	m_health			= ParseXmlAttribute( definitionXMLElement , "health"											, m_health	);
+	m_solidAtHealth		= ParseXmlAttribute( definitionXMLElement , "healthToSolid"									, m_solidAtHealth);
+	m_isSolid			= ParseXmlAttribute( definitionXMLElement , "isSolid"										, m_isSolid		);
+	m_isVisible			= ParseXmlAttribute( definitionXMLElement , "isVisible"										, m_isVisible		);
+	m_visibleAtHealth	= ParseXmlAttribute( definitionXMLElement , "visibleAtHealth"								, m_visibleAtHealth );
+	m_spriteCoords		= ParseXmlAttribute( definitionXMLElement , "spriteCoords"									, m_spriteCoords	);
+	m_VFXSpriteCoords	= ParseXmlAttribute( definitionXMLElement , "VFXSpriteCoords"								, m_VFXSpriteCoords );
+	m_ballSpriteCoords	= ParseXmlAttribute( definitionXMLElement , "BallSpriteCoords"								, m_ballSpriteCoords );
+	m_tileColor			= ParseXmlAttribute( definitionXMLElement , "colorInImageFile"								, m_tileColor		);
+	m_screenshakeMinProbablity = ParseXmlAttribute( definitionXMLElement , "screenshakeMinProbablity"				, m_screenshakeMinProbablity );
+	
 	const SpriteDefinition& currentTileSprite	= g_theGame->m_gameSS[ SS_BRICKS ]->GetSpriteDefinition( m_spriteCoords );
 	currentTileSprite.GetUVs( m_spriteUVs.m_mins , m_spriteUVs.m_maxs );
 }

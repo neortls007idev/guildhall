@@ -143,6 +143,9 @@ void Game::LoadAllTextures()
 
 	Texture* LeavesTex						= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/LeavesSpriteSheet.png" );
 	m_gameSS[ SS_VFX_LEAVES ]				= new SpriteSheet( *LeavesTex , IntVec2( 3 , 3 ) );
+
+	Texture* ballGrabTex					= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/BallHold2.png" );
+	m_gameSS[ SS_BALLGRAB ]					= new SpriteSheet( *ballGrabTex , IntVec2( 5 , 2 ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
