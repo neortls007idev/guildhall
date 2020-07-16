@@ -1,20 +1,34 @@
-﻿#include "Engine/Memory/Job.hpp"
+﻿#include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Memory/JobSystem.hpp"
+#include "Engine/Memory/JobSystemWorkerThread.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-static int s_nextJob	= 1;
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-Job::Job()
+JobSystemWorkerThread::JobSystemWorkerThread( JobSystem* owner ) : m_ownerJobSystem( owner )
 {
-	m_jobID					= s_nextJob++;
+	m_thread = new std::thread( &JobSystemWorkerThread::WorkerThreadMain , this , 1 );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Job::~Job()
+JobSystemWorkerThread::~JobSystemWorkerThread()
 {
+	m_thread->join();
+
+	delete m_thread;
+	m_thread = nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void JobSystemWorkerThread::WorkerThreadMain( int threadID )
+{
+	UNUSED( threadID );
+
+	while( true )
+	{
+		m_ownerJobSystem->ClaimJobForExecution();
+	}
 	
 }
 

@@ -10,9 +10,15 @@
     <ClCompile Include="Main.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="MostAwesomeGameplayJob.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineBuildPreferences.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="MostAwesomeGameplayJob.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,13 +2,27 @@
 
 //#include "Game/GameCommon.hpp"
 #include <stdio.h>
+#include <conio.h>
 #include <stdlib.h>
 #include <string>
+
+#include "MostAwesomeGameplayJob.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
+#include "Engine/Input/InputSystem.hpp"
+#include "Engine/Input/VirtualKeyboard.hpp"
+#include "Engine/Memory/JobSystem.hpp"
+#include "Engine/Renderer/RenderContext.hpp"
 
-//-----------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//			GLOBAL VARIABLES
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------------------------
+InputSystem*				g_theInput						= nullptr;
+RenderContext*				g_theRenderer					= nullptr;
+DevConsole*					g_theDevConsole					= nullptr;
+JobSystem*					g_theJobSystem					= nullptr;
+Window*						g_theWindow						= nullptr;
+
 struct  testStruct1
 {
 	char a;
@@ -49,6 +63,9 @@ typedef void( *EventCallbackFunctionPtrTypeThatTakesXY )( int x, int y );
 
 int main( int, char** )
 {
+	g_theJobSystem = new JobSystem();
+	g_theInput = new InputSystem();
+		
 	printf( "\n\n%zd %zd \n\n" , sizeof( abc ), sizeof( abc1 ) );
 	double a;
 	int b;
@@ -86,8 +103,7 @@ int main( int, char** )
 	{
 		partBeforeExclmation = a9;
 	}
-
-
+	
 	if ( indexOfTildeMark == std::string::npos )
 	{
 		
@@ -115,6 +131,23 @@ int main( int, char** )
 // 	class jkdn{};
 // 	selfRef:<jkdn> obj;
 
+	bool isRunning = true;
+	while( isRunning )
+	{
+		
+		if( _getch() == 'p' )
+		{
+			for ( int index = 0 ; index < 1000 ; index++ )
+			{
+				MostAwesomeGameplayJob* job = new MostAwesomeGameplayJob( index );
+				g_theJobSystem->PostJob( *job );
+			}
+		}
+		if( _getch() == 'q' )
+		{
+			isRunning = false;
+		}
+	}
 	return 0;
 }
 

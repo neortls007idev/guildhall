@@ -1,11 +1,180 @@
 #include "Engine/Memory/JobSystem.hpp"
 #include "Engine/Memory/Job.hpp"
+#include "Engine/Memory/JobSystemWorkerThread.hpp"
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+JobSystem::JobSystem()
+{
+	CreateWorkerThreadsForNumCores();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void JobSystem::CreateWorkerThreadsForNumCores()
+{
+	unsigned int numAvailableCores = std::thread::hardware_concurrency() - 1;			// Subtracting 1 for the main thread
+
+	m_workerThreads.resize( numAvailableCores );
+
+	for( size_t index = 0 ; index < numAvailableCores ; index++ )
+	{
+		JobSystemWorkerThread* newWorkerThread = new JobSystemWorkerThread( this );
+		m_workerThreads.push_back( newWorkerThread );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+JobSystem::~JobSystem()
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void JobSystem::Startup()
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void JobSystem::Shutdown()
+{
+	for ( auto iter = m_workerThreads.begin() ; iter != m_workerThreads.end() ; ++iter )
+	{
+		if( nullptr != *iter )
+		{
+			delete *iter;
+			*iter = nullptr;
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void JobSystem::BeginFrame()
+{
+	
+	ClaimAndDeleteAllCompletedJobs();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void JobSystem::EndFrame()
+{
+	if ( m_isQuitting )
+	{
+		m_pendingJobsQueueMutex.lock();
+	}
+}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void JobSystem::PostJob( Job& newJob )
 {
-	m_jobsQueue.push_back( &newJob );
+	m_pendingJobsQueueMutex.lock();
+	m_pendingJobsQueue.push_back( &newJob );
+	m_pendingJobsQueueMutex.unlock();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void JobSystem::OnJobCompleted( Job& Job )
+{
+	m_completedJobsQueueMutex.lock();
+	m_completedJobsQueue.push_back( &Job );
+	m_completedJobsQueueMutex.unlock();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void JobSystem::ClaimJobForExecution()
+{
+	//----------------------------------------------------------------------------------------------------------
+	//	TRY TO CLAIM A JOB
+	//----------------------------------------------------------------------------------------------------------
+	
+	m_pendingJobsQueueMutex.lock();
+	if ( !m_pendingJobsQueue.empty() )
+	{
+		Job* jobAtFrontOfQueue = m_pendingJobsQueue.front();
+		m_pendingJobsQueue.pop_front();
+		m_pendingJobsQueueMutex.unlock();
+
+	//----------------------------------------------------------------------------------------------------------
+	//	MOVE THE CLAIMED JOB TO RUNNING JOBS QUEUE
+	//----------------------------------------------------------------------------------------------------------
+		
+		m_processingJobsQueueMutex.lock();
+		m_processingJobsQueue.push_back( jobAtFrontOfQueue );
+		m_processingJobsQueueMutex.unlock();
+
+	//----------------------------------------------------------------------------------------------------------
+	//	EXECUTE THE JOB 
+	//----------------------------------------------------------------------------------------------------------
+		
+		jobAtFrontOfQueue->Execute();
+
+	//----------------------------------------------------------------------------------------------------------
+	//	POP THE JOB FROM THE RUNNING JOBS QUEUE AND PUSH TO COMPLETED JOBS QUEUE
+	//----------------------------------------------------------------------------------------------------------
+		
+		m_processingJobsQueueMutex.lock();
+		m_processingJobsQueue.pop_front();
+		m_processingJobsQueueMutex.unlock();
+		OnJobCompleted( *jobAtFrontOfQueue );
+	}
+	else
+	{
+		m_pendingJobsQueueMutex.unlock();
+		std::this_thread::sleep_for( std::chrono::microseconds( 10 ) );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void JobSystem::ClaimAndDeleteAllCompletedJobs()
+{
+	std::deque< Job* > claimedJobs;
+	m_completedJobsQueueMutex.lock();
+	m_completedJobsQueue.swap( claimedJobs );
+	m_completedJobsQueueMutex.unlock();
+
+//	while( !claimedJobs.empty() )
+//	{
+//		Job* jobAtFront = claimedJobs.front();
+//		claimedJobs.pop_front();
+//	}
+
+	for ( auto iter = claimedJobs.begin(); iter != claimedJobs.end(); ++iter )
+	{
+		Job* job = *iter;
+		job->ClaimJobCallbackOnComplete();
+		delete job;
+		job = nullptr;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+JobSystemWorkerThread* const JobSystem::CreateNewWorkerThread()
+{
+	JobSystemWorkerThread* newWorkerThread = new JobSystemWorkerThread( this );
+	m_workerThreads.push_back( newWorkerThread );
+
+	return newWorkerThread;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void JobSystem::SetJobSystemIsQuitting( bool isQuiting ) const
+{
+	if ( isQuiting )
+	{
+		//m_isQuitting = true ;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

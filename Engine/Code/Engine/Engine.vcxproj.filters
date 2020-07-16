@@ -388,6 +388,9 @@
     <ClCompile Include="Memory\Job.cpp">
       <Filter>Memory</Filter>
     </ClCompile>
+    <ClCompile Include="Memory\JobSystemWorkerThread.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -737,6 +740,9 @@
     </ClInclude>
     <ClInclude Include="Core\PromotedWarnings.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\JobSystemWorkerThread.hpp">
+      <Filter>Memory</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

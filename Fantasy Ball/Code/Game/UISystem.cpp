@@ -88,6 +88,7 @@ void UISystem::LoadUITextures()
 
 	m_UITextures[ GEN_BACK_BTN ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Back1.png" );
 	m_UITextures[ GEN_RESUME_BTN ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/ResumeButton.png" );
+	m_UITextures[ GEN_OK_BTN ]				= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/OkButton.png" );
 
 	m_UITextures[ GEN_SLIDER_BASE ]			= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/SliderBase.png" );
 	m_UITextures[ GEN_SLIDER_FILLBAR ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/UI/Images/Sliders/fillBar1.png" );
@@ -1401,7 +1402,7 @@ void UISystem::RenderGameOverInput() const
 	g_theRenderer->DrawVertexArray( playerNameTextVerts );
 	g_theRenderer->BindTexture( nullptr );
 
-	g_theRenderer->BindTexture( m_UITextures[ MM_BUTTON ] );
+	g_theRenderer->BindTexture( m_UITextures[ GEN_OK_BTN ] );
 	g_theRenderer->DrawAABB2( m_labels[ GO_OKBUTTON ] , WHITE );
 	g_theRenderer->BindTexture( nullptr );
 	

@@ -1,22 +1,68 @@
 #pragma once
 #include <deque>
-#include <thread>
+#include <mutex>
 #include <vector>
+#include <atomic>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 class Job;
+class JobSystemWorkerThread;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 class JobSystem
 {
-public:
-	void PostJob( Job& newJob );
 	
 public:
-	std::deque< Job* > m_jobsQueue;
-	//std::vector< std::thread > m_genericThreads;
+	//friend class Job;
+	
+	JobSystem();
+	~JobSystem();
+
+	void CreateWorkerThreadsForNumCores();
+
+	void Startup();
+	void Shutdown();
+	
+	void BeginFrame();
+	//void Update( float deltaSeconds );
+	void EndFrame();
+
+	//----------------------------------------------------------------------------------------------------------
+	
+	void PostJob( Job& newJob );
+	void OnJobCompleted( Job& Job );
+	void ClaimJobForExecution();
+
+	void ClaimAndDeleteAllCompletedJobs();
+
+	//----------------------------------------------------------------------------------------------------------
+	//			THREAD MANAGEMENT
+	//----------------------------------------------------------------------------------------------------------
+	JobSystemWorkerThread* const  CreateNewWorkerThread();
+	
+	//----------------------------------------------------------------------------------------------------------
+	//			DEBUG UTILITY
+	//----------------------------------------------------------------------------------------------------------
+	void DebugRender() const;
+
+	void SetJobSystemIsQuitting( bool isQuiting )const;
+	
+protected:
+
+	std::mutex								m_pendingJobsQueueMutex;
+	std::mutex								m_processingJobsQueueMutex;
+	std::mutex								m_completedJobsQueueMutex;
+	
+	std::deque< Job* >						m_processingJobsQueue;
+	std::deque< Job* >						m_completedJobsQueue;
+	std::deque< Job* >						m_pendingJobsQueue;
+
+private:
+
+	std::vector<JobSystemWorkerThread*>		m_workerThreads;
+	std::atomic<bool>						m_isQuitting		= false;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
