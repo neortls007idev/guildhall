@@ -164,7 +164,7 @@ GPUMesh* LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::string objFil
 			else
 			{
 				DebuggerPrintf( "Error in obj definition" );
-				DEBUGBREAK();
+				//DEBUGBREAK();
 			}
 		}
 	}
