@@ -43,6 +43,10 @@ public:
 	AABB2					CreateColliderFromCoords() const;
 	AABB2					GetCollider() const															{ return m_bounds;  }
 	void					UpdateCollider();
+
+public:
+	bool							m_isSolid										= false;
+	bool							m_isVisible										= false;
 	
 protected:
 	float							m_animTime;
@@ -52,8 +56,6 @@ protected:
 	TileDefinition*					m_tileDef										= nullptr;
 	int								m_solidAtHealth									= 0;
 	int								m_visibleAtHealth								= 0;
-	bool							m_isSolid										= false;
-	bool							m_isVisible										= false;
 	Rgba8							m_tileColor;
 	eTileMove						m_tileAnim;
 private:

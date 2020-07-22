@@ -22,7 +22,7 @@ private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
 public:
-	static std::unordered_map< std::string , MapDefinition* >			s_definitions;
+	static std::map< std::string , MapDefinition* >						s_definitions;
 	int																	m_width;
 	int																	m_height;
 	TileDefinition*														m_fillTile;

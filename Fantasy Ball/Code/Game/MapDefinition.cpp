@@ -9,7 +9,7 @@ extern RenderContext* g_theRenderer;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-std::unordered_map< std::string , MapDefinition* > MapDefinition::s_definitions;
+std::map< std::string , MapDefinition* > MapDefinition::s_definitions;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

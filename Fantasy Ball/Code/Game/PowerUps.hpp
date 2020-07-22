@@ -13,15 +13,15 @@ enum ePowerUpType : uchar
 {
 	PT_INVALID				= 0,
 
-	PT_BALLX2				= 1,
-	PT_BALLX3				= 2,
-	PT_BALLX8				= 3,
-	PT_BALL_SIZE_UP			= 4,
-	PT_BALL_SIZE_DOWN		= 5,
-	PT_BALL_SIZE_MEGA		= 6,
-	PT_BALL_SIZE_SHRINK		= 7,
-	PT_BRICK_THROUGH		= 8,
-	PT_BRICK_ALL_VISIBLE	= 9,
+	PT_BALLX2				,
+	PT_BALLX3				,
+	PT_BALLX8				,
+	PT_BRICK_THROUGH		,
+	PT_BRICK_ALL_VISIBLE	,
+	PT_BRICK_ALL_SOFT		,
+	PT_EXTRA_LIFE			,
+	PT_DEATH				,
+//	PT_PADDLE_SHOOT			= 7,
 
 	NUM_POWERUP_TYPES
 };
@@ -42,6 +42,10 @@ public:
 			void		PowerUpEffectMultipleBalls( uint numballs );
 			void		PowerUpEffectBrickThrough();
 			void		PowerUpEffectScaleBall( float scale );
+			void		PowerEffectDeath();
+			void		PowerEffectExtraLife();
+			void		PowerEffectAllBricksSoft();
+			void		PowerEffectAllBricksVisible();
 	
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 public:
@@ -57,7 +61,6 @@ public:
 		
 	ePowerUpType		m_type					= PT_INVALID;
 	PowerUpDefinition*	m_definition			= nullptr;
+	
 };
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
 

@@ -32,7 +32,7 @@ Game*						g_theGame						= nullptr;
 DevConsole*					g_theDevConsole					= nullptr;
 ParticleSystem2D*			g_theParticleSystem2D			= nullptr;
 UISystem*					g_theGamplayUISystem			= nullptr;
-JobSystem*					g_theJobSystem					= nullptr;
+//JobSystem*					g_theJobSystem					= nullptr;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -72,8 +72,8 @@ TheApp::~TheApp()
 	delete g_theEventSystem;
 	g_theEventSystem = nullptr;
 
-	delete g_theJobSystem;
-	g_theJobSystem = nullptr;
+//	delete g_theJobSystem;
+//	g_theJobSystem = nullptr;
 
 	delete m_timer;
 	m_timer = nullptr;
@@ -88,10 +88,11 @@ void TheApp::Startup()
 	m_timer = new Timer();
 	m_timer->SetSeconds( &Clock::g_theMasterClock , FRAME_RATE );
 	
-	if ( g_theJobSystem == nullptr )
-	{
-		g_theJobSystem = new JobSystem();
-	}
+//	if ( g_theJobSystem == nullptr )
+//	{
+//		g_theJobSystem = new JobSystem();
+//	}
+//	g_theJobSystem->Startup();
 	
 	if ( g_theEventSystem == nullptr )
 	{
@@ -204,6 +205,7 @@ void TheApp::BeginFrame()
 {
 	// all engine things that must begin at the beginning of each frame and not the game
 	Clock::BeginFrame();
+//	g_theJobSystem->BeginFrame();
 	g_theEventSystem->BeginFrame();
 	g_theWindow->BeginFrame();
 	g_theInput->BeginFrame();
@@ -276,7 +278,7 @@ void TheApp::EndFrame()
 	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
-
+//	g_theJobSystem->EndFrame();
 	Clock::EndFrame();
 }
 
@@ -297,14 +299,16 @@ void TheApp::Shutdown()
 	g_theInput->Shutdown();
 	g_theWindow->Shutdown();
 	g_theEventSystem->Shutdown();
+//	g_theJobSystem->Shutdown();
 	Clock::Shutdown();
-	g_theRenderer->Shutdown();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 bool TheApp::HandleQuitRequested()
 {
+//	g_theJobSystem->HandleQuitRequested();
+	
 	m_isQuitting			= true;
 	return m_isQuitting;
 }

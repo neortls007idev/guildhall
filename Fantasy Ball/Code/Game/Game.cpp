@@ -58,7 +58,12 @@ Game::Game()
 	m_cameraAspectRatio	= g_gameConfigBlackboard.GetValue( "windowAspect" , 1.77f );
 	
 	m_worldCamera.SetOrthoView( m_cameraHalfHeight , m_cameraAspectRatio );
-	// LoadAssets();	
+	// LoadAssets();
+
+	delete m_loadAudio;
+	m_loadAudio = nullptr;
+	delete m_loadTextures;
+	m_loadTextures = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -85,11 +90,11 @@ Game::~Game()
 	m_currentLevel = nullptr;
 	g_theAudioSystem->StopSound( m_currentBackgroundsound );
 
-	delete m_loadAudio;
-	m_loadAudio = nullptr;
-	
-	delete m_loadTextures;
-	m_loadTextures = nullptr;
+	//delete m_loadAudio;
+	//m_loadAudio = nullptr;
+	//
+	//delete m_loadTextures;
+	//m_loadTextures = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

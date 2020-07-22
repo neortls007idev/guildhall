@@ -22,13 +22,45 @@ void AppendLine2( std::vector<Vertex_PCU>& vertexArray , const Vec2& start , con
 {
 	Vec2 displacement = end - start;
 	Vec2 forward = displacement.GetNormalized();
-	forward.SetLength( thickness / 2.f );
+	forward.SetLength( thickness * 0.5f );
 	Vec2 left = forward.GetRotated90Degrees();
 
 	Vec2 endLeft = end + forward + left;
 	Vec2 endRight = end + forward - left;
 	Vec2 startLeft = start - forward + left;
 	Vec2 startRight = start - forward - left;
+
+	Vec3 endLeftVec3( endLeft.x , endLeft.y , 0.f );
+	Vec3 endRightVec3( endRight.x , endRight.y , 0.f );
+	Vec3 startLeftVec3( startLeft.x , startLeft.y , 0.f );
+	Vec3 startRightVec3( startRight.x , startRight.y , 0.f );
+
+	const Vertex_PCU lineVerts[ 6 ] = { Vertex_PCU( startRightVec3, color, Vec2( 0.f, 0.f ) ),
+								Vertex_PCU( endRightVec3  , color, Vec2( 0.f, 0.f ) ),
+								Vertex_PCU( endLeftVec3   , color, Vec2( 0.f, 0.f ) ),
+								Vertex_PCU( endLeftVec3   , color, Vec2( 0.f, 0.f ) ),
+								Vertex_PCU( startLeftVec3 , color, Vec2( 0.f, 0.f ) ),
+								Vertex_PCU( startRightVec3, color, Vec2( 0.f, 0.f ) ) };
+	
+	for ( int index = 0; index < 6; index++ )
+	{
+		vertexArray.push_back( lineVerts[ index ] );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void AppendExactLine2( std::vector<Vertex_PCU>& vertexArray , const Vec2& start , const Vec2& end , const Rgba8 color , const float thickness )
+{
+	Vec2 displacement = end - start;
+	Vec2 forward = displacement.GetNormalized();
+	forward.SetLength( thickness * 0.5f );
+	Vec2 left = forward.GetRotated90Degrees();
+
+	Vec2 endLeft	= end + left;
+	Vec2 endRight	= end - left;
+	Vec2 startLeft	= start + left;
+	Vec2 startRight = start - left;
 
 	Vec3 endLeftVec3( endLeft.x , endLeft.y , 0.f );
 	Vec3 endRightVec3( endRight.x , endRight.y , 0.f );

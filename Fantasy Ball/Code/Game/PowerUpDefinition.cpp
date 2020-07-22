@@ -111,29 +111,29 @@ STATIC PowerUpDefinition* PowerUpDefinition::GetPowerUpDefinitionForPowerUp( ePo
 				return definition;
 			}break;
 		
-		case PT_BALL_SIZE_UP		:
-			{
-				//definition = s_definitions.at( "2xBall" );
-				return definition;
-			}break;
-		
-		case PT_BALL_SIZE_DOWN		:
-			{
-				//definition = s_definitions.at( "2xBall" );
-				return definition;
-			}break;
-		
-		case PT_BALL_SIZE_MEGA		:
-			{
-				//definition = s_definitions.at( "2xBall" );
-				return definition;
-			}break;
-		
-		case PT_BALL_SIZE_SHRINK	:
-			{
-				//definition = s_definitions.at( "2xBall" );
-				return definition;
-			}break;
+//		case PT_BALL_SIZE_UP		:
+//			{
+//				//definition = s_definitions.at( "2xBall" );
+//				return definition;
+//			}break;
+//		
+//		case PT_BALL_SIZE_DOWN		:
+//			{
+//				//definition = s_definitions.at( "2xBall" );
+//				return definition;
+//			}break;
+//		
+//		case PT_BALL_SIZE_MEGA		:
+//			{
+//				//definition = s_definitions.at( "2xBall" );
+//				return definition;
+//			}break;
+//		
+//		case PT_BALL_SIZE_SHRINK	:
+//			{
+//				//definition = s_definitions.at( "2xBall" );
+//				return definition;
+//			}break;
 		
 		case PT_BRICK_THROUGH		:
 			{
@@ -144,6 +144,24 @@ STATIC PowerUpDefinition* PowerUpDefinition::GetPowerUpDefinitionForPowerUp( ePo
 		case PT_BRICK_ALL_VISIBLE:
 			{
 				definition = s_definitions.at( "AllVisible" );
+				return definition;
+			}break;
+
+		case PT_BRICK_ALL_SOFT:
+			{
+				definition = s_definitions.at( "Allsoft" );
+				return definition;
+			}break;
+
+		case PT_EXTRA_LIFE:
+			{
+				definition = s_definitions.at( "ExtraLife" );
+				return definition;
+			}break;
+
+		case PT_DEATH:
+			{
+				definition = s_definitions.at( "Death" );
 				return definition;
 			}break;
 	}

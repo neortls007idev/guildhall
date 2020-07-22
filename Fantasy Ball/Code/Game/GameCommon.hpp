@@ -86,8 +86,12 @@ const	  float BALL_MAX_PHYSICAL_RADIUS_FACTOR							= 1.5f;
 const	  float BALL_MIN_PHYSICAL_RADIUS_FACTOR							= 0.5f;
 
 const	  float MAX_HIGHSCORE_VALUE										= 99999999.f;
-const	  float PER_TILE_SCORE											= 100.f;
+const	  float PER_TILE_SCORE											= 5.f;
 const	  float WORLDBOUNDS_SCORE_ABLATION								= 0.75f;
+
+const	  float BALL_TRAIL_EFFECT_MAX_AGE								= 1.f;
+const	  float BALL_TRAIL_EFFECT_BLOCK_MAX_AGE							= BALL_TRAIL_EFFECT_MAX_AGE * 0.75f;
+const	  int	MAX_PLAYER_HEALTH										= 5;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			UI SYSTEM DATA

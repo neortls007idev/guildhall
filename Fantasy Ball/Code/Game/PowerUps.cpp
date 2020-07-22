@@ -5,6 +5,8 @@
 #include "Game/Game.hpp"
 #include "Game/PowerUpDefinition.hpp"
 #include "Game/PowerUps.hpp"
+#include "Game/Tile.hpp"
+#include "Engine/Math/MathUtils.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -89,14 +91,38 @@ void PowerUps::PowerUpEffects()
 		PowerUpEffectBrickThrough();
 	}
 
-	if ( m_type == PT_BALL_SIZE_MEGA )
+	//if ( m_type == PT_BALL_SIZE_MEGA )
+	//{
+	//	PowerUpEffectScaleBall( BALL_MAX_PHYSICAL_RADIUS_FACTOR );
+	//}
+	//
+	//if( m_type == PT_BALL_SIZE_SHRINK )
+	//{
+	//}
+
+	if( m_type == PT_BRICK_ALL_VISIBLE )
 	{
-		PowerUpEffectScaleBall( BALL_MAX_PHYSICAL_RADIUS_FACTOR );
+		PowerEffectAllBricksVisible();
 	}
 
-	if( m_type == PT_BALL_SIZE_SHRINK )
+	if( m_type == PT_BRICK_ALL_SOFT )
 	{
+		PowerEffectAllBricksSoft();
 	}
+
+	if ( m_type == PT_EXTRA_LIFE )
+	{
+		PowerEffectExtraLife();
+	}
+
+	if( m_type == PT_DEATH )
+	{
+		PowerEffectDeath();
+	}
+
+	//if( m_type == PT_PADDLE_SHOOT )
+	//{
+	//}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -195,6 +221,72 @@ void PowerUps::PowerUpEffectMultipleBalls( uint numballs )
 					newBall->m_brickThrough = ball->m_brickThrough;
 				}
 			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void PowerUps::PowerEffectDeath()
+{
+	m_owner->m_playerHealth -= 1;
+
+	if( m_owner->m_playerHealth == 0 )
+	{
+		Entitylist* curlist = m_owner->m_currentLevel->GetEntityList( BALL );
+
+		for( size_t index = 0 ; index < curlist->size() ; index++ )
+		{
+			Ball* curBall = ( Ball* ) &curlist[ index ];
+
+			if( curBall != nullptr )
+			{
+				m_owner->m_highScore				+= curBall->m_currentScore;
+				curBall->m_currentScore = 0.f;
+				curBall->m_currentScoreMultiplier = 0;
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void PowerUps::PowerEffectExtraLife()
+{
+	m_owner->m_playerHealth += 1;
+	m_owner->m_playerHealth = ( int ) Clamp( ( float ) m_owner->m_playerHealth , 0.f , ( float ) MAX_PLAYER_HEALTH );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void PowerUps::PowerEffectAllBricksSoft()
+{
+	Entitylist& curlist = *m_owner->m_currentLevel->GetEntityList( TILE );
+
+	for ( size_t index = 0 ; index < curlist.size() ; index++ )
+	{
+		Tile* curTile = ( Tile* ) curlist[ index ];
+		
+		if( curTile != nullptr )
+		{
+			curTile->m_isSolid = false;
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void PowerUps::PowerEffectAllBricksVisible()
+{
+	Entitylist& curlist = *m_owner->m_currentLevel->GetEntityList( TILE );
+
+	for( size_t index = 0 ; index < curlist.size() ; index++ )
+	{
+		Tile* curTile = ( Tile* ) curlist[ index ];
+
+		if( curTile != nullptr )
+		{
+			curTile->m_isVisible = true;
 		}
 	}
 }

@@ -94,8 +94,9 @@ bool Tile::TileCollisionResponse( Ball* ball )
 {
 	if( DoDiscAndAABBOverlap( ball->m_pos , ball->m_physicsRadius , m_bounds ) )
 	{
+		ball->m_color = m_tileColor;
+
 		Vec2 refPoint = m_bounds.GetNearestPoint( ball->m_pos );
-		
 		Vec2 edgeNormal = ( ball->m_pos - refPoint ).GetNormalized();
 
 		uint numParticles = ( uint ) g_RNG->RollRandomIntInRange( 5 , 10 );
@@ -126,17 +127,18 @@ bool Tile::TileCollisionResponse( Ball* ball )
 			}
 		}
 
+// 		PowerUps*  test = (PowerUps*) m_ownerMap->SpawnNewEntity( POWERUP , refPoint , POWERUP_VELOCITY_MULTIPLIER * ball->m_velocity ,
+// 									nullptr , ( ePowerUpType ) PT_BRICK_ALL_VISIBLE );
+
+
+
+		//float collisionScore = 0.f;
+				
 		float scrrenShake = g_RNG->RollRandomFloatBetweenZerotoOne();
 		if ( scrrenShake >= m_tileDef->m_screenshakeMinProbablity )
 		{
 			m_owner->AddScreenShakeIntensity();
 		}
-		//if ( powerupSpawnProbablity > 0.85f )
-		//{
-			//powerupDef = PowerUpDefinition::GetPowerUpDefinitionForPowerUp( ePowerUpType::PT_BALLX8  );
-			//m_ownerMap->SpawnNewEntity( POWERUP , refPoint , POWERUP_VELOCITY_MULTIPLIER * ball->m_velocity ,
-			//						nullptr , ( ePowerUpType ) PT_BALLX8 );
-		//}
 		
 		if ( !m_isSolid )
 		{
@@ -164,13 +166,15 @@ bool Tile::TileCollisionResponse( Ball* ball )
 			ball->m_currentScore += ball->m_currentScoreMultiplier * PER_TILE_SCORE * ( float ) m_health * 0.631f;
 			m_health = 0;
 		}
-
+		
 		if ( m_health == 0 )
 		{
 			ball->m_currentScore += ball->m_currentScoreMultiplier * PER_TILE_SCORE * 1.25f;
 			m_isGarbage = true;
 			m_ownerMap->m_numAliveTiles--;
 		}
+
+		//ball->m_currentScore += collisionScore;
 		
 		return true;
 	}
