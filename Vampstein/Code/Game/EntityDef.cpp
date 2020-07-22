@@ -30,9 +30,19 @@ STATIC void EntityDef::CreateDefinitions( char const* dataFilePath )
 
 	ParseAllActors( root );
 
-	tinyxml2::XMLElement* entityElement = root->FirstChildElement();
+	//tinyxml2::XMLElement* entityElement = root->FirstChildElement();
+	ParseAllEntitiesOfName( root , "Projectile" );
+	ParseAllEntitiesOfName( root , "Portal" );
+	ParseAllEntitiesOfName( root , "Entity" );
 
-	std::vector<std::string> entityTypes;
+
+	//--------------------------------------------------------------------------------
+	//			NOTES
+	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// DO NOT OVER RESOLVE ERRORS LIKE THIS THAT CAN BE CREATED BY LDs WHILE USING THE XML FILES
+	//--------------------------------------------------------------------------------
+	
+	/*std::vector<std::string> entityTypes;
 	entityTypes.push_back( "Actor" );
 	
 	while ( nullptr != entityElement )
@@ -53,7 +63,7 @@ STATIC void EntityDef::CreateDefinitions( char const* dataFilePath )
 			ParseAllEntitiesOfName( root , entityName );
 			entityTypes.push_back( entityName );
 		}
-	}
+	}*/
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -92,10 +102,41 @@ STATIC void EntityDef::ParseAllEntitiesOfName( tinyxml2::XMLElement* root , std:
 			newDef->m_damage		= ParseXmlAttribute( *gamePlayEle , "damage" , IntVec2::ZERO );
 		}
 
-		newDef->m_className			= "Projectile";
+		std::string portalElement = element->Name();
+		if ( portalElement == "Portal" )
+		{
+			ParsePortalSpecificData( element , newDef );
+		}
+
+		newDef->m_className			= elementName;
 		newDef->m_typeName			= name;
 
 		s_entityDefs[ name ]		= newDef;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void EntityDef::ParsePortalSpecificData( tinyxml2::XMLElement* elementRoot , EntityDef* definition )
+{
+	tinyxml2::XMLElement* appereanceEle = elementRoot->FirstChildElement( "Appearance" );
+	if( appereanceEle != nullptr )
+	{
+		std::string spritePath = ParseXmlAttribute( *appereanceEle , "spriteSheet" , "null" );
+		IntVec2 spriteLayout = ParseXmlAttribute( *appereanceEle , "layout" , IntVec2( 0 , 0 ) );
+
+		if( spritePath != "null" && spriteLayout != IntVec2( 0 , 0 ) )
+		{
+			Texture* spriteTex = g_theRenderer->GetOrCreateTextureFromFile( spritePath.c_str() );
+			definition->m_spriteSheet = new SpriteSheet( *spriteTex , spriteLayout );
+		}
+		//std::string texturePath = ParseXmlAttribute( *appereanceEle , "Texture" , "null" );
+		//
+		//if( texturePath != "null" )
+		//{
+		//	Texture* spriteTex = g_theRenderer->GetOrCreateTextureFromFile( texturePath.c_str() );
+		//	definition->m_texture = spriteTex;
+		//}
 	}
 }
 
@@ -187,11 +228,12 @@ STATIC void EntityDef::ParseAllActors( tinyxml2::XMLElement* root )
 					ParseEntityAnim( animElement , newDef , index , "backRight" );
 				}
 			}
-			newDef->m_className = "Actor";
-			newDef->m_typeName = name;
-
-			s_entityDefs[ name ] = newDef;
 		}
+
+		newDef->m_className = "Actor";
+		newDef->m_typeName = name;
+
+		s_entityDefs[ name ] = newDef;
 	}
 }
 

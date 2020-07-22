@@ -42,6 +42,7 @@ public:
 	bool IsPlayer();
 	bool IsProjectile();
 	bool IsNPC();
+	bool IsPortal();
 	
 public:
 	Map*											m_owner						= nullptr;

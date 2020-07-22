@@ -21,6 +21,8 @@
 		<Actor type="Pinky" pos="2.5,1.5" yaw="180" />
 		<Actor type="Marine" pos="5.5,6.5" yaw="180" />
 		<Actor type="Pinky" pos="3.5,6.5" yaw="180" />
+		<Portal type="Teleporter" pos="1.5,4.5" destMap="SingleBlock" destPos="2.5,2.5" destYawOffset="71.5" />
+		<Portal type="Teleporter" pos="3.5,3.5" destMap="SingleBlock" destPos="2.5,2.5" destYawOffset="79.2" />
 	</Entities>
 
 </MapDefinition>

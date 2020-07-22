@@ -34,7 +34,7 @@ Entity::Entity( EntityDef const& entityDef , Map* map )
 	m_canBePushedByEntities		= true;
 	m_canPushEntities			= true;
 
-	m_entityforwardVector = Vec2::ZERO_ONE;
+	m_entityforwardVector		= Vec2::ZERO_ONE;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -257,6 +257,18 @@ bool Entity::IsNPC()
 		return true;
 	}
 	
+	return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Entity::IsPortal()
+{
+	if( m_entityType == PORTAL )
+	{
+		return true;
+	}
+
 	return false;
 }
 

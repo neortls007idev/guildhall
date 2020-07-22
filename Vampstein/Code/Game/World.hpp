@@ -27,6 +27,8 @@ public:
 	size_t	GetNumMaps() const															{ return m_maps.size(); }
 	Strings	GetAllMapNames() const;
 	
+	Map*	GetMap( std::string mapName );
+	
 public:
 	Game*								m_owner							= nullptr;
 	Map* 								m_currentMap					= nullptr;

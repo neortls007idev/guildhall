@@ -128,3 +128,16 @@ Strings World::GetAllMapNames() const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+Map* World::GetMap( std::string mapName )
+{
+	std::string mapNameCopy = mapName + ".xml";
+
+	auto found = m_maps.find( mapNameCopy );
+	if( found != m_maps.end() )
+	{
+		//g_theAudio->PlaySound( m_sound , false , 1.f );
+		return found->second;
+	}
+	return nullptr;
+}

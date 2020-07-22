@@ -26,6 +26,15 @@
     <Filter Include="Map">
       <UniqueIdentifier>{f9b7ce24-7974-46c6-90d8-09c7879520c8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="XML Data">
+      <UniqueIdentifier>{78efcee5-e69b-4d3f-9b7e-a9694da34636}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XML Data\Definitions">
+      <UniqueIdentifier>{f59e6a4e-4d66-4ad0-8c0d-0bd34b32f465}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XML Data\Maps">
+      <UniqueIdentifier>{49475332-ac0d-41cd-8889-99a37773c61c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameCommon.cpp">
@@ -207,6 +216,30 @@
     </Xml>
     <Xml Include="..\..\Run\Data\Gameconfig.xml">
       <Filter>Data</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Maps\UVTest.xml">
+      <Filter>XML Data\Maps</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Maps\EmptyRoom.xml">
+      <Filter>XML Data\Maps</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Maps\SingleBlock.xml">
+      <Filter>XML Data\Maps</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Maps\TestRoom.xml">
+      <Filter>XML Data\Maps</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Maps\TwistyMaze.xml">
+      <Filter>XML Data\Maps</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Definitions\EntityTypes.xml">
+      <Filter>XML Data\Definitions</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Definitions\MapMaterialTypes.xml">
+      <Filter>XML Data\Definitions</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Definitions\MapRegionTypes.xml">
+      <Filter>XML Data\Definitions</Filter>
     </Xml>
   </ItemGroup>
   <ItemGroup>

@@ -409,7 +409,15 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <Xml Include="..\..\Run\Data\Definitions\EntityTypes.xml" />
+    <Xml Include="..\..\Run\Data\Definitions\MapMaterialTypes.xml" />
+    <Xml Include="..\..\Run\Data\Definitions\MapRegionTypes.xml" />
     <Xml Include="..\..\Run\Data\Gameconfig.xml" />
+    <Xml Include="..\..\Run\Data\Maps\EmptyRoom.xml" />
+    <Xml Include="..\..\Run\Data\Maps\SingleBlock.xml" />
+    <Xml Include="..\..\Run\Data\Maps\TestRoom.xml" />
+    <Xml Include="..\..\Run\Data\Maps\TwistyMaze.xml" />
+    <Xml Include="..\..\Run\Data\Maps\UVTest.xml" />
     <Xml Include="..\..\Run\Data\Materials\testMaterial.xml" />
   </ItemGroup>
   <ItemGroup>

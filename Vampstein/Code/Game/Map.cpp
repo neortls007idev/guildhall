@@ -3,6 +3,9 @@
 #include "Engine/Core/StdExtensions.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Game/Map.hpp"
+#include "Game/World.hpp"
+
+#include "Game/Game.hpp"
 #include "Game/TileMap.hpp"
 #include "Game/Portal.hpp"
 #include "Game/Projectile.hpp"
@@ -32,7 +35,7 @@ STATIC Map* Map::CreateNewMapOfType( std::string mapType , char const* mapName ,
 	if( _stricmp( mapType.c_str() , "TileMap" ) == 0 )
 	{
 		Map* newMap = new TileMap( mapName , rootElement );
-
+				
 		if( newMap->m_parsedSuccessfully == false )
 		{
 			g_theDevConsole->PrintString( eDevConsoleMessageType::DEVCONSOLE_ERROR ,
@@ -127,6 +130,11 @@ void Map::ParseAllMapEntitiesOfName( tinyxml2::XMLElement* parentElement , std::
 			}
 
 			newEntity->ConstructEntityBillboard();
+
+			if ( elementName == "Portal" )
+			{
+				ParseAllPortalEntities( newEntity , element , mapName );
+			}
 		}
 	}
 	parseResult = true;
@@ -143,6 +151,28 @@ void Map::ParseAllMapEntities( tinyxml2::XMLElement* rootElement , std::string m
 
 	ParseAllMapPlayerStartEntities( entityElement , mapName );
 	ParseAllMapEntitiesOfName( entityElement , "Actor" , mapName );
+	ParseAllMapEntitiesOfName( entityElement , "Portal" , mapName );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Map::ParseAllPortalEntities( Entity* portalEntity , tinyxml2::XMLElement* parentElement , std::string mapName )
+{
+
+	Portal* entityCopy = ( Portal* ) portalEntity;
+	
+	std::string destMapName = ParseXmlAttribute( *parentElement , "destMap" , "null" );
+
+	if( destMapName != "null" )
+	{
+		entityCopy->m_destMap	= destMapName;
+	}
+	
+	Vec2 destPos				= ParseXmlAttribute( *parentElement , "destPos" , Vec2( 0.f , 0.f ) );
+	entityCopy->m_desPos		= destPos;
+	
+	float yawOffset				= ParseXmlAttribute( *parentElement , "destYawOffset" , 0.f );
+	entityCopy->m_desYawOffset = yawOffset;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -240,6 +270,10 @@ void Map::AddEntityToMap( Entity* entity )
 	{
 		AddEntityToList( entity , m_NPCs );
 	}
+	else if( entity->IsPortal() )
+	{
+		AddEntityToList( entity , m_Portals );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -254,6 +288,57 @@ void Map::AddEntityToList( Entity* entity , Entitylist& eList )
 void Map::ResolveCollisions()
 {
 	ResolveEntityVsEntityCollisions();
+	ResolvePortalVsEntityCollisions();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Map::ResolvePortalVsEntityCollisions()
+{
+	for ( size_t portalEntityIndex = 0; portalEntityIndex < m_Portals.size() ; portalEntityIndex++  )
+	{
+		for( size_t entityIndex = 0 ; entityIndex < m_allEntities.size() ; entityIndex++ )
+		{
+			if( nullptr != m_allEntities[ entityIndex ] && nullptr != m_allEntities[ portalEntityIndex ] )
+			{
+				if( ( m_allEntities[ entityIndex ] != m_Portals[ portalEntityIndex ] ) && !m_allEntities[ entityIndex ]->IsPortal() )
+				{
+					Entity* entity = m_allEntities[ entityIndex ];
+					Portal* portalEntity = ( Portal* ) m_Portals[ portalEntityIndex ];
+
+					Vec2	firstPos = entity->m_pos.GetXYComponents();
+					float	firstRadius = entity->m_physicsRadius;
+
+					Vec2	secondPos = portalEntity->m_pos.GetXYComponents();
+					float	secondRadius = portalEntity->m_physicsRadius;
+
+					if( DoDiscsOverlap( firstPos , firstRadius , secondPos , secondRadius ) )
+					{
+						entity->m_pos = Vec3( portalEntity->m_desPos , portalEntity->m_pos.z );
+						entity->m_startYawDegrees += portalEntity->m_desYawOffset;
+
+						if( portalEntity->m_destMap != "" )
+						{
+							Map* destMap = g_theGame->s_world->GetMap( portalEntity->m_destMap );
+
+							if ( entity == g_theGame->m_player )
+							{
+								g_theGame->s_world->m_currentMap = destMap;
+								g_theGame->m_yaw += portalEntity->m_desYawOffset;
+							}
+							
+							if ( destMap != nullptr )
+							{
+								destMap->AddEntityToMap( entity );
+								m_allEntities[ entityIndex ] = nullptr;
+							}
+						}
+						return;
+					}
+				}
+			}
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -330,7 +415,6 @@ void Map::ResolveEntityVsEntityCollisions()
 						secondEntity->m_pos += Vec3( secondDisp , 0.f );
 					}
 				}
-				
 			}
 		}
 	}

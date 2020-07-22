@@ -249,7 +249,10 @@ void TheApp::Shutdown()
 
 void TheApp::UpdateFromKeyboard()
 {
-	if ( g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() ) { g_theWindow->HandleQuitRequested(); }
+	if ( g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() )
+	{
+		g_theWindow->HandleQuitRequested();
+	}
 
 	if ( g_theInput->WasKeyJustPressed( KEY_TILDE ) )
 	{

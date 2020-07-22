@@ -22,6 +22,8 @@ void JobSystem::CreateWorkerThreadsForNumCores()
 		JobSystemWorkerThread* newWorkerThread = new JobSystemWorkerThread( this );
 		m_workerThreads.push_back( newWorkerThread );
 	}
+
+	m_isQuitting = false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -42,10 +44,17 @@ void JobSystem::Startup()
 
 void JobSystem::Shutdown()
 {
+	if( m_isQuitting )
+	{
+		m_pendingJobsQueueMutex.lock();
+		ClaimAndDeleteAllCompletedJobs();
+		m_pendingJobsQueueMutex.unlock();
+	}
+	
 	for ( auto iter = m_workerThreads.begin() ; iter != m_workerThreads.end() ; ++iter )
 	{
 		if( nullptr != *iter )
-		{
+		{	
 			delete *iter;
 			*iter = nullptr;
 		}
@@ -56,7 +65,6 @@ void JobSystem::Shutdown()
 
 void JobSystem::BeginFrame()
 {
-	
 	ClaimAndDeleteAllCompletedJobs();
 }
 
@@ -64,10 +72,7 @@ void JobSystem::BeginFrame()
 
 void JobSystem::EndFrame()
 {
-	if ( m_isQuitting )
-	{
-		m_pendingJobsQueueMutex.lock();
-	}
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -125,6 +130,10 @@ void JobSystem::ClaimJobForExecution()
 		m_processingJobsQueue.pop_front();
 		m_processingJobsQueueMutex.unlock();
 		OnJobCompleted( *jobAtFrontOfQueue );
+
+		//m_completedJobsQueueMutex.lock();
+		//m_completedJobsQueue.push_back( jobAtFrontOfQueue );
+		//m_completedJobsQueueMutex.unlock();
 	}
 	else
 	{
@@ -169,12 +178,10 @@ JobSystemWorkerThread* const JobSystem::CreateNewWorkerThread()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void JobSystem::SetJobSystemIsQuitting( bool isQuiting ) const
+bool JobSystem::HandleQuitRequested()
 {
-	if ( isQuiting )
-	{
-		//m_isQuitting = true ;
-	}
+	m_isQuitting = true;
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

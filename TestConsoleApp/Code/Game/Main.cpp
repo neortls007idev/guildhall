@@ -132,6 +132,7 @@ int main( int, char** )
 // 	selfRef:<jkdn> obj;
 
 	bool isRunning = true;
+	
 	while( isRunning )
 	{
 		
@@ -145,6 +146,7 @@ int main( int, char** )
 		}
 		if( _getch() == 'q' )
 		{
+			g_theJobSystem->HandleQuitRequested();
 			isRunning = false;
 		}
 	}

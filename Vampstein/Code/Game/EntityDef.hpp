@@ -40,6 +40,7 @@ public:
 	static int		  GetIndexForAnimName( std::string animName );
 	static void		  ParseEntityAnim( tinyxml2::XMLElement* animElement , EntityDef* newDef , int index , std::string animName );
 	static void		  ParseAllEntitiesOfName( tinyxml2::XMLElement* root , std::string elementName );
+	static void		  ParsePortalSpecificData( tinyxml2::XMLElement* elementRoot , EntityDef* definition );
 		
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 

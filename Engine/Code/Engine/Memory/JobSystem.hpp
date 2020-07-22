@@ -47,7 +47,7 @@ public:
 	//----------------------------------------------------------------------------------------------------------
 	void DebugRender() const;
 
-	void SetJobSystemIsQuitting( bool isQuiting )const;
+	bool HandleQuitRequested();
 	
 protected:
 
@@ -62,7 +62,7 @@ protected:
 private:
 
 	std::vector<JobSystemWorkerThread*>		m_workerThreads;
-	std::atomic<bool>						m_isQuitting		= false;
+	std::atomic<bool>						m_isQuitting;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

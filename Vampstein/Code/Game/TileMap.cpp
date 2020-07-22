@@ -63,6 +63,7 @@ TileMap::TileMap( char const* mapName , IntVec2 dimensions ) :
 TileMap::TileMap( char const* mapName , XMLElement* rootElement ) :
 																	Map( mapName ) 
 {
+	
 	XMLElement* root = rootElement;
 
 	m_dimensions = ParseXmlAttribute( *root , "dimensions" , IntVec2( -1 , -1 ) );
@@ -99,6 +100,7 @@ TileMap::TileMap( char const* mapName , XMLElement* rootElement ) :
 	m_raytraceDebugMesh = new GPUMesh( g_theRenderer );
 	m_parsedSuccessfully = true;
 
+	m_Portals.clear();
 	ParseAllMapEntities( rootElement , mapName );
 }
 

@@ -5,7 +5,9 @@
 Portal::Portal( EntityDef const& entityDef , Map* map ) :
 															Entity( entityDef , map )
 {
-
+	m_canBePushedByWalls		= false;
+	m_canBePushedByEntities		= false;
+	m_canPushEntities			= false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -31,6 +31,7 @@ public:
 			void		ParseAllMapPlayerStartEntities( tinyxml2::XMLElement* parentElement , std::string mapName );
 			void		ParseAllMapEntitiesOfName( tinyxml2::XMLElement* parentElement , std::string elementName , std::string mapName );
 			void		ParseAllMapEntities( tinyxml2::XMLElement* parentElement , std::string mapName );
+			void		ParseAllPortalEntities( Entity* portalEntity , tinyxml2::XMLElement* parentElement , std::string mapName );
 
 	virtual void		Update( float deltaSeconds );
 	virtual void		UpdateMeshes() = 0;
@@ -43,6 +44,7 @@ public:
 			void		AddEntityToList( Entity* entity , Entitylist& eList );
 
 	virtual	void		ResolveCollisions();
+			void		ResolvePortalVsEntityCollisions();
 			void		ResolveEntityVsEntityCollisions();
 public:
 	std::string			m_name;
@@ -54,7 +56,7 @@ public:
 	Entitylist			m_players;
 	Entitylist			m_projectiles;
 	Entitylist			m_NPCs;
-	
+	Entitylist			m_Portals;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
