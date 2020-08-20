@@ -670,7 +670,8 @@ void RenderContext::SetInputLayoutForIA( buffer_attribute_t const* attribs )
 	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
 	//m_context->RSSetState( m_currentShader->m_rasterState );
 	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fragmentShader , nullptr , 0 );
-
+	m_context->CSSetShader( m_currentShader->m_fragmentStage.m_computeShader , nullptr , 0 );
+	
 	// So at this, I need to describe the vertex format to the shader
 	//ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
 	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( attribs );
@@ -1440,6 +1441,21 @@ void RenderContext::BindShader( std::string shaderFileName )
 	}
 	temp = GetOrCreateShader( shaderFileName.c_str() );
 	BindShader( temp );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::ExecuteComputeShader( Shader* computeShader )
+{
+	if ( computeShader == nullptr )
+	{
+		return;
+	}
+	if ( computeShader->m_computeStage.m_byteCode != nullptr )
+	{
+		BindShader( computeShader );
+		/*computeShader->m_owner->*/m_context->Dispatch( 1 , 1 , 0 );
+	}	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

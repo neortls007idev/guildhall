@@ -199,6 +199,7 @@ public:
 	void					BindTexture( const Texture* constTexture , UINT textureType = eTextureType::TEX_DIFFUSE , UINT userTextureIndexOffset = 0 );
 	bool					BindShader( Shader* shader );
 	void					BindShader( std::string shaderFileName );
+	void					ExecuteComputeShader( Shader* computeShader );
 	
 	bool					BindShaderState( ShaderState* shaderState );
 	void					BindShaderState( std::string shaderStateFileName );
@@ -210,6 +211,8 @@ public:
 	void					BindMaterialData( void* pointerToData , int sizeOfData ); 
 	void					BindSampler( const Sampler* sampler );
 	void					BindDepthStencil( Texture* depthStencilView );
+	void					BindComputeSampler( const Sampler* sampler );
+	void					BindComputeTexture( const Sampler* sampler );
 	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //			RENDERING PIPELINE CREATION METHODS

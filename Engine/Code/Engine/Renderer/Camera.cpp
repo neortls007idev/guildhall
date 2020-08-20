@@ -151,6 +151,8 @@ void Camera::SetPitchYawRollRotation( float pitch , float yaw , float roll )
 	m_transform.SetRotation( pitch , yaw , roll );
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 float Camera::GetAspectRatio() const
 {
 	return  ( GetOrthoMax().x - GetOrthoMin().x ) / ( GetOrthoMax().y - GetOrthoMin().y );

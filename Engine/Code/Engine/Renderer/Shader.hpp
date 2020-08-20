@@ -9,6 +9,7 @@ class RenderContext;
 struct ID3D11Resource;
 struct ID3D11VertexShader;
 struct ID3D11PixelShader;
+struct ID3D11ComputeShader;
 struct ID3D10Blob;
 
 struct ID3D11InputLayout;
@@ -21,6 +22,7 @@ enum SHADER_STAGE_TYPE
 {
 	SHADER_STAGE_VERTEX ,
 	SHADER_STAGE_FRAGMENT ,
+	SHADER_STAGE_COMPUTE ,
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -52,9 +54,10 @@ public:
 
 	union
 	{
-		ID3D11Resource*		m_handle;
-		ID3D11VertexShader* m_vertexShader;
-		ID3D11PixelShader*	m_fragmentShader;
+		ID3D11Resource*			m_handle;
+		ID3D11VertexShader*		m_vertexShader;
+		ID3D11PixelShader*		m_fragmentShader; 
+		ID3D11ComputeShader*	m_computeShader;
 	};
 };
 
@@ -86,6 +89,7 @@ public:
 	std::string					m_user;
 	ShaderStage					m_vertexStage;
 	ShaderStage					m_fragmentStage;
+	ShaderStage					m_computeStage;
 	//ID3D11RasterizerState*		m_rasterState			= nullptr;
 	buffer_attribute_t const*	m_lastBufferAttribute	= nullptr;
 

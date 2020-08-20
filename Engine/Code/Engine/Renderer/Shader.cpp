@@ -57,11 +57,13 @@ ShaderStage::~ShaderStage()
 	SetDebugName( m_handle         , &m_user );
 	SetDebugName( m_vertexShader   , &m_user );
 	SetDebugName( m_fragmentShader , &m_user );
+	SetDebugName( m_computeShader  , &m_user );
 
 	DX_SAFE_RELEASE( m_byteCode );
 	DX_SAFE_RELEASE( m_handle );
 	DX_SAFE_RELEASE( m_vertexShader );
 	DX_SAFE_RELEASE( m_fragmentShader );
+	DX_SAFE_RELEASE( m_computeShader );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -72,6 +74,7 @@ static char const* GetDefaultEntryPointForStage( SHADER_STAGE_TYPE type )
 	{
 		case SHADER_STAGE_VERTEX: return "VertexFunction";
 		case SHADER_STAGE_FRAGMENT: return "FragmentFunction";
+		case SHADER_STAGE_COMPUTE: return "ComputeFunction";
 		default:__debugbreak();
 	}
 	return "main";
@@ -87,6 +90,7 @@ static char const* GetShaderModelForStage( SHADER_STAGE_TYPE type )
 	{
 	case SHADER_STAGE_VERTEX: return "vs_5_0";
 	case SHADER_STAGE_FRAGMENT: return "ps_5_0";
+	case SHADER_STAGE_COMPUTE: return "cs_5_0";
 	default:__debugbreak(); return "Error";
 	}
 }
@@ -130,7 +134,7 @@ bool ShaderStage::Compile( RenderContext* ctx , std::string const& filename , vo
 	if ( FAILED( result ) )
 	{
 		// report errors
-		if ( errors != nullptr )
+		if ( errors != nullptr /*&& stageType != SHADER_STAGE_COMPUTE*/ )
 		{
 			char* errorString = ( char* ) errors->GetBufferPointer();
 			DebuggerPrintf( "Failed to compile [%s].  Compiler gave the following output;\n%s" ,
@@ -160,9 +164,15 @@ bool ShaderStage::Compile( RenderContext* ctx , std::string const& filename , vo
 			case SHADER_STAGE_FRAGMENT:
 			{
 				result = device->CreatePixelShader( byteCodePtr , byteCodeSize , nullptr , &m_fragmentShader );
-				GUARANTEE_OR_DIE( SUCCEEDED( result ) , "FAILED TO LINK VERTEX SHADER STAGE" );
+				GUARANTEE_OR_DIE( SUCCEEDED( result ) , "FAILED TO LINK PIXEL SHADER STAGE" );
 			} break;
 
+			case SHADER_STAGE_COMPUTE:
+				{
+					result = device->CreateComputeShader( byteCodePtr , byteCodeSize , nullptr , &m_computeShader );
+					GUARANTEE_OR_DIE( SUCCEEDED( result ) , "FAILED TO LINK COMPUTE SHADER STAGE" );
+				} break;
+				
 			default: GUARANTEE_OR_DIE( false , "Unimplemented Shader Stage." ); 
 					break;
 			
@@ -198,6 +208,7 @@ void ShaderStage::ReleaseShaderStageResources()
 	DX_SAFE_RELEASE( m_handle );
 	DX_SAFE_RELEASE( m_vertexShader );
 	DX_SAFE_RELEASE( m_fragmentShader );
+	DX_SAFE_RELEASE( m_computeShader );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -237,10 +248,11 @@ bool Shader::CreateFromFile( RenderContext* ctx , std::string const& filename )
 
 	m_vertexStage.Compile( m_owner , filename , source , fileSize , SHADER_STAGE_VERTEX );
 	m_fragmentStage.Compile( m_owner , filename , source , fileSize , SHADER_STAGE_FRAGMENT );
+	m_computeStage.Compile( m_owner , filename , source , fileSize , SHADER_STAGE_COMPUTE );
 
 	delete[] source;
 
-	if ( m_vertexStage.IsValid() && m_fragmentStage.IsValid() )
+	if ( ( m_vertexStage.IsValid() && m_fragmentStage.IsValid() ) || m_computeStage.IsValid() )
 	{
 		return true;
 	}
@@ -267,8 +279,9 @@ bool Shader::CreateFromString( RenderContext* ctx , std::string const& stringNam
 
 	m_vertexStage.Compile( m_owner , stringName , source , fileSize , SHADER_STAGE_VERTEX );
 	m_fragmentStage.Compile( m_owner , stringName , source , fileSize , SHADER_STAGE_FRAGMENT );
+	//m_computeStage.Compile( m_owner , stringName , source , fileSize , SHADER_STAGE_COMPUTE );
 
-	return m_vertexStage.IsValid() && m_fragmentStage.IsValid();
+	return m_vertexStage.IsValid() && m_fragmentStage.IsValid() /*&& m_computeStage.IsValid()*/;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -340,6 +353,7 @@ bool Shader::RecompileShader( std::string const& filename )
 {
 	m_vertexStage.ReleaseShaderStageResources();
 	m_fragmentStage.ReleaseShaderStageResources();
+	m_computeStage.ReleaseShaderStageResources();
 	ReleaseShaderResources();
 
 	CreateRasterState();
