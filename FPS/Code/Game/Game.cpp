@@ -96,10 +96,11 @@ Game::Game()
  	m_testMaterial->CreateFromFile( "Data/Materials/testMaterial.xml" );
 	m_testMaterial->SetData( m_dissolveShaderData );
 
-
 	Rahul r = Rahul();
 	g_theEventSystem->SubscribeToMethod( "me" , &r , &Rahul::SomeMethod );
 	g_theEventSystem->FireEvent( "me" , g_gameConfigBlackboard );
+
+	g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -204,7 +205,7 @@ void Game::IntializeGameObjects()
 	std::vector<VertexLit>		cubeMeshLitVerts;
 	std::vector<uint>			cubeMeshIndices;
 
-	AABB3 box( Vec3( 1 , -1 , -1 ) , Vec3( -1 , 1 , 1 ) );
+	AABB3 box( Vec3( -1 , -1 , -1 ) , Vec3( 5 , 1 , 1 ) );
 	CreateCuboid( cubeMeshVerts , cubeMeshIndices , box , WHITE );
 	VertexMaster::ConvertVertexMasterToVertexLit( cubeMeshLitVerts , cubeMeshVerts );
 
@@ -1145,17 +1146,17 @@ void Game::UpdateCurrentSelectedLightFromKeyBoard()
 		}
 	}
 
-	if ( g_theInput->WasKeyJustPressed( 'Q' ) )
-	{
-		g_theRenderer->EnableLight( m_currentLightIndex , m_lights.lights[ m_currentLightIndex ] );
-		m_lights.lights[ m_currentLightIndex ].intensity = 1.f;
-	}
-
-	if ( g_theInput->WasKeyJustPressed( 'E' ) )
-	{
-		g_theRenderer->DisableLight( m_currentLightIndex );
-		m_lights.lights[ m_currentLightIndex ].intensity = 0.f;
-	}
+	//if ( g_theInput->WasKeyJustPressed( 'Q' ) )
+	//{
+	//	g_theRenderer->EnableLight( m_currentLightIndex , m_lights.lights[ m_currentLightIndex ] );
+	//	m_lights.lights[ m_currentLightIndex ].intensity = 1.f;
+	//}
+	//
+	//if ( g_theInput->WasKeyJustPressed( 'E' ) )
+	//{
+	//	g_theRenderer->DisableLight( m_currentLightIndex );
+	//	m_lights.lights[ m_currentLightIndex ].intensity = 0.f;
+	//}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1627,12 +1628,12 @@ void Game::DebugLineStripDrawModeTest()
 
 void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 {
-	Vec3 movement = Vec3::ZERO;
 	Vec3 rotation = Vec3::ZERO;
 
-	Mat44 cameraTransform = m_gameCamera.GetCameraTransform().GetAsMatrix();
-	Vec3 forwardVector = -cameraTransform.GetKBasis3D();
-	Vec3 rightVector = cameraTransform.GetIBasis3D();
+	Mat44 cameraTransform	= m_gameCamera.GetCameraTransform().GetAsMatrix();
+	Vec3 forwardVector		= -cameraTransform.GetKBasis3D();
+	Vec3 rightVector		= cameraTransform.GetIBasis3D();
+	Vec3 UpVector			= Vec3::UNIT_VECTOR_ALONG_J_BASIS;
 
 	float speed = 4.0f;
 
@@ -1659,29 +1660,29 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	}
 	if ( g_theInput->IsKeyHeldDown( 'Q' ) )
 	{
-		movement.y -= 1.f;
+		m_gameCamera.SetPosition( m_gameCamera.GetPosition() - UpVector * speed * deltaSeconds );
 	}
 	if ( g_theInput->IsKeyHeldDown( 'E' ) )
 	{
-		movement.y += 1.f;
+		m_gameCamera.SetPosition( m_gameCamera.GetPosition() + UpVector * speed * deltaSeconds );
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 'O' ) )
 	{
-		m_cameraPosition = Vec3::ZERO;
-		m_cameraRotation = Vec3::ZERO;
+		m_cameraPosition	= Vec3::ZERO;
+		m_yaw				= 0.f;
+		m_pitch				= 0.f;
 	}
 
 	Vec2 mousePos		= g_theInput->GetRelativeMovement();
 
-	m_cameraRotation.x -= mousePos.y * speed * deltaSeconds;
-	m_cameraRotation.y -= mousePos.x * speed * deltaSeconds;
+	m_pitch -= mousePos.y * speed * deltaSeconds;
+	m_yaw	-= mousePos.x * speed * deltaSeconds;
 
-	float finalPitch	= Clamp( m_cameraRotation.x , -180.f , 180.f );
-	float finalYaw		= m_cameraRotation.z;//Clamp( m_cameraRotation.z , -175.f , 175.f );
-	float finalRoll		= m_cameraRotation.y;//Clamp( m_cameraRotation.y , -85.f , 85.f );
+	 m_pitch = Clamp( m_pitch , -180.f , 180.f );
+	//float finalRoll		= ;//Clamp( m_cameraRotation.y , -85.f , 85.f );
 
-	m_gameCamera.SetPitchYawRollRotation( finalPitch , finalYaw , finalRoll );
+	m_gameCamera.SetPitchYawRollRotation( m_pitch , m_yaw , 0.f );
 	//m_gameCamera.SetPitchYawRollRotation( m_cameraRotation.x , m_cameraRotation.z , m_cameraRotation.y );
 }
 

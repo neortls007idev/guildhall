@@ -178,21 +178,11 @@ void TheApp::Update( float deltaSeconds )
 	g_currentManager->Update( deltaSeconds );
 	UpdateFromKeyboard();
 
-	if ( m_isPaused ) { deltaSeconds = 0; }
-	else if ( m_isSloMo == true ) { deltaSeconds /= 10.f; }
-	if ( m_isSpeedMo ) { deltaSeconds = deltaSeconds * 4.0f; }
+	if ( m_isPaused )							{ deltaSeconds = 0; }
+	else if ( m_isSloMo == true )				{ deltaSeconds /= 10.f; }
+	if ( m_isSpeedMo )							{ deltaSeconds = deltaSeconds * 4.0f; }
 
 	g_theGame->Update( deltaSeconds );
-
-	if ( g_theDevConsole->IsOpen() )
-	{
-		g_theInput->SetCursorMode( ABSOLUTE_MODE );
-		g_theDevConsole->Update( deltaSeconds );
-	}
-	else
-	{
-		g_theInput->SetCursorMode( RELATIVE_MODE );
-	}
 
 	g_theInput->EndFrame();
 }
