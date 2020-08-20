@@ -20,6 +20,9 @@
     <Filter Include="Data\Materials">
       <UniqueIdentifier>{b9f5ec4c-4805-458f-b477-2b81d7e58d50}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data\Models">
+      <UniqueIdentifier>{4ae656a5-a6e7-4d97-960f-d2ff9080ccbc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameCommon.cpp">
@@ -125,10 +128,44 @@
     <FxCompile Include="..\..\Run\Data\Shaders\toneMap.hlsl">
       <Filter>Data\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\computeTest.hlsl">
+      <Filter>Data\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\..\Run\Data\Materials\testMaterial.xml">
       <Filter>Data\Materials</Filter>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="..\..\Run\Data\Models\double_wing_space_transporter_02_02_high_detail.obj">
+      <Filter>Data\Models</Filter>
+    </Object>
+    <Object Include="..\..\Run\Data\Models\NewTieFighter.obj">
+      <Filter>Data\Models</Filter>
+    </Object>
+    <Object Include="..\..\Run\Data\Models\Luminaris_OBJ\Luminaris OBJ.obj">
+      <Filter>Data\Models</Filter>
+    </Object>
+    <Object Include="..\..\Run\Data\Models\mini_spaceship_obj\mini_spaceship.obj">
+      <Filter>Data\Models</Filter>
+    </Object>
+    <Object Include="..\..\Run\Data\Models\Organodron City\Organodron City.obj">
+      <Filter>Data\Models</Filter>
+    </Object>
+    <Object Include="..\..\Run\Data\Models\SciFiTropicalCity\Sci-fi Tropical city.obj">
+      <Filter>Data\Models</Filter>
+    </Object>
+    <Object Include="..\..\Run\Data\Models\SS1_OBJ\SS1.obj">
+      <Filter>Data\Models</Filter>
+    </Object>
+    <Object Include="..\..\Run\Data\Models\IronMan\IronMan.obj">
+      <Filter>Data\Models</Filter>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="testDGSLShader.dgsl">
+      <Filter>Data\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

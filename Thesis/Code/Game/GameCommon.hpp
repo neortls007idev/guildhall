@@ -35,7 +35,7 @@ constexpr float PERCENTAGE_OF_OBSTACLES_IN_MAP							= 0.3f;
 
 enum  eScifiShips
 {
-	DELOREAN,
+//	DELOREAN,
 	LUMINARIS,
 
 	NUM_SCIFI_SHIPS
@@ -47,7 +47,7 @@ enum  eScifiShips
 enum  eCity
 {
 	TROPICAL_SCIFI_CITY ,
-	ORGANODRON_CITY ,
+//	ORGANODRON_CITY ,
 
 	NUM_CITIES
 

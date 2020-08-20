@@ -93,11 +93,7 @@ float4 FragmentFunction( VertexToFragment_t input ) : SV_Target0
   
     float4 imageColor   = tDiffuse.Sample( sSampler , input.uv );
             
-    float4 finalColor   = mul( toneMapMatrix , imageColor );
-           //finalColor.a = imageColor.a; 
-    //float lum  = 0.2126f *  imageColor.r + 0.7152f * imageColor.g + 0.0722f * imageColor.b;
-    //return float4( lum , lum , lum , imageColor.a );
-    finalColor = ToneMap( imageColor );
+    float4 finalColor = ToneMap( imageColor );
     float4 imageFactor = float4( imageColor.xyz * ( 1 - finalColor.a ) , ( 1 - finalColor.a ) );
     finalColor = float4( finalColor.xyz * finalColor.a , finalColor.a ) + imageFactor;
     return finalColor;

@@ -207,6 +207,7 @@ public:
 	static Texture*				m_dissolveShaderPatternTexture;
 	Texture*					m_triplanarShaderTextures[ 6 ];
 	Shader* 					m_toneMapShader;
+	Shader* 					m_computeShader;
 	ToneMap						m_currentToneMap									= ToneMap::NO_TONE;
 	Mat44						m_toneMapTransform;
 	float						m_tonePower											= 1.f;
@@ -222,4 +223,10 @@ public:
 	std::vector<Vec3>			m_lineStripPoints;									
 	eDebugRenderMode			m_debugRenderMode									= DEBUG_RENDER_ALWAYS;
 	
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//			TEST CODE
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+
+	GPUMesh*					m_scifiCity[ 4 ];
+	Texture*					m_scifiCityTex[ 4 ];
 };

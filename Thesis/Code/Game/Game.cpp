@@ -76,10 +76,10 @@ Game::Game()
 
 void Game::InitializeMeshTransforms()
 {
-	m_objSciFiShipTransform[ DELOREAN ].SetPosition(	  -100.f ,  50.0f , -350.0f );
+//	m_objSciFiShipTransform[ DELOREAN ].SetPosition(	  -100.f ,  50.0f , -350.0f );
 	m_objSciFiShipTransform[ LUMINARIS ].SetPosition(	   100.f ,  50.0f , -350.0f );
 	m_objCityTransform[ TROPICAL_SCIFI_CITY ].SetPosition(-200.f ,-200.0f , -450.0f );
-	m_objCityTransform[ ORGANODRON_CITY ].SetPosition(	   200.f ,-200.0f , -200.0f );
+//	m_objCityTransform[ ORGANODRON_CITY ].SetPosition(	   200.f ,-200.0f , -200.0f );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -154,6 +154,8 @@ void Game::LoadShaders()
 	m_blurShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );
 	m_toneMapShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/toneMap.hlsl" );
 
+	m_computeShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/computeTest.hlsl" );
+	
 	m_currentShader												= m_lightShaders[ LitShaderTypes::LIT ];
 	m_currentShaderIndex										= LitShaderTypes::LIT;
 }
@@ -174,8 +176,8 @@ void Game::LoadTextures()
 	m_objCityMeshTex_Diffuse[ TROPICAL_SCIFI_CITY ] = g_theRenderer->GetOrCreateTextureFromFile( "Data/Models/SciFiTropicalCity/Maps/axq2.jpg" );
 	m_objCityMeshTex_Normal[ TROPICAL_SCIFI_CITY ]	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Models/SciFiTropicalCity/Maps/1thr.jpg" );
 	
-	m_objCityMeshTex_Diffuse[ ORGANODRON_CITY ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Models/Organodron City/Maps/cta4.jpg" );
-	m_objCityMeshTex_Normal[ ORGANODRON_CITY ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Models/Organodron City/Maps/b1b2.jpg" );
+//	m_objCityMeshTex_Diffuse[ ORGANODRON_CITY ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Models/Organodron City/Maps/cta4.jpg" );
+//	m_objCityMeshTex_Normal[ ORGANODRON_CITY ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Models/Organodron City/Maps/b1b2.jpg" );
 
 	m_objScifiShipMeshTex_Diffuse[ LUMINARIS ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Models/Luminaris_OBJ/Luminaris Diffuse.png" );
 	m_objScifiShipMeshTex_Normal[ LUMINARIS ]		= g_theRenderer->GetOrCreateTextureFromFile( "Data/Models/Luminaris_OBJ/Luminaris Normal.png" );
@@ -231,14 +233,28 @@ void Game::IntializeGameObjects()
 	objMeshOptions1.generateNormals = true;
 	//objMeshOptions1.clean = true;
 
-	m_objCityMesh[ TROPICAL_SCIFI_CITY ] = new GPUMesh( g_theRenderer );
-	m_objCityMesh[ TROPICAL_SCIFI_CITY ] = LoadObjFileIntoGpuMesh( objMeshOptions1 , "Data/Models/SciFiTropicalCity/Sci-fi Tropical city.obj" );
-	
-	m_objCityMesh[ ORGANODRON_CITY ] = new GPUMesh( g_theRenderer );
-	m_objCityMesh[ ORGANODRON_CITY ] = LoadObjFileIntoGpuMesh( objMeshOptions1 , "Data/Models/Organodron City/Organodron City.obj" );
+//	m_objCityMesh[ TROPICAL_SCIFI_CITY ] = new GPUMesh( g_theRenderer );
+//	m_objCityMesh[ TROPICAL_SCIFI_CITY ] = LoadObjFileIntoGpuMesh( objMeshOptions1 , "Data/Models/SciFiTropicalCity/Sci-fi Tropical city.obj" );
 
-	m_objSciFiShipMeshes[ DELOREAN ] = new GPUMesh( g_theRenderer );
-	m_objSciFiShipMeshes[ DELOREAN ] = LoadObjFileIntoGpuMesh( objMeshOptions1 , "Data/Models/Delorean/CyberpunkDeLorean.obj" );
+	//m_scifiCity[ 0 ] = new GPUMesh( g_theRenderer );
+	//m_scifiCity[ 0 ] = LoadObjFileIntoGpuMesh( objMeshOptions1 , "Data/Models/SciFiTropicalCity/terrain.obj" );
+	//m_scifiCity[ 1 ] = new GPUMesh( g_theRenderer );
+	//m_scifiCity[ 1 ] = LoadObjFileIntoGpuMesh( objMeshOptions1 , "Data/Models/SciFiTropicalCity/rocks.obj" );
+	m_scifiCity[ 2 ] = new GPUMesh( g_theRenderer );
+	m_scifiCity[ 2 ] = LoadObjFileIntoGpuMesh( objMeshOptions1 , "Data/Models/SciFiTropicalCity/mountain.obj" );
+	m_scifiCity[ 3 ] = new GPUMesh( g_theRenderer );
+	m_scifiCity[ 3 ] = LoadObjFileIntoGpuMesh( objMeshOptions1 , "Data/Models/SciFiTropicalCity/buildings.obj" );
+
+	m_scifiCityTex[ 0 ] = g_theRenderer->GetOrCreateTextureFromFile( "Data/Models/SciFiTropicalCity/Maps/snd2_01.jpg" );
+	m_scifiCityTex[ 1 ] = g_theRenderer->GetOrCreateTextureFromFile( "Data/Models/SciFiTropicalCity/Maps/1thr.jpg" );
+	m_scifiCityTex[ 2 ] = g_theRenderer->GetOrCreateTextureFromFile( "Data/Models/SciFiTropicalCity/Maps/mtlm1.jpg" );
+	m_scifiCityTex[ 3 ] = g_theRenderer->GetOrCreateTextureFromFile( "Data/Models/SciFiTropicalCity/Maps/axq2.jpg" );
+	
+//	m_objCityMesh[ ORGANODRON_CITY ] = new GPUMesh( g_theRenderer );
+//	m_objCityMesh[ ORGANODRON_CITY ] = LoadObjFileIntoGpuMesh( objMeshOptions1 , "Data/Models/Organodron City/Organodron City.obj" );
+
+//	m_objSciFiShipMeshes[ DELOREAN ] = new GPUMesh( g_theRenderer );
+//	m_objSciFiShipMeshes[ DELOREAN ] = LoadObjFileIntoGpuMesh( objMeshOptions1 , "Data/Models/Delorean/CyberpunkDeLorean.obj" );
 
 	m_objSciFiShipMeshes[ LUMINARIS ] = new GPUMesh( g_theRenderer );
 	m_objSciFiShipMeshes[ LUMINARIS ] = LoadObjFileIntoGpuMesh( objMeshOptions1 , "Data/Models/Luminaris_OBJ/Luminaris OBJ.obj" );
@@ -652,16 +668,23 @@ void Game::Render() const
 	if ( m_isFresnelShaderActive )													{	RenderFresnelShader2ndPass();	}
 		
 	g_theRenderer->SetRasterState( FILL_SOLID );
-	
- 	g_theRenderer->BindTexture( m_objCityMeshTex_Diffuse[ TROPICAL_SCIFI_CITY ] );
-	g_theRenderer->BindTexture( m_objCityMeshTex_Normal[ TROPICAL_SCIFI_CITY ] , eTextureType::TEX_NORMAL );
-	g_theRenderer->SetModelMatrix( m_objCityTransform[ TROPICAL_SCIFI_CITY ].GetAsMatrix() );
- 	g_theRenderer->DrawMesh( m_objCityMesh[ TROPICAL_SCIFI_CITY ] );
 
-	g_theRenderer->BindTexture( m_objCityMeshTex_Diffuse[ ORGANODRON_CITY ] );
-	g_theRenderer->BindTexture( m_objCityMeshTex_Normal[ ORGANODRON_CITY ] , eTextureType::TEX_NORMAL );
-	g_theRenderer->SetModelMatrix( m_objCityTransform[ ORGANODRON_CITY ].GetAsMatrix() );
-	g_theRenderer->DrawMesh( m_objCityMesh[ ORGANODRON_CITY ] );
+	for ( int i = 2 ; i < 4 ; i++ )
+	{
+		g_theRenderer->BindTexture( m_scifiCityTex[ i ] );
+		g_theRenderer->SetModelMatrix( m_objCityTransform[ TROPICAL_SCIFI_CITY ].GetAsMatrix() );
+		g_theRenderer->DrawMesh( m_scifiCity[ i ] );
+	}
+	
+// 	g_theRenderer->BindTexture( m_objCityMeshTex_Diffuse[ TROPICAL_SCIFI_CITY ] );
+//	g_theRenderer->BindTexture( m_objCityMeshTex_Normal[ TROPICAL_SCIFI_CITY ] , eTextureType::TEX_NORMAL );
+//	g_theRenderer->SetModelMatrix( m_objCityTransform[ TROPICAL_SCIFI_CITY ].GetAsMatrix() );
+// 	g_theRenderer->DrawMesh( m_objCityMesh[ TROPICAL_SCIFI_CITY ] );
+
+//	g_theRenderer->BindTexture( m_objCityMeshTex_Diffuse[ ORGANODRON_CITY ] );
+//	g_theRenderer->BindTexture( m_objCityMeshTex_Normal[ ORGANODRON_CITY ] , eTextureType::TEX_NORMAL );
+//	g_theRenderer->SetModelMatrix( m_objCityTransform[ ORGANODRON_CITY ].GetAsMatrix() );
+//	g_theRenderer->DrawMesh( m_objCityMesh[ ORGANODRON_CITY ] );
 	
  	g_theRenderer->BindTexture( m_objScifiShipMeshTex_Diffuse[ LUMINARIS ] );
 	g_theRenderer->BindTexture( m_objScifiShipMeshTex_Normal[ LUMINARIS ] , eTextureType::TEX_NORMAL );
@@ -670,8 +693,8 @@ void Game::Render() const
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindTexture( nullptr , eTextureType::TEX_NORMAL );
 
-	g_theRenderer->SetModelMatrix( m_objSciFiShipTransform[ DELOREAN ].GetAsMatrix() );
-	g_theRenderer->DrawMesh( m_objSciFiShipMeshes[ DELOREAN ] );
+//	g_theRenderer->SetModelMatrix( m_objSciFiShipTransform[ DELOREAN ].GetAsMatrix() );
+//	g_theRenderer->DrawMesh( m_objSciFiShipMeshes[ DELOREAN ] );
 
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindShader( nullptr );
