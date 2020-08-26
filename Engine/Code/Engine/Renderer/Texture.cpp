@@ -129,6 +129,40 @@ TextureView* Texture::GetOrCreateShaderResourceView()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+TextureView* Texture::GetOrCreateCubeMapShaderResourceView()
+{
+	if( m_shaderResourceView )
+	{
+		return m_shaderResourceView;
+	}
+
+	ID3D11Device* device = m_owner->m_device;
+	ID3D11ShaderResourceView* srv = nullptr;
+
+	CD3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+		//memset( &view_desc , 0 , sizeof( CD3D11_SHADER_RESOURCE_VIEW_DESC ) );
+
+	viewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+	viewDesc.TextureCube.MostDetailedMip = 0;
+	viewDesc.TextureCube.MipLevels = 1;
+
+	device->CreateShaderResourceView( m_handle , &viewDesc , &srv );
+
+	std::string debugName = "Unreleased CubeMap Shader Resource View";
+	SetDebugName( srv , &debugName );
+
+	if( srv )
+	{
+		m_shaderResourceView = new TextureView();
+		m_shaderResourceView->m_srv = srv;
+	}
+
+	return m_shaderResourceView;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 TextureView* Texture::GetOrCreateDepthStencilView( Vec2 dimension )
 {
 	if ( m_depthStencilView != nullptr )

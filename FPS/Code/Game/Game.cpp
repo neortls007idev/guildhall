@@ -17,6 +17,7 @@
 #include "Engine/Renderer/Material.hpp"
 #include "Engine/Renderer/ShaderState.hpp"
 #include "Engine/Core/NamedProperties.hpp"
+#include "Engine/Renderer/Sampler.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -101,6 +102,26 @@ Game::Game()
 	g_theEventSystem->FireEvent( "me" , g_gameConfigBlackboard );
 
 	g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
+
+	m_unitCubeMesh = new GPUMesh( g_theRenderer );
+	
+	//m_cubeMapex = g_theRenderer->CreateTextureCubeFromFile( "Data/Images/CubeMaps/test_sky.png" );
+	m_cubeMapex = g_theRenderer->CreateTextureCubeFromFile( "Data/Images/CubeMaps/galaxy2.png" );
+	m_cubeMapTest = g_theRenderer->GetOrCreateShader( "Data/Shaders/CubeMap.hlsl" );
+
+	//std::vector<VertexMaster>	cubeMeshVerts;
+	std::vector<Vertex_PCU>		cubeMeshVerts;
+	std::vector<uint>			cubeMeshIndices;
+
+	AABB3 box( Vec3( -0.5f , -0.5f , -0.5f ) , Vec3( 0.5f , 0.5f , 0.5f ) );
+	CreateCuboid( cubeMeshVerts , cubeMeshIndices , box , WHITE );
+	//VertexMaster::ConvertVertexMasterToVertexPCU( cubeMeshLitVerts , cubeMeshVerts );
+
+	m_unitCubeMesh->UpdateVertices( ( uint ) cubeMeshVerts.size() , cubeMeshVerts.data() );
+	m_unitCubeMesh->UpdateIndices( cubeMeshIndices );
+
+	m_cubeSampler = new Sampler( g_theRenderer , SAMPLER_CUBEMAP );
+	m_linear = new Sampler( g_theRenderer , SAMPLER_BILINEAR );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -609,8 +630,11 @@ void Game::Render() const
 	g_theRenderer->BeginCamera( m_gameCamera );
 	m_gameCamera.CreateMatchingDepthStencilTarget(); 
 	g_theRenderer->BindDepthStencil( m_gameCamera.GetDepthStencilTarget() );
+	
 	g_theRenderer->BindShader( nullptr );
-
+	g_theRenderer->BindCubeMapTexture( nullptr );
+	g_theRenderer->BindSampler( m_linear );
+	
 	g_theRenderer->SetRasterState( FILL_SOLID );
 	
 	g_theRenderer->SetCullMode( CULL_BACK );
@@ -645,6 +669,7 @@ void Game::Render() const
 	
 	g_theRenderer->SetModelMatrix( m_cubeMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_cubeMesh );
+
 	
 	if ( m_isFresnelShaderActive )													{	RenderFresnelShader2ndPass();	}
 		
@@ -666,6 +691,17 @@ void Game::Render() const
 	//m_meshSphere->GetVertexBuffer()->SetVertexBufferLayout( VertexMaster::LAYOUT );
  
  	g_theRenderer->BindMaterial( nullptr );
+
+	g_theRenderer->BindShader( m_cubeMapTest );
+	g_theRenderer->BindCubeMapTexture( m_cubeMapex );
+	g_theRenderer->SetCullMode( CULL_NONE );
+	g_theRenderer->BindSampler( m_cubeSampler );
+	//g_theRenderer->SetModelMatrix( m_quadTransform.GetAsMatrix() );
+	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
+	g_theRenderer->DrawMesh( m_unitCubeMesh );
+	g_theRenderer->SetCullMode( CULL_BACK );
+	g_theRenderer->BindCubeMapTexture( nullptr );
+	g_theRenderer->BindShader( nullptr );
 	
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->SetDepthTest( COMPARE_ALWAYS , true );

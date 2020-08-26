@@ -134,7 +134,7 @@ bool ShaderStage::Compile( RenderContext* ctx , std::string const& filename , vo
 	if ( FAILED( result ) )
 	{
 		// report errors
-		if ( errors != nullptr /*&& stageType != SHADER_STAGE_COMPUTE*/ )
+		if ( errors != nullptr && stageType == ( SHADER_STAGE_FRAGMENT | SHADER_STAGE_VERTEX ) )
 		{
 			char* errorString = ( char* ) errors->GetBufferPointer();
 			DebuggerPrintf( "Failed to compile [%s].  Compiler gave the following output;\n%s" ,
@@ -154,26 +154,26 @@ bool ShaderStage::Compile( RenderContext* ctx , std::string const& filename , vo
 
 			switch ( stageType )
 			{
-			case SHADER_STAGE_VERTEX: 
-			{
-				result = device->CreateVertexShader( byteCodePtr , byteCodeSize , nullptr , &m_vertexShader );
-				GUARANTEE_OR_DIE( SUCCEEDED( result ) , "FAILED TO LINK VERTEX SHADER STAGE" );
-
-			} break;
-
-			case SHADER_STAGE_FRAGMENT:
-			{
-				result = device->CreatePixelShader( byteCodePtr , byteCodeSize , nullptr , &m_fragmentShader );
-				GUARANTEE_OR_DIE( SUCCEEDED( result ) , "FAILED TO LINK PIXEL SHADER STAGE" );
-			} break;
-
-			case SHADER_STAGE_COMPUTE:
+				case SHADER_STAGE_VERTEX: 
 				{
-					result = device->CreateComputeShader( byteCodePtr , byteCodeSize , nullptr , &m_computeShader );
-					GUARANTEE_OR_DIE( SUCCEEDED( result ) , "FAILED TO LINK COMPUTE SHADER STAGE" );
+					result = device->CreateVertexShader( byteCodePtr , byteCodeSize , nullptr , &m_vertexShader );
+					GUARANTEE_OR_DIE( SUCCEEDED( result ) , "FAILED TO LINK VERTEX SHADER STAGE" );
+
 				} break;
-				
-			default: GUARANTEE_OR_DIE( false , "Unimplemented Shader Stage." ); 
+
+				case SHADER_STAGE_FRAGMENT:
+				{
+					result = device->CreatePixelShader( byteCodePtr , byteCodeSize , nullptr , &m_fragmentShader );
+					GUARANTEE_OR_DIE( SUCCEEDED( result ) , "FAILED TO LINK PIXEL SHADER STAGE" );
+				} break;
+
+				case SHADER_STAGE_COMPUTE:
+					{
+						result = device->CreateComputeShader( byteCodePtr , byteCodeSize , nullptr , &m_computeShader );
+						GUARANTEE_OR_DIE( SUCCEEDED( result ) , "FAILED TO LINK COMPUTE SHADER STAGE" );
+					} break;
+					
+				default: GUARANTEE_OR_DIE( false , "Unimplemented Compute Shader Stage." ); 
 					break;
 			
 		}

@@ -23,6 +23,7 @@ public:
 
 	TextureView*	GetOrCreateRenderTargetView();
 	TextureView*	GetOrCreateShaderResourceView();
+	TextureView*	GetOrCreateCubeMapShaderResourceView();
 	TextureView*	GetOrCreateDepthStencilView( Vec2 dimension = Vec2::ZERO );
 
 	unsigned int	 GetTextureID() const;

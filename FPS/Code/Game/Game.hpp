@@ -215,5 +215,11 @@ public:
 	bool						m_lineStripMode										= false;
 	std::vector<Vec3>			m_lineStripPoints;									
 	eDebugRenderMode			m_debugRenderMode									= DEBUG_RENDER_ALWAYS;
-	
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	GPUMesh*					m_unitCubeMesh	= nullptr;
+	Texture*					m_cubeMapex		= nullptr;
+	Shader*						m_cubeMapTest	= nullptr;
+	Sampler*					m_cubeSampler	= nullptr;
+	Sampler*					m_linear		= nullptr;	
 };

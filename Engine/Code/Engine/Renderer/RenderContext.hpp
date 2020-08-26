@@ -30,6 +30,7 @@ class	RenderBuffer;
 class	GPUMesh;
 class	Sampler;
 class	Image;
+class	TextureCube;
 class	BitmapFont;
 
 struct	ID3D11Device;
@@ -197,6 +198,7 @@ public:
 	void					SetTransientRasterStateAsRasterState();
 	
 	void					BindTexture( const Texture* constTexture , UINT textureType = eTextureType::TEX_DIFFUSE , UINT userTextureIndexOffset = 0 );
+	void					BindCubeMapTexture( const Texture* constTexture );
 	bool					BindShader( Shader* shader );
 	void					BindShader( std::string shaderFileName );
 	void					ExecuteComputeShader( Shader* computeShader );
@@ -377,16 +379,17 @@ private:
 //			RENDERING PIPELINE CREATION METHODS ( TO BE ACCESSED BY THE RENDERER ONLY )
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-	Sampler*	CreateSamplerFromType( eSamplerType type );
-	Shader*		CreateShaderFromFile( char const* shaderFilePath );
-	ShaderState* CreateShaderStateFromFile( char const* shaderStateFilePath );
-	Texture*	CreateTextureFromFile( const char* imageFilePath );
-	Texture*	CreateTextureFromColor( Rgba8 color );
-	Texture*	CreateFromImage( Image* image );														// TODO :- IMPLEMENT ME
-	BitmapFont* CreateBitMapFontFromFile( std::string bitmapFontFilePath );
+	Sampler*		CreateSamplerFromType( eSamplerType type );
+	Shader*			CreateShaderFromFile( char const* shaderFilePath );
+	ShaderState*	CreateShaderStateFromFile( char const* shaderStateFilePath );
+	Texture*		CreateTextureFromFile( const char* imageFilePath );
+	Texture*		CreateTextureFromColor( Rgba8 color );
+	Texture*		CreateFromImage( Image* image );												// TODO :- IMPLEMENT ME
+	BitmapFont*		CreateBitMapFontFromFile( std::string bitmapFontFilePath );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 public:
+	Texture*		CreateTextureCubeFromFile( const char* imageFilePath );
 	ID3D11Device*								m_device												= nullptr;
 	ID3D11DeviceContext*						m_context												= nullptr;					// Immediate context
 	SwapChain*									m_swapChain												= nullptr;

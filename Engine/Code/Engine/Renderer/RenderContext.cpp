@@ -779,6 +779,96 @@ Texture* RenderContext::CreateTextureFromFile( const char* imageFilePath )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Texture* RenderContext::CreateTextureCubeFromFile( const char* imageFilePath )
+{
+		//unsigned int textureID = 0;
+	int imageTexelSizeX = 0; // This will be filled in for us to indicate image width
+	int imageTexelSizeY = 0; // This will be filled in for us to indicate image height
+	int numComponents = 0; // This will be filled in for us to indicate how many color components the image had (e.g. 3=RGB=24bit, 4=RGBA=32bit)
+	int numComponentsRequested = 4; // don't care; we support 3 (24-bit RGB) or 4 (32-bit RGBA)
+
+	stbi_set_flip_vertically_on_load( 1 ); // We prefer uvTexCoords has origin (0,0) at BOTTOM LEFT ,  0 for D3D11
+	unsigned char* imageData = stbi_load( imageFilePath , &imageTexelSizeX , &imageTexelSizeY , &numComponents , numComponentsRequested );
+
+	// Check if the load was successful
+	GUARANTEE_OR_DIE( imageData , Stringf( "Failed to load image \"%s\"" , imageFilePath ) );
+
+	uint w = imageTexelSizeX / 4;
+	uint h = imageTexelSizeY / 3;
+
+	GUARANTEE_OR_DIE( ( ( w > 0 ) && ( w == h ) ) != false , Stringf( "Bad CubeMap Texture File \"%s\"" , imageFilePath ) );
+
+	// describe the texture
+	D3D11_TEXTURE2D_DESC cubeDesc;
+	memset( &cubeDesc , 0 , sizeof( D3D11_TEXTURE2D_DESC ) );
+	
+	cubeDesc.Width = w;
+	cubeDesc.Height = w;
+	cubeDesc.MipLevels = 1;
+	cubeDesc.ArraySize = TEXCUBE_SIDE_COUNT;
+	cubeDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	cubeDesc.SampleDesc.Count = 1;							// Multi sampling Anti-Aliasing
+	cubeDesc.SampleDesc.Quality = 0;						// Multi sampling Anti-Aliasing
+	cubeDesc.Usage = D3D11_USAGE_DEFAULT;					//  if we do mip-chains, we change this to GPU/DEFAULT
+	cubeDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	cubeDesc.CPUAccessFlags = 0;							// does the CPU write to this? 0  = no
+	cubeDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;	// extension features like cube maps
+
+
+	D3D11_SUBRESOURCE_DATA data[ TEXCUBE_SIDE_COUNT ];
+	D3D11_SUBRESOURCE_DATA* pdata = nullptr;
+
+	pdata = data;
+	memset( &data , 0 , sizeof( data ) );
+	
+	uint pitch = w * 4;											// width of a single part in bytes
+	unsigned char const* start = ( unsigned char const* ) imageData;
+	uint total_pitch = 4 * pitch;								// total with of entire image in bytes
+	uint row = w * total_pitch;									// how far to get to the next row
+
+	uint offsets[] = {
+	   ( 1 * row ) + ( 2 * pitch ),   // right
+	   ( 1 * row ) + ( 0 * pitch ),   // left
+	   ( 0 * row ) + ( 1 * pitch ),   // top
+	   ( 2 * row ) + ( 1 * pitch ),   // bottom
+	   ( 1 * row ) + ( 1 * pitch ),   // front
+	   ( 1 * row ) + ( 3 * pitch )    // back
+	};
+
+	for( uint i = 0; i < TEXCUBE_SIDE_COUNT; ++i )
+	{
+		data[ i ].pSysMem = start + offsets[ i ];
+		data[ i ].SysMemPitch = total_pitch;
+	}
+
+	CD3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+	//memset( &viewDesc , 0 , sizeof( CD3D11_SHADER_RESOURCE_VIEW_DESC ) );
+
+	viewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	viewDesc.TextureCube.MipLevels = 1;
+	viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+	viewDesc.TextureCube.MostDetailedMip = 0;
+
+	// create my resource
+	ID3D11Texture2D* texHandle = nullptr;
+	if( FAILED( m_device->CreateTexture2D( &cubeDesc , pdata , &texHandle ) ) )
+	{
+		GUARANTEE_OR_DIE( false , "Failed to create cube texture." );
+		return nullptr;
+	}
+	
+	stbi_image_free( imageData );
+	Texture* temp = new Texture( imageFilePath , this , texHandle );
+	m_LoadedTextures[ imageFilePath ] = temp;
+	
+	std::string filePath = imageFilePath;
+	SetDebugName( ( ID3D11DeviceChild* ) temp->GetHandle() , &filePath );
+	
+	return m_LoadedTextures[ imageFilePath ];
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void RenderContext::CopyTexture( Texture* destination , Texture* source )
 {
 	m_context->CopyResource( destination->GetHandle() , source->GetHandle() );
@@ -890,6 +980,24 @@ void RenderContext::BindTexture( const Texture* constTexture , UINT textureType 
 	TextureView* shaderResourceView =  texture->GetOrCreateShaderResourceView();
 	ID3D11ShaderResourceView* shaderResourceViewHandle = shaderResourceView->GetSRVHandle();
 	m_context->PSSetShaderResources( textureType + userTextureIndexOffset , 1 , &shaderResourceViewHandle );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::BindCubeMapTexture( const Texture* constTexture )
+{
+	if( nullptr == constTexture )
+	{
+		TextureView* shaderResourceView = m_textureDefault->GetOrCreateCubeMapShaderResourceView();
+		ID3D11ShaderResourceView* shaderResourceViewHandle = shaderResourceView->GetSRVHandle();
+		m_context->PSSetShaderResources( 0 , 1 , &shaderResourceViewHandle );
+		return;
+	}
+
+	Texture* texture = const_cast< Texture* >( constTexture );
+	TextureView* shaderResourceView = texture->GetOrCreateCubeMapShaderResourceView();
+	ID3D11ShaderResourceView* shaderResourceViewHandle = shaderResourceView->GetSRVHandle();
+	m_context->PSSetShaderResources( 0 , 1 , &shaderResourceViewHandle );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1454,7 +1562,7 @@ void RenderContext::ExecuteComputeShader( Shader* computeShader )
 	if ( computeShader->m_computeStage.m_byteCode != nullptr )
 	{
 		BindShader( computeShader );
-		/*computeShader->m_owner->*/m_context->Dispatch( 1 , 1 , 0 );
+		m_context->Dispatch( 1 , 1 , 1 );
 	}	
 }
 
@@ -1655,7 +1763,6 @@ void RenderContext::SetModelMatrix( Mat44 modelMat , Rgba8 color /* = WHITE */  
 
 void RenderContext::BindSampler( const Sampler* sampler )
 {
-
 	if ( nullptr == sampler )
 	{
 		ID3D11SamplerState* samplerHandle = m_defaultSampler->GetHandle();

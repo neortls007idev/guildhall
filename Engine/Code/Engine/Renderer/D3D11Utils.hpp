@@ -22,6 +22,20 @@ enum  eCullMode
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+enum eTextureCubeSide : uint
+{
+	TEXCUBE_RIGHT ,
+	TEXCUBE_LEFT ,
+	TEXCUBE_TOP ,
+	TEXCUBE_BOTTOM ,
+	TEXCUBE_FRONT ,			// -z
+	TEXCUBE_BACK ,			// +z
+
+	TEXCUBE_SIDE_COUNT ,
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 D3D11_CULL_MODE GetD3D11CullMode( eCullMode cullMode );
 D3D11_FILL_MODE GetD3D11FillMode( eRasterStateFillMode rasterFillMode );
 
