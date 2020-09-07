@@ -247,6 +247,21 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui_demo.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui_draw.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui_impl_dx11.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui_impl_dx12.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui_impl_vulkan.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugInline|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugInline|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui_impl_win32.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="..\ThirdParty\MikkT\MikktSpace.c" />
     <ClCompile Include="..\ThirdParty\TinyXML2\tinyxml2.cpp" />
     <ClCompile Include="Audio\AudioSystem.cpp" />
@@ -280,6 +295,7 @@
     <ClCompile Include="Core\VertexMaster.cpp" />
     <ClCompile Include="Core\Vertex_PCU.cpp" />
     <ClCompile Include="Core\XmlUtils.cpp" />
+    <ClCompile Include="DebugUI\ImGUISystem.cpp" />
     <ClCompile Include="Experimental\Raytracer\LambertianDiffuseMaterial.cpp" />
     <ClCompile Include="Experimental\Raytracer\LDM_Metal.cpp" />
     <ClCompile Include="Experimental\Raytracer\RayHittable.cpp" />
@@ -310,9 +326,36 @@
     <ClCompile Include="Memory\Job.cpp" />
     <ClCompile Include="Memory\JobSystem.cpp" />
     <ClCompile Include="Memory\JobSystemWorkerThread.cpp" />
+    <ClCompile Include="Networking\Client.cpp" />
+    <ClCompile Include="Networking\Network.cpp" />
+    <ClCompile Include="Networking\Server.cpp" />
     <ClCompile Include="ParticleSystem\Particle2D.cpp" />
+    <ClCompile Include="ParticleSystem\Particle3D.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugInline|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugInline|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="ParticleSystem\ParticleEmitter2D.cpp" />
+    <ClCompile Include="ParticleSystem\ParticleEmitter3D.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugInline|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugInline|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="ParticleSystem\ParticleSystem2D.cpp" />
+    <ClCompile Include="ParticleSystem\ParticleSystem3D.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugInline|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugInline|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Physics\Collider2D.cpp" />
     <ClCompile Include="Physics\Collision2D.cpp" />
     <ClCompile Include="Physics\Manifold2D.cpp" />
@@ -366,6 +409,23 @@
     <ClInclude Include="..\ThirdParty\fmod\fmod_dsp_effects.h" />
     <ClInclude Include="..\ThirdParty\fmod\fmod_errors.h" />
     <ClInclude Include="..\ThirdParty\fmod\fmod_output.h" />
+    <ClInclude Include="..\ThirdParty\ImGUI\imconfig.h" />
+    <ClInclude Include="..\ThirdParty\ImGUI\imgui.h" />
+    <ClInclude Include="..\ThirdParty\ImGUI\imgui_impl_dx11.h" />
+    <ClInclude Include="..\ThirdParty\ImGUI\imgui_impl_dx12.h" />
+    <ClInclude Include="..\ThirdParty\ImGUI\imgui_impl_vulkan.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugInline|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugInline|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\ImGUI\imgui_impl_win32.h" />
+    <ClInclude Include="..\ThirdParty\ImGUI\imgui_internal.h" />
+    <ClInclude Include="..\ThirdParty\ImGUI\imstb_rectpack.h" />
+    <ClInclude Include="..\ThirdParty\ImGUI\imstb_textedit.h" />
+    <ClInclude Include="..\ThirdParty\ImGUI\imstb_truetype.h" />
     <ClInclude Include="..\ThirdParty\MikkT\MikktSpace.h" />
     <ClInclude Include="..\ThirdParty\stb\stb_image.h" />
     <ClInclude Include="..\ThirdParty\TinyOBJLoader\tiny_obj_loader.h" />
@@ -403,6 +463,8 @@
     <ClInclude Include="Core\VertexMaster.hpp" />
     <ClInclude Include="Core\Vertex_PCU.hpp" />
     <ClInclude Include="Core\XmlUtils.hpp" />
+    <ClInclude Include="DebugUI\ImGUICommon.hpp" />
+    <ClInclude Include="DebugUI\ImGUISystem.hpp" />
     <ClInclude Include="Experimental\Raytracer\LambertianDiffuseMaterial.hpp" />
     <ClInclude Include="Experimental\Raytracer\LDM_Metal.hpp" />
     <ClInclude Include="Experimental\Raytracer\RayHittable.hpp" />
@@ -435,9 +497,36 @@
     <ClInclude Include="Memory\Job.hpp" />
     <ClInclude Include="Memory\JobSystem.hpp" />
     <ClInclude Include="Memory\JobSystemWorkerThread.hpp" />
+    <ClInclude Include="Networking\Client.hpp" />
+    <ClInclude Include="Networking\Network.hpp" />
+    <ClInclude Include="Networking\Server.hpp" />
     <ClInclude Include="ParticleSystem\Particle2D.hpp" />
+    <ClInclude Include="ParticleSystem\Particle3D.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugInline|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugInline|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="ParticleSystem\ParticleEmitter2D.hpp" />
+    <ClInclude Include="ParticleSystem\ParticleEmitter3D.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugInline|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugInline|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="ParticleSystem\ParticleSystem2D.hpp" />
+    <ClInclude Include="ParticleSystem\ParticleSystem3D.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugInline|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugInline|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Physics\Collider2D.hpp" />
     <ClInclude Include="Physics\Collision2D.hpp" />
     <ClInclude Include="Physics\Manifold2D.hpp" />

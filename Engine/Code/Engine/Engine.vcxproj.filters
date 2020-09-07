@@ -83,6 +83,42 @@
     <Filter Include="Memory">
       <UniqueIdentifier>{75f8c939-47db-4589-9410-630b828b69f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ParticleSystem\ParticleSystem3D">
+      <UniqueIdentifier>{f06e9628-f9f5-46a8-8d1b-8ea4ce483d13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ParticleSystem\ParticleSystem2D">
+      <UniqueIdentifier>{5a102151-97cc-4513-809e-bd70651eb10d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\ImGUI">
+      <UniqueIdentifier>{94eb5f0a-8b23-4d5c-bc5b-92f00549b1a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\FMOD">
+      <UniqueIdentifier>{729d6a47-6c20-4bcb-bc2e-c3df844e2b7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\MikkT">
+      <UniqueIdentifier>{cfd0cd5c-8ece-46aa-8fe4-61818ec4174d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\STB">
+      <UniqueIdentifier>{fb9a82d1-c2a9-4423-bbd6-6538938b66f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\TinyXML">
+      <UniqueIdentifier>{853d47ad-18ec-4c50-87aa-d8b80a926982}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\TinyOBJ">
+      <UniqueIdentifier>{67ba1243-3b80-445c-8757-6dffef2edcf7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\ImGUI\RenderingAPI">
+      <UniqueIdentifier>{8c0bb47f-c014-470a-9c21-898f25fc3a50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\ImGUI\Platform">
+      <UniqueIdentifier>{2fcf3263-ab55-4407-b3ab-c1829b87f7e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DebugUI">
+      <UniqueIdentifier>{30a1de48-70c3-4ee5-9475-027bf4fbac2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Networking">
+      <UniqueIdentifier>{3274900d-59ac-4d8b-98a9-f907c71dcab1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Rgba8.cpp">
@@ -141,9 +177,6 @@
     </ClCompile>
     <ClCompile Include="Renderer\SpriteAnimation.cpp">
       <Filter>Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ThirdParty\TinyXML2\tinyxml2.cpp">
-      <Filter>ThirdParty</Filter>
     </ClCompile>
     <ClCompile Include="Core\NamedStrings.cpp">
       <Filter>Core</Filter>
@@ -364,23 +397,11 @@
     <ClCompile Include="Renderer\ShaderState.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\ThirdParty\MikkT\MikktSpace.c">
-      <Filter>ThirdParty</Filter>
-    </ClCompile>
     <ClCompile Include="Core\NamedProperties.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\DrawableObjects.cpp">
       <Filter>Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="ParticleSystem\Particle2D.cpp">
-      <Filter>ParticleSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="ParticleSystem\ParticleEmitter2D.cpp">
-      <Filter>ParticleSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="ParticleSystem\ParticleSystem2D.cpp">
-      <Filter>ParticleSystem</Filter>
     </ClCompile>
     <ClCompile Include="Memory\JobSystem.cpp">
       <Filter>Memory</Filter>
@@ -389,6 +410,66 @@
       <Filter>Memory</Filter>
     </ClCompile>
     <ClCompile Include="Memory\JobSystemWorkerThread.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem\Particle2D.cpp">
+      <Filter>ParticleSystem\ParticleSystem2D</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem\ParticleEmitter2D.cpp">
+      <Filter>ParticleSystem\ParticleSystem2D</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem\ParticleSystem2D.cpp">
+      <Filter>ParticleSystem\ParticleSystem2D</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem\ParticleEmitter3D.cpp">
+      <Filter>ParticleSystem\ParticleSystem3D</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem\ParticleSystem3D.cpp">
+      <Filter>ParticleSystem\ParticleSystem3D</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem\Particle3D.cpp">
+      <Filter>ParticleSystem\ParticleSystem3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\MikkT\MikktSpace.c">
+      <Filter>ThirdParty\MikkT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\TinyXML2\tinyxml2.cpp">
+      <Filter>ThirdParty\TinyXML</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui.cpp">
+      <Filter>ThirdParty\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui_demo.cpp">
+      <Filter>ThirdParty\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui_draw.cpp">
+      <Filter>ThirdParty\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui_widgets.cpp">
+      <Filter>ThirdParty\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui_impl_dx11.cpp">
+      <Filter>ThirdParty\ImGUI\RenderingAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui_impl_dx12.cpp">
+      <Filter>ThirdParty\ImGUI\RenderingAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui_impl_vulkan.cpp">
+      <Filter>ThirdParty\ImGUI\RenderingAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGUI\imgui_impl_win32.cpp">
+      <Filter>ThirdParty\ImGUI\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Networking\Network.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Networking\Client.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Networking\Server.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugUI\ImGUISystem.cpp">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
@@ -458,36 +539,6 @@
     </ClInclude>
     <ClInclude Include="Renderer\SpriteAnimation.hpp">
       <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ThirdParty\fmod\fmod.h">
-      <Filter>ThirdParty</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ThirdParty\fmod\fmod.hpp">
-      <Filter>ThirdParty</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ThirdParty\fmod\fmod_codec.h">
-      <Filter>ThirdParty</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ThirdParty\fmod\fmod_common.h">
-      <Filter>ThirdParty</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ThirdParty\fmod\fmod_dsp.h">
-      <Filter>ThirdParty</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ThirdParty\fmod\fmod_dsp_effects.h">
-      <Filter>ThirdParty</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ThirdParty\fmod\fmod_errors.h">
-      <Filter>ThirdParty</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ThirdParty\fmod\fmod_output.h">
-      <Filter>ThirdParty</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ThirdParty\TinyXML2\tinyxml2.h">
-      <Filter>ThirdParty</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ThirdParty\stb\stb_image.h">
-      <Filter>ThirdParty</Filter>
     </ClInclude>
     <ClInclude Include="Core\NamedStrings.hpp">
       <Filter>Core</Filter>
@@ -714,23 +765,11 @@
     <ClInclude Include="Renderer\ShaderState.hpp">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\ThirdParty\MikkT\MikktSpace.h">
-      <Filter>ThirdParty</Filter>
-    </ClInclude>
     <ClInclude Include="Core\NamedProperties.hpp">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\DrawableObjects.hpp">
       <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="ParticleSystem\Particle2D.hpp">
-      <Filter>ParticleSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="ParticleSystem\ParticleEmitter2D.hpp">
-      <Filter>ParticleSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="ParticleSystem\ParticleSystem2D.hpp">
-      <Filter>ParticleSystem</Filter>
     </ClInclude>
     <ClInclude Include="Memory\JobSystem.hpp">
       <Filter>Memory</Filter>
@@ -744,8 +783,104 @@
     <ClInclude Include="Memory\JobSystemWorkerThread.hpp">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleSystem\Particle2D.hpp">
+      <Filter>ParticleSystem\ParticleSystem2D</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem\ParticleEmitter2D.hpp">
+      <Filter>ParticleSystem\ParticleSystem2D</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem\ParticleSystem2D.hpp">
+      <Filter>ParticleSystem\ParticleSystem2D</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem\ParticleEmitter3D.hpp">
+      <Filter>ParticleSystem\ParticleSystem3D</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem\Particle3D.hpp">
+      <Filter>ParticleSystem\ParticleSystem3D</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem\ParticleSystem3D.hpp">
+      <Filter>ParticleSystem\ParticleSystem3D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\stb\stb_image.h">
+      <Filter>ThirdParty\STB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\fmod\fmod_output.h">
+      <Filter>ThirdParty\FMOD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\fmod\fmod.h">
+      <Filter>ThirdParty\FMOD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\fmod\fmod.hpp">
+      <Filter>ThirdParty\FMOD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\fmod\fmod_codec.h">
+      <Filter>ThirdParty\FMOD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\fmod\fmod_common.h">
+      <Filter>ThirdParty\FMOD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\fmod\fmod_dsp.h">
+      <Filter>ThirdParty\FMOD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\fmod\fmod_dsp_effects.h">
+      <Filter>ThirdParty\FMOD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\fmod\fmod_errors.h">
+      <Filter>ThirdParty\FMOD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\MikkT\MikktSpace.h">
+      <Filter>ThirdParty\MikkT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\TinyXML2\tinyxml2.h">
+      <Filter>ThirdParty\TinyXML</Filter>
+    </ClInclude>
     <ClInclude Include="..\ThirdParty\TinyOBJLoader\tiny_obj_loader.h">
-      <Filter>ThirdParty</Filter>
+      <Filter>ThirdParty\TinyOBJ</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\ImGUI\imconfig.h">
+      <Filter>ThirdParty\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\ImGUI\imgui.h">
+      <Filter>ThirdParty\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\ImGUI\imgui_internal.h">
+      <Filter>ThirdParty\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\ImGUI\imstb_rectpack.h">
+      <Filter>ThirdParty\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\ImGUI\imstb_textedit.h">
+      <Filter>ThirdParty\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\ImGUI\imstb_truetype.h">
+      <Filter>ThirdParty\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\ImGUI\imgui_impl_dx11.h">
+      <Filter>ThirdParty\ImGUI\RenderingAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\ImGUI\imgui_impl_dx12.h">
+      <Filter>ThirdParty\ImGUI\RenderingAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\ImGUI\imgui_impl_vulkan.h">
+      <Filter>ThirdParty\ImGUI\RenderingAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\ImGUI\imgui_impl_win32.h">
+      <Filter>ThirdParty\ImGUI\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\Network.hpp">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\Client.hpp">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\Server.hpp">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugUI\ImGUICommon.hpp">
+      <Filter>DebugUI</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugUI\ImGUISystem.hpp">
+      <Filter>DebugUI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

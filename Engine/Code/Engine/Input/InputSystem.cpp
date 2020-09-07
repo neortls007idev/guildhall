@@ -35,7 +35,7 @@ void InputSystem::Startup()
 	POINT cursorPos;
 	GetCursorPos( &cursorPos );
 	ScreenToClient( ( HWND ) g_theWindow->m_hwnd , &cursorPos );
-	m_trackMouseVelocityOverFrames[ 0 ] = Vec2( cursorPos.x , cursorPos.y );
+	m_trackMouseVelocityOverFrames[ 0 ] = Vec2( ( int ) cursorPos.x , ( int ) cursorPos.y );
 	m_currentlyTrackingFrameIndex ++;
 }
 
@@ -62,7 +62,7 @@ void InputSystem::Update( float deltaSeconds )
 	ScreenToClient( ( HWND ) g_theWindow->m_hwnd , &cursorPos );
 
 	m_trackMouseVelocityOverFrames[ m_currentlyTrackingFrameIndex % TOTAL_MOUSE_DRAG_TRACK_FRAMES ] =
-		( Vec2( cursorPos.x , cursorPos.y ) - m_trackMouseVelocityOverFrames[ m_currentlyTrackingFrameIndex ] ) * ( 1.f / 60.f );
+		( Vec2( ( int ) cursorPos.x , ( int ) cursorPos.y ) - m_trackMouseVelocityOverFrames[ m_currentlyTrackingFrameIndex ] ) * ( 1.f / 60.f );
 
 	Vec2 tempVelocity = Vec2::ZERO;
 	for ( int index = 0 ; index < TOTAL_MOUSE_DRAG_TRACK_FRAMES ; index++ )
@@ -282,7 +282,7 @@ void InputSystem::UpdateMouse()
 
 	RECT clientRect;
 	GetClientRect( ( HWND ) g_theWindow->m_hwnd , &clientRect );
-	AABB2 clientBounds = AABB2( clientRect.left , clientRect.top , clientRect.right , clientRect.bottom );
+	AABB2 clientBounds( ( int ) clientRect.left , ( int ) clientRect.top , ( int ) clientRect.right , ( int ) clientRect.bottom );
 	m_mouseNormalizedPosition = clientBounds.GetUVForPoint( clientMousePosition );
 	m_mouseNormalizedPosition.y = 1.f - m_mouseNormalizedPosition.y;
 
@@ -415,7 +415,7 @@ void InputSystem::UpdateRelativeMode()
 		POINT cursorPos;
 		GetCursorPos( &cursorPos );
 	
-		Vec2 positionThisFrame( cursorPos.x , cursorPos.y );
+		Vec2 positionThisFrame( ( int ) cursorPos.x , ( int ) cursorPos.y );
 		m_relativeMovement = positionThisFrame - m_positionLastFrame;
 		// remap relative movement ()
 
@@ -424,14 +424,14 @@ void InputSystem::UpdateRelativeMode()
 		GetWindowRect( ( HWND ) g_theWindow->m_hwnd , &clientWindow );
 
 		// GetClientRect() to get rectangle, find center of that
-		Vec2 windowCenter = Vec2( clientWindow.right - clientWindow.left , clientWindow.bottom - clientWindow.top ) * 0.5f;
+		Vec2 windowCenter = Vec2( ( int ) clientWindow.right - ( int ) clientWindow.left , ( int ) clientWindow.bottom - ( int ) clientWindow.top ) * 0.5f;
 
 		SetCursorPos( ( int ) windowCenter.x , ( int ) windowCenter.y );
 
 		// one little trick... without - will cause drift (maybe)
 		POINT point;
 		GetCursorPos( &point  );
-		windowCenter = Vec2( point.x , point.y );
+		windowCenter = Vec2( ( int ) point.x , ( int ) point.y );
 
 		// recenter
 		m_positionLastFrame = windowCenter;
