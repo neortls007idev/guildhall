@@ -470,7 +470,7 @@
       <Filter>Networking</Filter>
     </ClCompile>
     <ClCompile Include="DebugUI\ImGUISystem.cpp">
-      <Filter>Core</Filter>
+      <Filter>DebugUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
