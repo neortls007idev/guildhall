@@ -17,16 +17,18 @@
 #include "Engine/Renderer/Material.hpp"
 #include "Engine/Renderer/ShaderState.hpp"
 #include "Engine/Core/NamedProperties.hpp"
+#include "Engine/DebugUI/ImGUISystem.hpp"
 #include "Engine/Renderer/Sampler.hpp"
+#include "ThirdParty/ImGUI/imgui.h"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 extern RenderContext*	g_theRenderer;
 extern TheApp*			g_theApp;
 extern DevConsole*		g_theDevConsole;
+extern ImGUISystem*		g_debugUI;
 
 static  bool			s_areDevconsoleCommandsLoaded = false;
-
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -38,6 +40,22 @@ STATIC dissolveData_t	Game::m_dissolveShaderData;
 STATIC fogDataT			Game::m_fogData;
 STATIC Texture*			Game::m_dissolveShaderPatternTexture;
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::ImGUITest()
+{
+	ImGui::NewFrame();
+	ImGui::Begin( "Hello World" );
+	ImGui::Text( "This is some Useful Text" );
+	ImGui::Checkbox( "Demo Window" , &uiTestCheck1 );
+	ImGui::Checkbox( "Another Window" , &uiTestCheck2 );
+
+	ImGui::SliderFloat( "float" , &uiTestSlider , 0.0f , 10000.0f );
+	ImGui::ColorEdit3( "Clear Color" , ( float* ) &uiTestColor );
+	ImGui::End();	
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 class Rahul
 {
@@ -101,7 +119,7 @@ Game::Game()
 	g_theEventSystem->SubscribeToMethod( "me" , &r , &Rahul::SomeMethod );
 	g_theEventSystem->FireEvent( "me" , g_gameConfigBlackboard );
 
-	g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
+	g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_WINDOWLOCKED , true ) );
 
 	m_unitCubeMesh = new GPUMesh( g_theRenderer );
 	
@@ -334,6 +352,7 @@ void Game::Update( float deltaSeconds )
 		m_testMaterial->SetData( m_dissolveShaderData );
 		m_testMaterial->m_uboIsDirty = false;
 	}
+	ImGUITest();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -615,8 +634,8 @@ void Game::DebugDrawUI( float deltaSeconds )
 void Game::Render() const
 {
 	Texture* backBuffer		= g_theRenderer->m_swapChain->GetBackBuffer();
-	Texture* colorTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
-	Texture* bloomTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+	Texture* colorTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer , "realColorTarget" );
+	Texture* bloomTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer , "BloomColorTarget" );
 	//Texture* normalTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
 	//Texture* tangentTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
 	//Texture* albedoTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
@@ -724,7 +743,7 @@ void Game::Render() const
 	if ( m_isblurShaderActive )
 	{
 		Shader* blurShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );;
-		Texture* blurredBloom = g_theRenderer->GetOrCreatematchingRenderTarget( bloomTarget );
+		Texture* blurredBloom = g_theRenderer->GetOrCreatematchingRenderTarget( bloomTarget , "BlurBloomTarget" );
 		g_theRenderer->StartEffect( blurredBloom , bloomTarget , blurShader );
 		g_theRenderer->BindTexture( bloomTarget , TEX_USER_TYPE );
 		g_theRenderer->EndEffect();
@@ -752,7 +771,7 @@ void Game::Render() const
 	}
 	if ( m_isToneMapShaderActive )
 	{
-		Texture* toneMapTarget = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
+		Texture* toneMapTarget = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget , "ToneMapTarget" );
 		Texture* currentView   = g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
 		g_theRenderer->CopyTexture( currentView , backBuffer );
 		g_theRenderer->StartEffect( toneMapTarget , currentView , m_toneMapShader );
@@ -770,9 +789,12 @@ void Game::Render() const
 	m_gameCamera.SetColorTarget( backBuffer );
 	
 	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8 , "LEAKING RENDER TARGETS" );
-
+	
 	DebugRenderWorldToCamera( &m_gameCamera );
 	DebugRenderScreenTo( nullptr );
+
+	g_debugUI->Render();
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

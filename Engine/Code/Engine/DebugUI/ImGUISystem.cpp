@@ -9,6 +9,10 @@ ImGUISystem::ImGUISystem( Window* window, RenderContext* renderContext )
 {
 	m_renderContext = renderContext;
 	m_theWindow		= window;
+
+	m_debugCamera = new Camera();
+	m_debugCamera->SetProjectionOrthographic( 1080.f );
+	m_debugCamera->SetClearMode( CLEAR_NONE , BLACK );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -17,6 +21,8 @@ ImGUISystem::~ImGUISystem()
 {
 	
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 void ImGUISystem::Startup()
 {
@@ -32,6 +38,9 @@ void ImGUISystem::Startup()
 
 void ImGUISystem::Shutdown()
 {
+	delete m_debugCamera;
+	m_debugCamera = nullptr;
+	
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
@@ -56,13 +65,14 @@ void ImGUISystem::BeginFrame()
 
 void ImGUISystem::Update( float deltaSeconds )
 {
-
+	UNUSED( deltaSeconds );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void ImGUISystem::Render() const
 {
+	m_renderContext->BeginCamera( *m_debugCamera );
 	ImGui::Render();
 	ImDrawData* data = ImGui::GetDrawData();
 
@@ -75,6 +85,7 @@ void ImGUISystem::Render() const
 	//m_renderContext->m_context->OMSetRenderTargets(1,)
 	
 	ImGui_ImplDX11_RenderDrawData( data );
+	m_renderContext->EndCamera( *m_debugCamera );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

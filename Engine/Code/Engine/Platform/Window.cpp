@@ -7,6 +7,8 @@
 
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/DebugUI/ImGUISystem.hpp"
+#include "ThirdParty/ImGUI/imgui.h"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //		STATIC AND GLOBAL VARIABLES
@@ -18,6 +20,13 @@ extern InputSystem*		g_theInput;
 //-----------------------------------------------------------------------------------------------
 // Handles Windows (Win32) messages/events; i.e. the OS is trying to tell us something happened.
 // This function is called by Windows whenever we ask it for notifications
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//		IMGUI WINDOWS MESSAGE HANDLING FOR IO
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+extern ImGUISystem* g_debugUI;
+extern LRESULT ImGui_ImplWin32_WndProcHandler( HWND windowHandle , UINT wmMessageCode , WPARAM wParam , LPARAM lParam );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -37,6 +46,8 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 		input = window->GetInputSytem();
 	}
 
+	bool isInputProcessedByImGUI = ImGui_ImplWin32_WndProcHandler( windowHandle , wmMessageCode , wParam , lParam );
+	
 	switch ( wmMessageCode )
 	{
 		case WM_CREATE: {
@@ -131,6 +142,16 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 		{
 			g_theInput->UpdateMouseWheel( GET_WHEEL_DELTA_WPARAM( wParam ) );
 			break;
+		}
+	}
+
+	if( g_debugUI != nullptr )
+	{
+		const ImGuiIO& io = ImGui::GetIO();
+
+		if( isInputProcessedByImGUI || io.WantCaptureMouse )
+		{
+			// Do nothing Input was processed by ImGUI
 		}
 	}
 

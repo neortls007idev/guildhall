@@ -371,7 +371,7 @@ void RenderContext::SetDepthTest( eCompareOp compare , bool writeOnPass )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Texture* RenderContext::CreateRenderTarget( IntVec2 texelSize )
+Texture* RenderContext::CreateRenderTarget( IntVec2 texelSize , std::string debugRenderTargetName )
 {
 	D3D11_TEXTURE2D_DESC desc;
 	desc.Width						= texelSize.x;
@@ -395,6 +395,9 @@ Texture* RenderContext::CreateRenderTarget( IntVec2 texelSize )
 	std::string debugName = "Render Target Texture";
 	SetDebugName( ( ID3D11DeviceChild* ) temp->GetHandle() , &debugName );
 
+	TextureView* renderTarget = temp->GetOrCreateRenderTargetView();
+	SetDebugName( renderTarget->m_rtv , &debugRenderTargetName );
+	
 	return temp;
 }
 
@@ -668,7 +671,6 @@ ShaderState* RenderContext::GetOrCreateShaderState( char const* shaderStateFilen
 void RenderContext::SetInputLayoutForIA( buffer_attribute_t const* attribs )
 {
 	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
-	//m_context->RSSetState( m_currentShader->m_rasterState );
 	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fragmentShader , nullptr , 0 );
 	m_context->CSSetShader( m_currentShader->m_fragmentStage.m_computeShader , nullptr , 0 );
 	
@@ -898,7 +900,7 @@ void RenderContext::EndEffect()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Texture* RenderContext::GetOrCreatematchingRenderTarget( Texture* texture )
+Texture* RenderContext::GetOrCreatematchingRenderTarget( Texture* texture , std::string debugRenderTargetName/* = "Unreleased RTV"*/ )
 {
 	IntVec2 size = texture->GetDimensions();
 
@@ -916,7 +918,7 @@ Texture* RenderContext::GetOrCreatematchingRenderTarget( Texture* texture )
 		}
 	}
 
-	Texture* newRenderTarget = CreateRenderTarget( size );
+	Texture* newRenderTarget = CreateRenderTarget( size , debugRenderTargetName );
 	//m_renderTargetPool.push_back( newRenderTarget );
 	m_renderTargetPoolSize++;
 	return newRenderTarget;

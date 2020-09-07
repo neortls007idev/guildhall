@@ -166,12 +166,12 @@ public:
 	Texture*				GetFrameColorTarget();															// TODO :- IMPLEMENT ME
 	
 	// RENDER TARGET TEXTURE DOES NOT GET STORED IN ANY MAP
-	Texture*				CreateRenderTarget( IntVec2 texelSize );			
+	Texture*				CreateRenderTarget( IntVec2 texelSize , std::string debugRenderTargetName = "Unreleased RTV" );
 	void					CopyTexture( Texture* destination , Texture* source );
 	void					StartEffect( Texture* destination , Texture* source , Shader* shader );
 	void					EndEffect();
 	
-	Texture*				GetOrCreatematchingRenderTarget( Texture* texture );
+	Texture*				GetOrCreatematchingRenderTarget( Texture* texture , std::string debugRenderTargetName = "Unreleased RTV" );
 	void					ReleaseRenderTarget( Texture* texture );
 	int						GetTotalRenderTargetPoolSize() const				 { return m_renderTargetPoolSize;  }
 	int						GetTexturePoolFreeCount() const						 { return 8 - m_renderTargetPoolSize;  }

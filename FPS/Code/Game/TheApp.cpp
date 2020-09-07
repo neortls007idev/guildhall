@@ -2,6 +2,7 @@
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/EventSystem.hpp"
+#include "Engine/DebugUI/ImGUISystem.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Input/VirtualKeyboard.hpp"
 #include "Engine/Platform/Window.hpp"
@@ -9,9 +10,9 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Time/Time.hpp"
+#include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
-#include "Game/Game.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -20,6 +21,7 @@ TheApp*								g_theApp		= nullptr;
 InputSystem*						g_theInput		= nullptr;
 DevConsole*							g_theDevConsole = nullptr;
 Game*								g_theGame		= nullptr;
+ImGUISystem*						g_debugUI		= nullptr;			
 extern BitmapFont*					g_bitmapFont;
 extern DebugRenderObjectsManager*	g_currentManager;
 
@@ -37,6 +39,9 @@ TheApp::~TheApp()
 	delete g_theGame;
 	g_theGame = nullptr;
 
+	delete g_debugUI;
+	g_debugUI = nullptr;
+	
 	//delete g_theAudioSystem;
 	//g_theAudioSystem = nullptr;
 
@@ -117,6 +122,12 @@ void TheApp::Startup()
 // 	}
 // 	g_theAudioSystem->Startup();
 
+	if ( g_debugUI == nullptr )
+	{
+		g_debugUI = new ImGUISystem( g_theWindow , g_theRenderer );
+	}
+	g_debugUI->Startup();
+	
 	if ( g_theGame == nullptr )
 	{
 		g_theGame = new Game();
@@ -151,6 +162,7 @@ void TheApp::BeginFrame()
 	g_theRenderer->BeginFrame();
 	g_theDevConsole->BeginFrame();
 	g_currentManager->BeginFrame();
+	g_debugUI->BeginFrame();
 	
 	if ( m_taskbarProgress < 100.f  && m_taskbarProgressMode == WND_PROGRESS_VALUE )
 	{
@@ -167,6 +179,7 @@ void TheApp::BeginFrame()
 		g_theWindow->SetProgress( m_taskbarProgressMode , m_taskbarProgress );
 		//m_taskbarProgress = 0.f;
 	}
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -205,6 +218,7 @@ void TheApp::Render() const
 void TheApp::EndFrame()
 {
 	// all engine things that must end at the end of the frame and not the game
+	g_debugUI->EndFrame();
 	g_currentManager->EndFrame();
 	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
@@ -223,6 +237,7 @@ void TheApp::EndFrame()
 
 void TheApp::Shutdown()
 {
+	g_debugUI->Shutdown();
 	//g_theAudioSystem->Shutdown();
 	//g_thePhysicsSystem->Shutdown();
 	g_currentManager->Shutdown();

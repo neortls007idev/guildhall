@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Engine/Renderer/Camera.hpp"
 #include "ThirdParty/ImGUI/imgui.h"
 #include "ThirdParty/ImGUI/imgui_impl_dx11.h"
 #include "ThirdParty/ImGUI/imgui_impl_win32.h"
@@ -28,7 +29,8 @@ public:
 
 public:
 	RenderContext*	m_renderContext = nullptr;
-	Window*			m_theWindow = nullptr;
+	Window*			m_theWindow		= nullptr;
+	Camera*			m_debugCamera	= nullptr;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

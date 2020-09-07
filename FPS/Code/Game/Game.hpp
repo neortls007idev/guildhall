@@ -221,5 +221,12 @@ public:
 	Texture*					m_cubeMapex		= nullptr;
 	Shader*						m_cubeMapTest	= nullptr;
 	Sampler*					m_cubeSampler	= nullptr;
-	Sampler*					m_linear		= nullptr;	
+	Sampler*					m_linear		= nullptr;
+
+private:
+	void ImGUITest();
+	bool uiTestCheck1;
+	bool uiTestCheck2 = true;
+	float uiTestSlider;
+	float uiTestColor[ 3 ];
 };
