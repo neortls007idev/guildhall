@@ -14,7 +14,11 @@
 #pragma once
 #include "imgui.h"      // IMGUI_IMPL_API
 
+#pragma warning( push )
+#pragma warning ( disable: 4471 )
 enum DXGI_FORMAT;
+#pragma warning( pop )
+
 struct ID3D12Device;
 struct ID3D12DescriptorHeap;
 struct ID3D12GraphicsCommandList;

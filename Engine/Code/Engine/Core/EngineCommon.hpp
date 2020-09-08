@@ -6,6 +6,8 @@
 #include "Engine/Core/EventSystem.hpp"
 #include <string>
 
+#define MSVC
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 class RandomNumberGenerator;

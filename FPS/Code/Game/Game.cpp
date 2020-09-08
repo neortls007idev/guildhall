@@ -45,13 +45,24 @@ STATIC Texture*			Game::m_dissolveShaderPatternTexture;
 void Game::ImGUITest()
 {
 	ImGui::NewFrame();
-	ImGui::Begin( "Hello World" );
-	ImGui::Text( "This is some Useful Text" );
-	ImGui::Checkbox( "Demo Window" , &uiTestCheck1 );
-	ImGui::Checkbox( "Another Window" , &uiTestCheck2 );
+	if( ImGui::Begin( "UI Controls" ) )
+	{
+		ImGui::Text( "Effects" );
+		if( ImGui::CollapsingHeader( "Effects" ) )
+		{
+			ImGui::BeginChild( "Effects" );
+			ImGui::Checkbox( "Tone Map" , &m_isToneMapShaderActive );
+			ImGui::Checkbox( "Bloom Blur" , &m_isblurShaderActive );
+			ImGui::EndChild();	
+		}
 
-	ImGui::SliderFloat( "float" , &uiTestSlider , 0.0f , 10000.0f );
-	ImGui::ColorEdit3( "Clear Color" , ( float* ) &uiTestColor );
+		ImGui::RadioButton( "one" , 0 ) ; ImGui::SameLine();
+		ImGui::RadioButton( "two" , 1 ); ImGui::SameLine();
+		ImGui::RadioButton( "oneb" , 0 );
+		
+		ImGui::SliderFloat( "float" , &uiTestSlider , 0.0f , 10000.0f );
+		ImGui::ColorEdit3( "Clear Color" , ( float* ) &uiTestColor );
+	}
 	ImGui::End();	
 }
 
@@ -607,7 +618,7 @@ void Game::DebugDrawUI( float deltaSeconds )
 	if ( m_isToneMapShaderActive )
 	{
 		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 26 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
-			deltaSeconds , "[F3] Tone Map = ACTIVE" );
+							 deltaSeconds , "[F3] Tone Map = ACTIVE" );
 		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 27 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,
 			deltaSeconds , "[UP/DOWN ARROW] Switch Tone Map" );
 		DebugAddScreenTextf( Vec4( 0.f , 0.f , 1.f , 1 - ( 28 * normalizedOffset ) ) , Vec2::ONE , 14.5f , ORANGE ,

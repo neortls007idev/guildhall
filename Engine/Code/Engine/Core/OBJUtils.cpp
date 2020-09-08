@@ -449,7 +449,9 @@ void GenerateTangentsForVertexArray( std::vector<VertexMaster>& vertices )
 
 void LoadOBJWithMaterial( GPUMesh* mesh , std::vector<tinyobj::shape_t>& shapes , std::vector<tinyobj::material_t>& material )
 {
-
+	UNUSED( mesh );
+	UNUSED( shapes );
+	UNUSED( material );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

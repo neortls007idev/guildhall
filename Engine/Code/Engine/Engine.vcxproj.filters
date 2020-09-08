@@ -119,6 +119,9 @@
     <Filter Include="Networking">
       <UniqueIdentifier>{3274900d-59ac-4d8b-98a9-f907c71dcab1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ThirdParty\ImGUI\FileDialogBox">
+      <UniqueIdentifier>{c7094d33-6ba5-4104-83fe-ce613f3331fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Rgba8.cpp">
@@ -460,9 +463,6 @@
     <ClCompile Include="..\ThirdParty\ImGUI\imgui_impl_win32.cpp">
       <Filter>ThirdParty\ImGUI\Platform</Filter>
     </ClCompile>
-    <ClCompile Include="Networking\Network.cpp">
-      <Filter>Networking</Filter>
-    </ClCompile>
     <ClCompile Include="Networking\Client.cpp">
       <Filter>Networking</Filter>
     </ClCompile>
@@ -471,6 +471,12 @@
     </ClCompile>
     <ClCompile Include="DebugUI\ImGUISystem.cpp">
       <Filter>DebugUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Networking\NetworkSystem.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGUI\ImGuiFileDialog.cpp">
+      <Filter>ThirdParty\ImGUI\FileDialogBox</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -867,9 +873,6 @@
     <ClInclude Include="..\ThirdParty\ImGUI\imgui_impl_win32.h">
       <Filter>ThirdParty\ImGUI\Platform</Filter>
     </ClInclude>
-    <ClInclude Include="Networking\Network.hpp">
-      <Filter>Networking</Filter>
-    </ClInclude>
     <ClInclude Include="Networking\Client.hpp">
       <Filter>Networking</Filter>
     </ClInclude>
@@ -881,6 +884,18 @@
     </ClInclude>
     <ClInclude Include="DebugUI\ImGUISystem.hpp">
       <Filter>DebugUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\NetworkSystem.hpp">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\ImGUI\ImGuiFileDialog.h">
+      <Filter>ThirdParty\ImGUI\FileDialogBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\ImGUI\ImGuiFileDialogConfig.h">
+      <Filter>ThirdParty\ImGUI\FileDialogBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\ImGUI\dirent.h">
+      <Filter>ThirdParty\ImGUI\FileDialogBox</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
