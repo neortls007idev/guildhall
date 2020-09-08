@@ -114,5 +114,6 @@ private:
 	fresnelData_t				m_fresnelShaderData;
 	dissolveData_t				m_dissolveShaderData;
 	fogDataT					m_fogData;
-	float						m_frameRate = 0.f;
+	float						m_frameRate			  = 0.f;
+	bool						m_isMouseUnlocked	  = false;
 };

@@ -148,5 +148,8 @@
     <Xml Include="..\..\Run\Data\Materials\testMaterial.xml">
       <Filter>Data\Materials</Filter>
     </Xml>
+    <Xml Include="..\..\Run\Data\Models\Models.xml">
+      <Filter>Data\XML Data</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

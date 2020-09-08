@@ -20,11 +20,19 @@
 #include "ThirdParty/ImGUI/ImGuiFileDialog.h"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+#include <cguid.h>
+#include <atlbase.h>
+#include <d3d11_1.h>
+#pragma comment( lib, "d3d11.lib" ) 
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 extern RenderContext*	g_theRenderer;
 extern TheApp*			g_theApp;
 extern DevConsole*		g_theDevConsole;
 extern ImGUISystem*		g_debugUI;
+
+CComPtr<ID3DUserDefinedAnnotation> pPerf;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -48,7 +56,7 @@ Game::Game()
 	InitializeLightData();
 	InitializeShaderMaterialData();
 	
-	g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_WINDOWLOCKED , true ) );
+	g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
 
 	m_unitCubeMesh = new GPUMesh( g_theRenderer );
 	
@@ -66,6 +74,12 @@ Game::Game()
 
 	m_cubeSampler = new Sampler( g_theRenderer , SAMPLER_CUBEMAP );
 	m_linear = new Sampler( g_theRenderer , SAMPLER_BILINEAR );
+
+	HRESULT hr = g_theRenderer->m_context->QueryInterface( __uuidof( pPerf ) , reinterpret_cast< void** >( &pPerf ) );
+	if( FAILED( hr ) )
+	{
+		__debugbreak();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -103,6 +117,15 @@ void Game::InitializeCameras()
 
 void Game::Update( float deltaSeconds )
 {
+	if ( m_isMouseUnlocked )
+	{
+		g_theInput->PopCursorSettings();
+	}
+	else
+	{
+		g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
+	}
+	
 	m_frameRate = 1.f / deltaSeconds;
 	
 	m_ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
@@ -162,6 +185,10 @@ void Game::Render() const
 	m_gameCamera.SetColorTarget( 0 , colorTarget );
 	m_gameCamera.SetColorTarget( 1 , bloomTarget );
 
+	//const wchar_t* profillingEventName = L"RenderStart";
+	//ID3DUserDefinedAnnotation::BeginEvent( profillingEventName );
+	pPerf->BeginEvent( L"RenderStart" );
+	
 	g_theRenderer->BeginCamera( m_gameCamera );
 	m_gameCamera.CreateMatchingDepthStencilTarget(); 
 	g_theRenderer->BindDepthStencil( m_gameCamera.GetDepthStencilTarget() );
@@ -275,6 +302,8 @@ void Game::Render() const
 	g_theRenderer->ReleaseRenderTarget( colorTarget );
 	
 	m_gameCamera.SetColorTarget( backBuffer );
+
+	pPerf->EndEvent();
 	
 	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8 , "LEAKING RENDER TARGETS" );
 	
@@ -329,7 +358,12 @@ void Game::RenderFresnelShader2ndPass() const
 
 void Game::UpdateFromKeyBoard( float deltaSeconds )
 {
-	if ( g_theDevConsole->IsOpen() )
+	if( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasKeyJustPressed( 'T' ) )
+	{
+		m_isMouseUnlocked = !m_isMouseUnlocked;
+	}
+	
+	if ( g_theDevConsole->IsOpen() || m_isMouseUnlocked )
 	{
 		return;
 	}
