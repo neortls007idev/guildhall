@@ -11,6 +11,8 @@ class Shader;
 class Texture;
 class GPUMesh;
 
+typedef std::vector< Transform* > OBJInstances;
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 class Game
@@ -22,6 +24,7 @@ public:
 			void InitializeLightData();
 			void LoadShaders();
 			void LoadTextures();
+			void LoadModels();
 			void InitializeCameras();
 			void IntializeGameObjects();
 			void InitializeShaderMaterialData();
@@ -44,6 +47,9 @@ public:
 
 private:
 			void DebugUI();
+			bool AddGameOBJInstance( eGameObjModels modelType );
+			bool DestroyGameOBJInstance( eGameObjModels modelType , int instanceCount );
+			void RenderAllInstancesOfType( eGameObjModels modelType ) const;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				METHODS TO HANDLE USER INPUT
@@ -109,6 +115,12 @@ public:
 	Shader*						m_cubeMapTest	= nullptr;
 	Sampler*					m_cubeSampler	= nullptr;
 	Sampler*					m_linear		= nullptr;
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+
+	GPUMesh*					m_gameModels[ NUM_GAME_MODELS ];
+	Texture*					m_gameModelsDiffuse[ NUM_GAME_MODELS ];
+	Texture*					m_gameModelsNormals[ NUM_GAME_MODELS ];
+	OBJInstances				m_OBJInstance[ NUM_GAME_MODELS ];
 
 private:
 	fresnelData_t				m_fresnelShaderData;

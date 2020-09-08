@@ -23,7 +23,7 @@ public:
 	inline float GetRoll() const															{ return m_roll; }
 	inline Vec3  GetPostion() const															{ return m_position; }
 
-private:
+public:
 	Vec3	m_position			= Vec3( 0.0f );
 	float	m_pitch				= 0.f;
 	float	m_yaw				= 0.f;

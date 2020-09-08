@@ -1,3 +1,4 @@
+#include "Engine/Core/StdExtensions.hpp"
 #include "Game/Game.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -52,3 +53,36 @@ void Game::UpdateToneMapData()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Game::AddGameOBJInstance( eGameObjModels modelType )
+{
+	if( nullptr == m_gameModels[ modelType ] )
+	{
+		return false;
+	}
+
+	Transform* newTransform = new Transform();
+
+	EmplaceBackAtEmptySpace( m_OBJInstance[ modelType ] , newTransform );
+	//m_OBJInstance[ modelType ].push_back( newTransform );
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Game::DestroyGameOBJInstance( eGameObjModels modelType , int instanceCount )
+{
+	if ( nullptr == m_OBJInstance[ modelType ][ instanceCount ] )
+	{
+		return false;
+	}
+	
+	delete m_OBJInstance[ modelType ][ instanceCount ];
+	m_OBJInstance[ modelType ][ instanceCount ] = nullptr;
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+

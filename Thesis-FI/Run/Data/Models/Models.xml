@@ -1,6 +1,7 @@
 <Models>
-	<Model path="" diffuse="" normals="" enumValue ="" />
-	<Model path="" diffuse="" normals="" enumValue ="" />
-	<Model path="" diffuse="" normals="" enumValue ="" />
-	<Model path="" diffuse="" normals="" enumValue ="" />
+	<Model path="Data/Models/scifiFighter/mesh.obj" 
+	       diffuse="Data/Models/scifiFighter/diffuse.jpg" 
+	       normals="Data/Models/scifiFighter/normal.png" 
+	       enumValue ="0" />
+
 </Models>

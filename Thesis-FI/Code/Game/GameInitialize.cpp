@@ -1,3 +1,4 @@
+#include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/OBJUtils.hpp"
 #include "Engine/Core/VertexLit.hpp"
 #include "Engine/Core/VertexUtils.hpp"
@@ -100,6 +101,71 @@ void Game::LoadTextures()
 
 	m_objSciFiShipMeshTex_D		   = g_theRenderer->GetOrCreateTextureFromFile( "Data/Models/scifiFighter/diffuse.jpg" );
 	m_objSciFiShipMeshTex_N		   = g_theRenderer->GetOrCreateTextureFromFile( "Data/Models/scifiFighter/normal.png" );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::LoadModels()
+{
+	tinyxml2::XMLDocument xmlDocument;
+	xmlDocument.LoadFile( "Data/Models/Models.xml" );
+
+	if( xmlDocument.ErrorID() == tinyxml2::XML_SUCCESS )
+	{
+		tinyxml2::XMLElement* modelsRoot = xmlDocument.RootElement();
+		int numModelsListed = 0;
+		
+		tinyxml2::XMLElement* model = modelsRoot->FirstChildElement( "Model" );
+		while( model != nullptr )
+		{
+			numModelsListed++;
+			model = model->NextSiblingElement( "Model" );
+		}
+
+		GUARANTEE_OR_DIE( ( numModelsListed <= ( int ) NUM_GAME_MODELS ) , " Models listed in XML are more than defined in the eGameOBJModels in GameCommon.hpp" );
+
+		model = modelsRoot->FirstChildElement( "Model" );
+		while( model != nullptr )
+		{
+			bool isDataBad = false;
+			
+			std::string modelPath		= ParseXmlAttribute( *model , "path" , "" );
+			std::string modelDiffuseTex = ParseXmlAttribute( *model , "diffuse" , "" );
+			std::string modelNormalTex  = ParseXmlAttribute( *model , "normal" , "" );
+			int enumValue				= ParseXmlAttribute( *model , "enumValue" , -1 );
+
+			if( ( enumValue < 0 ) && ( enumValue >= NUM_GAME_MODELS ) )
+			{
+				isDataBad = true;
+			}
+
+			if ( modelPath == "" )
+			{
+				isDataBad = true;
+			}
+
+			if ( !isDataBad )
+			{
+				m_gameModels[ enumValue ] = new GPUMesh( g_theRenderer );
+				MeshBuilderOptions objMeshOptions;
+				objMeshOptions.generateTangents = true;
+				objMeshOptions.generateNormals = true;
+				objMeshOptions.clean = true;
+				m_gameModels[ enumValue ] = LoadObjFileIntoGpuMesh( objMeshOptions , "Data/Models/scifiFighter/mesh.obj" );
+
+				if ( modelDiffuseTex != "" )
+				{
+					m_gameModelsDiffuse[ enumValue ] = g_theRenderer->GetOrCreateTextureFromFile( modelDiffuseTex.c_str() );
+				}
+				
+				if ( modelNormalTex != "" )
+				{
+					m_gameModelsNormals[ enumValue ] = g_theRenderer->GetOrCreateTextureFromFile( modelNormalTex.c_str() );
+				}
+			}
+			model = model->NextSiblingElement( "Model" );
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

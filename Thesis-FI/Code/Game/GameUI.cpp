@@ -6,6 +6,19 @@
 
 extern RenderContext* g_theRenderer;
 
+static ImGuiComboFlags flags = 0;
+static int currentModelToAddIndex = 0;
+static int currentModelToUpdateIndex = 0;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+const char* modelNames[ NUM_GAME_MODELS ] =
+{
+	"SPACESHIP" ,
+	"LUMINARIS_SHIP" ,
+	"CITY_BUILDING_1" ,
+};
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Game::DebugUI()
@@ -206,6 +219,80 @@ void Game::DebugUI()
 					}
 					// close
 					igfd::ImGuiFileDialog::Instance()->CloseDialog( "Select Dissolve Pattern" );
+				}
+			}
+		}
+
+		if( ImGui::CollapsingHeader( "Scene Setup" ) )
+		{			
+			if( ImGui::BeginCombo( "OBJs" , modelNames[ currentModelToAddIndex ] , flags ) )
+			{
+				for( int modelIndex = 0; modelIndex < NUM_GAME_MODELS; modelIndex++ )
+				{
+					const bool is_selected = ( currentModelToAddIndex == modelIndex );
+					if( ImGui::Selectable( modelNames[ modelIndex ] , is_selected ) )
+					{
+						currentModelToAddIndex = modelIndex;
+					}
+
+					// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+					if( is_selected )
+						ImGui::SetItemDefaultFocus();
+				}
+
+				ImGui::EndCombo();
+			}
+
+			std::string instanceButton = "Add instance of" + std::string( modelNames[ currentModelToAddIndex ] );
+
+			if ( ImGui::Button( instanceButton .c_str() ) )
+			{
+				AddGameOBJInstance( ( eGameObjModels )currentModelToAddIndex );
+			}
+
+			if( ImGui::BeginCombo( "OBJs to Update" , modelNames[ currentModelToUpdateIndex ] , flags ) )
+			{
+				for( int modelIndex = 0; modelIndex < NUM_GAME_MODELS; modelIndex++ )
+				{
+					const bool is_selected = ( currentModelToUpdateIndex == modelIndex );
+					if( ImGui::Selectable( modelNames[ modelIndex ] , is_selected ) )
+					{
+						currentModelToUpdateIndex = modelIndex;
+					}
+
+					// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+					if( is_selected )
+						ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
+
+			std::string instancesHeader = "All instance of" + std::string( modelNames[ currentModelToUpdateIndex ] );
+			if( ImGui::CollapsingHeader( instancesHeader.c_str() ) )
+			{
+				for( int instanceIndex = 0 ; instanceIndex < ( int ) m_OBJInstance[ currentModelToUpdateIndex ].size() ; instanceIndex++ )
+				{
+					if( nullptr != m_OBJInstance[ currentModelToUpdateIndex ][ instanceIndex ] )
+					{
+						std::string instanceName = modelNames[ currentModelToUpdateIndex ] + std::string( " " ) + ToString( instanceIndex + 1 );
+
+						if( ImGui::TreeNode( instanceName.c_str() ) )
+						{
+							ImGui::Text( "Transform" );
+							ImGui::InputFloat3( "World Position" , ( float* ) &m_OBJInstance[ currentModelToUpdateIndex ][ instanceIndex ]->m_position );
+							ImGui::InputFloat( "Yaw" , ( float* ) &m_OBJInstance[ currentModelToUpdateIndex ][ instanceIndex ]->m_yaw );		//ImGui::SameLine();
+							ImGui::InputFloat( "Pitch" , ( float* ) &m_OBJInstance[ currentModelToUpdateIndex ][ instanceIndex ]->m_pitch );	//ImGui::SameLine();
+							ImGui::InputFloat( "Roll" , ( float* ) &m_OBJInstance[ currentModelToUpdateIndex ][ instanceIndex ]->m_roll );
+							ImGui::InputFloat3( "Scale" , ( float* ) &m_OBJInstance[ currentModelToUpdateIndex ][ instanceIndex ]->m_scale );
+
+							if( ImGui::Button( "Destroy Instance" ) )
+							{
+								DestroyGameOBJInstance( ( eGameObjModels ) currentModelToUpdateIndex , instanceIndex );
+							}
+
+							ImGui::TreePop();
+						}
+					}
 				}
 			}
 		}

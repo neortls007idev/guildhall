@@ -40,6 +40,7 @@ Game::Game()
 {
 	LoadShaders();
 	LoadTextures();
+	LoadModels();
 	
 	m_tileDiffuse	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/tile_diffuse.png" );
 	m_tileDiffuse	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Test_StbiFlippedAndOpenGL.png" );
@@ -228,6 +229,7 @@ void Game::Render() const
 	g_theRenderer->SetModelMatrix( m_cubeMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
+	RenderAllInstancesOfType( SPACESHIP );
 	
 	if ( m_isFresnelShaderActive )													{	RenderFresnelShader2ndPass();	}
 		
@@ -352,6 +354,24 @@ void Game::RenderFresnelShader2ndPass() const
 	g_theRenderer->SetModelMatrix( m_cubeMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_cubeMesh );
 	g_theRenderer->SetBlendMode( SOLID );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::RenderAllInstancesOfType( eGameObjModels modelType ) const
+{
+	g_theRenderer->BindTexture( m_gameModelsDiffuse[ modelType ] );
+	g_theRenderer->BindTexture( m_gameModelsNormals[ modelType ] , TEX_NORMAL );
+	
+	for( size_t instanceIndex = 0 ; instanceIndex < m_OBJInstance[ modelType ].size(); instanceIndex++ )
+	{
+		if ( nullptr == m_OBJInstance[ modelType ][ instanceIndex ] )
+		{
+			continue;
+		}
+		g_theRenderer->SetModelMatrix( m_OBJInstance[ modelType ][ instanceIndex ]->GetAsMatrix() );
+		g_theRenderer->DrawMesh( m_gameModels[ modelType ] );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
