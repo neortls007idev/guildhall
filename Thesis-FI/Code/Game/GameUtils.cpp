@@ -63,7 +63,7 @@ bool Game::AddGameOBJInstance( eGameObjModels modelType )
 
 	Transform* newTransform = new Transform();
 
-	EmplaceBackAtEmptySpace( m_OBJInstance[ modelType ] , newTransform );
+	EmplaceBackAtEmptySpace( m_ModelInstances[ modelType ] , newTransform );
 	//m_OBJInstance[ modelType ].push_back( newTransform );
 
 	return true;
@@ -73,16 +73,110 @@ bool Game::AddGameOBJInstance( eGameObjModels modelType )
 
 bool Game::DestroyGameOBJInstance( eGameObjModels modelType , int instanceCount )
 {
-	if ( nullptr == m_OBJInstance[ modelType ][ instanceCount ] )
+	if ( nullptr == m_ModelInstances[ modelType ][ instanceCount ] )
 	{
 		return false;
 	}
 	
-	delete m_OBJInstance[ modelType ][ instanceCount ];
-	m_OBJInstance[ modelType ][ instanceCount ] = nullptr;
+	delete m_ModelInstances[ modelType ][ instanceCount ];
+	m_ModelInstances[ modelType ][ instanceCount ] = nullptr;
 
 	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Game::LoadScene()
+{
+	tinyxml2::XMLDocument xmlDocument;
+	xmlDocument.LoadFile( "Data/Models/ModelInstances.xml" );
+
+	if( xmlDocument.ErrorID() == tinyxml2::XML_SUCCESS )
+	{
+		tinyxml2::XMLElement* modelsRoot = xmlDocument.RootElement();
+		
+		tinyxml2::XMLElement* modelInstance = modelsRoot->FirstChildElement( "ModelInstance" );
+		tinyxml2::XMLElement* modelTransform = nullptr;
+
+		while( modelInstance != nullptr )
+		{
+			modelTransform = modelInstance->FirstChildElement( "Transform" );
+
+			bool isDataBad = false;
+
+			int  modelIndex			= ParseXmlAttribute( *modelInstance , "enumValue" , 0 );
+			
+			Vec3 instancePos		= ParseXmlAttribute( *modelTransform , "pos" , Vec3::ZERO );
+			float instanceYaw		= ParseXmlAttribute( *modelTransform , "yaw" , 0.0f );
+			float instancePitch		= ParseXmlAttribute( *modelTransform , "pitch" , 0.0f );
+			float instanceRoll		= ParseXmlAttribute( *modelTransform , "roll" , 0.0f );
+			Vec3 instanceScale		= ParseXmlAttribute( *modelTransform , "scale" , Vec3::ZERO );
+			
+			
+			if( ( modelIndex < 0 ) && ( modelIndex >= NUM_GAME_MODELS ) )
+			{
+				isDataBad = true;
+			}
+
+			if( !isDataBad )
+			{
+				Transform* newInstance = new Transform();
+				newInstance->SetPosition( instancePos );
+				newInstance->SetRotation( instancePitch , instanceYaw , instanceRoll );
+				newInstance->SetScale( instanceScale.x , instanceScale.y , instanceScale.z );
+				m_ModelInstances[ modelIndex ].emplace_back( newInstance );
+			}
+			modelInstance = modelInstance->NextSiblingElement( "ModelInstance" );
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::SaveScene()
+{
+	tinyxml2::XMLDocument xmlDocument;
+	xmlDocument.LoadFile( "Data/Models/ModelInstances.xml" );
+	xmlDocument.Clear();
+
+	XMLElement* modelInstancesRootNode = xmlDocument.NewElement( "ModelIntances" );
+	xmlDocument.LinkEndChild( modelInstancesRootNode );
+
+	for ( int modelType = 0 ; modelType < NUM_GAME_MODELS ; modelType++ )
+	{
+		for ( size_t modelInstanceCount = 0 ; modelInstanceCount < m_ModelInstances[modelType].size() ; modelInstanceCount++ )
+		{
+			Transform* currTransform = m_ModelInstances[ modelType ][ modelInstanceCount ];
+
+			if ( nullptr == currTransform )
+			{
+				continue;
+			}
+			
+			XMLElement* modelInstance = xmlDocument.NewElement( "ModelInstance" );
+			tinyxml2::XMLText* modeInstanceText = xmlDocument.NewText( "" );
+
+			modelInstance->SetAttribute( "enumValue" , 0 );
+
+			XMLElement* instanceTransform = xmlDocument.NewElement( "Transform" );
+			tinyxml2::XMLText* instanceTransformText = xmlDocument.NewText( "" );
+
+			instanceTransform->SetAttribute( "pos"		, ToString( currTransform->GetPostion() ).c_str() );
+			instanceTransform->SetAttribute( "yaw"		, ToString( currTransform->GetYaw() ).c_str() );
+			instanceTransform->SetAttribute( "pitch"	, ToString( currTransform->GetPitch() ).c_str() );
+			instanceTransform->SetAttribute( "roll"		, ToString( currTransform->GetRoll() ).c_str() );
+			instanceTransform->SetAttribute( "scale"	, ToString( currTransform->GetScale() ).c_str() );
+			
+			modelInstance->InsertFirstChild( instanceTransform );
+			modelInstance->LinkEndChild( instanceTransform );
+			instanceTransform->LinkEndChild( instanceTransformText );
+
+			modelInstancesRootNode->LinkEndChild( modelInstance );
+			modelInstance->LinkEndChild( modeInstanceText );
+		}
+	}
+
+	xmlDocument.SaveFile( "Data/Models/ModelInstances.xml" );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

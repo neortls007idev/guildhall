@@ -151,5 +151,8 @@
     <Xml Include="..\..\Run\Data\Models\Models.xml">
       <Filter>Data\XML Data</Filter>
     </Xml>
+    <Xml Include="..\..\Run\Data\Models\ModelInstances.xml">
+      <Filter>Data\XML Data</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

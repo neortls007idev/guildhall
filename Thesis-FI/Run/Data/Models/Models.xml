@@ -2,6 +2,8 @@
 	<Model path="Data/Models/scifiFighter/mesh.obj" 
 	       diffuse="Data/Models/scifiFighter/diffuse.jpg" 
 	       normals="Data/Models/scifiFighter/normal.png" 
-	       enumValue ="0" />
+	       enumValue ="0" >
+		<BuildOptions generateTangent="true" generateNormals="true" optimizeVertexCount="false" />
+	</Model>
 
 </Models>

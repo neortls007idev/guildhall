@@ -270,20 +270,20 @@ void Game::DebugUI()
 			std::string instancesHeader = "All instance of" + std::string( modelNames[ currentModelToUpdateIndex ] );
 			if( ImGui::CollapsingHeader( instancesHeader.c_str() ) )
 			{
-				for( int instanceIndex = 0 ; instanceIndex < ( int ) m_OBJInstance[ currentModelToUpdateIndex ].size() ; instanceIndex++ )
+				for( int instanceIndex = 0 ; instanceIndex < ( int ) m_ModelInstances[ currentModelToUpdateIndex ].size() ; instanceIndex++ )
 				{
-					if( nullptr != m_OBJInstance[ currentModelToUpdateIndex ][ instanceIndex ] )
+					if( nullptr != m_ModelInstances[ currentModelToUpdateIndex ][ instanceIndex ] )
 					{
 						std::string instanceName = modelNames[ currentModelToUpdateIndex ] + std::string( " " ) + ToString( instanceIndex + 1 );
 
 						if( ImGui::TreeNode( instanceName.c_str() ) )
 						{
 							ImGui::Text( "Transform" );
-							ImGui::InputFloat3( "World Position" , ( float* ) &m_OBJInstance[ currentModelToUpdateIndex ][ instanceIndex ]->m_position );
-							ImGui::InputFloat( "Yaw" , ( float* ) &m_OBJInstance[ currentModelToUpdateIndex ][ instanceIndex ]->m_yaw );		//ImGui::SameLine();
-							ImGui::InputFloat( "Pitch" , ( float* ) &m_OBJInstance[ currentModelToUpdateIndex ][ instanceIndex ]->m_pitch );	//ImGui::SameLine();
-							ImGui::InputFloat( "Roll" , ( float* ) &m_OBJInstance[ currentModelToUpdateIndex ][ instanceIndex ]->m_roll );
-							ImGui::InputFloat3( "Scale" , ( float* ) &m_OBJInstance[ currentModelToUpdateIndex ][ instanceIndex ]->m_scale );
+							ImGui::InputFloat3( "World Position" , ( float* ) &m_ModelInstances[ currentModelToUpdateIndex ][ instanceIndex ]->m_position );
+							ImGui::InputFloat( "Yaw" , ( float* ) &m_ModelInstances[ currentModelToUpdateIndex ][ instanceIndex ]->m_yaw );		//ImGui::SameLine();
+							ImGui::InputFloat( "Pitch" , ( float* ) &m_ModelInstances[ currentModelToUpdateIndex ][ instanceIndex ]->m_pitch );	//ImGui::SameLine();
+							ImGui::InputFloat( "Roll" , ( float* ) &m_ModelInstances[ currentModelToUpdateIndex ][ instanceIndex ]->m_roll );
+							ImGui::InputFloat3( "Scale" , ( float* ) &m_ModelInstances[ currentModelToUpdateIndex ][ instanceIndex ]->m_scale );
 
 							if( ImGui::Button( "Destroy Instance" ) )
 							{

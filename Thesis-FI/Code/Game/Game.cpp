@@ -41,6 +41,7 @@ Game::Game()
 	LoadShaders();
 	LoadTextures();
 	LoadModels();
+	LoadScene();
 	
 	m_tileDiffuse	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/tile_diffuse.png" );
 	m_tileDiffuse	= g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Test_StbiFlippedAndOpenGL.png" );
@@ -87,6 +88,19 @@ Game::Game()
 
 Game::~Game()
 {
+	SaveScene();
+
+	for( int index = 0 ; index < NUM_GAME_MODELS ; index++ )
+	{
+		m_ModelInstances[ index ].clear();
+	}
+
+	for ( int index = 0 ; index < NUM_GAME_MODELS ; index++ )
+	{
+		delete m_gameModels[ index ];
+		m_gameModels[ index ] = nullptr;
+	}
+	
 	delete m_cubeMesh;
 	m_cubeMesh			= nullptr;
 
@@ -363,13 +377,13 @@ void Game::RenderAllInstancesOfType( eGameObjModels modelType ) const
 	g_theRenderer->BindTexture( m_gameModelsDiffuse[ modelType ] );
 	g_theRenderer->BindTexture( m_gameModelsNormals[ modelType ] , TEX_NORMAL );
 	
-	for( size_t instanceIndex = 0 ; instanceIndex < m_OBJInstance[ modelType ].size(); instanceIndex++ )
+	for( size_t instanceIndex = 0 ; instanceIndex < m_ModelInstances[ modelType ].size(); instanceIndex++ )
 	{
-		if ( nullptr == m_OBJInstance[ modelType ][ instanceIndex ] )
+		if ( nullptr == m_ModelInstances[ modelType ][ instanceIndex ] )
 		{
 			continue;
 		}
-		g_theRenderer->SetModelMatrix( m_OBJInstance[ modelType ][ instanceIndex ]->GetAsMatrix() );
+		g_theRenderer->SetModelMatrix( m_ModelInstances[ modelType ][ instanceIndex ]->GetAsMatrix() );
 		g_theRenderer->DrawMesh( m_gameModels[ modelType ] );
 	}
 }

@@ -116,6 +116,8 @@ void Game::LoadModels()
 		int numModelsListed = 0;
 		
 		tinyxml2::XMLElement* model = modelsRoot->FirstChildElement( "Model" );
+		tinyxml2::XMLElement* modelBuildOption = nullptr;
+		
 		while( model != nullptr )
 		{
 			numModelsListed++;
@@ -127,6 +129,8 @@ void Game::LoadModels()
 		model = modelsRoot->FirstChildElement( "Model" );
 		while( model != nullptr )
 		{
+			modelBuildOption = model->FirstChildElement( "BuildOptions" );
+			
 			bool isDataBad = false;
 			
 			std::string modelPath		= ParseXmlAttribute( *model , "path" , "" );
@@ -148,10 +152,10 @@ void Game::LoadModels()
 			{
 				m_gameModels[ enumValue ] = new GPUMesh( g_theRenderer );
 				MeshBuilderOptions objMeshOptions;
-				objMeshOptions.generateTangents = true;
-				objMeshOptions.generateNormals = true;
-				objMeshOptions.clean = true;
-				m_gameModels[ enumValue ] = LoadObjFileIntoGpuMesh( objMeshOptions , "Data/Models/scifiFighter/mesh.obj" );
+				objMeshOptions.generateTangents = ParseXmlAttribute( *modelBuildOption , "generateTangent" , true );
+				objMeshOptions.generateNormals	= ParseXmlAttribute( *modelBuildOption , "generateNormals" , true );
+				objMeshOptions.clean			= ParseXmlAttribute( *modelBuildOption , "optimizeVertexCount" , true );
+				m_gameModels[ enumValue ]		= LoadObjFileIntoGpuMesh( objMeshOptions , "Data/Models/scifiFighter/mesh.obj" );
 
 				if ( modelDiffuseTex != "" )
 				{

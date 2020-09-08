@@ -25,6 +25,7 @@ public:
 			void LoadShaders();
 			void LoadTextures();
 			void LoadModels();
+			void LoadScene();
 			void InitializeCameras();
 			void IntializeGameObjects();
 			void InitializeShaderMaterialData();
@@ -50,6 +51,7 @@ private:
 			bool AddGameOBJInstance( eGameObjModels modelType );
 			bool DestroyGameOBJInstance( eGameObjModels modelType , int instanceCount );
 			void RenderAllInstancesOfType( eGameObjModels modelType ) const;
+			void SaveScene();
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				METHODS TO HANDLE USER INPUT
@@ -120,7 +122,7 @@ public:
 	GPUMesh*					m_gameModels[ NUM_GAME_MODELS ];
 	Texture*					m_gameModelsDiffuse[ NUM_GAME_MODELS ];
 	Texture*					m_gameModelsNormals[ NUM_GAME_MODELS ];
-	OBJInstances				m_OBJInstance[ NUM_GAME_MODELS ];
+	OBJInstances				m_ModelInstances[ NUM_GAME_MODELS ];
 
 private:
 	fresnelData_t				m_fresnelShaderData;
