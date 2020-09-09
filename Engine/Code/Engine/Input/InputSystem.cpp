@@ -363,18 +363,6 @@ void InputSystem::ClipSystemCursor( eMouseClipping mouseLockMode )
 void InputSystem::SetCursorMode( eMouseMode mode )
 {
 	m_mouseMode = mode;
-	
-	switch ( m_mouseMode )
-	{
-		case RELATIVE_MODE: //ClipSystemCursor( MOUSE_IS_WINDOWLOCKED );
-							//HideSystemCursor();
-							UpdateRelativeMode();
-							break;
-
-		case ABSOLUTE_MODE: //ClipSystemCursor( MOUSE_IS_UNLOCKED );
-							//ShowSystemCursor();
-							break;
-	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -399,10 +387,6 @@ void InputSystem::PushCursorSettings( CursorSettings newCursorSettings )
 
 void InputSystem::PopCursorSettings()
 {
-	//m_cursorSettings.m_cursorClipMode	= MOUSE_IS_UNLOCKED;
-	//m_cursorSettings.m_cursorMode		= ABSOLUTE_MODE;
-	//m_cursorSettings.m_isCursorVisible	= true;
-	
 	ClipSystemCursor( MOUSE_IS_UNLOCKED );
 	SetCursorMode( ABSOLUTE_MODE );
 	ShowSystemCursor();
@@ -414,9 +398,10 @@ void InputSystem::UpdateRelativeMode()
 {
 		POINT cursorPos;
 		GetCursorPos( &cursorPos );
-	
+
 		Vec2 positionThisFrame( ( int ) cursorPos.x , ( int ) cursorPos.y );
 		m_relativeMovement = positionThisFrame - m_positionLastFrame;
+		
 		// remap relative movement ()
 
 		// move back to center

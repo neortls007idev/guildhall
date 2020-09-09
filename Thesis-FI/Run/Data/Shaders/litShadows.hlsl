@@ -1,8 +1,53 @@
 #include "ShaderMathUtils.hlsl"
 #include "LightMathUtils.hlsl"
-#include "defaultLitStageStructs.hlsl"
 
 //--------------------------------------------------------------------------------------
+// Stream Input
+// ------
+// Stream Input is input that is walked by the vertex shader.  
+// If you say "Draw(3,0)", you are telling to the GPU to expect '3' sets, or 
+// elements, of input data.  IE, 3 vertices.  Each call of the VertxShader
+// we be processing a different element. 
+//--------------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------------
+//                      PROGRAMMABLE SHADER STAGES STRUCTS
+//--------------------------------------------------------------------------------------
+//
+// INPUT FROM VERTEX BUFFERS
+//
+//--------------------------------------------------------------------------------------
+struct vs_input_t
+{
+   // we are not defining our own input data; 
+    float3 position : POSITION;
+    float4 color : COLOR;
+    float2 uv : TEXCOORD;
+
+    float3 normal : NORMAL;
+    float4 tangent : TANGENT;
+};
+
+
+//--------------------------------------------------------------------------------------
+//
+// INPUT FOR PASSING DATA FROM VERTEX STAGE TO FRAGMENT STAGE (V-2-F)
+// 
+//--------------------------------------------------------------------------------------
+
+struct v2f_t
+{
+    float4 position             : SV_POSITION;
+    float4 color                : COLOR;
+    float2 uv                   : UV;
+
+    float3 world_position       : WORLD_POSITION;
+    float3 world_normal         : WORLD_NORMAL;
+    float4 world_tangent        : WORLD_TANGENT;
+
+    float4 lightViewPosition[ TOTAL_LIGHTS ] : TEXCOORD1;
+    float3 lightPos[ TOTAL_LIGHTS ] : TEXCOORD2;
+};
 
 //--------------------------------------------------------------------------------------
 //                      PROGRAMMABLE SHADER STAGES FUNCTIONS
@@ -19,7 +64,10 @@ v2f_t VertexFunction(vs_input_t input)
    // move the vertex through the spaces
     float4 local_pos        = float4( input.position , 1.0f );                                      // passed in position is usually inferred to be "local position", ie, local to the object
     float4 world_pos        = mul( MODEL , local_pos );                                             // world pos is the object moved to its place int he world by the model, not used yet
-    float4 camera_pos       = mul( VIEW , world_pos );                                          
+
+   // float4 world_pos_copy   = world_pos;
+
+    float4 camera_pos       = mul( VIEW , world_pos );
     float4 clip_pos         = mul( PROJECTION , camera_pos );                                   
                                                                                                 
    // normal is currently in model/local space                                                  
@@ -30,7 +78,17 @@ v2f_t VertexFunction(vs_input_t input)
                                                                                                 
     float4 local_tangent    = float4( input.tangent.xyz , 0.0f );                               
     float4 world_tangent    = mul( MODEL , local_tangent );                                     
-                                                                                                
+
+
+    for( int lightIndex = 0 ; lightIndex < TOTAL_LIGHTS ; lightIndex++ )
+    {
+        v2f.lightViewPosition[ lightIndex ] = world_pos;
+        v2f.lightViewPosition[ lightIndex ] = mul( v2f.lightViewPosition[ lightIndex ] , LIGHT_VIEW[ lightIndex ] );
+        v2f.lightViewPosition[ lightIndex ] = mul( v2f.lightViewPosition[ lightIndex ] , LIGHT_PROJECTION[ lightIndex ] );
+
+        v2f.lightPos[ lightIndex ] = normalize( LIGHTS[ lightIndex ].worldPosition.xyz - world_pos.xyz );
+    }
+		
     v2f.position            = clip_pos;                                                             // we want to output the clip position to raster (a perspective point)
     v2f.color               = input.color * TINT;
     v2f.uv                  = input.uv;

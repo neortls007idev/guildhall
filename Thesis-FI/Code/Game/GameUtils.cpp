@@ -156,7 +156,7 @@ void Game::SaveScene()
 			XMLElement* modelInstance = xmlDocument.NewElement( "ModelInstance" );
 			tinyxml2::XMLText* modeInstanceText = xmlDocument.NewText( "" );
 
-			modelInstance->SetAttribute( "enumValue" , 0 );
+			modelInstance->SetAttribute( "enumValue" , modelType );
 
 			XMLElement* instanceTransform = xmlDocument.NewElement( "Transform" );
 			tinyxml2::XMLText* instanceTransformText = xmlDocument.NewText( "" );

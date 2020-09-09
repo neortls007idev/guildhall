@@ -135,7 +135,7 @@ void Game::LoadModels()
 			
 			std::string modelPath		= ParseXmlAttribute( *model , "path" , "" );
 			std::string modelDiffuseTex = ParseXmlAttribute( *model , "diffuse" , "" );
-			std::string modelNormalTex  = ParseXmlAttribute( *model , "normal" , "" );
+			std::string modelNormalTex  = ParseXmlAttribute( *model , "normals" , "" );
 			int enumValue				= ParseXmlAttribute( *model , "enumValue" , -1 );
 
 			if( ( enumValue < 0 ) && ( enumValue >= NUM_GAME_MODELS ) )
@@ -155,7 +155,7 @@ void Game::LoadModels()
 				objMeshOptions.generateTangents = ParseXmlAttribute( *modelBuildOption , "generateTangent" , true );
 				objMeshOptions.generateNormals	= ParseXmlAttribute( *modelBuildOption , "generateNormals" , true );
 				objMeshOptions.clean			= ParseXmlAttribute( *modelBuildOption , "optimizeVertexCount" , true );
-				m_gameModels[ enumValue ]		= LoadObjFileIntoGpuMesh( objMeshOptions , "Data/Models/scifiFighter/mesh.obj" );
+				m_gameModels[ enumValue ]		= LoadObjFileIntoGpuMesh( objMeshOptions , modelPath.c_str() );
 
 				if ( modelDiffuseTex != "" )
 				{
@@ -170,6 +170,7 @@ void Game::LoadModels()
 			model = model->NextSiblingElement( "Model" );
 		}
 	}
+	int x;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

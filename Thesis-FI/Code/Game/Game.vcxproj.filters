@@ -23,6 +23,12 @@
     <Filter Include="Data\XML Data">
       <UniqueIdentifier>{59a90ce4-442d-46ad-bdb0-93352c7a3e0f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data\Models">
+      <UniqueIdentifier>{ec484c5a-d37d-4c0b-b493-042fe8526aec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Models\Sci-Fi Fighter">
+      <UniqueIdentifier>{3964918c-1b07-4400-9ab1-a1db981b33d4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameCommon.cpp">
@@ -154,5 +160,27 @@
     <Xml Include="..\..\Run\Data\Models\ModelInstances.xml">
       <Filter>Data\XML Data</Filter>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\Run\Data\Models\scifiFighter\bump.jpg">
+      <Filter>Data\Models\Sci-Fi Fighter</Filter>
+    </Image>
+    <Image Include="..\..\Run\Data\Models\scifiFighter\diffuse.jpg">
+      <Filter>Data\Models\Sci-Fi Fighter</Filter>
+    </Image>
+    <Image Include="..\..\Run\Data\Models\scifiFighter\emissive.jpg">
+      <Filter>Data\Models\Sci-Fi Fighter</Filter>
+    </Image>
+    <Image Include="..\..\Run\Data\Models\scifiFighter\normal.png">
+      <Filter>Data\Models\Sci-Fi Fighter</Filter>
+    </Image>
+    <Image Include="..\..\Run\Data\Models\scifiFighter\specular.jpg">
+      <Filter>Data\Models\Sci-Fi Fighter</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="..\..\Run\Data\Models\scifiFighter\mesh.obj">
+      <Filter>Data\Models\Sci-Fi Fighter</Filter>
+    </Object>
   </ItemGroup>
 </Project>

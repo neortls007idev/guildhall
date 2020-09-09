@@ -5,5 +5,13 @@
 	       enumValue ="0" >
 		<BuildOptions generateTangent="true" generateNormals="true" optimizeVertexCount="false" />
 	</Model>
+	<Model path="Data/Models/Luminaris_OBJ/Luminaris OBJ.obj"
+	       diffuse="Data/Models/Luminaris_OBJ/Luminaris Diffuse.png"
+	       normals="Data/Models/Luminaris_OBJ/Luminaris Normal.png"
+	       enumValue ="1" >
+		<BuildOptions generateTangent="true"
+		              generateNormals="true"
+		              optimizeVertexCount="false" />
+	</Model>
 
 </Models>

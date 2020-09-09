@@ -68,6 +68,14 @@ struct light_t
 };
 
 //--------------------------------------------------------------------------------------
+
+struct lightView_t
+{
+    float4x4 LIGHT_PROJECTION;
+    float4x4 LIGHT_VIEW;
+};
+
+//--------------------------------------------------------------------------------------
 // buffer telling us information about our lights
 //--------------------------------------------------------------------------------------
 
@@ -88,11 +96,22 @@ cbuffer light_constants : register( b3 )                                        
 
 cbuffer fog_constants : register( b4 )                                                      // constant buffer slot 5
 {
-    float           nearFog;
-    float3          fogNearColor;
+    float nearFog;
+    float3 fogNearColor;
     
-    float           farFog;
-    float3          fogFarColor;
+    float farFog;
+    float3 fogFarColor;
+};
+
+//--------------------------------------------------------------------------------------
+
+cbuffer fog_constants : register( b5 )                                                      // constant buffer slot 6
+{
+	//  light matrices to transform the vertex based on the light's view point
+
+	//lightView_t LIGHT_VIEW[ TOTAL_LIGHTS ];
+    float4x4 LIGHT_PROJECTION[ TOTAL_LIGHTS ];                                              // aka, CameraToClipTransform
+    float4x4 LIGHT_VIEW[ TOTAL_LIGHTS ];                                                    // aka, WorldToCameraTransform
 };
 
 //--------------------------------------------------------------------------------------
@@ -102,6 +121,20 @@ cbuffer fog_constants : register( b4 )                                          
 
 Texture2D<float4>   tDiffuse    : register( t0 );                                           // color of the surface
 Texture2D<float4>   tNormal     : register( t1 );                                           // normal Map of the surface
+
+//--------------------------------------------------------------------------------------
+
+Texture2D<float4> depthMapTexture0 : register( t8 );
+Texture2D<float4> depthMapTexture1 : register( t9 );
+Texture2D<float4> depthMapTexture2 : register( t10 );
+Texture2D<float4> depthMapTexture3 : register( t11 );
+Texture2D<float4> depthMapTexture4 : register( t12 );
+Texture2D<float4> depthMapTexture5 : register( t13 );
+Texture2D<float4> depthMapTexture6 : register( t14 );
+Texture2D<float4> depthMapTexture7 : register( t15 );
+
+//--------------------------------------------------------------------------------------
+
 SamplerState        sSampler    : register( s0 );                                           // sampler are rules on how to sample (read) from the texture.
 
 //--------------------------------------------------------------------------------------

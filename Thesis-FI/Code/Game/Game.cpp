@@ -138,7 +138,7 @@ void Game::Update( float deltaSeconds )
 	}
 	else
 	{
-		g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_WINDOWLOCKED , false ) );
+		g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_UNLOCKED , false ) );
 	}
 	
 	m_frameRate = 1.f / deltaSeconds;
@@ -180,7 +180,6 @@ void Game::UpdateLightPosition( float deltaSeconds )
 			DebugAddWorldArrow( m_lights.lights[ index ].worldPosition , m_lights.lights[ index ].worldPosition + m_lights.lights[ index ].direction , lightColor , deltaSeconds * 0.5f );
 		}
 	}
-
 
 	if ( m_isLightAnimated )
 	{
@@ -244,6 +243,7 @@ void Game::Render() const
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
 	RenderAllInstancesOfType( SPACESHIP );
+	RenderAllInstancesOfType( LUMINARIS_SHIP );
 	
 	if ( m_isFresnelShaderActive )													{	RenderFresnelShader2ndPass();	}
 		
@@ -451,18 +451,18 @@ void Game::UpdateLightData( int lightIndex )
 
 void Game::UpdateLightPositionOnUserInput()
 {
-	if ( g_theInput->WasKeyJustPressed( KEY_F5 ) )
-	{
-		m_isLightFollowingTheCamera = false;
-		m_isLightAnimated = false;
-		m_lights.lights[ m_currentLightIndex ].worldPosition = Vec3::ZERO;
-
-		if ( m_lightType[m_currentLightIndex] != POINT_LIGHT )
-		{
-			Vec3 direction = m_gameCamera.GetCameraTransform().GetAsMatrix().GetKBasis3D();
-			m_lights.lights[ m_currentLightIndex ].direction = -direction;
-		}
-	}
+// 	if ( g_theInput->WasKeyJustPressed( KEY_F5 ) )
+// 	{
+// 		m_isLightFollowingTheCamera = false;
+// 		m_isLightAnimated = false;
+// 		m_lights.lights[ m_currentLightIndex ].worldPosition = Vec3::ZERO;
+// 
+// 		if ( m_lightType[m_currentLightIndex] != POINT_LIGHT )
+// 		{
+// 			Vec3 direction = m_gameCamera.GetCameraTransform().GetAsMatrix().GetKBasis3D();
+// 			m_lights.lights[ m_currentLightIndex ].direction = -direction;
+// 		}
+// 	}
 
 	if ( g_theInput->WasKeyJustPressed( KEY_F6 ) )
 	{
@@ -541,11 +541,11 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	}
 
 	Vec2 mousePos		= g_theInput->GetRelativeMovement();
-
+	
 	m_pitch -= mousePos.y * speed * deltaSeconds;
 	m_yaw	-= mousePos.x * speed * deltaSeconds;
 
-	m_pitch = Clamp( m_pitch , -180.f , 180.f );
+	m_pitch = Clamp( m_pitch , -90.f , 90.f );
 
 	m_gameCamera.SetPitchYawRollRotation( m_pitch , m_yaw , 0.f );
 }

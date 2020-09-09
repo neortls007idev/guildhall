@@ -298,9 +298,21 @@ void Game::DebugUI()
 		}
 	}
 	ImGui::End();
-	ImGui::Begin( "Debug Data",0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground );
+	ImGui::Begin( "Debug Data",0, ImGuiWindowFlags_NoCollapse /*| ImGuiWindowFlags_NoMove*/ | ImGuiWindowFlags_NoBackground );
 	ImGui::Text( "RTVs Created = %d" , g_theRenderer->GetTotalRenderTargetPoolSize() );
 	ImGui::Text( "RTVs In Free Pool = %d" , g_theRenderer->GetTexturePoolFreeCount() );
+
+	if( m_isMouseUnlocked )
+	{
+		ImGui::TextColored( ImVec4( 1.f , 1.f , 1.f , 1.f ) , "GAME MODE = " ); ImGui::SameLine();
+		ImGui::TextColored( ImVec4( 1.f , 0.f , 0.f , 1.f ) , "UI-MODE");
+	}
+	else
+	{
+		ImGui::TextColored( ImVec4( 1.f , 1.f , 1.f , 1.f ) , "GAME MODE = " ); ImGui::SameLine();
+		ImGui::TextColored( ImVec4( 0.f , 1.f , 0.f , 1.f ) , "GAME-MODE");
+	}
+	
 	if ( m_frameRate >= 50.f )
 	{
 		ImGui::TextColored( ImVec4( 0.f , 1.f , 0.f , 1.f ) , "Frame Rate = %.3f" , m_frameRate );
@@ -309,7 +321,28 @@ void Game::DebugUI()
 	{
 		ImGui::TextColored( ImVec4( 1.f , 0.f , 0.f , 1.f ) , "Frame Rate = %.3f" , m_frameRate );
 	}
+
+	Vec3 cameraPos	= m_gameCamera.GetPosition();
 		
+	ImGui::TextColored( ImVec4( 1.f , 1.f , 1.f , 1.f ) , "Camera Pos " ); ImGui::SameLine();
+	ImGui::TextColored( ImVec4( 1.f , 0.f , 0.f , 1.f ) , "X = %.3f " , cameraPos.x ); ImGui::SameLine();
+	ImGui::TextColored( ImVec4( 0.f , 1.f , 0.f , 1.f ) , "Y = %.3f " , cameraPos.y ); ImGui::SameLine();
+	ImGui::TextColored( ImVec4( 0.f , 0.f , 1.f , 1.f ) , "Z = %.3f " , cameraPos.z );
+	ImGui::TextColored( ImVec4( 1.f , 1.f , 1.f , 1.f ) , "Camera Rotation " ); ImGui::SameLine();
+	ImGui::TextColored( ImVec4( 1.f , 1.f , 0.f , 1.f ) , "Yaw = %.3f " , m_yaw ); ImGui::SameLine();
+	ImGui::TextColored( ImVec4( 0.f , 1.f , 1.f , 1.f ) , "Pitch = %.3f " , m_pitch ); ImGui::SameLine();
+	ImGui::TextColored( ImVec4( 1.f , 0.f , 1.f , 1.f ) , "Roll = 0.00" );
+			
+	ImGui::End();
+
+	ImGui::Begin( "Controls" , 0 , ImGuiWindowFlags_NoCollapse /*| ImGuiWindowFlags_NoMove*/ | ImGuiWindowFlags_NoBackground );
+	ImGui::TextColored( ImVec4( 0.f , 1.f , 0.f , 1.f ) , "SWITCH BETWEEN UI AND GAME MODE - [ SHIFT + T ]");
+	ImGui::TextColored( ImVec4( 0.f , 1.f , 0.f , 1.f ) , "CHANGE CURRENT LIGHT FROM LIGHTS MENU USING THE UI MODE");
+	ImGui::TextColored( ImVec4( 0.f , 1.f , 0.f , 1.f ) , "[O] - Reset Camera Position and Orientation to Origin");	
+	ImGui::TextColored( ImVec4( 0.f , 1.f , 0.f , 1.f ) , "[F6] - Move Current Light to the Camera Position");	
+	ImGui::TextColored( ImVec4( 0.f , 1.f , 0.f , 1.f ) , "[F7] - Current Light Follows the Camera Position");	
+	ImGui::TextColored( ImVec4( 0.f , 1.f , 0.f , 1.f ) , "[F9] - Light moves in a pre-defined Circular Path");	
+
 	ImGui::End();
 }
 

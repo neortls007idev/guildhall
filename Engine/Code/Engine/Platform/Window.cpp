@@ -151,6 +151,7 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle , UIN
 
 		if( isInputProcessedByImGUI || io.WantCaptureMouse )
 		{
+
 			// Do nothing Input was processed by ImGUI
 		}
 	}
