@@ -3,6 +3,8 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SwapChain.hpp"
 
+ImGUISystem* g_debugUI = nullptr;
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 ImGUISystem::ImGUISystem( Window* window, RenderContext* renderContext )

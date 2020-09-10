@@ -17,9 +17,6 @@ static TCHAR const*		WND_CLASS_NAME = TEXT( "Simple Window Class" );
 	   ITaskbarList3*	pTaskbar	   = NULL;
 	   UINT				m_taskbarButtonCreatedMessageId;
 extern InputSystem*		g_theInput;
-//-----------------------------------------------------------------------------------------------
-// Handles Windows (Win32) messages/events; i.e. the OS is trying to tell us something happened.
-// This function is called by Windows whenever we ask it for notifications
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //		IMGUI WINDOWS MESSAGE HANDLING FOR IO
@@ -27,6 +24,11 @@ extern InputSystem*		g_theInput;
 
 extern ImGUISystem* g_debugUI;
 extern LRESULT ImGui_ImplWin32_WndProcHandler( HWND windowHandle , UINT wmMessageCode , WPARAM wParam , LPARAM lParam );
+
+//-----------------------------------------------------------------------------------------------
+// Handles Windows (Win32) messages/events; i.e. the OS is trying to tell us something happened.
+// This function is called by Windows whenever we ask it for notifications
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

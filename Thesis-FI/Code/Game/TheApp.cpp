@@ -21,7 +21,7 @@ TheApp*								g_theApp		= nullptr;
 InputSystem*						g_theInput		= nullptr;
 DevConsole*							g_theDevConsole = nullptr;
 Game*								g_theGame		= nullptr;
-ImGUISystem*						g_debugUI		= nullptr;			
+extern ImGUISystem*					g_debugUI;			
 extern BitmapFont*					g_bitmapFont;
 extern DebugRenderObjectsManager*	g_currentManager;
 
