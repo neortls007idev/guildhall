@@ -45,8 +45,8 @@ struct v2f_t
     float3 world_normal         : WORLD_NORMAL;
     float4 world_tangent        : WORLD_TANGENT;
 
-    float4 lightViewPosition[ TOTAL_LIGHTS ] : TEXCOORD1;
-    float3 lightPos[ TOTAL_LIGHTS ] : TEXCOORD2;
+    float4 lightViewPosition[ TOTAL_LIGHTS ] : LIGHTVIEWPOS;
+    float3 lightPos[ TOTAL_LIGHTS ] : LIGHTPOS;
 };
 
 //--------------------------------------------------------------------------------------
@@ -117,7 +117,62 @@ struct fragmentFunctionOutput
 
 fragmentFunctionOutput FragmentFunction( v2f_t input )
 {
+	// Shadow mapping requires a bias adjustment when comparing the depth of the light
+	// and the depth of the object due to the low floating point precision of the depth map.
 
+	float   bias = 0.001f;
+
+	float4  color = AMBIENT;
+    float2  projectTexCoord[ TOTAL_LIGHTS ];
+    float   depthValue;
+    float   lightDepthValue;
+    float   lightIntensity;
+    float4  textureColor;
+
+    // Calculate the projected texture coordinates for sampling the shadow map (depth buffer texture) based on the light's viewing position.
+    // Calculate the projected texture coordinates.
+    for( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
+    {
+        projectTexCoord[ index ].x =  input.lightViewPosition[ index ].x / input.lightViewPosition[ index ].w / 2.0f + 0.5f;
+        projectTexCoord[ index ].y = -input.lightViewPosition[ index ].y / input.lightViewPosition[ index ].w / 2.0f + 0.5f;
+
+    //	Check if the projected coordinates are in the view of the light, if not then the pixel gets just an ambient value.
+    // Determine if the projected coordinates are in the 0 to 1 range.  If so then this pixel is in the view of the light.
+    if( ( saturate( projectTexCoord[ index ].x ) == projectTexCoord[ index ].x ) && ( saturate( projectTexCoord[ index ].y ) == projectTexCoord[ index ].y ) )
+    {
+    	[call] switch( index )
+        {
+            case 0:
+				depthValue = depthMapTexture0.Sample( sSampler , projectTexCoord[ index ] ).r;
+            case 1:
+				depthValue = depthMapTexture1.Sample( sSampler , projectTexCoord[ index ] ).r;
+            case 2:
+				depthValue = depthMapTexture2.Sample( sSampler , projectTexCoord[ index ] ).r;
+            case 3:
+				depthValue = depthMapTexture3.Sample( sSampler , projectTexCoord[ index ] ).r;
+            case 4:
+				depthValue = depthMapTexture4.Sample( sSampler , projectTexCoord[ index ] ).r;
+            case 5:
+				depthValue = depthMapTexture5.Sample( sSampler , projectTexCoord[ index ] ).r;
+            case 6:
+				depthValue = depthMapTexture6.Sample( sSampler , projectTexCoord[ index ] ).r;
+            case 7:
+				depthValue = depthMapTexture7.Sample( sSampler , projectTexCoord[ index ] ).r;
+    		default:
+                ;
+        }
+    }
+
+    // Calculate the depth of the light.
+    lightDepthValue = input.lightViewPosition[ index ].z / input.lightViewPosition[ index ].w;
+
+    // Subtract the bias from the lightDepthValue.
+    lightDepthValue = lightDepthValue - bias;
+
+
+
+
+	
 //--------------------------------------------------------------------------------------
 //              SAMPLE THE TEXTURES
 //--------------------------------------------------------------------------------------    
@@ -143,7 +198,7 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
 //--------------------------------------------------------------------------------------
 //              COMPUTE LIGHT FACTOR
 //--------------------------------------------------------------------------------------
-    PostLightingData lightResult   = ComputeLightingAt( input.world_position , worldNormal , surfaceColor , float3( 0.0f.xxx ) , SPECULAR_FACTOR );
+    PostLightingData lightResult = ComputeLightingAt( input.world_position , worldNormal , surfaceColor , float3( 0.0f, 0.0f, 0.0f ) , SPECULAR_FACTOR );
     float3 finalColor              = lightResult.diffuse + lightResult.specularEmmisive;
    
     float3 bloom                    = max( float3( 0.f , 0.f , 0.f ) , finalColor - float3( 1.f , 1.f , 1.f ) );

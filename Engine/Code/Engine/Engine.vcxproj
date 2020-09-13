@@ -676,9 +676,15 @@
     <ClCompile Include="Memory\Job.cpp" />
     <ClCompile Include="Memory\JobSystem.cpp" />
     <ClCompile Include="Memory\JobSystemWorkerThread.cpp" />
-    <ClCompile Include="Networking\Client.cpp" />
-    <ClCompile Include="Networking\NetworkSystem.cpp" />
-    <ClCompile Include="Networking\Server.cpp" />
+    <ClCompile Include="Networking\Client.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Networking\NetworkSystem.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Networking\Server.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="ParticleSystem\Particle2D.cpp" />
     <ClCompile Include="ParticleSystem\Particle3D.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -920,9 +926,15 @@
     <ClInclude Include="Memory\Job.hpp" />
     <ClInclude Include="Memory\JobSystem.hpp" />
     <ClInclude Include="Memory\JobSystemWorkerThread.hpp" />
-    <ClInclude Include="Networking\Client.hpp" />
-    <ClInclude Include="Networking\NetworkSystem.hpp" />
-    <ClInclude Include="Networking\Server.hpp" />
+    <ClInclude Include="Networking\Client.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Networking\NetworkSystem.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Networking\Server.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="ParticleSystem\Particle2D.hpp" />
     <ClInclude Include="ParticleSystem\Particle3D.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
