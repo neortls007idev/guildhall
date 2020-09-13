@@ -14,6 +14,8 @@
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
 
+#include "Engine/Networking/NetworkSystem.hpp"
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 RenderContext*						g_theRenderer	= nullptr;
@@ -24,6 +26,7 @@ Game*								g_theGame		= nullptr;
 extern ImGUISystem*					g_debugUI;			
 extern BitmapFont*					g_bitmapFont;
 extern DebugRenderObjectsManager*	g_currentManager;
+extern NetworkSystem*				g_theNetworkSys;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -41,6 +44,9 @@ TheApp::~TheApp()
 
 	delete g_debugUI;
 	g_debugUI = nullptr;
+
+	delete g_theNetworkSys;
+	g_theNetworkSys = nullptr;
 	
 	//delete g_theAudioSystem;
 	//g_theAudioSystem = nullptr;
@@ -103,6 +109,12 @@ void TheApp::Startup()
 	}
 	g_theDevConsole->Startup();
 	AddDebugRenderDevConsoleCommands( g_theDevConsole );
+
+	if ( g_theNetworkSys == nullptr )
+	{
+		g_theNetworkSys = new NetworkSystem();
+	}
+	g_theNetworkSys->Startup();
 	
 	if ( g_currentManager == nullptr )
 	{
@@ -161,6 +173,8 @@ void TheApp::BeginFrame()
 	g_theInput->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theDevConsole->BeginFrame();
+	g_theNetworkSys->BeginFrame();
+	
 	g_currentManager->BeginFrame();
 	g_debugUI->BeginFrame();
 	
@@ -197,6 +211,11 @@ void TheApp::Update( float deltaSeconds )
 
 	g_theGame->Update( deltaSeconds );
 
+	if( g_theDevConsole->IsOpen() )
+	{
+		g_theDevConsole->Update( deltaSeconds );
+	}
+
 	g_theInput->EndFrame();
 }
 
@@ -220,6 +239,7 @@ void TheApp::EndFrame()
 	// all engine things that must end at the end of the frame and not the game
 	g_debugUI->EndFrame();
 	g_currentManager->EndFrame();
+	g_theNetworkSys->EndFrame();
 	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
@@ -241,6 +261,7 @@ void TheApp::Shutdown()
 	//g_theAudioSystem->Shutdown();
 	//g_thePhysicsSystem->Shutdown();
 	g_currentManager->Shutdown();
+	g_theNetworkSys->Shutdown();
 	g_theDevConsole->Shutdown();
 	g_theRenderer->Shutdown();
 	g_theInput->Shutdown();

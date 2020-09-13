@@ -105,7 +105,7 @@ public:
 	uint GetReverseStringIndexForCurrentCarrotPos() const;
 	uint GetStringIndexForCurrentCarrotPos() const;
 
-protected:
+public:
 
 	static  bool							m_isConsoleOpen;
 	static  Rgba8							m_OverlayColor;
