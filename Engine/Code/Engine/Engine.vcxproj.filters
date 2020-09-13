@@ -482,7 +482,7 @@
       <Filter>ThirdParty\ImGUI\FileDialogBox</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\FrustumCulling.cpp">
-      <Filter>Core</Filter>
+      <Filter>Renderer\Culling</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
