@@ -2,9 +2,6 @@
 #include <atlalloc.h>
 #include <string>
 
-#ifndef  _WINSOCK_DEPRECATED_NO_WARNINGS
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-#endif
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 class NetworkSystem
@@ -20,8 +17,11 @@ public:
 	void EndFrame();
 
 	//----------------------------------------------------------------------------------------------------------
-	bool GetListenPort()									{ return m_listenPort;  }
-//	void SetListenPort();{ m_listenPort = }
+
+	bool GetListenPort()									{ return m_listenPort; }
+	void SetListenPort( int port )							{ m_listenPort = port; }
+	bool GetIsListening()									{ return m_isListening; }
+	void SetIsListening( bool listen )						{ m_isListening = listen; }
 	
 	std::string GetAddress();
 	
@@ -29,10 +29,11 @@ public:
 
 	void		AddNetowrkingCommandsToConsole();
 	static bool StartTCPServer( EventArgs& args );
+	static bool CloseTCPServer( EventArgs& args );
 	
 private:
-	int						m_listenPort;
-	bool					m_isListening;
+	int						m_listenPort	= -1;
+	bool					m_isListening	= false;
 	FD_SET					m_listenSet;
 	SOCKET					m_listenSocket;
 	SOCKET					m_clientSocket;
