@@ -122,6 +122,9 @@
     <Filter Include="ThirdParty\ImGUI\FileDialogBox">
       <UniqueIdentifier>{c7094d33-6ba5-4104-83fe-ce613f3331fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Renderer\Culling">
+      <UniqueIdentifier>{036d49b3-bb4d-4709-bbc9-c8dd6a5acd1e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Rgba8.cpp">
@@ -477,6 +480,9 @@
     </ClCompile>
     <ClCompile Include="..\ThirdParty\ImGUI\ImGuiFileDialog.cpp">
       <Filter>ThirdParty\ImGUI\FileDialogBox</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\FrustumCulling.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -896,6 +902,9 @@
     </ClInclude>
     <ClInclude Include="..\ThirdParty\ImGUI\dirent.h">
       <Filter>ThirdParty\ImGUI\FileDialogBox</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\FrustumCulling.hpp">
+      <Filter>Renderer\Culling</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

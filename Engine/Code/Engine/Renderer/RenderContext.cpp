@@ -48,6 +48,19 @@
 #pragma comment( lib, "d3d11.lib" )         // needed a01
 #pragma comment( lib, "dxgi.lib" )          // needed a01
 #pragma comment( lib, "d3dcompiler.lib" )   // needed when we get to shaders
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//				PROFILING D3D POINTER FOR THE SPECIFIC CONFIGURATIONS
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+#if defined ( _DEBUG_PROFILE ) || defined ( _FASTBREAK_PROFILE ) || defined ( _RELEASE_PROFILE )
+	#include <cguid.h>
+	#include <atlbase.h>
+	#include <d3d11_1.h>
+	CComPtr<ID3DUserDefinedAnnotation> pPerfMarker;
+#endif
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 		BitmapFont*			g_bitmapFont = nullptr;
@@ -172,6 +185,7 @@ void RenderContext::Startup( Window* window )
 {
 	// ID3D11Device
 	// ID3D11DeviceContext
+	
 #if defined(RENDER_DEBUG)
 	CreateDebugModule();
 #endif
@@ -229,6 +243,14 @@ void RenderContext::Startup( Window* window )
 	m_swapChain = new SwapChain( this , swapchain );
 
 	std::string debugName = "RenderContext Resource";
+
+#if defined ( _DEBUG_PROFILE ) || defined ( _FASTBREAK_PROFILE ) || defined ( _RELEASE_PROFILE )
+	HRESULT hr = m_context->QueryInterface( __uuidof( pPerfMarker ) , reinterpret_cast< void** >( &pPerfMarker ) );
+	if( FAILED( hr ) )
+	{
+		__debugbreak();
+	}
+#endif	
 	
 	/*Shader::s_errorShader->CreateFromString( this , g_errorShaderCode );*/
 

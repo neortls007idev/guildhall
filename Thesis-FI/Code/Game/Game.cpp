@@ -20,19 +20,21 @@
 #include "ThirdParty/ImGUI/ImGuiFileDialog.h"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-#include <cguid.h>
-#include <atlbase.h>
-#include <d3d11_1.h>
-#pragma comment( lib, "d3d11.lib" ) 
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
 
 extern RenderContext*	g_theRenderer;
 extern TheApp*			g_theApp;
 extern DevConsole*		g_theDevConsole;
 extern ImGUISystem*		g_debugUI;
 
-CComPtr<ID3DUserDefinedAnnotation> pPerf;
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+#if defined ( _DEBUG_PROFILE ) || defined( _FASTBREAK_PROFILE ) || defined ( _RELEASE_PROFILE )
+	#include <cguid.h>
+	#include <atlbase.h>
+	#include <d3d11_1.h>
+	extern CComPtr<ID3DUserDefinedAnnotation> pPerfMarker;
+#endif
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -76,12 +78,6 @@ Game::Game()
 
 	m_cubeSampler = new Sampler( g_theRenderer , SAMPLER_CUBEMAP );
 	m_linear = new Sampler( g_theRenderer , SAMPLER_BILINEAR );
-
-	HRESULT hr = g_theRenderer->m_context->QueryInterface( __uuidof( pPerf ) , reinterpret_cast< void** >( &pPerf ) );
-	if( FAILED( hr ) )
-	{
-		__debugbreak();
-	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -139,6 +135,14 @@ void Game::Update( float deltaSeconds )
 	else
 	{
 		g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_UNLOCKED , false ) );
+	}
+	for( size_t instanceIndex = 0 ; instanceIndex < m_ModelInstances[ SPACESHIP ].size(); instanceIndex++ )
+	{
+		if( nullptr == m_ModelInstances[ SPACESHIP ][ instanceIndex ] )
+		{
+			continue;
+		}
+		DebugAddWorldWireSphere( m_ModelInstances[ SPACESHIP ][ instanceIndex ]->m_position , m_gameModels[ SPACESHIP ]->m_boundingSphereRadius , GREEN , deltaSeconds );
 	}
 	
 	m_frameRate = 1.f / deltaSeconds;
@@ -201,7 +205,10 @@ void Game::Render() const
 
 	//const wchar_t* profillingEventName = L"RenderStart";
 	//ID3DUserDefinedAnnotation::BeginEvent( profillingEventName );
-	pPerf->BeginEvent( L"RenderStart" );
+
+#if defined ( _DEBUG_PROFILE ) || defined ( _FASTBREAK_PROFILE ) || defined ( _RELEASE_PROFILE )
+	pPerfMarker->BeginEvent( L"RenderStart" );
+#endif
 	
 	g_theRenderer->BeginCamera( m_gameCamera );
 	m_gameCamera.CreateMatchingDepthStencilTarget(); 
@@ -319,7 +326,9 @@ void Game::Render() const
 	
 	m_gameCamera.SetColorTarget( backBuffer );
 
-	pPerf->EndEvent();
+#if defined ( _DEBUG_PROFILE ) || defined ( _FASTBREAK_PROFILE ) || defined ( _RELEASE_PROFILE )
+	pPerfMarker->EndEvent();
+#endif
 	
 	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8 , "LEAKING RENDER TARGETS" );
 	

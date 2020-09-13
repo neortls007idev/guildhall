@@ -111,3 +111,10 @@ void GPUMesh::AddIndices( uint icount , uint const* indices )
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+void GPUMesh::SetBoundingSphereRadius( float boundingSphereRadius )
+{
+	m_boundingSphereRadius = boundingSphereRadius;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

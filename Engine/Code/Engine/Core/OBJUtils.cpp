@@ -71,6 +71,7 @@ GPUMesh* LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::string objFil
 
 	std::vector<uint>					indices;
 	uint currentVert					= 0;
+	float boundingRadiusSquare			= 0.f;
 	
 	for ( size_t i = 0; i < linesOfObjFile.size(); i++ )
 	{
@@ -326,6 +327,15 @@ GPUMesh* LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::string objFil
 			}
 		}
 	}
+
+	for ( size_t i = 0; i < finalVerts.size(); i++ )
+	{
+		float lengthSquaredFromOrigin = finalVerts[ i ].m_position.GetLengthSquared();
+		if (  lengthSquaredFromOrigin > boundingRadiusSquare )
+		{
+			boundingRadiusSquare = lengthSquaredFromOrigin;
+		}
+	}
 	
 	if ( options.generateNormals )
 	{
@@ -348,7 +358,8 @@ GPUMesh* LoadObjFileIntoGpuMesh( MeshBuilderOptions options , std::string objFil
 	{
 		mesh->UpdateIndices( indices );
 	}
-
+	
+	mesh->SetBoundingSphereRadius( sqrtf( boundingRadiusSquare ) );
 	//uint vertS = mesh->m_vertices->GetBufferSize();
 	return mesh;
 }

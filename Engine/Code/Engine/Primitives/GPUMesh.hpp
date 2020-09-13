@@ -32,11 +32,15 @@ public:
 		UpdateVertices( vcount , vertices , sizeof( VERTEX_TYPE ) , VERTEX_TYPE::LAYOUT );
 	}
 
+	float GetBoundingSphereRadius() const																			{ return m_boundingSphereRadius; }
+	void  SetBoundingSphereRadius( float boundingSphereRadius );
+	
 public:
 	VertexBuffer*				m_vertices				= nullptr;
 	IndexBuffer*				m_indices				= nullptr;
 	uint						m_vertexCount			= 0;
 	uint						m_indexCount			= 0;
+	float						m_boundingSphereRadius  = 0.0f;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
