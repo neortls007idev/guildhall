@@ -484,6 +484,9 @@
     <ClCompile Include="Renderer\FrustumCulling.cpp">
       <Filter>Renderer\Culling</Filter>
     </ClCompile>
+    <ClCompile Include="Math\Plane.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -905,6 +908,9 @@
     </ClInclude>
     <ClInclude Include="Renderer\FrustumCulling.hpp">
       <Filter>Renderer\Culling</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Plane.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
