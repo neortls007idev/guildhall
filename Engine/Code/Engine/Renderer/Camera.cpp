@@ -240,7 +240,9 @@ void Camera::SetClearMode( unsigned int clearFlags , Rgba8 color , float depth /
 
 void Camera::SetProjectionPerspective( float fov , float aspectRatio , float nearZ , float farZ )
 {
+	m_screenDepth = farZ - nearZ;
 	m_projection = CreatePerpsectiveProjectionMatrixD3D( fov , aspectRatio , nearZ , farZ );
+	ConstructCameraViewFrustum();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -248,6 +250,13 @@ void Camera::SetProjectionPerspective( float fov , float aspectRatio , float nea
 void Camera::SetProjectionMatrix( const Mat44& projection )
 {
 	m_projection = projection;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Camera::ConstructCameraViewFrustum()
+{
+	m_cameraViewFrustum.ConstructFrustum( m_screenDepth , m_projection , GetViewMatrix() );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -320,6 +329,7 @@ RenderBuffer* Camera::UpdateUBO( RenderContext* ctx )
 	cameraData.view		= GetViewMatrix();
 	cameraData.position = GetPosition();
 	
+	//m_cameraUBO->m_isDirty = true;
 	m_cameraUBO->Update( &cameraData , sizeof( cameraData ) , sizeof( cameraData ) );
 
 	return m_cameraUBO;

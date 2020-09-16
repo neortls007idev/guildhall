@@ -292,7 +292,7 @@ void RenderContext::UpdateFrameTime( float deltaSeconds )
 	FrameDataT frameData;
 	frameData.m_systemTime = ( float ) GetCurrentTimeSeconds();
 	frameData.m_systemDeltaTime = deltaSeconds;
-
+	//m_frameUBO->m_isDirty = true;
 	m_frameUBO->Update( &frameData , sizeof( frameData ) , sizeof( frameData ) );
 }
 
@@ -1285,6 +1285,7 @@ void RenderContext::SetAmbientLight( Rgba8 color /*= WHITE*/ , float intensity /
 	normalizedColor.w = intensity;								 
 
 	m_lights.ambientLight = normalizedColor;
+	//m_lightDataUBO->m_isDirty = true;
 	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
 	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
 }
@@ -1304,6 +1305,7 @@ void RenderContext::SetAmbientLight( Vec4 color , float intensity )
 void RenderContext::EnableLight( uint idx , lightDataT const& lightInfo )
 {
 	m_lights.lights[ idx ] = lightInfo;
+	//m_lightDataUBO->m_isDirty = true;
 	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
 	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
 }
@@ -1312,6 +1314,7 @@ void RenderContext::EnableLight( uint idx , lightDataT const& lightInfo )
 
 void RenderContext::EnableAllLights()
 {
+	//m_lightDataUBO->m_isDirty = true;
 	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
 	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
 }
@@ -1320,6 +1323,7 @@ void RenderContext::EnableAllLights()
 
 void RenderContext::DisableLight( uint idx )
 {
+	//m_lightDataUBO->m_isDirty = true;
 	m_lights.lights[ idx ].intensity = 0.f;
 	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
 	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
@@ -1346,6 +1350,7 @@ void RenderContext::UpdateLightsData( const shaderLightDataT& lightsData )
 
 void RenderContext::SetSpecularFactor( float normalizedFactor )
 {
+	//m_lightDataUBO->m_isDirty = true;
 	m_lights.SPECULAR_FACTOR = normalizedFactor;
 	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
 	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
@@ -1355,6 +1360,7 @@ void RenderContext::SetSpecularFactor( float normalizedFactor )
 
 void RenderContext::SetSpecularPower( float specularPower )
 {
+	//m_lightDataUBO->m_isDirty = true;
 	m_lights.SPECULAR_POWER = specularPower;
 	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
 	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
@@ -1378,6 +1384,7 @@ void RenderContext::AddFogCommandsToDevConsole( DevConsole* devConsole )
 
 void RenderContext::EnableFog( float nearFog , float farFog , Rgba8 nearFogColor , Rgba8 farFogColor )
 {
+	//m_fogDataUBO->m_isDirty = true;
 	m_fog.nearFog			= nearFog;
 	m_fog.farFog			= farFog;
 	m_fog.nearFogColor		= nearFogColor.GetAsNormalizedFloat3();
@@ -1391,6 +1398,7 @@ void RenderContext::EnableFog( float nearFog , float farFog , Rgba8 nearFogColor
 
 void RenderContext::EnableFog( float nearFog , float farFog , Vec3 nearFogColor , Vec3 farFogColor )
 {
+	//m_fogDataUBO->m_isDirty = true;
 	m_fog.nearFog			= nearFog;
 	m_fog.farFog			= farFog;
 	m_fog.nearFogColor		= nearFogColor;
@@ -1404,6 +1412,7 @@ void RenderContext::EnableFog( float nearFog , float farFog , Vec3 nearFogColor 
 
 void RenderContext::EnableFog( fogDataT fogData )
 {
+	//m_fogDataUBO->m_isDirty = true;
 	m_fog = fogData;
 	m_fogDataUBO->Update( &m_fog , sizeof( fogDataT ) , sizeof( fogDataT ) );
 	BindUniformBuffer( UBO_FOG_SLOT , m_fogDataUBO );
@@ -1474,11 +1483,11 @@ void RenderContext::DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes
 	// RenderBUffer* m_immediateVBO // VBO - vertex buffer object - a buffer of memomry on the GPU.
 	// void* cpuBuffer = ( void* ) vertexes;
 	// stride - the number of bytes we need to move in an array or buffer of a memory
-
 	size_t  bufferTotalByteSize	= numVertexes * sizeof( Vertex_PCU );
 	size_t	elementSize			= sizeof( Vertex_PCU );
 	m_immediateVBO->SetVBOStide( sizeof( Vertex_PCU ) );
 	m_immediateVBO->SetVertexBufferLayout( Vertex_PCU::LAYOUT );
+	//m_immediateVBO->m_isDirty = true;
 	m_immediateVBO->Update( vertexes , bufferTotalByteSize , elementSize );
 
 	// Bind the Shader
@@ -1767,6 +1776,7 @@ void RenderContext::BindUniformBuffer( unsigned int slot , RenderBuffer* ubo )
 
 void RenderContext::BindMaterialData( void* pointerToData , int sizeOfData )
 {
+	//m_materialDataUBO->m_isDirty = true;
 	m_materialDataUBO->Update( pointerToData , sizeOfData , sizeOfData );
 	BindUniformBuffer( UBO_MATERIAL_SLOT , m_materialDataUBO );
 }
@@ -1775,6 +1785,7 @@ void RenderContext::BindMaterialData( void* pointerToData , int sizeOfData )
 
 void RenderContext::SetModelMatrix( Mat44 modelMat , Rgba8 color /* = WHITE */  )
 {
+	//m_modelMatrixUBO->m_isDirty = true;
 	Vec4 normalizedModelColor = color.GetAsNormalizedFloat4();
 	ModelDataT modelData;
 	modelData.model = modelMat;

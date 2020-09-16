@@ -63,6 +63,10 @@ RenderBuffer::~RenderBuffer()
 
 bool RenderBuffer::Update( void const* data , size_t dataByteSize , size_t elementByteSize )
 {
+// 	if ( !m_isDirty )
+// 	{
+// 		return false;
+// 	}
 
 	if ( !IsCompatible( dataByteSize , elementByteSize ) )
 	{
@@ -107,7 +111,7 @@ bool RenderBuffer::Update( void const* data , size_t dataByteSize , size_t eleme
 			// if this is MEMORY_HINT_GPU
 			ctx->UpdateSubresource( m_handle , 0 , nullptr , data , 0 , 0 );
 		}
-		
+		//m_isDirty = false;
 		// CopySubresource ( directCopy ) , - this is only available to PGu buffers that have exactly the same size, and element size
 		return false;
 }

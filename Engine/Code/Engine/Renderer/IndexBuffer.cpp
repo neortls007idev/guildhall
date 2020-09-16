@@ -19,6 +19,7 @@ IndexBuffer::~IndexBuffer()
 
 void IndexBuffer::Update( uint icount , uint const* indices )
 {
+	//m_isDirty = true;
 	RenderBuffer::Update( indices , icount * sizeof( uint ) , sizeof( uint ) );
 }
 

@@ -16,14 +16,9 @@ extern Window*		g_theWindow;
 
 constexpr float CLIENT_ASPECT											= 16.f/9.f;
 
-constexpr float WORLD_SIZE_X											= 20.f;
-constexpr float WORLD_SIZE_Y											= 12.f;
-constexpr float WORLD_CAMERA_SIZE_X										= /*16.f;*/ WORLD_SIZE_Y*CLIENT_ASPECT;
-constexpr float WORLD_CAMERA_SIZE_Y										= /*9.f;*/WORLD_SIZE_Y;
-constexpr float UI_SIZE_X												= 1600.f;
-constexpr float UI_SIZE_Y												= 800.f;
-constexpr float WORLD_CENTER_X											= WORLD_SIZE_X / 2.f;
-constexpr float WORLD_CENTER_Y											= WORLD_SIZE_Y / 2.f;
+constexpr float GAME_CAM_NEAR_Z = 0.1f;
+constexpr float GAME_CAM_FAR_Z	= 100.0f;
+constexpr float GAME_CAM_FOV	= 90.0f;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -99,3 +94,22 @@ enum eGameObjModels
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum GAME_DEBUG_SWITCHS
+{
+	GAME_CAMERA_VIEW_FRUSTUM_CULLING ,
+
+	NUM_GAME_DEBUG_SWITCHS
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum DIRTY_UBOS
+{
+	GAME_CAMERA ,
+
+	NUM_DIRTY_UBOS
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+

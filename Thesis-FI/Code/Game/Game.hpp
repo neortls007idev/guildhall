@@ -12,6 +12,7 @@ class Texture;
 class GPUMesh;
 
 typedef std::vector< Transform* > OBJInstances;
+//typedef std::vector< Transform* > OBJInstancesInsideViewFrustum;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +38,7 @@ public:
 			void UpdateToneMapData();
 			
 			void UpdateLightPosition( float deltaSeconds );
-	
+			void UpdateViewFrustumCulling();
 			void Render() const;
 			void BindShaderSpecificMaterialData() const;
 			void RenderFresnelShader2ndPass() const;
@@ -123,6 +124,7 @@ public:
 	Texture*					m_gameModelsDiffuse[ NUM_GAME_MODELS ];
 	Texture*					m_gameModelsNormals[ NUM_GAME_MODELS ];
 	OBJInstances				m_ModelInstances[ NUM_GAME_MODELS ];
+	OBJInstances				m_ModelDrawableInstances[ NUM_GAME_MODELS ];
 
 private:
 	fresnelData_t				m_fresnelShaderData;
@@ -130,4 +132,8 @@ private:
 	fogDataT					m_fogData;
 	float						m_frameRate			  = 0.f;
 	bool						m_isMouseUnlocked	  = false;
+	bool						m_debugSwitchs[ NUM_GAME_DEBUG_SWITCHS ];
+	bool						m_dirtyUBOs[ NUM_DIRTY_UBOS ];
+	uint						m_totalDrawableMeshes;
+	uint						m_currentlyDrawingMeshes;
 };

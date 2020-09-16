@@ -51,8 +51,9 @@ private:
 	bool Create( size_t dataByteSize , size_t elementByteSize );
 
 public:
-	RenderContext* m_owner;
-	ID3D11Buffer* m_handle;
+	RenderContext*	m_owner;
+	ID3D11Buffer*	m_handle;
+	//bool			m_isDirty				= true;
 
 private:
 

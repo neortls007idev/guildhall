@@ -1,64 +1,145 @@
-#include "Engine/Primitives/Plane.hpp"
-#include "Engine/Math/MathUtils.hpp"
+﻿#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Primitives//Plane.hpp"
+#include "Engine/Math/Vec3.hpp"
+#include "Engine/Math/Vec4.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Plane2D::Plane2D()
+Plane::Plane()
 {
-	m_normal = Vec2( 0.f , 1.f );
-	m_distance = 0.f;
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Plane2D::Plane2D( Vec2 normal , const Vec2 pointOnPlane )
+Plane::Plane( const Plane& plane )
 {
-	m_normal = normal;
-	m_distance = DotProduct2D( pointOnPlane , normal );
+	a = plane.a;
+	b = plane.b;
+	c = plane.c;
+	d = plane.d;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-float Plane2D::GetDistance( Vec2 position ) const
+Plane::Plane( float coeffA , float coeffB , float coeffC , float coeffD )
 {
-	return 0.f;
+	a = coeffA;
+	b = coeffB;
+	c = coeffC;
+	d = coeffD;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-bool Plane2D::IsPointInFrontOfPlane( const Vec2 point ) const
+Plane::Plane( const Vec3& normalizedNormal , float coeffD )
 {
-	float dist = DotProduct2D( point , m_normal );
-	float distanceFromPlane = dist - m_distance;
-	return distanceFromPlane > 0.f;
+	a = normalizedNormal.x;
+	b = normalizedNormal.y;
+	c = normalizedNormal.z;
+	d = coeffD;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-float Plane2D::GetSignedDistanceFromPlane( const Vec2 point )
+Plane Plane::ConstructFromPointNormal( const Vec3& pointOnSurface , const Vec3& normal )
 {
-	float dist = DotProduct2D( point , m_normal );
-	float distanceFromPlane = dist - m_distance;
-	return distanceFromPlane;
+	Plane resultantPlane;
+	Vec3 normalizedNormal = normal.GetNormalized();
+	resultantPlane.a = normalizedNormal.x;
+	resultantPlane.b = normalizedNormal.y;
+	resultantPlane.c = normalizedNormal.z;
+	resultantPlane.d = -DotProduct3D( pointOnSurface , normalizedNormal );
+	return resultantPlane;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-bool Plane2D::operator!=( const Plane2D& compare ) const
+Plane Plane::ConstructFromPointVectors( const Vec3& pointOnSurface , const Vec3& v1 , const Vec3& v2 )
 {
-	return !( *this == compare );
+	Vec3 normal = CrossProduct3D( v1 , v2 );
+	return ConstructFromPointNormal( pointOnSurface , normal );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-bool Plane2D::operator==( const Plane2D& compare ) const
+Plane Plane::ConstructFromPoints( const Vec3& v1 , const Vec3& v2 , const Vec3& v3 )
+{	
+	Vec3 normal = CrossProduct3D( v2 - v1 , v3 - v1 ).GetNormalized();
+	return ConstructFromPointNormal( v1 , normal );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Plane Plane::GetNormalizedPlane()
 {
-	float nearZero = 0.001f;
-	if ( ( m_normal - compare.m_normal ).GetLength() <= nearZero && m_distance - compare.m_distance <= nearZero )
+	Plane normalizedPlane;
+	float distance	  = sqrtf( a * a + b * b + c * c );
+	normalizedPlane.a = a / distance;
+	normalizedPlane.b = b / distance;
+	normalizedPlane.c = c / distance;
+	normalizedPlane.d = d / distance;
+	return normalizedPlane;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Plane Plane::Flip()
+{
+	Plane flippedPlane;
+	flippedPlane.a = -a;
+	flippedPlane.b = -b;
+	flippedPlane.c = -c;
+	flippedPlane.d = -d;
+	return flippedPlane;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Vec3 Plane::GetClosestPointOnPlaneFromReferencePoint( const Vec3& referencePoint )
+{
+	return ( referencePoint - Vec3( a , b , c ) * SignedDistance( referencePoint ) );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+float Plane::SignedDistance( const Vec3& referencePoint ) const
+{
+	return ( ( a * referencePoint.x ) + ( b * referencePoint.y ) + ( c * referencePoint.z ) + d );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+float Plane::UnSignedDistance( const Vec3& referencePoint ) const
+{
+	float signedDist = SignedDistance( referencePoint );
+
+	if ( signedDist <= 0.f )
 	{
-		return true;
+		signedDist = -signedDist;
 	}
-	return false;
+	return signedDist;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+float Plane::Dot( const Plane& plane , const Vec4& vec )
+{
+	return ( plane.a * vec.x ) + ( plane.b * vec.y ) + ( plane.c * vec.z ) + ( plane.d * vec.w );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+float Plane::DotCoord( const Plane& plane , const Vec3& vec )
+{
+	return ( plane.a * vec.x ) + ( plane.b * vec.y ) + ( plane.c * vec.z ) + plane.d;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+float Plane::DotNormal( const Plane& plane , const Vec3& normalVec )
+{
+	return ( plane.a * normalVec.x ) + ( plane.b * normalVec.y ) + ( plane.c * normalVec.z );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

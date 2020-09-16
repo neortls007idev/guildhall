@@ -9,6 +9,7 @@
 // FORAWRD TYPE DECLARATIONS
 //-----------------------------------------------------------------------------------------------------------------
 
+struct Plane;
 class Polygon2D;
 struct Vec2;
 struct Vec3;
@@ -78,6 +79,12 @@ bool  IsPointInsideCapsule2D( const Vec2& referencePoint , const Vec2& capsuleMi
 bool  IsPointInsideOBB2D( const Vec2& referencePoint , const OBB2& box );
 bool  IsPointInSector( const Vec2& pointOfObservation , const Vec2& observerLocation , const float forwardDegrees, const float apertureDegrees, const float maxDistance );
 //bool  IsPointInSector( const Vec2& referencePoint, Vec2& center, const float& maxDistance/*radius*/, const Vec2& forwardDirection, const float& apertureDegrees );
+
+// NOTE:- Cannot be used for cuboid
+bool IsPointInFrontOfPlane( const Plane& plane , const Vec3& point );
+bool IsPointOnPlane( const Plane& plane , const Vec3& point );
+bool DoPlaneAndCubeOverlap( const Plane& plane , const Vec3& centerOfCube , const float radius );
+bool DoPlaneAndSphereOverlap( const Plane& plane , const Vec3& centerOfSphere , const float radius );
 
 //-----------------------------------------------------------------------------------------------------------------
 // TRANFORM UTILITIES

@@ -1,6 +1,11 @@
 #pragma once
 #include <atlalloc.h>
+#include <list>
 #include <string>
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+class TCPServer;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -17,12 +22,9 @@ public:
 	void EndFrame();
 
 	//----------------------------------------------------------------------------------------------------------
+	bool GetIsListening()																		{ return m_isListening; }
+	void SetIsListening( bool listen )															{ m_isListening = listen; }
 
-	bool GetListenPort()									{ return m_listenPort; }
-	void SetListenPort( int port )							{ m_listenPort = port; }
-	bool GetIsListening()									{ return m_isListening; }
-	void SetIsListening( bool listen )						{ m_isListening = listen; }
-	
 	std::string GetAddress();
 	
 	//----------------------------------------------------------------------------------------------------------
@@ -32,12 +34,10 @@ public:
 	static bool CloseTCPServer( EventArgs& args );
 	
 private:
-	int						m_listenPort	= -1;
 	bool					m_isListening	= false;
-	FD_SET					m_listenSet;
-	SOCKET					m_listenSocket;
+	int						m_listenPort	= -1;
 	SOCKET					m_clientSocket;
-	timeval					m_timeVal;
+	std::list< TCPServer* > m_TCPServers;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

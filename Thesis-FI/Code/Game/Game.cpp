@@ -78,6 +78,7 @@ Game::Game()
 
 	m_cubeSampler = new Sampler( g_theRenderer , SAMPLER_CUBEMAP );
 	m_linear = new Sampler( g_theRenderer , SAMPLER_BILINEAR );
+	m_debugSwitchs[ GAME_CAMERA_VIEW_FRUSTUM_CULLING ] = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -119,7 +120,7 @@ Game::~Game()
 
 void Game::InitializeCameras()
 {
-		m_gameCamera.SetProjectionPerspective( 60.f , CLIENT_ASPECT , -.1f , -100.f );
+		m_gameCamera.SetProjectionPerspective( GAME_CAM_FOV , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
 		m_gameCamera.SetPosition( Vec3( 0.f , 0.f , 0.f ) );
 		m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );
 }
@@ -128,6 +129,16 @@ void Game::InitializeCameras()
 
 void Game::Update( float deltaSeconds )
 {
+	if ( m_debugSwitchs[ GAME_CAMERA_VIEW_FRUSTUM_CULLING ] )
+	{
+		m_currentlyDrawingMeshes = 0;
+		UpdateViewFrustumCulling();
+	}
+	else
+	{
+		m_currentlyDrawingMeshes = m_totalDrawableMeshes;
+	}
+	
 	if ( m_isMouseUnlocked )
 	{
 		g_theInput->PopCursorSettings();
@@ -189,6 +200,40 @@ void Game::UpdateLightPosition( float deltaSeconds )
 	{
 		m_lights.lights[ m_currentLightIndex ].worldPosition = Vec3( 0.f , 0.f , -5.f ) + Vec3::MakeFromSpericalCoordinates(
 			45.f * ( float ) GetCurrentTimeSeconds() , 30.f * SinDegrees( ( float ) GetCurrentTimeSeconds() ) , 5.f );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateViewFrustumCulling()
+{
+	Frustum cameraViewFrustum = m_gameCamera.GetCameraViewFrustum();
+	
+	for ( int modelIndex = 0 ; modelIndex < NUM_GAME_MODELS ; modelIndex++ )
+	{
+		if( nullptr == m_gameModels[ modelIndex ] )
+		{
+			continue;
+		}
+		
+		m_ModelDrawableInstances[ modelIndex ].clear();
+		float currentModelRadius = m_gameModels[ modelIndex ]->m_boundingSphereRadius;
+		
+		for( size_t instanceIndex = 0 ; instanceIndex < m_ModelInstances[ modelIndex ].size() ; instanceIndex++ )
+		{
+			if( nullptr == m_ModelInstances[ modelIndex ][ instanceIndex ] )
+			{
+				continue;
+			}
+			
+			Vec3& pos = m_ModelInstances[ modelIndex ][ instanceIndex ]->m_position;
+
+			if( cameraViewFrustum.IsSphereInsideFrustum( pos , currentModelRadius ) )
+			{
+				m_ModelDrawableInstances[ modelIndex ].emplace_back( m_ModelInstances[ modelIndex ][ instanceIndex ] );
+				m_currentlyDrawingMeshes++;
+			}
+		}
 	}
 }
 
@@ -385,16 +430,32 @@ void Game::RenderAllInstancesOfType( eGameObjModels modelType ) const
 {
 	g_theRenderer->BindTexture( m_gameModelsDiffuse[ modelType ] );
 	g_theRenderer->BindTexture( m_gameModelsNormals[ modelType ] , TEX_NORMAL );
-	
-	for( size_t instanceIndex = 0 ; instanceIndex < m_ModelInstances[ modelType ].size(); instanceIndex++ )
+
+	if( m_debugSwitchs[ GAME_CAMERA_VIEW_FRUSTUM_CULLING ] )
 	{
-		if ( nullptr == m_ModelInstances[ modelType ][ instanceIndex ] )
+		for( size_t instanceIndex = 0 ; instanceIndex < m_ModelDrawableInstances[ modelType ].size(); instanceIndex++ )
 		{
-			continue;
+			if( nullptr == m_ModelDrawableInstances[ modelType ][ instanceIndex ] )
+			{
+				continue;
+			}
+			g_theRenderer->SetModelMatrix( m_ModelDrawableInstances[ modelType ][ instanceIndex ]->GetAsMatrix() );
+			g_theRenderer->DrawMesh( m_gameModels[ modelType ] );
 		}
-		g_theRenderer->SetModelMatrix( m_ModelInstances[ modelType ][ instanceIndex ]->GetAsMatrix() );
-		g_theRenderer->DrawMesh( m_gameModels[ modelType ] );
 	}
+	else
+	{
+		for( size_t instanceIndex = 0 ; instanceIndex < m_ModelInstances[ modelType ].size(); instanceIndex++ )
+		{
+			if( nullptr == m_ModelInstances[ modelType ][ instanceIndex ] )
+			{
+				continue;
+			}
+			g_theRenderer->SetModelMatrix( m_ModelInstances[ modelType ][ instanceIndex ]->GetAsMatrix() );
+			g_theRenderer->DrawMesh( m_gameModels[ modelType ] );
+		}
+	}
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -520,31 +581,38 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	if ( g_theInput->IsKeyHeldDown( 'A' ) )
 	{
 		m_gameCamera.SetPosition( m_gameCamera.GetPosition() - rightVector * speed * deltaSeconds );
+		m_dirtyUBOs[ GAME_CAMERA ] = true;
 	}
 	if ( g_theInput->IsKeyHeldDown( 'D' ) )
 	{
 		m_gameCamera.SetPosition( m_gameCamera.GetPosition() + rightVector * speed * deltaSeconds );
+		m_dirtyUBOs[ GAME_CAMERA ] = true;
 	}
 	if ( g_theInput->IsKeyHeldDown( 'W' ) )
 	{
 		m_gameCamera.SetPosition( m_gameCamera.GetPosition() + forwardVector * speed * deltaSeconds );
+		m_dirtyUBOs[ GAME_CAMERA ] = true;
 	}
 	if ( g_theInput->IsKeyHeldDown( 'S' ) )
 	{
 		m_gameCamera.SetPosition( m_gameCamera.GetPosition() - forwardVector * speed * deltaSeconds );
+		m_dirtyUBOs[ GAME_CAMERA ] = true;
 	}
 	if ( g_theInput->IsKeyHeldDown( 'Q' ) )
 	{
 		m_gameCamera.SetPosition( m_gameCamera.GetPosition() - UpVector * speed * deltaSeconds );
+		m_dirtyUBOs[ GAME_CAMERA ] = true;
 	}
 	if ( g_theInput->IsKeyHeldDown( 'E' ) )
 	{
 		m_gameCamera.SetPosition( m_gameCamera.GetPosition() + UpVector * speed * deltaSeconds );
+		m_dirtyUBOs[ GAME_CAMERA ] = true;
 	}
 
 	if ( g_theInput->WasKeyJustPressed( 'O' ) )
 	{
-		m_cameraPosition	= Vec3::ZERO;
+		m_dirtyUBOs[ GAME_CAMERA ] = true;
+		m_gameCamera.SetPosition( Vec3::ZERO );
 		m_yaw				= 0.f;
 		m_pitch				= 0.f;
 	}
@@ -557,6 +625,7 @@ void Game::CameraPositionUpdateOnInput( float deltaSeconds )
 	m_pitch = Clamp( m_pitch , -90.f , 90.f );
 
 	m_gameCamera.SetPitchYawRollRotation( m_pitch , m_yaw , 0.f );
+	m_gameCamera.ConstructCameraViewFrustum();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -1,4 +1,10 @@
-﻿#include "Engine/Networking/Client.hpp"
+#pragma once
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct MessageHeader
+{
+	std::uint16_t m_id;
+	std::uint16_t m_size;
+};
 

@@ -296,6 +296,13 @@ void Game::DebugUI()
 				}
 			}
 		}
+		if( ImGui::CollapsingHeader( "Profiling Debugging" ) )
+		{
+			ImGui::Checkbox( "Camera View Frustum Culling" , &m_debugSwitchs[ GAME_CAMERA_VIEW_FRUSTUM_CULLING ] );
+			//Vec3 cameraPos = m_gameCamera.GetCameraTransform().GetPostion();
+			//float cameraPitch = m_gameCamera.GetCameraTransform().Get;
+			//ImGui::InputFloat3( "Light World Position" , ( float* ) &m_gameCamera. );
+		}
 	}
 	ImGui::End();
 	ImGui::Begin( "Debug Data",0, ImGuiWindowFlags_NoCollapse /*| ImGuiWindowFlags_NoMove*/ | ImGuiWindowFlags_NoBackground );
@@ -332,7 +339,10 @@ void Game::DebugUI()
 	ImGui::TextColored( ImVec4( 1.f , 1.f , 0.f , 1.f ) , "Yaw = %.3f " , m_yaw ); ImGui::SameLine();
 	ImGui::TextColored( ImVec4( 0.f , 1.f , 1.f , 1.f ) , "Pitch = %.3f " , m_pitch ); ImGui::SameLine();
 	ImGui::TextColored( ImVec4( 1.f , 0.f , 1.f , 1.f ) , "Roll = 0.00" );
-			
+	ImGui::TextColored( ImVec4( 1.f , 1.f , 1.f , 1.f ) , "Total Drawable Objects = " , m_totalDrawableMeshes ); ImGui::SameLine();
+	ImGui::TextColored( ImVec4( 1.f , 0.f , 0.f , 1.f ) , "%i" , m_totalDrawableMeshes ); 
+	ImGui::TextColored( ImVec4( 1.f , 1.f , 1.f , 1.f ) , "Currently Drawing Objects = " , m_currentlyDrawingMeshes ); ImGui::SameLine();
+	ImGui::TextColored( ImVec4( 0.f , 1.f , 0.f , 1.f ) , "%i" , m_currentlyDrawingMeshes );
 	ImGui::End();
 
 	ImGui::Begin( "Controls" , 0 , ImGuiWindowFlags_NoCollapse /*| ImGuiWindowFlags_NoMove*/ | ImGuiWindowFlags_NoBackground );

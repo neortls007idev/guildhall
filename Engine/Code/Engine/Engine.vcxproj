@@ -666,7 +666,6 @@
     <ClCompile Include="Math\MathUtils.cpp" />
     <ClCompile Include="Math\Matrix4x4.cpp" />
     <ClCompile Include="Math\MatrixUtils.cpp" />
-    <ClCompile Include="Math\Plane.cpp" />
     <ClCompile Include="Math\RandomNumberGenerator.cpp" />
     <ClCompile Include="Math\RawNoise.cpp" />
     <ClCompile Include="Math\SmoothNoise.cpp" />
@@ -677,15 +676,16 @@
     <ClCompile Include="Memory\Job.cpp" />
     <ClCompile Include="Memory\JobSystem.cpp" />
     <ClCompile Include="Memory\JobSystemWorkerThread.cpp" />
-    <ClCompile Include="Networking\Client.cpp">
+    <ClCompile Include="Networking\TCPClient.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Networking\NetworkSystem.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Networking\Server.cpp">
+    <ClCompile Include="Networking\TCPServer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Networking\TCPSocket.cpp" />
     <ClCompile Include="ParticleSystem\Particle2D.cpp" />
     <ClCompile Include="ParticleSystem\Particle3D.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -751,16 +751,17 @@
     <ClCompile Include="Primitives\AABB3.cpp" />
     <ClCompile Include="Primitives\Capsule2D.cpp" />
     <ClCompile Include="Primitives\Disc2D.cpp" />
+    <ClCompile Include="Primitives\Frustum.cpp" />
     <ClCompile Include="Primitives\GPUMesh.cpp" />
     <ClCompile Include="Primitives\LineSegment2D.cpp" />
     <ClCompile Include="Primitives\OBB2.cpp" />
     <ClCompile Include="Primitives\OBB3.cpp" />
     <ClCompile Include="Primitives\Plane.cpp" />
+    <ClCompile Include="Primitives\Plane2D.cpp" />
     <ClCompile Include="Primitives\Polygon2D.cpp" />
     <ClCompile Include="Renderer\D3D11Common.cpp" />
     <ClCompile Include="Renderer\D3D11Utils.cpp" />
     <ClCompile Include="Renderer\DrawableObjects.cpp" />
-    <ClCompile Include="Renderer\FrustumCulling.cpp" />
     <ClCompile Include="Renderer\IndexBuffer.cpp" />
     <ClCompile Include="Renderer\Material.cpp" />
     <ClCompile Include="Renderer\RenderBuffer.cpp" />
@@ -918,7 +919,6 @@
     <ClInclude Include="Math\MathUtils.hpp" />
     <ClInclude Include="Math\Matrix4x4.hpp" />
     <ClInclude Include="Math\MatrixUtils.hpp" />
-    <ClInclude Include="Math\Plane.hpp" />
     <ClInclude Include="Math\RandomNumberGenerator.hpp" />
     <ClInclude Include="Math\RawNoise.hpp" />
     <ClInclude Include="Math\SmoothNoise.hpp" />
@@ -929,15 +929,17 @@
     <ClInclude Include="Memory\Job.hpp" />
     <ClInclude Include="Memory\JobSystem.hpp" />
     <ClInclude Include="Memory\JobSystemWorkerThread.hpp" />
-    <ClInclude Include="Networking\Client.hpp">
+    <ClInclude Include="Networking\NetworkCommon.hpp" />
+    <ClInclude Include="Networking\TCPClient.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Networking\NetworkSystem.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="Networking\Server.hpp">
+    <ClInclude Include="Networking\TCPServer.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="Networking\TCPSocket.hpp" />
     <ClInclude Include="ParticleSystem\Particle2D.hpp" />
     <ClInclude Include="ParticleSystem\Particle3D.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -1003,11 +1005,13 @@
     <ClInclude Include="Primitives\AABB3.hpp" />
     <ClInclude Include="Primitives\Capsule2D.hpp" />
     <ClInclude Include="Primitives\Disc2D.hpp" />
+    <ClInclude Include="Primitives\Frustum.hpp" />
     <ClInclude Include="Primitives\GPUMesh.hpp" />
     <ClInclude Include="Primitives\LineSegment2D.hpp" />
     <ClInclude Include="Primitives\OBB2.hpp" />
     <ClInclude Include="Primitives\OBB3.hpp" />
     <ClInclude Include="Primitives\Plane.hpp" />
+    <ClInclude Include="Primitives\Plane2D.hpp" />
     <ClInclude Include="Primitives\Polygon2D.hpp" />
     <ClInclude Include="Renderer\BitmapFont.hpp" />
     <ClInclude Include="Renderer\Camera.hpp" />
@@ -1015,7 +1019,6 @@
     <ClInclude Include="Renderer\D3D11Utils.hpp" />
     <ClInclude Include="Renderer\DrawableObjects.hpp" />
     <ClInclude Include="Renderer\ErrorShaderCode.hpp" />
-    <ClInclude Include="Renderer\FrustumCulling.hpp" />
     <ClInclude Include="Renderer\IndexBuffer.hpp" />
     <ClInclude Include="Renderer\Material.hpp" />
     <ClInclude Include="Renderer\RenderBuffer.hpp" />

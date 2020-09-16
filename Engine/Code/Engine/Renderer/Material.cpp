@@ -84,7 +84,7 @@ void Material::SetData( void const* data , size_t dataSize )
 	{
 		m_ubo = new RenderBuffer( g_theRenderer , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
 	}
-	
+	//m_ubo->m_isDirty = true;
 	m_ubo->Update( data , dataSize , dataSize );
 //	void* nonconstData = const_cast<void*>( data );
 //	g_theRenderer->BindMaterialData( nonconstData , dataSize );

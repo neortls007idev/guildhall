@@ -9,6 +9,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Primitives/Polygon2D.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Primitives/Plane2D.hpp"
 #include "Engine/Primitives/Plane.hpp"
 
 extern RenderContext* g_theRenderer;
@@ -420,6 +421,86 @@ bool  IsPointInSector( const Vec2& pointOfObservation , const Vec2& observerLoca
 	return false;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool IsPointInFrontOfPlane( const Plane& plane , const Vec3& point )
+{
+	if( Plane::DotCoord( plane , point ) < 0.0f )
+	{
+		return false;
+	}
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool IsPointOnPlane( const Plane& plane , const Vec3& point )
+{
+	if( ( Plane::DotCoord( plane , point ) < 0.0001f ) && ( Plane::DotCoord( plane , point ) > 0.0001f ) )
+	{
+		return false;
+	}
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool DoPlaneAndCubeOverlap( const Plane& plane , const Vec3& centerOfCube , const float radius )
+{
+	if ( Plane::DotCoord( plane , Vec3( ( centerOfCube.x - radius ) , ( centerOfCube.y - radius ) , ( centerOfCube.z - radius ) ) ) < 0.0f )
+	{
+		return false;
+	}
+	
+	if( Plane::DotCoord( plane , Vec3( ( centerOfCube.x + radius ) , ( centerOfCube.y - radius ) , ( centerOfCube.z - radius ) ) ) < 0.0f )
+	{
+		return false;
+	}
+	
+	if( Plane::DotCoord( plane , Vec3( ( centerOfCube.x - radius ) , ( centerOfCube.y + radius ) , ( centerOfCube.z - radius ) ) ) < 0.0f )
+	{
+		return false;
+	}
+	
+	if( Plane::DotCoord( plane , Vec3( ( centerOfCube.x + radius ) , ( centerOfCube.y + radius ) , ( centerOfCube.z - radius ) ) ) < 0.0f )
+	{
+		return false;
+	}
+	
+	if( Plane::DotCoord( plane , Vec3( ( centerOfCube.x - radius ) , ( centerOfCube.y - radius ) , ( centerOfCube.z + radius ) ) ) < 0.0f )
+	{
+		return false;
+	}
+	
+	if( Plane::DotCoord( plane , Vec3( ( centerOfCube.x + radius ) , ( centerOfCube.y - radius ) , ( centerOfCube.z + radius ) ) ) < 0.0f )
+	{
+		return false;
+	}
+	
+	if( Plane::DotCoord( plane , Vec3( ( centerOfCube.x - radius ) , ( centerOfCube.y + radius ) , ( centerOfCube.z + radius ) ) ) < 0.0f )
+	{
+		return false;
+	}
+	
+	if( Plane::DotCoord( plane , Vec3( ( centerOfCube.x + radius ) , ( centerOfCube.y + radius ) , ( centerOfCube.z + radius ) ) ) < 0.0f )
+	{
+		return false;
+	}
+	
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool DoPlaneAndSphereOverlap( const Plane& plane , const Vec3& centerOfSphere , const float radius )
+{
+	if( Plane::DotCoord( plane , centerOfSphere ) < -radius )
+	{
+		return false;
+	}
+
+	return true;
+}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // TRANFORM UTILITIES

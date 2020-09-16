@@ -65,7 +65,7 @@ bool Game::AddGameOBJInstance( eGameObjModels modelType )
 
 	EmplaceBackAtEmptySpace( m_ModelInstances[ modelType ] , newTransform );
 	//m_OBJInstance[ modelType ].push_back( newTransform );
-
+	m_totalDrawableMeshes++;
 	return true;
 }
 
@@ -80,7 +80,7 @@ bool Game::DestroyGameOBJInstance( eGameObjModels modelType , int instanceCount 
 	
 	delete m_ModelInstances[ modelType ][ instanceCount ];
 	m_ModelInstances[ modelType ][ instanceCount ] = nullptr;
-
+	m_totalDrawableMeshes--;
 	return true;
 }
 
@@ -125,6 +125,7 @@ void Game::LoadScene()
 				newInstance->SetRotation( instancePitch , instanceYaw , instanceRoll );
 				newInstance->SetScale( instanceScale.x , instanceScale.y , instanceScale.z );
 				m_ModelInstances[ modelIndex ].emplace_back( newInstance );
+				m_totalDrawableMeshes++;
 			}
 			modelInstance = modelInstance->NextSiblingElement( "ModelInstance" );
 		}

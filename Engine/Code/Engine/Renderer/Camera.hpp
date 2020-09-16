@@ -7,6 +7,8 @@
 #include "Engine/Math/Vec3.hpp"
 #include <vector>
 
+#include "Engine/Primitives/Frustum.hpp"
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 class Texture;
@@ -86,13 +88,14 @@ public:
 	void			ResetDepthStencilTarget();
 
 	void			SetWorldCoordinateSystem( const eWorldCoordinateSystem newWorldCoordinateSystem );
-	eWorldCoordinateSystem GetWorldCoordinateSystem() const																	{ return m_worldCoordinateSystem; }
+	eWorldCoordinateSystem GetWorldCoordinateSystem() const														{ return m_worldCoordinateSystem; }
 	void			SetCameraTransform( const Transform& newTransform );
 	void			SetProjectionOrthographic( float height , float nearZ = 0.f , float farZ = 1.f );
 //	void			SetProjectionOrthographic( float height , float nearZ = -1.0f , float farZ = 1.0f );
 	void			SetProjectionPerspective( float fov , float aspectRatio , float nearZ , float farZ );
 	void			SetProjectionMatrix( const Mat44& projection );
-
+	void			ConstructCameraViewFrustum();
+	Frustum			GetCameraViewFrustum() /*const*/																{ return m_cameraViewFrustum;  }
 
 	RenderBuffer*	UpdateUBO( RenderContext* ctx );
 	Vec3			ClientToWorld( Vec2 client , float ndcZ );
@@ -105,18 +108,21 @@ private:
 
 	eWorldCoordinateSystem m_worldCoordinateSystem = ENGINE_DEFAULT;
 	
-	eCameraClearBitFlag	m_clearMode				= CLEAR_COLOR_BIT;
-	Rgba8				m_clearColor			= BLACK;
+	eCameraClearBitFlag				m_clearMode				= CLEAR_COLOR_BIT;
+	Rgba8							m_clearColor			= BLACK;
 
-	Mat44				m_projection;
-	Transform			m_transform;
-	Mat44				m_view;
+	Mat44							m_projection;
+	Transform						m_transform;
+	Mat44							m_view;
 	
 	std::vector< Texture* >			m_colorTargets			/*= nullptr*/;
-	Texture*			m_depthStencilTarget	= nullptr;
-	float				m_clearDepth			= 1.0f;
-	float				m_clearStencil			= 0.f;
-	Vec2				m_outputSize;
+	Texture*						m_depthStencilTarget	= nullptr;
+	float							m_clearDepth			= 1.0f;
+	float							m_clearStencil			= 0.f;
+	Vec2							m_outputSize;
+	Frustum							m_cameraViewFrustum;
+	float							m_screenDepth			= 0.f;
+	bool							m_isCameraUBODirty = true;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
