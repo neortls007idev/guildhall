@@ -98,7 +98,7 @@ void NetworkSystem::BeginFrame()
 
 				if( m_linkSocket != INVALID_SOCKET )
 				{
-					g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client Connected from %s" , GetAddress().c_str() );
+					g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client Connected from %s" , GetAddress( m_linkSocket ).c_str() );
 				}
 			}
 			if( m_linkSocket != INVALID_SOCKET )
@@ -140,14 +140,14 @@ void NetworkSystem::EndFrame()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-std::string NetworkSystem::GetAddress()
+std::string NetworkSystem::GetAddress( SOCKET socket )
 {
 
 	std::array<char , 128> addressString;
 
 	sockaddr clientAddress;
 	int addressSize = sizeof( clientAddress );
-	int iResult = getpeername( m_linkSocket , &clientAddress , &addressSize );
+	int iResult = getpeername( socket , &clientAddress , &addressSize );
 
 	if( iResult == SOCKET_ERROR )
 	{
@@ -285,6 +285,12 @@ STATIC bool NetworkSystem::ConnectToServer( EventArgs& args )
 		g_theNetworkSys->m_TCPclient->m_clientSocket = g_theNetworkSys->m_TCPclient->Connect( host.c_str() ,
 		                                                                                      ( uint16_t )atoi( port.c_str() ) ,
 		                                                                                      Mode::Nonblocking );
+		if( g_theNetworkSys->m_TCPclient->m_clientSocket != INVALID_SOCKET )
+		{
+			g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Server Connected to %s" ,
+										  g_theNetworkSys->GetAddress( g_theNetworkSys->m_TCPclient->m_clientSocket ).c_str() );
+		}
+		
 		return true;
 	}
 	return false;

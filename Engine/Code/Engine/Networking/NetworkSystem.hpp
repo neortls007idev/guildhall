@@ -26,7 +26,7 @@ public:
 	bool GetIsListening()																		{ return m_isListening; }
 	void SetIsListening( bool listen )															{ m_isListening = listen; }
 
-	std::string GetAddress();
+	std::string GetAddress( SOCKET socket );
 	
 	//----------------------------------------------------------------------------------------------------------
 
