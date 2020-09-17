@@ -43,11 +43,18 @@ NetworkSystem::~NetworkSystem()
 {
 	m_linkSocket = INVALID_SOCKET;
 	m_isListening = false;
-	delete m_TCPclient;
-	m_TCPclient = nullptr;
 
-	delete m_TCPServer;
-	m_TCPServer = nullptr;
+	if ( nullptr != m_TCPclient )
+	{
+		delete m_TCPclient;
+		m_TCPclient = nullptr;
+	}
+
+	if ( nullptr != m_TCPServer )
+	{
+		delete m_TCPServer;
+		m_TCPServer = nullptr;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -123,33 +130,6 @@ void NetworkSystem::BeginFrame()
 		}
 	}
 }
-			
-// 	else if ( m_isListening )
-// 	{
-// 			//m_clientSocket = m_TCPServers.front()->Accept();
-// 		}
-// 		else
-// 		{
-// 
-// 				m_wasMessageJustSentByServer = false;
-// 			}
-// 			if ( m_wasMessageJustSentByClient )
-// 			{
-// 				std::array<char , 256> buffer;
-// 			}
-// 		}
-// 
-// 		if( INVALID_SOCKET != m_linkSocket )
-// 		{
-// 		}
-// 
-// 		if( INVALID_SOCKET != m_TCPclient->m_clientSocket )
-// 		{
-// 			std::array<char , 256> bufferRecieve;
-// 			m_TCPclient->ReceiveServerMessage( m_TCPclient->m_clientSocket , &bufferRecieve[ 0 ] , ( int ) ( bufferRecieve.size() - 1 ) );
-// 		}
-// 	}
-// }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -208,6 +188,9 @@ void NetworkSystem::AddNetowrkingCommandsToConsole()
 
 	g_theDevConsole->CreateCommand( "ClientSendMessage" , "Send Message from Client to Server" , consoleArgs );
 	g_theEventSystem->SubscribeToEvent( "ClientSendMessage" , SendMessageToServer );
+
+	g_theDevConsole->CreateCommand( "DisconnectClient" , "Disconnect Client from the Server" , consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "DisconnectClient" , DisconnectFromServer );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -244,6 +227,17 @@ STATIC bool NetworkSystem::CloseTCPServer( EventArgs& args )
 	{
 		g_theNetworkSys->SetIsListening( false );
 		g_theNetworkSys->m_TCPServer->SetListenPort( -1 );
+		closesocket( g_theNetworkSys->m_linkSocket );
+		closesocket( g_theNetworkSys->m_TCPServer->m_listenSocket );
+		
+		g_theNetworkSys->m_linkSocket = INVALID_SOCKET;
+		if ( g_theNetworkSys->m_TCPServer != nullptr )
+		{
+			delete g_theNetworkSys->m_TCPServer;
+			g_theNetworkSys->m_TCPServer = nullptr;
+		}
+		
+		g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "SERVER CLOSED" );
 	}
 
 	return true;
@@ -253,7 +247,7 @@ STATIC bool NetworkSystem::CloseTCPServer( EventArgs& args )
 
 STATIC bool NetworkSystem::SendMessageToClient( EventArgs& args )
 {
-	if( ( nullptr != g_theNetworkSys->m_TCPServer ) && ( /*nullptr != g_theNetworkSys->m_TCPclient*/ g_theNetworkSys->m_linkSocket != INVALID_SOCKET ) )
+	if( ( nullptr != g_theNetworkSys->m_TCPServer ) && ( g_theNetworkSys->m_linkSocket != INVALID_SOCKET ) )
 	{
 		std::string message = args.GetValue( "msg" , "InvalidMessage" );
 		g_theNetworkSys->m_TCPServer->SetServerSendMessage( message );
@@ -283,23 +277,37 @@ bool NetworkSystem::SendMessageToServer( EventArgs& args )
 
 STATIC bool NetworkSystem::ConnectToServer( EventArgs& args )
 {
-	if( /*( nullptr != g_theNetworkSys->m_TCPServer ) && */( nullptr != g_theNetworkSys->m_TCPclient ) )
+	if( ( nullptr != g_theNetworkSys->m_TCPclient ) )
 	{
 		std::string host = args.GetValue( "ipaddr" , "" );		
 		std::string port = args.GetValue( "port" , "48000" );
-		//g_theNetworkSys->m_TCPServer = new TCPServer( ( uint16_t ) atoi( port.c_str() ) );
+	
 		g_theNetworkSys->m_TCPclient->m_clientSocket = g_theNetworkSys->m_TCPclient->Connect( host.c_str() ,
-		                                                                                      ( uint16_t )atoi(
-			                                                                                      port.c_str() ) ,
+		                                                                                      ( uint16_t )atoi( port.c_str() ) ,
 		                                                                                      Mode::Nonblocking );
-		//g_theNetworkSys->m_TCPServer->Bind();
-		//g_theNetworkSys->m_TCPServer->Listen();
-		//g_theNetworkSys->m_isListening = true;
-		//std::string msg( "Send me some data" );
-		//g_theNetworkSys->m_TCPServer->m_listenSocket.send( msg.c_str() , msg.length() );
 		return true;
 	}
 	return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool NetworkSystem::DisconnectFromServer( EventArgs& args )
+{
+	UNUSED( args );
+
+	if( nullptr != g_theNetworkSys )
+	{
+		closesocket( g_theNetworkSys->m_linkSocket );
+		closesocket( g_theNetworkSys->m_TCPclient->m_clientSocket );
+
+		g_theNetworkSys->m_TCPclient->m_clientSocket = INVALID_SOCKET;
+		g_theNetworkSys->m_linkSocket = INVALID_SOCKET;
+
+		g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "CLIENT DISCONNECTED" );
+	}
+
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -71,19 +71,17 @@ void TCPServer::Bind()
 	{
 		g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to bind Failed %i" , WSAGetLastError() );
 	}
-
-	iResult = listen( m_listenSocket , SOMAXCONN );
-	if( iResult == SOCKET_ERROR )
-	{
-		g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to listen Failed %i" , WSAGetLastError() );
-	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TCPServer::Listen()
 {
-
+	int iResult = listen( m_listenSocket , SOMAXCONN );
+	if( iResult == SOCKET_ERROR )
+	{
+		g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to listen Failed %i" , WSAGetLastError() );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -95,17 +93,14 @@ void TCPServer::ReceiveClientMessage( SOCKET client , char* bufferAddr , int buf
 	{
 		int error = WSAGetLastError();
 
-		if( error == WSAEWOULDBLOCK /*&& m_mode == Mode::Nonblocking*/ )
+		if( error == WSAEWOULDBLOCK )
 		{
-			//g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to receive failed = %d", WSAGetLastError() );
-			return;/* TCPData { TCPData::DATA_PENDING, NULL };*/
+			return;
 		}
 		else
 		{
 			//g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to receive failed = %d", WSAGetLastError() );
 			return;
-			//closesocket( m_socket );
-			//throw std::runtime_error( msg.str() );
 		}
 	}
 	else if( iResult == 0 )
@@ -116,27 +111,25 @@ void TCPServer::ReceiveClientMessage( SOCKET client , char* bufferAddr , int buf
 	{
 		MessageHeader* header = reinterpret_cast< MessageHeader* >( &bufferAddr[ 0 ] );
 
-		ServerListenMessage serverListenMessage;
+		HeaderMessage serverListenMessage;
 		serverListenMessage.m_header = *header;
 
 		bufferAddr[ iResult ] = NULL;
-		serverListenMessage.m_recieveMessage = std::string( &bufferAddr[ 4 ] );
+		serverListenMessage.m_header.m_id = 1;
+		serverListenMessage.m_header.m_size = ( uint16_t ) serverListenMessage.m_message.size();
+		
+		serverListenMessage.m_message = std::string( &bufferAddr[ 4 ] );
 
-		g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client message: %s" , serverListenMessage.m_recieveMessage.c_str() );
+		g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client message: %s" , serverListenMessage.m_message.c_str() );
 	}
-	//std::string message = bufferAddr;
-	//if ( iResult > 0 )
-	//{
-	//	g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client Message = %s", message.c_str() );
-	//}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void TCPServer::SendClientMessage( SOCKET client )
 {
-	std::string msg = /*m_TCPServer->*/GetServerSendMessage();
-	int iResult = send( /*m_TCPclient->*/client , msg.c_str() , static_cast< int >( msg.length() ) , 0 );
+	std::string msg = GetServerSendMessage();
+	int iResult = send( client , msg.c_str() , static_cast< int >( msg.length() ) , 0 );
 	if( iResult == SOCKET_ERROR )
 	{
 		g_theDevConsole->PrintString( DEVCONSOLE_WARNING , "Sending Data to Client Failed %i" , WSAGetLastError() );

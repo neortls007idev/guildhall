@@ -12,7 +12,7 @@ public:
 	Frustum( const Frustum& frustum );
 	~Frustum();
 
-	void ConstructFrustum( float screenDepth, Mat44 projectionMatrix , Mat44 viewMatrix );
+	void ConstructFrustum( Mat44 projectionMatrix , Mat44 viewMatrix );
 
 	bool IsPointInsideFrustum( const Vec3& point );
 	bool IsCubeInsideFrustum( const Vec3& center , const float& radius );

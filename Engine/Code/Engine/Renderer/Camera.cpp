@@ -240,7 +240,6 @@ void Camera::SetClearMode( unsigned int clearFlags , Rgba8 color , float depth /
 
 void Camera::SetProjectionPerspective( float fov , float aspectRatio , float nearZ , float farZ )
 {
-	m_screenDepth = farZ - nearZ;
 	m_projection = CreatePerpsectiveProjectionMatrixD3D( fov , aspectRatio , nearZ , farZ );
 	ConstructCameraViewFrustum();
 }
@@ -256,7 +255,7 @@ void Camera::SetProjectionMatrix( const Mat44& projection )
 
 void Camera::ConstructCameraViewFrustum()
 {
-	m_cameraViewFrustum.ConstructFrustum( m_screenDepth , m_projection , GetViewMatrix() );
+	m_cameraViewFrustum.ConstructFrustum( m_projection , GetViewMatrix() );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

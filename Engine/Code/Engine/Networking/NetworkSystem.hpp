@@ -36,12 +36,11 @@ public:
 	static bool SendMessageToClient( EventArgs& args );
 	static bool SendMessageToServer( EventArgs& args );
 	static bool ConnectToServer( EventArgs& args );
+	static bool DisconnectFromServer( EventArgs& args );
 	
 private:
 	bool					m_isListening	= false;
 	int						m_listenPort	= -1;
-	//std::list< TCPClient* > m_clients;
-	//std::list< TCPServer* > m_TCPServers;
 	TCPServer*				m_TCPServer;
 	TCPClient*				m_TCPclient;
 	SOCKET					m_linkSocket;

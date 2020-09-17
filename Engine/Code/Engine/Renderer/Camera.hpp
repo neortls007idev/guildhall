@@ -121,7 +121,6 @@ private:
 	float							m_clearStencil			= 0.f;
 	Vec2							m_outputSize;
 	Frustum							m_cameraViewFrustum;
-	float							m_screenDepth			= 0.f;
 	bool							m_isCameraUBODirty = true;
 };
 

@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "Engine/Networking/NetworkCommon.hpp"
-//#include "Engine/Networking/TCPSocket.hpp"
 #include <atlalloc.h>
 #include <string>
 
@@ -20,12 +19,10 @@ public:
 
 	bool			GetListenPort()														{ return m_listenPort; }
 	void			SetListenPort( int port )											{ m_listenPort = port; }
-	void			SetServerSendMessage( std::string message )							{ m_sendMessage.m_sendMessage = message; }
-	std::string		GetServerSendMessage()												{ return m_sendMessage.m_sendMessage; }
-	//std::string GetAddress( TCPClient* client );
-	
+	void			SetServerSendMessage( std::string message )							{ m_sendMessage.m_message = message; }
+	std::string		GetServerSendMessage()												{ return m_sendMessage.m_message; }
+		
 	SOCKET					m_listenSocket;
-	//TCPSocket				m_listenSocket;
 private:
 	int						m_listenPort = -1;
 	FD_SET					m_listenSet;
