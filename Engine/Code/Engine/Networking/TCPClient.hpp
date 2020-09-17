@@ -21,12 +21,16 @@ public:
 
 	//----------------------------------------------------------------------------------------------------------
 
-	SOCKET connect( std::string const& host , std::uint16_t port , Mode mode = Mode::Nonblocking );
-	
+	SOCKET			Connect( std::string const& host , std::uint16_t port , Mode mode = Mode::Nonblocking );
+	void			ReceiveServerMessage( SOCKET server , char* bufferAddr , int bufferLength );
+	void			SendServerMessage( SOCKET server );
+	void			SetClientSendMessage( std::string message )										{ m_sendMessage.m_sendMessage = message; }
+	std::string		GetClientSendMessage()															{ return m_sendMessage.m_sendMessage; }
 public:
 	SOCKET					m_clientSocket;
 private:
 	Mode					m_mode;
+	HeaderMessage			m_sendMessage;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -34,6 +34,7 @@ public:
 	static bool StartTCPServer( EventArgs& args );
 	static bool CloseTCPServer( EventArgs& args );
 	static bool SendMessageToClient( EventArgs& args );
+	static bool SendMessageToServer( EventArgs& args );
 	static bool ConnectToServer( EventArgs& args );
 	
 private:
@@ -43,7 +44,9 @@ private:
 	//std::list< TCPServer* > m_TCPServers;
 	TCPServer*				m_TCPServer;
 	TCPClient*				m_TCPclient;
+	SOCKET					m_linkSocket;
 	static bool				m_wasMessageJustSentByServer;
+	static bool				m_wasMessageJustSentByClient;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

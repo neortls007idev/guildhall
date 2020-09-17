@@ -21,7 +21,7 @@ TCPClient::~TCPClient()
 	m_clientSocket = INVALID_SOCKET;
 }
 
-SOCKET TCPClient::connect( std::string const& host , std::uint16_t port , Mode mode /*= Mode::Nonblocking */ )
+SOCKET TCPClient::Connect( std::string const& host , std::uint16_t port , Mode mode /*= Mode::Nonblocking */ )
 {
 	m_mode = mode;
 	// Resolve the port locally
@@ -73,5 +73,82 @@ SOCKET TCPClient::connect( std::string const& host , std::uint16_t port , Mode m
 	}
 	return socket;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void TCPClient::ReceiveServerMessage( SOCKET server , char* bufferAddr , int bufferLength )
+{
+	int iResult = ::recv( server , bufferAddr , static_cast< int >( bufferLength ) , 0 );
+	if( iResult == SOCKET_ERROR )
+	{
+		int error = WSAGetLastError();
+
+		if( error == WSAEWOULDBLOCK /*&& m_mode == Mode::Nonblocking*/ )
+		{
+			//g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to receive failed = %d" , WSAGetLastError() );
+			return;/* TCPData { TCPData::DATA_PENDING, NULL };*/
+		}
+		else
+		{
+			//g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to receive failed = %d" , WSAGetLastError() );
+			return;
+			//closesocket( m_socket );
+			//throw std::runtime_error( msg.str() );
+		}
+	}
+	else if( iResult == 0 )
+	{
+		//g_theDevConsole->PrintString( DEVCONSOLE_WARNING , "Socket CLOSED from SERVER End received 0 Bytes" );
+	}
+	else
+	{
+		MessageHeader* header = reinterpret_cast< MessageHeader* >( &bufferAddr[ 0 ] );
+
+		ServerListenMessage serverListenMessage;
+		serverListenMessage.m_header = *header;
+
+		bufferAddr[ iResult ] = NULL;
+		serverListenMessage.m_recieveMessage = std::string( &bufferAddr[ 4 ] );
+
+		g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "SERVER message: %s" , serverListenMessage.m_recieveMessage.c_str() );
+	}
+
+	/*
+	int iResult = ::recv( server , bufferAddr , static_cast< int >( bufferLength ) , 0 );
+	if( iResult == SOCKET_ERROR )
+	{
+		int error = WSAGetLastError();
+
+		//if( error == WSAEWOULDBLOCK && m_mode == Mode::Nonblocking )
+		{
+			g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to receive failed = %d" , WSAGetLastError() );
+			return;
+		}
+		else
+		{
+			g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to receive failed = %d" , WSAGetLastError() );
+			return;
+		}
+	}
+
+	std::string message = bufferAddr;
+	if( iResult > 0 )
+	{
+		g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client Message = %s" , message.c_str() );
+	}*/
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void TCPClient::SendServerMessage( SOCKET server )
+{
+	std::string msg = GetClientSendMessage();
+	int iResult = send( server , msg.c_str() , static_cast< int >( msg.length() ) , 0 );
+	if( iResult == SOCKET_ERROR )
+	{
+		g_theDevConsole->PrintString( DEVCONSOLE_WARNING , "Sending Data to Server Failed %i" , WSAGetLastError() );
+	}
+}
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

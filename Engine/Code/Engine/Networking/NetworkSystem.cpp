@@ -15,6 +15,7 @@ static	bool				areDevConsoleCommandsAdded = false;
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 STATIC bool NetworkSystem::m_wasMessageJustSentByServer = false;
+STATIC bool NetworkSystem::m_wasMessageJustSentByClient = false;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -24,14 +25,11 @@ STATIC bool NetworkSystem::m_wasMessageJustSentByServer = false;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 NetworkSystem::NetworkSystem() :
 								m_isListening( false )
 								
 {
+	m_linkSocket = INVALID_SOCKET;
 	m_TCPclient = new TCPClient( INVALID_SOCKET );
 	if ( !areDevConsoleCommandsAdded )
 	{
@@ -43,6 +41,7 @@ NetworkSystem::NetworkSystem() :
 
 NetworkSystem::~NetworkSystem()
 {
+	m_linkSocket = INVALID_SOCKET;
 	m_isListening = false;
 	delete m_TCPclient;
 	m_TCPclient = nullptr;
@@ -82,76 +81,75 @@ void NetworkSystem::Shutdown()
 
 void NetworkSystem::BeginFrame()
 {
-	if( m_isListening && ( nullptr == m_TCPServer ) )
+	if( m_isListening )
 	{
-		//m_TCPServer.push_back( new TCPServer( m_listenPort ) );
-		//m_TCPServer.front()->Bind();
-		//m_TCPServer.front()->Listen();
-		m_TCPServer = new TCPServer( m_listenPort );
-		m_TCPServer->Bind();
-		m_TCPServer->Listen();
-	}
-	else if ( m_isListening )
-	{
-		if( m_TCPclient->m_clientSocket == INVALID_SOCKET )
+		if( ( m_TCPServer != nullptr ) && ( m_TCPServer->m_listenSocket != INVALID_SOCKET ) )
 		{
-			//m_clientSocket = m_TCPServers.front()->Accept();
-			m_TCPclient->m_clientSocket = m_TCPServer->Accept();
-			if ( m_TCPclient->m_clientSocket != INVALID_SOCKET )
+			if( m_linkSocket == INVALID_SOCKET )
 			{
-				g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client Connected from %s" , GetAddress().c_str() );
+				m_linkSocket = m_TCPServer->Accept();
+
+				if( m_linkSocket != INVALID_SOCKET )
+				{
+					g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client Connected from %s" , GetAddress().c_str() );
+				}
+			}
+			if( m_linkSocket != INVALID_SOCKET )
+			{
+				std::array<char , 256> bufferRecieve;
+				m_TCPServer->ReceiveClientMessage( m_linkSocket , &bufferRecieve[ 0 ] , ( int ) ( bufferRecieve.size() - 1 ) );
+
+				if( m_wasMessageJustSentByServer )
+				{
+					//std::array<char , 256> buffer;
+					m_TCPServer->SendClientMessage( m_linkSocket );
+					m_wasMessageJustSentByServer = false;
+				}
 			}
 		}
-		else
+	}
+
+	if( m_TCPclient != nullptr )
+	{
+		if( m_TCPclient->m_clientSocket != INVALID_SOCKET )
 		{
-			//--------------------------------------------------------------------------------
-			//			NOTES
-			//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-			//
-			//		static bool is for debugging purposes
-			//	
-			//--------------------------------------------------------------------------------
-			if ( m_wasMessageJustSentByServer )
+			std::array<char , 256> bufferRecieve;
+			m_TCPclient->ReceiveServerMessage( m_TCPclient->m_clientSocket , &bufferRecieve[ 0 ] , ( int ) ( bufferRecieve.size() - 1 ) );
+			if( m_wasMessageJustSentByClient )
 			{
-				std::array<char , 256> buffer;
-				//int iResult = ::recv( m_clientSocket , &buffer[ 0 ] , static_cast< int >( buffer.size() - 1 ) , 0 );
-				int iResult = ::recv( m_TCPclient->m_clientSocket , &buffer[ 0 ] , static_cast< int >( buffer.size() - 1 ) , 0 );
-
-				if( iResult == SOCKET_ERROR )
-				{
-					g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to Receive Failed %i" , WSAGetLastError() );
-				}
-				else if ( iResult == 0 )
-				{
-					g_theDevConsole->PrintString( DEVCONSOLE_WARNING , "Socket CLOSED from Client End received 0 Bytes" );
-				}
-				else
-				{
-					//buffer[ iResult ] = NULL;
-					MessageHeader* header = reinterpret_cast< MessageHeader* >( &buffer[ 0 ] );
-
-					ServerListenMessage serverListenMessage;
-					serverListenMessage.m_header = *header;
-
-					buffer[ iResult ] = NULL;
-					serverListenMessage.m_recieveMessage = std::string( &buffer[ 4 ] );
-					
-					g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client message: %s" , &buffer[ 0 ] );
-
-					std::string msg = m_TCPServer->GetServerSendMessage();
-					iResult = send( m_TCPclient->m_clientSocket , msg.c_str() , static_cast< int >( msg.length() ) , 0 );
-					if( iResult == SOCKET_ERROR )
-					{
-						g_theDevConsole->PrintString( DEVCONSOLE_WARNING , "Sending Data to Client Failed %i" , WSAGetLastError() );
-					}
-				}
-				m_wasMessageJustSentByServer = false;
+				m_TCPclient->SendServerMessage( m_TCPclient->m_clientSocket );
+				m_wasMessageJustSentByClient = false;
 			}
-			std::array<char , 256> clientMessage;
-			m_TCPServer->ReceiveClientMessage( m_TCPclient->m_clientSocket , &clientMessage[0] , 256 );
 		}
 	}
 }
+			
+// 	else if ( m_isListening )
+// 	{
+// 			//m_clientSocket = m_TCPServers.front()->Accept();
+// 		}
+// 		else
+// 		{
+// 
+// 				m_wasMessageJustSentByServer = false;
+// 			}
+// 			if ( m_wasMessageJustSentByClient )
+// 			{
+// 				std::array<char , 256> buffer;
+// 			}
+// 		}
+// 
+// 		if( INVALID_SOCKET != m_linkSocket )
+// 		{
+// 		}
+// 
+// 		if( INVALID_SOCKET != m_TCPclient->m_clientSocket )
+// 		{
+// 			std::array<char , 256> bufferRecieve;
+// 			m_TCPclient->ReceiveServerMessage( m_TCPclient->m_clientSocket , &bufferRecieve[ 0 ] , ( int ) ( bufferRecieve.size() - 1 ) );
+// 		}
+// 	}
+// }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -169,7 +167,7 @@ std::string NetworkSystem::GetAddress()
 
 	sockaddr clientAddress;
 	int addressSize = sizeof( clientAddress );
-	int iResult = getpeername( m_TCPclient->m_clientSocket , &clientAddress , &addressSize );
+	int iResult = getpeername( m_linkSocket , &clientAddress , &addressSize );
 
 	if( iResult == SOCKET_ERROR )
 	{
@@ -202,11 +200,14 @@ void NetworkSystem::AddNetowrkingCommandsToConsole()
 	g_theDevConsole->CreateCommand( "CloseTCPServer" , "Close TCP Server" , consoleArgs );
 	g_theEventSystem->SubscribeToEvent( "CloseTCPServer" , CloseTCPServer );
 
-	g_theDevConsole->CreateCommand( "ServerSendsMessage" , "Send Message from Server to Client" , consoleArgs );
-	g_theEventSystem->SubscribeToEvent( "ServerSendsMessage" , SendMessageToClient );
+	g_theDevConsole->CreateCommand( "ServerSendMessage" , "Send Message from Server to Client" , consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "ServerSendMessage" , SendMessageToClient );
 
 	g_theDevConsole->CreateCommand( "ConnectToServer" , "Connect Client to Server" , consoleArgs );
 	g_theEventSystem->SubscribeToEvent( "ConnectToServer" , ConnectToServer );
+
+	g_theDevConsole->CreateCommand( "ClientSendMessage" , "Send Message from Client to Server" , consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "ClientSendMessage" , SendMessageToServer );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -227,6 +228,7 @@ STATIC bool NetworkSystem::StartTCPServer( EventArgs& args )
 		}
 		
 		g_theNetworkSys->m_TCPServer->SetListenPort( port );
+		g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Server Started" );
 	}
 
 	return true;
@@ -251,7 +253,7 @@ STATIC bool NetworkSystem::CloseTCPServer( EventArgs& args )
 
 STATIC bool NetworkSystem::SendMessageToClient( EventArgs& args )
 {
-	if( ( nullptr != g_theNetworkSys->m_TCPServer ) && ( nullptr != g_theNetworkSys->m_TCPclient ) )
+	if( ( nullptr != g_theNetworkSys->m_TCPServer ) && ( /*nullptr != g_theNetworkSys->m_TCPclient*/ g_theNetworkSys->m_linkSocket != INVALID_SOCKET ) )
 	{
 		std::string message = args.GetValue( "msg" , "InvalidMessage" );
 		g_theNetworkSys->m_TCPServer->SetServerSendMessage( message );
@@ -264,18 +266,36 @@ STATIC bool NetworkSystem::SendMessageToClient( EventArgs& args )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+bool NetworkSystem::SendMessageToServer( EventArgs& args )
+{
+	if( ( nullptr != g_theNetworkSys->m_TCPclient ) && ( g_theNetworkSys->m_TCPclient->m_clientSocket != INVALID_SOCKET ) )
+	{
+		std::string message = args.GetValue( "msg" , "InvalidMessage" );
+		g_theNetworkSys->m_TCPclient->SetClientSendMessage( message );
+		m_wasMessageJustSentByClient = true;
+
+		return true;
+	}
+	return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 STATIC bool NetworkSystem::ConnectToServer( EventArgs& args )
 {
 	if( /*( nullptr != g_theNetworkSys->m_TCPServer ) && */( nullptr != g_theNetworkSys->m_TCPclient ) )
 	{
-		std::string host = args.GetValue( "ipaddr" , "" );
+		std::string host = args.GetValue( "ipaddr" , "" );		
 		std::string port = args.GetValue( "port" , "48000" );
-		g_theNetworkSys->m_TCPServer = new TCPServer( ( uint16_t ) atoi( port.c_str() ) );
-		g_theNetworkSys->m_TCPServer->m_listenSocket = g_theNetworkSys->m_TCPclient->connect( host.c_str() ,
+		//g_theNetworkSys->m_TCPServer = new TCPServer( ( uint16_t ) atoi( port.c_str() ) );
+		g_theNetworkSys->m_TCPclient->m_clientSocket = g_theNetworkSys->m_TCPclient->Connect( host.c_str() ,
 		                                                                                      ( uint16_t )atoi(
 			                                                                                      port.c_str() ) ,
-		                                                                                      Mode::Blocking );
-		std::string msg( "Send me some data" );
+		                                                                                      Mode::Nonblocking );
+		//g_theNetworkSys->m_TCPServer->Bind();
+		//g_theNetworkSys->m_TCPServer->Listen();
+		//g_theNetworkSys->m_isListening = true;
+		//std::string msg( "Send me some data" );
 		//g_theNetworkSys->m_TCPServer->m_listenSocket.send( msg.c_str() , msg.length() );
 		return true;
 	}

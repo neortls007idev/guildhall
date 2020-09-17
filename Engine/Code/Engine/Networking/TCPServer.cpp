@@ -102,20 +102,47 @@ void TCPServer::ReceiveClientMessage( SOCKET client , char* bufferAddr , int buf
 		}
 		else
 		{
-			
 			//g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to receive failed = %d", WSAGetLastError() );
 			return;
 			//closesocket( m_socket );
 			//throw std::runtime_error( msg.str() );
 		}
 	}
-
-	if ( iResult > 0 )
+	else if( iResult == 0 )
 	{
-		std::string message = bufferAddr;
-		g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client Message = %s", message.c_str() );
+		//g_theDevConsole->PrintString( DEVCONSOLE_WARNING , "Socket CLOSED from Client End received 0 Bytes" );
+	}
+	else
+	{
+		MessageHeader* header = reinterpret_cast< MessageHeader* >( &bufferAddr[ 0 ] );
+
+		ServerListenMessage serverListenMessage;
+		serverListenMessage.m_header = *header;
+
+		bufferAddr[ iResult ] = NULL;
+		serverListenMessage.m_recieveMessage = std::string( &bufferAddr[ 4 ] );
+
+		g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client message: %s" , serverListenMessage.m_recieveMessage.c_str() );
+	}
+	//std::string message = bufferAddr;
+	//if ( iResult > 0 )
+	//{
+	//	g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client Message = %s", message.c_str() );
+	//}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void TCPServer::SendClientMessage( SOCKET client )
+{
+	std::string msg = /*m_TCPServer->*/GetServerSendMessage();
+	int iResult = send( /*m_TCPclient->*/client , msg.c_str() , static_cast< int >( msg.length() ) , 0 );
+	if( iResult == SOCKET_ERROR )
+	{
+		g_theDevConsole->PrintString( DEVCONSOLE_WARNING , "Sending Data to Client Failed %i" , WSAGetLastError() );
 	}
 }
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

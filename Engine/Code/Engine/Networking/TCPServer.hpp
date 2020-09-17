@@ -1,24 +1,8 @@
 ﻿#pragma once
 #include "Engine/Networking/NetworkCommon.hpp"
-#include "Engine/Networking/TCPSocket.hpp"
+//#include "Engine/Networking/TCPSocket.hpp"
 #include <atlalloc.h>
 #include <string>
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-struct ServerListenMessage
-{
-	MessageHeader m_header;
-	std::string m_recieveMessage;
-};
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-struct ServerSendMessage
-{
-	MessageHeader m_header;
-	std::string m_sendMessage;
-};
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -31,6 +15,7 @@ public:
 	void			Bind();
 	void			Listen();
 	void			ReceiveClientMessage( SOCKET client , char* bufferAddr , int bufferLength );
+	void			SendClientMessage( SOCKET client );
 	SOCKET			Accept();
 
 	bool			GetListenPort()														{ return m_listenPort; }
@@ -39,14 +24,13 @@ public:
 	std::string		GetServerSendMessage()												{ return m_sendMessage.m_sendMessage; }
 	//std::string GetAddress( TCPClient* client );
 	
-	//SOCKET					m_listenSocket;
-	TCPSocket					m_listenSocket;
+	SOCKET					m_listenSocket;
+	//TCPSocket				m_listenSocket;
 private:
 	int						m_listenPort = -1;
-	//FD_SET					m_listenSet;
-	//timeval					m_timeVal;
-	ServerListenMessage		m_listenMessage;
-	ServerSendMessage		m_sendMessage;
+	FD_SET					m_listenSet;
+	timeval					m_timeVal;
+	HeaderMessage			m_sendMessage;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
