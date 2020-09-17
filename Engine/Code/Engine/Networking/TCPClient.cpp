@@ -1,6 +1,7 @@
 ﻿#include "Engine/Core/DevConsole.hpp"
 #include "Engine/Networking/TCPClient.hpp"
 #include <ws2tcpip.h>
+#include <array>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -100,13 +101,33 @@ void TCPClient::ReceiveServerMessage( SOCKET server , char* bufferAddr , int buf
 	{
 		MessageHeader* header = reinterpret_cast< MessageHeader* >( &bufferAddr[ 0 ] );
 
-		HeaderMessage serverListenMessage;
-		serverListenMessage.m_header = *header;
+		HeaderMessage clientListenMessage;
+		clientListenMessage.m_header = *header;
 
 		bufferAddr[ iResult ] = NULL;
-		serverListenMessage.m_message = std::string( &bufferAddr[ 4 ] );
+		clientListenMessage.m_header.m_id = 1;
+		clientListenMessage.m_header.m_size = ( uint16_t ) clientListenMessage.m_message.size();
 
-		g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "SERVER message: %s" , serverListenMessage.m_message.c_str() );
+		clientListenMessage.m_message = "";
+
+		for( int index = 4; index < bufferLength; index++ )
+		{
+			clientListenMessage.m_message += bufferAddr[ index ] ;
+		}
+
+// 		MessageHeader* header = reinterpret_cast< MessageHeader* >( &bufferAddr[ 0 ] );
+// 
+// 		HeaderMessage clientListenMessage;
+// 		clientListenMessage.m_header = *header;
+// 		clientListenMessage.m_message = "";
+// 		bufferAddr[ iResult ] = NULL;
+// 
+// 		for( int index = 4; index < bufferLength; index++ )
+// 		{
+// 			clientListenMessage.m_message += bufferAddr[ index ] ;
+// 		}
+
+		g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "SERVER message: %s" , clientListenMessage.m_message.c_str() );
 	}
 }
 
@@ -114,8 +135,27 @@ void TCPClient::ReceiveServerMessage( SOCKET server , char* bufferAddr , int buf
 
 void TCPClient::SendServerMessage( SOCKET server )
 {
+	std::array<char , 256> buffer;
+	MessageHeader* headerPtr = reinterpret_cast< MessageHeader* >( &buffer[ 0 ] );
+	headerPtr->m_id = 1;
+	headerPtr->m_size = ( uint16_t ) GetClientSendMessage().size();
 	std::string msg = GetClientSendMessage();
-	int iResult = send( server , msg.c_str() , static_cast< int >( msg.length() ) , 0 );
+
+	int index = 0;
+	for( index = 0; index < ( int ) GetClientSendMessage().size() && index < 252; index++ )
+	{
+		buffer[ index + 4 ] = msg[ index ];
+	}
+	//buffer[ index + 4 ] = '\0';
+
+// 	socket.send( &buffer[ 0 ] , 7 );
+// 	HeaderMessage newMessage;
+// 	newMessage.m_header.m_id = 1;
+// 	newMessage.m_header.m_size = ( uint16_t ) msg.size();
+// 
+// 	std::string finalMessage = std::to_string( newMessage.m_header.m_id ) + std::to_string( newMessage.m_header.m_size ) + msg;
+	
+	int iResult = send( server , &buffer[0] , static_cast< int >( GetClientSendMessage().size() + 4 ) , 0 );
 	if( iResult == SOCKET_ERROR )
 	{
 		g_theDevConsole->PrintString( DEVCONSOLE_WARNING , "Sending Data to Server Failed %i" , WSAGetLastError() );

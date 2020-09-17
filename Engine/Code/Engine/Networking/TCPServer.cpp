@@ -118,8 +118,13 @@ void TCPServer::ReceiveClientMessage( SOCKET client , char* bufferAddr , int buf
 		serverListenMessage.m_header.m_id = 1;
 		serverListenMessage.m_header.m_size = ( uint16_t ) serverListenMessage.m_message.size();
 		
-		serverListenMessage.m_message = std::string( &bufferAddr[ 4 ] );
+		serverListenMessage.m_message = "";
 
+ 		for( int index = 4; index < bufferLength; index++ )
+ 		{
+			serverListenMessage.m_message += bufferAddr[ index ] ;
+ 		}
+		
 		g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client message: %s" , serverListenMessage.m_message.c_str() );
 	}
 }
@@ -128,8 +133,26 @@ void TCPServer::ReceiveClientMessage( SOCKET client , char* bufferAddr , int buf
 
 void TCPServer::SendClientMessage( SOCKET client )
 {
+	std::array<char , 256> buffer;
+	MessageHeader* headerPtr = reinterpret_cast< MessageHeader* >( &buffer[ 0 ] );
+	headerPtr->m_id = 1;
+	headerPtr->m_size = ( uint16_t ) GetServerSendMessage().size();
 	std::string msg = GetServerSendMessage();
-	int iResult = send( client , msg.c_str() , static_cast< int >( msg.length() ) , 0 );
+
+	int index = 0;
+	for( index = 0; index < ( int ) GetServerSendMessage().size() && index < 252; index++ )
+	{
+		buffer[ index + 4 ] = msg[ index ];
+	}
+	
+	//HeaderMessage newMessage;
+	//newMessage.m_header.m_id = 1;
+	//std::string msg = GetServerSendMessage();
+	//newMessage.m_header.m_size = ( uint16_t ) msg.size();
+	//
+	//std::string finalMessage = std::to_string( newMessage.m_header.m_id ) + std::to_string( newMessage.m_header.m_size ) + newMessage.m_message.c_str();
+	
+	int iResult = send( client , &buffer[ 0 ] , static_cast< int >( GetServerSendMessage().size() + 4 ) , 0 );
 	if( iResult == SOCKET_ERROR )
 	{
 		g_theDevConsole->PrintString( DEVCONSOLE_WARNING , "Sending Data to Client Failed %i" , WSAGetLastError() );
