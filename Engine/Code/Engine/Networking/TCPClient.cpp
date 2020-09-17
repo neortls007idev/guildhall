@@ -115,18 +115,6 @@ void TCPClient::ReceiveServerMessage( SOCKET server , char* bufferAddr , int buf
 			clientListenMessage.m_message += bufferAddr[ index ] ;
 		}
 
-// 		MessageHeader* header = reinterpret_cast< MessageHeader* >( &bufferAddr[ 0 ] );
-// 
-// 		HeaderMessage clientListenMessage;
-// 		clientListenMessage.m_header = *header;
-// 		clientListenMessage.m_message = "";
-// 		bufferAddr[ iResult ] = NULL;
-// 
-// 		for( int index = 4; index < bufferLength; index++ )
-// 		{
-// 			clientListenMessage.m_message += bufferAddr[ index ] ;
-// 		}
-
 		g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "SERVER message: %s" , clientListenMessage.m_message.c_str() );
 	}
 }
@@ -146,14 +134,6 @@ void TCPClient::SendServerMessage( SOCKET server )
 	{
 		buffer[ index + 4 ] = msg[ index ];
 	}
-	//buffer[ index + 4 ] = '\0';
-
-// 	socket.send( &buffer[ 0 ] , 7 );
-// 	HeaderMessage newMessage;
-// 	newMessage.m_header.m_id = 1;
-// 	newMessage.m_header.m_size = ( uint16_t ) msg.size();
-// 
-// 	std::string finalMessage = std::to_string( newMessage.m_header.m_id ) + std::to_string( newMessage.m_header.m_size ) + msg;
 	
 	int iResult = send( server , &buffer[0] , static_cast< int >( GetClientSendMessage().size() + 4 ) , 0 );
 	if( iResult == SOCKET_ERROR )

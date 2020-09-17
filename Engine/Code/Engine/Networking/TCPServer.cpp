@@ -144,14 +144,7 @@ void TCPServer::SendClientMessage( SOCKET client )
 	{
 		buffer[ index + 4 ] = msg[ index ];
 	}
-	
-	//HeaderMessage newMessage;
-	//newMessage.m_header.m_id = 1;
-	//std::string msg = GetServerSendMessage();
-	//newMessage.m_header.m_size = ( uint16_t ) msg.size();
-	//
-	//std::string finalMessage = std::to_string( newMessage.m_header.m_id ) + std::to_string( newMessage.m_header.m_size ) + newMessage.m_message.c_str();
-	
+		
 	int iResult = send( client , &buffer[ 0 ] , static_cast< int >( GetServerSendMessage().size() + 4 ) , 0 );
 	if( iResult == SOCKET_ERROR )
 	{

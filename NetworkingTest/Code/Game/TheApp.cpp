@@ -5,6 +5,7 @@
 #include "Engine/DebugUI/ImGUISystem.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Input/VirtualKeyboard.hpp"
+#include "Engine/Networking/NetworkSystem.hpp"
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Renderer/D3D11Common.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
@@ -13,8 +14,6 @@
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
-
-#include "Engine/Networking/NetworkSystem.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
