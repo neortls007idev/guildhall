@@ -6,6 +6,7 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 class TCPServer;
+class TCPClient;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -32,12 +33,17 @@ public:
 	void		AddNetowrkingCommandsToConsole();
 	static bool StartTCPServer( EventArgs& args );
 	static bool CloseTCPServer( EventArgs& args );
+	static bool SendMessageToClient( EventArgs& args );
+	static bool ConnectToServer( EventArgs& args );
 	
 private:
 	bool					m_isListening	= false;
 	int						m_listenPort	= -1;
-	SOCKET					m_clientSocket;
-	std::list< TCPServer* > m_TCPServers;
+	//std::list< TCPClient* > m_clients;
+	//std::list< TCPServer* > m_TCPServers;
+	TCPServer*				m_TCPServer;
+	TCPClient*				m_TCPclient;
+	static bool				m_wasMessageJustSentByServer;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

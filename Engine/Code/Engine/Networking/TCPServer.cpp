@@ -1,5 +1,7 @@
 ﻿#include "Engine/Core/DevConsole.hpp"
 #include "Engine/Networking/TCPServer.hpp"
+#include "Engine/Networking/TCPClient.hpp"
+#include <array>
 #include <ws2tcpip.h>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -23,7 +25,7 @@ TCPServer::~TCPServer()
 	FD_ZERO( &m_listenSet );
 	m_listenSocket = INVALID_SOCKET;
 	m_listenPort = -1;
-	m_timeVal = timeval{ 01,01 };
+	m_timeVal = timeval { NULL,NULL };
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -86,6 +88,37 @@ void TCPServer::Listen()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void TCPServer::ReceiveClientMessage( SOCKET client , char* bufferAddr , int bufferLength )
+{
+	int iResult = ::recv( client , bufferAddr , static_cast< int >( bufferLength ) , 0 );
+	if( iResult == SOCKET_ERROR )
+	{
+		int error = WSAGetLastError();
+
+		if( error == WSAEWOULDBLOCK /*&& m_mode == Mode::Nonblocking*/ )
+		{
+			//g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to receive failed = %d", WSAGetLastError() );
+			return;/* TCPData { TCPData::DATA_PENDING, NULL };*/
+		}
+		else
+		{
+			
+			//g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to receive failed = %d", WSAGetLastError() );
+			return;
+			//closesocket( m_socket );
+			//throw std::runtime_error( msg.str() );
+		}
+	}
+
+	if ( iResult > 0 )
+	{
+		std::string message = bufferAddr;
+		g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client Message = %s", message.c_str() );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 SOCKET TCPServer::Accept()
 {
 	SOCKET clientSocket = INVALID_SOCKET;
@@ -107,43 +140,9 @@ SOCKET TCPServer::Accept()
 		{
 			g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to Accept Failed %i" , WSAGetLastError() );
 		}
-		//g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Clientconnected from %s" , GetAddress().c_str() );
 	}
 
 	return clientSocket;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-std::string TCPServer::GetAddress()
-{
-	/*
-	std::array<char , 128> addressString;
-
-	sockaddr clientAddress;
-	int addressSize = sizeof( clientAddress );
-	int iResult = getpeername( m_clientSocket , &clientAddress , &addressSize );
-
-	if( iResult == SOCKET_ERROR )
-	{
-		g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to Get Peer Name Failed %i" , WSAGetLastError() );
-	}
-
-	DWORD outLength = static_cast< DWORD >( addressString.size() );
-#pragma warning( push )
-#pragma warning( disable : 4996  )
-	iResult = WSAAddressToStringA( &clientAddress , addressSize , NULL , &addressString[0] , &outLength );
-#pragma warning( pop )
-
-	if( iResult == SOCKET_ERROR )
-	{
-		g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to Get Peer Name Failed %i" , WSAGetLastError() );
-	}
-
-	addressString[ outLength ] = NULL;
-	return std::string( &addressString[ 0 ] );
-	*/
-	return "";
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

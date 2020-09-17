@@ -183,6 +183,11 @@ void TheApp::Update( float deltaSeconds )
 		m_theGame = new Game;
 	}
 
+	if( g_theDevConsole->IsOpen() )
+	{
+		g_theDevConsole->Update( deltaSeconds );
+	}
+	
 	g_theInput->EndFrame();
 	HandleKeyReleased();
 }
@@ -204,6 +209,11 @@ void TheApp::Render() const
 		m_theGame->RenderUI();
 	}
 
+	if( g_theDevConsole->IsOpen() )
+	{
+		g_theDevConsole->Render( *g_theRenderer , *g_theDevConsole->GetDevConsoleCamera() , 14.f );
+	}
+	
 	g_theRenderer->EndCamera(*g_theCamera);	
 }
 

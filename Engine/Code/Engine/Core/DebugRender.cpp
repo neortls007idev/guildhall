@@ -1335,7 +1335,7 @@ void DebugRenderObjectsManager::RenderObjectArray( std::vector<DebugRenderObject
 				g_debugRenderContext->BindDepthStencil( cam->GetDepthStencilTarget() );
 				std::vector<Vertex_PCU> uvSphereMeshVerts;
 				std::vector<uint>		uvSphereIndices;
-				CreateUVSphere( 8,4 , uvSphereMeshVerts , uvSphereIndices , uvSphere->m_radius , uvSphere->m_position , uvSphere->m_currrentColor );
+				CreateUVSphere( 128,64 , uvSphereMeshVerts , uvSphereIndices , uvSphere->m_radius , uvSphere->m_position , uvSphere->m_currrentColor );
 				
 				GPUMesh uvSphereMesh( g_debugRenderContext );
 				uvSphereMesh.UpdateVertices( uvSphereMeshVerts );
