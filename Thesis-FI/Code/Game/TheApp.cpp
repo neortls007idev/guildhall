@@ -5,6 +5,7 @@
 #include "Engine/DebugUI/ImGUISystem.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Input/VirtualKeyboard.hpp"
+#include "Engine/ParticleSystem/ParticleSystem3D.hpp"
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Renderer/D3D11Common.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
@@ -13,8 +14,6 @@
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
-
-#include "Engine/Networking/NetworkSystem.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +25,7 @@ Game*								g_theGame		= nullptr;
 extern ImGUISystem*					g_debugUI;			
 extern BitmapFont*					g_bitmapFont;
 extern DebugRenderObjectsManager*	g_currentManager;
-extern NetworkSystem*				g_theNetworkSys;
+extern ParticleSystem3D*			g_theParticleSystem3D;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -45,8 +44,8 @@ TheApp::~TheApp()
 	delete g_debugUI;
 	g_debugUI = nullptr;
 
-	delete g_theNetworkSys;
-	g_theNetworkSys = nullptr;
+	delete g_theParticleSystem3D;
+	g_theParticleSystem3D = nullptr;
 	
 	//delete g_theAudioSystem;
 	//g_theAudioSystem = nullptr;
@@ -110,11 +109,11 @@ void TheApp::Startup()
 	g_theDevConsole->Startup();
 	AddDebugRenderDevConsoleCommands( g_theDevConsole );
 
-	if ( g_theNetworkSys == nullptr )
+	if ( g_theParticleSystem3D == nullptr )
 	{
-		g_theNetworkSys = new NetworkSystem();
+		g_theParticleSystem3D = new ParticleSystem3D();
 	}
-	g_theNetworkSys->Startup();
+	g_theParticleSystem3D->Startup();
 	
 	if ( g_currentManager == nullptr )
 	{
@@ -173,7 +172,7 @@ void TheApp::BeginFrame()
 	g_theInput->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theDevConsole->BeginFrame();
-	g_theNetworkSys->BeginFrame();
+	g_theParticleSystem3D->BeginFrame();
 	
 	g_currentManager->BeginFrame();
 	g_debugUI->BeginFrame();
@@ -210,7 +209,7 @@ void TheApp::Update( float deltaSeconds )
 	if ( m_isSpeedMo )							{ deltaSeconds = deltaSeconds * 4.0f; }
 
 	g_theGame->Update( deltaSeconds );
-
+	
 	if( g_theDevConsole->IsOpen() )
 	{
 		g_theDevConsole->Update( deltaSeconds );
@@ -239,7 +238,7 @@ void TheApp::EndFrame()
 	// all engine things that must end at the end of the frame and not the game
 	g_debugUI->EndFrame();
 	g_currentManager->EndFrame();
-	g_theNetworkSys->EndFrame();
+	g_theParticleSystem3D->EndFrame();
 	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
@@ -261,7 +260,7 @@ void TheApp::Shutdown()
 	//g_theAudioSystem->Shutdown();
 	//g_thePhysicsSystem->Shutdown();
 	g_currentManager->Shutdown();
-	g_theNetworkSys->Shutdown();
+	g_theParticleSystem3D->Shutdown();
 	g_theDevConsole->Shutdown();
 	g_theRenderer->Shutdown();
 	g_theInput->Shutdown();

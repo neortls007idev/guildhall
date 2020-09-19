@@ -18,13 +18,16 @@
 #include "Game/TheApp.hpp"
 #include "ThirdParty/ImGUI/imgui.h"
 #include "ThirdParty/ImGUI/ImGuiFileDialog.h"
+#include "Engine/ParticleSystem/ParticleEmitter3D.hpp"
+#include "Engine/ParticleSystem/ParticleSystem3D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-extern RenderContext*	g_theRenderer;
-extern TheApp*			g_theApp;
-extern DevConsole*		g_theDevConsole;
-extern ImGUISystem*		g_debugUI;
+extern RenderContext*		g_theRenderer;
+extern TheApp*				g_theApp;
+extern DevConsole*			g_theDevConsole;
+extern ImGUISystem*			g_debugUI;
+extern ParticleSystem3D*	g_theParticleSystem3D;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -79,6 +82,13 @@ Game::Game()
 	m_cubeSampler = new Sampler( g_theRenderer , SAMPLER_CUBEMAP );
 	m_linear = new Sampler( g_theRenderer , SAMPLER_BILINEAR );
 	m_debugSwitchs[ GAME_CAMERA_VIEW_FRUSTUM_CULLING ] = true;
+
+
+	Texture* emitterTexture = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/ParticleFX/VFXFlare192x108.png" );
+	SpriteSheet* spriteSheet = new SpriteSheet( *emitterTexture , IntVec2( 5 , 7 ) );
+	m_particleSystemSpriteSheets.emplace_back( spriteSheet );
+	//ParticleEmitter3D* testEmitter = new ParticleEmitter3D( g_theRenderer , spriteSheet, 10000 , m_gameCamera.GetPosition() );
+	m_emitters.emplace_back( g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , spriteSheet , 5000 , m_gameCamera.GetPosition() ) );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -153,7 +163,7 @@ void Game::Update( float deltaSeconds )
 		{
 			continue;
 		}
-		DebugAddWorldWireSphere( m_ModelInstances[ SPACESHIP ][ instanceIndex ]->m_position , m_gameModels[ SPACESHIP ]->m_boundingSphereRadius , GREEN , deltaSeconds );
+		//DebugAddWorldWireSphere( m_ModelInstances[ SPACESHIP ][ instanceIndex ]->m_position , m_gameModels[ SPACESHIP ]->m_boundingSphereRadius , GREEN , deltaSeconds );
 	}
 	
 	m_frameRate = 1.f / deltaSeconds;
@@ -163,7 +173,23 @@ void Game::Update( float deltaSeconds )
 	UpdateLightPosition( deltaSeconds );	
 	UpdateFromKeyBoard( deltaSeconds );
 
-	DebugUI();	
+	DebugUI();
+
+	m_emitters[ 0 ]->UpdateTargetPos( m_gameCamera.GetPosition() );
+	g_theParticleSystem3D->Update( deltaSeconds );
+
+	for ( int i = 0 ; i < 100 ; i++ )
+	{
+		Vec3 position				= g_RNG->RollRandomInUnitSphere();
+		Vec3 deviation				= g_RNG->RollRandomUnitVec3() /** 1.f*/;
+		//float scale = g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
+		float maxAge = g_RNG->RollRandomFloatInRange( 0.5 , 2.f );
+
+		m_emitters[ 0 ]->SpawnNewRandomParticleFromSpriteSheet( AABB2( Vec2( -1.f , -1.f ) , Vec2( 1.f , 1.f ) ) , position ,
+																m_gameCamera.GetPosition() , 1.f , deviation , 0.0f ,
+																maxAge , WHITE );
+	}
+	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -321,6 +347,8 @@ void Game::Render() const
 	g_theRenderer->SetDepthTest( COMPARE_ALWAYS , true );
 	g_theRenderer->SetCullMode( CULL_NONE );
 	g_theRenderer->DisableLight( 0 );
+
+	g_theParticleSystem3D->Render();
 	
 	g_theRenderer->EndCamera( m_gameCamera );
 	

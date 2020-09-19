@@ -1,6 +1,7 @@
 #include "Engine/ParticleSystem/ParticleEmitter3D.hpp"
 #include "Engine/Core/StdExtensions.hpp"
 #include "Engine/Core/VertexUtils.hpp"
+#include "Engine/Math/MatrixUtils.hpp"
 #include "Engine/ParticleSystem/Particle3D.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SpriteDefinition.hpp"
@@ -54,7 +55,7 @@ ParticleEmitter3D::~ParticleEmitter3D()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void ParticleEmitter3D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position , Vec3 velocity , float age ,
+void ParticleEmitter3D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position , Vec3 target , Vec3 velocity , float age ,
                                            float maxAge , Rgba8 color , IntVec2 spriteCoords )
 {
 	if( m_spriteSheet != nullptr )
@@ -70,13 +71,13 @@ void ParticleEmitter3D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position 
 	}
 	else
 	{
-		SpawnNewParticle( cosmeticBounds , position , velocity , age , maxAge , color );
+		//SpawnNewParticle( cosmeticBounds , position , velocity , age , maxAge , color );
 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void ParticleEmitter3D::SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position , Vec3 velocity , float age , float maxAge , Rgba8 color )
+void ParticleEmitter3D::SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position , Vec3 target , Vec3 velocity , float age , float maxAge , Rgba8 color )
 {
 	Particle3D* temp = new Particle3D( cosmeticBounds, position , velocity , age , maxAge , color );
 	EmplaceBackAtEmptySpace( m_particles , temp );
@@ -86,7 +87,7 @@ void ParticleEmitter3D::SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position ,
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void ParticleEmitter3D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position , float scale ,
+void ParticleEmitter3D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position , Vec3 target , float scale ,
                                            Vec3 velocity , float age , float maxAge ,
                                            Rgba8 color , IntVec2 spriteCoords )
 {
@@ -104,7 +105,7 @@ void ParticleEmitter3D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position 
 	}
 	else
 	{
-		SpawnNewParticle( cosmeticBounds , position , velocity , age , maxAge , color );
+		SpawnNewParticle( cosmeticBounds , position , target , velocity , age , maxAge , color );
 	}
 }
 
@@ -127,14 +128,14 @@ void ParticleEmitter3D::EmplaceBackNewParticle( Particle3D* temp )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void ParticleEmitter3D::SpawnNewRandomParticleFromSpriteSheet ( AABB2 cosmeticBounds , Vec3 position ,
+void ParticleEmitter3D::SpawnNewRandomParticleFromSpriteSheet ( AABB2 cosmeticBounds , Vec3 position , Vec3 target ,
 																float scale , Vec3 velocity , float age ,
                                                                 float maxAge , Rgba8 color )
 {
 	if ( m_spriteSheet != nullptr )
 	{
 		IntVec2 randSprite = m_spriteSheet->RollRandomSpriteCoordsInSpriteSheet();
-		SpawnNewParticle( cosmeticBounds , position , scale , velocity , age , maxAge , color , randSprite );
+		SpawnNewParticle( cosmeticBounds , position , target , scale , velocity , age , maxAge , color , randSprite );
 	}
 	
 }
@@ -158,15 +159,21 @@ void ParticleEmitter3D::Update( float deltaSeconds )
 			}
 		}
 	}
+
+	Mat44 lookAt;
 	
 	for ( size_t index = 0 ; index < m_particles.size() ; index++ )
 	{
 		Particle3D* particle = m_particles[ index ];
 		if( particle != nullptr )
 		{
-			//TransformAndAppendVertsForAABB2( m_particleVerts , particle->m_cosmeticBounds , particle->m_color ,
-			//                                 particle->m_minsUVs , particle->m_maxsUVs , particle->m_scale ,
-			//                                 particle->m_orientation , particle->m_position );
+
+			if ( m_areParticlesBillboarded )
+			{
+				lookAt = LookAtMatrix( particle->m_position , m_targetPos );
+				Transform3DAndAppendVertsForAABB2( m_particleVerts , particle->m_cosmeticBounds , particle->m_color ,
+				                                 particle->m_minsUVs , particle->m_maxsUVs , particle->m_position , lookAt );
+			}
 		}
 	}
 }
@@ -199,6 +206,13 @@ void ParticleEmitter3D::Destroy()
 
 	m_particles.clear();
 	m_particleVerts.clear();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void ParticleEmitter3D::UpdateTargetPos( Vec3 newTargetPos )
+{
+	m_targetPos = newTargetPos;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -24,6 +24,9 @@ void TransformAndAppendVertsForAABB2 ( std::vector< Vertex_PCU >& vertexArray , 
                                        const Vec2& uvAtMins , const Vec2& uvAtMaxs , float scale = 1.f,
                                        float orientationDegrees = 0.f , Vec2 translation = Vec2::ZERO );
 
+void Transform3DAndAppendVertsForAABB2( std::vector< Vertex_PCU >& vertexArray , const AABB2& box , const Rgba8& tint ,
+									  const Vec2& uvAtMins , const Vec2& uvAtMaxs , Vec3 position, Mat44 transform );
+
 void AppendVertsForPolygon( std::vector<Vertex_PCU>& vertexArray , const Vec2* points , const unsigned int count , const Rgba8& tint );
 void RotateDegreesPolygonAboutPoint( Polygon2D& polygon , Vec2 worldPosition , float orientationDegrees );
 

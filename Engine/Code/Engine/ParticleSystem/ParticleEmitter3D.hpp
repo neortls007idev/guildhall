@@ -27,9 +27,9 @@ public:
 	                    Vec3 targetPos , Shader* shader = nullptr , eBlendMode blendMode = ADDITIVE , eCullMode cullMode = CULL_BACK );
 	~ParticleEmitter3D();
 
-	void SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position , Vec3 velocity , float age , float maxAge , Rgba8 color );
-	void SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position , Vec3 velocity , float age , float maxAge , Rgba8 color , IntVec2 spriteCoords );
-	void SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position , float scale  , Vec3 velocity ,
+	void SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position , Vec3 target , Vec3 velocity , float age , float maxAge , Rgba8 color );
+	void SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position , Vec3 target , Vec3 velocity , float age , float maxAge , Rgba8 color , IntVec2 spriteCoords );
+	void SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position , Vec3 target , float scale  , Vec3 velocity ,
 	                        float age , float maxAge , Rgba8 color , IntVec2 spriteCoords );
 
 	void EmplaceBackNewParticle( Particle3D* temp );
@@ -37,12 +37,14 @@ public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
 
-	void SpawnNewRandomParticleFromSpriteSheet ( AABB2 cosmeticBounds , Vec3 position , float scale ,
+	void SpawnNewRandomParticleFromSpriteSheet ( AABB2 cosmeticBounds , Vec3 position , Vec3 target , float scale ,
 												 Vec3 velocity , float age , float maxAge , Rgba8 color );
 	
 	void Update( float deltaSeconds );
+	void UpdateParticlesBillboaring();
 	void Render();
 	void Destroy();
+	void UpdateTargetPos( Vec3 newTargetPos );
 	
 public:
 	Texture*						m_texture				= nullptr;
@@ -56,7 +58,7 @@ public:
 		
 	//Vec3							m_position;
 	//Vec3							m_velocity;
-	
+	bool							m_areParticlesBillboarded = true;
 	size_t							m_lastSpawnPointPos = 0;
 	std::vector<Particle3D*>		m_particles;
 	std::vector<Vertex_PCU>			m_particleVerts;

@@ -31,11 +31,12 @@ public:
 	
 	void Update( float deltaSeconds );
 	void Move( float deltaSeconds );
-
-	void UpdateTransformation();
 	
 public:
 	Vec3		m_position;
+	float		m_scale;
+	Vec3		m_target;
+	Mat44		m_model;
 	Vec3		m_velocity;
 	float		m_age;
 	float		m_maxAge;
@@ -43,6 +44,7 @@ public:
  	AABB2		m_cosmeticBounds;
  	Vec2		m_minsUVs			= Vec2::ZERO;
  	Vec2		m_maxsUVs			= Vec2::ONE;
+//	bool		m_isBillboarded		= false;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

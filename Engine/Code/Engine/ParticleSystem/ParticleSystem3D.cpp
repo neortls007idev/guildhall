@@ -1,8 +1,11 @@
 #include "Engine/ParticleSystem/ParticleSystem3D.hpp"
-
 #include "Engine/Core/StdExtensions.hpp"
 #include "Engine/ParticleSystem/ParticleEmitter3D.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+ParticleSystem3D* g_theParticleSystem3D = nullptr;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

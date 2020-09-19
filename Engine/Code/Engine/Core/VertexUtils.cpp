@@ -141,6 +141,30 @@ void TransformAndAppendVertsForAABB2( std::vector< Vertex_PCU >& vertexArray , c
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Transform3DAndAppendVertsForAABB2 ( std::vector< Vertex_PCU >& vertexArray , const AABB2& box , const Rgba8& tint ,
+                                         const Vec2& uvAtMins , const Vec2& uvAtMaxs , Vec3 position , Mat44 transform )
+{
+	Vertex_PCU boxVerts[ 6 ] = {
+							Vertex_PCU( Vec3( box.m_mins.x,box.m_mins.y,0.f ) , tint, uvAtMins ),
+							Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,0.f ) , tint, Vec2( uvAtMaxs.x, uvAtMins.y ) ),
+							Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,0.f ) , tint, Vec2( uvAtMins.x, uvAtMaxs.y ) ),
+
+							Vertex_PCU( Vec3( box.m_maxs.x,box.m_mins.y,0.f ) , tint, Vec2( uvAtMaxs.x, uvAtMins.y ) ),
+							Vertex_PCU( Vec3( box.m_maxs.x,box.m_maxs.y,0.f ) , tint, uvAtMaxs ),
+							Vertex_PCU( Vec3( box.m_mins.x,box.m_maxs.y,0.f ) , tint, Vec2( uvAtMins.x, uvAtMaxs.y ) ) };
+
+	for( int index = 0; index < 6; index++ )
+	{
+		//boxVerts->m_position = transform.TransformPosition3D( boxVerts->m_position );
+		//boxVerts->m_position += position;
+		boxVerts[ index ].m_position = transform.TransformPosition3D( boxVerts[ index ].m_position );
+		boxVerts[ index ].m_position += position;
+		vertexArray.push_back( boxVerts[ index ] );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void AppendVertsForPolygon( std::vector<Vertex_PCU>& vertexArray , const Vec2* points , const unsigned int count , const Rgba8& tint )
 {
 	const Vertex_PCU tempVert1 = Vertex_PCU( Vec3( points->x , points->y , 0.f ) , tint , Vec2::ZERO );
