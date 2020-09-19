@@ -178,10 +178,10 @@ void Game::Update( float deltaSeconds )
 	m_emitters[ 0 ]->UpdateTargetPos( m_gameCamera.GetPosition() );
 	g_theParticleSystem3D->Update( deltaSeconds );
 
-	for ( int i = 0 ; i < 100 ; i++ )
+	for ( int i = 0 ; i < 1000 ; i++ )
 	{
 		Vec3 position				= g_RNG->RollRandomInUnitSphere();
-		Vec3 deviation				= g_RNG->RollRandomUnitVec3() /** 1.f*/;
+		Vec3 deviation				= g_RNG->RollRandomUnitVec3() * 50.f;
 		//float scale = g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
 		float maxAge = g_RNG->RollRandomFloatInRange( 0.5 , 2.f );
 
