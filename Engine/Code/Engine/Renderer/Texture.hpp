@@ -23,6 +23,7 @@ public:
 
 	TextureView*	GetOrCreateRenderTargetView();
 	TextureView*	GetOrCreateShaderResourceView();
+	TextureView*	GetOrCreateUnorderedAccessView();
 	TextureView*	GetOrCreateCubeMapShaderResourceView();
 	TextureView*	GetOrCreateDepthStencilView( Vec2 dimension = Vec2::ZERO );
 
@@ -31,18 +32,19 @@ public:
 	const    IntVec2 GetDimensions() const;
 			 ID3D11Texture2D* GetHandle()																				{ return m_handle; }
 
-	Texture* CreateDepthStencil( Vec2 outputDimensions );
-	RenderContext* GetRenderContext() const																				{ return m_owner;  }
+	Texture*		CreateDepthStencil( Vec2 outputDimensions );
+	RenderContext*	GetRenderContext() const																			{ return m_owner;  }
 
 private:
-	RenderContext*		m_owner = nullptr;
-	ID3D11Texture2D*	m_handle = nullptr;
+	RenderContext*		m_owner					= nullptr;
+	ID3D11Texture2D*	m_handle				= nullptr;
 	//ID3D11Texture1D*
 	//ID3D11Texture3D*
 	
 	TextureView*		m_renderTargetView		= nullptr;
 	TextureView*		m_shaderResourceView	= nullptr;
 	TextureView*		m_depthStencilView		= nullptr;
+	TextureView*		m_unorderedAccessView	= nullptr;
 
 	const char*			m_imageFilePath			= nullptr;
 	unsigned int		m_textureID;

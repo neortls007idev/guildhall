@@ -134,7 +134,7 @@ bool ShaderStage::Compile( RenderContext* ctx , std::string const& filename , vo
 	if ( FAILED( result ) )
 	{
 		// report errors
-		if ( errors != nullptr && stageType == ( SHADER_STAGE_FRAGMENT | SHADER_STAGE_VERTEX ) )
+		if ( ( errors != nullptr ) && ( stageType ==  SHADER_STAGE_FRAGMENT ) || ( stageType == SHADER_STAGE_VERTEX ) )
 		{
 			char* errorString = ( char* ) errors->GetBufferPointer();
 			DebuggerPrintf( "Failed to compile [%s].  Compiler gave the following output;\n%s" ,
@@ -183,7 +183,7 @@ bool ShaderStage::Compile( RenderContext* ctx , std::string const& filename , vo
 	// link the stage
 	SetDebugName( m_handle , &filename );
 
-	if ( stageType == SHADER_STAGE_VERTEX )
+	if( ( stageType == SHADER_STAGE_VERTEX ) || ( stageType == SHADER_STAGE_COMPUTE ) )
 	{
 		m_byteCode = byteCode;
 	}

@@ -370,6 +370,31 @@ void Game::Render() const
 	g_theRenderer->SetCullMode( CULL_NONE );
 	g_theRenderer->DisableLight( 0 );
 
+	if( m_isToneMapShaderActive )
+	{
+#if defined ( _DEBUG_PROFILE ) || defined ( _FASTBREAK_PROFILE ) || defined ( _RELEASE_PROFILE )
+		pPerfMarker->BeginEvent( L"TONE MAP CS" );
+#endif
+		Texture* toneMapTarget = g_theRenderer->GetOrCreatematchingUAVTarget( colorTarget , "ToneMapCSTarget" );
+		Texture* currentView = g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+		g_theRenderer->CopyTexture( currentView , backBuffer );
+		//g_theRenderer->StartEffect( toneMapTarget , currentView , m_toneMapShader );
+		g_theRenderer->BindShader( m_toneMapShader );
+		g_theRenderer->BindMaterialData( ( void* ) &m_toneMapTransform , sizeof( m_toneMapTransform ) );
+		g_theRenderer->BindTexture( currentView , 0 , 0 , SHADER_STAGE_COMPUTE );
+		g_theRenderer->BindUAVTexture( toneMapTarget , 1 );
+		//g_theRenderer->EndEffect();
+
+		g_theRenderer->ExecuteComputeShader( m_toneMapShader , 32 , 32 , 1 );
+		g_theRenderer->CopyTexture( colorTarget , toneMapTarget );
+		g_theRenderer->ReleaseRenderTarget( currentView );
+		g_theRenderer->ReleaseUAVTarget( toneMapTarget );
+		g_theRenderer->BindShader( nullptr );
+
+#if defined ( _DEBUG_PROFILE ) || defined ( _FASTBREAK_PROFILE ) || defined ( _RELEASE_PROFILE )
+		pPerfMarker->EndEvent();
+#endif
+	}
 	
 	g_theRenderer->EndCamera( m_gameCamera );
 	
@@ -401,18 +426,6 @@ void Game::Render() const
 		g_theRenderer->EndEffect();
 		g_theRenderer->CopyTexture( backBuffer , finalImage );
 		g_theRenderer->ReleaseRenderTarget( finalImage );
-	}
-	if ( m_isToneMapShaderActive )
-	{
-		Texture* toneMapTarget = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget , "ToneMapTarget" );
-		Texture* currentView   = g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
-		g_theRenderer->CopyTexture( currentView , backBuffer );
-		g_theRenderer->StartEffect( toneMapTarget , currentView , m_toneMapShader );
-		g_theRenderer->BindMaterialData( ( void* ) &m_toneMapTransform , sizeof( m_toneMapTransform ) );
-		g_theRenderer->EndEffect();
-		g_theRenderer->CopyTexture( backBuffer , toneMapTarget );
-		g_theRenderer->ReleaseRenderTarget( currentView );
-		g_theRenderer->ReleaseRenderTarget( toneMapTarget );
 	}
 	
 	g_theRenderer->ReleaseRenderTarget( bloomTarget );

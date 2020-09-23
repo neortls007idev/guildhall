@@ -2,6 +2,18 @@
 // constants
 //--------------------------------------------------------------------------------------
 
+
+//--------------------------------------------------------------------------------------
+// vs_input_t is unused but added to avoid a hard crash due to setting invalid input layout 
+//--------------------------------------------------------------------------------------
+struct vs_input_t
+{
+    uint vidx : SV_VERTEXID; // SV_* stands for System Variable (ie, built-in by D3D11 and has special meaning)
+                                                            // in this case, is the the index of the vertex coming in.
+};
+
+//--------------------------------------------------------------------------------------
+
 cbuffer material_constants : register( b8 ) // constant buffer slot 9
 {
     float4x4 toneMapMatrix;
@@ -22,13 +34,13 @@ float4 ToneMap( float4 color )
 //--------------------------------------------------------------------------------------
 
 Texture2D<float4> gInput : register( t0 );
-RWTexture2D<float4> gOutput : register( u0 );
+RWTexture2D<float4> gOutput : register( u1 );
 
 //--------------------------------------------------------------------------------------
 // Compute Shader
 //--------------------------------------------------------------------------------------
 
-[numthreads( 1 , 1 , 1 )]
+[numthreads( 32 , 32 , 1 )]
 void ComputeFunction( uint3 DTid : SV_DispatchThreadID )
 {
     /*

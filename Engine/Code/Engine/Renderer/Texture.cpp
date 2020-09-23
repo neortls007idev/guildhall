@@ -129,6 +129,32 @@ TextureView* Texture::GetOrCreateShaderResourceView()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+TextureView* Texture::GetOrCreateUnorderedAccessView()
+{
+	if( m_unorderedAccessView )
+	{
+		return m_unorderedAccessView;
+	}
+
+	ID3D11Device* device = m_owner->m_device;
+	ID3D11UnorderedAccessView* uav = nullptr;
+
+	device->CreateUnorderedAccessView( m_handle , nullptr , &uav );
+
+	std::string debugName = "Unreleased Unordered access View Resource";
+	SetDebugName( uav , &debugName );
+
+	if( uav )
+	{
+		m_unorderedAccessView = new TextureView();
+		m_unorderedAccessView->m_uav = uav;
+	}
+
+	return m_unorderedAccessView;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 TextureView* Texture::GetOrCreateCubeMapShaderResourceView()
 {
 	if( m_shaderResourceView )

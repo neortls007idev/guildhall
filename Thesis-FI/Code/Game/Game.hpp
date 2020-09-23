@@ -118,7 +118,7 @@ public:
 
 	Texture*						m_dissolveShaderPatternTexture						= nullptr;
 	Texture*						m_triplanarShaderTextures[ 6 ];
-	int								m_currentToneMap									= ToneMap::NO_TONE;
+	int								m_currentToneMap									= ToneMap::SEPHIA;
 	Mat44							m_toneMapTransform;
 	float							m_tonePower											= 1.f;
 	

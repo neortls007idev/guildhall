@@ -401,12 +401,12 @@ Texture* RenderContext::CreateRenderTarget( IntVec2 texelSize , std::string debu
 	desc.MipLevels					= 1;
 	desc.ArraySize					= 1;
 	desc.Format						= DXGI_FORMAT_R8G8B8A8_UNORM;
-	desc.SampleDesc.Count			= 1;															// Multi sampling Anti-Aliasing
-	desc.SampleDesc.Quality			= 0;															// Multi sampling Anti-Aliasing
-	desc.Usage						= D3D11_USAGE_DEFAULT;											//  if we do mip-chains, we change this to GPU/DEFAULT
-	desc.BindFlags					= D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-	desc.CPUAccessFlags				= 0;															// does the CPU write to this? 0  = no
-	desc.MiscFlags					= 0;															// extension features like cube maps
+	desc.SampleDesc.Count			= 1;																					// Multi sampling Anti-Aliasing
+	desc.SampleDesc.Quality			= 0;																					// Multi sampling Anti-Aliasing
+	desc.Usage						= D3D11_USAGE_DEFAULT;																	//  if we do mip-chains, we change this to GPU/DEFAULT
+	desc.BindFlags					= D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE ;
+	desc.CPUAccessFlags				= 0;																					// does the CPU write to this? 0  = no
+	desc.MiscFlags					= 0;																					// extension features like cube maps
 
 	// DirectX Creation
 	ID3D11Texture2D* texHandle = nullptr;
@@ -421,6 +421,71 @@ Texture* RenderContext::CreateRenderTarget( IntVec2 texelSize , std::string debu
 	SetDebugName( renderTarget->m_rtv , &debugRenderTargetName );
 	
 	return temp;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Texture* RenderContext::GetOrCreatematchingUAVTarget( Texture* texture , std::string debugRenderTargetName /*= "Unreleased UAV" */ )
+{
+	IntVec2 size = texture->GetDimensions();
+
+	for( size_t index = 0; index < m_UAVTargetTexPool.size(); index++ )
+	{
+		Texture* UAVTarget = m_UAVTargetTexPool[ index ];
+
+		if( UAVTarget->GetDimensions() == size )
+		{
+			// fast remove at index
+			m_UAVTargetTexPool[ index ] = m_UAVTargetTexPool[ m_UAVTargetTexPool.size() - 1 ];
+			m_UAVTargetTexPool.pop_back();
+			// return the object from pool
+			return UAVTarget;
+		}
+	}
+
+	Texture* newUAVTarget = CreateUAVTarget( size , debugRenderTargetName );
+	//m_renderTargetPool.push_back( newRenderTarget );
+	m_UAVTargetTexPoolSize++;
+	return newUAVTarget;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Texture* RenderContext::CreateUAVTarget( IntVec2 texelSize , std::string debugUAVTargetName /*= "Unreleased UAV Texture" */ )
+{
+	D3D11_TEXTURE2D_DESC desc;
+	desc.Width = texelSize.x;
+	desc.Height = texelSize.y;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.SampleDesc.Count = 1;															// Multi sampling Anti-Aliasing
+	desc.SampleDesc.Quality = 0;														// Multi sampling Anti-Aliasing
+	desc.Usage = D3D11_USAGE_DEFAULT;													//  if we do mip-chains, we change this to GPU/DEFAULT
+	desc.BindFlags = D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags = 0;															// does the CPU write to this? 0  = no
+	desc.MiscFlags = 0;																	// extension features like cube maps
+
+	// DirectX Creation
+	ID3D11Texture2D* texHandle = nullptr;
+	m_device->CreateTexture2D( &desc , nullptr , &texHandle );
+
+	Texture* temp = new Texture( this , texHandle );
+
+	std::string debugName = "Unordered Access View Texture";
+	//SetDebugName( ( ID3D11DeviceChild* ) temp->GetHandle() , &debugName );
+
+	TextureView* uavTarget = temp->GetOrCreateUnorderedAccessView();
+	//SetDebugName( uavTarget->m_uav , &debugUAVTargetName );
+
+	return temp;	
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::ReleaseUAVTarget( Texture* texture )
+{
+	m_UAVTargetTexPool.push_back( texture );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -694,7 +759,7 @@ void RenderContext::SetInputLayoutForIA( buffer_attribute_t const* attribs )
 {
 	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
 	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fragmentShader , nullptr , 0 );
-	m_context->CSSetShader( m_currentShader->m_fragmentStage.m_computeShader , nullptr , 0 );
+	m_context->CSSetShader( m_currentShader->m_computeStage.m_computeShader , nullptr , 0 );
 	
 	// So at this, I need to describe the vertex format to the shader
 	//ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
@@ -990,20 +1055,64 @@ Texture* RenderContext::GetOrCreateTextureFromFile( const char* imageFilePath )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::BindTexture( const Texture* constTexture , UINT textureType /*= eTextureType::DIFFUSE*/ , UINT userTextureIndexOffset /*= 0*/ )
+void RenderContext::BindTexture ( const Texture* constTexture , UINT textureType /*= eTextureType::DIFFUSE*/ ,
+                                  UINT userTextureIndexOffset /*= 0*/ ,
+                                  SHADER_STAGE_TYPE shaderStage /*= SHADER_STAGE_FRAGMENT*/ )
 {
-	if ( nullptr == constTexture )
+	if( SHADER_STAGE_FRAGMENT == shaderStage )
 	{
-		TextureView* shaderResourceView = m_textureDefault->GetOrCreateShaderResourceView();
-		ID3D11ShaderResourceView* shaderResourceViewHandle = shaderResourceView->GetSRVHandle();
-		m_context->PSSetShaderResources( textureType + userTextureIndexOffset , 1 , &shaderResourceViewHandle );
+		if( nullptr == constTexture )
+		{
+			TextureView* shaderResourceViewPS = m_textureDefault->GetOrCreateShaderResourceView();
+			ID3D11ShaderResourceView* shaderResourceViewHandlePS = shaderResourceViewPS->GetSRVHandle();
+			m_context->PSSetShaderResources( textureType + userTextureIndexOffset , 1 , &shaderResourceViewHandlePS );
+			return;
+		}
+
+		Texture* texturePS = const_cast< Texture* >( constTexture );
+		TextureView* shaderResourceViewPS = texturePS->GetOrCreateShaderResourceView();
+		ID3D11ShaderResourceView* shaderResourceViewHandlePS = shaderResourceViewPS->GetSRVHandle();
+		m_context->PSSetShaderResources( textureType + userTextureIndexOffset , 1 , &shaderResourceViewHandlePS );
+		return;
+	}
+	else if( SHADER_STAGE_COMPUTE == shaderStage )
+	{
+		if( nullptr == constTexture )
+		{
+			TextureView* shaderResourceViewCS = m_textureDefault->GetOrCreateShaderResourceView();
+			ID3D11ShaderResourceView* shaderResourceViewHandleCS = shaderResourceViewCS->GetSRVHandle();
+			m_context->CSSetShaderResources( textureType + userTextureIndexOffset , 1 , &shaderResourceViewHandleCS );
+			return;
+		}
+
+		Texture* texture = const_cast< Texture* >( constTexture );
+		TextureView* shaderResourceViewCS = texture->GetOrCreateShaderResourceView();
+		ID3D11ShaderResourceView* shaderResourceViewHandleCS = shaderResourceViewCS->GetSRVHandle();
+		m_context->CSSetShaderResources( textureType + userTextureIndexOffset , 1 , &shaderResourceViewHandleCS );
+		return;
+	}
+	else
+	{
+		__debugbreak();
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::BindUAVTexture( const Texture* constTexture , UINT textureType /*= eTextureType::TEX_DIFFUSE */ , UINT userTextureIndexOffset /*= 0 */ )
+{
+	if( nullptr == constTexture )
+	{
+		TextureView* unorderedAccessView = m_textureDefault->GetOrCreateUnorderedAccessView();
+		ID3D11UnorderedAccessView* unorderedAccessViewHandle = unorderedAccessView->GetUAVHandle();
+		m_context->CSSetUnorderedAccessViews( textureType + userTextureIndexOffset , 1 , &unorderedAccessViewHandle , 0 );
 		return;
 	}
 
 	Texture* texture = const_cast< Texture* >( constTexture );
-	TextureView* shaderResourceView =  texture->GetOrCreateShaderResourceView();
-	ID3D11ShaderResourceView* shaderResourceViewHandle = shaderResourceView->GetSRVHandle();
-	m_context->PSSetShaderResources( textureType + userTextureIndexOffset , 1 , &shaderResourceViewHandle );
+	TextureView* unorderedAccessView = texture->GetOrCreateUnorderedAccessView();
+	ID3D11UnorderedAccessView* unorderedAccessViewHandle = unorderedAccessView->GetUAVHandle();
+	m_context->CSSetUnorderedAccessViews( textureType + userTextureIndexOffset , 1 , &unorderedAccessViewHandle , 0 );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1567,6 +1676,11 @@ bool RenderContext::BindShader( Shader* shader )
 	{
 		m_currentShader = m_defaultShader;
 	}
+
+	//m_context->VSSetShader( m_currentShader->m_vertexStage.m_vertexShader , nullptr , 0 );
+	//m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fragmentShader , nullptr , 0 );
+	//m_context->CSSetShader( m_currentShader->m_computeStage.m_computeShader , nullptr , 0 );
+	
 	return true;
 }
 
@@ -1586,7 +1700,7 @@ void RenderContext::BindShader( std::string shaderFileName )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::ExecuteComputeShader( Shader* computeShader )
+void RenderContext::ExecuteComputeShader( Shader* computeShader , uint numThreadGroupX , uint numThreadGroupY , uint numThreadGroupZ )
 {
 	if ( computeShader == nullptr )
 	{
@@ -1595,7 +1709,8 @@ void RenderContext::ExecuteComputeShader( Shader* computeShader )
 	if ( computeShader->m_computeStage.m_byteCode != nullptr )
 	{
 		BindShader( computeShader );
-		m_context->Dispatch( 1 , 1 , 1 );
+		m_context->CSSetShader( m_currentShader->m_computeStage.m_computeShader , nullptr , 0 );
+		m_context->Dispatch( numThreadGroupX , numThreadGroupY , numThreadGroupZ );
 	}	
 }
 
@@ -1770,6 +1885,7 @@ void RenderContext::BindUniformBuffer( unsigned int slot , RenderBuffer* ubo )
 
 	m_context->VSSetConstantBuffers( slot , 1 , &uboHandle );
 	m_context->PSSetConstantBuffers( slot , 1 , &uboHandle );
+	m_context->CSSetConstantBuffers( slot , 1 , &uboHandle );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

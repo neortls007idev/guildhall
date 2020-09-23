@@ -16,6 +16,8 @@
 #include <string>
 #include <vector>
 
+#include "Shader.hpp"
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				FORWARD DECLARATIONS 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -176,6 +178,13 @@ public:
 	int						GetTotalRenderTargetPoolSize() const				 { return m_renderTargetPoolSize;  }
 	int						GetTexturePoolFreeCount() const						 { return 8 - m_renderTargetPoolSize;  }
 
+	// UAV = Unordered access view - used by compute shaders
+	Texture*				GetOrCreatematchingUAVTarget( Texture* texture , std::string debugRenderTargetName = "Unreleased UAV" );
+	Texture*				CreateUAVTarget( IntVec2 texelSize , std::string debugUAVTargetName = "Unreleased UAV Texture" );
+	void					ReleaseUAVTarget( Texture* texture );
+	int						GetTotalUAVTargetPoolSize() const					{ return m_UAVTargetTexPoolSize; }
+	int						GetUAVTexturePoolFreeCount() const					{ return 8 - m_UAVTargetTexPoolSize; }
+	
 	void					BeginCamera( const Camera& camera );
 	void					EndCamera( const Camera& camera);
 
@@ -197,11 +206,13 @@ public:
 	void					SetRasterState( eRasterStateFillMode rasterState );
 	void					SetTransientRasterStateAsRasterState();
 	
-	void					BindTexture( const Texture* constTexture , UINT textureType = eTextureType::TEX_DIFFUSE , UINT userTextureIndexOffset = 0 );
+	void					BindTexture( const Texture* constTexture , UINT textureType = eTextureType::TEX_DIFFUSE ,
+											UINT userTextureIndexOffset = 0 , SHADER_STAGE_TYPE shaderStage = SHADER_STAGE_FRAGMENT );
+	void					BindUAVTexture( const Texture* constTexture , UINT textureType = eTextureType::TEX_DIFFUSE , UINT userTextureIndexOffset = 0 );
 	void					BindCubeMapTexture( const Texture* constTexture );
 	bool					BindShader( Shader* shader );
 	void					BindShader( std::string shaderFileName );
-	void					ExecuteComputeShader( Shader* computeShader );
+	void					ExecuteComputeShader( Shader* computeShader , uint numThreadGroupX , uint numThreadGroupY , uint numThreadGroupZ );
 	
 	bool					BindShaderState( ShaderState* shaderState );
 	void					BindShaderState( std::string shaderStateFileName );
@@ -430,6 +441,10 @@ private:
 	std::map<std::string , Texture*>			m_LoadedTextures;									// LOOKUP TABLE OF FILEPATH & TEXTURE
 	std::vector<Texture*>						m_renderTargetPool;
 	int											m_renderTargetPoolSize = 0;
+
+	std::vector<Texture*>						m_UAVTargetTexPool;
+	int											m_UAVTargetTexPoolSize = 0;
+	
 	std::map<std::string , BitmapFont*>			m_LoadedBitMapFonts;								// LOOKUP TABLE OF FILEPATH & BITMAPFONT
 	std::map<std::string , Shader*>				m_LoadedShaders;									// LOOKUP TABLE OF FILEPATH & SHADERS
 	std::map<std::string , ShaderState*>		m_LoadedShaderStates;								// LOOKUP TABLE OF FILEPATH & SHADER STATES
