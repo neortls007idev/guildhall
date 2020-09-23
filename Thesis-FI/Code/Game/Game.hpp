@@ -23,34 +23,49 @@ class Game
 
 public:
 			Game();
-
-			void InitializeLightData();
-			void LoadShaders();
-			void LoadTextures();
-			void LoadModels();
-			void LoadScene();
-			void InitializeCameras();
-			void IntializeGameObjects();
-			void InitializeShaderMaterialData();
+				void LoadShaders();
+				void LoadTextures();
+				void LoadModels();
+				void LoadScene();
+				void InitializeCameras();
+				void IntializeGameObjects();
+				void InitializeLightData();
+				void InitializeShaderMaterialData();
+				void InitializeParticleEmitters();
 
 			~Game();
 
 			void Update( float deltaSeconds );
-			void UpdateLightData( int lightIndex );
-			void UpdateToneMapData();
-			
-			void UpdateLightPosition( float deltaSeconds );
-			void UpdateViewFrustumCulling();
-			void Render() const;
-			void BindShaderSpecificMaterialData() const;
-			void RenderFresnelShader2ndPass() const;
+				void UpdateViewFrustumCulling();
+				void UpdateLightPosition( float deltaSeconds );
 
-			void SetLightPositionToOrigin( int lightIndex );
-			void SetLightPositionToCameraPos( int lightIndex );
-			void SetLightDirectionToCameraForwardVector( int lightIndex );
+				void UpdateAllStarEmitters( float deltaSeconds );
+			
+			void Render() const;
+				void BindShaderSpecificMaterialData() const;
+				void RenderFresnelShader2ndPass() const;
+
 
 private:
 			void DebugUI();
+				void UIControlsGUI();
+					void ShadersGUI();
+					void LightSettingsGUI();
+						void SetLightPositionToOrigin( int lightIndex );
+						void SetLightPositionToCameraPos( int lightIndex );
+						void SetLightDirectionToCameraForwardVector( int lightIndex );
+						void UpdateLightData( int lightIndex );
+					void EffectsSettingsUI();
+						void UpdateToneMapData();
+					void SceneSetupGUI();
+					void ProfilingSettingsGUI();
+					void ParticleEmitterSettingsGUI();
+				void PermanentDebugDataGUI();
+				void SpecialControlsDisplayGUI();
+
+			//--------------------------------------------------------------------------------------------------------------------------------------------
+
+
 			bool AddGameOBJInstance( eGameObjModels modelType );
 			bool DestroyGameOBJInstance( eGameObjModels modelType , int instanceCount );
 			void RenderAllInstancesOfType( eGameObjModels modelType ) const;
@@ -138,6 +153,8 @@ private:
 	bool								m_dirtyUBOs[ NUM_DIRTY_UBOS ];
 	uint								m_totalDrawableMeshes;
 	uint								m_currentlyDrawingMeshes;
-	std::vector<ParticleEmitter3D*>		m_emitters;
-	std::vector<SpriteSheet*>			m_particleSystemSpriteSheets;
+	GameParticleEmitter					m_starEmitters[ NUM_STARS_EMITTERS ];
+	SpriteSheet*						m_particleEmitterSheets[ NUM_GAME_SS ];
+	//std::vector<GameParticleEmitter>	m_emitters;
+	//std::vector<SpriteSheet*>			m_particleSystemSpriteSheets;
 };

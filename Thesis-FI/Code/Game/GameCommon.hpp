@@ -5,6 +5,7 @@
 
 class Game;
 class Window;
+class ParticleEmitter3D;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -113,3 +114,38 @@ enum DIRTY_UBOS
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+struct GameParticleEmitter
+{
+	ParticleEmitter3D*	m_emitter;
+//	SpriteSheet*		m_spriteSheetInUse;
+	Vec3				m_center						= Vec3::ZERO;
+	float				m_movementRadius				= 5.f;
+	Rgba8				m_particleStartColor;
+	Rgba8				m_particleEndColor;
+	float				m_particleMinLifeTime			= 0.25f;
+	float				m_particleMaxLifeTime			= 2.f;
+	float				m_particleVelocity				= 15.f;
+	Vec2				m_particleSize					= Vec2::ONE;
+	uint				m_numParticlesToSpawnPerFrame	= 1000;
+
+	uint				m_numAliveParticles				= 0;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum GameStarEmitters
+{
+	RED_ORANGE_STAR,
+	BLUE_CYAN_STAR,
+
+	NUM_STARS_EMITTERS
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+enum GameEmitterSpriteSheets
+{
+	STAR_SS ,
+	
+	NUM_GAME_SS
+};

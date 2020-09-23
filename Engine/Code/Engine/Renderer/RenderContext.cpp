@@ -186,7 +186,7 @@ void RenderContext::Startup( Window* window )
 	// ID3D11Device
 	// ID3D11DeviceContext
 	
-#if defined(RENDER_DEBUG)
+#if defined(RENDER_DEBUG) && defined ( _DEBUG ) || defined ( _FASTBREAK ) || defined ( _DEBUG_PROFILE ) || defined ( _FASTBREAK_PROFILE ) || defined ( _RELEASE_PROFILE )
 	CreateDebugModule();
 #endif
 

@@ -56,11 +56,11 @@ ParticleEmitter3D::~ParticleEmitter3D()
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void ParticleEmitter3D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position , Vec3 target , Vec3 velocity , float age ,
-                                           float maxAge , Rgba8 color , IntVec2 spriteCoords )
+                                           float maxAge , Rgba8 startColor , Rgba8 endColor , IntVec2 spriteCoords )
 {
 	if( m_spriteSheet != nullptr )
 	{		
-		Particle3D* temp = new Particle3D( cosmeticBounds , position , velocity , age , maxAge , color );
+		Particle3D* temp = new Particle3D( cosmeticBounds , m_position + position , m_velocity + velocity , age , maxAge , startColor ,endColor );
 		int		spriteSheetWidth = m_spriteSheet->GetSpriteDimension().x;
 		int		spriteIndex = spriteCoords.x + ( spriteSheetWidth * spriteCoords.y );
 
@@ -68,6 +68,7 @@ void ParticleEmitter3D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position 
 		currentParticleSprite.GetUVs( temp->m_minsUVs , temp->m_maxsUVs );
 
 		EmplaceBackNewParticle( temp );
+		m_numAliveParticles++;
 	}
 	else
 	{
@@ -77,11 +78,11 @@ void ParticleEmitter3D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void ParticleEmitter3D::SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position , Vec3 target , Vec3 velocity , float age , float maxAge , Rgba8 color )
+void ParticleEmitter3D::SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position , Vec3 target , Vec3 velocity , float age , float maxAge , Rgba8 startColor , Rgba8 endColor )
 {
-	Particle3D* temp = new Particle3D( cosmeticBounds, position , velocity , age , maxAge , color );
+	Particle3D* temp = new Particle3D( cosmeticBounds, m_position + position , m_velocity + velocity , age , maxAge , startColor , endColor );
 	EmplaceBackAtEmptySpace( m_particles , temp );
-
+	m_numAliveParticles++;
 	//temp->m_cosmeticBounds = cosmeticBounds;
 }
 
@@ -89,12 +90,12 @@ void ParticleEmitter3D::SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position ,
 
 void ParticleEmitter3D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position , Vec3 target , float scale ,
                                            Vec3 velocity , float age , float maxAge ,
-                                           Rgba8 color , IntVec2 spriteCoords )
+                                           Rgba8 startColor , Rgba8 endColor , IntVec2 spriteCoords )
 {
 	if( m_spriteSheet != nullptr )
 	{
-		Particle3D* temp = new Particle3D( cosmeticBounds , position , scale ,
-		                                   velocity , age , maxAge , color );
+		Particle3D* temp = new Particle3D( cosmeticBounds , m_position + position , scale ,
+		                                   m_velocity + velocity , age , maxAge , startColor , endColor );
 		int		spriteSheetWidth = m_spriteSheet->GetSpriteDimension().x;
 		int		spriteIndex = spriteCoords.x + ( spriteSheetWidth * spriteCoords.y );
 
@@ -102,10 +103,12 @@ void ParticleEmitter3D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position 
 		currentParticleSprite.GetUVs( temp->m_minsUVs , temp->m_maxsUVs );
 
 		EmplaceBackNewParticle( temp );
+		m_numAliveParticles++;
 	}
 	else
 	{
-		SpawnNewParticle( cosmeticBounds , position , target , velocity , age , maxAge , color );
+		SpawnNewParticle( cosmeticBounds , position , target , velocity , age , maxAge , startColor , endColor );
+		m_numAliveParticles++;
 	}
 }
 
@@ -130,14 +133,14 @@ void ParticleEmitter3D::EmplaceBackNewParticle( Particle3D* temp )
 
 void ParticleEmitter3D::SpawnNewRandomParticleFromSpriteSheet ( AABB2 cosmeticBounds , Vec3 position , Vec3 target ,
 																float scale , Vec3 velocity , float age ,
-                                                                float maxAge , Rgba8 color )
+                                                                float maxAge , Rgba8 startColor , Rgba8 endColor /*= CLEAR*/ )
 {
 	if ( m_spriteSheet != nullptr )
 	{
 		IntVec2 randSprite = m_spriteSheet->RollRandomSpriteCoordsInSpriteSheet();
-		SpawnNewParticle( cosmeticBounds , position , target , scale , velocity , age , maxAge , color , randSprite );
+		SpawnNewParticle( cosmeticBounds , m_position + position , target , scale , m_velocity + velocity , age , maxAge , startColor , endColor , randSprite );
+		m_numAliveParticles++;
 	}
-	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -145,17 +148,20 @@ void ParticleEmitter3D::SpawnNewRandomParticleFromSpriteSheet ( AABB2 cosmeticBo
 void ParticleEmitter3D::Update( float deltaSeconds )
 {
 	m_particleVerts.clear();
-
+	m_numAliveParticles = 0;
+	
 	for( size_t index = 0 ; index < m_particles.size() ; index++ )
 	{
 		if( m_particles[ index ] != nullptr )
 		{
 			m_particles[ index ]->Update( deltaSeconds );
+			m_numAliveParticles++;
 
 			if ( m_particles[ index ]->m_age >= m_particles[ index ]->m_maxAge )
 			{
 				delete m_particles[ index ];
 				m_particles[ index ] = nullptr;
+				m_numAliveParticles--;
 			}
 		}
 	}
@@ -167,11 +173,16 @@ void ParticleEmitter3D::Update( float deltaSeconds )
 		Particle3D* particle = m_particles[ index ];
 		if( particle != nullptr )
 		{
-
 			if ( m_areParticlesBillboarded )
 			{
 				lookAt = LookAtMatrix( particle->m_position , m_targetPos );
-				Transform3DAndAppendVertsForAABB2( m_particleVerts , particle->m_cosmeticBounds , particle->m_color ,
+				Vec4 ibasis = -lookAt.GetIBasis4D();
+				lookAt.Ix = ibasis.x;
+				lookAt.Iy = ibasis.y;
+				lookAt.Iz = ibasis.z;
+				lookAt.Iw = ibasis.w;
+				
+				Transform3DAndAppendVertsForAABB2( m_particleVerts , particle->m_cosmeticBounds , particle->m_startColor ,
 				                                 particle->m_minsUVs , particle->m_maxsUVs , particle->m_position , lookAt );
 			}
 		}
@@ -191,6 +202,7 @@ void ParticleEmitter3D::Render()
 	m_renderContext->BindTexture( m_texture );
 	
 	m_renderContext->SetBlendMode( m_blendMode );
+	m_renderContext->SetModelMatrix( Mat44::IDENTITY , HALF_ALPHA_WHITE );
     m_renderContext->DrawVertexArray( m_particleVerts );
 	m_renderContext->SetBlendMode( eBlendMode::ALPHA );
 }
@@ -213,6 +225,27 @@ void ParticleEmitter3D::Destroy()
 void ParticleEmitter3D::UpdateTargetPos( Vec3 newTargetPos )
 {
 	m_targetPos = newTargetPos;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void ParticleEmitter3D::Move( float deltaSeconds )
+{
+	m_position += m_velocity * deltaSeconds;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void ParticleEmitter3D::UpdatePosition( Vec3 newPos )
+{
+	m_position = newPos;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void ParticleEmitter3D::UpdateVelocity( Vec3 newVelocity )
+{
+	m_velocity = newVelocity;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

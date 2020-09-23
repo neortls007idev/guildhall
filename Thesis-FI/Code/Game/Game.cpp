@@ -83,12 +83,7 @@ Game::Game()
 	m_linear = new Sampler( g_theRenderer , SAMPLER_BILINEAR );
 	m_debugSwitchs[ GAME_CAMERA_VIEW_FRUSTUM_CULLING ] = true;
 
-
-	Texture* emitterTexture = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/ParticleFX/VFXFlare192x108.png" );
-	SpriteSheet* spriteSheet = new SpriteSheet( *emitterTexture , IntVec2( 5 , 7 ) );
-	m_particleSystemSpriteSheets.emplace_back( spriteSheet );
-	//ParticleEmitter3D* testEmitter = new ParticleEmitter3D( g_theRenderer , spriteSheet, 10000 , m_gameCamera.GetPosition() );
-	m_emitters.emplace_back( g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , spriteSheet , 5000 , m_gameCamera.GetPosition() ) );
+	InitializeParticleEmitters();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -175,21 +170,41 @@ void Game::Update( float deltaSeconds )
 
 	DebugUI();
 
-	m_emitters[ 0 ]->UpdateTargetPos( m_gameCamera.GetPosition() );
-	g_theParticleSystem3D->Update( deltaSeconds );
+	UpdateAllStarEmitters( deltaSeconds );	
+}
 
-	for ( int i = 0 ; i < 1000 ; i++ )
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateAllStarEmitters( float deltaSeconds )
+{
+	for ( int index = 0 ; index < NUM_STARS_EMITTERS ; index++ )
 	{
-		Vec3 position				= g_RNG->RollRandomInUnitSphere();
-		Vec3 deviation				= g_RNG->RollRandomUnitVec3() * 50.f;
-		//float scale = g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
-		float maxAge = g_RNG->RollRandomFloatInRange( 0.5 , 2.f );
+		m_starEmitters[ index ].m_emitter->UpdateTargetPos( m_gameCamera.GetPosition() );
+		g_theParticleSystem3D->Update( deltaSeconds );
 
-		m_emitters[ 0 ]->SpawnNewRandomParticleFromSpriteSheet( AABB2( Vec2( -1.f , -1.f ) , Vec2( 1.f , 1.f ) ) , position ,
-																m_gameCamera.GetPosition() , 1.f , deviation , 0.0f ,
-																maxAge , WHITE );
+		Vec3 emitterPos = m_starEmitters[ index ].m_center + Vec3::MakeFromSpericalCoordinates(
+		45.f * ( float ) GetCurrentTimeSeconds() , 30.f * SinDegrees( ( float ) GetCurrentTimeSeconds() ) , m_starEmitters[ index ].m_movementRadius );
+
+		m_starEmitters[ index ].m_emitter->UpdatePosition( emitterPos );
+		
+		for( uint particleSpawned = 0 ; particleSpawned < m_starEmitters[index].m_numParticlesToSpawnPerFrame ; particleSpawned++ )
+		{
+			Vec3 position = g_RNG->RollRandomInUnitSphere();
+			Vec3 deviation = g_RNG->RollRandomUnitVec3() * m_starEmitters[ index ].m_particleVelocity;
+			//float scale = g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
+			float maxAge = g_RNG->RollRandomFloatInRange( m_starEmitters[ index ].m_particleMinLifeTime , m_starEmitters[ index ].m_particleMaxLifeTime );
+
+			m_starEmitters[ index ].m_emitter->SpawnNewRandomParticleFromSpriteSheet( AABB2( -m_starEmitters[ index ].m_particleSize , m_starEmitters[ index ].m_particleSize ) 
+																					  , position ,m_gameCamera.GetPosition() , 1.f , deviation ,
+																					  0.0f , maxAge ,
+																					  m_starEmitters[ index ].m_particleStartColor , m_starEmitters[ index ].m_particleEndColor );
+		}
 	}
 	
+	//Vec3 emitterPos = Vec3( 0.f , 0.f , -10.f ) + Vec3::MakeFromSpericalCoordinates(
+	//	45.f * ( float ) GetCurrentTimeSeconds() , 30.f * SinDegrees( ( float ) GetCurrentTimeSeconds() ) , 5.f );
+	//m_emitters[ 0 ]->UpdatePosition( emitterPos );
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -325,12 +340,14 @@ void Game::Render() const
 	
 	if ( m_isFresnelShaderActive )													{	RenderFresnelShader2ndPass();	}
 		
+	
 	g_theRenderer->SetRasterState( FILL_SOLID );
 
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindShader( nullptr );
  
  	g_theRenderer->BindMaterial( nullptr );
+
 
 	g_theRenderer->BindShader( m_cubeMapTest );
 	g_theRenderer->BindCubeMapTexture( m_cubeMapex );
@@ -340,15 +357,19 @@ void Game::Render() const
 	g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
 	g_theRenderer->DrawMesh( m_unitCubeMesh );
 	g_theRenderer->SetCullMode( CULL_BACK );
+
+
 	g_theRenderer->BindCubeMapTexture( nullptr );
 	g_theRenderer->BindShader( nullptr );
 	
 	g_theRenderer->BindTexture( nullptr );
+	g_theParticleSystem3D->Render();
+
+	
 	g_theRenderer->SetDepthTest( COMPARE_ALWAYS , true );
 	g_theRenderer->SetCullMode( CULL_NONE );
 	g_theRenderer->DisableLight( 0 );
 
-	g_theParticleSystem3D->Render();
 	
 	g_theRenderer->EndCamera( m_gameCamera );
 	

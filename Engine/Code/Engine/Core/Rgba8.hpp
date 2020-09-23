@@ -93,4 +93,17 @@ constexpr Rgba8 HALF_ALPHA_PINK		= Rgba8( 255 , 0   , 127 , 127 );
 constexpr Rgba8 HALF_ALPHA_PURPLE	= Rgba8( 127 , 0   , 255 , 127 );
 constexpr Rgba8 HALF_ALPHA_GRAY		= Rgba8( 127 , 127 , 127 , 127 );
 
+constexpr Rgba8 NO_ALPHA_RED		= Rgba8( 255 , 0   , 0   , 0 );
+constexpr Rgba8 NO_ALPHA_GREEN		= Rgba8( 0   , 255 , 0   , 0 );
+constexpr Rgba8 NO_ALPHA_BLUE		= Rgba8( 0   , 0   , 255 , 0 );
+constexpr Rgba8 NO_ALPHA_WHITE		= Rgba8( 255 , 255 , 255 , 0 );
+constexpr Rgba8 NO_ALPHA_BLACK		= Rgba8( 0   , 0   , 0   , 0 );
+constexpr Rgba8 NO_ALPHA_MAGENTA	= Rgba8( 255 , 0   , 255 , 0 );
+constexpr Rgba8 NO_ALPHA_YELLOW		= Rgba8( 255 , 255 , 0   , 0 );
+constexpr Rgba8 NO_ALPHA_CYAN		= Rgba8( 0   , 255 , 255 , 0 );
+constexpr Rgba8 NO_ALPHA_ORANGE		= Rgba8( 255 , 127 , 0   , 0 );
+constexpr Rgba8 NO_ALPHA_PINK		= Rgba8( 255 , 0   , 127 , 0 );
+constexpr Rgba8 NO_ALPHA_PURPLE		= Rgba8( 127 , 0   , 255 , 0 );
+constexpr Rgba8 NO_ALPHA_GRAY		= Rgba8( 127 , 127 , 127 , 0 );
+
 //--------------------------------------------------------------------------------------------------------------------------------------------

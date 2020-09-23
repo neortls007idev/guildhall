@@ -99,7 +99,7 @@ $RECYCLE.BIN/
 
 # Data Directorys
 # TODO - ADD IGNORE PATTERNS
-
+*/*/*/VTune Profiler Results/*
 # EXAMPLES
 # Don't ignore all files with `obj` extension underneat `build` folder, including subfolders
 

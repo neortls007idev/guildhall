@@ -2,12 +2,14 @@
 #include "Engine/Core/OBJUtils.hpp"
 #include "Engine/Core/VertexLit.hpp"
 #include "Engine/Core/VertexUtils.hpp"
+#include "Engine/ParticleSystem/ParticleSystem3D.hpp"
 #include "Engine/Primitives/GPUMesh.hpp"
 #include "Game/Game.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-extern RenderContext* g_theRenderer;
+extern RenderContext*		g_theRenderer;
+extern ParticleSystem3D*	g_theParticleSystem3D;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -80,7 +82,7 @@ void Game::LoadShaders()
 	//m_lightShaders[ LitShaderTypes::FOG ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/fog.hlsl" );
 
 	m_blurShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );
-	m_toneMapShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/toneMap.hlsl" );
+	m_toneMapShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/toneMapCS.hlsl" );
 
 	m_currentShader												= m_lightShaders[ LitShaderTypes::LIT ];
 	m_currentShaderIndex										= LitShaderTypes::LIT;
@@ -217,6 +219,27 @@ void Game::IntializeGameObjects()
 	//objMeshOptions1.clean = true;
 	m_objSciFiShipMesh = new GPUMesh( g_theRenderer );
 	m_objSciFiShipMesh = LoadObjFileIntoGpuMesh( objMeshOptions1 , "Data/Models/scifiFighter/mesh.obj" );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::InitializeParticleEmitters()
+{
+	Texture* emitterTexture = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/ParticleFX/VFXFlare192x108.png" );
+	m_particleEmitterSheets[ STAR_SS ] = new SpriteSheet( *emitterTexture , IntVec2( 5 , 7 ) );
+
+//	m_starEmitters[ RED_ORANGE_STAR ].m_spriteSheetInUse = &spriteSheet;
+	//m_particleSystemSpriteSheets.emplace_back( spriteSheet );
+	//ParticleEmitter3D* testEmitter = new ParticleEmitter3D( g_theRenderer , spriteSheet, 10000 , m_gameCamera.GetPosition() );
+	//m_emitters.emplace_back( g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , spriteSheet , 5000 , m_gameCamera.GetPosition() ) );
+
+	m_starEmitters[ RED_ORANGE_STAR ].m_emitter = g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , m_particleEmitterSheets[ STAR_SS ] , 10000 , m_gameCamera.GetPosition() );
+	m_starEmitters[ RED_ORANGE_STAR ].m_particleStartColor	= RED;
+	m_starEmitters[ RED_ORANGE_STAR ].m_particleEndColor	= NO_ALPHA_ORANGE;
+
+	m_starEmitters[ BLUE_CYAN_STAR ].m_emitter = g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , m_particleEmitterSheets[ STAR_SS ] , 10000 , m_gameCamera.GetPosition() );
+	m_starEmitters[ BLUE_CYAN_STAR ].m_particleStartColor = BLUE;
+	m_starEmitters[ BLUE_CYAN_STAR ].m_particleEndColor = NO_ALPHA_CYAN;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

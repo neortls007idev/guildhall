@@ -15,18 +15,19 @@ struct Particle3D
 {
 public:
 	//Particle3D();
-	Particle3D( Vec3 position , Vec3 velocity , float age , float maxAge , Rgba8 color );
+	Particle3D( Vec3 position , Vec3 velocity , float age , float maxAge , Rgba8 startColor , Rgba8 endColor = CLEAR );
 
-	Particle3D( AABB2 cosmeticBounds , Vec3 position , Vec3 velocity , float age , float maxAge , Rgba8 color );
+	Particle3D( AABB2 cosmeticBounds , Vec3 position , Vec3 velocity , float age , float maxAge , Rgba8 startColor , Rgba8 endColor = CLEAR );
 
 	Particle3D ( AABB2 cosmeticBounds , Vec3 position , float scale ,
-	             Vec3 velocity , float age , float maxAge , Rgba8 color );
+	             Vec3 velocity , float age , float maxAge , Rgba8 startColor , Rgba8 endColor = CLEAR );
 
 	Particle3D ( AABB2 cosmeticBounds , Vec2 minUVs , Vec2 maxUVs , Vec3 position , float scale ,
-	             Vec3 velocity , float age , float maxAge , Rgba8 color );
+	             Vec3 velocity , float age , float maxAge , Rgba8 startColor , Rgba8 endColor = CLEAR );
 
 	Particle3D ( AABB2 cosmeticBounds , Vec2 minUVs , Vec2 maxUVs , Vec3 position , Vec3 velocity ,
- 	             float age , float maxAge , Rgba8 color );
+ 	             float age , float maxAge , Rgba8 startColor , Rgba8 endColor = CLEAR );
+	
 	~Particle3D();
 	
 	void Update( float deltaSeconds );
@@ -35,12 +36,13 @@ public:
 public:
 	Vec3		m_position;
 	float		m_scale;
-	Vec3		m_target;
-	Mat44		m_model;
+// 	Vec3		m_target;
+// 	Mat44		m_model;
 	Vec3		m_velocity;
 	float		m_age;
 	float		m_maxAge;
-	Rgba8		m_color;
+	Rgba8		m_startColor;
+	Rgba8		m_endColor			= CLEAR;
  	AABB2		m_cosmeticBounds;
  	Vec2		m_minsUVs			= Vec2::ZERO;
  	Vec2		m_maxsUVs			= Vec2::ONE;

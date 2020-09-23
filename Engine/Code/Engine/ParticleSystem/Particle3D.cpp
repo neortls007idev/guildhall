@@ -9,25 +9,27 @@ extern RenderContext* g_theRenderer;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Particle3D::Particle3D( Vec3 position , Vec3 velocity , float age , float maxAge , Rgba8 color ) :
+Particle3D::Particle3D( Vec3 position , Vec3 velocity , float age , float maxAge , Rgba8 color , Rgba8 endColor /*= CLEAR*/ ) :
 																							m_position( position ) ,
 																							m_velocity( velocity ) ,
 																							m_age( age ) ,
 																							m_maxAge( maxAge ) ,
-																							m_color( color )
+																							m_startColor( color ) ,
+																							m_endColor( endColor )
 {
 	m_scale = 1.f;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Particle3D::Particle3D( AABB2 cosmeticBounds , Vec3 position , Vec3 velocity , float age , float maxAge , Rgba8 color ) :
+Particle3D::Particle3D( AABB2 cosmeticBounds , Vec3 position , Vec3 velocity , float age , float maxAge , Rgba8 startColor , Rgba8 endColor /*= CLEAR*/ ) :
 																							m_position( position ) ,
 																							m_velocity( velocity ) ,
 																							m_age( age ) ,
 																							m_maxAge( maxAge ) ,
 																							m_cosmeticBounds( cosmeticBounds ) , 
-																							m_color( color )
+																							m_startColor( startColor ) ,
+																							m_endColor( endColor )
 {
 	//m_cosmeticBounds.Translate( m_position );
 	m_scale = 1.f;
@@ -36,7 +38,7 @@ Particle3D::Particle3D( AABB2 cosmeticBounds , Vec3 position , Vec3 velocity , f
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Particle3D::Particle3D ( AABB2 cosmeticBounds , Vec2 minUVs , Vec2 maxUVs , Vec3 position ,
-						 Vec3 velocity , float age , float maxAge , Rgba8 color ) :
+						 Vec3 velocity , float age , float maxAge , Rgba8 startColor , Rgba8 endColor /*= CLEAR*/ ) :
 																							m_cosmeticBounds( cosmeticBounds ) ,
 																							m_minsUVs( minUVs ),
 																							m_maxsUVs( maxUVs ),
@@ -44,7 +46,8 @@ Particle3D::Particle3D ( AABB2 cosmeticBounds , Vec2 minUVs , Vec2 maxUVs , Vec3
 																							m_velocity( velocity ) ,
 																							m_age( age ) ,
 																							m_maxAge( maxAge ) ,
-																							m_color( color )
+																							m_startColor( startColor ) ,
+																							m_endColor( endColor )
 {
 	//m_cosmeticBounds.Translate( m_position );
 }
@@ -52,7 +55,7 @@ Particle3D::Particle3D ( AABB2 cosmeticBounds , Vec2 minUVs , Vec2 maxUVs , Vec3
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Particle3D::Particle3D ( AABB2 cosmeticBounds , Vec2 minUVs , Vec2 maxUVs , Vec3 position , float scale ,
-						 Vec3 velocity , float age , float maxAge , Rgba8 color ) :
+						 Vec3 velocity , float age , float maxAge , Rgba8 startColor , Rgba8 endColor /*= CLEAR*/ ) :
 																							m_cosmeticBounds( cosmeticBounds ) ,
 																							m_minsUVs( minUVs ) ,
 																							m_maxsUVs( maxUVs ) ,
@@ -60,7 +63,8 @@ Particle3D::Particle3D ( AABB2 cosmeticBounds , Vec2 minUVs , Vec2 maxUVs , Vec3
 																							m_velocity( velocity ) ,
 																							m_age( age ) ,
 																							m_maxAge( maxAge ) ,
-																							m_color( color )
+																							m_startColor( startColor ) ,
+																							m_endColor( endColor )
 {
 	m_scale = scale;
 }
@@ -68,13 +72,14 @@ Particle3D::Particle3D ( AABB2 cosmeticBounds , Vec2 minUVs , Vec2 maxUVs , Vec3
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Particle3D::Particle3D ( AABB2 cosmeticBounds , Vec3 position , float scale , Vec3 velocity ,
-						 float age , float maxAge , Rgba8 color ) :
+						 float age , float maxAge , Rgba8 startColor , Rgba8 endColor /*= CLEAR*/ ) :
 																							m_cosmeticBounds( cosmeticBounds ) ,
 																							m_position( position ) ,
 																							m_velocity( velocity ) ,
 																							m_age( age ) ,
 																							m_maxAge( maxAge ) ,
-																							m_color( color )
+																							m_startColor( startColor ) ,
+																							m_endColor( endColor )
 
 {
 	m_scale = scale;
@@ -91,17 +96,11 @@ Particle3D::~Particle3D()
 
 void Particle3D::Update( float deltaSeconds )
 {
-//	if( m_isBillboarded )
-//	{
-//		Mat44 lookAt = LookAtMatrix( m_position , m_target );
-//		m_model.SetBasisVectors4D( -lookAt.GetIBasis4D() , lookAt.GetJBasis4D() , lookAt.GetKBasis4D() , lookAt.GetTranslation4D() );
-//	}
-	
 	if ( m_age < m_maxAge )
 	{
 		m_age += deltaSeconds;
 		Move( deltaSeconds );
-		m_color.LerpColorOverTime( m_color , CLEAR , m_maxAge , m_age );
+		m_startColor.LerpColorOverTime( m_startColor , m_endColor , m_maxAge , m_age );
 	}
 }
 

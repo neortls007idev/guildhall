@@ -27,10 +27,10 @@ public:
 	                    Vec3 targetPos , Shader* shader = nullptr , eBlendMode blendMode = ADDITIVE , eCullMode cullMode = CULL_BACK );
 	~ParticleEmitter3D();
 
-	void SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position , Vec3 target , Vec3 velocity , float age , float maxAge , Rgba8 color );
-	void SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position , Vec3 target , Vec3 velocity , float age , float maxAge , Rgba8 color , IntVec2 spriteCoords );
+	void SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position , Vec3 target , Vec3 velocity , float age , float maxAge , Rgba8 startColor , Rgba8 endColor = CLEAR );
+	void SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position , Vec3 target , Vec3 velocity , float age , float maxAge , Rgba8 startColor , Rgba8 endColor , IntVec2 spriteCoords );
 	void SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position , Vec3 target , float scale  , Vec3 velocity ,
-	                        float age , float maxAge , Rgba8 color , IntVec2 spriteCoords );
+	                        float age , float maxAge , Rgba8 startColor , Rgba8 endColor , IntVec2 spriteCoords );
 
 	void EmplaceBackNewParticle( Particle3D* temp );
 
@@ -38,28 +38,32 @@ public:
 
 
 	void SpawnNewRandomParticleFromSpriteSheet ( AABB2 cosmeticBounds , Vec3 position , Vec3 target , float scale ,
-												 Vec3 velocity , float age , float maxAge , Rgba8 color );
+												 Vec3 velocity , float age , float maxAge , Rgba8 startColor , Rgba8 endColor = CLEAR );
 	
 	void Update( float deltaSeconds );
 	void UpdateParticlesBillboaring();
 	void Render();
 	void Destroy();
 	void UpdateTargetPos( Vec3 newTargetPos );
+	void Move( float deltaSeconds );
+	void UpdatePosition( Vec3 newPos );
+	void UpdateVelocity( Vec3 newVelocity );
 	
 public:
-	Texture*						m_texture				= nullptr;
-	SpriteSheet*					m_spriteSheet			= nullptr;
-	Shader*							m_shader				= nullptr;
-	RenderContext*					m_renderContext			= nullptr;
-	eBlendMode						m_blendMode				= ADDITIVE;
-	eCullMode						m_cullMode				= CULL_BACK;
+	Texture*						m_texture					= nullptr;
+	SpriteSheet*					m_spriteSheet				= nullptr;
+	Shader*							m_shader					= nullptr;
+	RenderContext*					m_renderContext				= nullptr;
+	eBlendMode						m_blendMode					= ADDITIVE;
+	eCullMode						m_cullMode					= CULL_BACK;
 	
-	Vec3							m_targetPos				= Vec3::ZERO;
+	Vec3							m_targetPos					= Vec3::ZERO;
 		
-	//Vec3							m_position;
-	//Vec3							m_velocity;
-	bool							m_areParticlesBillboarded = true;
-	size_t							m_lastSpawnPointPos = 0;
+	Vec3							m_position					= Vec3::ZERO;
+	Vec3							m_velocity					= Vec3::ZERO;
+	bool							m_areParticlesBillboarded	= true;
+	size_t							m_lastSpawnPointPos			= 0;
+	uint							m_numAliveParticles			= 0;
 	std::vector<Particle3D*>		m_particles;
 	std::vector<Vertex_PCU>			m_particleVerts;
 };
