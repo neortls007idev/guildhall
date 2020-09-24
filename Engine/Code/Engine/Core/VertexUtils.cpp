@@ -159,7 +159,7 @@ void Transform3DAndAppendVertsForAABB2 ( std::vector< Vertex_PCU >& vertexArray 
 		//boxVerts->m_position += position;
 		boxVerts[ index ].m_position = transform.TransformPosition3D( boxVerts[ index ].m_position );
 		boxVerts[ index ].m_position += position;
-		vertexArray.push_back( boxVerts[ index ] );
+		vertexArray.emplace_back( boxVerts[ index ] );
 	}
 }
 

@@ -20,7 +20,7 @@ ParticleEmitter3D::ParticleEmitter3D( RenderContext* renderContext , Texture* te
 																														m_cullMode( cullMode )
 {
 	m_spriteSheet = nullptr;
-	m_particles.resize( intialArraySize );
+	m_particles.reserve( intialArraySize );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ ParticleEmitter3D::ParticleEmitter3D ( RenderContext* renderContext , SpriteShee
 {
 	m_texture = const_cast< Texture* >( &spriteSheet->GetTexture() );
 	//m_texture = const_cast< Texture* >( &( spriteSheet->GetTexture() ) );
-	m_particles.resize( intialArraySize );
+	m_particles.reserve( intialArraySize );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

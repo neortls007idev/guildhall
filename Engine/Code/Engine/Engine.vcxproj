@@ -829,6 +829,7 @@
     <ClCompile Include="Primitives\Plane.cpp" />
     <ClCompile Include="Primitives\Plane2D.cpp" />
     <ClCompile Include="Primitives\Polygon2D.cpp" />
+    <ClCompile Include="Profilling\D3D11PerformanceMarker.cpp" />
     <ClCompile Include="Renderer\D3D11Common.cpp" />
     <ClCompile Include="Renderer\D3D11Utils.cpp" />
     <ClCompile Include="Renderer\DrawableObjects.cpp" />
@@ -1168,6 +1169,7 @@
     <ClInclude Include="Primitives\Plane.hpp" />
     <ClInclude Include="Primitives\Plane2D.hpp" />
     <ClInclude Include="Primitives\Polygon2D.hpp" />
+    <ClInclude Include="Profilling\D3D11PerformanceMarker.hpp" />
     <ClInclude Include="Renderer\BitmapFont.hpp" />
     <ClInclude Include="Renderer\Camera.hpp" />
     <ClInclude Include="Renderer\D3D11Common.hpp" />

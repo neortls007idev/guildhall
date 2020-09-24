@@ -122,6 +122,9 @@
     <Filter Include="ThirdParty\ImGUI\FileDialogBox">
       <UniqueIdentifier>{c7094d33-6ba5-4104-83fe-ce613f3331fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Profilling">
+      <UniqueIdentifier>{7e1f1a60-8513-4e24-b63a-66769efc4676}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Rgba8.cpp">
@@ -489,6 +492,9 @@
     </ClCompile>
     <ClCompile Include="Networking\TCPData.cpp">
       <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Profilling\D3D11PerformanceMarker.cpp">
+      <Filter>Profilling</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -923,6 +929,9 @@
     </ClInclude>
     <ClInclude Include="Networking\TCPData.hpp">
       <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Profilling\D3D11PerformanceMarker.hpp">
+      <Filter>Profilling</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

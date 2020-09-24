@@ -44,27 +44,24 @@
 #include "Engine/Renderer/Material.hpp"
 #include "Engine/Renderer/Sampler.hpp"
 #include "Engine/Primitives/GPUMesh.hpp"
+#include "Engine/Profilling/D3D11PerformanceMarker.hpp"
 
 #pragma comment( lib, "d3d11.lib" )         // needed a01
 #pragma comment( lib, "dxgi.lib" )          // needed a01
 #pragma comment( lib, "d3dcompiler.lib" )   // needed when we get to shaders
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+		BitmapFont*				g_bitmapFont = nullptr;
+extern	char const*				g_errorShaderCode;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 //				PROFILING D3D POINTER FOR THE SPECIFIC CONFIGURATIONS
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-
-#if defined ( _DEBUG_PROFILE ) || defined ( _FASTBREAK_PROFILE ) || defined ( _RELEASE_PROFILE )
-	#include <cguid.h>
-	#include <atlbase.h>
-	#include <d3d11_1.h>
-	CComPtr<ID3DUserDefinedAnnotation> pPerfMarker;
-#endif
+extern	D3D11PerformanceMarker* g_D3D11PerfMarker;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-
-		BitmapFont*			g_bitmapFont = nullptr;
-extern	char const*			g_errorShaderCode;
 
 STATIC	fogDataT			RenderContext::m_fog;
 
@@ -174,6 +171,9 @@ RenderContext::~RenderContext()
 	DX_SAFE_RELEASE( m_context );
 	DX_SAFE_RELEASE( m_device );
 
+	delete g_D3D11PerfMarker;
+	g_D3D11PerfMarker = nullptr;
+	
 	ReportLiveObjects();    // do our leak reporting just before shutdown to give us a better detailed list;
 	DestroyDebugModule();
 
@@ -242,16 +242,10 @@ void RenderContext::Startup( Window* window )
 	GUARANTEE_OR_DIE( SUCCEEDED( result ) , "FAILED TO CREATE RESOURCES" );
 	m_swapChain = new SwapChain( this , swapchain );
 
-	std::string debugName = "RenderContext Resource";
-
-#if defined ( _DEBUG_PROFILE ) || defined ( _FASTBREAK_PROFILE ) || defined ( _RELEASE_PROFILE )
-	HRESULT hr = m_context->QueryInterface( __uuidof( pPerfMarker ) , reinterpret_cast< void** >( &pPerfMarker ) );
-	if( FAILED( hr ) )
-	{
-		__debugbreak();
-	}
-#endif	
-	
+	//std::string debugName = "RenderContext Resource";
+	g_D3D11PerfMarker = new D3D11PerformanceMarker( this );
+//#if defined ( _DEBUG_PROFILE ) || defined ( _FASTBREAK_PROFILE ) || defined ( _RELEASE_PROFILE )
+//#endif
 	/*Shader::s_errorShader->CreateFromString( this , g_errorShaderCode );*/
 
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/default.hlsl" );
@@ -477,7 +471,7 @@ Texture* RenderContext::CreateUAVTarget( IntVec2 texelSize , std::string debugUA
 
 	TextureView* uavTarget = temp->GetOrCreateUnorderedAccessView();
 	//SetDebugName( uavTarget->m_uav , &debugUAVTargetName );
-
+	UNUSED( uavTarget );
 	return temp;	
 }
 

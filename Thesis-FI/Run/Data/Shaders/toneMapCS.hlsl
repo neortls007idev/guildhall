@@ -43,16 +43,6 @@ RWTexture2D<float4> gOutput : register( u1 );
 [numthreads( 32 , 32 , 1 )]
 void ComputeFunction( uint3 DTid : SV_DispatchThreadID )
 {
-    /*
-
-    float4  imageColor  = gInput.Load( DTid );
-    float4  finalColor  = mul( toneMapMatrix , imageColor );
-			finalColor  = ToneMap( imageColor );
-	
-    float4  imageFactor = float4( imageColor.xyz * ( 1 - finalColor.a ) , ( 1 - finalColor.a ) );
-			finalColor  = float4( finalColor.xyz * finalColor.a , finalColor.a ) + imageFactor;
-	*/
-
     float4 imageColor = gInput[ DTid.xy ];
     float4 finalColor = mul( toneMapMatrix , imageColor );
     finalColor = ToneMap( imageColor );
@@ -60,7 +50,8 @@ void ComputeFunction( uint3 DTid : SV_DispatchThreadID )
     float4 imageFactor = float4( imageColor.xyz * ( 1 - finalColor.a ) , ( 1 - finalColor.a ) );
     finalColor = float4( finalColor.xyz * finalColor.a , finalColor.a ) + imageFactor;
 
-	gOutput[ DTid.xy ] = finalColor;
+    gOutput[ DTid.xy ] = finalColor;
+    //float4( 1.f , 1.f , 1.f , 1.f );
 
 }
 

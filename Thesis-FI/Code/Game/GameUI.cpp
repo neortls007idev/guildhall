@@ -344,6 +344,7 @@ void Game::ProfilingSettingsGUI()
 	if( ImGui::CollapsingHeader( "Profiling Debugging" ) )
 	{
 		ImGui::Checkbox( "Camera View Frustum Culling" , &m_debugSwitchs[ GAME_CAMERA_VIEW_FRUSTUM_CULLING ] );
+		ImGui::Checkbox( "Debug Draw Bounding Spheres" , &m_debugSwitchs[ VIEW_FRUSTUM_DEBUG_DRAW ] );
 		//Vec3 cameraPos = m_gameCamera.GetCameraTransform().GetPostion();
 		//float cameraPitch = m_gameCamera.GetCameraTransform().Get;
 		//ImGui::InputFloat3( "Light World Position" , ( float* ) &m_gameCamera. );
@@ -428,7 +429,7 @@ void Game::ParticleEmitterSettingsGUI()
 				if( ImGui::TreeNode( "Movement" ) )
 				{
 					ImGui::InputFloat3( "Emitter Center Position" , ( float* ) &m_starEmitters[ index ].m_center );
-					ImGui::SliderFloat( "Movement Radius" , &m_starEmitters[ index ].m_movementRadius , 0.f , 30.f );
+					ImGui::SliderFloat( "Movement Multiplier" , &m_starEmitters[ index ].m_movementRadius , -30.f , 30.f );
 					ImGui::TreePop();
 					ImGui::Separator();
 				}

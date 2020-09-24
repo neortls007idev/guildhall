@@ -20,6 +20,7 @@
 #include "ThirdParty/ImGUI/ImGuiFileDialog.h"
 #include "Engine/ParticleSystem/ParticleEmitter3D.hpp"
 #include "Engine/ParticleSystem/ParticleSystem3D.hpp"
+#include "Engine/Profilling/D3D11PerformanceMarker.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -31,13 +32,11 @@ extern ParticleSystem3D*	g_theParticleSystem3D;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//				PROFILING D3D POINTER FOR THE SPECIFIC CONFIGURATIONS
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
-#if defined ( _DEBUG_PROFILE ) || defined( _FASTBREAK_PROFILE ) || defined ( _RELEASE_PROFILE )
-	#include <cguid.h>
-	#include <atlbase.h>
-	#include <d3d11_1.h>
-	extern CComPtr<ID3DUserDefinedAnnotation> pPerfMarker;
-#endif
+extern	D3D11PerformanceMarker* g_D3D11PerfMarker;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -144,21 +143,18 @@ void Game::Update( float deltaSeconds )
 		m_currentlyDrawingMeshes = m_totalDrawableMeshes;
 	}
 	
-	if ( m_isMouseUnlocked )
-	{
-		g_theInput->PopCursorSettings();
-	}
-	else
-	{
-		g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_UNLOCKED , false ) );
-	}
 	for( size_t instanceIndex = 0 ; instanceIndex < m_ModelInstances[ SPACESHIP ].size(); instanceIndex++ )
 	{
 		if( nullptr == m_ModelInstances[ SPACESHIP ][ instanceIndex ] )
 		{
 			continue;
 		}
-		//DebugAddWorldWireSphere( m_ModelInstances[ SPACESHIP ][ instanceIndex ]->m_position , m_gameModels[ SPACESHIP ]->m_boundingSphereRadius , GREEN , deltaSeconds );
+
+		if ( m_debugSwitchs[ VIEW_FRUSTUM_DEBUG_DRAW ] )
+		{
+			DebugAddWorldWireSphere( m_ModelInstances[ SPACESHIP ][ instanceIndex ]->m_position ,
+			                         m_gameModels[ SPACESHIP ]->m_boundingSphereRadius , GREEN , deltaSeconds );
+		}
 	}
 	
 	m_frameRate = 1.f / deltaSeconds;
@@ -182,9 +178,18 @@ void Game::UpdateAllStarEmitters( float deltaSeconds )
 		m_starEmitters[ index ].m_emitter->UpdateTargetPos( m_gameCamera.GetPosition() );
 		g_theParticleSystem3D->Update( deltaSeconds );
 
-		Vec3 emitterPos = m_starEmitters[ index ].m_center + Vec3::MakeFromSpericalCoordinates(
-		45.f * ( float ) GetCurrentTimeSeconds() , 30.f * SinDegrees( ( float ) GetCurrentTimeSeconds() ) , m_starEmitters[ index ].m_movementRadius );
+		int direction = 1;
+		Vec3 emitterPos;
+		
+		if ( index == 0 )
+		{
+			direction = -1;
+		}
+		
+		emitterPos = m_starEmitters[ index ].m_center + Vec3::MakeFromSpericalCoordinates(
+			direction * 45.f * ( float ) GetCurrentTimeSeconds() , /*30.f * SinDegrees*/( ( float ) GetCurrentTimeSeconds() ) , m_starEmitters[ index ].m_movementRadius );
 
+		
 		m_starEmitters[ index ].m_emitter->UpdatePosition( emitterPos );
 		
 		for( uint particleSpawned = 0 ; particleSpawned < m_starEmitters[index].m_numParticlesToSpawnPerFrame ; particleSpawned++ )
@@ -292,10 +297,9 @@ void Game::Render() const
 	//const wchar_t* profillingEventName = L"RenderStart";
 	//ID3DUserDefinedAnnotation::BeginEvent( profillingEventName );
 
-#if defined ( _DEBUG_PROFILE ) || defined ( _FASTBREAK_PROFILE ) || defined ( _RELEASE_PROFILE )
-	pPerfMarker->BeginEvent( L"RenderStart" );
-#endif
+g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 	
+	g_D3D11PerfMarker->BeginPerformanceMarker( L"Initializing State" );
 	g_theRenderer->BeginCamera( m_gameCamera );
 	m_gameCamera.CreateMatchingDepthStencilTarget(); 
 	g_theRenderer->BindDepthStencil( m_gameCamera.GetDepthStencilTarget() );
@@ -323,6 +327,9 @@ void Game::Render() const
 	g_theRenderer->EnableFog( m_fogData );
 
 	BindShaderSpecificMaterialData();
+	g_D3D11PerfMarker->EndPerformanceMarker();
+	
+	g_D3D11PerfMarker->BeginPerformanceMarker( L"Test Meshes" );
 
  	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
  	g_theRenderer->DrawMesh( m_meshSphere );
@@ -335,10 +342,19 @@ void Game::Render() const
 	g_theRenderer->SetModelMatrix( m_cubeMeshTransform.GetAsMatrix() );
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
+	g_D3D11PerfMarker->EndPerformanceMarker();
+
+	g_D3D11PerfMarker->BeginPerformanceMarker( L"Render all OBJ Models" );
 	RenderAllInstancesOfType( SPACESHIP );
 	RenderAllInstancesOfType( LUMINARIS_SHIP );
+	g_D3D11PerfMarker->EndPerformanceMarker();
 	
-	if ( m_isFresnelShaderActive )													{	RenderFresnelShader2ndPass();	}
+	if ( m_isFresnelShaderActive )
+	{
+		g_D3D11PerfMarker->BeginPerformanceMarker( L"Fresnel Shader Pass" );
+		RenderFresnelShader2ndPass();
+		g_D3D11PerfMarker->EndPerformanceMarker();
+	}
 		
 	
 	g_theRenderer->SetRasterState( FILL_SOLID );
@@ -349,6 +365,7 @@ void Game::Render() const
  	g_theRenderer->BindMaterial( nullptr );
 
 
+	g_D3D11PerfMarker->BeginPerformanceMarker( L"Skybox" );
 	g_theRenderer->BindShader( m_cubeMapTest );
 	g_theRenderer->BindCubeMapTexture( m_cubeMapex );
 	g_theRenderer->SetCullMode( CULL_NONE );
@@ -361,45 +378,46 @@ void Game::Render() const
 
 	g_theRenderer->BindCubeMapTexture( nullptr );
 	g_theRenderer->BindShader( nullptr );
+	g_D3D11PerfMarker->EndPerformanceMarker();
 	
 	g_theRenderer->BindTexture( nullptr );
+
+	g_D3D11PerfMarker->BeginPerformanceMarker( L"Particle System 3D" );
 	g_theParticleSystem3D->Render();
+	g_D3D11PerfMarker->EndPerformanceMarker();
 
 	
 	g_theRenderer->SetDepthTest( COMPARE_ALWAYS , true );
 	g_theRenderer->SetCullMode( CULL_NONE );
 	g_theRenderer->DisableLight( 0 );
 
-	if( m_isToneMapShaderActive )
-	{
-#if defined ( _DEBUG_PROFILE ) || defined ( _FASTBREAK_PROFILE ) || defined ( _RELEASE_PROFILE )
-		pPerfMarker->BeginEvent( L"TONE MAP CS" );
-#endif
-		Texture* toneMapTarget = g_theRenderer->GetOrCreatematchingUAVTarget( colorTarget , "ToneMapCSTarget" );
-		Texture* currentView = g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
-		g_theRenderer->CopyTexture( currentView , backBuffer );
-		//g_theRenderer->StartEffect( toneMapTarget , currentView , m_toneMapShader );
-		g_theRenderer->BindShader( m_toneMapShader );
-		g_theRenderer->BindMaterialData( ( void* ) &m_toneMapTransform , sizeof( m_toneMapTransform ) );
-		g_theRenderer->BindTexture( currentView , 0 , 0 , SHADER_STAGE_COMPUTE );
-		g_theRenderer->BindUAVTexture( toneMapTarget , 1 );
-		//g_theRenderer->EndEffect();
-
-		g_theRenderer->ExecuteComputeShader( m_toneMapShader , 32 , 32 , 1 );
-		g_theRenderer->CopyTexture( colorTarget , toneMapTarget );
-		g_theRenderer->ReleaseRenderTarget( currentView );
-		g_theRenderer->ReleaseUAVTarget( toneMapTarget );
-		g_theRenderer->BindShader( nullptr );
-
-#if defined ( _DEBUG_PROFILE ) || defined ( _FASTBREAK_PROFILE ) || defined ( _RELEASE_PROFILE )
-		pPerfMarker->EndEvent();
-#endif
-	}
-	
+ 	if( m_isToneMapShaderActive )
+ 	{
+ 	g_D3D11PerfMarker->BeginPerformanceMarker( L"Tone Map Post Process via CS" );
+ 
+ 		Texture* toneMapTarget = g_theRenderer->GetOrCreatematchingUAVTarget( colorTarget , "ToneMapCSTarget" );
+ 		Texture* currentView = g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+ 		g_theRenderer->CopyTexture( currentView , colorTarget );
+ 		g_theRenderer->BindShader( m_toneMapShader );
+ 		g_theRenderer->BindMaterialData( ( void* ) &m_toneMapTransform , sizeof( m_toneMapTransform ) );
+ 		g_theRenderer->BindTexture( currentView , 0 , 0 , SHADER_STAGE_COMPUTE );
+ 		g_theRenderer->BindUAVTexture( toneMapTarget , 1 );
+ 
+ 		g_theRenderer->ExecuteComputeShader( m_toneMapShader , 44 , 25 , 1 );
+ 		g_theRenderer->CopyTexture( colorTarget , toneMapTarget );
+ 		g_theRenderer->ReleaseRenderTarget( currentView );
+ 		g_theRenderer->ReleaseUAVTarget( toneMapTarget );
+ 		g_theRenderer->BindShader( nullptr );
+ 
+ 	g_D3D11PerfMarker->EndPerformanceMarker();
+ 	}
+ 	
 	g_theRenderer->EndCamera( m_gameCamera );
 	
 	if ( m_isblurShaderActive )
 	{
+		g_D3D11PerfMarker->BeginPerformanceMarker( L"Blurred Bloom" );
+
 		Shader* blurShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );;
 		Texture* blurredBloom = g_theRenderer->GetOrCreatematchingRenderTarget( bloomTarget , "BlurBloomTarget" );
 		g_theRenderer->StartEffect( blurredBloom , bloomTarget , blurShader );
@@ -415,6 +433,8 @@ void Game::Render() const
 		g_theRenderer->CopyTexture( backBuffer , finalImage );
 		g_theRenderer->ReleaseRenderTarget( blurredBloom );
 		g_theRenderer->ReleaseRenderTarget( finalImage );
+
+		g_D3D11PerfMarker->EndPerformanceMarker();
 	}
 	else
 	{
@@ -433,16 +453,19 @@ void Game::Render() const
 	
 	m_gameCamera.SetColorTarget( backBuffer );
 
-#if defined ( _DEBUG_PROFILE ) || defined ( _FASTBREAK_PROFILE ) || defined ( _RELEASE_PROFILE )
-	pPerfMarker->EndEvent();
-#endif
+	g_D3D11PerfMarker->EndPerformanceMarker();
 	
 	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8 , "LEAKING RENDER TARGETS" );
-	
+	GUARANTEE_OR_DIE( g_theRenderer->GetTotalUAVTargetPoolSize() < 8 , "LEAKING UAV TEX TARGETS" );
+
+	g_D3D11PerfMarker->BeginPerformanceMarker( L"Debug Render" );
 	DebugRenderWorldToCamera( &m_gameCamera );
 	DebugRenderScreenTo( nullptr );
+	g_D3D11PerfMarker->EndPerformanceMarker();
 
+	g_D3D11PerfMarker->BeginPerformanceMarker( L"ImGUI Debug UI" );
 	g_debugUI->Render();
+	g_D3D11PerfMarker->EndPerformanceMarker();
 
 }
 
@@ -527,6 +550,15 @@ void Game::UpdateFromKeyBoard( float deltaSeconds )
 	if( g_theInput->IsKeyHeldDown( KEY_SHIFT ) && g_theInput->WasKeyJustPressed( 'T' ) )
 	{
 		m_isMouseUnlocked = !m_isMouseUnlocked;
+
+		if( m_isMouseUnlocked )
+		{
+			g_theInput->PopCursorSettings();
+		}
+		else
+		{
+			g_theInput->PushCursorSettings( CursorSettings( RELATIVE_MODE , MOUSE_IS_UNLOCKED , false ) );
+		}
 	}
 	
 	if ( g_theDevConsole->IsOpen() || m_isMouseUnlocked )

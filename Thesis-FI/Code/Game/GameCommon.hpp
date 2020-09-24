@@ -99,7 +99,8 @@ enum eGameObjModels
 enum GAME_DEBUG_SWITCHS
 {
 	GAME_CAMERA_VIEW_FRUSTUM_CULLING ,
-
+	VIEW_FRUSTUM_DEBUG_DRAW ,
+	
 	NUM_GAME_DEBUG_SWITCHS
 };
 
@@ -118,15 +119,15 @@ struct GameParticleEmitter
 {
 	ParticleEmitter3D*	m_emitter;
 //	SpriteSheet*		m_spriteSheetInUse;
-	Vec3				m_center						= Vec3::ZERO;
+	Vec3				m_center						= Vec3( 0.f , 0.f , -10.f );
 	float				m_movementRadius				= 5.f;
 	Rgba8				m_particleStartColor;
 	Rgba8				m_particleEndColor;
 	float				m_particleMinLifeTime			= 0.25f;
 	float				m_particleMaxLifeTime			= 2.f;
-	float				m_particleVelocity				= 15.f;
+	float				m_particleVelocity				= 0.f;
 	Vec2				m_particleSize					= Vec2::ONE;
-	uint				m_numParticlesToSpawnPerFrame	= 0;
+	uint				m_numParticlesToSpawnPerFrame	= 1000;
 
 	uint				m_numAliveParticles				= 0;
 };
