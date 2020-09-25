@@ -52,7 +52,8 @@ cbuffer model_constants : register( b2 )                                        
 struct light_t
 {
     float3          worldPosition;
-    float           pad00;                                                                  // this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
+    unsigned int    lightType;                                                              // this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
+ //   unsigned int    pad00;                                                                  // this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
 
     float3          color;
     float           intensity;                                                              // rgb and an intensity

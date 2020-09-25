@@ -228,15 +228,15 @@ void Game::UpdateLightPosition( float deltaSeconds )
 			m_lights.lights[ m_currentLightIndex ].direction = -direction;
 			continue;
 		}
-		if ( POINT_LIGHT == m_lightType[ index ] )
+		if ( POINT_LIGHT == m_lights.lights[ index ].lightType )
 		{
 			DebugAddWorldPoint( m_lights.lights[ index ].worldPosition , 0.125f , lightColor , deltaSeconds * 0.5f , DEBUG_RENDER_USE_DEPTH );
 		}
-		if ( DIRECTIONAL_LIGHT == m_lightType[ index ] )
+		if ( DIRECTIONAL_LIGHT == m_lights.lights[ index ].lightType )
 		{
 			DebugAddWorldArrow( m_lights.lights[ index ].worldPosition , m_lights.lights[ index ].worldPosition + m_lights.lights[ index ].direction , lightColor , deltaSeconds * 0.5f );
 		}
-		if ( SPOT_LIGHT == m_lightType[ index ] )
+		if ( SPOT_LIGHT == m_lights.lights[ index ].lightType )
 		{
 			DebugAddWorldArrow( m_lights.lights[ index ].worldPosition , m_lights.lights[ index ].worldPosition + m_lights.lights[ index ].direction , lightColor , deltaSeconds * 0.5f );
 		}
@@ -383,7 +383,7 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 	g_theRenderer->BindTexture( nullptr );
 
 	g_D3D11PerfMarker->BeginPerformanceMarker( L"Particle System 3D" );
-	g_theParticleSystem3D->Render();
+		g_theParticleSystem3D->Render();
 	g_D3D11PerfMarker->EndPerformanceMarker();
 
 	
@@ -391,19 +391,19 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 	g_theRenderer->SetCullMode( CULL_NONE );
 	g_theRenderer->DisableLight( 0 );
 
- 	if( m_isToneMapShaderActive )
+ 	if( m_isToneMapShaderActive && m_isToneMapComputeShaderActive )
  	{
  	g_D3D11PerfMarker->BeginPerformanceMarker( L"Tone Map Post Process via CS" );
  
  		Texture* toneMapTarget = g_theRenderer->GetOrCreatematchingUAVTarget( colorTarget , "ToneMapCSTarget" );
  		Texture* currentView = g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
  		g_theRenderer->CopyTexture( currentView , colorTarget );
- 		g_theRenderer->BindShader( m_toneMapShader );
+ 		g_theRenderer->BindShader( m_toneMapComputeShader );
  		g_theRenderer->BindMaterialData( ( void* ) &m_toneMapTransform , sizeof( m_toneMapTransform ) );
  		g_theRenderer->BindTexture( currentView , 0 , 0 , SHADER_STAGE_COMPUTE );
  		g_theRenderer->BindUAVTexture( toneMapTarget , 1 );
  
- 		g_theRenderer->ExecuteComputeShader( m_toneMapShader , 44 , 25 , 1 );
+ 		g_theRenderer->ExecuteComputeShader( m_toneMapComputeShader , 352 , 180 , 1 );
  		g_theRenderer->CopyTexture( colorTarget , toneMapTarget );
  		g_theRenderer->ReleaseRenderTarget( currentView );
  		g_theRenderer->ReleaseUAVTarget( toneMapTarget );
@@ -447,9 +447,21 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 		g_theRenderer->CopyTexture( backBuffer , finalImage );
 		g_theRenderer->ReleaseRenderTarget( finalImage );
 	}
-	
 	g_theRenderer->ReleaseRenderTarget( bloomTarget );
 	g_theRenderer->ReleaseRenderTarget( colorTarget );
+
+	if( m_isToneMapShaderActive && !m_isToneMapComputeShaderActive )
+	{
+		Texture* toneMapTarget = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
+		Texture* currentView = g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
+		g_theRenderer->CopyTexture( currentView , backBuffer );
+		g_theRenderer->StartEffect( toneMapTarget , currentView , m_toneMapShader );
+		g_theRenderer->BindMaterialData( ( void* ) &m_toneMapTransform , sizeof( m_toneMapTransform ) );
+		g_theRenderer->EndEffect();
+		g_theRenderer->CopyTexture( backBuffer , toneMapTarget );
+		g_theRenderer->ReleaseRenderTarget( currentView );
+		g_theRenderer->ReleaseRenderTarget( toneMapTarget );
+	}
 	
 	m_gameCamera.SetColorTarget( backBuffer );
 
@@ -582,7 +594,7 @@ void Game::UpdateLightsFromKeyBoard( float deltaSeconds )
 
 void Game::UpdateLightData( int lightIndex )
 {
-	switch( m_lightType[ lightIndex ] )
+	switch( m_lights.lights[ lightIndex ].lightType )
 	{
 		case POINT_LIGHT:
 			{
@@ -634,7 +646,7 @@ void Game::UpdateLightPositionOnUserInput()
 		m_isLightAnimated = false;
 		m_lights.lights[ m_currentLightIndex ].worldPosition = m_gameCamera.GetPosition();
 
-		if ( m_lightType[ m_currentLightIndex ] != POINT_LIGHT )
+		if ( m_lights.lights[ m_currentLightIndex ].lightType != POINT_LIGHT )
 		{
 			Vec3 direction = m_gameCamera.GetCameraTransform().GetAsMatrix().GetKBasis3D();
 			m_lights.lights[ m_currentLightIndex ].direction = -direction;

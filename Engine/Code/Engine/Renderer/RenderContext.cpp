@@ -193,7 +193,7 @@ void RenderContext::Startup( Window* window )
 	IDXGISwapChain* swapchain = nullptr;  // Create Swap Chain
 
 	UINT flags = 0; /*D3D11_CREATE_DEVICE_SINGLETHREADED;*/
-#if defined(RENDER_DEBUG)
+#if defined(RENDER_DEBUG) && defined ( _DEBUG ) || defined ( _FASTBREAK ) || defined ( _DEBUG_PROFILE ) || defined ( _FASTBREAK_PROFILE ) || defined ( _RELEASE_PROFILE )
 	flags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
@@ -251,11 +251,11 @@ void RenderContext::Startup( Window* window )
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/default.hlsl" );
 
 	m_immediateVBO		= new VertexBuffer( this , MEMORY_HINT_DYNAMIC );
-	m_frameUBO			= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
-	m_modelMatrixUBO	= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
-	m_lightDataUBO		= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
-	m_fogDataUBO		= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
-	m_materialDataUBO	= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	m_frameUBO			= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC , std::string( "Frame Data Buffer" ) );
+	m_modelMatrixUBO	= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC , std::string( "Render Context Model Matrix Buffer" ) );
+	m_lightDataUBO		= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC , std::string( "Lights Data Buffer" ) );
+	m_fogDataUBO		= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC , std::string( "Fog Data Buffer" ) );
+	m_materialDataUBO	= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC , std::string( "Renderer Material Data Buffer" ) );
 
 	m_defaultSampler = GetOrCreateSampler( SAMPLER_BILINEAR );
 	m_textureDefault = CreateTextureFromColor( WHITE );

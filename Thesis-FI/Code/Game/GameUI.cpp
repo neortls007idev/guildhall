@@ -140,9 +140,9 @@ void Game::LightSettingsGUI()
 
 				if( ImGui::TreeNode( "Light Type" ) )
 				{
-					ImGui::RadioButton( "Point Light"		 , &m_lightType[ lightIndex ] , POINT_LIGHT );
-					ImGui::RadioButton( "Spot Light"		 , &m_lightType[ lightIndex ] , SPOT_LIGHT );
-					ImGui::RadioButton( "Directional Light" , &m_lightType[ lightIndex ] , DIRECTIONAL_LIGHT );
+					ImGui::RadioButton( "Point Light"		 , ( int* ) &m_lights.lights[ lightIndex ].lightType , POINT_LIGHT );
+					ImGui::RadioButton( "Spot Light"		 , ( int* ) &m_lights.lights[ lightIndex ].lightType , SPOT_LIGHT );
+					ImGui::RadioButton( "Directional Light" , ( int* ) &m_lights.lights[ lightIndex ].lightType , DIRECTIONAL_LIGHT );
 					
 					ImGui::Text( "Direction Factor = %.3f"	 , m_lights.lights[ lightIndex ].directionFactor );
 					ImGui::InputFloat3( "Light Direction"	 , ( float* ) &m_lights.lights[ lightIndex ].direction );
@@ -184,6 +184,7 @@ void Game::EffectsSettingsUI()
 	if( ImGui::CollapsingHeader( "Effects" ) )
 	{
 		ImGui::Checkbox( "Tone Map" , &m_isToneMapShaderActive );
+		ImGui::Checkbox( "Use Compute Shader" , &m_isToneMapComputeShaderActive );
 		ImGui::Text( "Current Tone Map Shader" );
 		ImGui::RadioButton( "No Tone" , &m_currentToneMap , NO_TONE ); ImGui::SameLine();
 		ImGui::RadioButton( "GrayScale" , &m_currentToneMap , GRAYSCALE ); ImGui::SameLine();

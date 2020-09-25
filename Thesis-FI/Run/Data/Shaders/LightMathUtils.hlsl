@@ -16,9 +16,15 @@ float2 ComputeLightFactor( light_t light , float3 worldPosition , float3 worldNo
     // how much do these two coincide (cone lights)
     float       dotAngle                = dot( -directionToLight , light.direction );
     float coneAttenuation               = smoothstep( light.dotOuterAngle , light.dotInnerAngle , dotAngle);
-    
-    float       diffuseAttenuation      = light.intensity / dot( attenuationVector , light.attenuation ) * coneAttenuation;
-    float       specularAttenuation     = light.intensity / dot( attenuationVector , light.specularAttenuation )* coneAttenuation;
+
+	float diffuseAttenuation = light.intensity;
+    float specularAttenuation = light.intensity;
+	
+	if( light.lightType != 1 )
+    {
+		diffuseAttenuation      = light.intensity / dot( attenuationVector , light.attenuation ) * coneAttenuation;
+		specularAttenuation     = light.intensity / dot( attenuationVector , light.specularAttenuation )* coneAttenuation;
+    }
 
    // specularAttenuation = light.intensity;
     

@@ -35,11 +35,12 @@ void Game::InitializeLightData()
 		m_lights.lights[ index ].attenuation			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
 		m_lights.lights[ index ].specularAttenuation	= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
 		m_lights.lights[ index ].worldPosition			= Vec3( index * 1.5f , 0.f , 10.f );
+		m_lights.lights[ index ].lightType				= ( uint ) LightType::POINT_LIGHT;
 	}
 
 	for ( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
 	{
-		m_lightType[ index ] = POINT_LIGHT;
+		//m_lightType[ index ] = POINT_LIGHT;
 	}
 }
 
@@ -82,7 +83,8 @@ void Game::LoadShaders()
 	//m_lightShaders[ LitShaderTypes::FOG ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/fog.hlsl" );
 
 	m_blurShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );
-	m_toneMapShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/toneMapCS.hlsl" );
+	m_toneMapShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/toneMap.hlsl" );
+	m_toneMapComputeShader										= g_theRenderer->GetOrCreateShader( "Data/Shaders/toneMapCS.hlsl" );
 
 	m_currentShader												= m_lightShaders[ LitShaderTypes::LIT ];
 	m_currentShaderIndex										= LitShaderTypes::LIT;

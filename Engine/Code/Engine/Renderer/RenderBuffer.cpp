@@ -41,15 +41,19 @@ D3D11_USAGE ToDXMemoryUsage( eRenderMemoryHint hint )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-RenderBuffer::RenderBuffer( RenderContext* owner , eRenderBufferUsage usage , eRenderMemoryHint memHint )
+RenderBuffer::RenderBuffer ( RenderContext* owner , eRenderBufferUsage usage , eRenderMemoryHint memHint ,
+                             std::string debugName /*= "Render Buffer"*/ )
 {
-	m_owner = owner;
-	m_usage = usage;
-	m_memHint = memHint;
+	m_owner		= owner;
+	m_usage		= usage;
+	m_memHint	= memHint;
 
-	m_handle = nullptr;
-	m_bufferByteSize = 0U;
-	m_elementBysize = 0U;
+	m_handle			= nullptr;
+	m_bufferByteSize	= 0U;
+	m_elementBysize		= 0U;
+
+	m_debugName			= debugName;
+	SetDebugName( ( ID3D11DeviceChild* ) m_handle , &m_debugName );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -179,27 +183,26 @@ bool RenderBuffer::Create( size_t dataByteSize , size_t elementByteSize )
 	 
 	if ( m_handle )
 	{
-		std::string debugName = "Render buffer";
-		
-		if( bufferType == ( int ) VERTEX_BUFFER_BIT )
-		{
-			debugName = " Unreleased Vertex Buffer ";
-		}
-			
-		if ( bufferType == ( int ) INDEX_BUFFER_BIT )
-		{
-			debugName = " Unreleased Index Buffer ";
-		}
-
-		if ( bufferType == ( int ) UNIFORM_BUFFER_BIT )
-		{
-			debugName = " Unreleased Uniform Buffer ";
-		}
+				
+// 		if( bufferType == ( int ) VERTEX_BUFFER_BIT )
+// 		{
+// 			debugName = " Unreleased Vertex Buffer ";
+// 		}
+// 			
+// 		if ( bufferType == ( int ) INDEX_BUFFER_BIT )
+// 		{
+// 			debugName = " Unreleased Index Buffer ";
+// 		}
+// 
+// 		if ( bufferType == ( int ) UNIFORM_BUFFER_BIT )
+// 		{
+// 			debugName = " Unreleased Uniform Buffer ";
+// 		}
 
 		m_elementBysize = elementByteSize;
 		m_bufferByteSize = dataByteSize;
 		
-		SetDebugName( ( ID3D11DeviceChild* ) m_handle , &debugName );
+		//SetDebugName( ( ID3D11DeviceChild* ) m_handle , &m_debugName );
 		return true;
 	}
 	else

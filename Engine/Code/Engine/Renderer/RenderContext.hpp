@@ -4,19 +4,18 @@
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Math/Vec4.hpp"
-#include "Engine/Primitives/AABB2.hpp"
 #include "Engine/Primitives/Disc2D.hpp"
 #include "Engine/Primitives/OBB2.hpp"
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Renderer/D3D11Utils.hpp"
 #include "Engine/Renderer/RendererCommon.hpp"
+#include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/Texture.hpp"
 
 #include <map>
 #include <string>
 #include <vector>
 
-#include "Shader.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				FORWARD DECLARATIONS 
@@ -98,7 +97,8 @@ struct ModelDataT
 struct lightDataT
 {
 	Vec3        worldPosition				= Vec3::ZERO;
-	float       pad00						= -5000.f;                                     // this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
+	uint		lightType					= 0;										   // lightType
+//	uint		pad00						= 9999999;									   // this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
 
 	Vec3        color						= Vec3::ONE;
 	float       intensity					= 1.0f;                                        // rgb and an intensity

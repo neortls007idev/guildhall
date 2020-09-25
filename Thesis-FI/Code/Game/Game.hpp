@@ -109,11 +109,13 @@ public:
 	Shader* 							m_currentShader;
 	Shader* 							m_blurShader;
 	Shader* 							m_toneMapShader;
+	Shader* 							m_toneMapComputeShader;
 
 	int									m_currentShaderIndex;
 	bool								m_isFresnelShaderActive								= false;
 	bool								m_isblurShaderActive								= false;
 	bool								m_isToneMapShaderActive								= false;
+	bool								m_isToneMapComputeShaderActive						= false;
 	//bool								m_isFogShaderActive									= false;
 
 	Texture*							m_dissolveShaderPatternTexture						= nullptr;
@@ -124,7 +126,7 @@ public:
 	
 	shaderLightDataT					m_lights;
 	Rgba8								m_ambientLightColor;
-	int									m_lightType[ TOTAL_LIGHTS ];
+//	int									m_lightType[ TOTAL_LIGHTS ];
 	bool								m_isLightFollowingTheCamera							= false;
 	bool								m_isLightAnimated									= false;
 	int									m_currentLightIndex									= 0;

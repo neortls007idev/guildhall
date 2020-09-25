@@ -38,7 +38,7 @@ enum eRenderMemoryHint : uint
 class RenderBuffer
 {
 public:
-	RenderBuffer( RenderContext* owner , eRenderBufferUsage usage , eRenderMemoryHint memHint );
+	RenderBuffer( RenderContext* owner , eRenderBufferUsage usage , eRenderMemoryHint memHint , std::string debugName = "Render Buffer" );
 	~RenderBuffer();
 
 	bool Update( void const* data , size_t dataByteSize , size_t elementByteSize );
@@ -51,17 +51,18 @@ private:
 	bool Create( size_t dataByteSize , size_t elementByteSize );
 
 public:
-	RenderContext*	m_owner;
-	ID3D11Buffer*	m_handle;
-	//bool			m_isDirty				= true;
+	RenderContext*		m_owner;
+	ID3D11Buffer*		m_handle;
+	//bool				m_isDirty						= true;
+	std::string			m_debugName;
 
 private:
 
-	eRenderBufferUsage m_usage;
-	eRenderMemoryHint m_memHint;
+	eRenderBufferUsage	m_usage;
+	eRenderMemoryHint	m_memHint;
 
-	size_t m_bufferByteSize				= 0;
-	size_t m_elementBysize				= 0;
+	size_t				m_bufferByteSize				= 0;
+	size_t				m_elementBysize					= 0;
 };
 
 
