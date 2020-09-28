@@ -82,6 +82,7 @@ void Game::LoadShaders()
 	m_lightShaders[ LitShaderTypes::TRIPLANAR_LIT ]				= g_theRenderer->GetOrCreateShader( "Data/Shaders/triplanarLit.hlsl" );
 	//m_lightShaders[ LitShaderTypes::FOG ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/fog.hlsl" );
 
+	m_depthShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/depthPass.hlsl" );
 	m_blurShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );
 	m_toneMapShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/toneMap.hlsl" );
 	m_toneMapComputeShader										= g_theRenderer->GetOrCreateShader( "Data/Shaders/toneMapCS.hlsl" );

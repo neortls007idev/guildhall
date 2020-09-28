@@ -38,6 +38,7 @@
 //				D3D11 specific includes and Macros
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+#include "Engine/Math/MatrixUtils.hpp"
 #include "Engine/Renderer/D3D11Common.hpp"
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/ShaderState.hpp"
@@ -83,6 +84,17 @@ RenderContext::~RenderContext()
 		}
 	}
 
+	GUARANTEE_OR_DIE( m_UAVTargetTexPool.size() == m_UAVTargetTexPoolSize , "Someone Did not release a UAV Target " );
+
+	for ( auto& UAVTargetIndex : m_UAVTargetTexPool )
+	{
+		if ( UAVTargetIndex != nullptr )
+		{
+			delete UAVTargetIndex;
+			UAVTargetIndex = nullptr;
+		}
+	}
+	
 	for ( int index = 0; index < eBlendMode::TOTAL_BLEND_MODES; index++ )
 	{
 		DX_SAFE_RELEASE( m_blendStates[ index ] );
@@ -144,6 +156,9 @@ RenderContext::~RenderContext()
 	delete m_lightDataUBO;
 	m_lightDataUBO = nullptr;
 
+	delete m_lightsViewUBO;
+	m_lightsViewUBO = nullptr;
+	
 	delete m_fogDataUBO;
 	m_fogDataUBO = nullptr;
 
@@ -256,6 +271,7 @@ void RenderContext::Startup( Window* window )
 	m_lightDataUBO		= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC , std::string( "Lights Data Buffer" ) );
 	m_fogDataUBO		= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC , std::string( "Fog Data Buffer" ) );
 	m_materialDataUBO	= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC , std::string( "Renderer Material Data Buffer" ) );
+	m_lightsViewUBO		= new RenderBuffer( this , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC , std::string( "Lights View Data Buffer" ) );
 
 	m_defaultSampler = GetOrCreateSampler( SAMPLER_BILINEAR );
 	m_textureDefault = CreateTextureFromColor( WHITE );
@@ -494,7 +510,7 @@ void RenderContext::BeginCamera( const Camera& camera )
 
 	size_t rtvCount = camera.GetColorTargetCount();
 	std::vector<ID3D11RenderTargetView*> rtvs;
-
+	
 	rtvs.resize( rtvCount );
 
 	for ( size_t i = 0; i < rtvCount; i++ )
@@ -591,7 +607,7 @@ void RenderContext::BeginCamera( const Camera& camera )
 		
 	m_context->OMSetRenderTargets( ( UINT ) rtvCount ,          // One rendertarget view
 											rtvs.data() ,		// Render target view, created earlier
-							 nullptr );
+							  nullptr );
 
 // 	DepthStencilTargetView* dsv = new DepthStencilTargetView( this );
 // 	dsv->CreateDepthStencilState();
@@ -1467,6 +1483,37 @@ void RenderContext::SetSpecularPower( float specularPower )
 	m_lights.SPECULAR_POWER = specularPower;
 	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
 	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::SetLightsView( uint lightIndex , Mat44 lightProjection , float pitch , float yaw , float roll )
+{
+	m_lightsView[ lightIndex ].LIGHT_PROJECTION = lightProjection;
+	Transform m_lightTransform;
+	m_lightTransform.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
+	//m_lightTransform.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
+	
+	Mat44 currlightView = m_lightTransform.GetAsMatrix();
+	currlightView.Kx = m_lights.lights[ lightIndex ].direction.x;
+	currlightView.Ky = m_lights.lights[ lightIndex ].direction.y;
+	currlightView.Kz = m_lights.lights[ lightIndex ].direction.z;
+
+	m_lightsView[ lightIndex ].LIGHT_VIEW = MatrixInvertOrthoNormal( currlightView );
+		
+	m_lightsViewUBO->Update( &m_lightsView , sizeof( m_lightsView ) , sizeof( m_lightsView ) );
+	BindUniformBuffer( UBO_LIGHT_VIEW_SLOT , m_lightsViewUBO );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::SetLightsView( uint lightIndex , Mat44 lightProjection , Mat44 lightView )
+{
+	m_lightsView[ lightIndex ].LIGHT_PROJECTION = lightProjection;
+	m_lightsView[ lightIndex ].LIGHT_VIEW = MatrixInvertOrthoNormal( lightView );
+
+	m_lightsViewUBO->Update( &m_lightsView , sizeof( m_lightsView ) , sizeof( m_lightsView ) );
+	BindUniformBuffer( UBO_LIGHT_VIEW_SLOT , m_lightsViewUBO );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

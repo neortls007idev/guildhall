@@ -93,7 +93,7 @@ v2f_t VertexFunction( vs_input_t input )
 // is being drawn to the first bound color target.
 float4 FragmentFunction( v2f_t input ) : SV_Target0
 {
-	// we'll outoupt our UV coordinates as color here
+	// we'll output our UV coordinates as color here
 	// to make sure they're being passed correctly.
 	// Very common rendering debugging method is to
 	// use color to portray information;

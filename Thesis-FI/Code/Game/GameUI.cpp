@@ -379,7 +379,11 @@ void Game::PermanentDebugDataGUI()
 	{
 		ImGui::TextColored( ImVec4( 1.f , 0.f , 0.f , 1.f ) , "Frame Rate = %.3f" , m_frameRate );
 	}
-
+	ImGui::TextColored( ImVec4( 1.f , 0.f , 0.f , 1.f ) , "Worst Frame Time = %.3f" , m_worstFrame );
+	ImGui::TextColored( ImVec4( 0.f , 1.f , 0.f , 1.f ) , "Best Frame Time = %.3f" , m_bestFrame );
+	ImGui::TextColored( ImVec4( 1.f , 1.f , 0.f , 1.f ) , "Average Frame Time = %.3f" , m_rollingAvgFPS );
+	
+	
 	Vec3 cameraPos = m_gameCamera.GetPosition();
 
 	ImGui::TextColored( ImVec4( 1.f , 1.f , 1.f , 1.f ) , "Camera Pos " ); ImGui::SameLine();

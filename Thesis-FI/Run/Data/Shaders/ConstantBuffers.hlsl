@@ -106,13 +106,13 @@ cbuffer fog_constants : register( b4 )                                          
 
 //--------------------------------------------------------------------------------------
 
-cbuffer fog_constants : register( b5 )                                                      // constant buffer slot 6
+cbuffer lightView_constants : register( b5 )                                                // constant buffer slot 6
 {
 	//  light matrices to transform the vertex based on the light's view point
 
-	//lightView_t LIGHT_VIEW[ TOTAL_LIGHTS ];
-    float4x4 LIGHT_PROJECTION[ TOTAL_LIGHTS ];                                              // aka, CameraToClipTransform
-    float4x4 LIGHT_VIEW[ TOTAL_LIGHTS ];                                                    // aka, WorldToCameraTransform
+	lightView_t LIGHT_VIEW[ TOTAL_LIGHTS ];
+    //float4x4 LIGHT_PROJECTION[ TOTAL_LIGHTS ];                                              // aka, CameraToClipTransform
+    //float4x4 LIGHT_VIEW[ TOTAL_LIGHTS ];                                                    // aka, WorldToCameraTransform
 };
 
 //--------------------------------------------------------------------------------------
@@ -126,13 +126,13 @@ Texture2D<float4>   tNormal     : register( t1 );                               
 //--------------------------------------------------------------------------------------
 
 Texture2D<float4> depthMapTexture0 : register( t8 );
-Texture2D<float4> depthMapTexture1 : register( t9 );
-Texture2D<float4> depthMapTexture2 : register( t10 );
-Texture2D<float4> depthMapTexture3 : register( t11 );
-Texture2D<float4> depthMapTexture4 : register( t12 );
-Texture2D<float4> depthMapTexture5 : register( t13 );
-Texture2D<float4> depthMapTexture6 : register( t14 );
-Texture2D<float4> depthMapTexture7 : register( t15 );
+//Texture2D<float4> depthMapTexture1 : register( t9 );
+//Texture2D<float4> depthMapTexture2 : register( t10 );
+//Texture2D<float4> depthMapTexture3 : register( t11 );
+//Texture2D<float4> depthMapTexture4 : register( t12 );
+//Texture2D<float4> depthMapTexture5 : register( t13 );
+//Texture2D<float4> depthMapTexture6 : register( t14 );
+//Texture2D<float4> depthMapTexture7 : register( t15 );
 
 //--------------------------------------------------------------------------------------
 

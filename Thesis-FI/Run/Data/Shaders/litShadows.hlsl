@@ -80,11 +80,11 @@ v2f_t VertexFunction(vs_input_t input)
     float4 world_tangent    = mul( MODEL , local_tangent );                                     
 
 
-    for( int lightIndex = 0 ; lightIndex < TOTAL_LIGHTS ; lightIndex++ )
+    for( uint lightIndex = 0 ; lightIndex < TOTAL_LIGHTS ; lightIndex++ )
     {
         v2f.lightViewPosition[ lightIndex ] = world_pos;
-        v2f.lightViewPosition[ lightIndex ] = mul( v2f.lightViewPosition[ lightIndex ] , LIGHT_VIEW[ lightIndex ] );
-        v2f.lightViewPosition[ lightIndex ] = mul( v2f.lightViewPosition[ lightIndex ] , LIGHT_PROJECTION[ lightIndex ] );
+        v2f.lightViewPosition[ lightIndex ] = mul( v2f.lightViewPosition[ lightIndex ] , LIGHT_VIEW[ lightIndex ].LIGHT_VIEW );
+        v2f.lightViewPosition[ lightIndex ] = mul( v2f.lightViewPosition[ lightIndex ] , LIGHT_VIEW[ lightIndex ].LIGHT_PROJECTION );
 
         v2f.lightPos[ lightIndex ] = normalize( LIGHTS[ lightIndex ].worldPosition.xyz - world_pos.xyz );
     }
@@ -107,8 +107,9 @@ v2f_t VertexFunction(vs_input_t input)
 
 struct fragmentFunctionOutput
 {
-    float4 color    : SV_Target0;
-    float4 bloom    : SV_Target1;
+    float4 color        : SV_Target0;
+    float4 bloom        : SV_Target1;
+    float4 lightView    : SV_Target2;
   //  float4 normal   : SV_Target2;
   //  float4 albedo   : SV_Target3;
   //  float4 tangent  : SV_Target4;
@@ -120,104 +121,131 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
 	// Shadow mapping requires a bias adjustment when comparing the depth of the light
 	// and the depth of the object due to the low floating point precision of the depth map.
 
-	float   bias = 0.001f;
+    float bias = 0.001f;
+  
+    float4 color = AMBIENT;
+    float2 projectTexCoord[TOTAL_LIGHTS];
+    float depthValue;
+    float lightDepthValue;
+    float lightIntensity;
+    float4 textureColor;
+  
+//   // Calculate the projected texture coordinates for sampling the shadow map (depth buffer texture) based on the light's viewing position.
+//   // Calculate the projected texture coordinates.
+//   for (uint index = 0; index < TOTAL_LIGHTS; index++)
+//   {
+//       projectTexCoord[index].x = input.lightViewPosition[index].x / input.lightViewPosition[index].w / 2.0f + 0.5f;
+//       projectTexCoord[index].y = -input.lightViewPosition[index].y / input.lightViewPosition[index].w / 2.0f + 0.5f;
+//  
+//   //	Check if the projected coordinates are in the view of the light, if not then the pixel gets just an ambient value.
+//   // Determine if the projected coordinates are in the 0 to 1 range.  If so then this pixel is in the view of the light.
+//       if ((saturate(projectTexCoord[index].x) == projectTexCoord[index].x) && (saturate(projectTexCoord[index].y) == projectTexCoord[index].y))
+//       {
+//       	[call]
+//           switch (index)
+//           {
+//               case 0:
+//                   depthValue = depthMapTexture0.Sample(sSampler, projectTexCoord[index]).r;
+//               /*case 1:
+//    			depthValue = depthMapTexture1.Sample( sSampler , projectTexCoord[ index ] ).r;
+//               case 2:
+//    			depthValue = depthMapTexture2.Sample( sSampler , projectTexCoord[ index ] ).r;
+//               case 3:
+//    			depthValue = depthMapTexture3.Sample( sSampler , projectTexCoord[ index ] ).r;
+//               case 4:
+//    			depthValue = depthMapTexture4.Sample( sSampler , projectTexCoord[ index ] ).r;
+//               case 5:
+//    			depthValue = depthMapTexture5.Sample( sSampler , projectTexCoord[ index ] ).r;
+//               case 6:
+//    			depthValue = depthMapTexture6.Sample( sSampler , projectTexCoord[ index ] ).r;
+//               case 7:
+//    			depthValue = depthMapTexture7.Sample( sSampler , projectTexCoord[ index ] ).r;
+//       		default:*/
+//                   ;
+//           }
+//       }
+//  
+//       // Calculate the depth of the light.
+//       lightDepthValue = input.lightViewPosition[index].z / input.lightViewPosition[index].w;
+//  
+//       // Subtract the bias from the lightDepthValue.
+//       lightDepthValue = lightDepthValue - bias;
+//  
+//       if (lightDepthValue < depthValue)
+//       {
+//    // Calculate the amount of light on this pixel.
+//           lightIntensity = saturate(dot(input.world_normal, input.lightPos[index]));
+//    
+//           if (lightIntensity > 0.0f)
+//           {
+//           // Determine the final diffuse color based on the diffuse color and the amount of light intensity.
+//               color += (LIGHTS[index].color * lightIntensity);
+//       
+//           // Saturate the final light color.
+//               color = saturate(color);
+//           }
+//       }
+  
 
-	float4  color = AMBIENT;
-    float2  projectTexCoord[ TOTAL_LIGHTS ];
-    float   depthValue;
-    float   lightDepthValue;
-    float   lightIntensity;
-    float4  textureColor;
-
-    // Calculate the projected texture coordinates for sampling the shadow map (depth buffer texture) based on the light's viewing position.
-    // Calculate the projected texture coordinates.
-    for( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
-    {
-        projectTexCoord[ index ].x =  input.lightViewPosition[ index ].x / input.lightViewPosition[ index ].w / 2.0f + 0.5f;
-        projectTexCoord[ index ].y = -input.lightViewPosition[ index ].y / input.lightViewPosition[ index ].w / 2.0f + 0.5f;
-
-    //	Check if the projected coordinates are in the view of the light, if not then the pixel gets just an ambient value.
-    // Determine if the projected coordinates are in the 0 to 1 range.  If so then this pixel is in the view of the light.
-    if( ( saturate( projectTexCoord[ index ].x ) == projectTexCoord[ index ].x ) && ( saturate( projectTexCoord[ index ].y ) == projectTexCoord[ index ].y ) )
-    {
-    	[call] switch( index )
-        {
-            case 0:
-				depthValue = depthMapTexture0.Sample( sSampler , projectTexCoord[ index ] ).r;
-            case 1:
-				depthValue = depthMapTexture1.Sample( sSampler , projectTexCoord[ index ] ).r;
-            case 2:
-				depthValue = depthMapTexture2.Sample( sSampler , projectTexCoord[ index ] ).r;
-            case 3:
-				depthValue = depthMapTexture3.Sample( sSampler , projectTexCoord[ index ] ).r;
-            case 4:
-				depthValue = depthMapTexture4.Sample( sSampler , projectTexCoord[ index ] ).r;
-            case 5:
-				depthValue = depthMapTexture5.Sample( sSampler , projectTexCoord[ index ] ).r;
-            case 6:
-				depthValue = depthMapTexture6.Sample( sSampler , projectTexCoord[ index ] ).r;
-            case 7:
-				depthValue = depthMapTexture7.Sample( sSampler , projectTexCoord[ index ] ).r;
-    		default:
-                ;
-        }
-    }
-
-    // Calculate the depth of the light.
-    lightDepthValue = input.lightViewPosition[ index ].z / input.lightViewPosition[ index ].w;
-
-    // Subtract the bias from the lightDepthValue.
-    lightDepthValue = lightDepthValue - bias;
-
-
-
-
-	
 //--------------------------------------------------------------------------------------
 //              SAMPLE THE TEXTURES
 //--------------------------------------------------------------------------------------    
-    float4 diffuseColor            = tDiffuse.Sample( sSampler , input.uv );
-    float4 normalColor             = tNormal.Sample( sSampler , input.uv );
+        float4 diffuseColor = tDiffuse.Sample(sSampler, input.uv);
+        float4 normalColor = tNormal.Sample(sSampler, input.uv);
 //--------------------------------------------------------------------------------------
 //              COMPUTE SURFACE COLOR
 //--------------------------------------------------------------------------------------
     
-    float3 surfaceColor            = diffuseColor.xyz * input.color.xyz;
-           surfaceColor            = pow( surfaceColor , GAMMA.xxx );
-    float alpha                    = diffuseColor.w * input.color.w;
+        float3 surfaceColor = diffuseColor.xyz * input.color.xyz;
+        surfaceColor = pow(surfaceColor, GAMMA.xxx);
+        float alpha = diffuseColor.w * input.color.w;
       
-    float3 tangent                 = normalize( input.world_tangent.xyz );
-    float3 normal                  = normalize( input.world_normal );
-    float3 bitangent               = normalize( cross( normal , tangent ) ) * input.world_tangent.w;
-    float3x3 TBN                   = float3x3( tangent , bitangent , normal );
-    float3 directionToCamera       = normalize( CAMERA_POSITION - input.world_position ); // As the Camera IS OUR EYE
+        float3 tangent = normalize(input.world_tangent.xyz);
+        float3 normal = normalize(input.world_normal);
+        float3 bitangent = normalize(cross(normal, tangent)) * input.world_tangent.w;
+        float3x3 TBN = float3x3(tangent, bitangent, normal);
+        float3 directionToCamera = normalize(CAMERA_POSITION - input.world_position); // As the Camera IS OUR EYE
     
-    float3 surfaceNormal           = NormalColorToVector3( normalColor.xyz );
-    float3 worldNormal             = mul( surfaceNormal , TBN );
+        float3 surfaceNormal = NormalColorToVector3(normalColor.xyz);
+        float3 worldNormal = mul(surfaceNormal, TBN);
      
 //--------------------------------------------------------------------------------------
 //              COMPUTE LIGHT FACTOR
 //--------------------------------------------------------------------------------------
-    PostLightingData lightResult = ComputeLightingAt( input.world_position , worldNormal , surfaceColor , float3( 0.0f, 0.0f, 0.0f ) , SPECULAR_FACTOR );
-    float3 finalColor              = lightResult.diffuse + lightResult.specularEmmisive;
+        PostLightingData lightResult = ComputeLightingAt(input.world_position, worldNormal, surfaceColor, float3(0.0f, 0.0f, 0.0f), SPECULAR_FACTOR);
+        float3 finalColor = lightResult.diffuse + lightResult.specularEmmisive;
    
-    float3 bloom                    = max( float3( 0.f , 0.f , 0.f ) , finalColor - float3( 1.f , 1.f , 1.f ) );
-           bloom                    = pow( bloom.xyz , INVERSE_GAMMA.xxx );
+        float3 bloom = max(float3(0.f, 0.f, 0.f), finalColor - float3(1.f, 1.f, 1.f));
+        bloom = pow(bloom.xyz, INVERSE_GAMMA.xxx);
    // gamma correct back, and output
-           finalColor              = pow( finalColor.xyz , INVERSE_GAMMA.xxx );
+        finalColor = pow(finalColor.xyz, INVERSE_GAMMA.xxx);
 
-    finalColor                      = ApplyLinearFog( input.world_position , finalColor );
+        finalColor = ApplyLinearFog(input.world_position, finalColor);
             
    // return float4( finalColor , alpha );
     
-    fragmentFunctionOutput output;
-    output.color    = float4( finalColor.xyz , alpha );
-    output.bloom    = float4( bloom , 1 );
+        fragmentFunctionOutput output;
+        output.color = float4(finalColor.xyz, alpha);
+        output.bloom = float4(bloom, 1);
     //output.tangent  = float4( ( tangent     + float3( 1 , 1 , 1 ) ) * .5f , 1);
     //output.normal   = float4( ( worldNormal + float3( 1 , 1 , 1 ) ) * .5f , 1);
     //output.albedo   = diffuseColor;
-    
-    return output;
-}
+//        output.color = output.color * color;
 
+    float depthVal;
+	
+    for( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
+    {
+        projectTexCoord[ index ].x = input.lightViewPosition[ index ].x / input.lightViewPosition[ index ].w / 2.0f + 0.5f;
+        projectTexCoord[ index ].y = -input.lightViewPosition[ index ].y / input.lightViewPosition[ index ].w / 2.0f + 0.5f;
+
+        //if( ( saturate( projectTexCoord[ index ].x ) == projectTexCoord[ index ].x ) && ( saturate( projectTexCoord[ index ].y ) == projectTexCoord[ index ].y ) )
+        //{
+            depthValue = input.lightViewPosition[ index ].z / input.lightViewPosition[ index ].w;
+            output.lightView = float4( depthValue.xxx , 1.f );
+        //}
+    }
+        return output;
+    
+}
 //--------------------------------------------------------------------------------------

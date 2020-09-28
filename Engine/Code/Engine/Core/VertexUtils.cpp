@@ -879,7 +879,7 @@ void CreateUVSphere ( uint hCuts , uint vCuts , std::vector< VertexMaster >& sph
 			
 			VertexMaster currentCoordVerts = VertexMaster(
 															Vertex_PCU( center + ( currentCoordsNormal * radius ) , tint  ,
-																Vec2::ONE - Vec2( u , v ) ) ,
+																/*Vec2::ONE - */Vec2( u , v ) ) ,
 															currentCoordsNormal.GetNormalized() , -currentCoordsTangent );
 			
 			sphereMeshVerts.push_back( currentCoordVerts );

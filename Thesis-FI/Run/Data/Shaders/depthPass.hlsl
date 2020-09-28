@@ -136,7 +136,7 @@ v2f_t VertexFunction(vs_input_t input)
 // is being drawn to the first bound color target.
 float4 FragmentFunction(v2f_t input) : SV_Target0
 {
-    return float4(input.uv , 0, 1);
+    //return float4(input.uv , 0, 1);
 
 	// DEPTH DEBUGGING
     float   depthValue;

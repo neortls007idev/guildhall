@@ -57,6 +57,7 @@ enum eBufferSlot
 	UBO_MODEL_SLOT			= 2,
 	UBO_LIGHT_SLOT			= 3,
 	UBO_FOG_SLOT			= 4,
+	UBO_LIGHT_VIEW_SLOT		= 5,
 	UBO_MATERIAL_SLOT		= 8,
 };
 
@@ -129,6 +130,14 @@ struct shaderLightDataT
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+struct lightView_t
+{
+	Mat44 LIGHT_PROJECTION;
+	Mat44 LIGHT_VIEW;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 struct fogDataT
 {
 	float	nearFog;
@@ -184,6 +193,13 @@ public:
 	void					ReleaseUAVTarget( Texture* texture );
 	int						GetTotalUAVTargetPoolSize() const					{ return m_UAVTargetTexPoolSize; }
 	int						GetUAVTexturePoolFreeCount() const					{ return 8 - m_UAVTargetTexPoolSize; }
+
+	// UAV = Unordered access view - used by compute shaders
+	Texture*				GetOrCreatematchingDSVTarget( Texture* texture , std::string debugRenderTargetName = "Unreleased UAV" );
+	Texture*				CreateDSVTarget( IntVec2 texelSize , std::string debugUAVTargetName = "Unreleased UAV Texture" );
+	void					ReleaseDSVTarget( Texture* texture );
+	int						GetTotalDSVTargetPoolSize() const					{ return m_UAVTargetTexPoolSize; }
+	int						GetDSVTexturePoolFreCount() const					{ return 8 - m_UAVTargetTexPoolSize; }
 	
 	void					BeginCamera( const Camera& camera );
 	void					EndCamera( const Camera& camera);
@@ -279,6 +295,10 @@ public:
 
 	// Intensity of specular light
 	void SetSpecularPower( float specularPower );
+
+	// Update Lights View and Projection
+	void SetLightsView( uint lightIndex , Mat44 lightProjection , float pitch = 0.f , float yaw = 0.f , float roll = 0.f );
+	void SetLightsView( uint lightIndex , Mat44 lightProjection , Mat44 lightView );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	
@@ -430,9 +450,11 @@ public:
 	RenderBuffer*								m_lightDataUBO											= nullptr;
 	RenderBuffer*								m_fogDataUBO											= nullptr;
 	RenderBuffer*								m_materialDataUBO										= nullptr;
+	RenderBuffer*								m_lightsViewUBO											= nullptr;
 	Sampler*									m_defaultSampler										= nullptr;
 	Texture*									m_textureDefault										= nullptr;
 	shaderLightDataT							m_lights;
+	lightView_t									m_lightsView[ TOTAL_LIGHTS ];
 	static fogDataT								m_fog;
 	Camera*										m_effectCamera;
 	

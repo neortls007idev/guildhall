@@ -883,7 +883,7 @@ STATIC Mat44 Mat44::CreateFromScaleRotationTransformation ( const Vec3& scale ,
 		//--------------------------------------------------------------------------------
 
 		Mat44 transform;
-
+		
 		Mat44 scaleMatrix	= CreateNonUniformScale3D( scale );
  		Mat44 tranformPitch = CreateYRotationDegrees( pitch );
  		Mat44 tranformYaw	= CreateZRotationDegrees( yaw );

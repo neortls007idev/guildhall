@@ -97,12 +97,13 @@ public:
 	void			ConstructCameraViewFrustum();
 	Frustum			GetCameraViewFrustum() /*const*/																{ return m_cameraViewFrustum;  }
 
-	RenderBuffer*	UpdateUBO( RenderContext* ctx );
+	RenderBuffer*	UpdateUBO( RenderContext* ctx );	
 	Vec3			ClientToWorld( Vec2 client , float ndcZ );
 	Vec3			WorldToClient( Vec3 worldPos );
 
 public:
 	RenderBuffer*	m_cameraUBO		= nullptr;
+	Mat44							m_view;
 
 private:
 
@@ -113,7 +114,6 @@ private:
 
 	Mat44							m_projection;
 	Transform						m_transform;
-	Mat44							m_view;
 	
 	std::vector< Texture* >			m_colorTargets			/*= nullptr*/;
 	Texture*						m_depthStencilTarget	= nullptr;

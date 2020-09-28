@@ -44,7 +44,7 @@ public:
 			void Render() const;
 				void BindShaderSpecificMaterialData() const;
 				void RenderFresnelShader2ndPass() const;
-
+				void RenderShadowMapPass() const;
 
 private:
 			void DebugUI();
@@ -63,7 +63,7 @@ private:
 				void PermanentDebugDataGUI();
 				void SpecialControlsDisplayGUI();
 
-			//--------------------------------------------------------------------------------------------------------------------------------------------
+			//----------------------------------------------------------------------------------------------------------
 
 
 			bool AddGameOBJInstance( eGameObjModels modelType );
@@ -74,6 +74,7 @@ private:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //				METHODS TO HANDLE USER INPUT
 //--------------------------------------------------------------------------------------------------------------------------------------------
+	
 			void UpdateFromKeyBoard( float deltaSeconds );
 			void UpdateLightsFromKeyBoard( float deltaSeconds );
 			void UpdateLightPositionOnUserInput();
@@ -107,6 +108,7 @@ public:
 	
 	Shader*								m_lightShaders[ LitShaderTypes::TOTAL_LITSHADERS ];
 	Shader* 							m_currentShader;
+	Shader* 							m_depthShader;
 	Shader* 							m_blurShader;
 	Shader* 							m_toneMapShader;
 	Shader* 							m_toneMapComputeShader;
@@ -126,11 +128,14 @@ public:
 	
 	shaderLightDataT					m_lights;
 	Rgba8								m_ambientLightColor;
+	mutable Camera						m_lightsCamera;
 //	int									m_lightType[ TOTAL_LIGHTS ];
 	bool								m_isLightFollowingTheCamera							= false;
 	bool								m_isLightAnimated									= false;
 	int									m_currentLightIndex									= 0;
-																					
+	mutable Texture*					m_shadowMap[ TOTAL_LIGHTS ];
+	Vec3								m_lightsPitchYawRoll[ TOTAL_LIGHTS ];
+	
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	GPUMesh*							m_unitCubeMesh										= nullptr;
 	Texture*							m_cubeMapex											= nullptr;
@@ -144,12 +149,17 @@ public:
 	Texture*							m_gameModelsNormals[ NUM_GAME_MODELS ];
 	OBJInstances						m_ModelInstances[ NUM_GAME_MODELS ];
 	OBJInstances						m_ModelDrawableInstances[ NUM_GAME_MODELS ];
-
 private:
 	fresnelData_t						m_fresnelShaderData;
 	dissolveData_t						m_dissolveShaderData;
 	fogDataT							m_fogData;
+
 	float								m_frameRate											= 0.f;
+	float								m_rollingAvgFPS										= 0.f;
+	float								m_worstFrame										= INFINITY;
+	float								m_bestFrame											= 0.f;
+	float								m_currentFrame										= 0;
+	
 	bool								m_isMouseUnlocked									= false;
 	bool								m_debugSwitchs[ NUM_GAME_DEBUG_SWITCHS ];
 	bool								m_dirtyUBOs[ NUM_DIRTY_UBOS ];
