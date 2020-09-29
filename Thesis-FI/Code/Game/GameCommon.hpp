@@ -127,7 +127,7 @@ struct GameParticleEmitter
 	float				m_particleMaxLifeTime			= 2.f;
 	float				m_particleVelocity				= 0.f;
 	Vec2				m_particleSize					= Vec2::ONE;
-	uint				m_numParticlesToSpawnPerFrame	= 0;
+	uint				m_numParticlesToSpawnPerFrame	= 1000;
 
 	uint				m_numAliveParticles				= 0;
 };

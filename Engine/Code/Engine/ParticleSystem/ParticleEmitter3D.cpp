@@ -9,7 +9,7 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-ParticleEmitter3D::ParticleEmitter3D( RenderContext* renderContext , Texture* tex , size_t intialArraySize ,
+ParticleEmitter3D::ParticleEmitter3D( RenderContext* renderContext , Texture* tex , size_t initialArraySize ,
 									  Vec3 targetPos , Shader* shader /*= nullptr */ ,
 									  eBlendMode blendMode /*= ADDITIVE */ , eCullMode cullMode /*= CULL_BACK */ ) :
 																														m_renderContext( renderContext ) ,
@@ -20,13 +20,18 @@ ParticleEmitter3D::ParticleEmitter3D( RenderContext* renderContext , Texture* te
 																														m_cullMode( cullMode )
 {
 	m_spriteSheet = nullptr;
-	m_particles.reserve( intialArraySize );
+//	m_particles.reserve( intialArraySize );
+
+	m_totalSpawnableParticles = initialArraySize;
+	m_particles = new Particle3D[ initialArraySize ];
+	//m_particleVerts = new Vertex_PCU[ initialArraySize * 6 ];
+//	m_particleVerts.resize( 6 * initialArraySize );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 ParticleEmitter3D::ParticleEmitter3D ( RenderContext* renderContext , SpriteSheet* spriteSheet ,
-                                       size_t intialArraySize , Vec3 targetPos , Shader* shader /*= nullptr */ ,
+                                       size_t initialArraySize , Vec3 targetPos , Shader* shader /*= nullptr */ ,
 									   eBlendMode blendMode /*= ADDITIVE */ , eCullMode cullMode /*= CULL_BACK */ ) :
 																														m_renderContext( renderContext ) ,
 																														m_spriteSheet( spriteSheet ) ,
@@ -37,15 +42,26 @@ ParticleEmitter3D::ParticleEmitter3D ( RenderContext* renderContext , SpriteShee
 {
 	m_texture = const_cast< Texture* >( &spriteSheet->GetTexture() );
 	//m_texture = const_cast< Texture* >( &( spriteSheet->GetTexture() ) );
-	m_particles.reserve( intialArraySize );
+	//m_particles.reserve( intialArraySize );
+
+	m_totalSpawnableParticles = initialArraySize;
+	m_particles = new Particle3D[ initialArraySize ];
+//	m_particleVerts.resize( 6 * initialArraySize );
+	//m_particleVerts = new Vertex_PCU[ initialArraySize * 6 ];
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 ParticleEmitter3D::~ParticleEmitter3D()
 {
+	delete [] m_particles;
+	m_particles = nullptr;
+
+	//delete [] m_particleVerts;
+	//m_particleVerts = nullptr;
+	
 	//m_particles.clear();
-	//m_particleVerts.clear();
+	m_particleVerts.clear();
 
 	m_texture		= nullptr;
 	m_spriteSheet	= nullptr;
@@ -58,21 +74,25 @@ ParticleEmitter3D::~ParticleEmitter3D()
 void ParticleEmitter3D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position , Vec3 target , Vec3 velocity , float age ,
                                            float maxAge , Rgba8 startColor , Rgba8 endColor , IntVec2 spriteCoords )
 {
-	if( m_spriteSheet != nullptr )
-	{		
-		Particle3D* temp = new Particle3D( cosmeticBounds , m_position + position , m_velocity + velocity , age , maxAge , startColor ,endColor );
-		int		spriteSheetWidth = m_spriteSheet->GetSpriteDimension().x;
-		int		spriteIndex = spriteCoords.x + ( spriteSheetWidth * spriteCoords.y );
-
-		const SpriteDefinition& currentParticleSprite = m_spriteSheet->GetSpriteDefinition( spriteIndex );
-		currentParticleSprite.GetUVs( temp->m_minsUVs , temp->m_maxsUVs );
-
-		EmplaceBackNewParticle( temp );
-		m_numAliveParticles++;
-	}
-	else
+	if ( m_numAliveParticles < m_totalSpawnableParticles )
 	{
-		//SpawnNewParticle( cosmeticBounds , position , velocity , age , maxAge , color );
+		if ( m_spriteSheet != nullptr )
+		{
+			//Particle3D* temp = new Particle3D( cosmeticBounds , m_position + position , m_velocity + velocity , age , maxAge , startColor ,endColor );
+			Particle3D temp( cosmeticBounds , m_position + position , m_velocity + velocity , age , maxAge , startColor , endColor );
+			int		spriteSheetWidth = m_spriteSheet->GetSpriteDimension().x;
+			int		spriteIndex = spriteCoords.x + ( spriteSheetWidth * spriteCoords.y );
+
+			const SpriteDefinition& currentParticleSprite = m_spriteSheet->GetSpriteDefinition( spriteIndex );
+			//currentParticleSprite.GetUVs( temp->m_minsUVs , temp->m_maxsUVs );
+			currentParticleSprite.GetUVs( temp.m_minsUVs , temp.m_maxsUVs );
+
+			EmplaceBackNewParticle( temp );
+		}
+		else
+		{
+			//SpawnNewParticle( cosmeticBounds , position , velocity , age , maxAge , color );
+		}
 	}
 }
 
@@ -80,9 +100,12 @@ void ParticleEmitter3D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position 
 
 void ParticleEmitter3D::SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position , Vec3 target , Vec3 velocity , float age , float maxAge , Rgba8 startColor , Rgba8 endColor )
 {
-	Particle3D* temp = new Particle3D( cosmeticBounds, m_position + position , m_velocity + velocity , age , maxAge , startColor , endColor );
-	EmplaceBackAtEmptySpace( m_particles , temp );
-	m_numAliveParticles++;
+	if( m_numAliveParticles < m_totalSpawnableParticles )
+	{
+		Particle3D temp( cosmeticBounds, m_position + position , m_velocity + velocity , age , maxAge , startColor , endColor );
+		EmplaceBackNewParticle( temp );
+	}
+	//EmplaceBackAtEmptySpace( m_particles , temp );
 	//temp->m_cosmeticBounds = cosmeticBounds;
 }
 
@@ -92,41 +115,46 @@ void ParticleEmitter3D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position 
                                            Vec3 velocity , float age , float maxAge ,
                                            Rgba8 startColor , Rgba8 endColor , IntVec2 spriteCoords )
 {
-	if( m_spriteSheet != nullptr )
+	if ( m_numAliveParticles < m_totalSpawnableParticles )
 	{
-		Particle3D* temp = new Particle3D( cosmeticBounds , m_position + position , scale ,
-		                                   m_velocity + velocity , age , maxAge , startColor , endColor );
-		int		spriteSheetWidth = m_spriteSheet->GetSpriteDimension().x;
-		int		spriteIndex = spriteCoords.x + ( spriteSheetWidth * spriteCoords.y );
+		if ( m_spriteSheet != nullptr )
+		{
+			Particle3D temp( cosmeticBounds , m_position + position , scale ,
+				m_velocity + velocity , age , maxAge , startColor , endColor );
+			int		spriteSheetWidth = m_spriteSheet->GetSpriteDimension().x;
+			int		spriteIndex = spriteCoords.x + ( spriteSheetWidth * spriteCoords.y );
 
-		const SpriteDefinition& currentParticleSprite = m_spriteSheet->GetSpriteDefinition( spriteIndex );
-		currentParticleSprite.GetUVs( temp->m_minsUVs , temp->m_maxsUVs );
+			const SpriteDefinition& currentParticleSprite = m_spriteSheet->GetSpriteDefinition( spriteIndex );
+			currentParticleSprite.GetUVs( temp.m_minsUVs , temp.m_maxsUVs );
 
-		EmplaceBackNewParticle( temp );
-		m_numAliveParticles++;
-	}
-	else
-	{
-		SpawnNewParticle( cosmeticBounds , position , target , velocity , age , maxAge , startColor , endColor );
-		m_numAliveParticles++;
+			EmplaceBackNewParticle( temp );
+		}
+		else
+		{
+			SpawnNewParticle( cosmeticBounds , position , target , velocity , age , maxAge , startColor , endColor );
+			
+		}
 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void ParticleEmitter3D::EmplaceBackNewParticle( Particle3D* temp )
+void ParticleEmitter3D::EmplaceBackNewParticle( Particle3D temp )
 {
-	for( size_t index = m_lastSpawnPointPos ; index < m_particles.size() ; index++ )
+	if( m_numAliveParticles < m_totalSpawnableParticles )
 	{
-		if( nullptr == m_particles[ index ] )
+		for ( size_t index = 0; ( index < m_totalSpawnableParticles ) ; index++ )
 		{
-			m_particles[ index ] = temp;
-			m_lastSpawnPointPos = index;
-			return;
+			if ( m_particles[ index ].m_isGarbage )
+			{
+				temp.m_isGarbage = false;
+				m_particles[ index ] = temp;
+				m_numAliveParticles++;
+				break;
+				//m_lastSpawnPointPos++;
+			}
 		}
 	}
-	m_particles.push_back( temp );
-	m_lastSpawnPointPos = m_particles.size();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -139,7 +167,6 @@ void ParticleEmitter3D::SpawnNewRandomParticleFromSpriteSheet ( AABB2 cosmeticBo
 	{
 		IntVec2 randSprite = m_spriteSheet->RollRandomSpriteCoordsInSpriteSheet();
 		SpawnNewParticle( cosmeticBounds , m_position + position , target , scale , m_velocity + velocity , age , maxAge , startColor , endColor , randSprite );
-		m_numAliveParticles++;
 	}
 }
 
@@ -148,44 +175,43 @@ void ParticleEmitter3D::SpawnNewRandomParticleFromSpriteSheet ( AABB2 cosmeticBo
 void ParticleEmitter3D::Update( float deltaSeconds )
 {
 	m_particleVerts.clear();
-	m_numAliveParticles = 0;
 	
-	for( size_t index = 0 ; index < m_particles.size() ; index++ )
+	for( size_t index = 0 ; ( index < m_totalSpawnableParticles ) && ( m_numAliveParticles > 0 ); index++ )
 	{
-		if( m_particles[ index ] != nullptr )
+		if ( m_particles[ index ].m_isGarbage )
 		{
-			m_particles[ index ]->Update( deltaSeconds );
-			m_numAliveParticles++;
+			continue;
+		}
+		m_particles[ index ].Update( deltaSeconds );
 
-			if ( m_particles[ index ]->m_age >= m_particles[ index ]->m_maxAge )
-			{
-				delete m_particles[ index ];
-				m_particles[ index ] = nullptr;
-				m_numAliveParticles--;
-			}
+		if ( m_particles[ index ].m_age >= m_particles[ index ].m_maxAge )
+		{
+			m_particles[ index ].m_isGarbage = true;
+			m_numAliveParticles--;
 		}
 	}
 
 	Mat44 lookAt;
 	
-	for ( size_t index = 0 ; index < m_particles.size() ; index++ )
+	for ( size_t index = 0 ; index < m_totalSpawnableParticles && m_numAliveParticles > 0 ; index++ )
 	{
-		Particle3D* particle = m_particles[ index ];
-		if( particle != nullptr )
+		Particle3D* particle = &m_particles[ index ];
+
+		if( particle->m_isGarbage )
 		{
-			if ( m_areParticlesBillboarded )
-			{
-				lookAt = LookAtMatrix( particle->m_position , m_targetPos );
-				Vec4 ibasis = -lookAt.GetIBasis4D();
-				lookAt.Ix = ibasis.x;
-				lookAt.Iy = ibasis.y;
-				lookAt.Iz = ibasis.z;
-				lookAt.Iw = ibasis.w;
-				
-				Transform3DAndAppendVertsForAABB2( m_particleVerts , particle->m_cosmeticBounds , particle->m_startColor ,
-				                                 particle->m_minsUVs , particle->m_maxsUVs , particle->m_position , lookAt );
-			}
+			continue;
 		}
+		
+		lookAt = LookAtMatrix( particle->m_position , m_targetPos );
+		Vec4 ibasis = -lookAt.GetIBasis4D();
+		lookAt.Ix = ibasis.x;
+		lookAt.Iy = ibasis.y;
+		lookAt.Iz = ibasis.z;
+		lookAt.Iw = ibasis.w;
+		
+		Transform3DAndAppendVertsForAABB2( m_particleVerts , particle->m_cosmeticBounds , particle->m_startColor ,
+		                                particle->m_minsUVs , particle->m_maxsUVs , particle->m_position , lookAt );
+		
 	}
 }
 
@@ -197,13 +223,18 @@ void ParticleEmitter3D::Render()
 	{
 		return;
 	}
+
+	if( m_numAliveParticles == 0 )
+	{
+		return;
+	}
 	
 	m_renderContext->BindShader( m_shader );
 	m_renderContext->BindTexture( m_texture );
-	
-	m_renderContext->SetBlendMode( m_blendMode );
+	m_renderContext->SetBlendMode( m_blendMode );	
 	m_renderContext->SetModelMatrix( Mat44::IDENTITY , HALF_ALPHA_WHITE );
-    m_renderContext->DrawVertexArray( m_particleVerts );
+	//m_renderContext->DrawVertexArray( 6 * m_totalSpawnableParticles , &m_particleVerts[ 0 ] );
+	m_renderContext->DrawVertexArray( m_particleVerts );
 	m_renderContext->SetBlendMode( eBlendMode::ALPHA );
 }
 
@@ -216,7 +247,8 @@ void ParticleEmitter3D::Destroy()
 	m_shader				= nullptr;
 	m_renderContext			= nullptr;
 
-	m_particles.clear();
+	delete[] m_particles;
+	//delete[] m_particleVerts;
 	m_particleVerts.clear();
 }
 

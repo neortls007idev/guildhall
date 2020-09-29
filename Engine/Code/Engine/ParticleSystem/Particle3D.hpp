@@ -14,7 +14,9 @@ class GPUMesh;
 struct Particle3D
 {
 public:
-	//Particle3D();
+	Particle3D() {};
+	Particle3D( Particle3D& copy );
+	
 	Particle3D( Vec3 position , Vec3 velocity , float age , float maxAge , Rgba8 startColor , Rgba8 endColor = CLEAR );
 
 	Particle3D( AABB2 cosmeticBounds , Vec3 position , Vec3 velocity , float age , float maxAge , Rgba8 startColor , Rgba8 endColor = CLEAR );
@@ -34,18 +36,17 @@ public:
 	void Move( float deltaSeconds );
 	
 public:
-	Vec3		m_position;
-	float		m_scale;
-// 	Vec3		m_target;
-// 	Mat44		m_model;
-	Vec3		m_velocity;
-	float		m_age;
+	float		m_age				= 0.f;
 	float		m_maxAge;
-	Rgba8		m_startColor;
+	Vec3		m_position			= Vec3::ZERO;
+	Vec3		m_velocity			= Vec3::ZERO;
+	Rgba8		m_startColor		= CLEAR;
 	Rgba8		m_endColor			= CLEAR;
- 	AABB2		m_cosmeticBounds;
+ 	AABB2		m_cosmeticBounds	= AABB2( -1.f , -1.f , 1.f ,1.f);
  	Vec2		m_minsUVs			= Vec2::ZERO;
  	Vec2		m_maxsUVs			= Vec2::ONE;
+	float		m_scale				= 1.f;
+	bool		m_isGarbage			= true;
 //	bool		m_isBillboarded		= false;
 };
 
