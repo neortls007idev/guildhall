@@ -496,6 +496,9 @@
     <ClCompile Include="Profilling\D3D11PerformanceMarker.cpp">
       <Filter>Profilling</Filter>
     </ClCompile>
+    <ClCompile Include="Networking\UDPSocket.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -932,6 +935,9 @@
     </ClInclude>
     <ClInclude Include="Profilling\D3D11PerformanceMarker.hpp">
       <Filter>Profilling</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\UDPSocket.hpp">
+      <Filter>Networking</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
