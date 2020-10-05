@@ -107,10 +107,12 @@ bool ShaderStage::Compile( RenderContext* ctx , std::string const& filename , vo
 	char const* shaderModel = GetShaderModelForStage( stageType );
 
 	DWORD compileFlags = 0U;
+#define DEBUG_SHADERS
+	
 #if defined(DEBUG_SHADERS)
-	compile_flags |= D3DCOMPILE_DEBUG;
-	compile_flags |= D3DCOMPILE_SKIP_OPTIMIZATION;
-	compile_flags |= D3DCOMPILE_WARNINGS_ARE_ERRORS;  // cause, FIX YOUR WARNINGS
+	compileFlags |= D3DCOMPILE_DEBUG;
+	compileFlags |= D3DCOMPILE_SKIP_OPTIMIZATION;
+	//compileFlags |= D3DCOMPILE_WARNINGS_ARE_ERRORS;  // cause, FIX YOUR WARNINGS
 #else 
 	// compile_flags |= D3DCOMPILE_SKIP_VALIDATION;   // Only do this if you know for a fact this shader works with this device (so second run through of a game)
 	compileFlags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;   // Yay, fastness (default is level 1)

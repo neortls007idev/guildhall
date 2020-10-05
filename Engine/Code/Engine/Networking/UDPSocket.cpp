@@ -1,6 +1,10 @@
 ﻿#include "Engine/Networking/UDPSocket.hpp"
 #include "Engine/Core/DevConsole.hpp"
 
+#ifdef defined( UNITTEST )
+	#include <iostream>
+#endif
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 extern	DevConsole* g_theDevConsole;
@@ -19,7 +23,11 @@ UDPSocket::UDPSocket( const std::string& host , int port )
 
 	if ( m_socket == INVALID_SOCKET )
 	{
+#ifdef defined( UNITTEST )
+		std::cout << "UDP Socket instantiate failed, Error = %d" << WSAGetLastError() << std::endl;
+#else
 		g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "UDP Socket instantiate failed, Error = %d\n" , WSAGetLastError() );
+#endif
 	}
 }
 
@@ -43,7 +51,11 @@ void UDPSocket::Bind( int port )
 
 	if( iResult != 0 )
 	{
+#ifdef defined( UNITTEST )
+		std::cout << "UDP Socket Bind failed, Error = %d" << WSAGetLastError() << std::endl;
+#else
 		g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "UDP Socket Bind failed, Error = %d\n" , WSAGetLastError() );
+#endif
 	}
 }
 
@@ -71,7 +83,11 @@ void UDPSocket::Close()
 
 		if ( iResult == SOCKET_ERROR )
 		{
+#ifdef defined( UNITTEST )
+			std::cout << "UDP Socket Close failed, Error = %d" << WSAGetLastError() << std::endl;
+#else
 			g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "UDP Socket Close failed, Error = %d\n" , WSAGetLastError() );
+#endif
 		}
 		m_socket = INVALID_SOCKET;
 	}

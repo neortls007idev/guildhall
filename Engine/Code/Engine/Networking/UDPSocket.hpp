@@ -16,6 +16,9 @@
 class UDPSocket
 {
 public:
+	static const int BufferSize = 512;
+	using Buffer = std::array< char , BufferSize >;
+	
 	UDPSocket( const std::string& host , int port );
 	~UDPSocket();
 

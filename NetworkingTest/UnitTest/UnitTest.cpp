@@ -10,17 +10,19 @@
 //#include "Engine/Networking/UDPSocket.hpp"
 
 #include "Engine/Networking/UDPSocket.hpp"
-//#include "Engine/Core/DevConsole.hpp"
-//#include "Engine/Renderer/RenderContext.hpp"
-//#include "Engine/Input/InputSystem.hpp"
-//#include "Engine/Platform/Window.hpp"
+#include "Engine/Core/DevConsole.hpp"
+#include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Input/InputSystem.hpp"
+#include "Engine/Platform/Window.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-//extern RenderContext* g_theRenderer;
-//extern InputSystem* g_theInput;
-//extern DevConsole* g_theDevConsole;
-//extern Window*								g_theWindow;
+RenderContext*	g_theRenderer	= nullptr;
+InputSystem*	g_theInput		= nullptr;
+DevConsole*		g_theDevConsole = nullptr;
+Window*			g_theWindow		= nullptr;
+
+#define UNITTEST
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	

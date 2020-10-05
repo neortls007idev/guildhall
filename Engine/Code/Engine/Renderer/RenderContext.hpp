@@ -44,7 +44,7 @@ struct	ID3D11DepthStencilState;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-constexpr uint TOTAL_LIGHTS = 8;
+constexpr uint TOTAL_LIGHTS = 1;
 //float GAMMA = 2.2f;
 //float INVERSE_GAMMA = 1 / GAMMA;
 
@@ -81,7 +81,7 @@ struct FrameDataT
 
 	//float m_padding[ 2 ];
 
-	float m_GAMMA				= 2.2f/*GAMMA*/;
+	float m_GAMMA				= 1.f/*GAMMA*/;
 	float m_INVERSE_GAMMA		= 1/m_GAMMA;
 };
 
@@ -185,7 +185,7 @@ public:
 	Texture*				GetOrCreatematchingRenderTarget( Texture* texture , std::string debugRenderTargetName = "Unreleased RTV" );
 	void					ReleaseRenderTarget( Texture* texture );
 	int						GetTotalRenderTargetPoolSize() const				 { return m_renderTargetPoolSize;  }
-	int						GetTexturePoolFreeCount() const						 { return 8 - m_renderTargetPoolSize;  }
+	int						GetTexturePoolFreeCount() const						 { return 16 - m_renderTargetPoolSize;  }
 
 	// UAV = Unordered access view - used by compute shaders
 	Texture*				GetOrCreatematchingUAVTarget( Texture* texture , std::string debugRenderTargetName = "Unreleased UAV" );
@@ -459,7 +459,8 @@ public:
 	Camera*										m_effectCamera;
 	
 private:
-
+	Texture*									m_flatNormal											= nullptr;
+	
 	std::map<std::string , Texture*>			m_LoadedTextures;									// LOOKUP TABLE OF FILEPATH & TEXTURE
 	std::vector<Texture*>						m_renderTargetPool;
 	int											m_renderTargetPoolSize = 0;

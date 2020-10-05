@@ -14,7 +14,7 @@ float2 ComputeLightFactor( light_t light , float3 worldPosition , float3 worldNo
     float3      attenuationVector       = float3( 1.0f , distanceToLight , distanceToLight * distanceToLight );
     
     // how much do these two coincide (cone lights)
-    float       dotAngle                = dot( -directionToLight , light.direction );
+    float       dotAngle                = dot( lightDirection , light.direction );
     float coneAttenuation               = smoothstep( light.dotOuterAngle , light.dotInnerAngle , dotAngle);
 
 	float diffuseAttenuation = light.intensity;
@@ -35,14 +35,14 @@ float2 ComputeLightFactor( light_t light , float3 worldPosition , float3 worldNo
     float       diffuse                 = max( 0.0f , dotIncident );
       
    // BLINN-PHONG LIGHTING COMPUTATION
-    float3      hv                      = normalize( -lightDirection + directionToEye );
+    float3      hv                      = normalize( -lightDirection + directionToEye ); 
     float       specular                = max( 0.0f , dot( normalize( worldNormal ) , hv ) );
     
     // SPECULAR LIGHTING
                 specular                = facingDirection * specular;   
                 specular                = SPECULAR_FACTOR * pow( specular , SPECULAR_POWER );
  
-    return float2( diffuseAttenuation * diffuse , specularAttenuation * specular );
+    return float2( diffuseAttenuation * diffuse ,/* specularAttenuation * specular*/ 0.f );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

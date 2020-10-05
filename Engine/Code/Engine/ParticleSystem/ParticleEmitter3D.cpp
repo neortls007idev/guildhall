@@ -143,13 +143,20 @@ void ParticleEmitter3D::EmplaceBackNewParticle( Particle3D temp )
 {
 	if( m_numAliveParticles < m_totalSpawnableParticles )
 	{
-		for ( size_t index = 0; ( index < m_totalSpawnableParticles ) ; index++ )
+		for ( size_t index = m_lastSpawnPointPos; ( index < m_totalSpawnableParticles ) ; index++ )
 		{
 			if ( m_particles[ index ].m_isGarbage )
 			{
 				temp.m_isGarbage = false;
 				m_particles[ index ] = temp;
 				m_numAliveParticles++;
+				m_lastSpawnPointPos = index;
+
+				if ( m_lastSpawnPointPos == ( m_totalSpawnableParticles - 1 ) )
+				{
+					m_lastSpawnPointPos = 0;
+				}
+				
 				break;
 				//m_lastSpawnPointPos++;
 			}

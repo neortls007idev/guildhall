@@ -22,6 +22,7 @@ void Game::InitializeLightData()
 	m_lights.lights[ 0 ].worldPosition					= Vec3( 0.f , 0.f , -5.f );
 	m_lights.lights[ 0 ].attenuation					= Vec3::UNIT_VECTOR_ALONG_J_BASIS;
 	m_lights.lights[ 0 ].specularAttenuation			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
+	m_lights.lights[ 0 ].lightType						= ( uint ) LightType::DIRECTIONAL_LIGHT;
 
 	RandomNumberGenerator rng;
 	
@@ -35,7 +36,7 @@ void Game::InitializeLightData()
 		m_lights.lights[ index ].attenuation			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
 		m_lights.lights[ index ].specularAttenuation	= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
 		m_lights.lights[ index ].worldPosition			= Vec3( index * 1.5f , 0.f , 10.f );
-		m_lights.lights[ index ].lightType				= ( uint ) LightType::POINT_LIGHT;
+		m_lights.lights[ index ].lightType				= ( uint ) LightType::DIRECTIONAL_LIGHT;
 	}
 
 	for ( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
@@ -87,8 +88,8 @@ void Game::LoadShaders()
 	m_toneMapShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/toneMap.hlsl" );
 	m_toneMapComputeShader										= g_theRenderer->GetOrCreateShader( "Data/Shaders/toneMapCS.hlsl" );
 
-	m_currentShader												= m_lightShaders[ LitShaderTypes::LIT ];
-	m_currentShaderIndex										= LitShaderTypes::LIT;
+	m_currentShader												= m_lightShaders[ LitShaderTypes::LIT_SHADOW ];
+	m_currentShaderIndex										= LitShaderTypes::LIT_SHADOW;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -186,7 +187,7 @@ void Game::IntializeGameObjects()
 	std::vector<VertexLit>		cubeMeshLitVerts;
 	std::vector<uint>			cubeMeshIndices;
 
-	AABB3 box( Vec3( -1 , -1 , -1 ) , Vec3( 5 , 1 , 1 ) );
+	AABB3 box( Vec3( -0.5f , -0.5f , -0.5f ) , Vec3( 0.5f , 0.5f , 0.5f ) );
 	CreateCuboid( cubeMeshVerts , cubeMeshIndices , box , WHITE );
 	VertexMaster::ConvertVertexMasterToVertexLit( cubeMeshLitVerts , cubeMeshVerts );
 
@@ -211,7 +212,7 @@ void Game::IntializeGameObjects()
 	std::vector<uint>			quadIndices;
 
 	
-	CreateQuad( quadMeshVerts , quadIndices , AABB2::ZERO_TO_ONE );
+	CreateQuad( quadMeshVerts , quadIndices , AABB2( -3.5f , -3.5f , 3.5f , 3.5f ) );
 	m_quadMesh = new GPUMesh( g_theRenderer );
 	m_quadMesh->UpdateVertices( ( uint ) quadMeshVerts.size() , quadMeshVerts.data() );
 	m_quadMesh->UpdateIndices( quadIndices );
@@ -236,13 +237,28 @@ void Game::InitializeParticleEmitters()
 	//ParticleEmitter3D* testEmitter = new ParticleEmitter3D( g_theRenderer , spriteSheet, 10000 , m_gameCamera.GetPosition() );
 	//m_emitters.emplace_back( g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , spriteSheet , 5000 , m_gameCamera.GetPosition() ) );
 
-	m_starEmitters[ RED_ORANGE_STAR ].m_emitter = g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , m_particleEmitterSheets[ STAR_SS ] , 50000 , m_gameCamera.GetPosition() );
+	m_starEmitters[ RED_ORANGE_STAR ].m_emitter = g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , m_particleEmitterSheets[ STAR_SS ] , 10000 , m_gameCamera.GetPosition() );
 	m_starEmitters[ RED_ORANGE_STAR ].m_particleStartColor	= RED;
 	m_starEmitters[ RED_ORANGE_STAR ].m_particleEndColor	= NO_ALPHA_ORANGE;
 
-	m_starEmitters[ BLUE_CYAN_STAR ].m_emitter = g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , m_particleEmitterSheets[ STAR_SS ] , 50000 , m_gameCamera.GetPosition() );
+	m_starEmitters[ BLUE_CYAN_STAR ].m_emitter = g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , m_particleEmitterSheets[ STAR_SS ] , 10000 , m_gameCamera.GetPosition() );
 	m_starEmitters[ BLUE_CYAN_STAR ].m_particleStartColor = BLUE;
 	m_starEmitters[ BLUE_CYAN_STAR ].m_particleEndColor = NO_ALPHA_CYAN;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::InitializeShadowTestTrasforms()
+{
+	m_shadowTestCubes[ 0 ].SetPosition( Vec3(  1.5f , 0.f ,  0.f ) );
+	m_shadowTestCubes[ 1 ].SetPosition( Vec3( -1.5f , 0.f , 0.f ) );
+	m_shadowTestCubes[ 2 ].SetPosition( Vec3( 0.0f , 0.f , 1.5f ) );
+	m_shadowTestCubes[ 3 ].SetPosition( Vec3( 0.0f , 0.f , -1.5f ) );
+	m_shadowTestCubes[ 4 ].SetPosition( Vec3( -1.5f , 0.f , -1.5f ) );
+	m_shadowTestCubes[ 5 ].SetPosition( Vec3( -1.5f , 0.f , 1.5f ) );
+	m_shadowTestCubes[ 6 ].SetPosition( Vec3( 1.5f , 0.f , -1.5f ) );
+	m_shadowTestCubes[ 7 ].SetPosition( Vec3( 1.5f , 0.f , 1.5f ) );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	

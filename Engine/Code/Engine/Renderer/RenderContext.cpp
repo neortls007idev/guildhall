@@ -284,6 +284,8 @@ void RenderContext::Startup( Window* window )
 		g_bitmapFont = GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
 	}
 
+	m_flatNormal = CreateTextureFromColor( Rgba8( 127 , 127 , 255 , 255 ) );
+	
 	m_effectCamera = new Camera();
 	m_effectCamera->SetClearMode( 0 , WHITE );
 }
@@ -1079,6 +1081,14 @@ void RenderContext::BindTexture ( const Texture* constTexture , UINT textureType
 			return;
 		}
 
+		if ( nullptr == constTexture && textureType == TEX_NORMAL )
+		{
+			TextureView* shaderResourceViewPS = m_flatNormal->GetOrCreateShaderResourceView();
+			ID3D11ShaderResourceView* shaderResourceViewHandlePS = shaderResourceViewPS->GetSRVHandle();
+			m_context->PSSetShaderResources( textureType + userTextureIndexOffset , 1 , &shaderResourceViewHandlePS );
+			return;
+		}
+
 		Texture* texturePS = const_cast< Texture* >( constTexture );
 		TextureView* shaderResourceViewPS = texturePS->GetOrCreateShaderResourceView();
 		ID3D11ShaderResourceView* shaderResourceViewHandlePS = shaderResourceViewPS->GetSRVHandle();
@@ -1090,6 +1100,14 @@ void RenderContext::BindTexture ( const Texture* constTexture , UINT textureType
 		if( nullptr == constTexture )
 		{
 			TextureView* shaderResourceViewCS = m_textureDefault->GetOrCreateShaderResourceView();
+			ID3D11ShaderResourceView* shaderResourceViewHandleCS = shaderResourceViewCS->GetSRVHandle();
+			m_context->CSSetShaderResources( textureType + userTextureIndexOffset , 1 , &shaderResourceViewHandleCS );
+			return;
+		}
+
+		if ( nullptr == constTexture && textureType == TEX_NORMAL )
+		{
+			TextureView* shaderResourceViewCS = m_flatNormal->GetOrCreateShaderResourceView();
 			ID3D11ShaderResourceView* shaderResourceViewHandleCS = shaderResourceViewCS->GetSRVHandle();
 			m_context->CSSetShaderResources( textureType + userTextureIndexOffset , 1 , &shaderResourceViewHandleCS );
 			return;
@@ -1492,6 +1510,7 @@ void RenderContext::SetLightsView( uint lightIndex , Mat44 lightProjection , flo
 	m_lightsView[ lightIndex ].LIGHT_PROJECTION = lightProjection;
 	Transform m_lightTransform;
 	m_lightTransform.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
+	
 	//m_lightTransform.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
 	
 	Mat44 currlightView = m_lightTransform.GetAsMatrix();
@@ -1510,7 +1529,8 @@ void RenderContext::SetLightsView( uint lightIndex , Mat44 lightProjection , flo
 void RenderContext::SetLightsView( uint lightIndex , Mat44 lightProjection , Mat44 lightView )
 {
 	m_lightsView[ lightIndex ].LIGHT_PROJECTION = lightProjection;
-	m_lightsView[ lightIndex ].LIGHT_VIEW = MatrixInvertOrthoNormal( lightView );
+	//m_lightsView[ lightIndex ].LIGHT_VIEW = MatrixInvertOrthoNormal( lightView );
+	m_lightsView[ lightIndex ].LIGHT_VIEW = lightView;
 
 	m_lightsViewUBO->Update( &m_lightsView , sizeof( m_lightsView ) , sizeof( m_lightsView ) );
 	BindUniformBuffer( UBO_LIGHT_VIEW_SLOT , m_lightsViewUBO );
