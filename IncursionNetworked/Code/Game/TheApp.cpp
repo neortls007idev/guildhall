@@ -9,6 +9,7 @@
 #include "Engine/Time/Time.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
+#include "Engine/Networking/NetworkSystem.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -19,6 +20,7 @@
 		TheApp*								g_theApp			= nullptr;
 		Game*								g_theGame			= nullptr;
 extern	BitmapFont*							g_bitmapFont;
+extern NetworkSystem*						g_theNetworkSys;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -34,6 +36,9 @@ TheApp::~TheApp()
 	delete g_theGame;
 	g_theGame = nullptr;
 
+	delete g_theNetworkSys;
+	g_theNetworkSys = nullptr;
+	
 	delete g_theAudioSystem;
 	g_theAudioSystem = nullptr;
 	// 
@@ -114,6 +119,12 @@ void TheApp::Startup()
 		g_theAudioSystem->Startup();
 	}
 
+	if ( g_theNetworkSys == nullptr )
+	{
+		g_theNetworkSys = new NetworkSystem();
+	}
+	g_theNetworkSys->Startup();
+
 	if ( g_theGame == nullptr )
 	{
 		g_theGame = new Game();
@@ -147,6 +158,7 @@ void TheApp::BeginFrame()
 	g_theRenderer->BeginFrame();
 	g_theDevConsole->BeginFrame();
 	g_theAudioSystem->BeginFrame();
+	g_theNetworkSys->BeginFrame();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -182,7 +194,6 @@ void TheApp::Render() const
 
 		if ( g_theDevConsole->IsOpen() )
 		{
-			//g_theGame->m_worldCamera.SetOrthoView( Vec2( 5 , 5 ) , Vec2( 35 , 35 ) );
 			g_theDevConsole->Render( *g_theRenderer , *g_theDevConsole->GetDevConsoleCamera() , 14.f );
 		}
 }
@@ -193,6 +204,7 @@ void TheApp::EndFrame()
 {
 	// all engine things that must end at the end of the frame and not the game
 /*	g_currentManager->EndFrame();*/
+	g_theNetworkSys->EndFrame();
 	g_theAudioSystem->EndFrame();
 	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
@@ -208,6 +220,7 @@ void TheApp::Shutdown()
 	delete g_theGame;
 	g_theGame = nullptr;
 
+	g_theNetworkSys->Shutdown();
 	g_theAudioSystem->Shutdown();
 	// 	g_thePhysicsSystem->Shutdown();
 	// 	g_currentManager->Shutdown();
@@ -232,6 +245,16 @@ bool TheApp::HandleQuitRequested()
 
 void TheApp::UpdateFromKeyboard()
 {
+	if ( g_theInput->WasKeyJustPressed( KEY_TILDE ) )
+	{
+		g_theDevConsole->ToggleVisibility();
+	}
+
+	if ( g_theDevConsole->IsOpen() )
+	{
+		return;
+	}
+	
 	if ( g_theInput->GetButtonState( 'T' ).IsPressed() )									{ m_isSloMo = true; }
 	else																						{ m_isSloMo = false; }
 	
