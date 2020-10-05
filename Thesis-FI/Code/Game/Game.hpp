@@ -30,8 +30,10 @@ public:
 				void InitializeCameras();
 				void IntializeGameObjects();
 				void InitializeLightData();
+				void InitializeShadowMapTextures();
 				void InitializeShaderMaterialData();
 				void InitializeParticleEmitters();
+				void InitializeShadowTestTrasforms();
 
 			~Game();
 
@@ -167,6 +169,13 @@ private:
 	uint								m_currentlyDrawingMeshes;
 	GameParticleEmitter					m_starEmitters[ NUM_STARS_EMITTERS ];
 	SpriteSheet*						m_particleEmitterSheets[ NUM_GAME_SS ];
+
+	//----------------------------------------------------------------------------------------------------------
+	// SHADOW Test
+	//----------------------------------------------------------------------------------------------------------
+
+	Transform m_shadowTestCubes[ 8 ];
+	
 	//std::vector<GameParticleEmitter>	m_emitters;
 	//std::vector<SpriteSheet*>			m_particleSystemSpriteSheets;
 };

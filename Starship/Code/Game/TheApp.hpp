@@ -19,10 +19,8 @@ public:
 	void RunFrame();
 
 	bool IsQuitting() const													{ return m_isQuitting; }
-	bool HandleKeyReleased( unsigned char keyCode );
 	bool HandleKeyReleased();
 	bool HandleKeyPressed();
-	bool HandleKeyPressed( unsigned char keycode );
 	bool HandleQuitRequested();
 
 	void BeginFrame();

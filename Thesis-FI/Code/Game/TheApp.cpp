@@ -353,9 +353,9 @@ void TheApp::UpdateFromKeyboard()
 		g_theGame = new Game();
 	}
 
-	//if ( g_theInput->WasKeyJustPressed( 'R' ) )
-	//{
-	//	g_theRenderer->ReCompileAllShaders();
-	//}
+	if ( g_theInput->WasKeyJustPressed( 'R' ) )
+	{
+		g_theRenderer->ReCompileAllShaders();
+	}
 }
 

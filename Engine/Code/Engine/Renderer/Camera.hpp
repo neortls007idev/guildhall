@@ -77,6 +77,7 @@ public:
 
 	void			SetOrthoView( const Vec2& bottomLeft , const Vec2& topRight );
 	void			SetOrthoView( const float& halfHeight , const float& aspectRatio );
+	void			SetOrthoView3D( const float& halfHeight , const float& aspectRatio , float nearZ , float farZ );
 	void			SetClearMode( unsigned int clearFlags , Rgba8 color , float depth = 0.f , unsigned int stencil = 0 );
 	void			SetColorTarget( Texture* texture );
 	void			SetColorTarget( size_t index , Texture* texture );
