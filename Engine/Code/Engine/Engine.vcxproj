@@ -967,6 +967,8 @@
     <ClInclude Include="Core\VertexMaster.hpp" />
     <ClInclude Include="Core\Vertex_PCU.hpp" />
     <ClInclude Include="Core\XmlUtils.hpp" />
+    <ClInclude Include="DataStructures\ThreadSafe\BlockingQueue.hpp" />
+    <ClInclude Include="DataStructures\ThreadSafe\SynchronizedLockFreeQueue.hpp" />
     <ClInclude Include="DebugUI\ImGUICommon.hpp" />
     <ClInclude Include="DebugUI\ImGUISystem.hpp" />
     <ClInclude Include="Experimental\Raytracer\LambertianDiffuseMaterial.hpp" />
