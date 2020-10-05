@@ -273,21 +273,6 @@ bool TheApp::IsKeyPressed( unsigned char keyCode )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-bool TheApp::HandleKeyReleased( unsigned char keyCode )
-{
-	
-	if ( keyCode == 'T' )
-	{
-		m_isSloMo = false;
-		
-	}
-	
-	m_keyPressed[ keyCode ]		= false;
-	return	( m_keyPressed[ keyCode ] );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 bool TheApp::HandleKeyReleased()
 {
 	if ( !g_theInput->IsKeyHeldDown( 'T' ) )								{ m_isSloMo = false; }
@@ -319,41 +304,3 @@ bool TheApp::HandleKeyPressed()
 	//g_theInput->HandleKeyPressed()
 	return false;
 }
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-bool TheApp::HandleKeyPressed( unsigned char keyCode )
-{
-	if ( keyCode == 'T' )
-	{
-		m_isSloMo = true;
-	
-	}
-
-	if ( keyCode == 'P' )
-	{
-		if ( m_keyPressed[ 'P' ] == false )
-		{
-			m_isPaused = !m_isPaused;
-		}
-	}
-  	
-	if( keyCode == KEY_ESC ) 
-	{
-		HandleQuitRequested();
-		return false; 
-	}
-
-	if ( keyCode == KEY_F8 )
-	{
-		delete m_theGame;
-		m_theGame = nullptr;
-		m_theGame = new Game();
-	}
-
-	m_keyPressed[ keyCode ] = true;
-	
-	return( m_keyPressed[keyCode] );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
