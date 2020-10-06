@@ -141,7 +141,7 @@ void Game::InitializeCameras()
 		m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );
 
 		//m_lightsCamera.SetProjectionPerspective( GAME_CAM_FOV , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
-		m_lightsCamera.SetOrthoView3D( 20.f , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
+		m_lightsCamera.SetOrthoView3D( 10.f , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
 		//m_lightsCamera.SetOrthoView( 540.f , CLIENT_ASPECT );
 		m_lightsCamera.SetPosition( Vec3( 0.f , 0.f , 0.f ) );
 		m_lightsCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );
@@ -688,9 +688,27 @@ void Game::RenderShadowMapPass() const
 		RenderAllInstancesOfType( SPACESHIP );
 		RenderAllInstancesOfType( LUMINARIS_SHIP );
 		g_D3D11PerfMarker->EndPerformanceMarker();
-
+		//g_theRenderer->CopyTexture( m_shadowMap[ lightIndex ] , m_lightsCamera.GetDepthStencilTarget() );
 		//g_theRenderer->ReleaseRenderTarget( CurrentShadowMap );
 		g_theRenderer->EndCamera( m_lightsCamera );
+
+
+		//for ( int index = 0; index < 3; index++ )
+		//{
+		//
+		//	g_D3D11PerfMarker->BeginPerformanceMarker( L"Blurred Shadow" );
+		//	
+		//	Shader* blurShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );
+		//	Texture* blurredShadow = g_theRenderer->GetOrCreatematchingRenderTarget( m_shadowMap[ lightIndex ] , "BlurBloomTarget" );
+		//	g_theRenderer->StartEffect( blurredShadow , m_shadowMap[ lightIndex ] , blurShader );
+		//	g_theRenderer->BindTexture( m_shadowMap[ lightIndex ] , TEX_USER_TYPE );
+		//	g_theRenderer->EndEffect();
+		//	
+		//	g_theRenderer->CopyTexture( m_shadowMap[ lightIndex ] , blurredShadow );
+		//	g_theRenderer->ReleaseRenderTarget( blurredShadow );
+		//	
+		//	g_D3D11PerfMarker->EndPerformanceMarker();
+		//}
 		
 		g_D3D11PerfMarker->EndPerformanceMarker();
 	}

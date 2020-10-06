@@ -1,19 +1,19 @@
 #include "pch.h"
 #include "CppUnitTest.h"
 
+#include "Engine/Networking/UDPSocket.hpp"
+#include "Engine/Core/DevConsole.hpp"
+#include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Input/InputSystem.hpp"
+#include "Engine/Platform/Window.hpp"
+
 #include <WinSock2.h>
 #include "ws2tcpip.h"
 #pragma comment(lib, "Ws2_32.lib")
 
 #include <iostream>
 
-//#include "Engine/Networking/UDPSocket.hpp"
 
-#include "Engine/Networking/UDPSocket.hpp"
-#include "Engine/Core/DevConsole.hpp"
-#include "Engine/Renderer/RenderContext.hpp"
-#include "Engine/Input/InputSystem.hpp"
-#include "Engine/Platform/Window.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
