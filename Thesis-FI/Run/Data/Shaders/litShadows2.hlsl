@@ -1,6 +1,8 @@
 #include "ShaderMathUtils.hlsl"
 #include "LightMathUtils.hlsl"
 
+SamplerState compSampler : register( s2 );
+
 //--------------------------------------------------------------------------------------
 // Stream Input
 // ------
@@ -113,7 +115,6 @@ struct fragmentFunctionOutput
 {
     float4 color        : SV_Target0;
     float4 bloom        : SV_Target1;
-    //float4 lightView    : SV_Target2;
 };
 
 Texture2D<float4> depthMapTexture0 : register( t8 );
@@ -122,8 +123,13 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
 {
 	// Shadow mapping requires a bias adjustment when comparing the depth of the light
 	// and the depth of the object due to the low floating point precision of the depth map.
+    float2 shadowMapDimensions = float2( 32.f , 32.f );
+    depthMapTexture0.GetDimensions( shadowMapDimensions.x , shadowMapDimensions.y );
+    	
+    float deltaPixel    = 1.f / ( shadowMapDimensions.x * shadowMapDimensions.y );
+
 	
-    float bias = 0.0002f;
+    float bias = 0.0000001f;
   
     float4 color = float4( 0.f.xxxx );
     float2 projectTexCoord[TOTAL_LIGHTS];
@@ -150,66 +156,71 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
     projectTexCoord[ index ].x =  input.lightViewPosition[ index ].x / input.lightViewPosition[ index ].w / 2.0f + 0.5f;
     projectTexCoord[ index ].y = -input.lightViewPosition[ index ].y / input.lightViewPosition[ index ].w / 2.0f + 0.5f;
 
+	depthValue = input.lightViewPosition[ index ].z / input.lightViewPosition[ index ].w;
     
 	
-   // Check if the projected coordinates are in the view of the light, if not then the pixel gets just an ambient value.
+   //	Check if the projected coordinates are in the view of the light, if not then the pixel gets just an ambient value.
    // Determine if the projected coordinates are in the 0 to 1 range.  If so then this pixel is in the view of the light.
         if( ( saturate( projectTexCoord[ index ].x ) == projectTexCoord[ index ].x ) &&
 			( saturate( projectTexCoord[ index ].y ) == projectTexCoord[ index ].y ) )
         {
-       	//[call]
-        //    switch( index )
-        //    {
-        //        case 0:
-				depthValue = depthMapTexture0.Sample( sSampler , projectTexCoord[ index ] ).r;
-               /*case 1:
-    			depthValue = depthMapTexture1.Sample( sSampler , projectTexCoord[ index ] ).r;
-               case 2:
-    			depthValue = depthMapTexture2.Sample( sSampler , projectTexCoord[ index ] ).r;
-               case 3:
-    			depthValue = depthMapTexture3.Sample( sSampler , projectTexCoord[ index ] ).r;
-               case 4:
-    			depthValue = depthMapTexture4.Sample( sSampler , projectTexCoord[ index ] ).r;
-               case 5:
-    			depthValue = depthMapTexture5.Sample( sSampler , projectTexCoord[ index ] ).r;
-               case 6:
-    			depthValue = depthMapTexture6.Sample( sSampler , projectTexCoord[ index ] ).r;
-               case 7:
-    			depthValue = depthMapTexture7.Sample( sSampler , projectTexCoord[ index ] ).r;
-       		default:*/
-                   ;
-        //    }
-               	
-       // Calculate the depth of the light.
+        float s0 = depthMapTexture0.Sample( compSampler , projectTexCoord[ index ] ).r;
+        float s1 = depthMapTexture0.Sample( compSampler , projectTexCoord[ index ] + float2( deltaPixel , 0 ) ).r;
+        float s2 = depthMapTexture0.Sample( compSampler , projectTexCoord[ index ] + float2( 0 , deltaPixel ) ).r;
+        float s3 = depthMapTexture0.Sample( compSampler , projectTexCoord[ index ] + float2( deltaPixel , deltaPixel ) ).r;
+
+        float result0 = depthValue <= s0;
+        float result1 = depthValue <= s1;
+        float result2 = depthValue <= s2;
+        float result3 = depthValue <= s3;
+
+        float2 texelPos = deltaPixel * projectTexCoord[ index ].xy;
+        float2 t = frac( texelPos );
+        depthValue = lerp( lerp( result0 , result1 , t.x ) , lerp( result2 , result3 , t.x ) , t.y );
+
+        //depthValue = depthMapTexture0.SampleCmpLevelZero( compSampler , projectTexCoord[ index ] , depthValue ).r;
+
+        // Calculate the depth of the light.
         lightDepthValue = input.lightViewPosition[ index ].z / input.lightViewPosition[ index ].w;
   
-       // Subtract the bias from the lightDepthValue.
+		// Subtract the bias from the lightDepthValue.
         lightDepthValue = lightDepthValue - bias;
+
+
+         //float sum = 0;
+         //float x , y;
+         //for( y = -1.5 ; y <= 1.5 ; y += 1.0 )
+         //{
+         //    for( x = -1.5 ; x <= 1.5 ; x += 1.0 )
+         //    {
+         //        sum += offset_lookup( sSampler , input.lightViewPosition[ index ].xyzw , float2( x , y ) );
+         //       depthValue = sum / 16.0;
+         //   }
+         //}
 
         	
         if( lightDepthValue < depthValue )
         {
-			// Calculate the amount of light on this pixel.
-			lightIntensity = saturate( dot( lightDirection[ index ] , input.world_normal ) );
-			           
+    // Calculate the amount of light on this pixel.
+			  lightIntensity = saturate( dot( lightDirection[ index ] , input.world_normal ) );
+			//lightIntensity = saturate( dot( input.world_normal , lightDirection[ index ]  ) );
+           
             if( lightIntensity > 0.0f )
             {
-				// Determine the final diffuse color based on the diffuse color and the amount of light intensity.
+           // Determine the final diffuse color based on the diffuse color and the amount of light intensity.
                 color += float4( LIGHTS[ index ].color , lightIntensity );
          
-				// Saturate the final light color.
+           // Saturate the final light color.
                 color = saturate( color );
             }
         }
 	}
     else
     {
-	
-    // If this is outside the area of shadow map range then draw things normally with regular lighting.
-        
+		// If this is outside the area of shadow map range then draw things normally with regular lighting.
+        //lightIntensity = saturate( dot( input.world_normal , lightDirection[ index ] ) );
         lightIntensity = saturate( dot( lightDirection[ index ] , input.world_normal ) );
-
-    	if( lightIntensity > 0.0f )
+        if( lightIntensity > 0.0f )
         {
             color += ( LIGHTS[ index ].color , lightIntensity );
             color = saturate( color );
@@ -260,9 +271,9 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
     //output.tangent  = float4( ( tangent     + float3( 1 , 1 , 1 ) ) * .5f , 1);
     //output.normal   = float4( ( worldNormal + float3( 1 , 1 , 1 ) ) * .5f , 1);
     //output.albedo   = diffuseColor;
-		output.color = color;
+	//	output.color = color;
     // output.color = float4( lightDepthValue.xxx , 1.f );
-    // output.color = float4( depthValue.xxx , 1.f );
+    output.color = float4( depthValue.xxx , 1.f );
     //output.color = float4( projectTexCoord[ index ] , 0.f , 1.f );
     //float4( lightIntensity.xxx , 1.f );
         return output;

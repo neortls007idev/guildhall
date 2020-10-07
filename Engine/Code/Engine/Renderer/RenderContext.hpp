@@ -177,12 +177,13 @@ public:
 	Texture*				GetFrameColorTarget();															// TODO :- IMPLEMENT ME
 	
 	// RENDER TARGET TEXTURE DOES NOT GET STORED IN ANY MAP
-	Texture*				CreateRenderTarget( IntVec2 texelSize , std::string debugRenderTargetName = "Unreleased RTV" );
+	Texture*				CreateRenderTarget( IntVec2 texelSize , D3D_DXGI_FORMAT format , std::string debugRenderTargetName = "Unreleased RTV" );
 	void					CopyTexture( Texture* destination , Texture* source );
 	void					StartEffect( Texture* destination , Texture* source , Shader* shader );
 	void					EndEffect();
 	
-	Texture*				GetOrCreatematchingRenderTarget( Texture* texture , std::string debugRenderTargetName = "Unreleased RTV" );
+	Texture*				GetOrCreatematchingRenderTarget( Texture* texture, std::string debugRenderTargetName = "Unreleased RTV",
+															 D3D_DXGI_FORMAT format = D3D_DXGI_FORMAT_R8G8B8A8_UNORM );
 	void					ReleaseRenderTarget( Texture* texture );
 	int						GetTotalRenderTargetPoolSize() const				 { return m_renderTargetPoolSize;  }
 	int						GetTexturePoolFreeCount() const						 { return 16 - m_renderTargetPoolSize;  }
@@ -238,7 +239,7 @@ public:
 	void					BindIndexBuffer( IndexBuffer* ibo );
 	void					BindUniformBuffer( unsigned int slot , RenderBuffer* ubo ); // UBO - uniform buffer object
 	void					BindMaterialData( void* pointerToData , int sizeOfData ); 
-	void					BindSampler( const Sampler* sampler );
+	void					BindSampler( const Sampler* sampler , uint samplerSlot = 0 );
 	void					BindDepthStencil( Texture* depthStencilView );
 	void					BindComputeSampler( const Sampler* sampler );
 	void					BindComputeTexture( const Sampler* sampler );
@@ -297,7 +298,7 @@ public:
 	void SetSpecularPower( float specularPower );
 
 	// Update Lights View and Projection
-	void SetLightsView( uint lightIndex , Mat44 lightProjection , float pitch = 0.f , float yaw = 0.f , float roll = 0.f );
+	void SetLightsView( uint lightIndex , Mat44 lightProjection );
 	void SetLightsView( uint lightIndex , Mat44 lightProjection , Mat44 lightView );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

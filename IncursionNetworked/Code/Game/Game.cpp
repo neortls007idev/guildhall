@@ -14,6 +14,7 @@
 #include "Game/Game.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Renderer/SpriteAnimation.hpp"
+#include "Engine/DataStructures/ThreadSafe/SynchronizedLockFreeQueue.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // GLOBAL VARIABLES

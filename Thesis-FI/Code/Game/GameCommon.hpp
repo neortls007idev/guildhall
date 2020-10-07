@@ -17,7 +17,7 @@ extern Window*		g_theWindow;
 
 constexpr float CLIENT_ASPECT											= 16.f/9.f;
 
-constexpr float GAME_CAM_NEAR_Z = 0.001f;
+constexpr float GAME_CAM_NEAR_Z = 0.1f;
 constexpr float GAME_CAM_FAR_Z	= 100.0f;
 constexpr float GAME_CAM_FOV	= 60.0f;
 

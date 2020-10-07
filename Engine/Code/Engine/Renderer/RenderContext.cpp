@@ -405,14 +405,14 @@ void RenderContext::SetDepthTest( eCompareOp compare , bool writeOnPass )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Texture* RenderContext::CreateRenderTarget( IntVec2 texelSize , std::string debugRenderTargetName )
+Texture* RenderContext::CreateRenderTarget( IntVec2 texelSize , D3D_DXGI_FORMAT format , std::string debugRenderTargetName )
 {
 	D3D11_TEXTURE2D_DESC desc;
 	desc.Width						= texelSize.x;
 	desc.Height						= texelSize.y;
 	desc.MipLevels					= 1;
 	desc.ArraySize					= 1;
-	desc.Format						= DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.Format						=  ( DXGI_FORMAT )( format );
 	desc.SampleDesc.Count			= 1;																					// Multi sampling Anti-Aliasing
 	desc.SampleDesc.Quality			= 0;																					// Multi sampling Anti-Aliasing
 	desc.Usage						= D3D11_USAGE_DEFAULT;																	//  if we do mip-chains, we change this to GPU/DEFAULT
@@ -999,7 +999,8 @@ void RenderContext::EndEffect()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Texture* RenderContext::GetOrCreatematchingRenderTarget( Texture* texture , std::string debugRenderTargetName/* = "Unreleased RTV"*/ )
+Texture* RenderContext::GetOrCreatematchingRenderTarget( Texture* texture , std::string debugRenderTargetName/* = "Unreleased RTV"*/ ,
+														 D3D_DXGI_FORMAT format /*= D3D_DXGI_FORMAT_R8G8B8A8_UNORM*/ )
 {
 	IntVec2 size = texture->GetDimensions();
 
@@ -1017,7 +1018,7 @@ Texture* RenderContext::GetOrCreatematchingRenderTarget( Texture* texture , std:
 		}
 	}
 
-	Texture* newRenderTarget = CreateRenderTarget( size , debugRenderTargetName );
+	Texture* newRenderTarget = CreateRenderTarget( size , format , debugRenderTargetName );
 	//m_renderTargetPool.push_back( newRenderTarget );
 	m_renderTargetPoolSize++;
 	return newRenderTarget;
@@ -1505,7 +1506,7 @@ void RenderContext::SetSpecularPower( float specularPower )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::SetLightsView( uint lightIndex , Mat44 lightProjection , float pitch , float yaw , float roll )
+void RenderContext::SetLightsView( uint lightIndex , Mat44 lightProjection )
 {
 	m_lightsView[ lightIndex ].LIGHT_PROJECTION = lightProjection;
 	Transform m_lightTransform;
@@ -1973,16 +1974,16 @@ void RenderContext::SetModelMatrix( Mat44 modelMat , Rgba8 color /* = WHITE */  
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::BindSampler( const Sampler* sampler )
+void RenderContext::BindSampler( const Sampler* sampler , uint samplerSlot /* = 0 */ )
 {
 	if ( nullptr == sampler )
 	{
 		ID3D11SamplerState* samplerHandle = m_defaultSampler->GetHandle();
-		m_context->PSSetSamplers( 0 , 1 , &samplerHandle );
+		m_context->PSSetSamplers( samplerSlot , 1 , &samplerHandle );
 		return;
 	}
 	ID3D11SamplerState* samplerHandle = sampler->GetHandle();
-	m_context->PSSetSamplers( 0 , 1 , &samplerHandle );
+	m_context->PSSetSamplers( samplerSlot , 1 , &samplerHandle );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Sampler::Sampler( RenderContext* ctx , eSamplerType type )
+Sampler::Sampler( RenderContext* ctx , eSamplerType type , eCompareOp comparisonOp /*= COMPARE_NEVER*/ )
 {
 	m_handle = nullptr;
 	m_owner = ctx;
@@ -21,6 +21,11 @@ Sampler::Sampler( RenderContext* ctx , eSamplerType type )
 	{
 		desc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
 	}
+	else if( type == SAMPLER_LINEAR )
+	{
+		desc.Filter = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+		//desc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR;
+	}
 	
 	desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 	desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -28,7 +33,7 @@ Sampler::Sampler( RenderContext* ctx , eSamplerType type )
 
 	desc. MipLODBias = 0.0f;
 	desc.MaxAnisotropy = 0;
-	desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	desc.ComparisonFunc = GetD3D11ComparisonFunc( comparisonOp );
 	desc.BorderColor[ 0 ] = 0.0f;
 	desc.BorderColor[ 1 ] = 0.0f;
 	desc.BorderColor[ 2 ] = 0.0f;
