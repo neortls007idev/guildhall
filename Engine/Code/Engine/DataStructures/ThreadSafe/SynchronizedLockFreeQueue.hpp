@@ -52,7 +52,7 @@ void SynchronizedLockFreeQueue<T>::push( valueType const& value )
 template<typename T>
 typename SynchronizedLockFreeQueue<T>::valueType SynchronizedLockFreeQueue<T>::pop()
 {
-	valueType value = valueType( 0 );
+	valueType value /*= valueType( 0 )*/;
 
 	Lock();
 	if ( !Base::empty() )

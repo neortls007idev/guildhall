@@ -106,6 +106,9 @@ RenderContext::~RenderContext()
 	}
 
 	DX_SAFE_RELEASE( m_transientRaterState );
+
+	delete m_flatNormal;
+	m_flatNormal = nullptr;
 	
 	delete m_textureDefault;
 	m_textureDefault = nullptr;

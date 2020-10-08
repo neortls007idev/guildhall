@@ -14,7 +14,9 @@
 #include "Game/Game.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Renderer/SpriteAnimation.hpp"
-#include "Engine/DataStructures/ThreadSafe/SynchronizedLockFreeQueue.hpp"
+#include "Engine/Core/DevConsole.hpp"
+
+extern DevConsole* g_theDevConsole;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // GLOBAL VARIABLES
@@ -50,8 +52,13 @@ void Game::Update( float deltaSeconds )
 		{ return; }
 				
 		UpdateCamera();
-		UpdateFromKeyBoard();
-		UpdateGameplayFromXbox();
+
+		if( !g_theDevConsole->IsOpen() )
+		{
+			UpdateFromKeyBoard();
+			UpdateGameplayFromXbox();
+		}
+		
 		GameHasJustStarted();
 		m_world1->Update( deltaSeconds );
 	}

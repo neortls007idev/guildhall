@@ -756,6 +756,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='FastBreakProfile|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Networking\UDPListner.cpp" />
     <ClCompile Include="Networking\UDPSocket.cpp" />
     <ClCompile Include="ParticleSystem\Particle2D.cpp" />
     <ClCompile Include="ParticleSystem\Particle3D.cpp">
@@ -1099,6 +1100,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='FastBreakProfile|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="Networking\UDPListner.hpp" />
     <ClInclude Include="Networking\UDPSocket.hpp" />
     <ClInclude Include="ParticleSystem\Particle2D.hpp" />
     <ClInclude Include="ParticleSystem\Particle3D.hpp">

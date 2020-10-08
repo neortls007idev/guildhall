@@ -5,6 +5,7 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+class UDPListner;
 class TCPServer;
 class TCPClient;
 
@@ -27,6 +28,9 @@ public:
 	void SetIsListening( bool listen )															{ m_isListening = listen; }
 
 	std::string GetAddress( SOCKET socket );
+
+	void SendUDPMessage( std::string message );
+	void StartUDPListner( int bindPort , int sendPort , std::string host /*= "127.0.0.1"*/ );
 	
 	//----------------------------------------------------------------------------------------------------------
 
@@ -37,6 +41,9 @@ public:
 	static bool SendMessageToServer( EventArgs& args );
 	static bool ConnectToServer( EventArgs& args );
 	static bool DisconnectFromServer( EventArgs& args );
+	static bool OpenUDPPort( EventArgs& args );
+	static bool SendUDPMessage( EventArgs& args );
+	static bool CloseUDPPort( EventArgs& args );
 	
 private:
 	bool					m_isListening	= false;
@@ -46,6 +53,7 @@ private:
 	SOCKET					m_linkSocket;
 	static bool				m_wasMessageJustSentByServer;
 	static bool				m_wasMessageJustSentByClient;
+	UDPListner*				m_UDPListner	= nullptr;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

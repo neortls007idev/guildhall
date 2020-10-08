@@ -2,6 +2,7 @@
 #include "Engine/Networking/NetworkSystem.hpp"
 #include "Engine/Networking/TCPServer.hpp"
 #include "Engine/Networking/TCPClient.hpp"
+#include "Engine/Networking/UDPListner.hpp"
 #include <WinSock2.h>
 #include "ws2tcpip.h"
 #include <array>
@@ -35,6 +36,7 @@ NetworkSystem::NetworkSystem() :
 	{
 		AddNetowrkingCommandsToConsole();
 	}
+	m_UDPListner = new UDPListner();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -191,6 +193,15 @@ void NetworkSystem::AddNetowrkingCommandsToConsole()
 
 	g_theDevConsole->CreateCommand( "DisconnectClient" , "Disconnect Client from the Server" , consoleArgs );
 	g_theEventSystem->SubscribeToEvent( "DisconnectClient" , DisconnectFromServer );
+
+	g_theDevConsole->CreateCommand( "OpenUDPPort" , "Open UDP Socket at listen and send ports" , consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "OpenUDPPort" , OpenUDPPort );
+
+	g_theDevConsole->CreateCommand( "SendUDPMessage" , "Send Message over UDP Socket" , consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "SendUDPMessage" , SendUDPMessage );
+
+	g_theDevConsole->CreateCommand( "CloseUDPPort" , "Close UDP Socket" , consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "CloseUDPPort" , CloseUDPPort );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -314,6 +325,62 @@ bool NetworkSystem::DisconnectFromServer( EventArgs& args )
 	}
 
 	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool NetworkSystem::OpenUDPPort( EventArgs& args )
+{
+	if ( nullptr != g_theNetworkSys )
+	{
+		int bindPort	= args.GetValue( "bindPort" , 48000 );
+		int sendToPort	= args.GetValue( "sendPort" , 48001 );
+		std::string host = args.GetValue( "host" , "127.0.0.1" );
+
+		g_theNetworkSys->StartUDPListner( bindPort , sendToPort , host );
+	}
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool NetworkSystem::SendUDPMessage( EventArgs& args )
+{
+	if ( nullptr != g_theNetworkSys )
+	{
+		std::string msg = args.GetValue( "msg" , "" );
+		if( msg != "" )
+		{
+			g_theNetworkSys->SendUDPMessage( msg );
+		}
+	}
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool NetworkSystem::CloseUDPPort( EventArgs& args )
+{
+	if ( nullptr != g_theNetworkSys )
+	{
+		std::string bindPort = args.GetValue( "bindPort" , "48000" );
+		g_theNetworkSys->m_UDPListner->m_listenSocket->Close();
+	}
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	
+void NetworkSystem::StartUDPListner( int bindPort , int sendPort , std::string host /*= "127.0.0.1"*/ )
+{
+	m_UDPListner->StartSocket( bindPort , sendPort , host );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void NetworkSystem::SendUDPMessage( std::string message )
+{
+	m_UDPListner->AddMessage( message );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
