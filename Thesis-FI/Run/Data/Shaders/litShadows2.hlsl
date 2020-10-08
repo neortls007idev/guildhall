@@ -1,7 +1,7 @@
 #include "ShaderMathUtils.hlsl"
 #include "LightMathUtils.hlsl"
 
-SamplerState compSampler : register( s2 );
+SamplerComparisonState compSampler : register( s2 );
 
 //--------------------------------------------------------------------------------------
 // Stream Input
@@ -129,7 +129,7 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
     float deltaPixel    = 1.f / ( shadowMapDimensions.x * shadowMapDimensions.y );
 
 	
-    float bias = 0.0000001f;
+    float bias = 0.005f;
   
     float4 color = float4( 0.f.xxxx );
     float2 projectTexCoord[TOTAL_LIGHTS];
@@ -164,10 +164,10 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
         if( ( saturate( projectTexCoord[ index ].x ) == projectTexCoord[ index ].x ) &&
 			( saturate( projectTexCoord[ index ].y ) == projectTexCoord[ index ].y ) )
         {
-        float s0 = depthMapTexture0.Sample( compSampler , projectTexCoord[ index ] ).r;
-        float s1 = depthMapTexture0.Sample( compSampler , projectTexCoord[ index ] + float2( deltaPixel , 0 ) ).r;
-        float s2 = depthMapTexture0.Sample( compSampler , projectTexCoord[ index ] + float2( 0 , deltaPixel ) ).r;
-        float s3 = depthMapTexture0.Sample( compSampler , projectTexCoord[ index ] + float2( deltaPixel , deltaPixel ) ).r;
+        float s0 = depthMapTexture0.Sample( sSampler , projectTexCoord[ index ] ).r;
+        float s1 = depthMapTexture0.Sample( sSampler , projectTexCoord[ index ] + float2( deltaPixel , 0 ) ).r;
+        float s2 = depthMapTexture0.Sample( sSampler , projectTexCoord[ index ] + float2( 0 , deltaPixel ) ).r;
+        float s3 = depthMapTexture0.Sample( sSampler , projectTexCoord[ index ] + float2( deltaPixel , deltaPixel ) ).r;
 
         float result0 = depthValue <= s0;
         float result1 = depthValue <= s1;
@@ -271,9 +271,9 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
     //output.tangent  = float4( ( tangent     + float3( 1 , 1 , 1 ) ) * .5f , 1);
     //output.normal   = float4( ( worldNormal + float3( 1 , 1 , 1 ) ) * .5f , 1);
     //output.albedo   = diffuseColor;
-	//	output.color = color;
+		output.color = color;
     // output.color = float4( lightDepthValue.xxx , 1.f );
-    output.color = float4( depthValue.xxx , 1.f );
+    // output.color = float4( depthValue.xxx , 1.f );
     //output.color = float4( projectTexCoord[ index ] , 0.f , 1.f );
     //float4( lightIntensity.xxx , 1.f );
         return output;

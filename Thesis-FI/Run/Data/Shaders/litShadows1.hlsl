@@ -4,6 +4,8 @@
 //SamplerComparisonState compSampler : register( s2 );
 SamplerState compSampler : register( s2 );
 
+static int HALF_KERNEL_SIZE = 1;
+
 //--------------------------------------------------------------------------------------X--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
@@ -192,10 +194,10 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
         //    }
         float2 Blur;
         	
-        for( int x = -1 ; x < 2 ; x++ )
+        for( int x = -1 ; x <= 1 ; x++ )
         {
             Blur.x = projectTexCoord[ index ].x + x * PixelWidth;
-            for( int y = -1 ; y < 2 ; y++ )
+            for( int y = -1 ; y <= 1 ; y++ )
             {
                 Blur.y = projectTexCoord[ index ].y - y * PixelHeight;
                 depthValue += depthMapTexture0.Sample( sSampler , Blur ).r ;
