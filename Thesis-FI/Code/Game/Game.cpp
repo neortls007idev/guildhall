@@ -97,6 +97,11 @@ Game::~Game()
 {
 	SaveScene();
 
+	for ( uint index = 0; index < TOTAL_LIGHTS; index++ )
+	{
+		g_theRenderer->ReleaseRenderTarget( m_shadowMap[ index ] );
+	}
+	
 	for( int index = 0 ; index < NUM_GAME_MODELS ; index++ )
 	{
 		m_ModelInstances[ index ].clear();
@@ -145,7 +150,7 @@ void Game::InitializeCameras()
 		m_gameCamera.SetPosition( Vec3( 0.f , 0.f , 0.f ) );
 		m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );
 		float height = GAME_CAM_NEAR_Z * -tanf( GAME_CAM_FOV * 0.5f );
-			  //height = ( GAME_CAM_FAR_Z * height ) / GAME_CAM_NEAR_Z;
+			  height = ( GAME_CAM_FAR_Z * height ) / GAME_CAM_NEAR_Z;
 		//m_lightsCamera.SetProjectionPerspective( GAME_CAM_FOV , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
 		m_lightsCamera.SetOrthoView3D( 2.5f , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
 		//m_lightsCamera.SetOrthoView( 540.f , CLIENT_ASPECT );
@@ -159,8 +164,8 @@ void Game::InitializeShadowMapTextures()
 {
 	for( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
 	{
-		m_shadowMap[ index ] = new Texture( g_theRenderer , g_theRenderer->m_swapChain->GetBackBuffer()->GetDimensions() );
-		m_shadowMap[ index ]->GetOrCreateShaderAndDepthStencilResourceView( Vec2( g_theRenderer->m_swapChain->GetBackBuffer()->GetDimensions() ) );
+		m_shadowMap[index] = g_theRenderer->CreateRenderTarget(IntVec2(4096, 4096), D3D_DXGI_FORMAT_R32_FLOAT,
+		                                                       "ShadowMapRTV");		
 	}
 }
 

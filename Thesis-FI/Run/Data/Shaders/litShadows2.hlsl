@@ -178,7 +178,7 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
         float2 t = frac( texelPos );
         depthValue = lerp( lerp( result0 , result1 , t.x ) , lerp( result2 , result3 , t.x ) , t.y );
 
-        //depthValue = depthMapTexture0.SampleCmpLevelZero( compSampler , projectTexCoord[ index ] , depthValue ).r;
+        depthValue = depthMapTexture0.SampleCmpLevelZero( compSampler , projectTexCoord[ index ] , depthValue ).r;
 
         // Calculate the depth of the light.
         lightDepthValue = input.lightViewPosition[ index ].z / input.lightViewPosition[ index ].w;
