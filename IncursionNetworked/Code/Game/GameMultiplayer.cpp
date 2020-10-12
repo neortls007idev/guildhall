@@ -14,6 +14,7 @@
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
+#include "Game/GameMultiplayer.hpp"
 #include "Game/TheApp.hpp"
 
 extern DevConsole* g_theDevConsole;
@@ -28,7 +29,7 @@ extern TheApp* g_theApp;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Game::Game()
+GameMultiplayer::GameMultiplayer()
 {
 	m_font = g_theRenderer->GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" );
 	m_worldCamera.SetOrthoView( Vec2( 0.f , 0.f ) , Vec2( INTITAL_MAP_SIZE_X , INTITAL_MAP_SIZE_Y ) );

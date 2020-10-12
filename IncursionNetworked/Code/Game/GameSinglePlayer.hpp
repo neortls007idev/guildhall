@@ -7,6 +7,7 @@
 #include "Engine/Renderer/SpriteDefinition.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Renderer/Texture.hpp"
+#include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/Player.hpp"
 #include "Game/TileDefinition.hpp"
@@ -16,12 +17,12 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 
-class Game
+class GameSinglePlayer : public Game
 {
 
 public:
 
-	Game();
+	GameSinglePlayer();
 
 	void LoadAssets();
 	void LoadAllSounds();

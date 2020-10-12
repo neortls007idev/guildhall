@@ -11,6 +11,9 @@
     <Filter Include="Gameplay\Entities">
       <UniqueIdentifier>{3329ea6d-c86e-48d3-8692-1cbaaabb7222}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Networking">
+      <UniqueIdentifier>{7a0b5265-0487-48a0-879c-ceb933ea804c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entity.cpp">
@@ -58,6 +61,30 @@
     <ClCompile Include="Explosion.cpp">
       <Filter>Gameplay\Entities</Filter>
     </ClCompile>
+    <ClCompile Include="Server.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="AuthServer.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="RemoteServer.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Client.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerClient.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="RemoteClient.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMultiplayer.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="GameSinglePlayer.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.hpp">
@@ -104,6 +131,30 @@
     </ClInclude>
     <ClInclude Include="Explosion.hpp">
       <Filter>Gameplay\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Server.hpp">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="AuthServer.hpp">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="RemoteServer.hpp">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Client.hpp">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerClient.hpp">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="RemoteClient.hpp">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMultiplayer.hpp">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSinglePlayer.hpp">
+      <Filter>Gameplay</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

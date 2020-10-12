@@ -193,16 +193,24 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AuthServer.cpp" />
     <ClCompile Include="Boulder.cpp" />
     <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="Client.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Explosion.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCommon.cpp" />
+    <ClCompile Include="GameMultiplayer.cpp" />
+    <ClCompile Include="GameSinglePlayer.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="NpcTank.cpp" />
     <ClCompile Include="NpcTurret.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PlayerClient.cpp" />
+    <ClCompile Include="RemoteClient.cpp" />
+    <ClCompile Include="RemoteServer.cpp" />
+    <ClCompile Include="Server.cpp" />
     <ClCompile Include="TheApp.cpp" />
     <ClCompile Include="Main_Windows.cpp" />
     <ClCompile Include="Tile.cpp" />
@@ -210,16 +218,24 @@
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AuthServer.hpp" />
     <ClInclude Include="Boulder.hpp" />
     <ClInclude Include="Bullet.hpp" />
+    <ClInclude Include="Client.hpp" />
     <ClInclude Include="EngineBuildPreferences.hpp" />
     <ClInclude Include="Entity.hpp" />
     <ClInclude Include="Explosion.hpp" />
     <ClInclude Include="Game.hpp" />
+    <ClInclude Include="GameMultiplayer.hpp" />
+    <ClInclude Include="GameSinglePlayer.hpp" />
     <ClInclude Include="Map.hpp" />
     <ClInclude Include="NpcTank.hpp" />
     <ClInclude Include="NpcTurret.hpp" />
     <ClInclude Include="Player.hpp" />
+    <ClInclude Include="PlayerClient.hpp" />
+    <ClInclude Include="RemoteClient.hpp" />
+    <ClInclude Include="RemoteServer.hpp" />
+    <ClInclude Include="Server.hpp" />
     <ClInclude Include="TheApp.hpp" />
     <ClInclude Include="GameCommon.hpp" />
     <ClInclude Include="Tile.hpp" />
