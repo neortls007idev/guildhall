@@ -48,6 +48,8 @@ public:
 	void DebugRender() const;
 
 	bool HandleQuitRequested();
+	bool IsQuitting()				 { return m_isQuitting;  }
+	bool AreAllJobsComplete();
 	
 protected:
 

@@ -41,6 +41,8 @@ public:
 												 Vec3 velocity , float age , float maxAge , Rgba8 startColor , Rgba8 endColor = CLEAR );
 	
 	void Update( float deltaSeconds );
+	void UpdateParticlesData( float deltaSeconds );
+	void UpdateParticlesVBO( size_t startIndex , size_t endIndex );
 	void UpdateParticlesBillboaring();
 	void Render();
 	void Destroy();
@@ -70,6 +72,7 @@ public:
 	
 	Particle3D*						m_particles;
 //	Vertex_PCU*						m_particleVerts;
+	std::atomic<bool>				m_lock;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

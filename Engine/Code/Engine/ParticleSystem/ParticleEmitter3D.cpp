@@ -215,10 +215,62 @@ void ParticleEmitter3D::Update( float deltaSeconds )
 		lookAt.Iy = ibasis.y;
 		lookAt.Iz = ibasis.z;
 		lookAt.Iw = ibasis.w;
-		
+
 		Transform3DAndAppendVertsForAABB2( m_particleVerts , particle->m_cosmeticBounds , particle->m_startColor ,
-		                                particle->m_minsUVs , particle->m_maxsUVs , particle->m_position , lookAt );
+				                            particle->m_minsUVs , particle->m_maxsUVs , particle->m_position , lookAt );
 		
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void ParticleEmitter3D::UpdateParticlesData( float deltaSeconds )
+{
+	m_particleVerts.clear();
+	
+	for ( size_t index = 0; ( index < m_totalSpawnableParticles ) && ( m_numAliveParticles > 0 ); index++ )
+	{
+		if ( m_particles[ index ].m_isGarbage )
+		{
+			continue;
+		}
+		m_particles[ index ].Update( deltaSeconds );
+
+		if ( m_particles[ index ].m_age >= m_particles[ index ].m_maxAge )
+		{
+			m_particles[ index ].m_isGarbage = true;
+			m_numAliveParticles--;
+		}
+	}
+
+	m_particleVerts.resize( 6 * m_numAliveParticles );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void ParticleEmitter3D::UpdateParticlesVBO( size_t startIndex , size_t endIndex )
+{
+	Mat44 lookAt;
+
+	for ( size_t index = startIndex ; index <= endIndex ; index++ )
+	{
+		Particle3D* particle = &m_particles[ index ];
+
+		if ( particle->m_isGarbage )
+		{
+			continue;
+		}
+
+		lookAt = LookAtMatrix( particle->m_position , m_targetPos );
+		Vec4 ibasis = -lookAt.GetIBasis4D();
+		lookAt.Ix = ibasis.x;
+		lookAt.Iy = ibasis.y;
+		lookAt.Iz = ibasis.z;
+		lookAt.Iw = ibasis.w;
+
+		Transform3DAndAppendVertsForAABB2AtIndex( m_particleVerts , index * 6 , particle->m_cosmeticBounds , particle->m_startColor ,
+			particle->m_minsUVs , particle->m_maxsUVs , particle->m_position , lookAt );
+
 	}
 }
 

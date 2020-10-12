@@ -97,10 +97,10 @@ Game::~Game()
 {
 	SaveScene();
 
-	for ( uint index = 0; index < TOTAL_LIGHTS; index++ )
-	{
-		g_theRenderer->ReleaseRenderTarget( m_shadowMap[ index ] );
-	}
+	//for ( uint index = 0; index < TOTAL_LIGHTS; index++ )
+	//{
+	//	g_theRenderer->ReleaseRenderTarget( m_shadowMap[ index ] );
+	//}
 	
 	for( int index = 0 ; index < NUM_GAME_MODELS ; index++ )
 	{
@@ -140,6 +140,7 @@ Game::~Game()
 
 	delete m_linear;
 	m_linear = nullptr;
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -222,10 +223,11 @@ void Game::Update( float deltaSeconds )
 
 void Game::UpdateAllStarEmitters( float deltaSeconds )
 {
+	UNUSED( deltaSeconds );
+	
 	for ( int index = 0 ; index < NUM_STARS_EMITTERS ; index++ )
 	{
 		m_starEmitters[ index ].m_emitter->UpdateTargetPos( m_gameCamera.GetPosition() );
-		g_theParticleSystem3D->Update( deltaSeconds );
 
 		int direction = 1;
 		Vec3 emitterPos;
@@ -703,6 +705,7 @@ void Game::RenderShadowMapPass() const
 		RenderAllInstancesOfType( LUMINARIS_SHIP );
 		g_D3D11PerfMarker->EndPerformanceMarker();
 		//g_theRenderer->CopyTexture( m_shadowMap[ lightIndex ] , m_lightsCamera.GetDepthStencilTarget() );
+		//g_theRenderer->ReleaseRenderTarget( m_shadowMap[ lightIndex ] );
 		//g_theRenderer->ReleaseRenderTarget( CurrentShadowMap );
 		g_theRenderer->EndCamera( m_lightsCamera );
 

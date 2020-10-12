@@ -20,7 +20,7 @@
 InputSystem*				g_theInput						= nullptr;
 RenderContext*				g_theRenderer					= nullptr;
 DevConsole*					g_theDevConsole					= nullptr;
-JobSystem*					g_theJobSystem					= nullptr;
+extern JobSystem*			g_theJobSystem;
 Window*						g_theWindow						= nullptr;
 
 struct  testStruct1

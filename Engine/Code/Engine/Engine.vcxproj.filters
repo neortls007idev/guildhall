@@ -508,6 +508,12 @@
     <ClCompile Include="Networking\UDPListner.cpp">
       <Filter>Networking</Filter>
     </ClCompile>
+    <ClCompile Include="ParticleSystem\ParticleSystem3DJob.cpp">
+      <Filter>ParticleSystem\ParticleSystem3D</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem\ParticleEmitter3DJob.cpp">
+      <Filter>ParticleSystem\ParticleSystem3D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -956,6 +962,12 @@
     </ClInclude>
     <ClInclude Include="Networking\UDPListner.hpp">
       <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem\ParticleSystem3DJob.hpp">
+      <Filter>ParticleSystem\ParticleSystem3D</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem\ParticleEmitter3DJob.hpp">
+      <Filter>ParticleSystem\ParticleSystem3D</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

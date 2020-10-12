@@ -125,9 +125,9 @@ struct GameParticleEmitter
 	Rgba8				m_particleEndColor;
 	float				m_particleMinLifeTime			= 0.25f;
 	float				m_particleMaxLifeTime			= 2.f;
-	float				m_particleVelocity				= 0.f;
+	float				m_particleVelocity				= 10.f;
 	Vec2				m_particleSize					= Vec2::ONE;
-	uint				m_numParticlesToSpawnPerFrame	= 1000;
+	uint				m_numParticlesToSpawnPerFrame	= 20000;
 
 	uint				m_numAliveParticles				= 0;
 };
@@ -138,6 +138,8 @@ enum GameStarEmitters
 {
 	RED_ORANGE_STAR,
 	BLUE_CYAN_STAR,
+	YELLOW_GREEN_STAR,
+	PINK_PURPLE_STAR,
 
 	NUM_STARS_EMITTERS
 };
