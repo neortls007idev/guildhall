@@ -8,6 +8,12 @@
 
 #define MSVC
 
+class DevConsole;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	
+extern DevConsole* g_theDevConsole;
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 class RandomNumberGenerator;
@@ -122,3 +128,16 @@ enum eWorldCoordinateSystem
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+#ifdef UNIT_TEST
+#define LOG_ERROR(...) printf( Stringf( __VA_ARGS__ ) + std::string("\n") )
+#define LOG_WARNING(...) printf( Stringf( __VA_ARGS__ ) + std::string("\n") )
+#define LOG_SYSMESSAGE(...) printf( Stringf( __VA_ARGS__ ) + std::string("\n") )
+#else
+#define LOG_ERROR(...) g_theDevConsole->PrintString( Stringf(__VA_ARGS__) , DEVCONSOLE_ERROR );
+#define LOG_WARNING(...) g_theDevConsole->PrintString( Stringf(__VA_ARGS__ , DEVCONSOLE_WARNING ) );
+#define LOG_SYSMESSAGE(...) g_theDevConsole->PrintString( Stringf(__VA_ARGS__) , DEVCONSOLE_SYTEMLOG );
+#endif
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	

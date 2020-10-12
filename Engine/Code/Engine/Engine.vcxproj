@@ -756,6 +756,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='FastBreakProfile|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Networking\UDPListner.cpp" />
     <ClCompile Include="Networking\UDPSocket.cpp" />
     <ClCompile Include="ParticleSystem\Particle2D.cpp" />
     <ClCompile Include="ParticleSystem\Particle3D.cpp">
@@ -791,6 +792,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='FastBreakProfile|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseProfile|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="ParticleSystem\ParticleEmitter3DJob.cpp" />
     <ClCompile Include="ParticleSystem\ParticleSystem2D.cpp" />
     <ClCompile Include="ParticleSystem\ParticleSystem3D.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -808,6 +810,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='FastBreakProfile|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseProfile|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="ParticleSystem\ParticleSystem3DJob.cpp" />
     <ClCompile Include="Physics\Collider2D.cpp" />
     <ClCompile Include="Physics\Collision2D.cpp" />
     <ClCompile Include="Physics\Manifold2D.cpp" />
@@ -1099,6 +1102,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='FastBreakProfile|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="Networking\UDPListner.hpp" />
     <ClInclude Include="Networking\UDPSocket.hpp" />
     <ClInclude Include="ParticleSystem\Particle2D.hpp" />
     <ClInclude Include="ParticleSystem\Particle3D.hpp">
@@ -1134,6 +1138,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='FastBreakProfile|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseProfile|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="ParticleSystem\ParticleEmitter3DJob.hpp" />
     <ClInclude Include="ParticleSystem\ParticleSystem2D.hpp" />
     <ClInclude Include="ParticleSystem\ParticleSystem3D.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -1151,6 +1156,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='FastBreakProfile|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseProfile|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="ParticleSystem\ParticleSystem3DJob.hpp" />
     <ClInclude Include="Physics\Collider2D.hpp" />
     <ClInclude Include="Physics\Collision2D.hpp" />
     <ClInclude Include="Physics\Manifold2D.hpp" />

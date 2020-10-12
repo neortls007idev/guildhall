@@ -26,7 +26,6 @@ public:
 
 	void BeginFrame();
 	void Update( float deltaSeconds );
-	void UpdateFromKeyboard();
 	void Render() const;
 
 	void EndFrame();

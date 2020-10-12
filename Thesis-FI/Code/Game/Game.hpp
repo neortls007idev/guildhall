@@ -143,6 +143,7 @@ public:
 	Texture*							m_cubeMapex											= nullptr;
 	Shader*								m_cubeMapTest										= nullptr;
 	Sampler*							m_cubeSampler										= nullptr;
+	Sampler*							m_bilinear											= nullptr;
 	Sampler*							m_linear											= nullptr;
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 

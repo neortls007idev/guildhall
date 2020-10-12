@@ -23,6 +23,7 @@ public:
 
 	TextureView*	GetOrCreateRenderTargetView();
 	TextureView*	GetOrCreateShaderResourceView();
+	TextureView*	GetOrCreateShaderAndDepthStencilResourceView( Vec2 dimension );
 	TextureView*	GetOrCreateUnorderedAccessView();
 	TextureView*	GetOrCreateCubeMapShaderResourceView();
 	TextureView*	GetOrCreateDepthStencilView( Vec2 dimension = Vec2::ZERO );

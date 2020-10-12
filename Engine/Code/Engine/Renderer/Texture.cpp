@@ -129,6 +129,73 @@ TextureView* Texture::GetOrCreateShaderResourceView()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+TextureView* Texture::GetOrCreateShaderAndDepthStencilResourceView( Vec2 dimension )
+{
+	if ( m_depthStencilView != nullptr )
+	{
+		return m_depthStencilView;
+	}
+
+	if( m_shaderResourceView != nullptr )
+	{
+		return m_shaderResourceView;
+	}
+
+	ID3D11Device* device = m_owner->m_device;
+	ID3D11DepthStencilView* dsv = nullptr;
+
+	D3D11_TEXTURE2D_DESC descDepth;
+	descDepth.Width = ( UINT ) dimension.x;
+	descDepth.Height = ( UINT ) dimension.y;
+	descDepth.MipLevels = 0;
+	descDepth.ArraySize = 1;
+	descDepth.Format = DXGI_FORMAT_R32_TYPELESS;
+	descDepth.SampleDesc.Count = 1;
+	descDepth.SampleDesc.Quality = 0;
+	descDepth.Usage = D3D11_USAGE_DEFAULT;
+	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+	descDepth.CPUAccessFlags = 0;
+	descDepth.MiscFlags = 0;
+	device->CreateTexture2D( &descDepth , NULL , &m_handle );
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
+	memset( &descDSV , 0 , sizeof( D3D11_DEPTH_STENCIL_VIEW_DESC ) );
+
+	descDSV.Format = DXGI_FORMAT_D32_FLOAT;
+	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	descDSV.Texture2D.MipSlice = 0;
+
+	// Create the depth stencil view	
+	device->CreateDepthStencilView( m_handle ,				// Depth stencil texture
+		&descDSV ,												// Depth stencil desc
+		&dsv );													// [out] Depth stencil view
+
+	if ( dsv )
+	{
+		m_depthStencilView = new TextureView();
+		m_depthStencilView->m_dsv = dsv;
+	}
+
+	ID3D11ShaderResourceView* srv = nullptr;
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	ZeroMemory( &srvDesc , sizeof( srvDesc ) );
+	srvDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = 0;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	device->CreateShaderResourceView( m_handle , &srvDesc , &srv );
+	
+	if ( srv )
+	{
+		m_shaderResourceView = new TextureView();
+		m_shaderResourceView->m_srv = srv;
+	}
+	return m_depthStencilView;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 TextureView* Texture::GetOrCreateUnorderedAccessView()
 {
 	if( m_unorderedAccessView )

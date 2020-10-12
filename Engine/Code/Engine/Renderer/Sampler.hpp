@@ -1,5 +1,6 @@
 #pragma once
 #include "RendererCommon.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -11,7 +12,7 @@ class RenderContext;
 class Sampler
 {
 public:
-	Sampler( RenderContext* ctx , eSamplerType type );
+	Sampler( RenderContext* ctx , eSamplerType type , eCompareOp comparisonOp = COMPARE_NEVER );
 	~Sampler();
 
 	inline ID3D11SamplerState*	GetHandle() const					{ return m_handle;  }

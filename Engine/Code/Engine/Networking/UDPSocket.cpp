@@ -1,10 +1,6 @@
 ﻿#include "Engine/Networking/UDPSocket.hpp"
 #include "Engine/Core/DevConsole.hpp"
 
-#ifdef defined( UNITTEST )
-	#include <iostream>
-#endif
-
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 extern	DevConsole* g_theDevConsole;
@@ -23,11 +19,11 @@ UDPSocket::UDPSocket( const std::string& host , int port )
 
 	if ( m_socket == INVALID_SOCKET )
 	{
-#ifdef defined( UNITTEST )
-		std::cout << "UDP Socket instantiate failed, Error = %d" << WSAGetLastError() << std::endl;
-#else
-		g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "UDP Socket instantiate failed, Error = %d\n" , WSAGetLastError() );
-#endif
+		LOG_ERROR( "UDP Socket instantiate failed , Error = %d" , WSAGetLastError() );
+	}
+	else
+	{
+		LOG_SYSMESSAGE( "UDP Socket started on %s:%d" , host.c_str() , port );
 	}
 }
 
@@ -51,29 +47,56 @@ void UDPSocket::Bind( int port )
 
 	if( iResult != 0 )
 	{
-#ifdef defined( UNITTEST )
-		std::cout << "UDP Socket Bind failed, Error = %d" << WSAGetLastError() << std::endl;
-#else
-		g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "UDP Socket Bind failed, Error = %d\n" , WSAGetLastError() );
-#endif
+		LOG_ERROR( "UDP Socket Bind failed, Error = %d" , WSAGetLastError() );
+	}
+	else
+	{
+		LOG_SYSMESSAGE( "UDP Socket Bind Successful on port: %d" , port );
 	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-int UDPSocket::Send()
+int UDPSocket::Send( int length )
 {
-	return 0;
+	int result = ::sendto( m_socket , &m_sendBuffer[ 0 ] , static_cast< int >( length ) , 0 , reinterpret_cast< SOCKADDR* >( &m_toAddress ) , sizeof( m_toAddress ) );
+	if ( result == SOCKET_ERROR )
+	{
+		LOG_ERROR( "Send on UDP Socket Failed, Error = %d" , WSAGetLastError() );
+	}
+	return result;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 int UDPSocket::Receive()
 {
-	return 0;
+	sockaddr_in fromAddr;
+	int fromLen = sizeof( fromAddr );
+	int result = ::recvfrom( m_socket , &m_receiveBuffer[ 0 ] , static_cast< int > ( m_receiveBuffer.size() ) , 0 , reinterpret_cast< SOCKADDR* >( &fromAddr ) , &fromLen );
+	if ( result == SOCKET_ERROR || result < 0 )
+	{
+		LOG_ERROR( "Recieve on UDP Socket Failed, Error = %d" , WSAGetLastError() );
+	}
+	return result;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+UDPSocket::Buffer& UDPSocket::SendBuffer()
+{
+	return m_sendBuffer;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	
+UDPSocket::Buffer& UDPSocket::ReceiveBuffer()
+{
+	return m_receiveBuffer;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	
 
 void UDPSocket::Close()
 {
@@ -83,12 +106,21 @@ void UDPSocket::Close()
 
 		if ( iResult == SOCKET_ERROR )
 		{
-#ifdef defined( UNITTEST )
-			std::cout << "UDP Socket Close failed, Error = %d" << WSAGetLastError() << std::endl;
-#else
-			g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "UDP Socket Close failed, Error = %d\n" , WSAGetLastError() );
-#endif
+			LOG_ERROR( "UDP Socket Close failed, Error = %d" , WSAGetLastError() );
+		}
+		else
+		{
+			LOG_SYSMESSAGE( "UDP Socket Closed Successfully" );
 		}
 		m_socket = INVALID_SOCKET;
 	}
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	
+bool UDPSocket::IsValid()
+{
+	return m_socket != INVALID_SOCKET;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

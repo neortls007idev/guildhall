@@ -107,7 +107,7 @@ bool ShaderStage::Compile( RenderContext* ctx , std::string const& filename , vo
 	char const* shaderModel = GetShaderModelForStage( stageType );
 
 	DWORD compileFlags = 0U;
-#define DEBUG_SHADERS
+//#define DEBUG_SHADERS
 	
 #if defined(DEBUG_SHADERS)
 	compileFlags |= D3DCOMPILE_DEBUG;

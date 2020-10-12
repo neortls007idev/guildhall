@@ -136,34 +136,11 @@ v2f_t VertexFunction(vs_input_t input)
 // is being drawn to the first bound color target.
 float4 FragmentFunction(v2f_t input) : SV_Target0
 {
-    //return float4(input.uv , 0, 1);
-
 	// DEPTH DEBUGGING
     float   depthValue;
-    float4  color;
-
+    
     depthValue = input.position.z / input.position.w;
 		// First 10% of the depth buffer color red.
 
     return float4( depthValue.xxx , 1.f );
-
-	if( depthValue < 0.9f )
-    {
-        color = float4( 1.0 , 0.0f , 0.0f , 1.0f );
-    }
-	
-	// The next 0.025% portion of the depth buffer color green.
-    if( depthValue > 0.9f )
-    {
-        color = float4( 0.0 , 1.0f , 0.0f , 1.0f );
-    }
-
-	// The remainder of the depth buffer color blue.
-    if( depthValue > 0.925f )
-    {
-        color = float4( 0.0 , 0.0f , 1.0f , 1.0f );
-    }
-
-    return color;
-    //return  input.position;
 }

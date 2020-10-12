@@ -7,14 +7,16 @@
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Input/VirtualKeyboard.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
+#include "Engine/Core/DevConsole.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //		GLOBAL VARIABLES
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-extern RenderContext* g_theRenderer;
-extern TheApp* g_theApp;
-extern AudioSystem* g_theAudioSystem;
+extern RenderContext*	g_theRenderer;
+extern TheApp*			g_theApp;
+extern AudioSystem*		g_theAudioSystem;
+extern DevConsole*		g_theDevConsole;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -41,7 +43,10 @@ void Player::Update( float deltaSeconds )
 	{
 		return;
 	}
-	checkKeyboardKeyPressForMovement( deltaSeconds );
+	if( !g_theDevConsole->IsOpen() )
+	{
+		checkKeyboardKeyPressForMovement( deltaSeconds );
+	}
 	Entity::WrapAroundScreen();
 }
 

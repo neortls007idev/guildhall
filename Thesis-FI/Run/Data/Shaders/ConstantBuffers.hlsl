@@ -125,7 +125,6 @@ Texture2D<float4>   tNormal     : register( t1 );                               
 
 //--------------------------------------------------------------------------------------
 
-Texture2D<float4> depthMapTexture0 : register( t8 );
 //Texture2D<float4> depthMapTexture1 : register( t9 );
 //Texture2D<float4> depthMapTexture2 : register( t10 );
 //Texture2D<float4> depthMapTexture3 : register( t11 );
@@ -137,6 +136,7 @@ Texture2D<float4> depthMapTexture0 : register( t8 );
 //--------------------------------------------------------------------------------------
 
 SamplerState        sSampler    : register( s0 );                                           // sampler are rules on how to sample (read) from the texture.
+//sampler2D        sSampler    : register( s0 );                                           // sampler are rules on how to sample (read) from the texture.
 
 //--------------------------------------------------------------------------------------
 

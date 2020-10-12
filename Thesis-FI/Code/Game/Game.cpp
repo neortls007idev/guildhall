@@ -81,12 +81,14 @@ Game::Game()
 	m_unitCubeMesh->UpdateVertices( ( uint ) cubeMeshVerts.size() , cubeMeshVerts.data() );
 	m_unitCubeMesh->UpdateIndices( cubeMeshIndices );
 
-	m_cubeSampler = new Sampler( g_theRenderer , SAMPLER_CUBEMAP );
-	m_linear = new Sampler( g_theRenderer , SAMPLER_BILINEAR );
+	m_cubeSampler	= new Sampler( g_theRenderer , SAMPLER_CUBEMAP );
+	m_bilinear		= new Sampler( g_theRenderer , SAMPLER_BILINEAR );
+	m_linear		= new Sampler( g_theRenderer , SAMPLER_LINEAR , COMPARE_LESS );
 	m_debugSwitchs[ GAME_CAMERA_VIEW_FRUSTUM_CULLING ] = true;
 
 	InitializeParticleEmitters();
 	InitializeShadowTestTrasforms();
+	//InitializeShadowMapTextures();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -95,6 +97,11 @@ Game::~Game()
 {
 	SaveScene();
 
+	//for ( uint index = 0; index < TOTAL_LIGHTS; index++ )
+	//{
+	//	g_theRenderer->ReleaseRenderTarget( m_shadowMap[ index ] );
+	//}
+	
 	for( int index = 0 ; index < NUM_GAME_MODELS ; index++ )
 	{
 		m_ModelInstances[ index ].clear();
@@ -128,8 +135,12 @@ Game::~Game()
 	delete m_cubeSampler;
 	m_cubeSampler = nullptr;
 	
-	delete	m_linear;
+	delete	m_bilinear;
+	m_bilinear = nullptr;
+
+	delete m_linear;
 	m_linear = nullptr;
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -139,9 +150,10 @@ void Game::InitializeCameras()
 		m_gameCamera.SetProjectionPerspective( GAME_CAM_FOV , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
 		m_gameCamera.SetPosition( Vec3( 0.f , 0.f , 0.f ) );
 		m_gameCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );
-
+		float height = GAME_CAM_NEAR_Z * -tanf( GAME_CAM_FOV * 0.5f );
+			  height = ( GAME_CAM_FAR_Z * height ) / GAME_CAM_NEAR_Z;
 		//m_lightsCamera.SetProjectionPerspective( GAME_CAM_FOV , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
-		m_lightsCamera.SetOrthoView3D( 20.f , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
+		m_lightsCamera.SetOrthoView3D( 2.5f , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
 		//m_lightsCamera.SetOrthoView( 540.f , CLIENT_ASPECT );
 		m_lightsCamera.SetPosition( Vec3( 0.f , 0.f , 0.f ) );
 		m_lightsCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );
@@ -151,10 +163,11 @@ void Game::InitializeCameras()
 
 void Game::InitializeShadowMapTextures()
 {
-	//for( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
-	//{
-	//	m_shadowMap[ index ] = new Texture( g_theRenderer , g_theRenderer->m_swapChain->GetBackBuffer()->GetDimensions() );
-	//}
+	for( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
+	{
+		m_shadowMap[index] = g_theRenderer->CreateRenderTarget(IntVec2(4096, 4096), D3D_DXGI_FORMAT_R32_FLOAT,
+		                                                       "ShadowMapRTV");		
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -210,10 +223,11 @@ void Game::Update( float deltaSeconds )
 
 void Game::UpdateAllStarEmitters( float deltaSeconds )
 {
+	UNUSED( deltaSeconds );
+	
 	for ( int index = 0 ; index < NUM_STARS_EMITTERS ; index++ )
 	{
 		m_starEmitters[ index ].m_emitter->UpdateTargetPos( m_gameCamera.GetPosition() );
-		g_theParticleSystem3D->Update( deltaSeconds );
 
 		int direction = 1;
 		Vec3 emitterPos;
@@ -342,6 +356,7 @@ void Game::Render() const
 	Texture* backBuffer		= g_theRenderer->m_swapChain->GetBackBuffer();
 	Texture* colorTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer , "realColorTarget" );
 	Texture* bloomTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer , "BloomColorTarget" );
+	Texture* finalImage = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
 	
 	m_gameCamera.SetColorTarget( 0 , colorTarget );
 	m_gameCamera.SetColorTarget( 1 , bloomTarget );
@@ -354,7 +369,8 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 	g_theRenderer->BindDepthStencil( m_gameCamera.GetDepthStencilTarget() );
 	g_theRenderer->BindShader( nullptr );
 	g_theRenderer->BindCubeMapTexture( nullptr );
-	g_theRenderer->BindSampler( m_linear );
+	g_theRenderer->BindSampler( m_bilinear );
+	g_theRenderer->BindSampler( m_linear , 2 );
 	
 	g_theRenderer->SetRasterState( FILL_SOLID );
 	
@@ -494,7 +510,6 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 	if ( m_isblurShaderActive )
 	{
 		g_D3D11PerfMarker->BeginPerformanceMarker( L"Blurred Bloom" );
-
 		Shader* blurShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );;
 		Texture* blurredBloom = g_theRenderer->GetOrCreatematchingRenderTarget( bloomTarget , "BlurBloomTarget" );
 		g_theRenderer->StartEffect( blurredBloom , bloomTarget , blurShader );
@@ -502,7 +517,7 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 		g_theRenderer->EndEffect();
 		
 		Shader* combineImageShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/combineImage.hlsl" );;
-		Texture* finalImage = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
+		//Texture* finalImage = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
 		g_theRenderer->StartEffect( finalImage , colorTarget , combineImageShader );
 		g_theRenderer->BindTexture( blurredBloom , TEX_USER_TYPE );
 		g_theRenderer->BindTexture( colorTarget , TEX_USER_TYPE , 1 );
@@ -516,7 +531,7 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 	else
 	{
 		Shader* combineImageShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/combineImage.hlsl" );;
-		Texture* finalImage = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
+		//Texture* finalImage = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
 		g_theRenderer->StartEffect( finalImage , colorTarget , combineImageShader );
 		g_theRenderer->BindTexture( bloomTarget , TEX_USER_TYPE );
 		g_theRenderer->BindTexture( colorTarget , TEX_USER_TYPE , 1 );
@@ -608,7 +623,7 @@ void Game::RenderShadowMapPass() const
 	for ( uint lightIndex = 0; lightIndex < TOTAL_LIGHTS; lightIndex++ )
 	{
 		Texture* backBuffer = g_theRenderer->m_swapChain->GetBackBuffer();
-		m_shadowMap[ lightIndex ] = g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer , "lightDepthTarget" );
+		m_shadowMap[ lightIndex ] = g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer , "lightDepthTarget" , D3D_DXGI_FORMAT_R32_FLOAT );
 
 		m_lightsCamera.SetColorTarget( 0 , m_shadowMap[ lightIndex ] );
 
@@ -617,11 +632,11 @@ void Game::RenderShadowMapPass() const
 		m_lightsCamera.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
 		m_lightsCamera.SetPitchYawRollRotation( m_lightsPitchYawRoll[ lightIndex ].x , m_lightsPitchYawRoll[ lightIndex ].y , 0.f );
 
-		Vec3 lightCameraMin = m_lightsCamera.GetOrthoMin();
-		Vec3 lightCameraMax = m_lightsCamera.GetOrthoMax();
-
-		DebugAddWorldWireBounds(OBB3(lightCameraMin, lightCameraMax, m_lightsPitchYawRoll[lightIndex]), GREEN,
-		                        0.25f);
+		//Vec3 lightCameraMin = m_lightsCamera.GetOrthoMin();
+		//Vec3 lightCameraMax = m_lightsCamera.GetOrthoMax();
+		//
+		//DebugAddWorldWireBounds(OBB3(lightCameraMin, lightCameraMax, m_lightsPitchYawRoll[lightIndex]), GREEN,
+		//                        0.25f);
 		
 		g_D3D11PerfMarker->BeginPerformanceMarker( passName.c_str() );
 		g_D3D11PerfMarker->BeginPerformanceMarker( L"Initializing State" );
@@ -639,7 +654,8 @@ void Game::RenderShadowMapPass() const
 		g_theRenderer->BindDepthStencil( m_lightsCamera.GetDepthStencilTarget() );
 		g_theRenderer->BindShader( nullptr );
 		g_theRenderer->BindCubeMapTexture( nullptr );
-		g_theRenderer->BindSampler( m_linear );
+		g_theRenderer->BindSampler( m_bilinear );
+		g_theRenderer->BindSampler( m_linear , 2 );
 
 		g_theRenderer->SetRasterState( FILL_SOLID );
 
@@ -688,9 +704,27 @@ void Game::RenderShadowMapPass() const
 		RenderAllInstancesOfType( SPACESHIP );
 		RenderAllInstancesOfType( LUMINARIS_SHIP );
 		g_D3D11PerfMarker->EndPerformanceMarker();
-
+		//g_theRenderer->CopyTexture( m_shadowMap[ lightIndex ] , m_lightsCamera.GetDepthStencilTarget() );
+		//g_theRenderer->ReleaseRenderTarget( m_shadowMap[ lightIndex ] );
 		//g_theRenderer->ReleaseRenderTarget( CurrentShadowMap );
 		g_theRenderer->EndCamera( m_lightsCamera );
+
+		//for ( int index = 0; index < 1 ; index++ )
+		//{
+		//
+		//	g_D3D11PerfMarker->BeginPerformanceMarker( L"Blurred Shadow" );
+		//	
+		//	Shader* blurShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );
+		//	Texture* blurredShadow = g_theRenderer->GetOrCreatematchingRenderTarget( m_shadowMap[ lightIndex ] , "BlurBloomTarget" , D3D_DXGI_FORMAT_R32_FLOAT );
+		//	g_theRenderer->StartEffect( blurredShadow , m_shadowMap[ lightIndex ] , blurShader );
+		//	g_theRenderer->BindTexture( m_shadowMap[ lightIndex ] , TEX_USER_TYPE );
+		//	g_theRenderer->EndEffect();
+		//	
+		//	g_theRenderer->CopyTexture( m_shadowMap[ lightIndex ] , blurredShadow );
+		//	g_theRenderer->ReleaseRenderTarget( blurredShadow );
+		//	
+		//	g_D3D11PerfMarker->EndPerformanceMarker();
+		//}
 		
 		g_D3D11PerfMarker->EndPerformanceMarker();
 	}
