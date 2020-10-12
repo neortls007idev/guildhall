@@ -14,6 +14,8 @@
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
+#include "Engine/Memory/JobSystem.hpp"
+#include "Engine/ParticleSystem/ParticleSystem3DJob.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -26,6 +28,7 @@ extern ImGUISystem*					g_debugUI;
 extern BitmapFont*					g_bitmapFont;
 extern DebugRenderObjectsManager*	g_currentManager;
 extern ParticleSystem3D*			g_theParticleSystem3D;
+extern JobSystem*					g_theJobSystem;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -62,6 +65,9 @@ TheApp::~TheApp()
 	delete g_theInput;
 	g_theInput = nullptr;
 
+	delete g_theJobSystem;
+	g_theJobSystem = nullptr;
+	
 	delete g_theEventSystem;
 	g_theEventSystem = nullptr;
 }
@@ -91,6 +97,12 @@ void TheApp::Startup()
 	}
 	g_theInput->Startup();
 
+	if( g_theJobSystem == nullptr )
+	{
+		g_theJobSystem = new JobSystem();
+	}
+	g_theJobSystem->Startup();
+	
 	if ( g_theRenderer == nullptr )
 	{
 		g_theRenderer = new RenderContext();
@@ -156,6 +168,15 @@ void TheApp::RunFrame()
 
 	BeginFrame();                        // all engine system and not game systems
 	Update( ( float ) deltaSeconds );
+
+	m_particleSystemJob = new ParticleSystem3DUpdateJob( 0 , g_theParticleSystem3D , ( float ) deltaSeconds );
+	g_theJobSystem->PostJob( *m_particleSystemJob );
+
+	while ( !g_theJobSystem->AreAllJobsComplete() && !g_theJobSystem->IsQuitting() )
+	{
+		// wait for all jobs to complete
+	}
+	
 	Render();
 	EndFrame();
 }
@@ -170,6 +191,7 @@ void TheApp::BeginFrame()
 	g_theEventSystem->BeginFrame();
 	g_theWindow->BeginFrame();
 	g_theInput->BeginFrame();
+	g_theJobSystem->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theDevConsole->BeginFrame();
 	g_theParticleSystem3D->BeginFrame();
@@ -200,6 +222,7 @@ void TheApp::BeginFrame()
 void TheApp::Update( float deltaSeconds )
 {
 	//g_theInput->Update( deltaSeconds );
+	
 	g_theRenderer->UpdateFrameTime( deltaSeconds );
 	g_currentManager->Update( deltaSeconds );
 	UpdateFromKeyboard();
@@ -208,13 +231,18 @@ void TheApp::Update( float deltaSeconds )
 	else if ( m_isSloMo == true )				{ deltaSeconds /= 10.f; }
 	if ( m_isSpeedMo )							{ deltaSeconds = deltaSeconds * 4.0f; }
 
+	//g_theParticleSystem3D->Update( deltaSeconds );
+	//ParticleSystem3DUpdateJob ParticleSystem3DJob( 0 , g_theParticleSystem3D , deltaSeconds );
+	//g_theJobSystem->PostJob( ParticleSystem3DJob );
+	
 	g_theGame->Update( deltaSeconds );
+	
 	
 	if( g_theDevConsole->IsOpen() )
 	{
 		g_theDevConsole->Update( deltaSeconds );
 	}
-
+	
 	g_theInput->EndFrame();
 }
 
@@ -241,6 +269,7 @@ void TheApp::EndFrame()
 	g_theParticleSystem3D->EndFrame();
 	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
+	g_theJobSystem->EndFrame();
 	g_theInput->EndFrame();
 
 // 	if ( g_theRenderer->HasAnyShaderChangedAtPath( L"\\Data\\Shaders\\" , 3.f ) )
@@ -263,6 +292,7 @@ void TheApp::Shutdown()
 	g_theParticleSystem3D->Shutdown();
 	g_theDevConsole->Shutdown();
 	g_theRenderer->Shutdown();
+	g_theJobSystem->Shutdown();
 	g_theInput->Shutdown();
 	// TODO :- write me g_theWindow->Shutdown();
 	g_theEventSystem->Shutdown();
@@ -273,7 +303,11 @@ void TheApp::Shutdown()
 
 void TheApp::UpdateFromKeyboard()
 {
-	if ( g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() ) { g_theWindow->HandleQuitRequested(); }
+	if ( g_theInput->GetButtonState( KEY_ESC ).WasJustPressed() )
+	{
+		g_theJobSystem->HandleQuitRequested();
+		g_theWindow->HandleQuitRequested();
+	}
 
 	if ( g_theInput->WasKeyJustPressed( KEY_TILDE ) )
 	{

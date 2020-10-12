@@ -3,6 +3,10 @@
 #include "Engine/Memory/JobSystemWorkerThread.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+	
+JobSystem* g_theJobSystem = nullptr;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 JobSystem::JobSystem()
 {
@@ -54,7 +58,7 @@ void JobSystem::Shutdown()
 	for ( auto iter = m_workerThreads.begin() ; iter != m_workerThreads.end() ; ++iter )
 	{
 		if( nullptr != *iter )
-		{	
+		{
 			delete *iter;
 			*iter = nullptr;
 		}
@@ -121,7 +125,7 @@ void JobSystem::ClaimJobForExecution()
 	//----------------------------------------------------------------------------------------------------------
 		
 		jobAtFrontOfQueue->Execute();
-
+		
 	//----------------------------------------------------------------------------------------------------------
 	//	POP THE JOB FROM THE RUNNING JOBS QUEUE AND PUSH TO COMPLETED JOBS QUEUE
 	//----------------------------------------------------------------------------------------------------------
@@ -182,6 +186,13 @@ bool JobSystem::HandleQuitRequested()
 {
 	m_isQuitting = true;
 	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool JobSystem::AreAllJobsComplete()
+{
+	return ( m_pendingJobsQueue.empty() && m_processingJobsQueue.empty() );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

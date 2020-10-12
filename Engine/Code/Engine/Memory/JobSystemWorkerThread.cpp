@@ -25,7 +25,7 @@ void JobSystemWorkerThread::WorkerThreadMain( int threadID )
 {
 	UNUSED( threadID );
 
-	while( true )
+	while( !m_ownerJobSystem->IsQuitting() )
 	{
 		m_ownerJobSystem->ClaimJobForExecution();
 	}
