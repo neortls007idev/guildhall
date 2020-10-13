@@ -24,6 +24,7 @@ ParticleEmitter3D::ParticleEmitter3D( RenderContext* renderContext , Texture* te
 
 	m_totalSpawnableParticles = initialArraySize;
 	m_particles = new Particle3D[ initialArraySize ];
+	m_isParticleGarbage = new bool[ initialArraySize ];
 	//m_particleVerts = new Vertex_PCU[ initialArraySize * 6 ];
 //	m_particleVerts.resize( 6 * initialArraySize );
 }
@@ -46,6 +47,7 @@ ParticleEmitter3D::ParticleEmitter3D ( RenderContext* renderContext , SpriteShee
 
 	m_totalSpawnableParticles = initialArraySize;
 	m_particles = new Particle3D[ initialArraySize ];
+	m_isParticleGarbage = new bool[ initialArraySize ];
 //	m_particleVerts.resize( 6 * initialArraySize );
 	//m_particleVerts = new Vertex_PCU[ initialArraySize * 6 ];
 }
@@ -57,6 +59,9 @@ ParticleEmitter3D::~ParticleEmitter3D()
 	delete [] m_particles;
 	m_particles = nullptr;
 
+	delete[] m_isParticleGarbage;
+	m_isParticleGarbage = nullptr;
+	
 	//delete [] m_particleVerts;
 	//m_particleVerts = nullptr;
 	
@@ -145,9 +150,11 @@ void ParticleEmitter3D::EmplaceBackNewParticle( Particle3D temp )
 	{
 		for ( size_t index = m_lastSpawnPointPos; ( index < m_totalSpawnableParticles ) ; index++ )
 		{
-			if ( m_particles[ index ].m_isGarbage )
+			//if ( m_particles[ index ].m_isGarbage )
+			if ( m_isParticleGarbage[ index ] )
 			{
-				temp.m_isGarbage = false;
+				//temp.m_isGarbage = false;
+				m_isParticleGarbage[ index ] = false;
 				m_particles[ index ] = temp;
 				m_numAliveParticles++;
 				m_lastSpawnPointPos = index;
@@ -185,7 +192,8 @@ void ParticleEmitter3D::Update( float deltaSeconds )
 	
 	for( size_t index = 0 ; ( index < m_totalSpawnableParticles ) && ( m_numAliveParticles > 0 ); index++ )
 	{
-		if ( m_particles[ index ].m_isGarbage )
+		//if ( m_particles[ index ].m_isGarbage )
+		if ( m_isParticleGarbage[ index ] )
 		{
 			continue;
 		}
@@ -193,7 +201,8 @@ void ParticleEmitter3D::Update( float deltaSeconds )
 
 		if ( m_particles[ index ].m_age >= m_particles[ index ].m_maxAge )
 		{
-			m_particles[ index ].m_isGarbage = true;
+			//m_particles[ index ].m_isGarbage = true;
+			m_isParticleGarbage[ index ] = true;
 			m_numAliveParticles--;
 		}
 	}
@@ -204,7 +213,8 @@ void ParticleEmitter3D::Update( float deltaSeconds )
 	{
 		Particle3D* particle = &m_particles[ index ];
 
-		if( particle->m_isGarbage )
+		//if( particle->m_isGarbage )
+		if( m_isParticleGarbage[ index ] )
 		{
 			continue;
 		}
@@ -230,7 +240,8 @@ void ParticleEmitter3D::UpdateParticlesData( float deltaSeconds )
 	
 	for ( size_t index = 0; ( index < m_totalSpawnableParticles ) && ( m_numAliveParticles > 0 ); index++ )
 	{
-		if ( m_particles[ index ].m_isGarbage )
+		//if ( m_particles[ index ].m_isGarbage )
+		if ( m_isParticleGarbage[ index ] )
 		{
 			continue;
 		}
@@ -238,7 +249,8 @@ void ParticleEmitter3D::UpdateParticlesData( float deltaSeconds )
 
 		if ( m_particles[ index ].m_age >= m_particles[ index ].m_maxAge )
 		{
-			m_particles[ index ].m_isGarbage = true;
+			//m_particles[ index ].m_isGarbage = true;
+			m_isParticleGarbage[ index ] = true;
 			m_numAliveParticles--;
 		}
 	}
@@ -256,7 +268,8 @@ void ParticleEmitter3D::UpdateParticlesVBO( size_t startIndex , size_t endIndex 
 	{
 		Particle3D* particle = &m_particles[ index ];
 
-		if ( particle->m_isGarbage )
+		//if ( particle->m_isGarbage )
+		if ( m_isParticleGarbage[ index ] )
 		{
 			continue;
 		}

@@ -46,7 +46,7 @@ public:
  	Vec2		m_minsUVs			= Vec2::ZERO;
  	Vec2		m_maxsUVs			= Vec2::ONE;
 	float		m_scale				= 1.f;
-	bool		m_isGarbage			= true;
+//	bool		m_isGarbage			= true;
 //	bool		m_isBillboarded		= false;
 };
 

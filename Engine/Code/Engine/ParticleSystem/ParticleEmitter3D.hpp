@@ -71,6 +71,7 @@ public:
 	size_t							m_totalSpawnableParticles		= 0;
 	
 	Particle3D*						m_particles;
+	bool*							m_isParticleGarbage;
 //	Vertex_PCU*						m_particleVerts;
 	std::atomic<bool>				m_lock;
 };
