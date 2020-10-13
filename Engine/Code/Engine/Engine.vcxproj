@@ -604,6 +604,9 @@
     </ClCompile>
     <ClCompile Include="..\ThirdParty\ImGUI\imgui_impl_win32.cpp" />
     <ClCompile Include="..\ThirdParty\ImGUI\imgui_widgets.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGUI\implot.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGUI\implot_demo.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGUI\implot_items.cpp" />
     <ClCompile Include="..\ThirdParty\MikkT\MikktSpace.c" />
     <ClCompile Include="..\ThirdParty\TinyXML2\tinyxml2.cpp" />
     <ClCompile Include="Audio\AudioSystem.cpp" />
@@ -922,6 +925,8 @@
     </ClInclude>
     <ClInclude Include="..\ThirdParty\ImGUI\imgui_impl_win32.h" />
     <ClInclude Include="..\ThirdParty\ImGUI\imgui_internal.h" />
+    <ClInclude Include="..\ThirdParty\ImGUI\implot.h" />
+    <ClInclude Include="..\ThirdParty\ImGUI\implot_internal.h" />
     <ClInclude Include="..\ThirdParty\ImGUI\imstb_rectpack.h" />
     <ClInclude Include="..\ThirdParty\ImGUI\imstb_textedit.h" />
     <ClInclude Include="..\ThirdParty\ImGUI\imstb_truetype.h" />

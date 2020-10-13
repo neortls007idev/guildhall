@@ -131,6 +131,9 @@
     <Filter Include="DataStructures\ThreadSafe">
       <UniqueIdentifier>{cbb66828-4243-4358-b248-72f7fca08066}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ThirdParty\ImGUI\Plot">
+      <UniqueIdentifier>{a11a00e2-e778-4a82-8e83-80c098ef9117}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Rgba8.cpp">
@@ -513,6 +516,15 @@
     </ClCompile>
     <ClCompile Include="ParticleSystem\ParticleEmitter3DJob.cpp">
       <Filter>ParticleSystem\ParticleSystem3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGUI\implot.cpp">
+      <Filter>ThirdParty\ImGUI\Plot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGUI\implot_demo.cpp">
+      <Filter>ThirdParty\ImGUI\Plot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGUI\implot_items.cpp">
+      <Filter>ThirdParty\ImGUI\Plot</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -968,6 +980,12 @@
     </ClInclude>
     <ClInclude Include="ParticleSystem\ParticleEmitter3DJob.hpp">
       <Filter>ParticleSystem\ParticleSystem3D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\ImGUI\implot.h">
+      <Filter>ThirdParty\ImGUI\Plot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\ImGUI\implot_internal.h">
+      <Filter>ThirdParty\ImGUI\Plot</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

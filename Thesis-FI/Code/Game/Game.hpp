@@ -63,6 +63,7 @@ private:
 					void ProfilingSettingsGUI();
 					void ParticleEmitterSettingsGUI();
 				void PermanentDebugDataGUI();
+				void PlotFrameRate();
 				void SpecialControlsDisplayGUI();
 
 			//----------------------------------------------------------------------------------------------------------
@@ -176,7 +177,12 @@ private:
 	//----------------------------------------------------------------------------------------------------------
 
 	Transform m_shadowTestCubes[ 8 ];
-	
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//				FRAME DATA
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	float m_frameRates[ FRAME_RATE_BUFFER_SIZE ] = { 0.f };
+	size_t m_currentFrameInBuffer = 0;
 	//std::vector<GameParticleEmitter>	m_emitters;
 	//std::vector<SpriteSheet*>			m_particleSystemSpriteSheets;
 };

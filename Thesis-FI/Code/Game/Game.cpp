@@ -175,7 +175,14 @@ void Game::InitializeShadowMapTextures()
 void Game::Update( float deltaSeconds )
 {
 	m_frameRate = 1.f / deltaSeconds;
-
+	//m_frameRates.push_back( m_frameRate );
+	m_currentFrameInBuffer++;
+	if( m_currentFrameInBuffer == FRAME_RATE_BUFFER_SIZE )
+	{
+		m_currentFrameInBuffer = 0;
+	}
+	m_frameRates[ m_currentFrameInBuffer ] = m_frameRate;
+	
 	if( m_worstFrame > m_frameRate )	{	m_worstFrame = m_frameRate;		}
 	if( m_bestFrame < m_frameRate )		{	m_bestFrame = m_frameRate;		}
 

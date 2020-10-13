@@ -43,9 +43,18 @@ void ParticleEmitter3DUpdateParticlesJob::Execute()
 		g_theJobSystem->PostJob( *vboJob );
 		jobEndIndex += numJobRange;
 	}
-	
-	//ParticleEmitter3DUpdateParticlesVertexBufferJob* vboJob = new ParticleEmitter3DUpdateParticlesVertexBufferJob( 0 , m_emitter , jobEndIndex + 1 , jobEndIndex + numJobRange  );
-	//g_theJobSystem->PostJob( *vboJob );
+
+//	if( numRangeCorrection == 1)
+//	{
+//		ParticleEmitter3DUpdateParticlesVertexBufferJob* vboJob = new ParticleEmitter3DUpdateParticlesVertexBufferJob( 0 , m_emitter , jobEndIndex + 1 , jobEndIndex + 1  );
+//		g_theJobSystem->PostJob( *vboJob );
+//	}
+//
+//	if ( numRangeCorrection > 0 )
+//	{
+//		ParticleEmitter3DUpdateParticlesVertexBufferJob* vboJob = new ParticleEmitter3DUpdateParticlesVertexBufferJob( 0 , m_emitter , jobEndIndex + 1 , jobEndIndex + numRangeCorrection );
+//		g_theJobSystem->PostJob( *vboJob );
+//	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
