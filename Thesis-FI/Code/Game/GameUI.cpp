@@ -2,6 +2,7 @@
 #include "ThirdParty/ImGUI/imgui.h"
 #include "ThirdParty/ImGUI/ImGuiFileDialog.h"
 #include "Engine/ParticleSystem/ParticleEmitter3D.hpp"
+#include "ThirdParty/ImGUI/implot.h"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -28,6 +29,7 @@ void Game::DebugUI()
 	UIControlsGUI();
 	PermanentDebugDataGUI();
 	SpecialControlsDisplayGUI();
+	PlotFrameRate();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -398,6 +400,20 @@ void Game::PermanentDebugDataGUI()
 	ImGui::TextColored( ImVec4( 1.f , 0.f , 0.f , 1.f ) , "%i" , m_totalDrawableMeshes );
 	ImGui::TextColored( ImVec4( 1.f , 1.f , 1.f , 1.f ) , "Currently Drawing Objects = " , m_currentlyDrawingMeshes ); ImGui::SameLine();
 	ImGui::TextColored( ImVec4( 0.f , 1.f , 0.f , 1.f ) , "%i" , m_currentlyDrawingMeshes );
+	ImGui::End();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::PlotFrameRate()
+{
+	ImGui::Begin( "Frame Rate" );
+	if ( ImPlot::BeginPlot( "Frame Rate Graph" ) )
+	{
+		//ImPlot::PlotLine( "FrameTime" , m_frameRates.data() , m_frameRates.size() );
+		ImPlot::PlotLine( "FrameTime" , &m_frameRates[0] , FRAME_RATE_BUFFER_SIZE );
+		ImPlot::EndPlot();
+	}
 	ImGui::End();
 }
 

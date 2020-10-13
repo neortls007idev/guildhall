@@ -1,14 +1,17 @@
-#include "Engine/Platform/Window.hpp"
 #include "Engine/Core/DevConsole.hpp"
+#include "Engine/Platform/Window.hpp"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <Shobjidl.h>
 
-#include "Engine/Input/InputSystem.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/DebugUI/ImGUISystem.hpp"
+#include "Engine/Input/InputSystem.hpp"
+#include "Engine/Memory/JobSystem.hpp"
 #include "ThirdParty/ImGUI/imgui.h"
+
+extern JobSystem* g_theJobSystem;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //		STATIC AND GLOBAL VARIABLES
@@ -417,6 +420,12 @@ bool Window::HandleQuitRequested()
 
 bool Window::ForceQuit()
 {
+	if( g_theJobSystem != nullptr )
+	{
+		g_theJobSystem->HandleQuitRequested();
+	}
+	
+	
 	m_isQuitting = true;
 	return m_isQuitting;
 }

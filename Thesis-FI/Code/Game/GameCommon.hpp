@@ -20,6 +20,7 @@ constexpr float CLIENT_ASPECT											= 16.f/9.f;
 constexpr float GAME_CAM_NEAR_Z = 0.1f;
 constexpr float GAME_CAM_FAR_Z	= 100.0f;
 constexpr float GAME_CAM_FOV	= 60.0f;
+constexpr size_t FRAME_RATE_BUFFER_SIZE = 9000;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

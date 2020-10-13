@@ -2,6 +2,7 @@
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SwapChain.hpp"
+#include "ThirdParty/ImGUI/implot.h"
 
 ImGUISystem* g_debugUI = nullptr;
 
@@ -30,6 +31,7 @@ void ImGUISystem::Startup()
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
+	ImPlot::CreateContext();
 	//ImGuiIO& io = ImGui::GetIO();
 	ImGui_ImplWin32_Init( m_theWindow->m_hwnd );
 	ImGui_ImplDX11_Init( m_renderContext->m_device , m_renderContext->m_context );
@@ -45,6 +47,7 @@ void ImGUISystem::Shutdown()
 	
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
+	ImPlot::DestroyContext();
 	ImGui::DestroyContext();
 }
 
