@@ -25,6 +25,7 @@ ParticleEmitter3D::ParticleEmitter3D( RenderContext* renderContext , Texture* te
 	m_totalSpawnableParticles = initialArraySize;
 	m_particles = new Particle3D[ initialArraySize ];
 	m_isParticleGarbage = new bool[ initialArraySize ];
+	memset( &m_isParticleGarbage[ 0 ] , 1 , initialArraySize * sizeof( bool ) );
 	//m_particleVerts = new Vertex_PCU[ initialArraySize * 6 ];
 //	m_particleVerts.resize( 6 * initialArraySize );
 }
@@ -48,6 +49,7 @@ ParticleEmitter3D::ParticleEmitter3D ( RenderContext* renderContext , SpriteShee
 	m_totalSpawnableParticles = initialArraySize;
 	m_particles = new Particle3D[ initialArraySize ];
 	m_isParticleGarbage = new bool[ initialArraySize ];
+	memset( &m_isParticleGarbage[ 0 ] , 1 , initialArraySize * sizeof( bool ) );
 //	m_particleVerts.resize( 6 * initialArraySize );
 	//m_particleVerts = new Vertex_PCU[ initialArraySize * 6 ];
 }
