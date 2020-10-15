@@ -181,7 +181,7 @@ void Game::Update( float deltaSeconds )
 	{
 		m_currentFrameInBuffer = 0;
 	}
-	m_frameRates[ m_currentFrameInBuffer ] = m_frameRate;
+	m_frameTimes[ m_currentFrameInBuffer ] = deltaSeconds;
 	
 	if( m_worstFrame > m_frameRate )	{	m_worstFrame = m_frameRate;		}
 	if( m_bestFrame < m_frameRate )		{	m_bestFrame = m_frameRate;		}
@@ -235,9 +235,9 @@ void Game::UpdateAllStarEmitters( float deltaSeconds )
 	for ( int index = 0 ; index < NUM_STARS_EMITTERS ; index++ )
 	{
 		m_starEmitters[ index ].m_emitter->UpdateTargetPos( m_gameCamera.GetPosition() );
-
+		//m_starEmitters[ index ].m_emitter->m_targetUp = m_gameCamera.GetCameraTransform().GetAsMatrix().GetJBasis3D();
 		int direction = 1;
-		Vec3 emitterPos;
+		Vec3 emitterPos = Vec3( 0.f , 0.f , -5.f );
 		
 		if ( index == 0 )
 		{
@@ -252,7 +252,7 @@ void Game::UpdateAllStarEmitters( float deltaSeconds )
 		
 		for( uint particleSpawned = 0 ; particleSpawned < m_starEmitters[index].m_numParticlesToSpawnPerFrame ; particleSpawned++ )
 		{
-			if( m_starEmitters[index].m_emitter->m_numAliveParticles == m_starEmitters[ index ].m_emitter->m_totalSpawnableParticles )
+			if( m_starEmitters[index].m_emitter->m_numAliveParticles == ( m_starEmitters[ index ].m_emitter->m_totalSpawnableParticles - 1 )  )
 			{
 				break;
 			}
@@ -266,6 +266,7 @@ void Game::UpdateAllStarEmitters( float deltaSeconds )
 																					  , position ,m_gameCamera.GetPosition() , 1.f , deviation ,
 																					  0.0f , maxAge ,
 																					  m_starEmitters[ index ].m_particleStartColor , m_starEmitters[ index ].m_particleEndColor );
+																					 // WHITE , WHITE );
 		}
 	}
 	

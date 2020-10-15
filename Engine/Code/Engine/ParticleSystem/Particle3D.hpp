@@ -42,6 +42,7 @@ public:
 	Vec3		m_velocity			= Vec3::ZERO;
 	Rgba8		m_startColor		= CLEAR;
 	Rgba8		m_endColor			= CLEAR;
+	//Rgba8		m_color				= CLEAR;
  	AABB2		m_cosmeticBounds	= AABB2( -1.f , -1.f , 1.f ,1.f);
  	Vec2		m_minsUVs			= Vec2::ZERO;
  	Vec2		m_maxsUVs			= Vec2::ONE;

@@ -25,6 +25,7 @@ ParticleEmitter3D::ParticleEmitter3D( RenderContext* renderContext , Texture* te
 	m_totalSpawnableParticles = initialArraySize;
 	m_particles = new Particle3D[ initialArraySize ];
 	m_isParticleGarbage = new bool[ initialArraySize ];
+	memset( &m_isParticleGarbage[ 0 ] , 1 , sizeof( bool ) * initialArraySize );
 	//m_particleVerts = new Vertex_PCU[ initialArraySize * 6 ];
 //	m_particleVerts.resize( 6 * initialArraySize );
 }
@@ -48,6 +49,7 @@ ParticleEmitter3D::ParticleEmitter3D ( RenderContext* renderContext , SpriteShee
 	m_totalSpawnableParticles = initialArraySize;
 	m_particles = new Particle3D[ initialArraySize ];
 	m_isParticleGarbage = new bool[ initialArraySize ];
+	memset( &m_isParticleGarbage[ 0 ] , 1 , sizeof( bool ) * initialArraySize );
 //	m_particleVerts.resize( 6 * initialArraySize );
 	//m_particleVerts = new Vertex_PCU[ initialArraySize * 6 ];
 }
@@ -147,25 +149,30 @@ void ParticleEmitter3D::SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position 
 void ParticleEmitter3D::EmplaceBackNewParticle( Particle3D temp )
 {
 	if( m_numAliveParticles < m_totalSpawnableParticles )
-	{
-		for ( size_t index = m_lastSpawnPointPos; ( index < m_totalSpawnableParticles ) ; index++ )
+	{		
+		for ( size_t index = m_lastSearchPos ;  index < m_totalSpawnableParticles ; index++ )
 		{
-			//if ( m_particles[ index ].m_isGarbage )
 			if ( m_isParticleGarbage[ index ] )
 			{
-				//temp.m_isGarbage = false;
 				m_isParticleGarbage[ index ] = false;
 				m_particles[ index ] = temp;
 				m_numAliveParticles++;
-				m_lastSpawnPointPos = index;
+				m_lastSearchPos = index;
 
-				if ( m_lastSpawnPointPos == ( m_totalSpawnableParticles - 1 ) )
-				{
-					m_lastSpawnPointPos = 0;
-				}
-				
-				break;
-				//m_lastSpawnPointPos++;
+				return;
+			}
+		}
+
+		for ( size_t index = 0; index < m_lastSearchPos; index++ )
+		{
+			if ( m_isParticleGarbage[ index ] )
+			{
+				m_isParticleGarbage[ index ] = false;
+				m_particles[ index ] = temp;
+				m_numAliveParticles++;
+				m_lastSearchPos = index;
+
+				return;
 			}
 		}
 	}
@@ -189,8 +196,13 @@ void ParticleEmitter3D::SpawnNewRandomParticleFromSpriteSheet ( AABB2 cosmeticBo
 void ParticleEmitter3D::Update( float deltaSeconds )
 {
 	m_particleVerts.clear();
+
+	if( m_numAliveParticles == 0 )
+	{
+		return;
+	}
 	
-	for( size_t index = 0 ; ( index < m_totalSpawnableParticles ) && ( m_numAliveParticles > 0 ); index++ )
+	for( size_t index = 0 ; index < m_totalSpawnableParticles ; index++ )
 	{
 		//if ( m_particles[ index ].m_isGarbage )
 		if ( m_isParticleGarbage[ index ] )
@@ -209,16 +221,16 @@ void ParticleEmitter3D::Update( float deltaSeconds )
 
 	Mat44 lookAt;
 	
-	for ( size_t index = 0 ; index < m_totalSpawnableParticles && m_numAliveParticles > 0 ; index++ )
+	for ( size_t index = 0 ; index < m_totalSpawnableParticles ; index++ )
 	{
 		Particle3D* particle = &m_particles[ index ];
 
 		//if( particle->m_isGarbage )
-		if( m_isParticleGarbage[ index ] )
+		if ( m_isParticleGarbage[ index ] )
 		{
 			continue;
 		}
-		
+
 		lookAt = LookAtMatrix( particle->m_position , m_targetPos );
 		Vec4 ibasis = -lookAt.GetIBasis4D();
 		lookAt.Ix = ibasis.x;
@@ -227,9 +239,9 @@ void ParticleEmitter3D::Update( float deltaSeconds )
 		lookAt.Iw = ibasis.w;
 
 		Transform3DAndAppendVertsForAABB2( m_particleVerts , particle->m_cosmeticBounds , particle->m_startColor ,
-				                            particle->m_minsUVs , particle->m_maxsUVs , particle->m_position , lookAt );
-		
+			particle->m_minsUVs , particle->m_maxsUVs , particle->m_position , lookAt );
 	}
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

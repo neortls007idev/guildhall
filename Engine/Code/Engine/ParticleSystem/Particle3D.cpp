@@ -18,6 +18,7 @@ Particle3D::Particle3D( Vec3 position , Vec3 velocity , float age , float maxAge
 																							m_endColor( endColor )
 {
 	m_scale = 1.f;
+//	m_color = m_startColor;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -33,6 +34,7 @@ Particle3D::Particle3D( AABB2 cosmeticBounds , Vec3 position , Vec3 velocity , f
 {
 	//m_cosmeticBounds.Translate( m_position );
 	m_scale = 1.f;
+//	m_color = m_startColor;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -50,6 +52,7 @@ Particle3D::Particle3D ( AABB2 cosmeticBounds , Vec2 minUVs , Vec2 maxUVs , Vec3
 																							m_maxsUVs( maxUVs )
 {
 	//m_cosmeticBounds.Translate( m_position );
+//	m_color = m_startColor;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -67,6 +70,7 @@ Particle3D::Particle3D ( AABB2 cosmeticBounds , Vec2 minUVs , Vec2 maxUVs , Vec3
 																							m_maxsUVs( maxUVs ) 
 {
 	m_scale = scale;
+//	m_color = m_startColor;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -83,6 +87,7 @@ Particle3D::Particle3D ( AABB2 cosmeticBounds , Vec3 position , float scale , Ve
 
 {
 	m_scale = scale;
+//	m_color = m_startColor;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -98,7 +103,8 @@ Particle3D::Particle3D( Particle3D& copy )
 	m_cosmeticBounds	= copy.m_cosmeticBounds;
 	m_minsUVs			= copy.m_minsUVs;			
 	m_maxsUVs			= copy.m_maxsUVs;			
-	m_scale				= copy.m_scale;				
+	m_scale				= copy.m_scale;
+//	m_color				= copy.m_color;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -116,7 +122,9 @@ void Particle3D::Update( float deltaSeconds )
 	{
 		m_age += deltaSeconds;
 		Move( deltaSeconds );
+		// change to current color.
 		m_startColor.LerpColorOverTime( m_startColor , m_endColor , m_maxAge , m_age );
+		//DebuggerPrintf("Particle Current Age = %f , max AGE = %f , Start Color = %u, %u ,%u , %u", m_age , )
 	}
 }
 

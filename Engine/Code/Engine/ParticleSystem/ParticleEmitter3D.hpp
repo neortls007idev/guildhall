@@ -64,16 +64,17 @@ public:
 	Vec3							m_position					= Vec3::ZERO;
 	Vec3							m_velocity					= Vec3::ZERO;
 	bool							m_areParticlesBillboarded	= true;
-	size_t							m_lastSpawnPointPos			= 0;
+	size_t							m_lastSearchPos				= 0;
 	uint							m_numAliveParticles			= 0;
-//	std::vector<Particle3D*>		m_particles;
 	std::vector<Vertex_PCU>			m_particleVerts;
-	size_t							m_totalSpawnableParticles		= 0;
+	size_t							m_totalSpawnableParticles	= 0;
 	
 	Particle3D*						m_particles;
 	bool*							m_isParticleGarbage;
-//	Vertex_PCU*						m_particleVerts;
-	std::atomic<bool>				m_lock;
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+
+	//Vec3							m_targetUp					= Vec3::UNIT_VECTOR_ALONG_J_BASIS;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

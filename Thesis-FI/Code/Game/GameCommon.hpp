@@ -17,7 +17,7 @@ extern Window*		g_theWindow;
 
 constexpr float CLIENT_ASPECT											= 16.f/9.f;
 
-constexpr float GAME_CAM_NEAR_Z = 0.1f;
+constexpr float GAME_CAM_NEAR_Z = 0.01f;
 constexpr float GAME_CAM_FAR_Z	= 100.0f;
 constexpr float GAME_CAM_FOV	= 60.0f;
 constexpr size_t FRAME_RATE_BUFFER_SIZE = 9000;
@@ -126,9 +126,9 @@ struct GameParticleEmitter
 	Rgba8				m_particleEndColor;
 	float				m_particleMinLifeTime			= 0.25f;
 	float				m_particleMaxLifeTime			= 2.f;
-	float				m_particleVelocity				= 10.f;
+	float				m_particleVelocity				= 0.f;
 	Vec2				m_particleSize					= Vec2::ONE;
-	uint				m_numParticlesToSpawnPerFrame	= 20000;
+	uint				m_numParticlesToSpawnPerFrame	= 10000;
 
 	uint				m_numAliveParticles				= 0;
 };

@@ -181,8 +181,8 @@ private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	//				FRAME DATA
 	//--------------------------------------------------------------------------------------------------------------------------------------------
-	float m_frameRates[ FRAME_RATE_BUFFER_SIZE ] = { 0.f };
-	size_t m_currentFrameInBuffer = 0;
+	float m_frameTimes[ FRAME_RATE_BUFFER_SIZE ]	= { 0.f };
+	size_t m_currentFrameInBuffer					= 0;
 	//std::vector<GameParticleEmitter>	m_emitters;
 	//std::vector<SpriteSheet*>			m_particleSystemSpriteSheets;
 };

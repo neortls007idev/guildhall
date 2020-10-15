@@ -165,16 +165,16 @@ void TheApp::RunFrame()
 	double        timeThisFrameStarted = GetCurrentTimeSeconds();
 	double		  deltaSeconds		   = timeThisFrameStarted - timeLastFrameStarted;
 	timeLastFrameStarted			   = timeThisFrameStarted;
-
+	
 	BeginFrame();                        // all engine system and not game systems
-	Update( ( float ) deltaSeconds );
+	Update( ( float ) Clock::g_theMasterClock.GetLastDeltaSeconds() );
 
-	m_particleSystemJob = new ParticleSystem3DUpdateJob( 0 , g_theParticleSystem3D , ( float ) deltaSeconds );
+	m_particleSystemJob = new ParticleSystem3DUpdateJob( 0 , g_theParticleSystem3D , ( float ) Clock::g_theMasterClock.GetLastDeltaSeconds() );
 	g_theJobSystem->PostJob( *m_particleSystemJob );
-
+	
 	while ( !g_theJobSystem->AreAllJobsComplete() && !g_theJobSystem->IsQuitting() )
 	{
-		// wait for all jobs to complete
+		// DO NOTHING
 	}
 	
 	Render();
@@ -231,13 +231,12 @@ void TheApp::Update( float deltaSeconds )
 	else if ( m_isSloMo == true )				{ deltaSeconds /= 10.f; }
 	if ( m_isSpeedMo )							{ deltaSeconds = deltaSeconds * 4.0f; }
 
-	//g_theParticleSystem3D->Update( deltaSeconds );
 	//ParticleSystem3DUpdateJob ParticleSystem3DJob( 0 , g_theParticleSystem3D , deltaSeconds );
 	//g_theJobSystem->PostJob( ParticleSystem3DJob );
 	
 	g_theGame->Update( deltaSeconds );
-	
-	
+	//g_theParticleSystem3D->Update( deltaSeconds );
+		
 	if( g_theDevConsole->IsOpen() )
 	{
 		g_theDevConsole->Update( deltaSeconds );

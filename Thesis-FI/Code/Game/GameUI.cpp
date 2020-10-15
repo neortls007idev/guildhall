@@ -411,7 +411,7 @@ void Game::PlotFrameRate()
 	if ( ImPlot::BeginPlot( "Frame Rate Graph" ) )
 	{
 		//ImPlot::PlotLine( "FrameTime" , m_frameRates.data() , m_frameRates.size() );
-		ImPlot::PlotLine( "FrameTime" , &m_frameRates[0] , FRAME_RATE_BUFFER_SIZE );
+		ImPlot::PlotLine( "FrameTime" , &m_frameTimes[0] , FRAME_RATE_BUFFER_SIZE );
 		ImPlot::EndPlot();
 	}
 	ImGui::End();
