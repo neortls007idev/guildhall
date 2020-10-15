@@ -232,26 +232,25 @@ void Game::InitializeParticleEmitters()
 	Texture* emitterTexture = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/ParticleFX/VFXFlare192x108.png" );
 	m_particleEmitterSheets[ STAR_SS ] = new SpriteSheet( *emitterTexture , IntVec2( 5 , 7 ) );
 
-//	m_starEmitters[ RED_ORANGE_STAR ].m_spriteSheetInUse = &spriteSheet;
-	//m_particleSystemSpriteSheets.emplace_back( spriteSheet );
-	//ParticleEmitter3D* testEmitter = new ParticleEmitter3D( g_theRenderer , spriteSheet, 10000 , m_gameCamera.GetPosition() );
-	//m_emitters.emplace_back( g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , spriteSheet , 5000 , m_gameCamera.GetPosition() ) );
-
-	m_starEmitters[ RED_ORANGE_STAR ].m_emitter = g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , m_particleEmitterSheets[ STAR_SS ] , 100000 , m_gameCamera.GetPosition() );
+	m_starEmitters[ RED_ORANGE_STAR ].m_emitter = g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , m_particleEmitterSheets[ STAR_SS ] , PARTICLE_EMITTER_LIMIT , m_gameCamera.GetPosition() );
 	m_starEmitters[ RED_ORANGE_STAR ].m_particleStartColor	= RED;
 	m_starEmitters[ RED_ORANGE_STAR ].m_particleEndColor	= NO_ALPHA_ORANGE;
+	m_starEmitters[ RED_ORANGE_STAR ].m_center = Vec3( 0.f , 0.f , 3.f );
 
-	m_starEmitters[ BLUE_CYAN_STAR ].m_emitter = g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , m_particleEmitterSheets[ STAR_SS ] , 100000 , m_gameCamera.GetPosition() );
+	m_starEmitters[ BLUE_CYAN_STAR ].m_emitter = g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , m_particleEmitterSheets[ STAR_SS ] , PARTICLE_EMITTER_LIMIT , m_gameCamera.GetPosition() );
 	m_starEmitters[ BLUE_CYAN_STAR ].m_particleStartColor = BLUE;
 	m_starEmitters[ BLUE_CYAN_STAR ].m_particleEndColor = NO_ALPHA_CYAN;
-
-	m_starEmitters[ YELLOW_GREEN_STAR ].m_emitter = g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , m_particleEmitterSheets[ STAR_SS ] , 100000 , m_gameCamera.GetPosition() );
+	m_starEmitters[ BLUE_CYAN_STAR ].m_center = Vec3( 0.f , 0.f , -3.f );
+	
+	m_starEmitters[ YELLOW_GREEN_STAR ].m_emitter = g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , m_particleEmitterSheets[ STAR_SS ] , PARTICLE_EMITTER_LIMIT , m_gameCamera.GetPosition() );
 	m_starEmitters[ YELLOW_GREEN_STAR ].m_particleStartColor = GREEN;
 	m_starEmitters[ YELLOW_GREEN_STAR ].m_particleEndColor = NO_ALPHA_YELLOW;
+	m_starEmitters[ YELLOW_GREEN_STAR ].m_center = Vec3( 3.f , 0.f , 0.f );
 
-	m_starEmitters[ PINK_PURPLE_STAR ].m_emitter = g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , m_particleEmitterSheets[ STAR_SS ] , 100000 , m_gameCamera.GetPosition() );
-	m_starEmitters[ PINK_PURPLE_STAR ].m_particleStartColor = PINK;
-	m_starEmitters[ PINK_PURPLE_STAR ].m_particleEndColor = NO_ALPHA_PURPLE;
+	m_starEmitters[ PINK_PURPLE_STAR ].m_emitter = g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , m_particleEmitterSheets[ STAR_SS ] , PARTICLE_EMITTER_LIMIT , m_gameCamera.GetPosition() );
+	m_starEmitters[ PINK_PURPLE_STAR ].m_particleStartColor = HALF_ALPHA_PURPLE;
+	m_starEmitters[ PINK_PURPLE_STAR ].m_particleEndColor = NO_ALPHA_PINK;
+	m_starEmitters[ PINK_PURPLE_STAR ].m_center = Vec3( -3.f , 0.f , 0.f );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -15,12 +15,13 @@ extern Window*		g_theWindow;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-constexpr float CLIENT_ASPECT											= 16.f/9.f;
+constexpr float		CLIENT_ASPECT											= 16.f/9.f;
 
-constexpr float GAME_CAM_NEAR_Z = 0.01f;
-constexpr float GAME_CAM_FAR_Z	= 100.0f;
-constexpr float GAME_CAM_FOV	= 60.0f;
-constexpr size_t FRAME_RATE_BUFFER_SIZE = 9000;
+constexpr float		GAME_CAM_NEAR_Z											= 0.01f;
+constexpr float		GAME_CAM_FAR_Z											= 200.0f;
+constexpr float		GAME_CAM_FOV											= 60.0f;
+constexpr size_t	FRAME_RATE_BUFFER_SIZE									= 9000;
+constexpr size_t	PARTICLE_EMITTER_LIMIT									= 50000;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -120,7 +121,7 @@ struct GameParticleEmitter
 {
 	ParticleEmitter3D*	m_emitter;
 //	SpriteSheet*		m_spriteSheetInUse;
-	Vec3				m_center						= Vec3( 0.f , 0.f , -10.f );
+	Vec3				m_center						= Vec3::ZERO;
 	float				m_movementRadius				= 5.f;
 	Rgba8				m_particleStartColor;
 	Rgba8				m_particleEndColor;
@@ -128,7 +129,7 @@ struct GameParticleEmitter
 	float				m_particleMaxLifeTime			= 2.f;
 	float				m_particleVelocity				= 0.f;
 	Vec2				m_particleSize					= Vec2::ONE;
-	uint				m_numParticlesToSpawnPerFrame	= 10000;
+	uint				m_numParticlesToSpawnPerFrame	= 5000;
 
 	uint				m_numAliveParticles				= 0;
 };

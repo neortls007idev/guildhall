@@ -42,6 +42,7 @@ public:
 				void UpdateLightPosition( float deltaSeconds );
 
 				void UpdateAllStarEmitters( float deltaSeconds );
+				void UpdateEmitterOfType( GameStarEmitters emitterType );
 			
 			void Render() const;
 				void BindShaderSpecificMaterialData() const;

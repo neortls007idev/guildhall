@@ -235,17 +235,17 @@ void Game::UpdateAllStarEmitters( float deltaSeconds )
 	for ( int index = 0 ; index < NUM_STARS_EMITTERS ; index++ )
 	{
 		m_starEmitters[ index ].m_emitter->UpdateTargetPos( m_gameCamera.GetPosition() );
-		//m_starEmitters[ index ].m_emitter->m_targetUp = m_gameCamera.GetCameraTransform().GetAsMatrix().GetJBasis3D();
+	
 		int direction = 1;
 		Vec3 emitterPos = Vec3( 0.f , 0.f , -5.f );
 		
-		if ( index == 0 )
+		if ( index % 2 == 0 )
 		{
 			direction = -1;
 		}
 		
 		emitterPos = m_starEmitters[ index ].m_center + Vec3::MakeFromSpericalCoordinates(
-			direction * 45.f * ( float ) GetCurrentTimeSeconds() , 30.f * SinDegrees( ( float ) GetCurrentTimeSeconds() ) , m_starEmitters[ index ].m_movementRadius );
+ 			direction * 45.f * ( float ) GetCurrentTimeSeconds() , 30.f * SinDegrees( ( float ) GetCurrentTimeSeconds() ) , m_starEmitters[ index ].m_movementRadius );
 
 		
 		m_starEmitters[ index ].m_emitter->UpdatePosition( emitterPos );
@@ -273,6 +273,13 @@ void Game::UpdateAllStarEmitters( float deltaSeconds )
 	//Vec3 emitterPos = Vec3( 0.f , 0.f , -10.f ) + Vec3::MakeFromSpericalCoordinates(
 	//	45.f * ( float ) GetCurrentTimeSeconds() , 30.f * SinDegrees( ( float ) GetCurrentTimeSeconds() ) , 5.f );
 	//m_emitters[ 0 ]->UpdatePosition( emitterPos );
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateEmitterOfType( GameStarEmitters emitterType )
+{
 
 }
 
