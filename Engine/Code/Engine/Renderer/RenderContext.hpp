@@ -184,6 +184,8 @@ public:
 	
 	Texture*				GetOrCreatematchingRenderTarget( Texture* texture, std::string debugRenderTargetName = "Unreleased RTV",
 															 D3D_DXGI_FORMAT format = D3D_DXGI_FORMAT_R8G8B8A8_UNORM );
+	Texture*				GetOrCreatematchingRenderTargetOfSize( IntVec2 textureSize, std::string debugRenderTargetName = "Unreleased RTV",
+																   D3D_DXGI_FORMAT format = D3D_DXGI_FORMAT_R8G8B8A8_UNORM );
 	void					ReleaseRenderTarget( Texture* texture );
 	int						GetTotalRenderTargetPoolSize() const				 { return m_renderTargetPoolSize;  }
 	int						GetTexturePoolFreeCount() const						 { return 16 - m_renderTargetPoolSize;  }
@@ -252,6 +254,7 @@ public:
 	Shader*					GetOrCreateShader( char const* shaderFilename );
 	ShaderState*			GetOrCreateShaderState( char const* shaderStateFilename );
 	Texture*				GetOrCreateTextureFromFile( const char* imageFilePath );
+	Texture*				GetOrCreateTextureCubeFromFile( const char* imageFilePath );
 	BitmapFont*				GetOrCreateBitmapFontFromFile( std::string bitmapFontFilePath );
 	void					CreateBlendStates();
 	void					CreateRasterStates();
@@ -414,6 +417,7 @@ private:
 	Sampler*		CreateSamplerFromType( eSamplerType type );
 	Shader*			CreateShaderFromFile( char const* shaderFilePath );
 	ShaderState*	CreateShaderStateFromFile( char const* shaderStateFilePath );
+	Texture*		CreateTextureCubeFromFile( const char* imageFilePath );
 	Texture*		CreateTextureFromFile( const char* imageFilePath );
 	Texture*		CreateTextureFromColor( Rgba8 color );
 	Texture*		CreateFromImage( Image* image );												// TODO :- IMPLEMENT ME
@@ -421,7 +425,6 @@ private:
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 public:
-	Texture*		CreateTextureCubeFromFile( const char* imageFilePath );
 	ID3D11Device*								m_device												= nullptr;
 	ID3D11DeviceContext*						m_context												= nullptr;					// Immediate context
 	SwapChain*									m_swapChain												= nullptr;
@@ -463,6 +466,7 @@ private:
 	Texture*									m_flatNormal											= nullptr;
 	
 	std::map<std::string , Texture*>			m_LoadedTextures;									// LOOKUP TABLE OF FILEPATH & TEXTURE
+	std::map<std::string , Texture*>			m_LoadedCubeTextures;									// LOOKUP TABLE OF FILEPATH & CUBE MAP TEXTURES
 	std::vector<Texture*>						m_renderTargetPool;
 	int											m_renderTargetPoolSize = 0;
 

@@ -133,6 +133,15 @@ RenderContext::~RenderContext()
 		}
 	}
 
+	for ( auto& textureIndex : m_LoadedCubeTextures )
+	{
+		if ( textureIndex.second != nullptr )
+		{
+			delete textureIndex.second;
+			textureIndex.second = nullptr;
+		}
+	}
+
 	for ( auto& bitmapFontIndex : m_LoadedBitMapFonts )
 	{
 		if ( bitmapFontIndex.second != nullptr )
@@ -963,12 +972,12 @@ Texture* RenderContext::CreateTextureCubeFromFile( const char* imageFilePath )
 	
 	stbi_image_free( imageData );
 	Texture* temp = new Texture( imageFilePath , this , texHandle );
-	m_LoadedTextures[ imageFilePath ] = temp;
+	m_LoadedCubeTextures[ imageFilePath ] = temp;
 	
 	std::string filePath = imageFilePath;
 	SetDebugName( ( ID3D11DeviceChild* ) temp->GetHandle() , &filePath );
 	
-	return m_LoadedTextures[ imageFilePath ];
+	return m_LoadedCubeTextures[ imageFilePath ];
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -1029,6 +1038,30 @@ Texture* RenderContext::GetOrCreatematchingRenderTarget( Texture* texture , std:
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Texture* RenderContext::GetOrCreatematchingRenderTargetOfSize( IntVec2 textureSize , std::string debugRenderTargetName /*= "Unreleased RTV"*/ , D3D_DXGI_FORMAT format /*= D3D_DXGI_FORMAT_R8G8B8A8_UNORM */ )
+{
+	for ( size_t index = 0; index < m_renderTargetPool.size(); index++ )
+	{
+		Texture* renderTarget = m_renderTargetPool[ index ];
+
+		if ( renderTarget->GetDimensions() == textureSize )
+		{
+			// fast remove at index
+			m_renderTargetPool[ index ] = m_renderTargetPool[ m_renderTargetPool.size() - 1 ];
+			m_renderTargetPool.pop_back();
+			// return the object from pool
+			return renderTarget;
+		}
+	}
+
+	Texture* newRenderTarget = CreateRenderTarget( textureSize , format , debugRenderTargetName );
+	//m_renderTargetPool.push_back( newRenderTarget );
+	m_renderTargetPoolSize++;
+	return newRenderTarget;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void RenderContext::ReleaseRenderTarget( Texture* texture )
 {
 	m_renderTargetPool.push_back( texture );
@@ -1064,6 +1097,20 @@ Texture* RenderContext::GetOrCreateTextureFromFile( const char* imageFilePath )
 	if (Temp == nullptr)
 	{
 		Temp = CreateTextureFromFile( imageFilePath );
+	}
+
+	return Temp;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Texture* RenderContext::GetOrCreateTextureCubeFromFile( const char* imageFilePath )
+{
+	Texture* Temp = m_LoadedCubeTextures[ imageFilePath ];
+	
+	if ( Temp == nullptr )
+	{
+		Temp = CreateTextureCubeFromFile( imageFilePath );
 	}
 
 	return Temp;

@@ -84,6 +84,124 @@ private:
 			void CameraPositionUpdateOnInput( float deltaSeconds );
 	
 public:
+	
+	mutable Camera						m_gameCamera;
+	
+	Vec3								m_cameraPosition									= Vec3::ZERO;
+	float								m_pitch												= 0.f;
+	float								m_yaw												= 0.f;
+
+	Shader*								m_lightShaders[ LitShaderTypes::TOTAL_LITSHADERS ];
+	Shader* 							m_currentShader;
+	int									m_currentShaderIndex;
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//				LIGHTS DATA
+	//--------------------------------------------------------------------------------------------------------------------------------------------	
+	shaderLightDataT					m_lights;
+	Rgba8								m_ambientLightColor;
+	mutable Camera						m_lightsCamera;
+//	int									m_lightType[ TOTAL_LIGHTS ];
+	bool								m_isLightFollowingTheCamera							= false;
+	bool								m_isLightAnimated									= false;
+	int									m_currentLightIndex									= 0;
+	mutable Texture*					m_shadowMap[ TOTAL_LIGHTS ];
+	Vec3								m_lightsPitchYawRoll[ TOTAL_LIGHTS ];
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+			
+	Sampler*							m_bilinear											= nullptr;
+	Sampler*							m_linear											= nullptr;
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//				SCENE OBJECTS
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	uint								m_hCuts = 32;		// slices
+	uint								m_vCuts = 16;		// stacks
+
+	GPUMesh*							m_gameModels[ NUM_GAME_MODELS ];
+	Texture*							m_gameModelsDiffuse[ NUM_GAME_MODELS ];
+	Texture*							m_gameModelsNormals[ NUM_GAME_MODELS ];
+	Texture*							m_gamePlanetaryDiffuse[ NUM_GAME_MODELS ];
+	Texture*							m_gamePlanetaryNormals[ NUM_GAME_MODELS ];
+	OBJInstances						m_ModelInstances[ NUM_GAME_MODELS ];
+	OBJInstances						m_ModelDrawableInstances[ NUM_GAME_MODELS ];
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//				SKY-BOX
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	GPUMesh*							m_unitCubeMesh										= nullptr;
+	Texture*							m_cubeMapex											= nullptr;
+	Shader*								m_cubeMapTest										= nullptr;
+	Sampler*							m_cubeSampler										= nullptr;
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+
+private:
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//				MATERIAL SHADER DATA
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	Shader* 							m_depthShader;
+	Shader* 							m_blurShader;
+	Shader* 							m_toneMapShader;
+	Shader* 							m_toneMapComputeShader;
+	
+	Mat44								m_toneMapTransform;
+	float								m_tonePower											= 1.f;
+	fresnelData_t						m_fresnelShaderData;
+	dissolveData_t						m_dissolveShaderData;
+	fogDataT							m_fogData;
+	bool								m_isFresnelShaderActive								= false;
+	bool								m_isblurShaderActive								= false;
+	bool								m_isToneMapShaderActive								= false;
+	bool								m_isToneMapComputeShaderActive						= false;
+	//bool								m_isFogShaderActive									= false;
+
+	Texture*							m_dissolveShaderPatternTexture						= nullptr;
+	Texture*							m_triplanarShaderTextures[ 6 ];
+	int									m_currentToneMap									= ToneMap::SEPHIA;
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//				FRAME RATE DEBUG DATA
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	float								m_frameRate											= 0.f;
+	float								m_rollingAvgFPS										= 0.f;
+	float								m_worstFrame										= INFINITY;
+	float								m_bestFrame											= 0.f;
+	float								m_currentFrame										= 0;
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//				UI DEBUG DATA
+	//--------------------------------------------------------------------------------------------------------------------------------------------		
+	bool								m_isMouseUnlocked									= false;
+	bool								m_debugSwitchs[ NUM_GAME_DEBUG_SWITCHS ];
+	bool								m_dirtyUBOs[ NUM_DIRTY_UBOS ];
+	uint								m_totalDrawableMeshes;
+	uint								m_currentlyDrawingMeshes;
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//				TITLE
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+			
+	GameParticleEmitter					m_starEmitters[ NUM_STARS_EMITTERS ];
+	SpriteSheet*						m_particleEmitterSheets[ NUM_GAME_SS ];
+
+	//----------------------------------------------------------------------------------------------------------
+	//				SHADOW
+	//----------------------------------------------------------------------------------------------------------
+
+	int									m_shadowMapDimension					= 4098;
+	int									m_shadowMapDimensionCopy				= 4098;
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//				FRAME DATA
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	float								m_frameTimes[ FRAME_RATE_BUFFER_SIZE ]	= { 0.f };
+	float								m_frameRates[ FRAME_RATE_BUFFER_SIZE ]	= { 0.f };
+	size_t								m_currentFrameInBuffer					= 0;
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//				TEST / DEBUG CODE
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+
+	Transform							m_shadowTestCubes[ 8 ];
 
 	GPUMesh*							m_cubeMesh;
 	GPUMesh*							m_meshSphere;
@@ -99,93 +217,5 @@ public:
 	Texture*							m_tileNormal										= nullptr;
 	Texture*							m_objSciFiShipMeshTex_D								= nullptr;
 	Texture*							m_objSciFiShipMeshTex_N								= nullptr;
-
-	uint								m_hCuts												= 32;		// slices
-	uint								m_vCuts												= 16;		// stacks
-
-	mutable Camera						m_gameCamera;
-	
-	Vec3								m_cameraPosition									= Vec3::ZERO;
-	float								m_pitch												= 0.f;
-	float								m_yaw												= 0.f;
-	
-	Shader*								m_lightShaders[ LitShaderTypes::TOTAL_LITSHADERS ];
-	Shader* 							m_currentShader;
-	Shader* 							m_depthShader;
-	Shader* 							m_blurShader;
-	Shader* 							m_toneMapShader;
-	Shader* 							m_toneMapComputeShader;
-
-	int									m_currentShaderIndex;
-	bool								m_isFresnelShaderActive								= false;
-	bool								m_isblurShaderActive								= false;
-	bool								m_isToneMapShaderActive								= false;
-	bool								m_isToneMapComputeShaderActive						= false;
-	//bool								m_isFogShaderActive									= false;
-
-	Texture*							m_dissolveShaderPatternTexture						= nullptr;
-	Texture*							m_triplanarShaderTextures[ 6 ];
-	int									m_currentToneMap									= ToneMap::SEPHIA;
-	Mat44								m_toneMapTransform;
-	float								m_tonePower											= 1.f;
-	
-	shaderLightDataT					m_lights;
-	Rgba8								m_ambientLightColor;
-	mutable Camera						m_lightsCamera;
-//	int									m_lightType[ TOTAL_LIGHTS ];
-	bool								m_isLightFollowingTheCamera							= false;
-	bool								m_isLightAnimated									= false;
-	int									m_currentLightIndex									= 0;
-	mutable Texture*					m_shadowMap[ TOTAL_LIGHTS ];
-	Vec3								m_lightsPitchYawRoll[ TOTAL_LIGHTS ];
-	
-	//--------------------------------------------------------------------------------------------------------------------------------------------
-	GPUMesh*							m_unitCubeMesh										= nullptr;
-	Texture*							m_cubeMapex											= nullptr;
-	Shader*								m_cubeMapTest										= nullptr;
-	Sampler*							m_cubeSampler										= nullptr;
-	Sampler*							m_bilinear											= nullptr;
-	Sampler*							m_linear											= nullptr;
-	//--------------------------------------------------------------------------------------------------------------------------------------------
-
-	GPUMesh*							m_gameModels[ NUM_GAME_MODELS ];
-	Texture*							m_gameModelsDiffuse[ NUM_GAME_MODELS ];
-	Texture*							m_gameModelsNormals[ NUM_GAME_MODELS ];
-	Texture*							m_gamePlanetaryDiffuse[ NUM_GAME_MODELS ];
-	Texture*							m_gamePlanetaryNormals[ NUM_GAME_MODELS ];
-	OBJInstances						m_ModelInstances[ NUM_GAME_MODELS ];
-	OBJInstances						m_ModelDrawableInstances[ NUM_GAME_MODELS ];
-private:
-	fresnelData_t						m_fresnelShaderData;
-	dissolveData_t						m_dissolveShaderData;
-	fogDataT							m_fogData;
-
-	float								m_frameRate											= 0.f;
-	float								m_rollingAvgFPS										= 0.f;
-	float								m_worstFrame										= INFINITY;
-	float								m_bestFrame											= 0.f;
-	float								m_currentFrame										= 0;
-	
-	bool								m_isMouseUnlocked									= false;
-	bool								m_debugSwitchs[ NUM_GAME_DEBUG_SWITCHS ];
-	bool								m_dirtyUBOs[ NUM_DIRTY_UBOS ];
-	uint								m_totalDrawableMeshes;
-	uint								m_currentlyDrawingMeshes;
-	GameParticleEmitter					m_starEmitters[ NUM_STARS_EMITTERS ];
-	SpriteSheet*						m_particleEmitterSheets[ NUM_GAME_SS ];
-
-	//----------------------------------------------------------------------------------------------------------
-	// SHADOW Test
-	//----------------------------------------------------------------------------------------------------------
-
-	Transform m_shadowTestCubes[ 8 ];
-
-	//--------------------------------------------------------------------------------------------------------------------------------------------
-	//				FRAME DATA
-	//--------------------------------------------------------------------------------------------------------------------------------------------
-	float m_frameTimes[ FRAME_RATE_BUFFER_SIZE ]	= { 0.f };
-	float m_frameRates[ FRAME_RATE_BUFFER_SIZE ]	= { 0.f };
-	size_t m_currentFrameInBuffer					= 0;
-	//std::vector<GameParticleEmitter>	m_emitters;
-	//std::vector<SpriteSheet*>			m_particleSystemSpriteSheets;
+		
 };

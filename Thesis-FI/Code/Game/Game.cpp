@@ -70,7 +70,7 @@ Game::Game()
 
 	m_unitCubeMesh = new GPUMesh( g_theRenderer );
 	
-	m_cubeMapex = g_theRenderer->CreateTextureCubeFromFile( "Data/Images/CubeMaps/galaxy2.png" );
+	m_cubeMapex = g_theRenderer->GetOrCreateTextureCubeFromFile( "Data/Images/CubeMaps/galaxy2.png" );
 	m_cubeMapTest = g_theRenderer->GetOrCreateShader( "Data/Shaders/CubeMap.hlsl" );
 
 	std::vector<Vertex_PCU>		cubeMeshVerts;
@@ -161,7 +161,7 @@ void Game::InitializeCameras()
 		float height = GAME_CAM_NEAR_Z * -tanf( GAME_CAM_FOV * 0.5f );
 			  height = ( GAME_CAM_FAR_Z * height ) / GAME_CAM_NEAR_Z;
 		//m_lightsCamera.SetProjectionPerspective( GAME_CAM_FOV , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
-		m_lightsCamera.SetOrthoView3D( 2.5f , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
+		m_lightsCamera.SetOrthoView3D( 10.f , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
 		//m_lightsCamera.SetOrthoView( 540.f , CLIENT_ASPECT );
 		m_lightsCamera.SetPosition( Vec3( 0.f , 0.f , 0.f ) );
 		m_lightsCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );
@@ -383,7 +383,7 @@ void Game::Render() const
 	Texture* backBuffer		= g_theRenderer->m_swapChain->GetBackBuffer();
 	Texture* colorTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer , "realColorTarget" );
 	Texture* bloomTarget	= g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer , "BloomColorTarget" );
-	Texture* finalImage = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
+	Texture* finalImage		= g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
 	
 	m_gameCamera.SetColorTarget( 0 , colorTarget );
 	m_gameCamera.SetColorTarget( 1 , bloomTarget );
@@ -489,7 +489,6 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 	g_theRenderer->BindShader( nullptr );
  
  	g_theRenderer->BindMaterial( nullptr );
-
 
 	g_D3D11PerfMarker->BeginPerformanceMarker( L"Skybox" );
 	g_theRenderer->BindShader( m_cubeMapTest );
@@ -656,7 +655,8 @@ void Game::RenderShadowMapPass() const
 	for ( uint lightIndex = 0; lightIndex < TOTAL_LIGHTS; lightIndex++ )
 	{
 		Texture* backBuffer = g_theRenderer->m_swapChain->GetBackBuffer();
-		m_shadowMap[ lightIndex ] = g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer , "lightDepthTarget" , D3D_DXGI_FORMAT_R32_FLOAT );
+		m_shadowMap[ lightIndex ] = g_theRenderer->GetOrCreatematchingRenderTargetOfSize( IntVec2(m_shadowMapDimension , m_shadowMapDimension ) ,
+																				"lightDepthTarget" , D3D_DXGI_FORMAT_R32_FLOAT );
 
 		m_lightsCamera.SetColorTarget( 0 , m_shadowMap[ lightIndex ] );
 

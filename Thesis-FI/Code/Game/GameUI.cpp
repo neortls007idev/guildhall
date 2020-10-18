@@ -348,6 +348,16 @@ void Game::ProfilingSettingsGUI()
 	{
 		ImGui::Checkbox( "Camera View Frustum Culling" , &m_debugSwitchs[ GAME_CAMERA_VIEW_FRUSTUM_CULLING ] );
 		ImGui::Checkbox( "Debug Draw Bounding Spheres" , &m_debugSwitchs[ VIEW_FRUSTUM_DEBUG_DRAW ] );
+
+		ImGui::InputInt( "Shadow Map Edge Size(input power a of 2)" , &m_shadowMapDimensionCopy );
+		if( ImGui::Button( "Apply New Shadow Map Edge Dimesion" ) )
+		{
+			m_shadowMapDimension = m_shadowMapDimensionCopy;
+			for( uint index = 0 ;  index < TOTAL_LIGHTS ; index++ )
+			{
+				g_theRenderer->ReleaseRenderTarget( m_shadowMap[ index ] );
+			}
+		}
 		//Vec3 cameraPos = m_gameCamera.GetCameraTransform().GetPostion();
 		//float cameraPitch = m_gameCamera.GetCameraTransform().Get;
 		//ImGui::InputFloat3( "Light World Position" , ( float* ) &m_gameCamera. );
