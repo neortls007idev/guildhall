@@ -21,7 +21,7 @@ constexpr float		GAME_CAM_NEAR_Z											= 0.01f;
 constexpr float		GAME_CAM_FAR_Z											= 200.0f;
 constexpr float		GAME_CAM_FOV											= 60.0f;
 constexpr size_t	FRAME_RATE_BUFFER_SIZE									= 9000;
-constexpr size_t	PARTICLE_EMITTER_LIMIT									= 50000;
+constexpr size_t	PARTICLE_EMITTER_LIMIT									= 30000;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -136,11 +136,11 @@ struct GameParticleEmitter
 	float				m_movementRadius				= 5.f;
 	Rgba8				m_particleStartColor;
 	Rgba8				m_particleEndColor;
-	float				m_particleMinLifeTime			= 0.25f;
-	float				m_particleMaxLifeTime			= 2.f;
+	int					m_particleMinLifeTime			= 15;
+	int					m_particleMaxLifeTime			= 120;
 	float				m_particleVelocity				= 0.f;
 	Vec2				m_particleSize					= Vec2::ONE;
-	uint				m_numParticlesToSpawnPerFrame	= 5000;
+	uint				m_numParticlesToSpawnPerFrame	= 500;
 
 	uint				m_numAliveParticles				= 0;
 };

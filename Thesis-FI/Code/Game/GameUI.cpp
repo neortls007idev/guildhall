@@ -408,10 +408,11 @@ void Game::PermanentDebugDataGUI()
 void Game::PlotFrameRate()
 {
 	ImGui::Begin( "Frame Rate" );
-	if ( ImPlot::BeginPlot( "Frame Rate Graph" ) )
+	if ( ImPlot::BeginPlot( "Frame Data Graph" ) )
 	{
 		//ImPlot::PlotLine( "FrameTime" , m_frameRates.data() , m_frameRates.size() );
 		ImPlot::PlotLine( "FrameTime" , &m_frameTimes[0] , FRAME_RATE_BUFFER_SIZE );
+		ImPlot::PlotLine( "FrameRate" , &m_frameRates[ 0 ] , FRAME_RATE_BUFFER_SIZE );
 		ImPlot::EndPlot();
 	}
 	ImGui::End();
@@ -458,8 +459,8 @@ void Game::ParticleEmitterSettingsGUI()
 				if( ImGui::TreeNode( "Particle Settings" ) )
 				{
 					ImGui::SliderInt( "New Particles Per Frame" , ( int* ) &m_starEmitters[ index ].m_numParticlesToSpawnPerFrame , 0 , 10000 );
-					ImGui::SliderFloat( "Min Life Time"			, ( float* ) &m_starEmitters[ index ].m_particleMinLifeTime , 0.008333f , 2.f );
-					ImGui::SliderFloat( "Max Life Time"			, ( float* ) &m_starEmitters[ index ].m_particleMaxLifeTime , 0.008333f , 2.f );
+					ImGui::SliderInt( "Min Life Time"			, ( int* ) &m_starEmitters[ index ].m_particleMinLifeTime , 0 , 120 );
+					ImGui::SliderInt( "Max Life Time"			, ( int* ) &m_starEmitters[ index ].m_particleMaxLifeTime , 0 , 120 );
 					ImGui::SliderFloat( "Velocity Multiplier"	, ( float* ) &m_starEmitters[ index ].m_particleVelocity , 0.f ,100.f );
 					ImGui::SliderFloat2( "Particle Size"	, ( float* ) &m_starEmitters[ index ].m_particleSize , 0.f ,10.f );
 

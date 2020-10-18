@@ -241,7 +241,7 @@ void Game::InitializeParticleEmitters()
 	m_starEmitters[ BLUE_CYAN_STAR ].m_particleStartColor = BLUE;
 	m_starEmitters[ BLUE_CYAN_STAR ].m_particleEndColor = NO_ALPHA_CYAN;
 	m_starEmitters[ BLUE_CYAN_STAR ].m_center = Vec3( 0.f , 0.f , -3.f );
-	
+
 	m_starEmitters[ YELLOW_GREEN_STAR ].m_emitter = g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , m_particleEmitterSheets[ STAR_SS ] , PARTICLE_EMITTER_LIMIT , m_gameCamera.GetPosition() );
 	m_starEmitters[ YELLOW_GREEN_STAR ].m_particleStartColor = GREEN;
 	m_starEmitters[ YELLOW_GREEN_STAR ].m_particleEndColor = NO_ALPHA_YELLOW;

@@ -23,6 +23,7 @@
 #include "Game/TheApp.hpp"
 #include "ThirdParty/ImGUI/imgui.h"
 #include "ThirdParty/ImGUI/ImGuiFileDialog.h"
+#include "Engine/ParticleSystem/Particle3D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -188,6 +189,7 @@ void Game::Update( float deltaSeconds )
 	{
 		m_currentFrameInBuffer = 0;
 	}
+	m_frameRates[ m_currentFrameInBuffer ] = m_frameRate;
 	m_frameTimes[ m_currentFrameInBuffer ] = deltaSeconds;
 	
 	if( m_worstFrame > m_frameRate )	{	m_worstFrame = m_frameRate;		}
@@ -230,15 +232,13 @@ void Game::Update( float deltaSeconds )
 
 	DebugUI();
 
-	UpdateAllStarEmitters( deltaSeconds );
+	UpdateAllStarEmitters();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Game::UpdateAllStarEmitters( float deltaSeconds )
-{
-	UNUSED( deltaSeconds );
-	
+void Game::UpdateAllStarEmitters()
+{	
 	for ( int index = 0 ; index < NUM_STARS_EMITTERS ; index++ )
 	{
 		m_starEmitters[ index ].m_emitter->UpdateTargetPos( m_gameCamera.GetPosition() );
@@ -267,40 +267,32 @@ void Game::UpdateAllStarEmitters( float deltaSeconds )
 		}
 
 		m_starEmitters[ index ].m_emitter->UpdatePosition( emitterPos );
+
+		uint numNewSpawns = ( ( uint ) m_starEmitters[ index ].m_emitter->m_totalSpawnableParticles ) - m_starEmitters[ index ].m_emitter->m_numAliveParticles;
 		
-		RandomNumberGenerator rng;
-		for( uint particleSpawned = 0 ; particleSpawned < m_starEmitters[index].m_numParticlesToSpawnPerFrame ; particleSpawned++ )
-		{
-			if( m_starEmitters[index].m_emitter->m_numAliveParticles == ( m_starEmitters[ index ].m_emitter->m_totalSpawnableParticles - 1 )  )
-			{
-				break;
-			}
+		numNewSpawns = numNewSpawns <= m_starEmitters[ index ].m_numParticlesToSpawnPerFrame ? numNewSpawns : m_starEmitters[ index ].m_numParticlesToSpawnPerFrame;
 
-			
-			Vec3 position = rng.RollRandomInUnitSphere();
-			Vec3 deviation = rng.RollRandomUnitVec3() * m_starEmitters[ index ].m_particleVelocity;
+	
+		for( uint particleSpawned = 0 ; particleSpawned <= numNewSpawns ; particleSpawned++ )
+		{			
+			Vec3 position = g_RNG->RollRandomInUnitSphere();
+			Vec3 deviation = g_RNG->RollRandomUnitVec3() * m_starEmitters[ index ].m_particleVelocity;
 			//float scale = g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
-			float maxAge = rng.RollRandomFloatInRange( m_starEmitters[ index ].m_particleMinLifeTime , m_starEmitters[ index ].m_particleMaxLifeTime );
+			int maxAge = g_RNG->RollRandomIntInRange( m_starEmitters[ index ].m_particleMinLifeTime , m_starEmitters[ index ].m_particleMaxLifeTime );
 
-			m_starEmitters[ index ].m_emitter->SpawnNewRandomParticleFromSpriteSheet( AABB2( -m_starEmitters[ index ].m_particleSize , m_starEmitters[ index ].m_particleSize ) 
-																					  , position ,m_gameCamera.GetPosition() , 1.f , deviation ,
-																					  0.0f , maxAge ,
+			m_starEmitters[ index ].m_emitter->SpawnNewRandomParticleFromSpriteSheet( AABB2( -m_starEmitters[ index ].m_particleSize , m_starEmitters[ index ].m_particleSize )
+																					 , position , 1.f , deviation , static_cast< uint16_t >( maxAge ) ,
 																					  m_starEmitters[ index ].m_particleStartColor , m_starEmitters[ index ].m_particleEndColor );
 																					 // WHITE , WHITE );
 		}
 	}
-	
-	//Vec3 emitterPos = Vec3( 0.f , 0.f , -10.f ) + Vec3::MakeFromSpericalCoordinates(
-	//	45.f * ( float ) GetCurrentTimeSeconds() , 30.f * SinDegrees( ( float ) GetCurrentTimeSeconds() ) , 5.f );
-	//m_emitters[ 0 ]->UpdatePosition( emitterPos );
-
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void Game::UpdateEmitterOfType( GameStarEmitters emitterType )
 {
-
+	UNUSED( emitterType );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -454,7 +446,6 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
  	g_theRenderer->DrawMesh( m_meshSphere );
 
 	g_theRenderer->DisableFog();
-
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindTexture( nullptr , TEX_NORMAL );
 

@@ -27,18 +27,17 @@ public:
 	                    Vec3 targetPos , Shader* shader = nullptr , eBlendMode blendMode = ADDITIVE , eCullMode cullMode = CULL_BACK );
 	~ParticleEmitter3D();
 
-	void SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position , Vec3 target , Vec3 velocity , float age , float maxAge , Rgba8 startColor , Rgba8 endColor = CLEAR );
-	void SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position , Vec3 target , Vec3 velocity , float age , float maxAge , Rgba8 startColor , Rgba8 endColor , IntVec2 spriteCoords );
-	void SpawnNewParticle ( AABB2 cosmeticBounds , Vec3 position , Vec3 target , float scale  , Vec3 velocity ,
-	                        float age , float maxAge , Rgba8 startColor , Rgba8 endColor , IntVec2 spriteCoords );
+	void SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position , Vec3 velocity , uint16_t maxAge , Rgba8 startColor , Rgba8 endColor = CLEAR );
+	void SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position , Vec3 velocity , uint16_t maxAge , Rgba8 startColor , Rgba8 endColor , IntVec2 spriteCoords );
+	void SpawnNewParticle( AABB2 cosmeticBounds , Vec3 position , float scale  , Vec3 velocity ,
+	                       uint16_t maxAge , Rgba8 startColor , Rgba8 endColor , IntVec2 spriteCoords );
 
 	void EmplaceBackNewParticle( Particle3D temp );
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
-
-	void SpawnNewRandomParticleFromSpriteSheet ( AABB2 cosmeticBounds , Vec3 position , Vec3 target , float scale ,
-												 Vec3 velocity , float age , float maxAge , Rgba8 startColor , Rgba8 endColor = CLEAR );
+	void SpawnNewRandomParticleFromSpriteSheet ( AABB2 cosmeticBounds , Vec3 position , float scale , Vec3 velocity ,
+												 uint16_t maxAge , Rgba8 startColor , Rgba8 endColor = CLEAR );
 	
 	void Update( float deltaSeconds );
 	void UpdateParticlesData( float deltaSeconds );
