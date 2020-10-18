@@ -93,6 +93,13 @@ Game::Game()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Game::LoadPlanetaryTextures()
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Game::~Game()
 {
 	SaveScene();
@@ -243,24 +250,37 @@ void Game::UpdateAllStarEmitters( float deltaSeconds )
 		{
 			direction = -1;
 		}
-		
+
 		emitterPos = m_starEmitters[ index ].m_center + Vec3::MakeFromSpericalCoordinates(
  			direction * 45.f * ( float ) GetCurrentTimeSeconds() , 30.f * SinDegrees( ( float ) GetCurrentTimeSeconds() ) , m_starEmitters[ index ].m_movementRadius );
 
+		if( index == 0 )
+		{
+			//emitterPos = Vec3::ZERO;
 		
+			//Vec3 plaentPos = m_starEmitters[ index ].m_center + Vec3::MakeFromSpericalCoordinates(
+			//direction * 45.f * ( float ) GetCurrentTimeSeconds() , 0.f , 5.f );
+			//
+			////m_sphereMeshTransform.SetPosition( plaentPos );
+			//m_sphereMeshTransform.SetPosition( Vec3::ZERO );
+			//m_sphereMeshTransform.SetRotation( 0.f , ( float ) GetCurrentTimeSeconds() * 10.f , 0.f );
+		}
+
 		m_starEmitters[ index ].m_emitter->UpdatePosition( emitterPos );
 		
+		RandomNumberGenerator rng;
 		for( uint particleSpawned = 0 ; particleSpawned < m_starEmitters[index].m_numParticlesToSpawnPerFrame ; particleSpawned++ )
 		{
 			if( m_starEmitters[index].m_emitter->m_numAliveParticles == ( m_starEmitters[ index ].m_emitter->m_totalSpawnableParticles - 1 )  )
 			{
 				break;
 			}
+
 			
-			Vec3 position = g_RNG->RollRandomInUnitSphere();
-			Vec3 deviation = g_RNG->RollRandomUnitVec3() * m_starEmitters[ index ].m_particleVelocity;
+			Vec3 position = rng.RollRandomInUnitSphere();
+			Vec3 deviation = rng.RollRandomUnitVec3() * m_starEmitters[ index ].m_particleVelocity;
 			//float scale = g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
-			float maxAge = g_RNG->RollRandomFloatInRange( m_starEmitters[ index ].m_particleMinLifeTime , m_starEmitters[ index ].m_particleMaxLifeTime );
+			float maxAge = rng.RollRandomFloatInRange( m_starEmitters[ index ].m_particleMinLifeTime , m_starEmitters[ index ].m_particleMaxLifeTime );
 
 			m_starEmitters[ index ].m_emitter->SpawnNewRandomParticleFromSpriteSheet( AABB2( -m_starEmitters[ index ].m_particleSize , m_starEmitters[ index ].m_particleSize ) 
 																					  , position ,m_gameCamera.GetPosition() , 1.f , deviation ,
@@ -423,7 +443,14 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 	
 	g_D3D11PerfMarker->BeginPerformanceMarker( L"Test Meshes" );
 
+	Mat44 sph = m_sphereMeshTransform.GetAsMatrix();
+	Transform emitT;
+	emitT.SetPosition( m_starEmitters->m_emitter->m_position );
+	Mat44 emiM = emitT.GetAsMatrix();
+	//emiM.TransformBy( sph );
+	
  	g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
+ 	//g_theRenderer->SetModelMatrix( emiM );
  	g_theRenderer->DrawMesh( m_meshSphere );
 
 	g_theRenderer->DisableFog();

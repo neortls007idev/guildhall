@@ -30,7 +30,7 @@ void ParticleEmitter3DUpdateParticlesJob::Execute()
 {
 	m_emitter->UpdateParticlesData( m_frameTime );
 
-	size_t numParticles = m_emitter->m_numAliveParticles;
+	size_t numParticles = m_emitter->m_totalSpawnableParticles;
 
 	size_t numJobRange = static_cast< size_t >( numParticles / 6 );
 	size_t numRangeCorrection = static_cast< size_t >( numParticles % 6 );
