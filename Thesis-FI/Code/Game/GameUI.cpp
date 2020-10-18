@@ -353,11 +353,17 @@ void Game::ProfilingSettingsGUI()
 		if( ImGui::Button( "Apply New Shadow Map Edge Dimesion" ) )
 		{
 			m_shadowMapDimension = m_shadowMapDimensionCopy;
-			for( uint index = 0 ;  index < TOTAL_LIGHTS ; index++ )
-			{
-				g_theRenderer->ReleaseRenderTarget( m_shadowMap[ index ] );
-			}
+			//for( uint index = 0 ;  index < TOTAL_LIGHTS ; index++ )
+			//{
+			//	g_theRenderer->ReleaseAndDeleteRenderTarget( m_shadowMap[ index ] );
+			//}
 		}
+		ImGui::InputFloat( "Shadow Cam Ortho Height" , &m_shadowCamHeight );
+		if ( ImGui::Button( "Apply New Shadow Cam Ortho Height" ) )
+		{
+			m_lightsCamera.SetOrthoView3D( m_shadowCamHeight , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );	
+		}
+		
 		//Vec3 cameraPos = m_gameCamera.GetCameraTransform().GetPostion();
 		//float cameraPitch = m_gameCamera.GetCameraTransform().Get;
 		//ImGui::InputFloat3( "Light World Position" , ( float* ) &m_gameCamera. );

@@ -1038,7 +1038,10 @@ Texture* RenderContext::GetOrCreatematchingRenderTarget( Texture* texture , std:
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Texture* RenderContext::GetOrCreatematchingRenderTargetOfSize( IntVec2 textureSize , std::string debugRenderTargetName /*= "Unreleased RTV"*/ , D3D_DXGI_FORMAT format /*= D3D_DXGI_FORMAT_R8G8B8A8_UNORM */ )
+Texture* RenderContext::GetOrCreatematchingRenderTargetOfSize(IntVec2 textureSize,
+                                                              std::string debugRenderTargetName /*= "Unreleased RTV"*/ ,
+                                                              D3D_DXGI_FORMAT format
+                                                              /*= D3D_DXGI_FORMAT_R8G8B8A8_UNORM */)
 {
 	for ( size_t index = 0; index < m_renderTargetPool.size(); index++ )
 	{
@@ -1062,9 +1065,40 @@ Texture* RenderContext::GetOrCreatematchingRenderTargetOfSize( IntVec2 textureSi
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Texture* RenderContext::GetMatchingRenderTarget( Texture* texture )
+{
+	IntVec2 size = texture->GetDimensions();
+	
+	for ( size_t index = 0; index < m_renderTargetPool.size(); index++ )
+	{
+		Texture* renderTarget = m_renderTargetPool[ index ];
+
+		if ( renderTarget->GetDimensions() == size )
+		{
+			// fast remove at index
+			m_renderTargetPool[ index ] = m_renderTargetPool[ m_renderTargetPool.size() - 1 ];
+			m_renderTargetPool.pop_back();
+			// return the object from pool
+			return renderTarget;
+		}
+	}
+	return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void RenderContext::ReleaseRenderTarget( Texture* texture )
 {
 	m_renderTargetPool.push_back( texture );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RenderContext::ReleaseAndDeleteRenderTarget( Texture* texture )
+{
+	m_renderTargetPool.push_back( texture );
+	Texture* renderTarget = GetMatchingRenderTarget( texture );
+	SAFE_RELEASE_POINTER( renderTarget );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

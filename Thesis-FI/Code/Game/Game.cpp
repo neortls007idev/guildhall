@@ -161,7 +161,7 @@ void Game::InitializeCameras()
 		float height = GAME_CAM_NEAR_Z * -tanf( GAME_CAM_FOV * 0.5f );
 			  height = ( GAME_CAM_FAR_Z * height ) / GAME_CAM_NEAR_Z;
 		//m_lightsCamera.SetProjectionPerspective( GAME_CAM_FOV , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
-		m_lightsCamera.SetOrthoView3D( 10.f , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
+		m_lightsCamera.SetOrthoView3D( m_shadowCamHeight , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
 		//m_lightsCamera.SetOrthoView( 540.f , CLIENT_ASPECT );
 		m_lightsCamera.SetPosition( Vec3( 0.f , 0.f , 0.f ) );
 		m_lightsCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );

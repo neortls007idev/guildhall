@@ -250,7 +250,7 @@ void ParticleEmitter3D::UpdateParticlesData( float deltaSeconds )
 		}
 	}
 
-	m_particleVerts.resize( 6 * m_totalSpawnableParticles );
+	m_particleVerts.resize( 6 * m_numAliveParticles );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
