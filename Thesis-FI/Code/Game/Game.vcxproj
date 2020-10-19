@@ -559,6 +559,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FrustumCullingJob.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCommon.cpp" />
     <ClCompile Include="GameInitialize.cpp" />
@@ -569,6 +570,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineBuildPreferences.hpp" />
+    <ClInclude Include="FrustumCullingJob.hpp" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="TheApp.hpp" />
     <ClInclude Include="GameCommon.hpp" />

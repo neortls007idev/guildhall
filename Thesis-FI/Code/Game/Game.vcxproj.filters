@@ -52,6 +52,9 @@
     <ClCompile Include="GameUtils.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
+    <ClCompile Include="FrustumCullingJob.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">
@@ -65,6 +68,9 @@
     </ClInclude>
     <ClInclude Include="EngineBuildPreferences.hpp">
       <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="FrustumCullingJob.hpp">
+      <Filter>Gameplay</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

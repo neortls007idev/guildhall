@@ -186,6 +186,8 @@ public:
 															 D3D_DXGI_FORMAT format = D3D_DXGI_FORMAT_R8G8B8A8_UNORM );
 	Texture*				GetOrCreatematchingRenderTargetOfSize( IntVec2 textureSize, std::string debugRenderTargetName = "Unreleased RTV",
 																   D3D_DXGI_FORMAT format = D3D_DXGI_FORMAT_R8G8B8A8_UNORM );
+	Texture*				CreateUnPooledRenderTargetOfSize( IntVec2 textureSize, std::string debugRenderTargetName = "Unreleased RTV",
+																   D3D_DXGI_FORMAT format = D3D_DXGI_FORMAT_R8G8B8A8_UNORM );
 	Texture*				GetMatchingRenderTarget( Texture* texture );
 	
 	void					ReleaseRenderTarget( Texture* texture );

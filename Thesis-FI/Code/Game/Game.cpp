@@ -89,7 +89,7 @@ Game::Game()
 
 	InitializeParticleEmitters();
 	InitializeShadowTestTrasforms();
-	//InitializeShadowMapTextures();
+	InitializeShadowMapTextures();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -105,10 +105,11 @@ Game::~Game()
 {
 	SaveScene();
 
-	//for ( uint index = 0; index < TOTAL_LIGHTS; index++ )
-	//{
-	//	g_theRenderer->ReleaseRenderTarget( m_shadowMap[ index ] );
-	//}
+	for ( uint index = 0; index < TOTAL_LIGHTS; index++ )
+	{
+		delete m_shadowMap[ index ] ;
+		m_shadowMap[ index ] = nullptr;
+	}
 	
 	for( int index = 0 ; index < NUM_GAME_MODELS ; index++ )
 	{
@@ -173,8 +174,8 @@ void Game::InitializeShadowMapTextures()
 {
 	for( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
 	{
-		m_shadowMap[index] = g_theRenderer->CreateRenderTarget(IntVec2(4096, 4096), D3D_DXGI_FORMAT_R32_FLOAT,
-		                                                       "ShadowMapRTV");		
+		m_shadowMap[ index ] = g_theRenderer->CreateUnPooledRenderTargetOfSize( IntVec2( m_shadowMapDimension , m_shadowMapDimension ) ,
+																	"lightDepthTarget" , D3D_DXGI_FORMAT_R32_FLOAT );;
 	}
 }
 
@@ -471,7 +472,7 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 	for ( uint index = 0; index < TOTAL_LIGHTS; index++ )
 	{
 		g_theRenderer->BindTexture( nullptr , 8 + index );
-		g_theRenderer->ReleaseRenderTarget( m_shadowMap[ index ] );
+		//g_theRenderer->ReleaseRenderTarget( m_shadowMap[ index ] );
 	}
 	
 	g_D3D11PerfMarker->EndPerformanceMarker();
@@ -655,9 +656,8 @@ void Game::RenderShadowMapPass() const
 
 	for ( uint lightIndex = 0; lightIndex < TOTAL_LIGHTS; lightIndex++ )
 	{
-		Texture* backBuffer = g_theRenderer->m_swapChain->GetBackBuffer();
-		m_shadowMap[ lightIndex ] = g_theRenderer->GetOrCreatematchingRenderTargetOfSize( IntVec2(m_shadowMapDimension , m_shadowMapDimension ) ,
-																				"lightDepthTarget" , D3D_DXGI_FORMAT_R32_FLOAT );
+		//m_shadowMap[ lightIndex ] = g_theRenderer->GetOrCreatematchingRenderTargetOfSize( IntVec2(m_shadowMapDimension , m_shadowMapDimension ) ,
+		//																		"lightDepthTarget" , D3D_DXGI_FORMAT_R32_FLOAT );
 
 		m_lightsCamera.SetColorTarget( 0 , m_shadowMap[ lightIndex ] );
 

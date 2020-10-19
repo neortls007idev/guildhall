@@ -1065,6 +1065,17 @@ Texture* RenderContext::GetOrCreatematchingRenderTargetOfSize(IntVec2 textureSiz
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Texture* RenderContext::CreateUnPooledRenderTargetOfSize(IntVec2 textureSize,
+                                                         std::string debugRenderTargetName /*= "Unreleased RTV"*/ ,
+                                                         D3D_DXGI_FORMAT format /*= D3D_DXGI_FORMAT_R8G8B8A8_UNORM */)
+{
+
+	Texture* newRenderTarget = CreateRenderTarget( textureSize , format , debugRenderTargetName );
+	return newRenderTarget;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Texture* RenderContext::GetMatchingRenderTarget( Texture* texture )
 {
 	IntVec2 size = texture->GetDimensions();

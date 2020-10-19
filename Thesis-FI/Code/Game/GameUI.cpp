@@ -376,10 +376,14 @@ void Game::ProfilingSettingsGUI()
 		if( ImGui::Button( "Apply New Shadow Map Edge Dimesion" ) )
 		{
 			m_shadowMapDimension = m_shadowMapDimensionCopy;
-			//for( uint index = 0 ;  index < TOTAL_LIGHTS ; index++ )
-			//{
-			//	g_theRenderer->ReleaseAndDeleteRenderTarget( m_shadowMap[ index ] );
-			//}
+
+			for ( uint index = 0; index < TOTAL_LIGHTS; index++ )
+			{
+				delete m_shadowMap[ index ];
+				m_shadowMap[ index ] = nullptr;
+			}
+
+			InitializeShadowMapTextures();
 		}
 		ImGui::InputFloat( "Shadow Cam Ortho Height" , &m_shadowCamHeight );
 		if ( ImGui::Button( "Apply New Shadow Cam Ortho Height" ) )
