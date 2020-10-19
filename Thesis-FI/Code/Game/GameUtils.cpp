@@ -64,8 +64,39 @@ bool Game::AddGameOBJInstance( eGameObjModels modelType )
 	Transform* newTransform = new Transform();
 
 	EmplaceBackAtEmptySpace( m_ModelInstances[ modelType ] , newTransform );
-	//m_OBJInstance[ modelType ].push_back( newTransform );
 	m_totalDrawableMeshes++;
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Game::AddGameOBJInstances( eGameObjModels modelType )
+{
+	float deltaYaw		= ( m_maxYaw - m_minYaw ) / ( float ) m_numNewInstancesCount;
+	float deltaPitch	= ( m_maxPitch - m_minPitch ) / ( float ) m_numNewInstancesCount;
+	float deltaRoll		= ( m_maxRoll - m_minRoll ) / ( float ) m_numNewInstancesCount;
+
+	float Yaw		= m_minYaw;
+	float Pitch		= m_minPitch;
+	float Roll		= m_minRoll;
+	
+	for( int index = 0 ; index < m_numNewInstancesCount ; index++ )
+	{		
+		if ( nullptr == m_gameModels[ modelType ] )
+		{
+			return false;
+		}
+
+		Transform* newTransform = new Transform();
+
+		EmplaceBackAtEmptySpace( m_ModelInstances[ modelType ] , newTransform );
+		m_totalDrawableMeshes++;
+		newTransform->SetPosition( Vec3::MakeFromSpericalCoordinates( Pitch , Yaw , m_numNewInstancesRadius ) );
+		newTransform->SetRotation( Pitch , Yaw , Roll );
+		Yaw		+= deltaYaw;
+		Pitch	+= deltaPitch;
+		Roll	+= deltaRoll;
+	}
 	return true;
 }
 
@@ -111,7 +142,16 @@ void Game::LoadScene()
 			float instancePitch		= ParseXmlAttribute( *modelTransform , "pitch" , 0.0f );
 			float instanceRoll		= ParseXmlAttribute( *modelTransform , "roll" , 0.0f );
 			Vec3 instanceScale		= ParseXmlAttribute( *modelTransform , "scale" , Vec3::ZERO );
-			
+
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//				HACK TO CREATE SYMMETRY ON THE OPPOSITE SIDE WITHT HE OTHER MESH
+//--------------------------------------------------------------------------------------------------------------------------------------------
+				
+// 			if( modelIndex == 1 )
+// 			{
+// 				instancePos.x = abs( instancePos.x );
+// 			}
 			
 			if( ( modelIndex < 0 ) && ( modelIndex >= NUM_GAME_MODELS ) )
 			{

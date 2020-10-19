@@ -175,27 +175,8 @@
     <Xml Include="..\..\Run\Data\Models\ModelInstances.xml">
       <Filter>Data\XML Data</Filter>
     </Xml>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\..\Run\Data\Models\scifiFighter\bump.jpg">
-      <Filter>Data\Models\Sci-Fi Fighter</Filter>
-    </Image>
-    <Image Include="..\..\Run\Data\Models\scifiFighter\diffuse.jpg">
-      <Filter>Data\Models\Sci-Fi Fighter</Filter>
-    </Image>
-    <Image Include="..\..\Run\Data\Models\scifiFighter\emissive.jpg">
-      <Filter>Data\Models\Sci-Fi Fighter</Filter>
-    </Image>
-    <Image Include="..\..\Run\Data\Models\scifiFighter\normal.png">
-      <Filter>Data\Models\Sci-Fi Fighter</Filter>
-    </Image>
-    <Image Include="..\..\Run\Data\Models\scifiFighter\specular.jpg">
-      <Filter>Data\Models\Sci-Fi Fighter</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="..\..\Run\Data\Models\scifiFighter\mesh.obj">
-      <Filter>Data\Models\Sci-Fi Fighter</Filter>
-    </Object>
+    <Xml Include="..\..\Run\Data\Models\ModelInstances - Copy.xml">
+      <Filter>Data\XML Data</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

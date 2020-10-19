@@ -70,8 +70,10 @@ private:
 			//----------------------------------------------------------------------------------------------------------
 
 			bool AddGameOBJInstance( eGameObjModels modelType );
+			bool AddGameOBJInstances( eGameObjModels modelType );
 			bool DestroyGameOBJInstance( eGameObjModels modelType , int instanceCount );
 			void RenderAllInstancesOfType( eGameObjModels modelType ) const;
+			void RenderAllModelInstances() const;
 			void SaveScene();
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -217,5 +219,17 @@ private:
 	Texture*							m_tileNormal										= nullptr;
 	Texture*							m_objSciFiShipMeshTex_D								= nullptr;
 	Texture*							m_objSciFiShipMeshTex_N								= nullptr;
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//				GUI TEST CODE
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	int									m_numNewInstancesCount	= 0;
+	float								m_numNewInstancesRadius = 0.f;
+	float								m_minPitch				= 0.f;
+	float								m_minYaw				= 0.f;
+	float								m_minRoll				= 0.f;
+	float								m_maxPitch				= 0.f;
+	float								m_maxYaw				= 0.f;
+	float								m_maxRoll				= 0.f;
 		
 };

@@ -18,7 +18,7 @@ extern Window*		g_theWindow;
 constexpr float		CLIENT_ASPECT											= 16.f/9.f;
 
 constexpr float		GAME_CAM_NEAR_Z											= 0.01f;
-constexpr float		GAME_CAM_FAR_Z											= 200.0f;
+constexpr float		GAME_CAM_FAR_Z											= 1000.0f;
 constexpr float		GAME_CAM_FOV											= 60.0f;
 constexpr size_t	FRAME_RATE_BUFFER_SIZE									= 9000;
 constexpr size_t	PARTICLE_EMITTER_LIMIT									= 30000;
@@ -91,7 +91,10 @@ enum eGameObjModels
 {
 	SPACESHIP ,
 	LUMINARIS_SHIP ,
-	CITY_BUILDING_1 ,
+	W_CRUSIER ,
+	MINI_SHIP ,
+	STAR_SHIP ,
+	STRIDER ,
 	
 	NUM_GAME_MODELS
 };

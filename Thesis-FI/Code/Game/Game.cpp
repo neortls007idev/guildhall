@@ -232,7 +232,7 @@ void Game::Update( float deltaSeconds )
 
 	DebugUI();
 
-	UpdateAllStarEmitters();
+	//UpdateAllStarEmitters();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -464,8 +464,9 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 	g_D3D11PerfMarker->EndPerformanceMarker();
 
 	g_D3D11PerfMarker->BeginPerformanceMarker( L"Render all OBJ Models" );
-	RenderAllInstancesOfType( SPACESHIP );
-	RenderAllInstancesOfType( LUMINARIS_SHIP );
+	RenderAllModelInstances();
+	//RenderAllInstancesOfType( SPACESHIP );
+	//RenderAllInstancesOfType( LUMINARIS_SHIP );
 
 	for ( uint index = 0; index < TOTAL_LIGHTS; index++ )
 	{
@@ -734,8 +735,10 @@ void Game::RenderShadowMapPass() const
 		g_D3D11PerfMarker->EndPerformanceMarker();
 
 		g_D3D11PerfMarker->BeginPerformanceMarker( L"Render all OBJ Models" );
-		RenderAllInstancesOfType( SPACESHIP );
-		RenderAllInstancesOfType( LUMINARIS_SHIP );
+
+		RenderAllModelInstances();
+		//RenderAllInstancesOfType( SPACESHIP );
+		//RenderAllInstancesOfType( LUMINARIS_SHIP );
 		g_D3D11PerfMarker->EndPerformanceMarker();
 		//g_theRenderer->CopyTexture( m_shadowMap[ lightIndex ] , m_lightsCamera.GetDepthStencilTarget() );
 		//g_theRenderer->ReleaseRenderTarget( m_shadowMap[ lightIndex ] );
@@ -796,7 +799,16 @@ void Game::RenderAllInstancesOfType( eGameObjModels modelType ) const
 			g_theRenderer->DrawMesh( m_gameModels[ modelType ] );
 		}
 	}
+}
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::RenderAllModelInstances() const
+{
+	for( int index = 0 ; index < NUM_GAME_MODELS ; index++ )
+	{
+		RenderAllInstancesOfType( ( eGameObjModels ) index );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

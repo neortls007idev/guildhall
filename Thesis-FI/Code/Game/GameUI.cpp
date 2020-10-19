@@ -1,7 +1,9 @@
+#include "Engine/Core/DebugRender.hpp"
 #include "Game/Game.hpp"
 #include "ThirdParty/ImGUI/imgui.h"
 #include "ThirdParty/ImGUI/ImGuiFileDialog.h"
 #include "Engine/ParticleSystem/ParticleEmitter3D.hpp"
+#include "Engine/Primitives/GPUMesh.hpp"
 #include "ThirdParty/ImGUI/implot.h"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -17,8 +19,11 @@ static int currentModelToUpdateIndex = 0;
 const char* modelNames[ NUM_GAME_MODELS ] =
 {
 	"SPACESHIP" ,
-	"LUMINARIS_SHIP" ,
-	"CITY_BUILDING_1" ,
+	"LUMINARIS SHIP" ,
+	"W-CRUISER SHIP" ,
+	"MINI SHIP",
+	"STAR SHIP" ,
+	"STRIDER"
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -291,7 +296,24 @@ void Game::SceneSetupGUI()
 		{
 			AddGameOBJInstance( ( eGameObjModels ) currentModelToAddIndex );
 		}
+		if ( ImGui::CollapsingHeader( "Instances Spawn settings" ) )
+		{
+			ImGui::InputInt( "New Instances Count" , &m_numNewInstancesCount );
+			ImGui::InputFloat( "new Instances Radius" , &m_numNewInstancesRadius );
+			ImGui::InputFloat( "min Yaw"	, &m_minYaw  );		//ImGui::SameLine();
+			ImGui::InputFloat( "min Pitch" , &m_minPitch );	//ImGui::SameLine();
+			ImGui::InputFloat( "min Roll"	, &m_minRoll );
+			ImGui::InputFloat( "max Yaw"	, &m_maxYaw );		//ImGui::SameLine();
+			ImGui::InputFloat( "max Pitch" , &m_maxPitch );	//ImGui::SameLine();
+			ImGui::InputFloat( "max Roll"	, &m_maxRoll );
+		}
 
+		std::string instancesButton = "Add " + ToString( m_numNewInstancesCount ) + " instances of" + std::string( modelNames[ currentModelToAddIndex ] );
+		if ( ImGui::Button( instancesButton.c_str() ) )
+		{
+			AddGameOBJInstances( ( eGameObjModels ) currentModelToAddIndex );
+ 		}
+		
 		if( ImGui::BeginCombo( "OBJs to Update" , modelNames[ currentModelToUpdateIndex ] , flags ) )
 		{
 			for( int modelIndex = 0; modelIndex < NUM_GAME_MODELS; modelIndex++ )
@@ -321,12 +343,13 @@ void Game::SceneSetupGUI()
 					if( ImGui::TreeNode( instanceName.c_str() ) )
 					{
 						ImGui::Text( "Transform" );
-						ImGui::InputFloat3( "World Position" , ( float* ) &m_ModelInstances[ currentModelToUpdateIndex ][ instanceIndex ]->m_position );
-						ImGui::InputFloat( "Yaw" , ( float* ) &m_ModelInstances[ currentModelToUpdateIndex ][ instanceIndex ]->m_yaw );		//ImGui::SameLine();
-						ImGui::InputFloat( "Pitch" , ( float* ) &m_ModelInstances[ currentModelToUpdateIndex ][ instanceIndex ]->m_pitch );	//ImGui::SameLine();
-						ImGui::InputFloat( "Roll" , ( float* ) &m_ModelInstances[ currentModelToUpdateIndex ][ instanceIndex ]->m_roll );
-						ImGui::InputFloat3( "Scale" , ( float* ) &m_ModelInstances[ currentModelToUpdateIndex ][ instanceIndex ]->m_scale );
-
+						ImGui::DragFloat3( "World Position" , ( float* ) &m_ModelInstances[ currentModelToUpdateIndex ][ instanceIndex ]->m_position );
+						ImGui::DragFloat( "Yaw" , ( float* ) &m_ModelInstances[ currentModelToUpdateIndex ][ instanceIndex ]->m_yaw );		//ImGui::SameLine();
+						ImGui::DragFloat( "Pitch" , ( float* ) &m_ModelInstances[ currentModelToUpdateIndex ][ instanceIndex ]->m_pitch );	//ImGui::SameLine();
+						ImGui::DragFloat( "Roll" , ( float* ) &m_ModelInstances[ currentModelToUpdateIndex ][ instanceIndex ]->m_roll );
+						ImGui::DragFloat3( "Scale" , ( float* ) &m_ModelInstances[ currentModelToUpdateIndex ][ instanceIndex ]->m_scale );
+						DebugAddWorldWireSphere( m_ModelInstances[ SPACESHIP ][ instanceIndex ]->m_position ,
+							m_gameModels[ SPACESHIP ]->m_boundingSphereRadius , GREEN , 0.01667f );
 						if( ImGui::Button( "Destroy Instance" ) )
 						{
 							DestroyGameOBJInstance( ( eGameObjModels ) currentModelToUpdateIndex , instanceIndex );

@@ -88,8 +88,8 @@ void Game::LoadShaders()
 	m_toneMapShader												= g_theRenderer->GetOrCreateShader( "Data/Shaders/toneMap.hlsl" );
 	m_toneMapComputeShader										= g_theRenderer->GetOrCreateShader( "Data/Shaders/toneMapCS.hlsl" );
 
-	m_currentShader												= m_lightShaders[ LitShaderTypes::LIT_SHADOW ];
-	m_currentShaderIndex										= LitShaderTypes::LIT_SHADOW;
+	m_currentShader												= m_lightShaders[ LitShaderTypes::UNLIT ];
+	m_currentShaderIndex										= LitShaderTypes::UNLIT;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

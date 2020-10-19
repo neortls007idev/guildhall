@@ -277,9 +277,10 @@ const Vec3 Vec3::GetNormalized() const
 
 const Vec3 Vec3::SetFromText( const char* text )
 {
+		Strings xyz = SplitStringAtGivenDelimiter( text );
 		Vec3 vec3FromText;
-		vec3FromText.x = static_cast< float >( atof( text ) );
-
+		vec3FromText.x = static_cast< float >( atof( xyz[ 0 ].c_str() ) );
+	
 		char currentChar = NULL;
 
 		while ( currentChar != ',' /* currentChar != NULL*/ )
@@ -287,14 +288,14 @@ const Vec3 Vec3::SetFromText( const char* text )
 			currentChar = *text;
 			text++;
 		}
-		vec3FromText.y = static_cast< float >( atof( text ) );
+		vec3FromText.y = static_cast< float >( atof( xyz[ 1 ].c_str() ) );
 
 		while ( currentChar != ',' /* currentChar != NULL*/ )
 		{
 			currentChar = *text;
 			text++;
 		}
-		vec3FromText.z = static_cast< float >( atof( text ) );
+		vec3FromText.z = static_cast< float >( atof( xyz[ 2 ].c_str() ) );
 
 		return vec3FromText;
 }
