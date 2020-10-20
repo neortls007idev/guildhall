@@ -20,10 +20,10 @@ const char* modelNames[ NUM_GAME_MODELS ] =
 {
 	"SPACESHIP" ,
 	"LUMINARIS SHIP" ,
-	"W-CRUISER SHIP" ,
-	"MINI SHIP",
-	"STAR SHIP" ,
-	"STRIDER"
+//	"W-CRUISER SHIP" ,
+//	"MINI SHIP",
+//	"STAR SHIP" ,
+//	"STRIDER"
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -390,7 +390,12 @@ void Game::ProfilingSettingsGUI()
 		{
 			m_lightsCamera.SetOrthoView3D( m_shadowCamHeight , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );	
 		}
-		
+		ImGui::SliderFloat( "Game Cam Near Z" , &m_nearZ , 0.001f , 0.999f );
+		ImGui::SliderFloat( "Game Cam Far Z" , &m_farZ , 10.f , 1000.f );
+		if( ImGui::Button("Apply new Near and FarZ" ) )
+		{
+			m_gameCamera.SetProjectionPerspective( GAME_CAM_FOV , CLIENT_ASPECT , -m_nearZ , -m_farZ );
+		}
 		//Vec3 cameraPos = m_gameCamera.GetCameraTransform().GetPostion();
 		//float cameraPitch = m_gameCamera.GetCameraTransform().Get;
 		//ImGui::InputFloat3( "Light World Position" , ( float* ) &m_gameCamera. );

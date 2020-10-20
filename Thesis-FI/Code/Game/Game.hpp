@@ -86,13 +86,21 @@ private:
 			void CameraPositionUpdateOnInput( float deltaSeconds );
 	
 public:
-	
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//				GAME CAMERA
+	//--------------------------------------------------------------------------------------------------------------------------------------------
 	mutable Camera						m_gameCamera;
 	
 	Vec3								m_cameraPosition									= Vec3::ZERO;
 	float								m_pitch												= 0.f;
 	float								m_yaw												= 0.f;
 
+	float								m_nearZ												= GAME_CAM_NEAR_Z;
+	float								m_farZ												= GAME_CAM_FAR_Z;
+	
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+			
 	Shader*								m_lightShaders[ LitShaderTypes::TOTAL_LITSHADERS ];
 	Shader* 							m_currentShader;
 	int									m_currentShaderIndex;

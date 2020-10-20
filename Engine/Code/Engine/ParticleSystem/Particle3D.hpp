@@ -43,7 +43,7 @@ public:
 	Rgba8		m_startColor		= CLEAR;
 	Rgba8		m_endColor			= CLEAR;
  	AABB2		m_cosmeticBounds	= AABB2( -1.f , -1.f , 1.f ,1.f);
-	int			m_spriteIndex			= 0;
+	int			m_spriteIndex		= 0;
 	float		m_scale				= 1.f;
 };
 

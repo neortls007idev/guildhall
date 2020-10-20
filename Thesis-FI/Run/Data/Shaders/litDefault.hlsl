@@ -81,7 +81,7 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
     
     float3 surfaceNormal           = NormalColorToVector3( normalColor.xyz );
     float3 worldNormal             = mul( surfaceNormal , TBN );
-    worldNormal = normal;
+  
 //--------------------------------------------------------------------------------------
 //              COMPUTE LIGHT FACTOR
 //--------------------------------------------------------------------------------------

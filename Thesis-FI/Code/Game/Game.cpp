@@ -233,7 +233,7 @@ void Game::Update( float deltaSeconds )
 
 	DebugUI();
 
-	//UpdateAllStarEmitters();
+	UpdateAllStarEmitters();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -652,6 +652,11 @@ void Game::RenderFresnelShader2ndPass() const
 
 void Game::RenderShadowMapPass() const
 {
+	if( m_currentShaderIndex != LIT_SHADOW )
+	{
+		return;
+	}
+		
 	g_D3D11PerfMarker->BeginPerformanceMarker( L"Shadow Map Render Pass Start" );
 
 	for ( uint lightIndex = 0; lightIndex < TOTAL_LIGHTS; lightIndex++ )
@@ -805,10 +810,14 @@ void Game::RenderAllInstancesOfType( eGameObjModels modelType ) const
 
 void Game::RenderAllModelInstances() const
 {
+	g_D3D11PerfMarker->BeginPerformanceMarker( L"Rendering All Meshes" );
 	for( int index = 0 ; index < NUM_GAME_MODELS ; index++ )
 	{
+		g_D3D11PerfMarker->BeginPerformanceMarker( L"Rendering Mesh Instances" );
 		RenderAllInstancesOfType( ( eGameObjModels ) index );
+		g_D3D11PerfMarker->EndPerformanceMarker();
 	}
+	g_D3D11PerfMarker->EndPerformanceMarker();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

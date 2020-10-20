@@ -91,10 +91,10 @@ enum eGameObjModels
 {
 	SPACESHIP ,
 	LUMINARIS_SHIP ,
-	W_CRUSIER ,
-	MINI_SHIP ,
-	STAR_SHIP ,
-	STRIDER ,
+//	W_CRUSIER ,
+//	MINI_SHIP ,
+//	STAR_SHIP ,
+//	STRIDER ,
 	
 	NUM_GAME_MODELS
 };
@@ -143,9 +143,9 @@ struct GameParticleEmitter
 	int					m_particleMaxLifeTime			= 120;
 	float				m_particleVelocity				= 0.f;
 	Vec2				m_particleSize					= Vec2::ONE;
-	uint				m_numParticlesToSpawnPerFrame	= 500;
+	uint				m_numParticlesToSpawnPerFrame	= 1000;
 
-	uint				m_numAliveParticles				= 0;
+	//uint				m_numAliveParticles				= 0;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

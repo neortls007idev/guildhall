@@ -302,7 +302,7 @@ void ParticleEmitter3D::Render()
 	m_renderContext->BindShader( m_shader );
 	m_renderContext->BindTexture( m_texture );
 	m_renderContext->SetBlendMode( m_blendMode );	
-	m_renderContext->SetModelMatrix( Mat44::IDENTITY /*, HALF_ALPHA_WHITE*/ );
+	m_renderContext->SetModelMatrix( Mat44::IDENTITY , HALF_ALPHA_WHITE );
 	m_renderContext->DrawVertexArray( m_particleVerts );
 	m_renderContext->SetBlendMode( eBlendMode::ALPHA );
 }

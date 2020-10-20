@@ -42,7 +42,7 @@ float2 ComputeLightFactor( light_t light , float3 worldPosition , float3 worldNo
                 specular                = facingDirection * specular;   
                 specular                = SPECULAR_FACTOR * pow( specular , SPECULAR_POWER );
  
-    return float2( diffuseAttenuation * diffuse ,/* specularAttenuation * specular*/ 0.f );
+    return float2( diffuseAttenuation * diffuse , specularAttenuation * specular );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -52,6 +52,8 @@ struct PostLightingData
     float3 diffuse;
     float3 specularEmmisive;
 };
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 PostLightingData ComputeLightingAt( float3 worldPos , float3 worldNormal , float3 surfaceColor , float3 emmisiveColor , float specularFactor )
 {
@@ -80,6 +82,8 @@ PostLightingData ComputeLightingAt( float3 worldPos , float3 worldNormal , float
    // returns light color (in linear space)
     PostLightingData result;
     result.specularEmmisive = specular + emmisiveColor;
-    result.diffuse = diffuse * surfaceColor + result.specularEmmisive;
+    result.diffuse = diffuse * surfaceColor;
     return result;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------

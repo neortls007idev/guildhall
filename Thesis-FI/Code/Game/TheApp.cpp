@@ -169,13 +169,13 @@ void TheApp::RunFrame()
 	BeginFrame();                        // all engine system and not game systems
 	Update( ( float ) deltaSeconds/*( float ) Clock::g_theMasterClock.GetLastDeltaSeconds()*/ );
 
-	//m_particleSystemJob = new ParticleSystem3DUpdateJob( 0 , g_theParticleSystem3D , ( float ) deltaSeconds/*( float ) Clock::g_theMasterClock.GetLastDeltaSeconds()*/ );
-	//g_theJobSystem->PostJob( *m_particleSystemJob );
-	//
-	//while ( !g_theJobSystem->AreAllJobsComplete() && !g_theJobSystem->IsQuitting() )
-	//{
-	//	// DO NOTHING
-	//}
+	m_particleSystemJob = new ParticleSystem3DUpdateJob( 0 , g_theParticleSystem3D , ( float ) deltaSeconds/*( float ) Clock::g_theMasterClock.GetLastDeltaSeconds()*/ );
+	g_theJobSystem->PostJob( *m_particleSystemJob );
+
+	while ( !g_theJobSystem->AreAllJobsComplete() && !g_theJobSystem->IsQuitting() )
+	{
+		// DO NOTHING
+	}
 
 	Render();
 	EndFrame();

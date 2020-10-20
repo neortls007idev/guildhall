@@ -14,7 +14,7 @@
 		              generateNormals="true"
 		              optimizeVertexCount="false" />
 	</Model>
-	
+	<!--
 	<Model path="Data/Models/SpaceShipW-cruiser/doubleWingSpaceTransporterHD.obj"
 	       diffuse=""
 	       normals=""
@@ -48,5 +48,5 @@
 	       enumValue ="5" >
 		<BuildOptions generateTangent="true" generateNormals="true" optimizeVertexCount="false" />
 	</Model>
-
+	-->
 </Models>
