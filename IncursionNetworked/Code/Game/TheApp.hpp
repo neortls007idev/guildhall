@@ -1,8 +1,4 @@
 #pragma once
-#include "Engine/Math/Vec2.hpp"
-#include "Engine/Core/Rgba8.hpp"
-#include "Engine/Core/Vertex_PCU.hpp"
-#include "Game/Game.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -17,7 +13,7 @@ public:
 	void Shutdown();
 	void RunFrame();
 
-	bool IsQuitting() const { return m_isQuitting; }
+	bool IsQuitting() const																							{ return m_isQuitting; }
 	bool HandleQuitRequested();
 
 	void BeginFrame();
@@ -32,14 +28,14 @@ public:
 
 private :
 
-	bool m_isQuitting  = false ;
-	bool m_isSloMo = false;
-	bool m_isSpeedMo = false;
+	bool m_isQuitting	= false ;
+	bool m_isSloMo		= false;
+	bool m_isSpeedMo	= false;
 
 public:
 
-	bool m_isPaused = false;
-	bool m_debugCamera = false;
+	bool m_isPaused		= false;
+	bool m_debugCamera	= false;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

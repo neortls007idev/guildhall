@@ -24,10 +24,6 @@ public:
 
 	GameSinglePlayer();
 
-	void LoadAssets();
-	void LoadAllSounds();
-	void LoadAllEntityTextures();
-
 	void Update( float deltaSeconds );
 	void UpdateCamera();
 	bool LoadingState();
@@ -63,25 +59,25 @@ private:
 
 private:
 
-	int m_controllerID = -1;
-	float m_screenShakeIntensity = 0.f;
-	float m_tilesInViewHorizontally = 16.0f;
-	float m_tilesInViewVertically = 9.0f;
-	float m_victoryPanelFadeTimer = 0.5f;
-	Rgba8 m_fadeColor;
-	bool  m_hasLoadingStateStarted = true;
-	Vec2 m_CameraCenter= Vec2( m_tilesInViewHorizontally / 2 , m_tilesInViewVertically / 2 );
+	int				m_controllerID					= -1;
+	float			m_screenShakeIntensity			= 0.f;
+	float			m_tilesInViewHorizontally		= 16.0f;
+	float			m_tilesInViewVertically			= 9.0f;
+	float			m_victoryPanelFadeTimer			= 0.5f;
+	Rgba8			m_fadeColor;
+	bool			m_hasLoadingStateStarted		= true;
+	Vec2			m_CameraCenter					= Vec2( m_tilesInViewHorizontally / 2 , m_tilesInViewVertically / 2 );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 public:
 
-	bool             m_isClipping	   = false;
-	bool             m_debugDraw	   = false;
-	bool             m_gameJustStarted = false;
-	bool             m_gameOverAudio   = false;
+	bool             m_isClipping					= false;
+	bool             m_debugDraw					= false;
+	bool             m_gameJustStarted				= false;
+	bool             m_gameOverAudio				= false;
 	GameStates		 m_gameState;
-	World*			 m_world1		   = nullptr;
+	World*			 m_world1						= nullptr;
 	mutable Camera	 m_worldCamera;
 	Camera			 m_uiCamera;
 	Texture*		 m_textures[ NUM_TOTAL_TEXTURES ];

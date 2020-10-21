@@ -3,13 +3,14 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Input/VirtualKeyboard.hpp"
+#include "Engine/Networking/NetworkSystem.hpp"
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Time/Time.hpp"
+#include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/TheApp.hpp"
-#include "Engine/Networking/NetworkSystem.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -90,7 +91,7 @@ void TheApp::Startup()
 
 	if ( g_bitmapFont == nullptr )
 	{
-		g_bitmapFont = g_theRenderer->GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); // TO DO PASS IN THE FONT ADDRESS AND THE TEXTURE POINTER TO IT.
+		g_bitmapFont = g_theRenderer->GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); 
 	}
 
 	if ( g_theDevConsole == nullptr )

@@ -7,6 +7,7 @@
 #include "Engine/Core/VertexUtils.hpp"
 #include "Game/player.hpp"
 #include "Game/GameCommon.hpp"
+#include "Game/Game.hpp"
 #include "Game/TheApp.hpp"
 #include "Game/NpcTank.hpp"
 #include "Game/Bullet.hpp"

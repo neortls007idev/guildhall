@@ -6,6 +6,8 @@
 #include "Engine/Core/VertexUtils.hpp"
 #include "Game/TheApp.hpp"
 #include "TileDefinition.hpp"
+#include "Engine/Renderer/SpriteSheet.hpp"
+#include "Game.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

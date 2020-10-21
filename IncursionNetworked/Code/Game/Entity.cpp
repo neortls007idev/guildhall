@@ -1,6 +1,7 @@
 #include "Game/Entity.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Game/TheApp.hpp"
+#include "Game/Game.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

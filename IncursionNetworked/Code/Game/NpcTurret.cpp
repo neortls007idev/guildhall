@@ -6,6 +6,7 @@
 #include "Game/TheApp.hpp"
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Game.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

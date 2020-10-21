@@ -4,6 +4,7 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Game/TheApp.hpp"
+#include "Game/Game.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

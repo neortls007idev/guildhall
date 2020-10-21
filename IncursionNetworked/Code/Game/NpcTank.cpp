@@ -7,6 +7,8 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Game/TheApp.hpp"
+#include "Game/Map.hpp"
+#include "Game/Game.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

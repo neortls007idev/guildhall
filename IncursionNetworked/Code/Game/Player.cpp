@@ -8,6 +8,7 @@
 #include "Engine/Input/VirtualKeyboard.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/DevConsole.hpp"
+#include "Game/Game.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //		GLOBAL VARIABLES
