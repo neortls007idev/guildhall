@@ -142,6 +142,7 @@ void JobSystem::ClaimJobForExecution()
 	else
 	{
 		m_pendingJobsQueueMutex.unlock();
+		std::this_thread::yield();
 		//std::this_thread::sleep_for( std::chrono::microseconds( 1 ) );
 	}
 }

@@ -421,9 +421,6 @@
     <ClCompile Include="Memory\Job.cpp">
       <Filter>Memory</Filter>
     </ClCompile>
-    <ClCompile Include="Memory\JobSystemWorkerThread.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="ParticleSystem\Particle2D.cpp">
       <Filter>ParticleSystem\ParticleSystem2D</Filter>
     </ClCompile>
@@ -525,6 +522,9 @@
     </ClCompile>
     <ClCompile Include="..\ThirdParty\ImGUI\implot_items.cpp">
       <Filter>ThirdParty\ImGUI\Plot</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\JobSystemWorkerThread.cpp">
+      <Filter>Memory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
