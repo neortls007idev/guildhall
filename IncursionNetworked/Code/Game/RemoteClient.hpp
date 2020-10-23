@@ -5,7 +5,9 @@
 
 class RemoteClient : protected Client
 {
-	
+public:
+	RemoteClient( Server* ownerServer );
+	~RemoteClient();
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

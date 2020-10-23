@@ -22,9 +22,9 @@ extern DevConsole* g_theDevConsole;
 // GLOBAL VARIABLES
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-extern RenderContext* g_theRenderer;
-extern AudioSystem* g_theAudioSystem;
-extern TheApp* g_theApp;
+extern RenderContext*	g_theRenderer;
+extern AudioSystem*		g_theAudioSystem;
+extern TheApp*			g_theApp;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -209,9 +209,6 @@ void Game::Render() const
 	default:
 		break;
 	}
-
-
-
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

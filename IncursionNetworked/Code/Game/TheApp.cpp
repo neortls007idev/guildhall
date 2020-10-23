@@ -14,10 +14,10 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-		AudioSystem*						g_theAudioSystem	= nullptr;
-		DevConsole*							g_theDevConsole		= nullptr;
-		InputSystem*						g_theInput			= nullptr;
-		RenderContext*						g_theRenderer		= nullptr;
+extern	DevConsole*							g_theDevConsole;	
+extern	AudioSystem*						g_theAudioSystem;
+extern	InputSystem*						g_theInput;
+extern	RenderContext*						g_theRenderer;
 		TheApp*								g_theApp			= nullptr;
 		Game*								g_theGame			= nullptr;
 extern	BitmapFont*							g_bitmapFont;
@@ -74,50 +74,6 @@ void TheApp::Startup()
 	if ( g_theWindow == nullptr )
 	{
 		g_theWindow = new Window();
-	}
-
-	if ( g_theInput == nullptr )
-	{
-		g_theInput = new InputSystem();
-		g_theWindow->SetInputSystem( g_theInput );
-	}
-	g_theInput->Startup();
-
-	if ( g_theRenderer == nullptr )
-	{
-		g_theRenderer = new RenderContext();
-	}
-	g_theRenderer->Startup( g_theWindow );
-
-	if ( g_bitmapFont == nullptr )
-	{
-		g_bitmapFont = g_theRenderer->GetOrCreateBitmapFontFromFile( "Data/Fonts/SquirrelFixedFont" ); 
-	}
-
-	if ( g_theDevConsole == nullptr )
-	{
-		g_theDevConsole = new DevConsole();
-	}
-	g_theDevConsole->Startup();
-	// 	AddDebugRenderDevConsoleCommands( g_theDevConsole );
-
-	// 	if ( g_currentManager == nullptr )
-	// 	{
-	// 		// instantiating a default DRO_Manager
-	// 		g_currentManager = new DebugRenderObjectsManager();
-	// 	}
-	// 	g_currentManager->Startup();
-
-	// 	if ( g_thePhysicsSystem == nullptr )
-	// 	{
-	// 		g_thePhysicsSystem = new Physics2D();
-	// 	}
-	// 	g_thePhysicsSystem->Startup();
-
-	if ( g_theAudioSystem == nullptr )
-	{
-		g_theAudioSystem = new AudioSystem();
-		g_theAudioSystem->Startup();
 	}
 
 	if ( g_theNetworkSys == nullptr )

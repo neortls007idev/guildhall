@@ -6,7 +6,8 @@
 class PlayerClient : protected Client
 {
 public:
-	
+	PlayerClient( Server* ownerServer );
+	~PlayerClient();
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
