@@ -27,6 +27,13 @@ extern	RenderContext*						g_theRenderer;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+#ifdef UNIT_TEST
+#undef UNIT_TEST
+#endif
+	
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 TheApp::TheApp()
 {
 
@@ -126,6 +133,8 @@ void TheApp::Startup()
 		g_theNetworkSys = new NetworkSystem();
 	}
 	g_theNetworkSys->Startup();
+
+	AddMultiplayerGameCommandsToConsole();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -156,7 +165,11 @@ void TheApp::BeginFrame()
 	g_theDevConsole->BeginFrame();
 	g_theAudioSystem->BeginFrame();
 	g_theNetworkSys->BeginFrame();
-	g_theAuthServer->BeginFrame();
+
+	if( g_theAuthServer != nullptr )
+	{
+		g_theAuthServer->BeginFrame();
+	}
 
 	if( m_client != nullptr )
 	{
@@ -169,7 +182,10 @@ void TheApp::BeginFrame()
 void TheApp::Update( float deltaSeconds )
 {
 	UpdateFromKeyboard();
-	g_theAuthServer->Update( deltaSeconds );
+	if ( g_theAuthServer != nullptr )
+	{
+		g_theAuthServer->Update( deltaSeconds );
+	}
 	
 	if( m_client != nullptr )
 	{
@@ -186,7 +202,14 @@ void TheApp::Update( float deltaSeconds )
 
 void TheApp::Render() const
 {
-	m_client->Render();
+	if( m_client != nullptr )
+	{
+		m_client->Render();
+	}
+	if ( g_theDevConsole->IsOpen() )
+	{
+		g_theDevConsole->Render( *g_theRenderer , *g_theDevConsole->GetDevConsoleCamera() , 14.f );
+	}
 	//g_theGame->RenderUI();
 }
 
@@ -196,7 +219,10 @@ void TheApp::EndFrame()
 {
 	// all engine things that must end at the end of the frame and not the game
 /*	g_currentManager->EndFrame();*/
-	g_theAuthServer->EndFrame();
+	if( g_theAuthServer != nullptr )
+	{
+		g_theAuthServer->EndFrame();
+	}
 	if( m_client != nullptr )
 	{
 		m_client->EndFrame();
@@ -210,13 +236,28 @@ void TheApp::EndFrame()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void TheApp::AddMultiplayerGameCommandsToConsole()
+{
+	EventArgs consoleArgs;
+	g_theDevConsole->CreateCommand( "StartMultiplayerServer" , "StartMutiplayerServer port=<port number>" , consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "StartMultiplayerServer" , StartMultiplayerServer );
+
+	g_theDevConsole->CreateCommand( "ConnectToMultiplayerServer" , "ConnectToMultiplayerServer ip=<IPv4 address> |port=<port number> " , consoleArgs );
+	g_theEventSystem->SubscribeToEvent( "ConnectToMultiplayerServer" , ConnectToMultiplayerServer );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void TheApp::Shutdown()
 {
 	if( m_client != nullptr )
 	{
 		m_client->Shutdown();
 	}
-	g_theAuthServer->Shutdown();
+	if( g_theAuthServer != nullptr )
+	{
+		g_theAuthServer->Shutdown();
+	}
 	g_theNetworkSys->Shutdown();
 	g_theAudioSystem->Shutdown();
 	g_theDevConsole->Shutdown();
@@ -245,8 +286,9 @@ void TheApp::UpdateFromKeyboard()
  		g_theDevConsole->ToggleVisibility();
  	}
 
-	if ( g_theDevConsole->IsOpen() )
+	if ( g_theDevConsole->IsOpen() && g_theInput->WasKeyJustPressed( KEY_ESC ) )
 	{
+ 		g_theDevConsole->ToggleVisibility();
 		return;
 	}
 	
@@ -258,3 +300,35 @@ void TheApp::UpdateFromKeyboard()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+STATIC bool TheApp::StartMultiplayerServer( EventArgs& args )
+{
+	LOG_SYSMESSAGE( "Stopping Current Game" );
+	int port = args.GetValue( "port" , 48000 );
+	
+	delete g_theAuthServer;
+	g_theAuthServer = nullptr;
+	delete g_theApp->m_client;
+	g_theApp->m_client = nullptr;
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	
+STATIC bool TheApp::ConnectToMultiplayerServer( EventArgs& args )
+{
+	LOG_SYSMESSAGE( "Stopping Current Game" );
+	std::string ipAddr = args.GetValue( "ip" , "127.0.0.1" );
+	int port = args.GetValue( "port" , 48000 );
+	
+	delete g_theAuthServer;
+	g_theAuthServer = nullptr;
+	delete g_theApp->m_client;
+	g_theApp->m_client = nullptr;
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	

@@ -26,8 +26,12 @@ public:
 	void Render() const;
 
 	void EndFrame();
-	
 
+	void AddMultiplayerGameCommandsToConsole();
+	
+	static bool StartMultiplayerServer( EventArgs& args );
+	static bool ConnectToMultiplayerServer( EventArgs& args );
+	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 private :

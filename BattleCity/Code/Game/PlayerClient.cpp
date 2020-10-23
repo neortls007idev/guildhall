@@ -58,10 +58,6 @@ void PlayerClient::Render()
 	{
 		m_game->Render();
 	}
-	if ( g_theDevConsole->IsOpen() )
-	{
-		g_theDevConsole->Render( *g_theRenderer , *g_theDevConsole->GetDevConsoleCamera() , 14.f );
-	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
