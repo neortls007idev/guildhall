@@ -10,20 +10,20 @@
 #include "Engine/Time/Time.hpp"
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
-#include "Game/Server.hpp"
+#include "Game/AuthServer.hpp"
 #include "Game/TheApp.hpp"
+#include "PlayerClient.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-extern	DevConsole*							g_theDevConsole;	
-extern	AudioSystem*						g_theAudioSystem;
-extern	InputSystem*						g_theInput;
-extern	RenderContext*						g_theRenderer;
-		Game*								g_theGame			= nullptr;
 		TheApp*								g_theApp			= nullptr;
+extern	AudioSystem*						g_theAudioSystem;
+extern	AuthoritativeServer*				g_theAuthServer;
 extern	BitmapFont*							g_bitmapFont;
+extern	DevConsole*							g_theDevConsole;	
+extern	InputSystem*						g_theInput;
 extern	NetworkSystem*						g_theNetworkSys;
-extern	Server*								g_theServer;
+extern	RenderContext*						g_theRenderer;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -36,17 +36,14 @@ TheApp::TheApp()
 
 TheApp::~TheApp()
 {
-	delete g_theGame;
-	g_theGame = nullptr;
+	delete g_theAuthServer;
+	g_theAuthServer = nullptr;
 
 	delete g_theNetworkSys;
 	g_theNetworkSys = nullptr;
-	
+
 	delete g_theAudioSystem;
 	g_theAudioSystem = nullptr;
-	// 
-	// 	delete g_thePhysicsSystem;
-	// 	g_thePhysicsSystem = nullptr;
 
 	delete g_theDevConsole;
 	g_theDevConsole = nullptr;
@@ -56,7 +53,7 @@ TheApp::~TheApp()
 
 	delete g_theInput;
 	g_theInput = nullptr;
-
+	
 	delete g_theEventSystem;
 	g_theEventSystem = nullptr;
 }
@@ -108,16 +105,27 @@ void TheApp::Startup()
 	}
 	g_theAudioSystem->Startup();
 	
+	if ( g_theAuthServer == nullptr )
+	{
+		g_theAuthServer = new AuthoritativeServer();
+		g_theAuthServer->CreateSinglePlayerGame();
+	}
+	g_theAuthServer->Startup();
+	g_theAuthServer->AddPlayers();
+	
+	if( m_client == nullptr )
+	{
+		m_client = new PlayerClient();
+		m_client->Startup();
+	}
+
+	g_theAuthServer->AddPlayerClientToServer( m_client );
+	
 	if ( g_theNetworkSys == nullptr )
 	{
 		g_theNetworkSys = new NetworkSystem();
 	}
 	g_theNetworkSys->Startup();
-
-	if ( g_theGame == nullptr )
-	{
-		g_theGame = new Game();
-	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -148,6 +156,12 @@ void TheApp::BeginFrame()
 	g_theDevConsole->BeginFrame();
 	g_theAudioSystem->BeginFrame();
 	g_theNetworkSys->BeginFrame();
+	g_theAuthServer->BeginFrame();
+
+	if( m_client != nullptr )
+	{
+		m_client->BeginFrame();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -155,18 +169,16 @@ void TheApp::BeginFrame()
 void TheApp::Update( float deltaSeconds )
 {
 	UpdateFromKeyboard();
+	g_theAuthServer->Update( deltaSeconds );
 	
-	if ( m_isPaused )							{ deltaSeconds = 0.f; }
-	
+	if( m_client != nullptr )
+	{
+		m_client->Update( deltaSeconds );
+	}
 	if ( g_theDevConsole->IsOpen() )
 	{
 		g_theDevConsole->Update( deltaSeconds );
 	}
-	else
-	{
-		g_theGame->Update( deltaSeconds );
-	}
-
 	g_theInput->EndFrame();
 }
 
@@ -174,17 +186,8 @@ void TheApp::Update( float deltaSeconds )
 
 void TheApp::Render() const
 {
-		g_theRenderer->BeginCamera( g_theGame->m_worldCamera );
-		g_theRenderer->SetBlendMode( ALPHA );
-		g_theGame->Render();
-		g_theRenderer->EndCamera( g_theGame->m_worldCamera );
-
-		//g_theGame->RenderUI();
-
-		if ( g_theDevConsole->IsOpen() )
-		{
-			g_theDevConsole->Render( *g_theRenderer , *g_theDevConsole->GetDevConsoleCamera() , 14.f );
-		}
+	m_client->Render();
+	//g_theGame->RenderUI();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -193,12 +196,15 @@ void TheApp::EndFrame()
 {
 	// all engine things that must end at the end of the frame and not the game
 /*	g_currentManager->EndFrame();*/
+	g_theAuthServer->EndFrame();
+	if( m_client != nullptr )
+	{
+		m_client->EndFrame();
+	}
 	g_theNetworkSys->EndFrame();
 	g_theAudioSystem->EndFrame();
 	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
-	g_theInput->EndFrame();
-
 	Clock::EndFrame();
 }
 
@@ -206,17 +212,17 @@ void TheApp::EndFrame()
 
 void TheApp::Shutdown()
 {
-	delete g_theGame;
-	g_theGame = nullptr;
-
+	if( m_client != nullptr )
+	{
+		m_client->Shutdown();
+	}
+	g_theAuthServer->Shutdown();
 	g_theNetworkSys->Shutdown();
 	g_theAudioSystem->Shutdown();
-	// 	g_thePhysicsSystem->Shutdown();
-	// 	g_currentManager->Shutdown();
 	g_theDevConsole->Shutdown();
 	g_theRenderer->Shutdown();
 	g_theInput->Shutdown();
-	// TODO :- write me g_theWindow->Shutdown();
+	g_theWindow->Shutdown();
 	g_theEventSystem->Shutdown();
 	Clock::Shutdown();
 	g_theRenderer->Shutdown();
@@ -234,10 +240,10 @@ bool TheApp::HandleQuitRequested()
 
 void TheApp::UpdateFromKeyboard()
 {
-	if ( g_theInput->WasKeyJustPressed( KEY_TILDE ) )
-	{
-		g_theDevConsole->ToggleVisibility();
-	}
+ 	if ( g_theInput->WasKeyJustPressed( KEY_TILDE ) )
+ 	{
+ 		g_theDevConsole->ToggleVisibility();
+ 	}
 
 	if ( g_theDevConsole->IsOpen() )
 	{
@@ -249,13 +255,6 @@ void TheApp::UpdateFromKeyboard()
 		HandleQuitRequested();
 		g_theWindow->HandleQuitRequested();
 	}
-				
-	if ( g_theInput->GetButtonState( KEY_F8 ).WasJustPressed() ) 
-	{
-		delete g_theGame;
-		g_theGame = nullptr;
-		g_theGame = new Game();
-	}	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

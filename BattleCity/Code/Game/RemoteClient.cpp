@@ -2,7 +2,7 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-RemoteClient::RemoteClient( Server* ownerServer ) : Client( ownerServer )
+RemoteClient::RemoteClient() : Client()
 {
 
 }

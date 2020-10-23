@@ -8,7 +8,7 @@ class GameMultiplayer;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	
-class AuthoritativeServer : protected Server
+class AuthoritativeServer : public Server
 {
 public:
 	AuthoritativeServer();
@@ -20,10 +20,10 @@ public:
 	virtual void	BeginFrame() override;
 	virtual void	EndFrame() override;
 			Game*	GetGame();
-
+			void	AddPlayers();
+//			void	AssignInputSystem( InputSystem* inputSystem );
 public:
-	GameSinglePlayer*	m_singlePlayerGame		= nullptr;
-	GameMultiplayer*	m_multiplayerGame		= nullptr;	
+	
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -74,8 +74,8 @@ Map::Map( Game* theGame , IntVec2 size , int MapNumber ) : m_theGame( theGame ) 
 	SafeZonesBoundary();
 
 	InitializeTileVertices();
-	SpawnNewEntity( PLAYERTANK_ENTITY , FACTION_ALLY , Vec2( 1.5f , 1.5f ) , 45.f );
-	//InitialNPCSpawner();
+	//SpawnNewEntity( PLAYERTANK_ENTITY , FACTION_ALLY , Vec2( 1.5f , 1.5f ) , 45.f );
+	InitialNPCSpawner();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -144,7 +144,7 @@ void Map::GarbageCollection()
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Map::SpawnNewEntity( EntityType type , Faction faction , const Vec2& position, const float& orientation, const float blastRadius , const float animationDuration )
+Entity* Map::SpawnNewEntity( EntityType type , Faction faction , const Vec2& position, const float& orientation, const float blastRadius , const float animationDuration )
 {
 	Entity* newEntity = nullptr;
 
@@ -180,6 +180,7 @@ void Map::SpawnNewEntity( EntityType type , Faction faction , const Vec2& positi
 	}
 
 	AddEntityToMap( newEntity );
+	return newEntity;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -560,17 +561,17 @@ bool Map::IsTileSolid( const Tile& tile )const
 
 void Map::CheckNoClipping()
 {
-	if ( m_theGame->m_isClipping )
-	{
-		for ( int entityIndex = 0; entityIndex < ( int ) m_entityListsByType[ PLAYERTANK_ENTITY ].size(); entityIndex++ )
-		{
-			if ( m_entityListsByType[ PLAYERTANK_ENTITY ][ entityIndex ] )
-			{
-				m_entityListsByType[ PLAYERTANK_ENTITY ][ entityIndex ]->m_isPushedByWalls = false;
-			}
-		}
-	}
-	else
+	//if ( m_theGame->m_isClipping )
+	//{
+	//	for ( int entityIndex = 0; entityIndex < ( int ) m_entityListsByType[ PLAYERTANK_ENTITY ].size(); entityIndex++ )
+	//	{
+	//		if ( m_entityListsByType[ PLAYERTANK_ENTITY ][ entityIndex ] )
+	//		{
+	//			m_entityListsByType[ PLAYERTANK_ENTITY ][ entityIndex ]->m_isPushedByWalls = false;
+	//		}
+	//	}
+	//}
+	//else
 	{
 		for ( int entityIndex = 0; entityIndex < ( int ) m_entityListsByType[ PLAYERTANK_ENTITY ].size(); entityIndex++ )
 		{

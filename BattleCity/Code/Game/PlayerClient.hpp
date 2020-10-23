@@ -2,11 +2,15 @@
 #include "Game/Client.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-	
-class PlayerClient : protected Client
+
+class Game;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+class PlayerClient : public Client
 {
 public:
-	PlayerClient( Server* ownerServer );
+	PlayerClient();
 	~PlayerClient();
 
 	virtual void	Startup() override;
@@ -15,6 +19,9 @@ public:
 	virtual void	Render() override;
 	virtual void	BeginFrame() override;
 	virtual void	EndFrame() override;
+
+public:
+	Game* m_game = nullptr;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

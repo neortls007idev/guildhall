@@ -6,7 +6,7 @@
 class RemoteClient : protected Client
 {
 public:
-	RemoteClient( Server* ownerServer );
+	RemoteClient();
 	~RemoteClient();
 
 	virtual void	Startup() override;

@@ -78,11 +78,11 @@ void NpcTurret::Update( float deltaSeconds )
 				if ( m_firingCoolDown <= 0.f )
 				{
 					m_theGame->m_world->m_currentMap->SpawnNewEntity( EVIL_BULLET_ENTITY , m_faction , m_position , m_turretOrientation );
-					SoundPlaybackID currentTurretShootID = g_theAudioSystem->PlaySound( m_theGame->m_sounds[ SOUND_ENEMY_SHOOT ] );
-					float playbackBalance = CosDegrees( ( m_position - playerPosition ).GetAngleDegrees() );
-					g_theAudioSystem->SetSoundPlaybackBalance( currentTurretShootID, playbackBalance );
-					float playbackVolume = RangeMapFloat( 0.f , m_lineOfSightRadius , 1.0 , 0.f , ( m_position - playerPosition ).GetClamped( m_lineOfSightRadius ).GetLength() );
-					g_theAudioSystem->SetSoundPlaybackVolume( currentTurretShootID , playbackVolume );
+					//SoundPlaybackID currentTurretShootID = g_theAudioSystem->PlaySound( m_theGame->m_sounds[ SOUND_ENEMY_SHOOT ] );
+					//float playbackBalance = CosDegrees( ( m_position - playerPosition ).GetAngleDegrees() );
+					//g_theAudioSystem->SetSoundPlaybackBalance( currentTurretShootID, playbackBalance );
+					//float playbackVolume = RangeMapFloat( 0.f , m_lineOfSightRadius , 1.0 , 0.f , ( m_position - playerPosition ).GetClamped( m_lineOfSightRadius ).GetLength() );
+					//g_theAudioSystem->SetSoundPlaybackVolume( currentTurretShootID , playbackVolume );
 				}
 			}
 		}
@@ -170,11 +170,11 @@ void NpcTurret::Render() const
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
-	if ( g_theGame->m_debugDraw )
-	{
-		g_theRenderer->DrawRing( m_position , m_cosmeticRadius , m_cosmeticRing , 0.02f );
-		g_theRenderer->DrawRing( m_position , m_physicsRadius , m_physicsRing , 0.02f );
-	}
+	//if ( g_theGame->m_debugDraw )
+	//{
+	//	g_theRenderer->DrawRing( m_position , m_cosmeticRadius , m_cosmeticRing , 0.02f );
+	//	g_theRenderer->DrawRing( m_position , m_physicsRadius , m_physicsRing , 0.02f );
+	//}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

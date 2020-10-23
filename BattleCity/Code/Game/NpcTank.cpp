@@ -87,12 +87,12 @@ void NpcTank::Update( float deltaSeconds )
 				if ( m_firingCoolDown <= 0.f )
 				{
 					currentMap->SpawnNewEntity( EVIL_BULLET_ENTITY , m_faction , m_position , m_orientationDegrees );
-					SoundPlaybackID currentNPCTankShootID = g_theAudioSystem->PlaySound( m_theGame->m_sounds[ SOUND_ENEMY_SHOOT ] );
-					float playbackBalance = CosDegrees( ( m_position - playerPosition ).GetAngleDegrees() );
-					g_theAudioSystem->SetSoundPlaybackBalance( currentNPCTankShootID , playbackBalance );
-					float playbackVolume = RangeMapFloat( 0.f , m_lineOfSightRadius , 1.0 , 0.f , ( m_position - playerPosition ).GetClamped( m_lineOfSightRadius ).GetLength() );
-					g_theAudioSystem->SetSoundPlaybackVolume( currentNPCTankShootID , playbackVolume );
-					m_firingCoolDown = 1.7f;
+					//SoundPlaybackID currentNPCTankShootID = g_theAudioSystem->PlaySound( m_theGame->m_sounds[ SOUND_ENEMY_SHOOT ] );
+					//float playbackBalance = CosDegrees( ( m_position - playerPosition ).GetAngleDegrees() );
+					//g_theAudioSystem->SetSoundPlaybackBalance( currentNPCTankShootID , playbackBalance );
+					//float playbackVolume = RangeMapFloat( 0.f , m_lineOfSightRadius , 1.0 , 0.f , ( m_position - playerPosition ).GetClamped( m_lineOfSightRadius ).GetLength() );
+					//g_theAudioSystem->SetSoundPlaybackVolume( currentNPCTankShootID , playbackVolume );
+					//m_firingCoolDown = 1.7f;
 				}
 			}
 		}
@@ -169,14 +169,14 @@ void NpcTank::Render() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-	if ( g_theGame->m_debugDraw )
-	{
-		g_theRenderer->DrawRing( m_position , m_cosmeticRadius , m_cosmeticRing , 0.02f );
-		g_theRenderer->DrawRing( m_position , m_physicsRadius , m_physicsRing , 0.02f );
-		g_theRenderer->DrawLine( m_position , m_whiskers[0].m_impactPosition , Rgba8( 0 , 0 , 100 ) , 0.05f );
-		g_theRenderer->DrawLine( m_position , m_whiskers[1].m_impactPosition , Rgba8( 0 , 0 , 100 ) , 0.05f );
-		g_theRenderer->DrawLine( m_position , m_whiskers[2].m_impactPosition , Rgba8( 0 , 0 , 100 ) , 0.05f );
-	}
+	//if ( g_theGame->m_debugDraw )
+	//{
+	//	g_theRenderer->DrawRing( m_position , m_cosmeticRadius , m_cosmeticRing , 0.02f );
+	//	g_theRenderer->DrawRing( m_position , m_physicsRadius , m_physicsRing , 0.02f );
+	//	g_theRenderer->DrawLine( m_position , m_whiskers[0].m_impactPosition , Rgba8( 0 , 0 , 100 ) , 0.05f );
+	//	g_theRenderer->DrawLine( m_position , m_whiskers[1].m_impactPosition , Rgba8( 0 , 0 , 100 ) , 0.05f );
+	//	g_theRenderer->DrawLine( m_position , m_whiskers[2].m_impactPosition , Rgba8( 0 , 0 , 100 ) , 0.05f );
+	//}
 
 }
 

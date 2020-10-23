@@ -77,11 +77,11 @@ void Player::Render() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-	if (g_theGame->m_debugDraw)
-	{
-		g_theRenderer->DrawRing( m_position , m_cosmeticRadius , m_cosmeticRing , 0.02f );
-		g_theRenderer->DrawRing( m_position , m_physicsRadius , m_physicsRing , 0.02f );
-	}
+	//if (g_theGame->m_debugDraw)
+	//{
+	//	g_theRenderer->DrawRing( m_position , m_cosmeticRadius , m_cosmeticRing , 0.02f );
+	//	g_theRenderer->DrawRing( m_position , m_physicsRadius , m_physicsRing , 0.02f );
+	//}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -104,10 +104,10 @@ void Player::UpdateFromJoystick( float deltaSeconds )
 	const XboxController& controller = g_theInput->GetXboxController( m_controllerID );
 	if ( !controller.IsConnected() )
 		return;
-	if ( g_theApp->m_isPaused == false )
-	{
-		XboxButtonPresses( controller , deltaSeconds );
-	}
+	//if ( g_theApp->m_isPaused == false )
+	//{
+	//	XboxButtonPresses( controller , deltaSeconds );
+	//}
 
 }
 
@@ -115,7 +115,7 @@ void Player::UpdateFromJoystick( float deltaSeconds )
 
 void Player::checkKeyboardKeyPressForMovement( float deltaSeconds )
 {
-	if ( !m_isDead || !g_theApp->m_isPaused )
+	if ( !m_isDead /*|| !g_theApp->m_isPaused*/ )
 	{
 		if ( g_theInput->WasKeyJustPressed( KEY_SPACE ) )
 		{
@@ -211,7 +211,7 @@ void Player::TankMovement( float deltaSeconds )
 void Player::XboxButtonPresses( const XboxController& controller , float deltaSeconds )
 {
 	// Check if player is dead; if so, respawn on Start button (only)
-	if ( !m_isDead || !g_theApp->m_isPaused)
+	if ( !m_isDead /*|| !g_theApp->m_isPaused*/ )
 	{
 		const KeyButtonState& aButton = controller.GetButtonState( XBOX_BUTTON_ID_A );
 		if ( aButton.WasJustPressed() && m_health > 0 )

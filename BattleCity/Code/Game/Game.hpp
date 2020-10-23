@@ -27,6 +27,7 @@ public:
 	void LoadAllSounds();
 	void LoadAllEntityTextures();
 
+	virtual void Startup();
 	virtual void Update( float deltaSeconds );
 	void UpdateCamera();
 
@@ -44,8 +45,6 @@ public:
 
 private:
 
-	void UpdateFromKeyBoard();
-
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 private:
@@ -55,24 +54,13 @@ private:
 	float			m_tilesInViewHorizontally				= 48.0f;
 	float			m_tilesInViewVertically					= 27.0f;
 	float			m_victoryPanelFadeTimer					= 0.5f;
-//	Rgba8			m_fadeColor;
-//	bool			m_hasLoadingStateStarted				= true;
 	Vec2			m_CameraCenter							= Vec2( m_tilesInViewHorizontally / 2 , m_tilesInViewVertically / 2 );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 public:
-
-	bool             m_isClipping							= false;
-	bool             m_debugDraw							= false;
-//	bool             m_gameJustStarted						= false;
-//	bool             m_gameOverAudio						= false;
-//	GameStates		 m_gameState;
 	World*			 m_world								= nullptr;
-	mutable Camera	 m_worldCamera;
-//	Camera			 m_uiCamera;
 	Texture*		 m_textures[ NUM_TOTAL_TEXTURES ];
-	BitmapFont*		 m_font;
 	SoundID			 m_sounds[ NUM_TOTAL_SOUNDS ];
 };
 

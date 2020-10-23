@@ -2,8 +2,9 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-class RemoteServer;
-class AuthoritativeServer;
+class PlayerClient;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 class TheApp
 {
@@ -34,11 +35,7 @@ private :
 	bool					m_isQuitting			= false ;
 	
 public:
-
-	bool					m_isPaused				= false;
-
-	AuthoritativeServer*	m_theAuthServer			= nullptr;
-	RemoteServer*			m_remotteServer			= nullptr;
+	PlayerClient*			m_client				= nullptr;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

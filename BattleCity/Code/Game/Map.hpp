@@ -31,7 +31,7 @@ public:
 	void SafeZonesBoundary();
 	bool CheckMapValidityUsingFloodFill( IntVec2 startTile , IntVec2 endTile );
 
-	void SpawnNewEntity( EntityType type , Faction faction , const Vec2& position, const float& orientation, const float blastRadius = 1.f, const float animationDuration = 1.f );
+	Entity* SpawnNewEntity( EntityType type , Faction faction , const Vec2& position, const float& orientation, const float blastRadius = 1.f, const float animationDuration = 1.f );
 	void AddEntityToMap( Entity* entity );
 	void AddEntityToList( Entitylist& entityList, Entity* entity );
 

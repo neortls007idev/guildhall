@@ -80,11 +80,11 @@ void Boulder::Render() const
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
-	if ( g_theGame->m_debugDraw )
-	{
-		g_theRenderer->DrawRing( m_position , m_cosmeticRadius , m_cosmeticRing , 0.02f );
-		g_theRenderer->DrawRing( m_position , m_physicsRadius , m_physicsRing , 0.02f );
-	}
+	//if ( g_theGame->m_debugDraw )
+	//{
+	//	g_theRenderer->DrawRing( m_position , m_cosmeticRadius , m_cosmeticRing , 0.02f );
+	//	g_theRenderer->DrawRing( m_position , m_physicsRadius , m_physicsRing , 0.02f );
+	//}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

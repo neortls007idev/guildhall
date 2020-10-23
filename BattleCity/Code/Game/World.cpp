@@ -48,7 +48,7 @@ void World::Update( float deltaSeconds )
 
 void World::Render() const
 {
-		m_currentMap->Render();
+	m_currentMap->Render();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

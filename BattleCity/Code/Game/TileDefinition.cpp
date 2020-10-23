@@ -24,10 +24,6 @@ TileDefinition::TileDefinition( SpriteDefinition spriteDefinition , Rgba8 tint ,
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 void TileDefinition::CreateTileDefinitions()
 {
 	Texture* tileTerrain8x8 = g_theRenderer->GetOrCreateTextureFromFile( "Data/Images/Terrain_8x8.png" );
@@ -64,10 +60,6 @@ void TileDefinition::CreateTileDefinitions()
 	s_definitions.push_back( TileDefinition( exitAreaTerrain , YELLOW , false ) );
 	
 }
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

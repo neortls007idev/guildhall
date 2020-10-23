@@ -1,8 +1,12 @@
 #pragma once
 #include <vector>
 
+#include "GameCommon.hpp"
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+class GameMultiplayer;
+class GameSinglePlayer;
 class Game;
 class PlayerClient;
 class Client;
@@ -12,7 +16,7 @@ class Client;
 class Server
 {
 public:
-	Server( Game* game );
+	Server();
 	~Server();
 
 	virtual void Startup();
@@ -22,13 +26,17 @@ public:
 	virtual void Update( float deltaSeconds );
 	virtual void EndFrame();
 
-	void AddPlayerClientToServer( PlayerClient* playerClient );
-	void RemovePlayerClientFromServer( PlayerClient* playerClient );
+	void CreateSinglePlayerGame();
+	void CreateMultiPlayerGame();
+	
+	void AddPlayerClientToServer( Client* client );
+	bool RemovePlayerClientFromServer( Client* client );
 	
 public:
-	Game*						m_theGame		= nullptr;
-	
-	std::vector< Client* >		m_playerClients;
+	GameSinglePlayer*			m_singlePlayerGame	= nullptr;
+	GameMultiplayer*			m_multiPlayerGame	= nullptr;
+	GameType					m_gameType			= SINGLE_PLAYER;
+	std::vector< Client* >		m_clients;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

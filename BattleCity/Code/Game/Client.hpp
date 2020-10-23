@@ -9,7 +9,7 @@ class Server;
 class Client
 {
 public:
-	Client( Server* ownerServer );
+	Client();
 	~Client();
 
 	virtual void	Startup();
@@ -20,7 +20,6 @@ public:
 	virtual void	EndFrame();
 	
 public:
-	Server* m_ownerServer = nullptr;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

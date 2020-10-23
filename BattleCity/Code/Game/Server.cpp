@@ -10,8 +10,7 @@ Server* g_theServer = nullptr;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Server::Server( Game* game ) :
-								m_theGame( game )
+Server::Server()				
 {
 	
 }
@@ -20,7 +19,10 @@ Server::Server( Game* game ) :
 
 Server::~Server()
 {
-	for ( auto index : m_playerClients )
+	SAFE_RELEASE_POINTER( m_singlePlayerGame );
+	SAFE_RELEASE_POINTER( m_multiPlayerGame );
+	
+	for ( auto index : m_clients )
 	{
 		index = nullptr;
 	}
@@ -63,22 +65,46 @@ void Server::EndFrame()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Server::AddPlayerClientToServer( PlayerClient* playerClient )
+void Server::CreateSinglePlayerGame()
 {
-	EmplaceBackAtEmptySpace( m_playerClients , ( Client* ) playerClient );
+	m_singlePlayerGame = new GameSinglePlayer();
+	m_gameType = SINGLE_PLAYER;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Server::RemovePlayerClientFromServer( PlayerClient* playerClient )
+void Server::CreateMultiPlayerGame()
 {
-	//for (auto index : m_playerClients)
-	//{
-	//	if( index == playerClient )
-	//	{
-	//		index = nullptr;
-	//	}
-	//}
+	m_multiPlayerGame = new GameMultiplayer();
+	m_gameType = MULTIPLAYER;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Server::AddPlayerClientToServer( Client* client )
+{
+	EmplaceBackAtEmptySpace( m_clients , client );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Server::RemovePlayerClientFromServer( Client* client )
+{
+	for( int index = 0 ; index < m_clients.size(); index++ )
+	{
+		if( m_clients[ index ] == nullptr )
+		{
+			continue;
+		}
+
+		if( m_clients[ index ] == client )
+		{
+			m_clients[ index ] = nullptr;
+			return true;
+		}
+	}
+
+	return false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

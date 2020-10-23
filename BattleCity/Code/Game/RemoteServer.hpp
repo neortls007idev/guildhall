@@ -5,6 +5,7 @@
 
 class RemoteServer : protected Server
 {
+public:
 	
 };
 
