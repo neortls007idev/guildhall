@@ -134,6 +134,9 @@
     <Filter Include="ThirdParty\ImGUI\Plot">
       <UniqueIdentifier>{a11a00e2-e778-4a82-8e83-80c098ef9117}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Renderer\Lighting">
+      <UniqueIdentifier>{cb28d59f-791c-4b51-aee4-2656b78f9cdf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Rgba8.cpp">
@@ -986,6 +989,9 @@
     </ClInclude>
     <ClInclude Include="..\ThirdParty\ImGUI\implot_internal.h">
       <Filter>ThirdParty\ImGUI\Plot</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\LightStructs.hpp">
+      <Filter>Renderer\Lighting</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

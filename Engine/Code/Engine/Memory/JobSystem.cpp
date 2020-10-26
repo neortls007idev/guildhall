@@ -1,4 +1,6 @@
 #include "Engine/Memory/JobSystem.hpp"
+
+#include "Engine/Core/StdExtensions.hpp"
 #include "Engine/Memory/Job.hpp"
 #include "Engine/Memory/JobSystemWorkerThread.hpp"
 
@@ -117,7 +119,10 @@ void JobSystem::ClaimJobForExecution()
 	//----------------------------------------------------------------------------------------------------------
 		
 		m_processingJobsQueueMutex.lock();
-		m_processingJobsQueue.push_back( jobAtFrontOfQueue );
+		//EmplaceBackAtEmptySpace( m_processingJobsQueue , jobAtFrontOfQueue );
+		MoveJobToProcessingQueue( jobAtFrontOfQueue );
+
+		//m_processingJobsQueue.push_back( jobAtFrontOfQueue );
 		m_processingJobsQueueMutex.unlock();
 
 	//----------------------------------------------------------------------------------------------------------
@@ -131,7 +136,15 @@ void JobSystem::ClaimJobForExecution()
 	//----------------------------------------------------------------------------------------------------------
 		
 		m_processingJobsQueueMutex.lock();
-		m_processingJobsQueue.pop_front();
+		//m_processingJobsQueue.pop_front();
+		for( size_t index = 0 ; index < m_processingJobsQueue.size() ; index++ )
+		{
+			if( m_processingJobsQueue[ index ] == jobAtFrontOfQueue )
+			{
+				m_processingJobsQueue[ index ] = nullptr;
+				break;
+			}
+		}
 		m_processingJobsQueueMutex.unlock();
 		OnJobCompleted( *jobAtFrontOfQueue );
 
@@ -145,6 +158,21 @@ void JobSystem::ClaimJobForExecution()
 		std::this_thread::yield();
 		//std::this_thread::sleep_for( std::chrono::microseconds( 1 ) );
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void JobSystem::MoveJobToProcessingQueue( Job* jobAtFrontOfQueue )
+{
+	for ( size_t index = 0; index < m_processingJobsQueue.size(); index++ )
+	{
+		if ( m_processingJobsQueue[ index ] == nullptr )
+		{
+			m_processingJobsQueue[ index ] = jobAtFrontOfQueue;
+			return;
+		}
+	}
+	m_processingJobsQueue.push_back( jobAtFrontOfQueue );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -193,7 +221,17 @@ bool JobSystem::HandleQuitRequested()
 
 bool JobSystem::AreAllJobsComplete()
 {
-	return ( m_pendingJobsQueue.empty() && m_processingJobsQueue.empty() );
+	if( m_processingJobsQueue.empty() )
+	{
+		for( size_t index = 0 ; index < m_processingJobsQueue.size() ; index++ )
+		{
+			if( nullptr != m_processingJobsQueue[ index ]  )
+			{
+				return false;
+			}
+		}
+	}
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

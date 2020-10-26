@@ -7,7 +7,57 @@
 // changed in-between draw calls on the CPU
 //--------------------------------------------------------------------------------------
 
-static const uint TOTAL_LIGHTS = 1;
+static const uint TOTAL_LIGHTS      = 8;
+static const uint TOTAL_OMNI_LIGHTS = 8;
+static const uint TOTAL_SPOT_LIGHTS = 16;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct dirLightDataT
+{
+	float3      color;																		
+	float       intensity;																	// rgb and an intensity
+
+	float3      direction;																	// direction light is point, default (0,0,1)
+	float		shadowFactor;																// 0 or 1 for if the light shadow is accounted for
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct pointLightDataT
+{
+	float3      worldPosition;														
+	float		shadowFactor;															   // 0 or 1 for if the light shadow is accounted for
+
+	float3      color;																
+	float       intensity;															       // rgb and an intensity
+
+	float3      attenuation;														       // intensity falloff , attenuation for diffuse light, default (0,0,1)
+	uint		pad03;																	   // this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
+
+	float3      specularAttenuation;												       // attenuation for specular lighting (constant,linear,quadratic), default (0,0,1)
+	uint		pad04;																	   // this is not required, but know the GPU will add this padding to make the next variable 16-byte aligned
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+struct spotLightDataT
+{
+	float3      worldPosition;														
+	float		shadowFactor;															   // 0 or 1 for if the light shadow is accounted for
+
+	float3      color;																
+	float       intensity;															       // rgb and an intensity
+
+	float3      direction;															       // direction light is point, default (0,0,1)
+	float       directionFactor;													       // do we consider this a point light (0.0f) or a directional light (1.0f).  Determine how we calcualte the incident light vector, default (0.0f)
+
+	float3      attenuation;														       // intensity falloff , attenuation for diffuse light, default (0,0,1)
+	float       dotInnerAngle;														       // cone light inner angle (default -1.0f) - angle at which cone lights begin to stop affecting an object
+
+	float3      specularAttenuation;												       // attenuation for specular lighting (constant,linear,quadratic), default (0,0,1)
+	float       dotOuterAngle;														       // cone light outer angle (default -1.0f) - angle at which cone lights stop affecting the object completely
+};
 
 //--------------------------------------------------------------------------------------
 // buffer holding time information from our game
@@ -82,15 +132,17 @@ struct lightView_t
 
 cbuffer light_constants : register( b3 )                                                    // constant buffer slot 3
 {
-    float4          AMBIENT;
-    light_t         LIGHTS[TOTAL_LIGHTS];
-    
-     // all 0 to 1 and help influence the lighting equation
-    float           DIFFUSE_FACTOR;                                                         // default: 1  - scales diffuse lighting in equation (lower values make an object absorb light
-    float           SPECULAR_FACTOR;                                                        // default: 1  - scales specular lighting in the equation (higher values create a "shinier" surface)
-    float           SPECULAR_POWER;                                                         // default: 32 - controls the specular falloff (higher values create a "smoother" looking surface)
+    float4				AMBIENT;										// rgb and an intensity
+	dirLightDataT		globalDirLight;
+	pointLightDataT		omniPointLights[ TOTAL_OMNI_LIGHTS ];
+	spotLightDataT		spotLights[ TOTAL_SPOT_LIGHTS ];
+		
+	// all 0 to 1 and help influence the lighting equation
+	float				DIFFUSE_FACTOR;		                        						// default: 1  - scales diffuse lighting in equation (lower values make an object absorb light
+	float				SPECULAR_FACTOR;		                        						// default: 1  - scales specular lighting in the equation (higher values create a "shinier" surface)
+	float				SPECULAR_POWER;		                        					    // default: 32 - controls the specular falloff (higher values create a "smoother" looking surface)
+	float				padding01;			                        					
 
-    float           padding01;
 };
 
 //--------------------------------------------------------------------------------------
@@ -110,7 +162,7 @@ cbuffer lightView_constants : register( b5 )                                    
 {
 	//  light matrices to transform the vertex based on the light's view point
 
-	lightView_t LIGHT_VIEW[ TOTAL_LIGHTS ];
+	lightView_t LIGHT_VIEW[ TOTAL_OMNI_LIGHTS + TOTAL_SPOT_LIGHTS + 1 ];                      // + 1 , for the global directional light
     //float4x4 LIGHT_PROJECTION[ TOTAL_LIGHTS ];                                              // aka, CameraToClipTransform
     //float4x4 LIGHT_VIEW[ TOTAL_LIGHTS ];                                                    // aka, WorldToCameraTransform
 };

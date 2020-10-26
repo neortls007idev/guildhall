@@ -1535,13 +1535,13 @@ void RenderContext::SetAmbientLight( Vec4 color , float intensity )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::EnableLight( uint idx , lightDataT const& lightInfo )
-{
-	m_lights.lights[ idx ] = lightInfo;
-	//m_lightDataUBO->m_isDirty = true;
-	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
-	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
-}
+// void RenderContext::EnableLight( uint idx , lightDataT const& lightInfo )
+// {
+// 	m_lights.lights[ idx ] = lightInfo;
+// 	//m_lightDataUBO->m_isDirty = true;
+// 	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
+// 	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
+// }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1554,13 +1554,13 @@ void RenderContext::EnableAllLights()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::DisableLight( uint idx )
-{
-	//m_lightDataUBO->m_isDirty = true;
-	m_lights.lights[ idx ].intensity = 0.f;
-	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
-	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
-}
+// void RenderContext::DisableLight( uint idx )
+// {
+// 	//m_lightDataUBO->m_isDirty = true;
+// 	m_lights.lights[ idx ].intensity = 0.f;
+// 	m_lightDataUBO->Update( &m_lights , sizeof( m_lights ) , sizeof( m_lights ) );
+// 	BindUniformBuffer( UBO_LIGHT_SLOT , m_lightDataUBO );
+// }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1601,24 +1601,24 @@ void RenderContext::SetSpecularPower( float specularPower )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void RenderContext::SetLightsView( uint lightIndex , Mat44 lightProjection )
-{
-	m_lightsView[ lightIndex ].LIGHT_PROJECTION = lightProjection;
-	Transform m_lightTransform;
-	m_lightTransform.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
-	
-	//m_lightTransform.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
-	
-	Mat44 currlightView = m_lightTransform.GetAsMatrix();
-	currlightView.Kx = m_lights.lights[ lightIndex ].direction.x;
-	currlightView.Ky = m_lights.lights[ lightIndex ].direction.y;
-	currlightView.Kz = m_lights.lights[ lightIndex ].direction.z;
-
-	m_lightsView[ lightIndex ].LIGHT_VIEW = MatrixInvertOrthoNormal( currlightView );
-		
-	m_lightsViewUBO->Update( &m_lightsView , sizeof( m_lightsView ) , sizeof( m_lightsView ) );
-	BindUniformBuffer( UBO_LIGHT_VIEW_SLOT , m_lightsViewUBO );
-}
+// void RenderContext::SetLightsView( uint lightIndex , Mat44 lightProjection )
+// {
+// 	m_lightsView[ lightIndex ].LIGHT_PROJECTION = lightProjection;
+// 	Transform m_lightTransform;
+// 	m_lightTransform.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
+// 	
+// 	//m_lightTransform.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
+// 	
+// 	Mat44 currlightView = m_lightTransform.GetAsMatrix();
+// 	currlightView.Kx = m_lights.lights[ lightIndex ].direction.x;
+// 	currlightView.Ky = m_lights.lights[ lightIndex ].direction.y;
+// 	currlightView.Kz = m_lights.lights[ lightIndex ].direction.z;
+// 
+// 	m_lightsView[ lightIndex ].LIGHT_VIEW = MatrixInvertOrthoNormal( currlightView );
+// 		
+// 	m_lightsViewUBO->Update( &m_lightsView , sizeof( m_lightsView ) , sizeof( m_lightsView ) );
+// 	BindUniformBuffer( UBO_LIGHT_VIEW_SLOT , m_lightsViewUBO );
+// }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

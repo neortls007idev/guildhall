@@ -1192,6 +1192,7 @@
     <ClInclude Include="Renderer\DrawableObjects.hpp" />
     <ClInclude Include="Renderer\ErrorShaderCode.hpp" />
     <ClInclude Include="Renderer\IndexBuffer.hpp" />
+    <ClInclude Include="Renderer\LightStructs.hpp" />
     <ClInclude Include="Renderer\Material.hpp" />
     <ClInclude Include="Renderer\RenderBuffer.hpp" />
     <ClInclude Include="Renderer\RenderContext.hpp" />

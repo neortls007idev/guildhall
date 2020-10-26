@@ -47,6 +47,43 @@ float2 ComputeLightFactor( light_t light , float3 worldPosition , float3 worldNo
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+float2 ComputeDirectionalLightFactor( dirLightDataT dirlight , float3 worldPosition , float3 worldNormal , float3 directionToEye )
+{
+    float diffuse = 0.f;
+    float specular = 0.f;
+    // The light vector aims opposite the direction the light rays travel.
+    float3 lightVec = -dirlight.direction;
+    float diffuseFactor = dot( lightVec , worldNormal );
+
+    // Flatten to avoid dynamic branching.
+[flatten]
+    if( diffuseFactor > 0.0f )
+    {
+        float3 v = reflect( -lightVec , worldNormal );
+    // BLINN-PHONG LIGHTING COMPUTATION
+        float3 hv                       = normalize( -lightDirection + directionToEye );
+        float specular                  = max( 0.0f , dot( normalize( worldNormal ) , hv ) );
+    
+    // SPECULAR LIGHTING
+        specular                        = facingDirection * specular;
+        specular                        = SPECULAR_FACTOR * pow( specular , SPECULAR_POWER );
+        
+    float       dotIncident             = dot( -lightDirection , worldNormal );
+    float       facingDirection         = smoothstep( -0.4f , 0.1f , dotIncident );
+                diffuse                 = max( 0.0f , dotIncident );
+    }
+    
+    return float2( diffuse , specular );
+        
+   // compute diffuse
+   // max prevents lighting from the "back", which would subtract light
+   // float       dotIncident             = dot( -lightDirection , worldNormal );
+   // float       facingDirection         = smoothstep( -0.4f , 0.1f , dotIncident );
+   
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 struct PostLightingData
 {
     float3 diffuse;
@@ -54,6 +91,7 @@ struct PostLightingData
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
 
 PostLightingData ComputeLightingAt( float3 worldPos , float3 worldNormal , float3 surfaceColor , float3 emmisiveColor , float specularFactor )
 {
@@ -64,16 +102,16 @@ PostLightingData ComputeLightingAt( float3 worldPos , float3 worldNormal , float
     float3 specular                 = float3( 0.0f.xxx );
 
    // add up contribution of all lights
-    for( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
-    {
-        float3 lightColor           = LIGHTS[ index ].color.xyz;
-               lightColor           = pow( lightColor , GAMMA.xxx );                                                    // assumes light color is set by a user - so sRGB space
-        
-        float2 lightFactors         = ComputeLightFactor( LIGHTS[ index ] , worldPos , worldNormal , directionToEye );
-
-               diffuse             += lightFactors.x * lightColor;
-               specular            += lightFactors.y * lightColor;
-    }
+    //for( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
+    //{
+    //    float3 lightColor           = LIGHTS[ index ].color.xyz;
+    //           lightColor           = pow( lightColor , GAMMA.xxx );                                                    // assumes light color is set by a user - so sRGB space
+    //    
+    //    float2 lightFactors         = ComputeLightFactor( LIGHTS[ index ] , worldPos , worldNormal , directionToEye );
+    //
+    //           diffuse             += lightFactors.x * lightColor;
+    //           specular            += lightFactors.y * lightColor;
+    //}
    
    // limit it
     diffuse                         = min( DIFFUSE_FACTOR * diffuse , float3( 1.f.xxx ) );

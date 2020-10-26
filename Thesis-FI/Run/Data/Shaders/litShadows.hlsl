@@ -190,14 +190,14 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
 			// Calculate the amount of light on this pixel.
 			lightIntensity = saturate( dot( lightDirection[ index ] , input.world_normal ) );
 			           
-            if( lightIntensity > 0.0f )
-            {
+            //if( lightIntensity > 0.0f )
+            //{
 				// Determine the final diffuse color based on the diffuse color and the amount of light intensity.
-                color += float4( LIGHTS[ index ].color , lightIntensity );
+                color += lightIntensity * float4( LIGHTS[ index ].color , lightIntensity );
          
 				// Saturate the final light color.
                // color = saturate( color );
-            }
+            //}
         }
 	}
     else
