@@ -529,6 +529,18 @@
     <ClCompile Include="Memory\JobSystemWorkerThread.cpp">
       <Filter>Memory</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\DirectionalLight.cpp">
+      <Filter>Renderer\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\PointLight.cpp">
+      <Filter>Renderer\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\SpotLight.cpp">
+      <Filter>Renderer\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Light.cpp">
+      <Filter>Renderer\Lighting</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rgba8.hpp">
@@ -991,6 +1003,18 @@
       <Filter>ThirdParty\ImGUI\Plot</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\LightStructs.hpp">
+      <Filter>Renderer\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\DirectionalLight.hpp">
+      <Filter>Renderer\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\PointLight.hpp">
+      <Filter>Renderer\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\SpotLight.hpp">
+      <Filter>Renderer\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Light.hpp">
       <Filter>Renderer\Lighting</Filter>
     </ClInclude>
   </ItemGroup>
