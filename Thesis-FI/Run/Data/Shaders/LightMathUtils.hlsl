@@ -19,7 +19,8 @@ float2 ComputeLightFactor( light_t light , float3 worldPosition , float3 worldNo
 
 	float diffuseAttenuation = light.intensity;
     float specularAttenuation = light.intensity;
-	
+
+	// flatten To avoid dynamic branching
 	if( light.lightType != 1 )
     {
 		diffuseAttenuation      = light.intensity / dot( attenuationVector , light.attenuation ) * coneAttenuation;
@@ -42,7 +43,7 @@ float2 ComputeLightFactor( light_t light , float3 worldPosition , float3 worldNo
                 specular                = facingDirection * specular;   
                 specular                = SPECULAR_FACTOR * pow( specular , SPECULAR_POWER );
  
-    return float2( diffuseAttenuation * diffuse , specularAttenuation * specular );
+    return float2( diffuseAttenuation * diffuse , /*specularAttenuation * specular*/ 0.f );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

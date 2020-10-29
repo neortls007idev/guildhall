@@ -5,7 +5,8 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	
-extern JobSystem* g_theJobSystem;
+extern		JobSystem*	g_theJobSystem;
+constexpr	uint		NUM_JOBS_SPLIT = 6;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -32,29 +33,24 @@ void ParticleEmitter3DUpdateParticlesJob::Execute()
 
 	size_t numParticles = m_emitter->m_numAliveParticles;
 
-	size_t numJobRange = static_cast< size_t >( numParticles / 6 );
-	size_t numRangeCorrection = static_cast< size_t >( numParticles % 6 );
+	size_t particlesPerJob = static_cast< size_t >( numParticles / 6 );
+	size_t leftoverParticles = static_cast< size_t >( numParticles % 6 );
 
-	size_t jobEndIndex = numJobRange;
+	size_t particleEndIndex = particlesPerJob - 1;
 		
-	for( size_t jobStartIndex = 0 ; jobStartIndex < numParticles; jobStartIndex = jobEndIndex + 1 )
+	for ( size_t particleStartIndex = 0; particleEndIndex < ( numParticles - leftoverParticles );  )
 	{
-		ParticleEmitter3DUpdateParticlesVertexBufferJob* vboJob = new ParticleEmitter3DUpdateParticlesVertexBufferJob( 0 , m_emitter , jobStartIndex , jobEndIndex );
+		ParticleEmitter3DUpdateParticlesVertexBufferJob* vboJob = new ParticleEmitter3DUpdateParticlesVertexBufferJob( 0 , m_emitter , particleStartIndex , particleEndIndex );
 		g_theJobSystem->PostJob( *vboJob );
-		jobEndIndex += numJobRange;
+		particleStartIndex = particleEndIndex + 1;
+		particleEndIndex += particlesPerJob;
 	}
-
-//	if( numRangeCorrection == 1)
-//	{
-//		ParticleEmitter3DUpdateParticlesVertexBufferJob* vboJob = new ParticleEmitter3DUpdateParticlesVertexBufferJob( 0 , m_emitter , jobEndIndex + 1 , jobEndIndex + 1  );
-//		g_theJobSystem->PostJob( *vboJob );
-//	}
-//
-//	if ( numRangeCorrection > 0 )
-//	{
-//		ParticleEmitter3DUpdateParticlesVertexBufferJob* vboJob = new ParticleEmitter3DUpdateParticlesVertexBufferJob( 0 , m_emitter , jobEndIndex + 1 , jobEndIndex + numRangeCorrection );
-//		g_theJobSystem->PostJob( *vboJob );
-//	}
+	if( leftoverParticles > 0 )
+	{
+		particleEndIndex -= particlesPerJob;
+		ParticleEmitter3DUpdateParticlesVertexBufferJob* vboJob = new ParticleEmitter3DUpdateParticlesVertexBufferJob( 0 , m_emitter , particleEndIndex + 1 , particleEndIndex + leftoverParticles );
+		g_theJobSystem->PostJob( *vboJob );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

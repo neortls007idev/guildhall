@@ -162,11 +162,15 @@ void Game::InitializeCameras()
 		float height = GAME_CAM_NEAR_Z * -tanf( GAME_CAM_FOV * 0.5f );
 			  height = ( GAME_CAM_FAR_Z * height ) / GAME_CAM_NEAR_Z;
 		//m_lightsCamera.SetProjectionPerspective( GAME_CAM_FOV , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
-		m_lightsCamera.SetOrthoView3D( height , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
+		m_lightsOrtho3DCamera.SetOrthoView3D( 2.5f /*height*/ , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z *.1f );
 		m_shadowCamHeight = height;
 		//m_lightsCamera.SetOrthoView( 540.f , CLIENT_ASPECT );
-		m_lightsCamera.SetPosition( Vec3( 0.f , 0.f , 0.f ) );
-		m_lightsCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );
+		m_lightsOrtho3DCamera.SetPosition( Vec3( 0.f , 0.f , 0.f ) );
+		m_lightsOrtho3DCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );
+
+		m_lightsProjectionCamera.SetProjectionPerspective( GAME_CAM_FOV , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
+		m_lightsProjectionCamera.SetPosition( Vec3( 0.f , 0.f , 0.f ) );
+		m_lightsProjectionCamera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT | CLEAR_STENCIL_BIT , BLACK , 1.f , 0 );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -415,9 +419,9 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 
 	for( uint lightIndex = 0 ; lightIndex < TOTAL_LIGHTS ; lightIndex++  )
 	{
-		m_lightsCamera.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
-		m_lightsCamera.SetPitchYawRollRotation( m_lightsPitchYawRoll[ lightIndex ].x , m_lightsPitchYawRoll[ lightIndex ].y , 0.f );
-		g_theRenderer->SetLightsView( m_currentLightIndex , m_lightsCamera.GetProjectionMatrix() , m_lightsCamera.GetViewMatrix() );
+		m_lightsOrtho3DCamera.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
+		m_lightsOrtho3DCamera.SetPitchYawRollRotation( m_lightsPitchYawRoll[ lightIndex ].x , m_lightsPitchYawRoll[ lightIndex ].y , 0.f );
+		g_theRenderer->SetLightsView( lightIndex , m_lightsOrtho3DCamera.GetProjectionMatrix() , m_lightsOrtho3DCamera.GetViewMatrix() );
 	}
 	//g_theRenderer->SetLightsView( m_currentLightIndex , m_gameCamera.GetProjectionMatrix() );
 	
@@ -425,9 +429,12 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 	g_theRenderer->BindTexture( m_tileDiffuse );
 	g_theRenderer->BindTexture( m_tileNormal , eTextureType::TEX_NORMAL );
 
-	for( uint index = 0 ; index < TOTAL_LIGHTS ; index++  )
+	if ( m_currentShader == m_lightShaders[ LIT_SHADOW ] )
 	{
-		g_theRenderer->BindTexture( m_shadowMap[ index ] , 8 + index );
+		for( uint index = 0 ; index < TOTAL_LIGHTS ; index++  )
+		{
+			g_theRenderer->BindTexture( m_shadowMap[ index ] , 8 + index );
+		}
 	}
 
 	g_theRenderer->EnableFog( m_fogData );
@@ -466,7 +473,7 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 	g_D3D11PerfMarker->EndPerformanceMarker();
 
 	g_D3D11PerfMarker->BeginPerformanceMarker( L"Render all OBJ Models" );
-	RenderAllModelInstances();
+	//RenderAllModelInstances();
 	//RenderAllInstancesOfType( SPACESHIP );
 	//RenderAllInstancesOfType( LUMINARIS_SHIP );
 
@@ -653,125 +660,100 @@ void Game::RenderFresnelShader2ndPass() const
 
 void Game::RenderShadowMapPass() const
 {
-	if( m_currentShaderIndex != LIT_SHADOW )
+	RenderOrthoShadowMapPass();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::RenderOrthoShadowMapPass() const
+{
+	if ( m_currentShaderIndex != LIT_SHADOW )
 	{
 		return;
 	}
-		
-	g_D3D11PerfMarker->BeginPerformanceMarker( L"Shadow Map Render Pass Start" );
+
+	g_D3D11PerfMarker->BeginPerformanceMarker( L"Shadow Map Direcional Light Render Pass Start" );
 
 	for ( uint lightIndex = 0; lightIndex < TOTAL_LIGHTS; lightIndex++ )
 	{
-		//m_shadowMap[ lightIndex ] = g_theRenderer->GetOrCreatematchingRenderTargetOfSize( IntVec2(m_shadowMapDimension , m_shadowMapDimension ) ,
-		//																		"lightDepthTarget" , D3D_DXGI_FORMAT_R32_FLOAT );
+		if ( m_lights.lights[ lightIndex ].lightType == DIRECTIONAL_LIGHT )
+		{
+			m_lightsOrtho3DCamera.SetColorTarget( 0 , m_shadowMap[ lightIndex ] );
 
-		m_lightsCamera.SetColorTarget( 0 , m_shadowMap[ lightIndex ] );
+			std::wstring passName = L"Light " + std::to_wstring( lightIndex ) + L" Shadow Map Render Pass Start";
 
-		std::wstring passName = L"Light " + std::to_wstring( lightIndex ) + L" Shadow Map Render Pass Start";
+			m_lightsOrtho3DCamera.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
+			m_lightsOrtho3DCamera.SetPitchYawRollRotation( m_lightsPitchYawRoll[ lightIndex ].x , m_lightsPitchYawRoll[ lightIndex ].y , 0.f );
 
-		m_lightsCamera.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
-		m_lightsCamera.SetPitchYawRollRotation( m_lightsPitchYawRoll[ lightIndex ].x , m_lightsPitchYawRoll[ lightIndex ].y , 0.f );
+			g_D3D11PerfMarker->BeginPerformanceMarker( passName.c_str() );
+			g_D3D11PerfMarker->BeginPerformanceMarker( L"Initializing State" );
 
-		//Vec3 lightCameraMin = m_lightsCamera.GetOrthoMin();
-		//Vec3 lightCameraMax = m_lightsCamera.GetOrthoMax();
-		//
-		//DebugAddWorldWireBounds(OBB3(lightCameraMin, lightCameraMax, m_lightsPitchYawRoll[lightIndex]), GREEN,
-		//                        0.25f);
-		
-		g_D3D11PerfMarker->BeginPerformanceMarker( passName.c_str() );
-		g_D3D11PerfMarker->BeginPerformanceMarker( L"Initializing State" );
-		g_theRenderer->BeginCamera( m_lightsCamera );
+			g_theRenderer->BeginCamera( m_lightsOrtho3DCamera );
 
-		//if( m_lights.lights[ lightIndex ].lightType == DIRECTIONAL_LIGHT )
-		//{
-		//	m_lightsCamera.m_view.Kx = -m_lights.lights[ lightIndex ].direction.x;
-		//	m_lightsCamera.m_view.Ky = -m_lights.lights[ lightIndex ].direction.y;
-		//	m_lightsCamera.m_view.Kz = -m_lights.lights[ lightIndex ].direction.z;
-		//	//m_lightsCamera.ForceUpdateUBO( g_theRenderer );
-		//}
+			m_lightsOrtho3DCamera.CreateMatchingDepthStencilTarget();
+			g_theRenderer->BindDepthStencil( m_lightsOrtho3DCamera.GetDepthStencilTarget() );
+			g_theRenderer->BindShader( nullptr );
+			g_theRenderer->BindCubeMapTexture( nullptr );
+			g_theRenderer->BindSampler( m_bilinear );
+			g_theRenderer->BindSampler( m_linear , 2 );
 
-		m_lightsCamera.CreateMatchingDepthStencilTarget();
-		g_theRenderer->BindDepthStencil( m_lightsCamera.GetDepthStencilTarget() );
-		g_theRenderer->BindShader( nullptr );
-		g_theRenderer->BindCubeMapTexture( nullptr );
-		g_theRenderer->BindSampler( m_bilinear );
-		g_theRenderer->BindSampler( m_linear , 2 );
+			g_theRenderer->SetRasterState( FILL_SOLID );
 
-		g_theRenderer->SetRasterState( FILL_SOLID );
+			g_theRenderer->SetCullMode( CULL_BACK );
+			g_theRenderer->SetDepthTest( COMPARE_LEQUAL , true );
 
-		g_theRenderer->SetCullMode( CULL_BACK );
-		g_theRenderer->SetDepthTest( COMPARE_LEQUAL , true );
+			g_theRenderer->SetAmbientLight( m_ambientLightColor , m_lights.ambientLight.w );
 
-		g_theRenderer->SetAmbientLight( m_ambientLightColor , m_lights.ambientLight.w );
+			g_theRenderer->UpdateLightsData( m_lights );
+			g_theRenderer->EnableAllLights();
+			g_theRenderer->SetSpecularFactor( m_lights.SPECULAR_FACTOR );
+			g_theRenderer->SetSpecularPower( m_lights.SPECULAR_POWER );
+			g_theRenderer->SetLightsView( lightIndex , m_lightsOrtho3DCamera.GetProjectionMatrix() , m_lightsOrtho3DCamera.GetViewMatrix() );
 
-		g_theRenderer->UpdateLightsData( m_lights );
-		g_theRenderer->EnableAllLights();
-		g_theRenderer->SetSpecularFactor( m_lights.SPECULAR_FACTOR );
-		g_theRenderer->SetSpecularPower( m_lights.SPECULAR_POWER );
-		g_theRenderer->SetLightsView( m_currentLightIndex , m_lightsCamera.GetProjectionMatrix() , m_lightsCamera.GetViewMatrix() );
+			g_theRenderer->BindShader( m_depthShader );
+			g_theRenderer->BindTexture( m_tileDiffuse );
+			g_theRenderer->BindTexture( m_tileNormal , eTextureType::TEX_NORMAL );
 
-		g_theRenderer->BindShader( m_depthShader );
-		g_theRenderer->BindTexture( m_tileDiffuse );
-		g_theRenderer->BindTexture( m_tileNormal , eTextureType::TEX_NORMAL );
+			g_theRenderer->EnableFog( m_fogData );
 
-		g_theRenderer->EnableFog( m_fogData );
+			BindShaderSpecificMaterialData();
+			g_D3D11PerfMarker->EndPerformanceMarker();
 
-		BindShaderSpecificMaterialData();
-		g_D3D11PerfMarker->EndPerformanceMarker();
+			g_D3D11PerfMarker->BeginPerformanceMarker( L"Test Meshes" );
 
-		g_D3D11PerfMarker->BeginPerformanceMarker( L"Test Meshes" );
+			g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
+			g_theRenderer->DrawMesh( m_meshSphere );
 
-		g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
-		g_theRenderer->DrawMesh( m_meshSphere );
+			g_theRenderer->DisableFog();
 
-		g_theRenderer->DisableFog();
+			g_theRenderer->SetModelMatrix( m_quadTransform.GetAsMatrix() );
+			g_theRenderer->DrawMesh( m_quadMesh );
 
-		g_theRenderer->SetModelMatrix( m_quadTransform.GetAsMatrix() );
-		g_theRenderer->DrawMesh( m_quadMesh );
+			g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
+			g_theRenderer->DrawMesh( m_cubeMesh );
 
-		//for ( uint index = 0; index < 8; index++ )
-		//{
-		//	g_theRenderer->SetModelMatrix( m_shadowTestCubes[ index ].GetAsMatrix() );
-		//	g_theRenderer->DrawMesh( m_cubeMesh );
-		//}
-		//g_theRenderer->SetModelMatrix( m_cubeMeshTransform.GetAsMatrix() );
-		g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
-		g_theRenderer->DrawMesh( m_cubeMesh );
+			g_D3D11PerfMarker->EndPerformanceMarker();
 
-		g_D3D11PerfMarker->EndPerformanceMarker();
+			g_D3D11PerfMarker->BeginPerformanceMarker( L"Render all OBJ Models" );
 
-		g_D3D11PerfMarker->BeginPerformanceMarker( L"Render all OBJ Models" );
+			//RenderAllModelInstances();
 
-		RenderAllModelInstances();
-		//RenderAllInstancesOfType( SPACESHIP );
-		//RenderAllInstancesOfType( LUMINARIS_SHIP );
-		g_D3D11PerfMarker->EndPerformanceMarker();
-		//g_theRenderer->CopyTexture( m_shadowMap[ lightIndex ] , m_lightsCamera.GetDepthStencilTarget() );
-		//g_theRenderer->ReleaseRenderTarget( m_shadowMap[ lightIndex ] );
-		//g_theRenderer->ReleaseRenderTarget( CurrentShadowMap );
-		g_theRenderer->EndCamera( m_lightsCamera );
+			g_D3D11PerfMarker->EndPerformanceMarker();
 
-		//for ( int index = 0; index < 1 ; index++ )
-		//{
-		//
-		//	g_D3D11PerfMarker->BeginPerformanceMarker( L"Blurred Shadow" );
-		//	
-		//	Shader* blurShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/blur.hlsl" );
-		//	Texture* blurredShadow = g_theRenderer->GetOrCreatematchingRenderTarget( m_shadowMap[ lightIndex ] , "BlurBloomTarget" , D3D_DXGI_FORMAT_R32_FLOAT );
-		//	g_theRenderer->StartEffect( blurredShadow , m_shadowMap[ lightIndex ] , blurShader );
-		//	g_theRenderer->BindTexture( m_shadowMap[ lightIndex ] , TEX_USER_TYPE );
-		//	g_theRenderer->EndEffect();
-		//	
-		//	g_theRenderer->CopyTexture( m_shadowMap[ lightIndex ] , blurredShadow );
-		//	g_theRenderer->ReleaseRenderTarget( blurredShadow );
-		//	
-		//	g_D3D11PerfMarker->EndPerformanceMarker();
-		//}
-		
+			g_theRenderer->EndCamera( m_lightsOrtho3DCamera );
+
+			g_D3D11PerfMarker->EndPerformanceMarker();
+		}
+
 		g_D3D11PerfMarker->EndPerformanceMarker();
 	}
+}
 
-g_D3D11PerfMarker->EndPerformanceMarker();
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::RenderPerspectiveShadowMapPass() const
+{
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

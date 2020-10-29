@@ -48,6 +48,8 @@ public:
 				void BindShaderSpecificMaterialData() const;
 				void RenderFresnelShader2ndPass() const;
 				void RenderShadowMapPass() const;
+					void RenderOrthoShadowMapPass() const;
+					void RenderPerspectiveShadowMapPass() const;
 
 private:
 			void DebugUI();
@@ -110,7 +112,8 @@ public:
 	//--------------------------------------------------------------------------------------------------------------------------------------------	
 	shaderLightDataT					m_lights;
 	Rgba8								m_ambientLightColor;
-	mutable Camera						m_lightsCamera;
+	mutable Camera						m_lightsOrtho3DCamera;
+	mutable Camera						m_lightsProjectionCamera;
 //	int									m_lightType[ TOTAL_LIGHTS ];
 	bool								m_isLightFollowingTheCamera							= false;
 	bool								m_isLightAnimated									= false;

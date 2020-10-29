@@ -32,7 +32,7 @@ void Game::InitializeLightData()
 		color.RollRandomColor( rng );
 		rng.manuallyIncrementPosition();
 		m_lights.lights[ index ].color					= color.GetAsNormalizedFloat3();
-		m_lights.lights[ index ].intensity				= 0.f;
+		m_lights.lights[ index ].intensity				= 1.f;
 		m_lights.lights[ index ].attenuation			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
 		m_lights.lights[ index ].specularAttenuation	= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
 		m_lights.lights[ index ].worldPosition			= Vec3( index * 1.5f , 0.f , 10.f );
@@ -251,6 +251,11 @@ void Game::InitializeParticleEmitters()
 	m_starEmitters[ PINK_PURPLE_STAR ].m_particleStartColor = HALF_ALPHA_PURPLE;
 	m_starEmitters[ PINK_PURPLE_STAR ].m_particleEndColor = NO_ALPHA_PINK;
 	m_starEmitters[ PINK_PURPLE_STAR ].m_center = Vec3( -3.f , 0.f , 0.f );
+
+	m_starEmitters[ TEST_STAR ].m_emitter = g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , m_particleEmitterSheets[ STAR_SS ] , 1 , m_gameCamera.GetPosition() );
+	m_starEmitters[ TEST_STAR ].m_particleStartColor = WHITE;
+	m_starEmitters[ TEST_STAR ].m_particleEndColor = WHITE;
+	m_starEmitters[ TEST_STAR ].m_center = Vec3( 0.f , 0.f , -5.f );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

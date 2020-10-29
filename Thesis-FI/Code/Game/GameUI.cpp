@@ -388,7 +388,7 @@ void Game::ProfilingSettingsGUI()
 		ImGui::InputFloat( "Shadow Cam Ortho Height" , &m_shadowCamHeight );
 		if ( ImGui::Button( "Apply New Shadow Cam Ortho Height" ) )
 		{
-			m_lightsCamera.SetOrthoView3D( m_shadowCamHeight , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );	
+			m_lightsOrtho3DCamera.SetOrthoView3D( m_shadowCamHeight , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );	
 		}
 		ImGui::SliderFloat( "Game Cam Near Z" , &m_nearZ , 0.001f , 0.999f );
 		ImGui::SliderFloat( "Game Cam Far Z" , &m_farZ , 10.f , 1000.f );

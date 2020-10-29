@@ -25,6 +25,8 @@ ParticleEmitter3D::ParticleEmitter3D( RenderContext* renderContext , Texture* te
 	m_particles = new Particle3D[ initialArraySize ];
 	m_isParticleGarbage = new bool[ initialArraySize ];
 	memset( &m_isParticleGarbage[ 0 ] , 1 , sizeof( bool ) * initialArraySize );
+//	m_isParticleInViewFrusutum = new bool[ initialArraySize ];
+//	memset( &m_isParticleInViewFrusutum[ 0 ] , 1 , sizeof( bool ) * initialArraySize );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -45,6 +47,8 @@ ParticleEmitter3D::ParticleEmitter3D ( RenderContext* renderContext , SpriteShee
 	m_particles = new Particle3D[ initialArraySize ];
 	m_isParticleGarbage = new bool[ initialArraySize ];
 	memset( &m_isParticleGarbage[ 0 ] , 1 , sizeof( bool ) * initialArraySize );
+//	m_isParticleInViewFrusutum = new bool[ initialArraySize ];
+//	memset( &m_isParticleInViewFrusutum[ 0 ] , 1 , sizeof( bool ) * initialArraySize );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -300,7 +304,7 @@ void ParticleEmitter3D::Render()
 	}
 	
 	m_renderContext->BindShader( m_shader );
-	m_renderContext->BindTexture( m_texture );
+	//m_renderContext->BindTexture( m_texture );
 	m_renderContext->SetBlendMode( m_blendMode );	
 	m_renderContext->SetModelMatrix( Mat44::IDENTITY , HALF_ALPHA_WHITE );
 	m_renderContext->DrawVertexArray( m_particleVerts );
@@ -325,6 +329,44 @@ void ParticleEmitter3D::Destroy()
 void ParticleEmitter3D::UpdateTargetPos( Vec3 newTargetPos )
 {
 	m_targetPos = newTargetPos;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+//void ParticleEmitter3D::UpdateViewFrustum( Frustum viewFrustum )
+//{
+//	m_viewFrustum = viewFrustum;
+//}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void ParticleEmitter3D::FrustumCulling()
+{
+	m_ParticlesInViewFrustum = 0;
+
+	for ( size_t index = 0; index < m_totalSpawnableParticles; index++ )
+	{
+		if ( m_isParticleGarbage[ index ] )
+		{
+			continue;
+		}
+		
+		if ( m_viewFrustum.IsPointInsideFrustum( m_particles[ index ].m_position ) )
+		{
+			m_ParticlesInViewFrustum++;
+
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void ParticleEmitter3D::SortParticlesBasedOnPosition()
+{
+	for ( size_t index = 0; index < m_totalSpawnableParticles; index++ )
+	{
+		
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

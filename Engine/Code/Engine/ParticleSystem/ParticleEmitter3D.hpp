@@ -7,6 +7,7 @@
 
 #include "Engine/Primitives/AABB2.hpp"
 #include "Engine/Renderer/D3D11Utils.hpp"
+#include "../Primitives/Frustum.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -46,6 +47,9 @@ public:
 	void Render();
 	void Destroy();
 	void UpdateTargetPos( Vec3 newTargetPos );
+//	void UpdateViewFrustum( Frustum viewFrustum );
+	void FrustumCulling();
+	void SortParticlesBasedOnPosition();
 	void Move( float deltaSeconds );
 	void UpdatePosition( Vec3 newPos );
 	void UpdateVelocity( Vec3 newVelocity );
@@ -58,6 +62,7 @@ public:
 	eBlendMode						m_blendMode					= ADDITIVE;
 	eCullMode						m_cullMode					= CULL_BACK;
 	
+	Frustum							m_viewFrustum;
 	Vec3							m_targetPos					= Vec3::ZERO;
 		
 	Vec3							m_position					= Vec3::ZERO;
@@ -70,6 +75,8 @@ public:
 	
 	Particle3D*						m_particles;
 	bool*							m_isParticleGarbage;
+//	bool*							m_isParticleInViewFrusutum;
+	size_t							m_ParticlesInViewFrustum	= 0;
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
