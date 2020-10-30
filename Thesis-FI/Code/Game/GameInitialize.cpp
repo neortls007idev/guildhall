@@ -15,33 +15,33 @@ extern ParticleSystem3D*	g_theParticleSystem3D;
 
 void Game::InitializeLightData()
 {
-	m_lights.ambientLight								= Vec4( 1.f , 1.f , 1.f , 0.f );
+
+	constexpr float AMBIENT_INITITAL_INTENSITY = 0.2f;
+	constexpr float INITIAL_INTENSITY_PER_LIGHT = ( 1.f - AMBIENT_INITITAL_INTENSITY ) / 8.f/*TOTAL_LIGHTS*/;
+
+	m_lights.ambientLight = Vec4( 1.f , 1.f , 1.f , 0.f );
 	m_ambientLightColor.SetColorFromNormalizedFloat( m_lights.ambientLight );
-	m_lights.lights[ 0 ].color							= Vec3( 1.f , 1.f , 1.f );
-	m_lights.lights[ 0 ].intensity						= 1.0f;
-	m_lights.lights[ 0 ].worldPosition					= Vec3( 0.f , 0.f , -5.f );
-	m_lights.lights[ 0 ].attenuation					= Vec3::UNIT_VECTOR_ALONG_J_BASIS;
-	m_lights.lights[ 0 ].specularAttenuation			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
-	m_lights.lights[ 0 ].lightType						= ( uint ) LightType::DIRECTIONAL_LIGHT;
+	m_lights.lights[ 0 ].color = Vec3( 1.f , 1.f , 1.f );
+	m_lights.lights[ 0 ].intensity = INITIAL_INTENSITY_PER_LIGHT;
+	m_lights.lights[ 0 ].worldPosition = Vec3( 0.f , 0.f , -5.f );
+	m_lights.lights[ 0 ].attenuation = Vec3::UNIT_VECTOR_ALONG_J_BASIS;
+	m_lights.lights[ 0 ].specularAttenuation = Vec3::UNIT_VECTOR_ALONG_K_BASIS;
+	m_lights.lights[ 0 ].lightType = ( uint ) LightType::DIRECTIONAL_LIGHT;
 
 	RandomNumberGenerator rng;
-	
-	for ( uint index = 1 ; index < TOTAL_LIGHTS ; index++ )
+
+	for ( uint index = 1; index < TOTAL_LIGHTS; index++ )
 	{
 		Rgba8 color;
 		color.RollRandomColor( rng );
 		rng.manuallyIncrementPosition();
-		m_lights.lights[ index ].color					= color.GetAsNormalizedFloat3();
-		m_lights.lights[ index ].intensity				= 1.f;
-		m_lights.lights[ index ].attenuation			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
-		m_lights.lights[ index ].specularAttenuation	= Vec3::UNIT_VECTOR_ALONG_K_BASIS;
-		m_lights.lights[ index ].worldPosition			= Vec3( index * 1.5f , 0.f , 10.f );
-		m_lights.lights[ index ].lightType				= ( uint ) LightType::DIRECTIONAL_LIGHT;
-	}
-
-	for ( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
-	{
-		//m_lightType[ index ] = POINT_LIGHT;
+		m_lights.lights[ index ].color = Vec3( 1.f , 1.f , 1.f ); /*color.GetAsNormalizedFloat3();*/
+		m_lights.lights[ index ].intensity = INITIAL_INTENSITY_PER_LIGHT;
+		m_lights.lights[ index ].attenuation = Vec3::UNIT_VECTOR_ALONG_K_BASIS;
+		m_lights.lights[ index ].specularAttenuation = Vec3::UNIT_VECTOR_ALONG_K_BASIS;
+		m_lights.lights[ index ].worldPosition = Vec3( index * 1.5f , 0.f , 10.f );
+		m_lights.lights[ index ].direction = Vec3::UNIT_VECTOR_ALONG_J_BASIS;
+		m_lights.lights[ index ].lightType = ( uint ) LightType::DIRECTIONAL_LIGHT;
 	}
 }
 

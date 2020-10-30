@@ -7,7 +7,7 @@
 // changed in-between draw calls on the CPU
 //--------------------------------------------------------------------------------------
 
-static const uint TOTAL_LIGHTS = 3;
+static const uint TOTAL_LIGHTS = 2;
 
 //--------------------------------------------------------------------------------------
 // buffer holding time information from our game

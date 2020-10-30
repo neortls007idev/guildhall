@@ -34,7 +34,6 @@ public:
 				void InitializeShaderMaterialData();
 				void InitializeParticleEmitters();
 				void InitializeShadowTestTrasforms();
-
 			~Game();
 
 			void Update( float deltaSeconds );
@@ -200,8 +199,8 @@ private:
 	//				SHADOW
 	//----------------------------------------------------------------------------------------------------------
 	float								m_shadowCamHeight						= 2.5f;
-	int									m_shadowMapDimension					= 4098;
-	int									m_shadowMapDimensionCopy				= 4098;
+	int									m_shadowMapDimension					= 1024;
+	int									m_shadowMapDimensionCopy				= 1024;
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	//				FRAME DATA

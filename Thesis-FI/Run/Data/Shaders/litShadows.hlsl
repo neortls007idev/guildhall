@@ -146,7 +146,7 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
    // Calculate the projected texture coordinates.
    //   uint index = 0;
    for (uint index = 0; index < TOTAL_LIGHTS; index++)
-    {
+   {
         float2 mapDim;
         depthMapTexture[ index ].GetDimensions( mapDim.x , mapDim.y );
 	// Range mapping NDC space to 0 to 1
@@ -156,33 +156,33 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
 	
    // Check if the projected coordinates are in the view of the light, if not then the pixel gets just an ambient value.
    // Determine if the projected coordinates are in the 0 to 1 range.  If so then this pixel is in the view of the light.
-        if( ( saturate( projectTexCoord[ index ].x ) == projectTexCoord[ index ].x ) &&
-			( saturate( projectTexCoord[ index ].y ) == projectTexCoord[ index ].y ) )
-        {
-            depthValue = depthMapTexture[ index ].Sample( sSampler , projectTexCoord[ index ] ).r;
-                  	
-            // Calculate the depth of the light.
-            lightDepthValue = input.lightViewPosition[ index ].z / input.lightViewPosition[ index ].w;
+       if( ( saturate( projectTexCoord[ index ].x ) == projectTexCoord[ index ].x ) &&
+		( saturate( projectTexCoord[ index ].y ) == projectTexCoord[ index ].y ) )
+       {
+           depthValue = depthMapTexture[ index ].Sample( sSampler , projectTexCoord[ index ] ).r;
+                 	
+           // Calculate the depth of the light.
+           lightDepthValue = input.lightViewPosition[ index ].z / input.lightViewPosition[ index ].w;
   
-            // Subtract the bias from the lightDepthValue.
-            lightDepthValue = lightDepthValue - bias;
+           // Subtract the bias from the lightDepthValue.
+           lightDepthValue = lightDepthValue - bias;
 
-            if( lightDepthValue < depthValue )
-            {
-			// Calculate the amount of light on this pixel.
-                lightIntensity = saturate( dot( lightDirection[ index ] , input.world_normal ) );
-			           
-                if( lightIntensity > 0.f )
-                {
-				    // Determine the final diffuse color based on the diffuse color and the amount of light intensity.
-                   color += float4( LIGHTS[ index ].color , lightIntensity );
+           if( lightDepthValue < depthValue )
+           {
+		    // Calculate the amount of light on this pixel.
+               lightIntensity = saturate( dot( lightDirection[ index ] , input.world_normal ) );
+		           
+               if( lightIntensity > 0.f )
+               {
+			    // Determine the final diffuse color based on the diffuse color and the amount of light intensity.
+                    color += float4( LIGHTS[ index ].color , lightIntensity );
                 }
-            }
-        }
+           }
+       }
    }
    
-    //color = saturate( color );
-        //color += ( LIGHTS[ index ].color , lightIntensity );
+   // color = saturate( color );
+   // color += ( LIGHTS[ index ].color , lightIntensity );
     
 //--------------------------------------------------------------------------------------
 //              SAMPLE THE TEXTURES

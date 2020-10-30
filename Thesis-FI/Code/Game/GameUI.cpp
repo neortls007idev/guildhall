@@ -89,9 +89,9 @@ void Game::LightSettingsGUI()
 		if( ImGui::CollapsingHeader( "GlobalSettings" ) )
 		{
 			ImGui::ColorEdit3( "Ambient Light Color"		, ( float* ) &m_lights.ambientLight );
-			ImGui::SliderFloat( "Ambient Light Intensity"	, &m_lights.ambientLight.w , 0.f , 1.f );
-			ImGui::SliderFloat( "Global Specular Power"	, &m_lights.SPECULAR_POWER , 1.f , 10000.f );
-			ImGui::SliderFloat( "Global Specular Factor"	, &m_lights.SPECULAR_FACTOR , 0.f , 1.f );
+			ImGui::DragFloat( "Ambient Light Intensity"	, &m_lights.ambientLight.w , 0.01f , 0.f , 1.f );
+			ImGui::DragFloat( "Global Specular Power"	, &m_lights.SPECULAR_POWER , 2.f , 1.f , 10000.f );
+			ImGui::DragFloat( "Global Specular Factor"	, &m_lights.SPECULAR_FACTOR , 0.01f , 0.f , 1.f );
 			ImGui::Separator();
 		}
 
@@ -166,7 +166,7 @@ void Game::LightSettingsGUI()
 				}
 
 				ImGui::ColorEdit3( "Light Color" , ( float* ) &m_lights.lights[ lightIndex ].color );
-				ImGui::SliderFloat( "Light Intensity" , &m_lights.lights[ lightIndex ].intensity , -100.f , +100.f );
+				ImGui::DragFloat( "Light Intensity" , &m_lights.lights[ lightIndex ].intensity , 0.01f , 0.f , 1.f );
 
 				if( ImGui::TreeNode( "Attenuation" ) )
 				{
