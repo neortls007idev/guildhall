@@ -111,9 +111,10 @@ void Game::TestCaseDirectionalShadows()
 	//	x = -cos(yaw)sin(pitch)sin(roll)-sin(yaw)cos(roll)
 	//	y = -sin( yaw )sin( pitch )sin( roll ) + cos( yaw )cos( roll )
 	//	z = cos( pitch )sin( roll )
+	float IND_INTENSITY = 1.f;
 
 	m_lights.lights[ 0 ].color = Vec3( 1.f , 1.f , 1.f );
-	m_lights.lights[ 0 ].intensity = 1.f;
+	m_lights.lights[ 0 ].intensity = IND_INTENSITY;
 	m_lights.lights[ 0 ].worldPosition = Vec3( -2.f , 1.f , 2.f );
 	m_lights.lights[ 0 ].attenuation = Vec3::ZERO;
 	m_lights.lights[ 0 ].specularAttenuation = Vec3::ZERO;
@@ -129,7 +130,7 @@ void Game::TestCaseDirectionalShadows()
 
 //----------------------------------------------------------------------------------------------------------
 	m_lights.lights[ 1 ].color = Vec3( 1.f , 1.f , 1.f );
-	m_lights.lights[ 1 ].intensity = 1.f;
+	m_lights.lights[ 1 ].intensity = IND_INTENSITY;
 	m_lights.lights[ 1 ].worldPosition = Vec3( 2.f , 1.f , 2.f );
 	m_lights.lights[ 1 ].attenuation = Vec3::ZERO;
 	m_lights.lights[ 1 ].specularAttenuation = Vec3::ZERO;
@@ -143,25 +144,46 @@ void Game::TestCaseDirectionalShadows()
 
 	m_lights.lights[ 1 ].direction = -m_gameCamera.GetCameraTransform().GetAsMatrix().GetKBasis3D();
 
+//----------------------------------------------------------------------------------------------------------
+
+//	m_lights.lights[ 2 ].color = Vec3( 1.f , 1.f , 1.f );
+//	m_lights.lights[ 2 ].intensity = IND_INTENSITY;
+//	m_lights.lights[ 2 ].worldPosition = Vec3( 2.f , 1.f , -2.f );
+//	m_lights.lights[ 2 ].attenuation = Vec3::ZERO;
+//	m_lights.lights[ 2 ].specularAttenuation = Vec3::ZERO;
+//	m_lights.lights[ 2 ].lightType = ( uint ) LightType::DIRECTIONAL_LIGHT;
+//	m_lightsPitchYawRoll[ 2 ].x = -30.f;
+//	m_lightsPitchYawRoll[ 2 ].y = 135.f;
+//	m_lightsPitchYawRoll[ 2 ].z = 0.f;
+//
+//	m_gameCamera.SetPosition( m_lights.lights[ 1 ].worldPosition );
+//	m_gameCamera.SetPitchYawRollRotation( -30.f , 135.f , 0.f );
+//
+//	m_lights.lights[ 2 ].direction = -m_gameCamera.GetCameraTransform().GetAsMatrix().GetKBasis3D();
+
+//----------------------------------------------------------------------------------------------------------
+
+//	m_lights.lights[ 3 ].color = Vec3( 1.f , 1.f , 1.f );
+//	m_lights.lights[ 3 ].intensity = IND_INTENSITY;
+//	m_lights.lights[ 3 ].worldPosition = Vec3( -2.f , 1.f , -2.f );
+//	m_lights.lights[ 3 ].attenuation = Vec3::ZERO;
+//	m_lights.lights[ 3 ].specularAttenuation = Vec3::ZERO;
+//	m_lights.lights[ 3 ].lightType = ( uint ) LightType::DIRECTIONAL_LIGHT;
+//	m_lightsPitchYawRoll[ 3 ].x = -30.f;
+//	m_lightsPitchYawRoll[ 3 ].y = 225.f;
+//	m_lightsPitchYawRoll[ 3 ].z = 0.f;
+//
+//	m_gameCamera.SetPosition( m_lights.lights[ 1 ].worldPosition );
+//	m_gameCamera.SetPitchYawRollRotation( -30.f , 225.f , 0.f );
+//
+//	m_lights.lights[ 3 ].direction = -m_gameCamera.GetCameraTransform().GetAsMatrix().GetKBasis3D();
+
+//----------------------------------------------------------------------------------------------------------
+
 	m_gameCamera.SetPosition( Vec3( 0.f , 2.f , -6.f ) );
 	m_yaw = 180.f;
 	m_pitch = -15.f;
-	m_gameCamera.SetPitchYawRollRotation( -15.f , 180.f , 0.f );
-	RandomNumberGenerator rng;
-	
-	for ( uint index = 2; index < TOTAL_LIGHTS; index++ )
-	{
-		Rgba8 color;
-		color.RollRandomColor( rng );
-		rng.manuallyIncrementPosition();
-		m_lights.lights[ index ].color = Vec3( 1.f , 1.f , 1.f ); /*color.GetAsNormalizedFloat3();*/
-		m_lights.lights[ index ].intensity = 0.5f;
-		m_lights.lights[ index ].attenuation = Vec3::UNIT_VECTOR_ALONG_K_BASIS;
-		m_lights.lights[ index ].specularAttenuation = Vec3::UNIT_VECTOR_ALONG_K_BASIS;
-		m_lights.lights[ index ].worldPosition = Vec3( index * 1.5f , 0.f , 10.f );
-		m_lights.lights[ index ].direction = Vec3::UNIT_VECTOR_ALONG_J_BASIS;
-		m_lights.lights[ index ].lightType = ( uint ) LightType::DIRECTIONAL_LIGHT;
-	}
+	m_gameCamera.SetPitchYawRollRotation( -15.f , 180.f , 0.f );	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
