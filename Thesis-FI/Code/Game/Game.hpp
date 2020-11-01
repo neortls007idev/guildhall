@@ -34,6 +34,7 @@ public:
 				void InitializeShaderMaterialData();
 				void InitializeParticleEmitters();
 				void InitializeShadowTestTrasforms();
+				void TestCaseDirectionalShadows();
 			~Game();
 
 			void Update( float deltaSeconds );

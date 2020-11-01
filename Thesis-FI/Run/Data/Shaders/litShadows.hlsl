@@ -167,7 +167,7 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
            // Subtract the bias from the lightDepthValue.
            lightDepthValue = lightDepthValue - bias;
 
-           if( lightDepthValue < depthValue )
+           if( lightDepthValue <= depthValue )
            {
 		    // Calculate the amount of light on this pixel.
                lightIntensity = saturate( dot( lightDirection[ index ] , input.world_normal ) );
@@ -175,7 +175,7 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
                if( lightIntensity > 0.f )
                {
 			    // Determine the final diffuse color based on the diffuse color and the amount of light intensity.
-                    color += float4( LIGHTS[ index ].color , lightIntensity );
+                    color += float4( LIGHTS[ index ].color , LIGHTS[ index ].intensity );
                 }
            }
        }
