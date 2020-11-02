@@ -69,7 +69,7 @@ void Game::InitializeShaderMaterialData()
 
 void Game::LoadShaders()
 {
-	m_lightShaders[ LitShaderTypes::LIT_SHADOW ]				= g_theRenderer->GetOrCreateShader( "Data/Shaders/litShadows.hlsl" );
+	m_lightShaders[ LitShaderTypes::LIT_SHADOW ]				= g_theRenderer->GetOrCreateShader( "Data/Shaders/litShadows1.hlsl" );
 	m_lightShaders[ LitShaderTypes::LIT ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/litDefault.hlsl" );
 	m_lightShaders[ LitShaderTypes::UNLIT ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/default.hlsl" );
 	m_lightShaders[ LitShaderTypes::UV ]						= g_theRenderer->GetOrCreateShader( "Data/Shaders/uvDebugger.hlsl" );
