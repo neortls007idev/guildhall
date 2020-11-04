@@ -1,9 +1,10 @@
 #include "Engine/Core/DebugRender.hpp"
+#include "Engine/Math/MathUtils.hpp"
+#include "Engine/ParticleSystem/ParticleEmitter3D.hpp"
+#include "Engine/Primitives/GPUMesh.hpp"
 #include "Game/Game.hpp"
 #include "ThirdParty/ImGUI/imgui.h"
 #include "ThirdParty/ImGUI/ImGuiFileDialog.h"
-#include "Engine/ParticleSystem/ParticleEmitter3D.hpp"
-#include "Engine/Primitives/GPUMesh.hpp"
 #include "ThirdParty/ImGUI/implot.h"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -97,14 +98,11 @@ void Game::LightSettingsGUI()
 
 		if( ImGui::TreeNode( "Currently Actively selected light( For additional movement options )" ) )
 		{
-			ImGui::RadioButton( "1"	, &m_currentLightIndex , 0 ); ImGui::SameLine();
-			ImGui::RadioButton( "2"	, &m_currentLightIndex , 1 ); ImGui::SameLine();
-			ImGui::RadioButton( "3"	, &m_currentLightIndex , 2 ); ImGui::SameLine();
-			ImGui::RadioButton( "4"	, &m_currentLightIndex , 3 ); ImGui::SameLine();
-			ImGui::RadioButton( "5"	, &m_currentLightIndex , 4 ); ImGui::SameLine();
-			ImGui::RadioButton( "6"	, &m_currentLightIndex , 5 ); ImGui::SameLine();
-			ImGui::RadioButton( "7"	, &m_currentLightIndex , 6 ); ImGui::SameLine();
-			ImGui::RadioButton( "8"	, &m_currentLightIndex , 7 );
+			for( int index = 0; index < TOTAL_LIGHTS - 1 ; index++ )
+			{
+				ImGui::RadioButton( ToString( index + 1 ).c_str() , &m_currentLightIndex , index ); ImGui::SameLine();
+			}
+			ImGui::RadioButton( ToString( ( int ) TOTAL_LIGHTS ).c_str() , &m_currentLightIndex , TOTAL_LIGHTS - 1 );
 
 			ImGui::TreePop();
 			ImGui::Separator();
@@ -175,6 +173,22 @@ void Game::LightSettingsGUI()
 
 					ImGui::TreePop();
 					ImGui::Separator();
+				}
+
+				if( m_lights.lights[ lightIndex ].lightType == 2 )
+				{
+					if ( ImGui::TreeNode( "Spot Light Cone Angles" ) )
+					{
+						ImGui::SliderFloat( "Outer Cone Angle" , ( float* ) &m_spotlightConeAngles[ lightIndex ].y , 0.f , 120.f );
+						ImGui::SliderFloat( "Inner Cone Angle" , ( float* ) &m_spotlightConeAngles[ lightIndex ].x , 0.f , m_spotlightConeAngles[ lightIndex ].y );
+
+						m_spotlightConeAngles[ lightIndex ].x = Clamp( m_spotlightConeAngles[ lightIndex ].x , 0.f , m_spotlightConeAngles[ lightIndex ].y );
+
+						UpdateSpotLightConeData( lightIndex );
+
+						ImGui::TreePop();
+						ImGui::Separator();
+					}
 				}
 
 				ImGui::TreePop();

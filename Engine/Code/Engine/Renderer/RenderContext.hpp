@@ -112,6 +112,9 @@ struct lightDataT
 
 	Vec3        specularAttenuation			= Vec3::UNIT_VECTOR_ALONG_K_BASIS;             // attenuation for specular lighting (constant,linear,quadratic), default (0,0,1)
 	float       dotOuterAngle				= -1.0f;                                       // cone light outer angle (default -1.0f) - angle at which cone lights stop affecting the object completely
+	
+	float       shadowFlag					= 1.0f;                                        // 1.0f Enable Shadows for this light 0.0f Disable Shadows for this light.
+	Vec3        pad00						= Vec3::ZERO;								   // padding to keep 16-byte structs
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

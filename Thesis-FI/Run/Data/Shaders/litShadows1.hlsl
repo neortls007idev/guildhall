@@ -153,18 +153,7 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
     float3 specular = float3( 0.0f.xxx );
     float3 emmisiveColor = float3( 0.0f.xxx );
 
-    // add up contribution of all lights
-   // for( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
-   // {
-   //     float3 lightColor = LIGHTS[ index ].color.xyz;
-   //     lightColor = pow( lightColor , GAMMA.xxx ); // assumes light color is set by a user - so sRGB space
-   //     
-   //     float2 lightFactors = ComputeLightFactor( LIGHTS[ index ] , input.world_position , worldNormal , directionToEye );
-   //
-   //     diffuse += lightFactors.x * lightColor;
-   //     specular += lightFactors.y * lightColor;
-   // }
-       
+
     // Shadow mapping requires a bias adjustment when comparing the depth of the light
 	// and the depth of the object due to the low floating point precision of the depth map.
 	
@@ -178,10 +167,12 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
     float lightIntensity;
     float4 textureColor;
     float3 lightDirection[ TOTAL_LIGHTS ];
+    
+    float2 lightFactors;
 
     for( uint lightDirIndex = 0 ; lightDirIndex < TOTAL_LIGHTS ; lightDirIndex++ )
     {
-        lightDirection[ lightDirIndex ] = -LIGHTS[ lightDirIndex ].direction;
+            lightDirection[ lightDirIndex ] = -LIGHTS[ lightDirIndex ].direction;
     }
   
    // Calculate the projected texture coordinates for sampling the shadow map (depth buffer texture) based on the light's viewing position.
@@ -189,8 +180,11 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
    //   uint index = 0;
     for( uint index = 0 ; index < TOTAL_LIGHTS ; index++ )
     {
-        float2 mapDim;
-        depthMapTexture[ index ].GetDimensions( mapDim.x , mapDim.y );
+        lightFactors = ComputeLightFactor( LIGHTS[ index ] , input.world_position , worldNormal , directionToEye );
+        
+        float3 lightColor = LIGHTS[ index ].color.xyz;
+        lightColor = pow( lightColor , GAMMA.xxx );                                                                 // assumes light color is set by a user - so sRGB space
+        
 	// Range mapping NDC space to 0 to 1
       
         projectTexCoord[ index ].x = input.lightViewPosition[ index ].x / input.lightViewPosition[ index ].w / 2.0f + 0.5f;
@@ -213,21 +207,33 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
             {
 		    // Calculate the amount of light on this pixel.
                //lightIntensity = saturate( dot( lightDirection[ index ] , input.world_normal ) );
-                lightIntensity = saturate( dot( lightDirection[ index ] , input.world_normal ) );
+                if( LIGHTS[ index ].lightType == 1 )
+                {
+                    lightIntensity = saturate( dot( lightDirection[ index ] , input.world_normal ) );
+                }
+                if( LIGHTS[ index ].lightType == 2 )
+                {
+                    lightIntensity = saturate( dot( input.world_normal , input.lightViewPosition[ index ] ) );
+                    /*saturate( dot( LIGHTS[ index ].worldPosition , input.world_normal ) );*/
+                }
 		           
                 if( lightIntensity > 0.f )
                 {
 			        // Determine the final diffuse color based on the diffuse color and the amount of light intensity.
                     //color += float4( LIGHTS[ index ].color , LIGHTS[ index ].intensity );
-                    float3 lightColor = LIGHTS[ index ].color.xyz;
-                    lightColor = pow( lightColor , GAMMA.xxx ); // assumes light color is set by a user - so sRGB space
-        
-                    float2 lightFactors = ComputeLightFactor( LIGHTS[ index ] , input.world_position , worldNormal , directionToEye );
-
-                    diffuse += lightFactors.x * lightColor;
-                    specular += lightFactors.y * lightColor;
+                    if( LIGHTS[ index ].shadowFlag > 0.f )
+                    {
+                        diffuse += lightFactors.x * lightColor;
+                        specular += lightFactors.y * lightColor;
+                    }
                 }
             }
+        }
+        
+        if( LIGHTS[ index ].shadowFlag < 1.f )
+        {
+            diffuse += lightFactors.x * lightColor;
+            specular += lightFactors.y * lightColor;
         }
     }
     

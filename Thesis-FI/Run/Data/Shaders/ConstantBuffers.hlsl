@@ -66,6 +66,9 @@ struct light_t
   
     float3          specularAttenuation;                                                    // attenuation for specular lighting (constant,linear,quadratic), default (0,0,1)
     float           dotOuterAngle;                                                          // cone light outer angle (default -1.0f) - angle at which cone lights stop affecting the object completely
+    
+    float           shadowFlag;					                                            // 1.0f Enable Shadows for this light 0.0f Disable Shadows for this light.
+	float3          pad00;						            								// padding to keep 16-byte structs
 };
 
 //--------------------------------------------------------------------------------------

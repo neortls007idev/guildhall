@@ -28,6 +28,8 @@ void Game::InitializeLightData()
 	m_lights.lights[ 0 ].specularAttenuation = Vec3::UNIT_VECTOR_ALONG_K_BASIS;
 	m_lights.lights[ 0 ].lightType = ( uint ) LightType::DIRECTIONAL_LIGHT;
 
+	m_spotlightConeAngles[ 0 ] = Vec2( 30.f , 60.f );
+	
 	RandomNumberGenerator rng;
 
 	for ( uint index = 1; index < TOTAL_LIGHTS; index++ )
@@ -42,6 +44,8 @@ void Game::InitializeLightData()
 		m_lights.lights[ index ].worldPosition = Vec3( index * 1.5f , 0.f , 10.f );
 		m_lights.lights[ index ].direction = Vec3::UNIT_VECTOR_ALONG_J_BASIS;
 		m_lights.lights[ index ].lightType = ( uint ) LightType::DIRECTIONAL_LIGHT;
+
+		m_spotlightConeAngles[ index ] = Vec2( 30.f , 60.f );
 	}
 }
 

@@ -93,6 +93,7 @@ Game::Game()
 	DebugAddWorldBasis( Mat44::IDENTITY , 60000.f , DEBUG_RENDER_ALWAYS );
 
 	TestCaseDirectionalShadows();
+	TestCaseSpotShadows();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -189,6 +190,103 @@ void Game::TestCaseDirectionalShadows()
 	m_yaw = 180.f;
 	m_pitch = -15.f;
 	m_gameCamera.SetPitchYawRollRotation( -15.f , 180.f , 0.f );	
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::TestCaseSpotShadows()
+{
+	float IND_INTENSITY = 0.0f;
+	float commonPitch = -30.f;
+	float commonDirectionFactor = 0.f;
+
+	for( int index = 0 ; index < TOTAL_LIGHTS ; index++ )
+	{
+		m_spotlightConeAngles[ index ].x = 30.f;
+		m_spotlightConeAngles[ index ].y = 30.f;
+		m_lights.lights[ index ].dotInnerAngle = CosDegrees( m_spotlightConeAngles[ index ].x );
+		m_lights.lights[ index ].dotOuterAngle = CosDegrees( m_spotlightConeAngles[ index ].y );
+	}
+
+	m_lights.lights[ 0 ].color = Vec3( 1.f , 1.f , 1.f );
+	m_lights.lights[ 0 ].intensity = 1.f;
+	m_lights.lights[ 0 ].worldPosition = Vec3( -2.f , 1.f , 2.f );
+	m_lights.lights[ 0 ].attenuation = Vec3::UNIT_VECTOR_ALONG_J_BASIS;
+	m_lights.lights[ 0 ].specularAttenuation = Vec3::UNIT_VECTOR_ALONG_I_BASIS;
+	m_lights.lights[ 0 ].lightType = ( uint ) LightType::SPOT_LIGHT;
+	m_lights.lights[ 0 ].directionFactor = commonDirectionFactor;
+	m_lights.lights[ 0 ].shadowFlag = 1.f;
+	m_lightsPitchYawRoll[ 0 ].x = commonPitch;
+	m_lightsPitchYawRoll[ 0 ].y = -45.f;
+	m_lightsPitchYawRoll[ 0 ].z = 0.f;
+
+	m_gameCamera.SetPosition( m_lights.lights[ 0 ].worldPosition );
+	m_gameCamera.SetPitchYawRollRotation( commonPitch , -45.f , 0.f );
+
+	m_lights.lights[ 0 ].direction = -m_gameCamera.GetCameraTransform().GetAsMatrix().GetKBasis3D();
+
+	//----------------------------------------------------------------------------------------------------------
+	m_lights.lights[ 1 ].color = Vec3( 1.f , 1.f , 1.f );
+	m_lights.lights[ 1 ].intensity = IND_INTENSITY;
+	m_lights.lights[ 1 ].worldPosition = Vec3( 2.f , 1.f , 2.f );
+	m_lights.lights[ 1 ].attenuation = Vec3::UNIT_VECTOR_ALONG_J_BASIS;
+	m_lights.lights[ 1 ].specularAttenuation = Vec3::UNIT_VECTOR_ALONG_I_BASIS;
+	m_lights.lights[ 1 ].lightType = ( uint ) LightType::SPOT_LIGHT;
+	m_lights.lights[ 1 ].directionFactor = commonDirectionFactor;
+	m_lights.lights[ 1 ].shadowFlag = 1.f;
+	m_lightsPitchYawRoll[ 1 ].x = commonPitch;
+	m_lightsPitchYawRoll[ 1 ].y = 45.f;
+	m_lightsPitchYawRoll[ 1 ].z = 0.f;
+
+	m_gameCamera.SetPosition( m_lights.lights[ 1 ].worldPosition );
+	m_gameCamera.SetPitchYawRollRotation( commonPitch , 45.f , 0.f );
+
+	m_lights.lights[ 1 ].direction = -m_gameCamera.GetCameraTransform().GetAsMatrix().GetKBasis3D();
+
+	//----------------------------------------------------------------------------------------------------------
+
+	m_lights.lights[ 2 ].color = Vec3( 1.f , 1.f , 1.f );
+	m_lights.lights[ 2 ].intensity = IND_INTENSITY;
+	m_lights.lights[ 2 ].worldPosition = Vec3( 2.f , 1.f , -2.f );
+	m_lights.lights[ 2 ].attenuation = Vec3::UNIT_VECTOR_ALONG_J_BASIS;
+	m_lights.lights[ 2 ].specularAttenuation = Vec3::UNIT_VECTOR_ALONG_I_BASIS;
+	m_lights.lights[ 2 ].lightType = ( uint ) LightType::SPOT_LIGHT;
+	m_lights.lights[ 2 ].directionFactor = commonDirectionFactor;
+	m_lights.lights[ 2 ].shadowFlag = 1.f;
+	m_lightsPitchYawRoll[ 2 ].x = commonPitch;
+	m_lightsPitchYawRoll[ 2 ].y = 135.f;
+	m_lightsPitchYawRoll[ 2 ].z = 0.f;
+
+	m_gameCamera.SetPosition( m_lights.lights[ 1 ].worldPosition );
+	m_gameCamera.SetPitchYawRollRotation( commonPitch , 135.f , 0.f );
+
+	m_lights.lights[ 2 ].direction = -m_gameCamera.GetCameraTransform().GetAsMatrix().GetKBasis3D();
+
+	//----------------------------------------------------------------------------------------------------------
+
+	m_lights.lights[ 3 ].color = Vec3( 1.f , 1.f , 1.f );
+	m_lights.lights[ 3 ].intensity = IND_INTENSITY;
+	m_lights.lights[ 3 ].worldPosition = Vec3( -2.f , 1.f , -2.f );
+	m_lights.lights[ 3 ].attenuation = Vec3::UNIT_VECTOR_ALONG_J_BASIS;
+	m_lights.lights[ 3 ].specularAttenuation = Vec3::UNIT_VECTOR_ALONG_I_BASIS;
+	m_lights.lights[ 3 ].lightType = ( uint ) LightType::SPOT_LIGHT;
+	m_lights.lights[ 3 ].directionFactor = commonDirectionFactor;
+	m_lights.lights[ 3 ].shadowFlag = 1.f;
+	m_lightsPitchYawRoll[ 3 ].x = commonPitch;
+	m_lightsPitchYawRoll[ 3 ].y = 225.f;
+	m_lightsPitchYawRoll[ 3 ].z = 0.f;
+
+	m_gameCamera.SetPosition( m_lights.lights[ 1 ].worldPosition );
+	m_gameCamera.SetPitchYawRollRotation( commonPitch , 225.f , 0.f );
+
+	m_lights.lights[ 3 ].direction = -m_gameCamera.GetCameraTransform().GetAsMatrix().GetKBasis3D();
+
+	//----------------------------------------------------------------------------------------------------------
+
+	m_gameCamera.SetPosition( Vec3( 0.f , 2.f , -6.f ) );
+	m_yaw = 180.f;
+	m_pitch = -15.f;
+	m_gameCamera.SetPitchYawRollRotation( -15.f , 180.f , 0.f );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -516,9 +614,21 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 
 	for( uint lightIndex = 0 ; lightIndex < TOTAL_LIGHTS ; lightIndex++  )
 	{
-		m_lightsOrtho3DCamera.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
-		m_lightsOrtho3DCamera.SetPitchYawRollRotation( m_lightsPitchYawRoll[ lightIndex ].x , m_lightsPitchYawRoll[ lightIndex ].y , 0.f );
-		g_theRenderer->SetLightsView( lightIndex , m_lightsOrtho3DCamera.GetProjectionMatrix() , m_lightsOrtho3DCamera.GetViewMatrix() );
+		if( m_lights.lights[ lightIndex ].lightType == 1 )
+		{
+			m_lightsOrtho3DCamera.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
+			m_lightsOrtho3DCamera.SetPitchYawRollRotation( m_lightsPitchYawRoll[ lightIndex ].x , m_lightsPitchYawRoll[ lightIndex ].y , 0.f );
+			g_theRenderer->SetLightsView( lightIndex , m_lightsOrtho3DCamera.GetProjectionMatrix() , m_lightsOrtho3DCamera.GetViewMatrix() );
+		}
+
+		else if ( m_lights.lights[ lightIndex ].lightType == 2 )
+		{
+			m_lightsProjectionCamera.SetProjectionPerspective( m_spotlightConeAngles[ lightIndex ].y , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
+			m_lightsProjectionCamera.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
+			m_lightsProjectionCamera.SetPitchYawRollRotation( m_lightsPitchYawRoll[ lightIndex ].x , m_lightsPitchYawRoll[ lightIndex ].y , 0.f );
+			//g_theRenderer->SetLightsView( lightIndex , m_lightsProjectionCamera.GetProjectionMatrix() );
+			g_theRenderer->SetLightsView( lightIndex , m_lightsProjectionCamera.GetProjectionMatrix() , m_lightsProjectionCamera.GetViewMatrix() );
+		}
 	}
 	//g_theRenderer->SetLightsView( m_currentLightIndex , m_gameCamera.GetProjectionMatrix() );
 	
@@ -758,6 +868,41 @@ void Game::RenderFresnelShader2ndPass() const
 void Game::RenderShadowMapPass() const
 {
 	RenderOrthoShadowMapPass();
+	RenderSpotShadowMapPass();
+	ClearShadowMapsForNonShadowCastingLights();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::ClearShadowMapsForNonShadowCastingLights() const
+{
+	if ( m_currentShaderIndex != LIT_SHADOW )
+	{
+		return;
+	}
+
+	g_D3D11PerfMarker->BeginPerformanceMarker( L"Clear Shadow Maps for Non Shadow Casting Lights" );
+
+	for ( uint lightIndex = 0; lightIndex < TOTAL_LIGHTS; lightIndex++ )
+	{
+		if( m_lights.lights[ lightIndex ].lightType == POINT_LIGHT )
+		{
+			m_lightsOrtho3DCamera.SetColorTarget( 0 , m_shadowMap[ lightIndex ] );
+			g_theRenderer->BeginCamera( m_lightsOrtho3DCamera );
+			g_theRenderer->EndCamera( m_lightsOrtho3DCamera );
+			continue;
+		}
+		if( ( m_lights.lights[ lightIndex ].lightType != POINT_LIGHT ) &&
+			( m_lights.lights[ lightIndex ].intensity < 0.001f ) || ( m_lights.lights[ lightIndex ].shadowFlag == 0.f ) )
+		{
+			m_lightsOrtho3DCamera.SetColorTarget( 0 , m_shadowMap[ lightIndex ] );
+			g_theRenderer->BeginCamera( m_lightsOrtho3DCamera );
+			g_theRenderer->EndCamera( m_lightsOrtho3DCamera );
+			continue;
+		}
+	}
+
+	g_D3D11PerfMarker->EndPerformanceMarker();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -769,23 +914,17 @@ void Game::RenderOrthoShadowMapPass() const
 		return;
 	}
 
-	g_D3D11PerfMarker->BeginPerformanceMarker( L"Shadow Map Direcional Light Render Pass Start" );
+	g_D3D11PerfMarker->BeginPerformanceMarker( L"Shadow Map Directional Light Render Pass Start" );
 
 	for ( uint lightIndex = 0; lightIndex < TOTAL_LIGHTS; lightIndex++ )
 	{
 		if ( m_lights.lights[ lightIndex ].lightType != DIRECTIONAL_LIGHT )
 		{
-			m_lightsOrtho3DCamera.SetColorTarget( 0 , m_shadowMap[ lightIndex ] );
-			g_theRenderer->BeginCamera( m_lightsOrtho3DCamera );
-			g_theRenderer->EndCamera( m_lightsOrtho3DCamera );
 			continue;
 		}
 
-		if( m_lights.lights[ lightIndex ].intensity < 0.001f )
+		if( ( m_lights.lights[ lightIndex ].intensity < 0.001f ) || ( m_lights.lights[ lightIndex ].shadowFlag == 0.f ) )
 		{
-			m_lightsOrtho3DCamera.SetColorTarget( 0 , m_shadowMap[ lightIndex ] );
-			g_theRenderer->BeginCamera( m_lightsOrtho3DCamera );
-			g_theRenderer->EndCamera( m_lightsOrtho3DCamera );
 			continue;
 		}
 
@@ -860,9 +999,102 @@ void Game::RenderOrthoShadowMapPass() const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Game::RenderPerspectiveShadowMapPass() const
+void Game::RenderSpotShadowMapPass() const
 {
+	if ( m_currentShaderIndex != LIT_SHADOW )
+	{
+		return;
+	}
 
+	g_D3D11PerfMarker->BeginPerformanceMarker( L"Shadow Map Spot Light Render Pass Start" );
+
+	for ( uint lightIndex = 0; lightIndex < TOTAL_LIGHTS; lightIndex++ )
+	{
+		if ( ( m_lights.lights[ lightIndex ].intensity < 0.001f ) || ( m_lights.lights[ lightIndex ].shadowFlag == 0.f ) )
+		{
+			continue;
+		}
+
+		if ( ( m_lights.lights[ lightIndex ].lightType == SPOT_LIGHT ) )
+		{
+			m_lightsProjectionCamera.SetColorTarget( 0 , m_shadowMap[ lightIndex ] );
+
+			std::wstring passName = L"Light " + std::to_wstring( lightIndex ) + L" Shadow Map Render Pass Start";
+
+			m_lightsProjectionCamera.SetProjectionPerspective( m_spotlightConeAngles[ lightIndex ].y , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
+			m_lightsProjectionCamera.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
+			m_lightsProjectionCamera.SetPitchYawRollRotation( m_lightsPitchYawRoll[ lightIndex ].x , m_lightsPitchYawRoll[ lightIndex ].y , 0.f );
+
+			g_D3D11PerfMarker->BeginPerformanceMarker( passName.c_str() );
+			g_D3D11PerfMarker->BeginPerformanceMarker( L"Initializing State" );
+
+			g_theRenderer->BeginCamera( m_lightsProjectionCamera );
+
+//			if ( m_lights.lights[ lightIndex ].lightType == SPOT_LIGHT )
+//			{
+//				m_lightsProjectionCamera.m_view.Kx = -m_lights.lights[ lightIndex ].direction.x;
+//				m_lightsProjectionCamera.m_view.Ky = -m_lights.lights[ lightIndex ].direction.y;
+//				m_lightsProjectionCamera.m_view.Kz = -m_lights.lights[ lightIndex ].direction.z;
+//				m_lightsProjectionCamera.upda ForceUpdateUBO( g_theRenderer );
+//			}
+
+			m_lightsProjectionCamera.CreateMatchingDepthStencilTarget();
+			g_theRenderer->BindDepthStencil( m_lightsProjectionCamera.GetDepthStencilTarget() );
+			g_theRenderer->BindShader( nullptr );
+			g_theRenderer->BindCubeMapTexture( nullptr );
+			g_theRenderer->BindSampler( m_bilinear );
+			g_theRenderer->BindSampler( m_linear , 2 );
+
+			g_theRenderer->SetRasterState( FILL_SOLID );
+
+			g_theRenderer->SetCullMode( CULL_BACK );
+			g_theRenderer->SetDepthTest( COMPARE_LEQUAL , true );
+
+			g_theRenderer->SetAmbientLight( m_ambientLightColor , m_lights.ambientLight.w );
+
+			g_theRenderer->UpdateLightsData( m_lights );
+			g_theRenderer->EnableAllLights();
+			g_theRenderer->SetSpecularFactor( m_lights.SPECULAR_FACTOR );
+			g_theRenderer->SetSpecularPower( m_lights.SPECULAR_POWER );
+			g_theRenderer->SetLightsView( lightIndex , m_lightsProjectionCamera.GetProjectionMatrix() , m_lightsProjectionCamera.GetViewMatrix() );
+//			g_theRenderer->SetLightsView( lightIndex , m_lightsProjectionCamera.GetProjectionMatrix() );
+
+			g_theRenderer->BindShader( m_depthShader );
+			g_theRenderer->BindTexture( m_tileDiffuse );
+			g_theRenderer->BindTexture( m_tileNormal , eTextureType::TEX_NORMAL );
+
+			g_theRenderer->EnableFog( m_fogData );
+
+			BindShaderSpecificMaterialData();
+			g_D3D11PerfMarker->EndPerformanceMarker();
+
+			g_D3D11PerfMarker->BeginPerformanceMarker( L"Test Meshes" );
+
+			g_theRenderer->SetModelMatrix( m_sphereMeshTransform.GetAsMatrix() );
+			g_theRenderer->DrawMesh( m_meshSphere );
+
+			g_theRenderer->DisableFog();
+
+			g_theRenderer->SetModelMatrix( m_quadTransform.GetAsMatrix() );
+			g_theRenderer->DrawMesh( m_quadMesh );
+
+			g_theRenderer->SetModelMatrix( Mat44::IDENTITY );
+			g_theRenderer->DrawMesh( m_cubeMesh );
+
+			g_D3D11PerfMarker->EndPerformanceMarker();
+
+			g_D3D11PerfMarker->BeginPerformanceMarker( L"Render all OBJ Models" );
+
+			//RenderAllModelInstances();
+
+			g_D3D11PerfMarker->EndPerformanceMarker();
+
+			g_theRenderer->EndCamera( m_lightsProjectionCamera );
+
+			g_D3D11PerfMarker->EndPerformanceMarker();
+		}
+	}
+	g_D3D11PerfMarker->EndPerformanceMarker();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -958,6 +1190,9 @@ void Game::UpdateLightData( int lightIndex )
 				m_lights.lights[ lightIndex ].directionFactor = 0.f;
 				m_lights.lights[ lightIndex ].dotInnerAngle = -1.f;
 				m_lights.lights[ lightIndex ].dotOuterAngle = -1.f;
+				m_lights.lights[ lightIndex ].shadowFlag = 0.f;
+				m_lights.lights[ lightIndex ].attenuation = Vec3::UNIT_VECTOR_ALONG_K_BASIS;
+				m_lights.lights[ lightIndex ].specularAttenuation = Vec3::UNIT_VECTOR_ALONG_I_BASIS;
 			}	break;
 
 		case DIRECTIONAL_LIGHT:
@@ -967,6 +1202,9 @@ void Game::UpdateLightData( int lightIndex )
 				//m_lights.lights[ lightIndex ].direction = -direction;
 				m_lights.lights[ lightIndex ].dotInnerAngle = -1.f;
 				m_lights.lights[ lightIndex ].dotOuterAngle = -1.f;
+				m_lights.lights[ lightIndex ].attenuation = Vec3::ZERO;
+				m_lights.lights[ lightIndex ].specularAttenuation = Vec3::ZERO;
+				m_lights.lights[ lightIndex ].shadowFlag = 1.f;
 			}	break;
 
 		case SPOT_LIGHT:
@@ -974,10 +1212,21 @@ void Game::UpdateLightData( int lightIndex )
 				m_lights.lights[ lightIndex ].directionFactor = 0.f;
 				Vec3 direction = m_gameCamera.GetCameraTransform().GetAsMatrix().GetKBasis3D();
 				m_lights.lights[ lightIndex ].direction = -direction;
-				m_lights.lights[ lightIndex ].dotInnerAngle = CosDegrees( 15.f );
-				m_lights.lights[ lightIndex ].dotOuterAngle = CosDegrees( 30.f );
+				m_lights.lights[ lightIndex ].attenuation = Vec3::UNIT_VECTOR_ALONG_J_BASIS;
+				m_lights.lights[ lightIndex ].specularAttenuation = Vec3::UNIT_VECTOR_ALONG_I_BASIS;
+				m_lights.lights[ lightIndex ].dotInnerAngle = CosDegrees( m_spotlightConeAngles[ lightIndex ].x );
+				m_lights.lights[ lightIndex ].dotOuterAngle = CosDegrees( m_spotlightConeAngles[ lightIndex ].y );
+				m_lights.lights[ lightIndex ].shadowFlag = 1.f;
 			}	break;
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateSpotLightConeData( int lightIndex )
+{
+	m_lights.lights[ lightIndex ].dotInnerAngle = CosDegrees( m_spotlightConeAngles[ lightIndex ].x );
+	m_lights.lights[ lightIndex ].dotOuterAngle = CosDegrees( m_spotlightConeAngles[ lightIndex ].y );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -35,6 +35,7 @@ public:
 				void InitializeParticleEmitters();
 				void InitializeShadowTestTrasforms();
 				void TestCaseDirectionalShadows();
+				void TestCaseSpotShadows();
 			~Game();
 
 			void Update( float deltaSeconds );
@@ -48,8 +49,9 @@ public:
 				void BindShaderSpecificMaterialData() const;
 				void RenderFresnelShader2ndPass() const;
 				void RenderShadowMapPass() const;
+					void ClearShadowMapsForNonShadowCastingLights() const;
 					void RenderOrthoShadowMapPass() const;
-					void RenderPerspectiveShadowMapPass() const;
+					void RenderSpotShadowMapPass() const;
 
 private:
 			void DebugUI();
@@ -60,6 +62,7 @@ private:
 						void SetLightPositionToCameraPos( int lightIndex );
 						void SetLightDirectionToCameraForwardVector( int lightIndex );
 						void UpdateLightData( int lightIndex );
+						void UpdateSpotLightConeData( int lightIndex );
 					void EffectsSettingsUI();
 						void UpdateToneMapData();
 					void SceneSetupGUI();
@@ -111,6 +114,7 @@ public:
 	//				LIGHTS DATA
 	//--------------------------------------------------------------------------------------------------------------------------------------------	
 	shaderLightDataT					m_lights;
+	Vec2								m_spotlightConeAngles[ TOTAL_LIGHTS ];
 	Rgba8								m_ambientLightColor;
 	mutable Camera						m_lightsOrtho3DCamera;
 	mutable Camera						m_lightsProjectionCamera;
