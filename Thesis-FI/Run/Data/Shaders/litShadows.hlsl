@@ -46,6 +46,7 @@ struct v2f_t
     float4 world_tangent        : WORLD_TANGENT;
 
     float4 lightViewPosition[ TOTAL_LIGHTS ] : LIGHTVIEWPOS;
+    float3 lightPos[ TOTAL_LIGHTS ] : LIGHTPOS;
 };
 
 //--------------------------------------------------------------------------------------
@@ -90,7 +91,7 @@ v2f_t VertexFunction(vs_input_t input)
         temp = mul( LIGHT_VIEW[ lightIndex ].LIGHT_PROJECTION , v2f.lightViewPosition[ lightIndex ] );
         v2f.lightViewPosition[ lightIndex ] = temp;
 
-        //v2f.lightPos[ lightIndex ] = normalize( LIGHTS[ lightIndex ].worldPosition.xyz - world_pos.xyz );
+        v2f.lightPos[ lightIndex ] = normalize( LIGHTS[ lightIndex ].worldPosition.xyz - world_pos.xyz );
     }
 		
     v2f.position            = clip_pos;                                                             // we want to output the clip position to raster (a perspective point)
@@ -171,8 +172,10 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
            if( lightDepthValue < depthValue )
            {
 		    // Calculate the amount of light on this pixel.
-               //lightIntensity = saturate( dot( lightDirection[ index ] , input.world_normal ) );
                lightIntensity = saturate( dot( lightDirection[ index ] , input.world_normal ) );
+               
+               //lightIntensity = saturate( dot( input.lightPos[ index ] , input.world_normal ) );
+               //lightIntensity = saturate( dot( input.world_normal , input.lightPos[ index ] ) );
 		           
                if( lightIntensity > 0.f )
                {

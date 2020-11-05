@@ -44,7 +44,7 @@ struct	ID3D11DepthStencilState;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-constexpr uint TOTAL_LIGHTS = 4;
+constexpr uint TOTAL_LIGHTS = 1;
 //float GAMMA = 2.2f;
 //float INVERSE_GAMMA = 1 / GAMMA;
 

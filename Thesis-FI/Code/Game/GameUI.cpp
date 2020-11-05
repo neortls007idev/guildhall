@@ -191,6 +191,17 @@ void Game::LightSettingsGUI()
 					}
 				}
 
+				if ( m_lights.lights[ lightIndex ].lightType != 0 )
+				{
+					if ( ImGui::TreeNode( "Shadow Parameters" ) )
+					{
+						ImGui::DragFloat( "Enable Shadow" , &m_lights.lights[ lightIndex ].shadowFlag , 1.f , 0.f , 1.f );
+												
+						ImGui::TreePop();
+						ImGui::Separator();
+					}
+				}
+
 				ImGui::TreePop();
 				ImGui::Separator();
 			}

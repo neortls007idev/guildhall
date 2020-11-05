@@ -229,7 +229,7 @@ void ParticleEmitter3D::Update( float deltaSeconds )
 		lookAt.Iw = ibasis.w;
 
 		Transform3DAndAppendVertsForAABB2( m_particleVerts , particle->m_cosmeticBounds , particle->m_startColor ,
-			minUVs , maxUVs , particle->m_position , lookAt );
+			minUVs , maxUVs , particle->m_position , m_targetViewMat );
 	}
 }
 

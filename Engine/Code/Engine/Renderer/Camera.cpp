@@ -347,6 +347,34 @@ RenderBuffer* Camera::UpdateUBO( RenderContext* ctx )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+RenderBuffer* Camera::ForceUpdateUBO( RenderContext* ctx )
+{
+	if ( m_cameraUBO == nullptr )
+	{
+		m_cameraUBO = new RenderBuffer( ctx , UNIFORM_BUFFER_BIT , MEMORY_HINT_DYNAMIC );
+	}
+
+	//m_cameraUBO->Update()
+
+	CameraDataT cameraData;
+
+	cameraData.cameraToClipTransform = m_projection;
+
+	// CameraToWorld Space Transform
+	// View -> worldToCamera
+	// Mat44 View  = Invert(cameraModel);
+
+	cameraData.view		= m_view;
+	cameraData.position = GetPosition();
+	
+	//m_cameraUBO->m_isDirty = true;
+	m_cameraUBO->Update( &cameraData , sizeof( cameraData ) , sizeof( cameraData ) );
+
+	return m_cameraUBO;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 Texture* Camera::GetColorTarget() const
 {
 	if ( m_colorTargets.size() == 0 )

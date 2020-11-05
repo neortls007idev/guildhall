@@ -15,7 +15,6 @@ extern ParticleSystem3D*	g_theParticleSystem3D;
 
 void Game::InitializeLightData()
 {
-
 	constexpr float AMBIENT_INITITAL_INTENSITY = 0.2f;
 	constexpr float INITIAL_INTENSITY_PER_LIGHT = ( 1.f - AMBIENT_INITITAL_INTENSITY ) / 8.f/*TOTAL_LIGHTS*/;
 

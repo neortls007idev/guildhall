@@ -64,7 +64,8 @@ public:
 	
 	Frustum							m_viewFrustum;
 	Vec3							m_targetPos					= Vec3::ZERO;
-		
+	Mat44							m_targetViewMat;
+
 	Vec3							m_position					= Vec3::ZERO;
 	Vec3							m_velocity					= Vec3::ZERO;
 	bool							m_areParticlesBillboarded	= true;
