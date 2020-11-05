@@ -139,7 +139,7 @@ float4 FragmentFunction(v2f_t input) : SV_Target0
 	// DEPTH DEBUGGING
     float   depthValue;
     
-    depthValue = input.position.z / input.position.w;
+    depthValue = input.position.z;
 		// First 10% of the depth buffer color red.
 
     return float4( depthValue.xxx , 1.f );

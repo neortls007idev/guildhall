@@ -36,6 +36,8 @@ public:
 				void InitializeShadowTestTrasforms();
 				void TestCaseDirectionalShadows();
 				void TestCaseSpotShadows();
+				void TestCaseSpotShadows2();
+				void TestCaseDirectionalAndSpotShadows();
 			~Game();
 
 			void Update( float deltaSeconds );
