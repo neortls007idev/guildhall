@@ -135,7 +135,7 @@ void Game::AddScreenShakeIntensity( float deltaShakeIntensity )
 
 void Game::LoadAssets()
 {
-	TileDefinition::CreateTileDefinitions();
+	TileDefinition::CreateTileDefinitions( "Data/GamePlay/TileDefs.xml" );
 	LoadAllEntityTextures();
 	//LoadAllSounds();
 }

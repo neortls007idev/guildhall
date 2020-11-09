@@ -36,11 +36,16 @@ Map::Map( Game* theGame , IntVec2 size , int MapNumber ) : m_theGame( theGame ) 
 //						INITIALIZING ALL TILES TO GRASSTILES
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-	for ( int verticalIndex = 0; verticalIndex < m_size.y; verticalIndex ++ )
+	TileDefinition* defaultTile = TileDefinition::s_definitions.at( "defaultTerrain" );
+
+	if( defaultTile != nullptr )
 	{
-		for ( int horizontalIndex = 0; horizontalIndex < m_size.x; horizontalIndex ++ )
+		for ( int verticalIndex = 0; verticalIndex < m_size.y; verticalIndex ++ )
 		{
-			m_tiles.push_back( Tile( IntVec2( horizontalIndex , verticalIndex ) , TILE_TYPE_DEFAULT ) );
+			for ( int horizontalIndex = 0; horizontalIndex < m_size.x; horizontalIndex ++ )
+			{
+				m_tiles.push_back( Tile( IntVec2( horizontalIndex , verticalIndex ) , defaultTile ) );
+			}
 		}
 	}
 		
@@ -48,8 +53,8 @@ Map::Map( Game* theGame , IntVec2 size , int MapNumber ) : m_theGame( theGame ) 
 //						INITIALIZING ALL TILES AND ENTITIES AS NECESSARY
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-	RandomizeStoneTiles();
-	RandomizeMudTiles();
+//	RandomizeStoneTiles();
+//	RandomizeMudTiles();
 // 	if ( MapNumber >= 1 && MapNumber != 2)
 // 	{
 // 		SpawnWorms( MAX_NUMBER_OF_LAVA_WORMS , TILE_TYPE_LAVA );
@@ -62,20 +67,15 @@ Map::Map( Game* theGame , IntVec2 size , int MapNumber ) : m_theGame( theGame ) 
 	OuterBoundaryWalls();
 	SafeZonesBoundary();
 	IntVec2 startPosition = IntVec2( 1 , 1 );
-	bool mapvalidity = CheckMapValidityUsingFloodFill( startPosition , IntVec2( m_exitPosition ) );
-	SetUnreachedTilesToStone();
-	if ( !mapvalidity )
-	{
-		delete this;
-		return;
-	}
+//	bool mapvalidity = CheckMapValidityUsingFloodFill( startPosition , IntVec2( m_exitPosition ) );
+	
 	SafeZones();
 	OuterBoundaryWalls();
 	SafeZonesBoundary();
 
 	InitializeTileVertices();
 	//SpawnNewEntity( PLAYERTANK_ENTITY , FACTION_ALLY , Vec2( 1.5f , 1.5f ) , 45.f );
-	InitialNPCSpawner();
+	// InitialNPCSpawner();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -267,35 +267,35 @@ void Map::ResolveEntityWorldCollision( Entity* entity )
 
 		float entityPhysicsRadius = entity->m_physicsRadius;
 			
-		if ( IsTileTypeSolid( m_tiles[ leftIndex ].m_type ) )
+		if ( m_tiles[ leftIndex ].IsSolid() )
 		{
 			PushDiscOutOfAABB( entityPosition , entityPhysicsRadius , leftAABB );
 		}
-		if ( IsTileTypeSolid( m_tiles[ rightIndex ].m_type ) )
+		if ( m_tiles[ rightIndex ].IsSolid() )
 		{
 			PushDiscOutOfAABB( entityPosition , entityPhysicsRadius , rightAABB );
 		}
-		if ( IsTileTypeSolid( m_tiles[ upIndex ].m_type ) )
+		if ( m_tiles[ upIndex ].IsSolid() )
 		{
 			PushDiscOutOfAABB( entityPosition , entityPhysicsRadius , upAABB );
 		}
-		if ( IsTileTypeSolid( m_tiles[ downIndex ].m_type ) )
+		if ( m_tiles[ downIndex ].IsSolid() )
 		{
 			PushDiscOutOfAABB( entityPosition , entityPhysicsRadius , downAABB );
 		}
-		if ( IsTileTypeSolid( m_tiles[ topRighttIndex ].m_type ) )
+		if ( m_tiles[ topRighttIndex ].IsSolid() )
 		{
 			PushDiscOutOfAABB( entityPosition , entityPhysicsRadius , topRightAABB );
 		}
-		if ( IsTileTypeSolid( m_tiles[ topLeftIndex ].m_type ) )
+		if ( m_tiles[ topLeftIndex ].IsSolid() )
 		{
 			PushDiscOutOfAABB( entityPosition , entityPhysicsRadius , topLeftAABB );
 		}
-		if ( IsTileTypeSolid( m_tiles[ bottomRightIndex ].m_type ) )
+		if ( m_tiles[ bottomRightIndex ].IsSolid() )
 		{
 			PushDiscOutOfAABB( entityPosition , entityPhysicsRadius , bottomRightAABB );
 		}
-		if ( IsTileTypeSolid( m_tiles[ bottomLeftIndex ].m_type ) )
+		if ( m_tiles[ bottomLeftIndex ].IsSolid() )
 		{
 			PushDiscOutOfAABB( entityPosition , entityPhysicsRadius , bottomLeftAABB );
 		}
@@ -308,7 +308,7 @@ void Map::ResolveEntityWorldCollision( Entity* entity )
 		int currentTileIndex = GetTileIndexforTileCoords( currentTileCoords );
 		AABB2 currentAABB = AABB2( currentTileCoords.x , currentTileCoords.y , currentTileCoords.x + 1 , currentTileCoords.y + 1 );
 							   
-		if ( m_tiles[ leftIndex ].m_type == TILE_TYPE_MUD && DoDiscAndAABBOverlap( entityPosition , entityPhysicsRadius , leftAABB ) )
+/*		if ( m_tiles[ leftIndex ].m_type == TILE_TYPE_MUD && DoDiscAndAABBOverlap( entityPosition , entityPhysicsRadius , leftAABB ) )
 		{
 			entity->m_velocity = entity->m_velocity * 0.5f;
 		}
@@ -348,7 +348,7 @@ void Map::ResolveEntityWorldCollision( Entity* entity )
 		{
 			entity->m_velocity = entityOriginalVelocity;
 		}
-
+		*/
 	entity->m_position = entityPosition;
 	}
 
@@ -356,7 +356,7 @@ void Map::ResolveEntityWorldCollision( Entity* entity )
 	{
 		for ( int tileIndex = 0; tileIndex < ( int ) m_tiles.size(); tileIndex++ )
 		{
-			if ( IsTileTypeSolid( m_tiles[ tileIndex ].m_type ) )
+			if ( m_tiles[ tileIndex ].IsSolid() )
 			{
 				AABB2 box = AABB2( ( float ) m_tiles[ tileIndex ].m_tileCoords.x , ( float ) m_tiles[ tileIndex ].m_tileCoords.y ,
 									( float ) m_tiles[ tileIndex ].m_tileCoords.x + 1 , ( float ) m_tiles[ tileIndex ].m_tileCoords.y + 1 );
@@ -508,7 +508,7 @@ RayCastResult Map::RayCast( Vec2 startPosition , Vec2 forwardDirection , float m
 		IntVec2 currentTileCoords = IntVec2( RoundDownToInt( endPosition.x ) , RoundDownToInt( endPosition.y ) );
 		int index = ( currentTileCoords.y * m_size.x ) + currentTileCoords.x;
 
-		if ( IsTileTypeSolid(m_tiles[index].m_type) )
+		if ( m_tiles[index].IsSolid() )
 		{
 			rayCastResult.m_didImpact = true;
 			rayCastResult.m_impactDistance = currentDistance;
@@ -554,7 +554,7 @@ bool Map::InLineOfSight( Vec2& endPosition , Vec2& startPosition , float maxDist
 
 bool Map::IsTileSolid( const Tile& tile )const
 {
-	return IsTileTypeSolid( tile.GetTileType() );	
+	return tile.IsSolid();	
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -594,70 +594,25 @@ Vec2 Map::GetTileCenter( IntVec2 tileCoords ) const
 
 void Map::OuterBoundaryWalls()
 {
+	TileDefinition* stone = TileDefinition::s_definitions.at( "edgeTileTerrain" );
+
 	for ( int horizontalIndex = 0; horizontalIndex < m_size.x; horizontalIndex++ )
 	{
-		m_tiles[ horizontalIndex ].SetTileType( TILE_TYPE_EDGETILE );
+		m_tiles[ horizontalIndex ].m_tileDef = stone;
 	}
 	for ( int verticalIndex = 1; verticalIndex < m_size.y; verticalIndex++ )
 	{
 		int index =  verticalIndex * m_size.x ;
 		int index2 = index - 1;
-		m_tiles[ index2 ].SetTileType( TILE_TYPE_EDGETILE );
-		m_tiles[ index ].SetTileType( TILE_TYPE_EDGETILE );
+		m_tiles[ index2 ].m_tileDef = stone;
+		m_tiles[ index ].m_tileDef = stone;
 	}
 	
 	for ( int horizontalIndex = 0; horizontalIndex < m_size.x; horizontalIndex++ )
 	{
 		int index = ((m_size.y-1)*m_size.x) + horizontalIndex;
-		m_tiles[ index ].SetTileType( TILE_TYPE_EDGETILE );
+		m_tiles[ index ].m_tileDef = stone;
 	}
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Map::SpawnWorms( int numberOfWormsToSpawn , Tiletype wormType )
-{
-	for ( int currentWormNum = 0; currentWormNum < numberOfWormsToSpawn * ( m_thisMapNumber + 1 ); currentWormNum++ )
-	{
-
-		IntVec2 tileCoords;
-		tileCoords.x = g_RNG->RollRandomIntInRange( 1 , m_size.x - 2 );
-		tileCoords.y = g_RNG->RollRandomIntInRange( 1 , m_size.y - 2 );
-		int wormLength = g_RNG->RollRandomIntInRange( MIN_WORM_LENGTH , MAX_WORM_LENGTH );
-		//int wormCurrentLength = 0;
-		int tileIndex = ( tileCoords.y * m_size.x ) + tileCoords.x;
-		for ( int wormCurrentLength = 0; wormCurrentLength < wormLength; wormCurrentLength++ )
-		{
-
-			IntVec2 nextTile = tileCoords;
-			int nextTileMovement = g_RNG->RollRandomIntInRange( 0 , 1 );
-			int nextTileVariation = g_RNG->RollRandomIntInRange( -1 , 1 );
-
-			if ( nextTileMovement == 0 )
-			{ tileCoords.x += nextTileVariation; }
-			else
-			{ tileCoords.y += nextTileVariation; }
-
-			tileIndex = ( tileCoords.y * m_size.x ) + tileCoords.x;
-
-			int currentTileIndex = GetTileIndexforTileCoords( tileCoords );
-			m_tiles[ currentTileIndex ].SetTileType( wormType );
-		}
-	}
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Map::RandomizeStoneTiles()
-{
-	SpawnWorms( MAX_NUMBER_OF_STONE_WORMS , TILE_TYPE_STONE );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Map::RandomizeMudTiles()
-{
-	SpawnWorms( MAX_NUMBER_OF_MUD_WORMS , TILE_TYPE_MUD );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -667,81 +622,29 @@ void Map::SafeZones()
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //									SPAWN SAFEZONE
 //--------------------------------------------------------------------------------------------------------------------------------------------
-	
+	TileDefinition* start = TileDefinition::s_definitions.at( "startAreaTerrain" );
+
 	for (int verticalIndex = 1; verticalIndex < 6; verticalIndex++)
 	{
 		for ( int horizontalIndex = 1; horizontalIndex < 6; horizontalIndex++ )
 		{
 			int index = ( verticalIndex * m_size.x ) + horizontalIndex;
-			m_tiles[ index ].SetTileType( TILE_TYPE_STARTAREA_TILE );
+			m_tiles[ index ].m_tileDef = start;
 		}
 	}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //									FINISH SAFEZONE
 //--------------------------------------------------------------------------------------------------------------------------------------------
+	TileDefinition* endZone = TileDefinition::s_definitions.at( "exitAreaTerrain" );
 
 	for ( int verticalIndex = m_size.y - 1; verticalIndex > m_size.y - 7; verticalIndex-- )
 	{
 		for ( int horizontalIndex = m_size.x - 1; horizontalIndex > m_size.x - 7; horizontalIndex-- )
 		{
 			int index = ( verticalIndex * m_size.x ) + horizontalIndex;
-			m_tiles[ index ].SetTileType( TILE_TYPE_EXITAREA_TILE );
+			m_tiles[ index ].m_tileDef = endZone;
 		}
-	}
-}
-
-bool Map::CheckMapValidityUsingFloodFill( IntVec2 startTile , IntVec2 endTile )
-{
-	bool hasAnythingChanged = true;
-	//bool hasReached
-	int startTileIndex = GetTileIndexforTileCoords( startTile );
-	m_tiles[ startTileIndex ].m_hasBeenSeen = true;
-	int tilesTraversed = 0;
-	while ( hasAnythingChanged )
-	{
-		hasAnythingChanged = false;
-	
-		for ( int currentTileIndex = startTileIndex + 1; currentTileIndex < ( int ) m_tiles.size(); currentTileIndex++ )
-		{
-			IntVec2 currentTile = GetTileCoordsforTileIndex( currentTileIndex );
-			IntVec2 northTile = IntVec2( currentTile.x , currentTile.y + 1 );
-			IntVec2 southTile = IntVec2( currentTile.x , currentTile.y - 1 );
-			IntVec2 eastTile = IntVec2( currentTile.x + 1 , currentTile.y );
-			IntVec2 westTile = IntVec2( currentTile.x - 1 , currentTile.y );
-
-			int northTileIndex = GetTileIndexforTileCoords( northTile );
-			int southTileIndex = GetTileIndexforTileCoords( southTile );
-			int eastTileIndex = GetTileIndexforTileCoords( eastTile );
-			int westTileIndex = GetTileIndexforTileCoords( westTile );
-			
-
-			if (  !IsTileSolid( m_tiles[ currentTileIndex ] )  &&  
-				( m_tiles[ northTileIndex ].m_hasBeenSeen || m_tiles[ southTileIndex ].m_hasBeenSeen || 
-				  m_tiles[ eastTileIndex ].m_hasBeenSeen || m_tiles[westTileIndex].m_hasBeenSeen )
-				)
-			{
-				if ( !m_tiles[currentTileIndex].m_hasBeenSeen)
-				{
-					m_tiles[ currentTileIndex ].m_hasBeenSeen = true;
-					tilesTraversed++;
-					hasAnythingChanged = true;
-				}
-			}
-
-			if ( m_tiles[ GetTileIndexforTileCoords( endTile ) ].m_hasBeenSeen )
-			{
-				return true;
-			}
-		}
-	}
-	if (  m_tiles[GetTileIndexforTileCoords(endTile)].m_hasBeenSeen )
-	{
-		return true;
-	}
-	else
-	{
-		return false;
 	}
 }
 
@@ -749,56 +652,57 @@ bool Map::CheckMapValidityUsingFloodFill( IntVec2 startTile , IntVec2 endTile )
 
 void Map::SafeZonesBoundary()
 {
+	TileDefinition* stone = TileDefinition::s_definitions.at( "edgeTileTerrain" );
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //									 SPAWN SAFE ZONE BOUNDARY
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 	int index = ( int ) ( ( 2 * m_size.x ) + 4 );
-	m_tiles[ index ].SetTileType( TILE_TYPE_STONE );
+	m_tiles[ index ].m_tileDef = stone;
 
 	index = ( int ) ( ( 3 * m_size.x ) + 4 );
-	m_tiles[ index ].SetTileType( TILE_TYPE_STONE );
+	m_tiles[ index ].m_tileDef = stone;
 
 	index = ( int ) ( ( 4 * m_size.x ) + 2 );
-	m_tiles[ index ].SetTileType( TILE_TYPE_STONE );
+	m_tiles[ index ].m_tileDef = stone;
 
 	index = ( int ) ( ( 4 * m_size.x ) + 3 );
-	m_tiles[ index ].SetTileType( TILE_TYPE_STONE );
+	m_tiles[ index ].m_tileDef = stone;
 
 	index = ( int ) ( ( 4 * m_size.x ) + 4 );
-	m_tiles[ index ].SetTileType( TILE_TYPE_STONE );
+	m_tiles[ index ].m_tileDef = stone;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //									FINISH LINE SAFE ZONE BOUNDARY
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 	index = ( int ) ( ( ( m_size.y - 3 ) * m_size.x ) + m_size.x - 5 );
-	m_tiles[ index ].SetTileType( TILE_TYPE_STONE );
+	m_tiles[ index ].m_tileDef = stone;
 
 	index = ( int ) ( ( ( m_size.y - 4 ) * m_size.x ) + m_size.x - 5 );
-	m_tiles[ index ].SetTileType( TILE_TYPE_STONE );
+	m_tiles[ index ].m_tileDef = stone;
 
 	index = ( int ) ( ( ( m_size.y - 5 ) * m_size.x ) + m_size.x - 5 );
-	m_tiles[ index ].SetTileType( TILE_TYPE_STONE );
+	m_tiles[ index ].m_tileDef = stone;
 
 	//index = ( int ) ( ( ( m_size.y - 6 ) * m_size.x ) + m_size.x - 5 );
-	//m_tiles[ index ].SetTileType( TILE_TYPE_STONE );
+	//m_tiles[ index ].m_tileDef = stone;
 
 	index = ( int ) ( ( ( m_size.y - 5 ) * m_size.x ) + m_size.x - 4 );
-	m_tiles[ index ].SetTileType( TILE_TYPE_STONE );
+	m_tiles[ index ].m_tileDef = stone;
 
 	index = ( int ) ( ( ( m_size.y - 5 ) * m_size.x ) + m_size.x - 3 );
-	m_tiles[ index ].SetTileType( TILE_TYPE_STONE );
+	m_tiles[ index ].m_tileDef = stone;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // FLOODFILL TESTING
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 //   	index = ( int ) ( ( ( m_size.y - 2 ) * m_size.x ) + m_size.x - 5 );
-//   	m_tiles[ index ].SetTileType( TILE_TYPE_STONE );
+//   	m_tiles[ index ].m_tileDef = stone;
 //   
 //  	index = ( int ) ( ( ( m_size.y - 6 ) * m_size.x ) + m_size.x - 2 );
-//  	m_tiles[ index ].SetTileType( TILE_TYPE_STONE );
+//  	m_tiles[ index ].m_tileDef = stone;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -810,18 +714,15 @@ void Map::InitializeTileVertices()
 {
 	IntVec2 exitPosition = IntVec2(m_exitPosition);
 	int exitTileIndex = ( exitPosition.y * m_size.x ) + exitPosition.x;
-	m_tiles[ exitTileIndex ].m_type = TILE_TYPE_EXIT;
+	m_tiles[ exitTileIndex ].m_tileDef = TileDefinition::s_definitions.at( "exitPosition" );
 	for ( int verticalIndex = 0; verticalIndex < m_size.y; verticalIndex++ )
 	{
 		for ( int horizontalIndex = 0; horizontalIndex < m_size.x; horizontalIndex++ )
 		{
 			int currentTileIndex = ( verticalIndex * m_size.x ) + horizontalIndex;
 			AABB2 box = AABB2( Vec2( horizontalIndex , verticalIndex ) , Vec2( horizontalIndex + 1 , verticalIndex + 1 ) );
-			Vec2 minUVs;
-			Vec2 maxUVs;
-			Tiletype tempType = m_tiles[ currentTileIndex ].GetTileType();
-			TileDefinition::s_definitions[ tempType ].m_spriteDfinition.GetUVs( minUVs , maxUVs );
-			AppendVertsForAABB2( m_tileVerts , box , GetColorForTileType( tempType ) , minUVs, maxUVs );
+			TileDefinition* tempType = m_tiles[ currentTileIndex ].m_tileDef;
+			AppendVertsForAABB2( m_tileVerts , box , tempType->m_tint , tempType->m_minUVs, tempType->m_maxUVs );
 		}
 	}
 }
@@ -903,19 +804,6 @@ IntVec2 Map::GetTileCoordsforTileIndex( int tileIndex ) const
 	int tileY = tileIndex / m_size.x;
 	int tileX = tileIndex - ( tileY * m_size.x );
 	return( IntVec2( tileX , tileY ) );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Map::SetUnreachedTilesToStone()
-{
-	for ( int tileIndex = 0; tileIndex < ( int ) m_tiles.size(); tileIndex++ )
-	{
-		if ( !IsTileTypeSolid(m_tiles[tileIndex].GetTileType()) && !m_tiles[tileIndex].m_hasBeenSeen )
-		{
-			m_tiles[ tileIndex ].SetTileType( TILE_TYPE_STONE );
-		}
-	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

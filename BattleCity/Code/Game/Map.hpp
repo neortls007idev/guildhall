@@ -24,12 +24,11 @@ public:
 
 	void InitializeTileVertices();
 	void OuterBoundaryWalls();
-	void SpawnWorms( int numberOfWormsToSpawn , Tiletype wormType );
-	void RandomizeStoneTiles();
-	void RandomizeMudTiles();
+//	void RandomizeStoneTiles();
+//	void RandomizeMudTiles();
 	void SafeZones();
 	void SafeZonesBoundary();
-	bool CheckMapValidityUsingFloodFill( IntVec2 startTile , IntVec2 endTile );
+//	bool CheckMapValidityUsingFloodFill( IntVec2 startTile , IntVec2 endTile );
 
 	Entity* SpawnNewEntity( EntityType type , Faction faction , const Vec2& position, const float& orientation, const float blastRadius = 1.f, const float animationDuration = 1.f );
 	void AddEntityToMap( Entity* entity );
@@ -68,7 +67,6 @@ public:
 	std::vector<Vertex_PCU>     m_tileVerts;
 	Entitylist					m_entityListsByType[ NUM_ENTITY_TYPES ];
 private:
-	void SetUnreachedTilesToStone();
 	int							m_thisMapNumber = 0;
 };
 

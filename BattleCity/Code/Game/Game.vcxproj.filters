@@ -14,6 +14,9 @@
     <Filter Include="Networking">
       <UniqueIdentifier>{7a0b5265-0487-48a0-879c-ceb933ea804c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data">
+      <UniqueIdentifier>{81b8ecf6-c181-46d6-9031-b6dc93638518}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entity.cpp">
@@ -156,5 +159,13 @@
     <ClInclude Include="GameSinglePlayer.hpp">
       <Filter>Gameplay</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\..\Run\Data\Gameplay\MapDefs.xml">
+      <Filter>Data</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Gameplay\TileDefs.xml">
+      <Filter>Data</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

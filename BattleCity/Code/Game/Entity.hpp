@@ -103,7 +103,6 @@ public:
 	Vec2		m_impactPosition = Vec2::ZERO;
 	float		m_impactDistance = 0.f;
 	Vec2		m_impactNormal = Vec2::ZERO;
-	Tiletype	m_impactTileType   = TILE_TYPE_INVALID;
 	EntityType	m_impactEntityType = INVALID_ENTITY;
 	float		m_impactFraction = 0.f;
 

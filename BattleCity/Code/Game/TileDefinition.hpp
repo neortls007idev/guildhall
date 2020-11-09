@@ -1,7 +1,9 @@
 #pragma once
 #include "Game/Tile.hpp"
 #include "Engine/Renderer/SpriteDefinition.hpp"
-#include <vector>
+//#include <vector>
+#include <map>
+#include <string>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -9,28 +11,20 @@ class TileDefinition
 {
 public:
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-	explicit TileDefinition( SpriteDefinition spriteDefinition , Rgba8 tint , bool isSolid );
-	//Rgba8 GetColorForTileType( Tiletype type ) const;
-	//bool  IsTileTypeSolid( Tiletype type ) const;
-	static void  CreateTileDefinitions();
-	void  GetSpriteSheetUv( Vec2 minSpriteSheetUVs, Vec2 maxSpriteSheetUvs ) ;
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-private:
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
+	TileDefinition( const tinyxml2::XMLElement& definitionXMLElement );
+	static void  CreateTileDefinitions( const char* xmlFilePath );
+	friend TileDefinition* ParseXmlAttribute( const tinyxml2::XMLElement& element , const char* attributeName , TileDefinition* defaultValue );
+	~TileDefinition();
 
 public:
 	
-	static std::vector<TileDefinition>  s_definitions;
-	bool							    m_isSolid = false;
-	SpriteDefinition					m_spriteDfinition;
-	Vec2								m_minUVs;
-	Vec2								m_maxUVs;
-	Rgba8							    m_tint;
+	static std::map< std::string , TileDefinition* >		s_definitions;
+	static SpriteSheet*										s_tileSS;
+	std::string												m_name				= "";
+	bool													m_isSolid			= false;
+	Vec2													m_minUVs;
+	Vec2													m_maxUVs;
+	Rgba8													m_tint;
 
 private:
 

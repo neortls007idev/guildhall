@@ -256,6 +256,10 @@
     <ClInclude Include="TileDefinition.hpp" />
     <ClInclude Include="World.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\..\Run\Data\Gameplay\MapDefs.xml" />
+    <Xml Include="..\..\Run\Data\Gameplay\TileDefs.xml" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
