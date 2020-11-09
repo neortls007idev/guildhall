@@ -1,21 +1,21 @@
 #include "Game/World.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Game/Game.hpp"
+#include "Game/MapDefinition.hpp"
 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 World::World( Game* theGame ) : m_theGame( theGame )
 {
-	//m_currentMap = new Map( m_theGame , IntVec2( ( int ) INTITAL_MAP_SIZE_X , ( int ) INTITAL_MAP_SIZE_Y ), m_mapNumber );
-	for ( int mapNumber = 0; mapNumber < TOTAL_MAPS_IN_THE_WORLD; mapNumber++ )
+	int mapNumber = 0;
+
+	for( auto mapDefIndex : MapDefinition::s_definitions )
 	{
-		while ( m_Maps[mapNumber] == nullptr )
-		{
-			m_Maps[ mapNumber ] = new Map( m_theGame , IntVec2( ( int ) ( INTITAL_MAP_SIZE_X + ( mapNumber * 10 ) ) ,
-									( int ) ( INTITAL_MAP_SIZE_Y + ( mapNumber * 10 ) ) ) , mapNumber );
-		}
+		m_Maps[ mapNumber ] = new Map( m_theGame , mapDefIndex.second, mapDefIndex.second->m_name.c_str() );
+		mapNumber++;
 	}
+
 	m_currentMap = m_Maps[ 0 ];
 	m_currentMapNumber = 0;
 }

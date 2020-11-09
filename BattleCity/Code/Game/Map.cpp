@@ -15,21 +15,26 @@
 #include "Game/NpcTurret.hpp"
 #include "Game/Explosion.hpp"
 #include "Game/TileDefinition.hpp"
+#include "Game/MapDefinition.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // GLOBAL VARIABLES
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-extern RenderContext* g_theRenderer;
-extern AudioSystem* g_theAudioSystem;
-extern TheApp* g_theApp;
+extern RenderContext*	g_theRenderer;
+extern AudioSystem*		g_theAudioSystem;
+extern TheApp*			g_theApp;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-Map::Map( Game* theGame , IntVec2 size , int MapNumber ) : m_theGame( theGame ) , m_size( size ) , m_thisMapNumber( MapNumber )
+Map::Map( Game* theGame , MapDefinition* mapDefinition , std::string mapName ) : 
+																					m_theGame( theGame ) ,
+																					m_name( mapName ) ,
+																					m_mapDefinition( mapDefinition )
 {
+	m_size.x = mapDefinition->m_width;
+	m_size.y = mapDefinition->m_height;
 
-	m_thisMapNumber++;
 	m_exitPosition = Vec2( m_size.x - 2 , m_size.y - 2 ) + Vec2( 0.5f , 0.5f ); // adding in the offset for center point
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -38,44 +43,38 @@ Map::Map( Game* theGame , IntVec2 size , int MapNumber ) : m_theGame( theGame ) 
 
 	TileDefinition* defaultTile = TileDefinition::s_definitions.at( "defaultTerrain" );
 
-	if( defaultTile != nullptr )
+	if ( defaultTile != nullptr )
 	{
-		for ( int verticalIndex = 0; verticalIndex < m_size.y; verticalIndex ++ )
+		for ( int verticalIndex = 0; verticalIndex < m_size.y; verticalIndex++ )
 		{
-			for ( int horizontalIndex = 0; horizontalIndex < m_size.x; horizontalIndex ++ )
+			for ( int horizontalIndex = 0; horizontalIndex < m_size.x; horizontalIndex++ )
 			{
 				m_tiles.push_back( Tile( IntVec2( horizontalIndex , verticalIndex ) , defaultTile ) );
 			}
 		}
 	}
-		
-//--------------------------------------------------------------------------------------------------------------------------------------------
-//						INITIALIZING ALL TILES AND ENTITIES AS NECESSARY
-//--------------------------------------------------------------------------------------------------------------------------------------------
 
-//	RandomizeStoneTiles();
-//	RandomizeMudTiles();
-// 	if ( MapNumber >= 1 && MapNumber != 2)
-// 	{
-// 		SpawnWorms( MAX_NUMBER_OF_LAVA_WORMS , TILE_TYPE_LAVA );
-// 	}
-// 	if ( MapNumber >= 2 )
-// 	{
-// 		SpawnWorms( MAX_NUMBER_OF_WATER_WORMS , TILE_TYPE_WATER );
-// 	}
-	SafeZones();
-	OuterBoundaryWalls();
-	SafeZonesBoundary();
-	IntVec2 startPosition = IntVec2( 1 , 1 );
-//	bool mapvalidity = CheckMapValidityUsingFloodFill( startPosition , IntVec2( m_exitPosition ) );
+//--------------------------------------------------------------------------------------------------------------------------------------------
 	
-	SafeZones();
-	OuterBoundaryWalls();
-	SafeZonesBoundary();
+	for ( int mapGenSteps = 0; mapGenSteps < m_mapDefinition->m_generationSteps.size(); mapGenSteps++ )
+	{
+		FloatRange* chanceToRun = &m_mapDefinition->m_generationSteps[ mapGenSteps ]->m_chanceToRun;
 
-	InitializeTileVertices();
-	//SpawnNewEntity( PLAYERTANK_ENTITY , FACTION_ALLY , Vec2( 1.5f , 1.5f ) , 45.f );
-	// InitialNPCSpawner();
+		m_mapDefinition->m_generationSteps[ mapGenSteps ]->RunStep( *this );
+	}
+	
+	for ( int verticalIndex = 0; verticalIndex < m_size.y; verticalIndex++ )
+	{
+		for ( int horizontalIndex = 0; horizontalIndex < m_size.x; horizontalIndex++ )
+		{
+			int currentTileIndex = ( verticalIndex * m_size.x ) + horizontalIndex;
+			AABB2 box = AABB2( Vec2( horizontalIndex , verticalIndex ) , Vec2( horizontalIndex + 1 , verticalIndex + 1 ) );
+			TileDefinition* tempType = m_tiles[ currentTileIndex ].m_tileDef;
+			AppendVertsForAABB2( m_tileVerts , box , tempType->m_tint , tempType->m_minUVs , tempType->m_maxUVs );
+		}
+	}
+
+//	InitialNPCSpawner();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -592,143 +591,6 @@ Vec2 Map::GetTileCenter( IntVec2 tileCoords ) const
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Map::OuterBoundaryWalls()
-{
-	TileDefinition* stone = TileDefinition::s_definitions.at( "edgeTileTerrain" );
-
-	for ( int horizontalIndex = 0; horizontalIndex < m_size.x; horizontalIndex++ )
-	{
-		m_tiles[ horizontalIndex ].m_tileDef = stone;
-	}
-	for ( int verticalIndex = 1; verticalIndex < m_size.y; verticalIndex++ )
-	{
-		int index =  verticalIndex * m_size.x ;
-		int index2 = index - 1;
-		m_tiles[ index2 ].m_tileDef = stone;
-		m_tiles[ index ].m_tileDef = stone;
-	}
-	
-	for ( int horizontalIndex = 0; horizontalIndex < m_size.x; horizontalIndex++ )
-	{
-		int index = ((m_size.y-1)*m_size.x) + horizontalIndex;
-		m_tiles[ index ].m_tileDef = stone;
-	}
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Map::SafeZones()
-{
-//--------------------------------------------------------------------------------------------------------------------------------------------
-//									SPAWN SAFEZONE
-//--------------------------------------------------------------------------------------------------------------------------------------------
-	TileDefinition* start = TileDefinition::s_definitions.at( "startAreaTerrain" );
-
-	for (int verticalIndex = 1; verticalIndex < 6; verticalIndex++)
-	{
-		for ( int horizontalIndex = 1; horizontalIndex < 6; horizontalIndex++ )
-		{
-			int index = ( verticalIndex * m_size.x ) + horizontalIndex;
-			m_tiles[ index ].m_tileDef = start;
-		}
-	}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-//									FINISH SAFEZONE
-//--------------------------------------------------------------------------------------------------------------------------------------------
-	TileDefinition* endZone = TileDefinition::s_definitions.at( "exitAreaTerrain" );
-
-	for ( int verticalIndex = m_size.y - 1; verticalIndex > m_size.y - 7; verticalIndex-- )
-	{
-		for ( int horizontalIndex = m_size.x - 1; horizontalIndex > m_size.x - 7; horizontalIndex-- )
-		{
-			int index = ( verticalIndex * m_size.x ) + horizontalIndex;
-			m_tiles[ index ].m_tileDef = endZone;
-		}
-	}
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Map::SafeZonesBoundary()
-{
-	TileDefinition* stone = TileDefinition::s_definitions.at( "edgeTileTerrain" );
-//--------------------------------------------------------------------------------------------------------------------------------------------
-//									 SPAWN SAFE ZONE BOUNDARY
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-	int index = ( int ) ( ( 2 * m_size.x ) + 4 );
-	m_tiles[ index ].m_tileDef = stone;
-
-	index = ( int ) ( ( 3 * m_size.x ) + 4 );
-	m_tiles[ index ].m_tileDef = stone;
-
-	index = ( int ) ( ( 4 * m_size.x ) + 2 );
-	m_tiles[ index ].m_tileDef = stone;
-
-	index = ( int ) ( ( 4 * m_size.x ) + 3 );
-	m_tiles[ index ].m_tileDef = stone;
-
-	index = ( int ) ( ( 4 * m_size.x ) + 4 );
-	m_tiles[ index ].m_tileDef = stone;
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-//									FINISH LINE SAFE ZONE BOUNDARY
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-	index = ( int ) ( ( ( m_size.y - 3 ) * m_size.x ) + m_size.x - 5 );
-	m_tiles[ index ].m_tileDef = stone;
-
-	index = ( int ) ( ( ( m_size.y - 4 ) * m_size.x ) + m_size.x - 5 );
-	m_tiles[ index ].m_tileDef = stone;
-
-	index = ( int ) ( ( ( m_size.y - 5 ) * m_size.x ) + m_size.x - 5 );
-	m_tiles[ index ].m_tileDef = stone;
-
-	//index = ( int ) ( ( ( m_size.y - 6 ) * m_size.x ) + m_size.x - 5 );
-	//m_tiles[ index ].m_tileDef = stone;
-
-	index = ( int ) ( ( ( m_size.y - 5 ) * m_size.x ) + m_size.x - 4 );
-	m_tiles[ index ].m_tileDef = stone;
-
-	index = ( int ) ( ( ( m_size.y - 5 ) * m_size.x ) + m_size.x - 3 );
-	m_tiles[ index ].m_tileDef = stone;
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-// FLOODFILL TESTING
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-//   	index = ( int ) ( ( ( m_size.y - 2 ) * m_size.x ) + m_size.x - 5 );
-//   	m_tiles[ index ].m_tileDef = stone;
-//   
-//  	index = ( int ) ( ( ( m_size.y - 6 ) * m_size.x ) + m_size.x - 2 );
-//  	m_tiles[ index ].m_tileDef = stone;
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Map::InitializeTileVertices()
-{
-	IntVec2 exitPosition = IntVec2(m_exitPosition);
-	int exitTileIndex = ( exitPosition.y * m_size.x ) + exitPosition.x;
-	m_tiles[ exitTileIndex ].m_tileDef = TileDefinition::s_definitions.at( "exitPosition" );
-	for ( int verticalIndex = 0; verticalIndex < m_size.y; verticalIndex++ )
-	{
-		for ( int horizontalIndex = 0; horizontalIndex < m_size.x; horizontalIndex++ )
-		{
-			int currentTileIndex = ( verticalIndex * m_size.x ) + horizontalIndex;
-			AABB2 box = AABB2( Vec2( horizontalIndex , verticalIndex ) , Vec2( horizontalIndex + 1 , verticalIndex + 1 ) );
-			TileDefinition* tempType = m_tiles[ currentTileIndex ].m_tileDef;
-			AppendVertsForAABB2( m_tileVerts , box , tempType->m_tint , tempType->m_minUVs, tempType->m_maxUVs );
-		}
-	}
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 void Map::InitialNPCSpawner()
 {
 	int npcTanksToSpawn	   = INTITAL_MAP_MAX_NUM_NPC_TANKS   + ( 2 * m_thisMapNumber );
@@ -790,7 +652,7 @@ void Map::InitialNPCSpawner()
 
 int Map::GetTileIndexforTileCoords( const IntVec2& tileCoords ) const
 {
-	if ( tileCoords.x < 1 || tileCoords.y<1 || tileCoords.x >m_size.x - 2 || tileCoords.y > m_size.y - 2 )
+	if ( tileCoords.x < 0 || tileCoords.y < 0 || tileCoords.x >m_size.x - 1 || tileCoords.y > m_size.y - 1 )
 	{
 		return 0;
 	}
@@ -804,6 +666,14 @@ IntVec2 Map::GetTileCoordsforTileIndex( int tileIndex ) const
 	int tileY = tileIndex / m_size.x;
 	int tileX = tileIndex - ( tileY * m_size.x );
 	return( IntVec2( tileX , tileY ) );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Tile* Map::GetTileAtTileCoords( const IntVec2& tileCoords )
+{
+	int tileIndex = GetTileIndexforTileCoords( tileCoords );
+	return &m_tiles[ tileIndex ];
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

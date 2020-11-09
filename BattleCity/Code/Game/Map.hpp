@@ -4,6 +4,10 @@
 #include "Engine/Math/IntVec2.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+	
+class MapDefinition;
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 typedef int TileIndex;
 
@@ -18,17 +22,9 @@ class Map
 
 public:
 
-	Map( Game* theGame , IntVec2 size, int MapNumber );
+	Map( Game* theGame , MapDefinition* mapDefinition , std::string mapName );
 
 	void InitialNPCSpawner();
-
-	void InitializeTileVertices();
-	void OuterBoundaryWalls();
-//	void RandomizeStoneTiles();
-//	void RandomizeMudTiles();
-	void SafeZones();
-	void SafeZonesBoundary();
-//	bool CheckMapValidityUsingFloodFill( IntVec2 startTile , IntVec2 endTile );
 
 	Entity* SpawnNewEntity( EntityType type , Faction faction , const Vec2& position, const float& orientation, const float blastRadius = 1.f, const float animationDuration = 1.f );
 	void AddEntityToMap( Entity* entity );
@@ -53,21 +49,20 @@ public:
 
 	int GetTileIndexforTileCoords( const IntVec2& tileCoords ) const;
 	IntVec2 GetTileCoordsforTileIndex( int tileIndex ) const;
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
+	Tile* GetTileAtTileCoords( const IntVec2& tileCoords );
 
 public:
-
-	
-	Vec2 m_exitPosition;
-	IntVec2						m_size			   = IntVec2( 0 , 0 );
-	Game*						m_theGame		   = nullptr;
-	float						m_age			   = 0.f;
+	std::string					m_name;
+	MapDefinition*				m_mapDefinition		= nullptr;
+	Vec2						m_exitPosition;
+	IntVec2						m_size				= IntVec2( 0 , 0 );
+	Game*						m_theGame			= nullptr;
+	float						m_age				= 0.f;
 	std::vector< Tile >			m_tiles;
 	std::vector<Vertex_PCU>     m_tileVerts;
 	Entitylist					m_entityListsByType[ NUM_ENTITY_TYPES ];
 private:
-	int							m_thisMapNumber = 0;
+	int							m_thisMapNumber		= 0;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -12,7 +12,8 @@
 #include "Game/GameCommon.hpp"
 #include "Game/AuthServer.hpp"
 #include "Game/TheApp.hpp"
-#include "PlayerClient.hpp"
+#include "Game/PlayerClient.hpp"
+#include "Game/MapDefinition.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -112,6 +113,9 @@ void TheApp::Startup()
 	}
 	g_theAudioSystem->Startup();
 	
+//	TileDefinition::CreateTileDefinitions( "Data/GamePlay/TileDefs.xml" );
+//	MapDefinition::CreateMapDefinitions( "Data/GamePlay/MapDefs.xml" );
+
 	if ( g_theAuthServer == nullptr )
 	{
 		g_theAuthServer = new AuthoritativeServer();

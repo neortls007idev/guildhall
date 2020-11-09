@@ -32,7 +32,7 @@
 	
 	<TileDefinition
 		name="lavaTerrain"
-		colorInImageFile="197,123,26,255"
+		colorInImageFile="255,0,0,255"
 		spriteCoords="6,7"
 		isSolid="false"
 	/>

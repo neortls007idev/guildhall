@@ -1,18 +1,16 @@
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-
 #include "Engine/Core/SimpleTriangleFont.hpp"
-
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Input/VirtualKeyboard.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
-
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
+#include "Game/MapDefinition.hpp"
 #include "Game/TheApp.hpp"
 
 extern DevConsole* g_theDevConsole;
@@ -136,6 +134,7 @@ void Game::AddScreenShakeIntensity( float deltaShakeIntensity )
 void Game::LoadAssets()
 {
 	TileDefinition::CreateTileDefinitions( "Data/GamePlay/TileDefs.xml" );
+	MapDefinition::CreateMapDefinitions( "Data/GamePlay/MapDefs.xml" );
 	LoadAllEntityTextures();
 	//LoadAllSounds();
 }

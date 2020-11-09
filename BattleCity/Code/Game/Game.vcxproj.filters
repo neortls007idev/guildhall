@@ -17,6 +17,9 @@
     <Filter Include="Data">
       <UniqueIdentifier>{81b8ecf6-c181-46d6-9031-b6dc93638518}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Gameplay\Map">
+      <UniqueIdentifier>{62ad6358-45fa-4b0e-b7c2-389b32caab1c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entity.cpp">
@@ -35,9 +38,6 @@
       <Filter>Gameplay</Filter>
     </ClCompile>
     <ClCompile Include="World.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="Map.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
     <ClCompile Include="Tile.cpp">
@@ -88,6 +88,18 @@
     <ClCompile Include="GameSinglePlayer.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>Gameplay\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="MapDefinition.cpp">
+      <Filter>Gameplay\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="MapGenStep.cpp">
+      <Filter>Gameplay\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="MapGenStepFromImage.cpp">
+      <Filter>Gameplay\Map</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.hpp">
@@ -103,9 +115,6 @@
       <Filter>Gameplay</Filter>
     </ClInclude>
     <ClInclude Include="World.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="Map.hpp">
       <Filter>Gameplay</Filter>
     </ClInclude>
     <ClInclude Include="Tile.hpp">
@@ -158,6 +167,18 @@
     </ClInclude>
     <ClInclude Include="GameSinglePlayer.hpp">
       <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.hpp">
+      <Filter>Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="MapDefinition.hpp">
+      <Filter>Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="MapGenStep.hpp">
+      <Filter>Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="MapGenStepFromImage.hpp">
+      <Filter>Gameplay\Map</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

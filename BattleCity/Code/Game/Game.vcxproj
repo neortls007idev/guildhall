@@ -213,6 +213,9 @@
     <ClCompile Include="GameMultiplayer.cpp" />
     <ClCompile Include="GameSinglePlayer.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="MapDefinition.cpp" />
+    <ClCompile Include="MapGenStep.cpp" />
+    <ClCompile Include="MapGenStepFromImage.cpp" />
     <ClCompile Include="NpcTank.cpp" />
     <ClCompile Include="NpcTurret.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -243,6 +246,9 @@
     <ClInclude Include="GameMultiplayer.hpp" />
     <ClInclude Include="GameSinglePlayer.hpp" />
     <ClInclude Include="Map.hpp" />
+    <ClInclude Include="MapDefinition.hpp" />
+    <ClInclude Include="MapGenStep.hpp" />
+    <ClInclude Include="MapGenStepFromImage.hpp" />
     <ClInclude Include="NpcTank.hpp" />
     <ClInclude Include="NpcTurret.hpp" />
     <ClInclude Include="Player.hpp" />
