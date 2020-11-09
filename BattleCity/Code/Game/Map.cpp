@@ -306,48 +306,51 @@ void Map::ResolveEntityWorldCollision( Entity* entity )
 				
 		int currentTileIndex = GetTileIndexforTileCoords( currentTileCoords );
 		AABB2 currentAABB = AABB2( currentTileCoords.x , currentTileCoords.y , currentTileCoords.x + 1 , currentTileCoords.y + 1 );
-							   
-/*		if ( m_tiles[ leftIndex ].m_type == TILE_TYPE_MUD && DoDiscAndAABBOverlap( entityPosition , entityPhysicsRadius , leftAABB ) )
+		
+		TileDefinition* mudTileDef = TileDefinition::s_definitions.at( "mudTerrain" );
+		float tileVelocityMultipler = 0.1f;
+
+		if ( m_tiles[ leftIndex ].m_tileDef == mudTileDef && DoDiscAndAABBOverlap( entityPosition , entityPhysicsRadius , leftAABB ) )
 		{
-			entity->m_velocity = entity->m_velocity * 0.5f;
+			entity->m_velocity = entity->m_velocity * tileVelocityMultipler;
 		}
-		else if ( m_tiles[ rightIndex ].m_type == TILE_TYPE_MUD && DoDiscAndAABBOverlap( entityPosition , entityPhysicsRadius , rightAABB ) )
+		else if ( m_tiles[ rightIndex ].m_tileDef == mudTileDef && DoDiscAndAABBOverlap( entityPosition , entityPhysicsRadius , rightAABB ) )
 		{
-			entity->m_velocity = entity->m_velocity * 0.5f;
+			entity->m_velocity = entity->m_velocity * tileVelocityMultipler;
 		}
-		else if ( m_tiles[ upIndex ].m_type == TILE_TYPE_MUD && DoDiscAndAABBOverlap( entityPosition , entityPhysicsRadius , upAABB ) )
+		else if ( m_tiles[ upIndex ].m_tileDef == mudTileDef && DoDiscAndAABBOverlap( entityPosition , entityPhysicsRadius , upAABB ) )
 		{
-			entity->m_velocity = entity->m_velocity * 0.5f;
+			entity->m_velocity = entity->m_velocity * tileVelocityMultipler;
 		}
-		else if ( m_tiles[ downIndex ].m_type == TILE_TYPE_MUD && DoDiscAndAABBOverlap( entityPosition , entityPhysicsRadius , downAABB ) )
+		else if ( m_tiles[ downIndex ].m_tileDef == mudTileDef && DoDiscAndAABBOverlap( entityPosition , entityPhysicsRadius , downAABB ) )
 		{
-			entity->m_velocity = entity->m_velocity * 0.5f;
+			entity->m_velocity = entity->m_velocity * tileVelocityMultipler;
 		}
-		else if ( m_tiles[ topRighttIndex ].m_type == TILE_TYPE_MUD && DoDiscAndAABBOverlap( entityPosition , entityPhysicsRadius , topRightAABB ) )
+		else if ( m_tiles[ topRighttIndex ].m_tileDef == mudTileDef && DoDiscAndAABBOverlap( entityPosition , entityPhysicsRadius , topRightAABB ) )
 		{
-			entity->m_velocity = entity->m_velocity * 0.5f;
+			entity->m_velocity = entity->m_velocity * tileVelocityMultipler;
 		}
-		else if ( m_tiles[ topLeftIndex ].m_type == TILE_TYPE_MUD && DoDiscAndAABBOverlap( entityPosition , entityPhysicsRadius , topLeftAABB ) )
+		else if ( m_tiles[ topLeftIndex ].m_tileDef == mudTileDef && DoDiscAndAABBOverlap( entityPosition , entityPhysicsRadius , topLeftAABB ) )
 		{
-			entity->m_velocity = entity->m_velocity * 0.5f;
+			entity->m_velocity = entity->m_velocity * tileVelocityMultipler;
 		}
-		else if ( m_tiles[ bottomRightIndex ].m_type == TILE_TYPE_MUD && DoDiscAndAABBOverlap( entityPosition , entityPhysicsRadius , bottomRightAABB ) )
+		else if ( m_tiles[ bottomRightIndex ].m_tileDef == mudTileDef && DoDiscAndAABBOverlap( entityPosition , entityPhysicsRadius , bottomRightAABB ) )
 		{
-			entity->m_velocity = entity->m_velocity * 0.5f;
+			entity->m_velocity = entity->m_velocity * tileVelocityMultipler;
 		}
-		else if ( m_tiles[ bottomLeftIndex ].m_type == TILE_TYPE_MUD && DoDiscAndAABBOverlap( entityPosition , entityPhysicsRadius , bottomLeftAABB ) )
+		else if ( m_tiles[ bottomLeftIndex ].m_tileDef == mudTileDef && DoDiscAndAABBOverlap( entityPosition , entityPhysicsRadius , bottomLeftAABB ) )
 		{
-			entity->m_velocity = entity->m_velocity * 0.5f;
+			entity->m_velocity = entity->m_velocity * tileVelocityMultipler;
 		}
-		else if ( m_tiles[ currentTileIndex ].m_type == TILE_TYPE_MUD )
+		else if ( m_tiles[ currentTileIndex ].m_tileDef == mudTileDef )
 		{
-			entity->m_velocity = entity->m_velocity * 0.5f;
+			entity->m_velocity = entity->m_velocity * tileVelocityMultipler;
 		}
 		else
 		{
 			entity->m_velocity = entityOriginalVelocity;
 		}
-		*/
+		
 	entity->m_position = entityPosition;
 	}
 
