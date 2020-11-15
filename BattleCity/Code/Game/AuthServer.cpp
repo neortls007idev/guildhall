@@ -9,6 +9,7 @@
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/DevConsole.hpp"
+#include "Engine/Time/Timer.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	
@@ -34,7 +35,8 @@ AuthoritativeServer::~AuthoritativeServer()
 
 void AuthoritativeServer::Startup()
 {
-
+	m_sendFreq = new Timer();
+	m_sendFreq->SetSeconds( 0.032 );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -128,6 +130,12 @@ void AuthoritativeServer::BeginFrame()
 void AuthoritativeServer::EndFrame()
 {
 	ParseReceivedMessages( g_theNetworkSys->m_recievedUDPMesageBuffer );
+
+	if( m_sendFreq->HasElapsed() )
+	{
+		ParseAndSendEntityData();
+		m_sendFreq->Reset();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -162,6 +170,47 @@ void AuthoritativeServer::AddPlayers()
 	{
 		m_multiPlayerGame->Startup();
 		m_multiPlayerGame->CreateAndAddPlayerAtpositionAndOrientation();
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void AuthoritativeServer::ParseAndSendEntityData()
+{
+
+	if ( m_gameType == MULTIPLAYER && m_isRemoteClientConnectionComplete )
+	{
+		Game* currentGame = GetGame();
+
+		if ( currentGame == nullptr )
+		{
+			return;
+		}
+		
+		for ( int Entitytype = 0; Entitytype < NUM_ENTITY_TYPES; Entitytype++ )
+		{
+			if ( Entitytype == PLAYERTANK_ENTITY )
+			{
+				continue;
+			}
+
+			Entitylist& currentList = currentGame->m_world->m_currentMap->m_entityListsByType[ Entitytype ];
+			for ( int entityIndex = 0; entityIndex < ( int ) currentList.size(); entityIndex++ )
+			{
+				if ( currentList[ entityIndex ] )
+				{
+					EventArgs EntityUpdateArgs;
+					std::string EntityDataAsString = ToString( m_uniqueKey ) + "|" +
+													 ToString( Entitytype ) + "|" +
+													 ToString( currentList[ entityIndex ]->m_entityID ) + "|" +
+													 ToString( currentList[ entityIndex ]->m_position ) + "|" +
+													 ToString( currentList[ entityIndex ]->m_orientationDegrees );
+
+					EntityUpdateArgs.SetValue( "msg" , EntityDataAsString.c_str() );
+					g_theNetworkSys->SendUDPMessage( EntityUpdateArgs );
+				}
+			}
+		}
 	}
 }
 

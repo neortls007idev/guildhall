@@ -5,6 +5,7 @@
 
 class GameSinglePlayer;
 class GameMultiplayer;
+class Timer;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	
@@ -19,13 +20,15 @@ public:
 	virtual void	Update( float deltaSeconds ) override;
 	virtual void	BeginFrame() override;
 	virtual void	EndFrame() override;
-//			Game*	GetGame();
+
 			void	AddPlayers();
 //			void	AssignInputSystem( InputSystem* inputSystem );
+			void	ParseAndSendEntityData();
 public:
 	
 private:
 	int m_numRemotePlayers = 0;
+	Timer* m_sendFreq = nullptr;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

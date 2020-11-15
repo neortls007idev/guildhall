@@ -14,6 +14,7 @@ public:
 	virtual void	Update( float deltaSeconds ) override;
 	virtual void	BeginFrame() override;
 	virtual void	EndFrame() override;
+			void	ParseAndUpdateEntities();
 
 //	Game* GetGame();
 	bool RequestAddPlayerEntityandUDPConnection();

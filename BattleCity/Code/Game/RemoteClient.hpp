@@ -16,7 +16,7 @@ public:
 	virtual void	Update( float deltaSeconds ) override;
 	virtual void	BeginFrame() override;
 	virtual void	EndFrame() override;
-	
+			
 public:
 	Game* m_game = nullptr;
 	int m_remotePlayerID = 1;

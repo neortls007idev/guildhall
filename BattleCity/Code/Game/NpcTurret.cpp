@@ -77,7 +77,7 @@ void NpcTurret::Update( float deltaSeconds )
 			{
 				if ( m_firingCoolDown <= 0.f )
 				{
-					m_theGame->m_world->m_currentMap->SpawnNewEntity( EVIL_BULLET_ENTITY , m_faction , m_position , m_turretOrientation );
+					// m_theGame->m_world->m_currentMap->SpawnNewEntity( EVIL_BULLET_ENTITY , m_faction , m_position , m_turretOrientation );
 					//SoundPlaybackID currentTurretShootID = g_theAudioSystem->PlaySound( m_theGame->m_sounds[ SOUND_ENEMY_SHOOT ] );
 					//float playbackBalance = CosDegrees( ( m_position - playerPosition ).GetAngleDegrees() );
 					//g_theAudioSystem->SetSoundPlaybackBalance( currentTurretShootID, playbackBalance );

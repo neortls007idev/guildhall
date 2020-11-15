@@ -58,7 +58,7 @@ Map::Map( Game* theGame , MapDefinition* mapDefinition , std::string mapName ) :
 	
 	for ( int mapGenSteps = 0; mapGenSteps < m_mapDefinition->m_generationSteps.size(); mapGenSteps++ )
 	{
-		FloatRange* chanceToRun = &m_mapDefinition->m_generationSteps[ mapGenSteps ]->m_chanceToRun;
+		//FloatRange* chanceToRun = &m_mapDefinition->m_generationSteps[ mapGenSteps ]->m_chanceToRun;
 
 		m_mapDefinition->m_generationSteps[ mapGenSteps ]->RunStep( *this );
 	}
@@ -74,7 +74,7 @@ Map::Map( Game* theGame , MapDefinition* mapDefinition , std::string mapName ) :
 		}
 	}
 
-//	InitialNPCSpawner();
+	InitialNPCSpawner();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -512,8 +512,8 @@ RayCastResult Map::RayCast( Vec2 startPosition , Vec2 forwardDirection , float m
 		endPosition += forwardDirection * correctionScale;
 		currentDistance += correctionScale;
 		IntVec2 currentTileCoords = IntVec2( RoundDownToInt( endPosition.x ) , RoundDownToInt( endPosition.y ) );
-		int index = ( currentTileCoords.y * m_size.x ) + currentTileCoords.x;
-
+		int index = GetTileIndexforTileCoords( currentTileCoords );
+			
 		if ( m_tiles[index].IsSolid() )
 		{
 			rayCastResult.m_didImpact = true;
@@ -602,9 +602,11 @@ void Map::InitialNPCSpawner()
 {
 	int npcTanksToSpawn	   = INTITAL_MAP_MAX_NUM_NPC_TANKS   + ( 2 * m_thisMapNumber );
 	int npcTurretsToSpawn  = INTITAL_MAP_MAX_NUM_NPC_TURRETS + ( 2 * m_thisMapNumber );
+		npcTurretsToSpawn  = 0;
 	int npcBouldersToSpawn = INTITAL_MAP_MAX_NUM_BOULDERS    + ( 2 * m_thisMapNumber );
+	int initialSpawnCOunt = npcTanksToSpawn + npcTurretsToSpawn + npcBouldersToSpawn;
 
-	for ( int totalNPCEntitiesToSpawn = 16 + ( 6 * m_thisMapNumber ); totalNPCEntitiesToSpawn > 0; )
+	for ( int totalNPCEntitiesToSpawn = initialSpawnCOunt; totalNPCEntitiesToSpawn > 0; )
 	{
 		IntVec2 tileCoords;
 		tileCoords.x = g_RNG->RollRandomIntInRange( 1 , m_size.x - 2 );

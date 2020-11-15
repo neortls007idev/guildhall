@@ -109,6 +109,8 @@ void Player::IsDead()
 
 void Player::UpdateFromJoystick( float deltaSeconds )
 {
+	UNUSED( deltaSeconds );
+
 	m_controllerID = g_theInput->GetXboxController( m_controllerID ).GetControllerID();
 	// Do nothing if this player ship has no controller assigned to it
 	if ( m_controllerID < 0 )
@@ -133,10 +135,10 @@ void Player::checkKeyboardKeyPressForMovement( float deltaSeconds )
 	{
 		if ( g_theInput->WasKeyJustPressed( KEY_SPACE ) )
 		{
-			m_theGame->m_world->m_currentMap->SpawnNewEntity( GOOD_BULLET_ENTITY , m_faction , m_position , m_turretOrientation + m_orientationDegrees );
-			//m_theGame->m_world1->m_currentMap->SpawnNewEntity( EXPLOSION_ENTITY , m_faction , m_position , m_turretOrientation + m_orientationDegrees );
-			//SoundID testSound = g_theAudioSystem->CreateOrGetSound( "Data/Audio/PlayerShoot.wav" );
-			g_theAudioSystem->PlaySound( m_theGame->m_sounds[ SOUND_PLAYER_SHOOT ] );
+			// m_theGame->m_world->m_currentMap->SpawnNewEntity( GOOD_BULLET_ENTITY , m_faction , m_position , m_turretOrientation + m_orientationDegrees );
+			// //m_theGame->m_world1->m_currentMap->SpawnNewEntity( EXPLOSION_ENTITY , m_faction , m_position , m_turretOrientation + m_orientationDegrees );
+			// //SoundID testSound = g_theAudioSystem->CreateOrGetSound( "Data/Audio/PlayerShoot.wav" );
+			// g_theAudioSystem->PlaySound( m_theGame->m_sounds[ SOUND_PLAYER_SHOOT ] );
 		}
 		if ( g_theInput->IsKeyHeldDown( 'E' ) )
 		{
@@ -231,7 +233,7 @@ void Player::XboxButtonPresses( const XboxController& controller , float deltaSe
 		const KeyButtonState& aButton = controller.GetButtonState( XBOX_BUTTON_ID_A );
 		if ( aButton.WasJustPressed() && m_health > 0 )
 		{
-			m_theGame->m_world->m_currentMap->SpawnNewEntity( GOOD_BULLET_ENTITY , m_faction , m_position , m_turretOrientation + m_orientationDegrees );
+			// m_theGame->m_world->m_currentMap->SpawnNewEntity( GOOD_BULLET_ENTITY , m_faction , m_position , m_turretOrientation + m_orientationDegrees );
 			//SoundID testSound = g_theAudioSystem->CreateOrGetSound( "Data/Audio/PlayerShoot.wav" );
 			g_theAudioSystem->PlaySound( m_theGame->m_sounds[ SOUND_PLAYER_SHOOT ] );
 		}

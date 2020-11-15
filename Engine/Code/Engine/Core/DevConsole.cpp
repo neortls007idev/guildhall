@@ -484,7 +484,7 @@ STATIC void DevConsole::ToggleVisibility()
 	if ( m_isConsoleOpen )
 	{
 		m_originalCursorSettings = g_theInput->GetCursorSettings();
-		g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_WINDOWLOCKED , true ) );
+		g_theInput->PushCursorSettings( CursorSettings( ABSOLUTE_MODE , MOUSE_IS_UNLOCKED , true ) );
 	}
 	else
 	{

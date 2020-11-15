@@ -366,7 +366,7 @@ STATIC bool TheApp::StartMultiplayerServer( EventArgs& args )
 	}
 
 	g_theAuthServer->AddPlayerClientToServer( g_theApp->m_localclient );
-
+	
 	return true;
 }
 

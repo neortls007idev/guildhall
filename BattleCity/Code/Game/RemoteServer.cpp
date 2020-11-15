@@ -48,10 +48,12 @@ void RemoteServer::Shutdown()
 
 void RemoteServer::Update( float deltaSeconds )
 {
-	if ( m_gameType == MULTIPLAYER )
-	{
-		m_multiPlayerGame->Update( deltaSeconds );
-	}
+	UNUSED( deltaSeconds );
+
+	//if ( m_gameType == MULTIPLAYER )
+	//{
+	//	m_multiPlayerGame->Update( deltaSeconds );
+	//}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -115,6 +117,48 @@ void RemoteServer::BeginFrame()
 void RemoteServer::EndFrame()
 {
 	ParseReceivedMessages( g_theNetworkSys->m_recievedUDPMesageBuffer );
+	ParseAndUpdateEntities();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void RemoteServer::ParseAndUpdateEntities()
+{
+	if ( m_gameType == MULTIPLAYER && m_isRemoteClientConnectionComplete )
+	{
+		Game* currentGame = GetGame();
+		
+		if ( currentGame == nullptr )
+		{
+			return;
+		}
+
+		for ( auto index : g_theNetworkSys->m_recievedUDPMesageBuffer )
+		{
+			if ( index != "" )
+			{
+				Strings data = SplitStringAtGivenDelimiter( index , '|' );
+				int identifier = atoi( data[ 0 ].c_str() );
+				//LOG_SYSMESSAGE( " UniqueKey = %d" , identifier );
+				if ( identifier != m_uniqueKey )
+				{
+					continue;
+				}
+								
+				Entitylist& entityList = currentGame->m_world->m_currentMap->m_entityListsByType[ atoi( data[ 1 ].c_str() ) ];
+				int entityID = atoi( data[ 2 ].c_str() );
+
+				for ( int entityIndex = 0; entityIndex < entityList.size(); entityIndex++ )
+				{
+					if ( entityList[ entityIndex ]->m_entityID == entityID )
+					{
+						entityList[ entityIndex ]->m_position = entityList[ entityIndex ]->m_position.SetFromText( data[ 3 ].c_str() );
+						entityList[ entityIndex ]->m_orientationDegrees = StringConvertToValue( data[ 4 ].c_str() , entityList[ entityIndex ]->m_orientationDegrees );
+					}
+				}
+			}
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

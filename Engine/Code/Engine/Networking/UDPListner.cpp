@@ -66,7 +66,20 @@ void UDPListner::Reader( UDPSocket& socket , SynchronizedLockFreeQueue<std::stri
 
 			if( receivedMessage != "" )
 			{
-				g_theNetworkSys->m_recievedUDPMesageBuffer.emplace_back( receivedMessage );
+				bool wasMessageAddedToBuffer = false;
+				for( auto index : g_theNetworkSys->m_recievedUDPMesageBuffer )
+				{
+					if( index == "" )
+					{
+						g_theNetworkSys->m_recievedUDPMesageBuffer.emplace_back( receivedMessage );
+						wasMessageAddedToBuffer = true;
+						break;
+					}
+				}
+				if( !wasMessageAddedToBuffer )
+				{
+					g_theNetworkSys->m_recievedUDPMesageBuffer.emplace_back( receivedMessage );
+				}
 			}
 		}
 	}
