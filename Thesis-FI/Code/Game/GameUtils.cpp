@@ -62,8 +62,9 @@ bool Game::AddGameOBJInstance( eGameObjModels modelType )
 	}
 
 	Transform* newTransform = new Transform();
-
 	EmplaceBackAtEmptySpace( m_ModelInstances[ modelType ] , newTransform );
+//	EmplaceBackAtEmptySpace( m_isInstanceGarbage[ modelType ] , false );
+
 	m_totalDrawableMeshes++;
 	return true;
 }
@@ -87,9 +88,10 @@ bool Game::AddGameOBJInstances( eGameObjModels modelType )
 			return false;
 		}
 
-		Transform* newTransform = new Transform();
+		Transform* newTransform =  new Transform();
 
 		EmplaceBackAtEmptySpace( m_ModelInstances[ modelType ] , newTransform );
+//		EmplaceBackAtEmptySpace( m_isInstanceGarbage[ modelType ] , false );
 		m_totalDrawableMeshes++;
 		newTransform->SetPosition( Vec3::MakeFromSpericalCoordinates( Pitch , Yaw , m_numNewInstancesRadius ) );
 		newTransform->SetRotation( Pitch , Yaw , Roll );
@@ -126,26 +128,34 @@ void Game::LoadScene()
 	{
 		tinyxml2::XMLElement* modelsRoot = xmlDocument.RootElement();
 		
-		tinyxml2::XMLElement* modelInstance = modelsRoot->FirstChildElement( "ModelInstance" );
+		tinyxml2::XMLElement* modelInstance = modelsRoot->FirstChildElement( "ModelInstances" );
 		tinyxml2::XMLElement* modelTransform = nullptr;
 
-		while( modelInstance != nullptr )
+		for( int modelIndex = 0 ; modelIndex < NUM_GAME_MODELS ; modelIndex++ )
 		{
+			if( modelInstance == nullptr )
+			{
+				continue;
+			}
+
+			int modelinstanceCount		= ParseXmlAttribute( *modelInstance , "count" , 0 );
+			m_ModelInstances[ modelIndex ].resize( modelinstanceCount );
+			int  enumValIndex			= ParseXmlAttribute( *modelInstance , "enumValue" , modelIndex );
+
 			modelTransform = modelInstance->FirstChildElement( "Transform" );
 
-			bool isDataBad = false;
+			while( modelTransform != nullptr )
+			{
+				bool isDataBad			= false;
 
-			int  modelIndex			= ParseXmlAttribute( *modelInstance , "enumValue" , 0 );
-			
-			Vec3 instancePos		= ParseXmlAttribute( *modelTransform , "pos" , Vec3::ZERO );
-			float instanceYaw		= ParseXmlAttribute( *modelTransform , "yaw" , 0.0f );
-			float instancePitch		= ParseXmlAttribute( *modelTransform , "pitch" , 0.0f );
-			float instanceRoll		= ParseXmlAttribute( *modelTransform , "roll" , 0.0f );
-			Vec3 instanceScale		= ParseXmlAttribute( *modelTransform , "scale" , Vec3::ZERO );
-
+				Vec3 instancePos		= ParseXmlAttribute( *modelTransform , "pos" , Vec3::ZERO );
+				float instanceYaw		= ParseXmlAttribute( *modelTransform , "yaw" , 0.0f );
+				float instancePitch		= ParseXmlAttribute( *modelTransform , "pitch" , 0.0f );
+				float instanceRoll		= ParseXmlAttribute( *modelTransform , "roll" , 0.0f );
+				Vec3 instanceScale		= ParseXmlAttribute( *modelTransform , "scale" , Vec3::ZERO );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-//				HACK TO CREATE SYMMETRY ON THE OPPOSITE SIDE WITHT HE OTHER MESH
+//				HACK TO CREATE SYMMETRY ON THE OPPOSITE SIDE WITH THE OTHER MESH
 //--------------------------------------------------------------------------------------------------------------------------------------------
 				
 // 			if( modelIndex == 1 )
@@ -153,21 +163,18 @@ void Game::LoadScene()
 // 				instancePos.x = abs( instancePos.x );
 // 			}
 			
-			if( ( modelIndex < 0 ) && ( modelIndex >= NUM_GAME_MODELS ) )
-			{
-				isDataBad = true;
+				if( !isDataBad )
+				{
+					Transform* newInstance = new Transform();
+					newInstance->SetPosition( instancePos );
+					newInstance->SetRotation( instancePitch , instanceYaw , instanceRoll );
+					newInstance->SetScale( instanceScale.x , instanceScale.y , instanceScale.z );
+					m_ModelInstances[ enumValIndex ].emplace_back( newInstance );
+					m_totalDrawableMeshes++;
+				}
+				modelTransform = modelTransform->NextSiblingElement( "Transform" );
 			}
-
-			if( !isDataBad )
-			{
-				Transform* newInstance = new Transform();
-				newInstance->SetPosition( instancePos );
-				newInstance->SetRotation( instancePitch , instanceYaw , instanceRoll );
-				newInstance->SetScale( instanceScale.x , instanceScale.y , instanceScale.z );
-				m_ModelInstances[ modelIndex ].emplace_back( newInstance );
-				m_totalDrawableMeshes++;
-			}
-			modelInstance = modelInstance->NextSiblingElement( "ModelInstance" );
+			modelInstance = modelInstance->NextSiblingElement( "ModelInstances" );
 		}
 	}
 }
@@ -180,11 +187,17 @@ void Game::SaveScene()
 	xmlDocument.LoadFile( "Data/Models/ModelInstances.xml" );
 	xmlDocument.Clear();
 
-	XMLElement* modelInstancesRootNode = xmlDocument.NewElement( "ModelIntances" );
+	XMLElement* modelInstancesRootNode = xmlDocument.NewElement( "ModelIntancesData" );
 	xmlDocument.LinkEndChild( modelInstancesRootNode );
 
 	for ( int modelType = 0 ; modelType < NUM_GAME_MODELS ; modelType++ )
 	{
+		XMLElement* modelInstances = xmlDocument.NewElement( "ModelInstances" );
+		tinyxml2::XMLText* modeInstanceText = xmlDocument.NewText( "" );
+		
+		modelInstances->SetAttribute( "count" , ToString( ( int ) m_ModelInstances[ modelType ].size() ).c_str() );
+		modelInstances->SetAttribute( "enumValue" , modelType );
+		
 		for ( size_t modelInstanceCount = 0 ; modelInstanceCount < m_ModelInstances[modelType].size() ; modelInstanceCount++ )
 		{
 			Transform* currTransform = m_ModelInstances[ modelType ][ modelInstanceCount ];
@@ -194,11 +207,6 @@ void Game::SaveScene()
 				continue;
 			}
 			
-			XMLElement* modelInstance = xmlDocument.NewElement( "ModelInstance" );
-			tinyxml2::XMLText* modeInstanceText = xmlDocument.NewText( "" );
-
-			modelInstance->SetAttribute( "enumValue" , modelType );
-
 			XMLElement* instanceTransform = xmlDocument.NewElement( "Transform" );
 			tinyxml2::XMLText* instanceTransformText = xmlDocument.NewText( "" );
 
@@ -208,13 +216,13 @@ void Game::SaveScene()
 			instanceTransform->SetAttribute( "roll"		, ToString( currTransform->GetRoll() ).c_str() );
 			instanceTransform->SetAttribute( "scale"	, ToString( currTransform->GetScale() ).c_str() );
 			
-			modelInstance->InsertFirstChild( instanceTransform );
-			modelInstance->LinkEndChild( instanceTransform );
+			modelInstances->InsertEndChild( instanceTransform );
+			modelInstances->LinkEndChild( instanceTransform );
 			instanceTransform->LinkEndChild( instanceTransformText );
 
-			modelInstancesRootNode->LinkEndChild( modelInstance );
-			modelInstance->LinkEndChild( modeInstanceText );
 		}
+		modelInstances->LinkEndChild( modeInstanceText );
+		modelInstancesRootNode->LinkEndChild( modelInstances );
 	}
 
 	xmlDocument.SaveFile( "Data/Models/ModelInstances.xml" );

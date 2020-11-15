@@ -144,6 +144,7 @@ public:
 	Texture*							m_gamePlanetaryDiffuse[ NUM_GAME_MODELS ];
 	Texture*							m_gamePlanetaryNormals[ NUM_GAME_MODELS ];
 	OBJInstances						m_ModelInstances[ NUM_GAME_MODELS ];
+	std::vector<bool>					m_isInstanceGarbage[ NUM_GAME_MODELS ];
 	OBJInstances						m_ModelDrawableInstances[ NUM_GAME_MODELS ];
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
