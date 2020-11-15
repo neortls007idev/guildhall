@@ -15,6 +15,7 @@ public:
 	void InitializePlayerMemberVariables();
 
 	void Update( float deltaSeconds ) override;
+	void UpdatePlayerColor( Rgba8 playerTint );
 	void Render() const override;
 	void IsDead() override;
 
@@ -42,6 +43,8 @@ public:
 public:
 
 	float m_turretOrientation;
+	bool m_didPlayerMoveThisFrame = false;
+	bool m_didPlayerMoveLastFrame = false;
 
 private:
 

@@ -4,10 +4,15 @@
 #include "Game/Game.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 
+static int s_entityID = 0;
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Entity::Entity( Game* pointerToGameInstance, Vec2 pos, Vec2 velocity, float orientation, EntityType type , Faction faction )
 {
+	m_entityID = s_entityID;
+	s_entityID++;
+
 	m_theGame = pointerToGameInstance;
 	m_position = pos;
 	m_velocity = velocity;

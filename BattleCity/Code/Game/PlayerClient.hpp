@@ -10,7 +10,7 @@ class Game;
 class PlayerClient : public Client
 {
 public:
-	PlayerClient();
+	PlayerClient( int playerID );
 	~PlayerClient();
 
 	virtual void	Startup() override;
@@ -22,6 +22,8 @@ public:
 
 public:
 	Game* m_game = nullptr;
+	int m_localPlayerID = 0;
+	int m_uniqueKey = 0;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

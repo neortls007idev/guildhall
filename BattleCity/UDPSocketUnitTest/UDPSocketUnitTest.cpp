@@ -24,10 +24,10 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-RenderContext*	g_theRenderer	= nullptr;
-InputSystem*	g_theInput		= nullptr;
-DevConsole*		g_theDevConsole = nullptr;
-Window*			g_theWindow		= nullptr;
+extern RenderContext*	g_theRenderer;
+extern InputSystem*		g_theInput;
+extern DevConsole*		g_theDevConsole;
+Window*					g_theWindow		= nullptr;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

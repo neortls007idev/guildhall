@@ -83,6 +83,11 @@ void Map::Update( float deltaSeconds )
 {
 	for ( int Entitytype = 0; Entitytype < NUM_ENTITY_TYPES; Entitytype++ )
 	{
+		if( Entitytype == PLAYERTANK_ENTITY )
+		{
+			continue;
+		}
+
 		Entitylist& currentList = m_entityListsByType[ Entitytype ];	
 		for ( int entityIndex = 0; entityIndex < (int)m_entityListsByType[ Entitytype ].size(); entityIndex++ )
 		{
@@ -90,7 +95,6 @@ void Map::Update( float deltaSeconds )
 			{
 				currentList[ entityIndex ]->Update( deltaSeconds );
 			}
-			
 		}
 	}
 	CheckNoClipping();

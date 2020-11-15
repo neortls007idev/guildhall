@@ -31,8 +31,15 @@ public:
 	
 	void AddPlayerClientToServer( Client* client );
 	bool RemovePlayerClientFromServer( Client* client );
+
+	void	AddRemoteNewRemotePlayer();
+	Game*	GetGame();
+	void	ParseReceivedMessages( std::vector< std::string > messageBuffer );
 	
 public:
+	bool						m_isRemoteClientConnectionComplete = false;
+	int							m_uniqueKey = 0;
+
 	GameSinglePlayer*			m_singlePlayerGame	= nullptr;
 	GameMultiplayer*			m_multiPlayerGame	= nullptr;
 	GameType					m_gameType			= SINGLE_PLAYER;

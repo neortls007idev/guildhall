@@ -1,12 +1,14 @@
 #pragma once
 #include "Game/Client.hpp"
 
+class Game;
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-class RemoteClient : protected Client
+class RemoteClient : public Client
 {
 public:
-	RemoteClient();
+	RemoteClient( int PlayerID );
 	~RemoteClient();
 
 	virtual void	Startup() override;
@@ -14,6 +16,10 @@ public:
 	virtual void	Update( float deltaSeconds ) override;
 	virtual void	BeginFrame() override;
 	virtual void	EndFrame() override;
+	
+public:
+	Game* m_game = nullptr;
+	int m_remotePlayerID = 1;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -3,6 +3,8 @@
 #include "Engine/Core/StdExtensions.hpp"
 #include "Game/GameSinglePlayer.hpp"
 #include "Game/GameMultiPlayer.hpp"
+#include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Core/DevConsole.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -105,6 +107,68 @@ bool Server::RemovePlayerClientFromServer( Client* client )
 	}
 
 	return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Server::AddRemoteNewRemotePlayer()
+{
+	Player* secondplayer = m_multiPlayerGame->CreateAndAddPlayerAtpositionAndOrientation( Vec2( 46.5 , 1.5f ) , 135.f );
+	secondplayer->UpdatePlayerColor( MAGENTA );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+Game* Server::GetGame()
+{
+	if ( m_gameType == SINGLE_PLAYER )
+	{
+		return m_singlePlayerGame;
+	}
+	else if ( m_gameType == MULTIPLAYER )
+	{
+		return m_multiPlayerGame;
+	}
+	else
+	{
+		__debugbreak();
+	}
+	return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Server::ParseReceivedMessages( std::vector< std::string > messageBuffer )
+{
+	if ( m_gameType == MULTIPLAYER && m_isRemoteClientConnectionComplete )
+	{
+		for ( auto index : messageBuffer )
+		{
+			if ( index != "" )
+			{
+				Strings data = SplitStringAtGivenDelimiter( index , '|' );
+				int identifier = atoi( data[ 0 ].c_str() );
+				//LOG_SYSMESSAGE( " UniqueKey = %d" , identifier );
+				if ( identifier != m_uniqueKey )
+				{
+					continue;
+				}
+
+				Game* currentGame = GetGame();
+				Entitylist& entityList = currentGame->m_world->m_currentMap->m_entityListsByType[ atoi( data[ 1 ].c_str() ) ];
+				int entityID = atoi( data[ 2 ].c_str() );
+
+				for ( int entityIndex = 0; entityIndex < entityList.size(); entityIndex++ )
+				{
+					if ( entityList[ entityIndex ]->m_entityID == entityID )
+					{
+						entityList[ entityIndex ]->m_position = entityList[ entityIndex ]->m_position.SetFromText( data[ 3 ].c_str() );
+						entityList[ entityIndex ]->m_orientationDegrees = StringConvertToValue( data[ 4 ].c_str() , entityList[ entityIndex ]->m_orientationDegrees );
+					}
+				}
+			}
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

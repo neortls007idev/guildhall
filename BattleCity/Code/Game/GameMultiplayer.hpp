@@ -14,9 +14,9 @@ public:
 	virtual void Startup() override;
 	virtual void Update( float deltaSeconds ) override;
 	virtual void Render() const override;
-		void CreateAndAddPlayer();
+	Player* CreateAndAddPlayerAtpositionAndOrientation( Vec2 pos = Vec2( 1.5f , 1.5f ) , float orientation = 45.f );
 
-	std::vector< Player* >	m_player;
+	std::vector< Player* >	m_players;
 	Camera*					m_playerCamera	= nullptr;
 	Camera*					m_UICamera		= nullptr;
 

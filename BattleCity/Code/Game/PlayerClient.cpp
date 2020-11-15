@@ -5,6 +5,9 @@
 #include "Game/Server.hpp"
 #include "Game/GameSinglePlayer.hpp"
 #include "Game/AuthServer.hpp"
+#include "Game/RemoteServer.hpp"
+#include "Engine/Networking/NetworkSystem.hpp"
+#include "Player.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -14,19 +17,22 @@ extern	InputSystem*						g_theInput;
 extern	RenderContext*						g_theRenderer;
 extern	Window*								g_theWindow;
 extern	BitmapFont*							g_bitmapFont;
-extern AuthoritativeServer*					g_theAuthServer;
+extern	AuthoritativeServer*				g_theAuthServer;
+extern	RemoteServer*						g_theRemoteServer;
+extern	NetworkSystem*						g_theNetworkSys;
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	
-PlayerClient::PlayerClient() : Client()
+PlayerClient::PlayerClient( int playerID ) : Client()
 {
-	
+	m_localPlayerID = playerID;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 PlayerClient::~PlayerClient()
 {
-
+	m_game = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -47,7 +53,28 @@ void PlayerClient::Shutdown()
 
 void PlayerClient::Update( float deltaSeconds )
 {
+	if( m_game != nullptr )
+	{
+		if( ( m_game->m_world->m_currentMap->m_entityListsByType[ PLAYERTANK_ENTITY ].size() > m_localPlayerID ) &&
+			( nullptr != m_game->m_world->m_currentMap->m_entityListsByType[ PLAYERTANK_ENTITY ][ m_localPlayerID ] ) )
+		{
+			Player* player = ( Player* ) m_game->m_world->m_currentMap->m_entityListsByType[ PLAYERTANK_ENTITY ][ m_localPlayerID ];
+			player->Update( deltaSeconds );
 
+			if( player->m_didPlayerMoveLastFrame )
+			{
+				EventArgs ClientUpdateArgs;
+				std::string clientDataAsString = ToString( m_uniqueKey ) + "|" +
+												 ToString( PLAYERTANK_ENTITY ) + "|" + 
+												 ToString( player->m_entityID ) + "|" +
+												 ToString( player->m_position ) + "|" +
+												 ToString( player->m_orientationDegrees );
+
+				ClientUpdateArgs.SetValue( "msg" , clientDataAsString.c_str() );
+				g_theNetworkSys->SendUDPMessage( ClientUpdateArgs );
+			}
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -71,7 +98,16 @@ void PlayerClient::BeginFrame()
 
 void PlayerClient::EndFrame()
 {
-	m_game = g_theAuthServer->GetGame();
+	if( g_theAuthServer != nullptr )
+	{
+		m_game = g_theAuthServer->GetGame();
+		m_uniqueKey = g_theAuthServer->m_uniqueKey;
+	}
+	else if( m_game == nullptr && g_theRemoteServer != nullptr )
+	{
+		m_game = g_theRemoteServer->GetGame();
+		m_uniqueKey = g_theRemoteServer->m_uniqueKey;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

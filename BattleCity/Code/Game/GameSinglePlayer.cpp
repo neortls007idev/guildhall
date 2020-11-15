@@ -1,3 +1,5 @@
+#include "Engine/Core/Devconsole.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 #include "Game/GameSinglePlayer.hpp"
 #include "Game/Map.hpp"
 #include "Game/World.hpp"
@@ -10,7 +12,7 @@ extern RenderContext* g_theRenderer;
 
 GameSinglePlayer::GameSinglePlayer()
 {
-
+	LOG_SYSMESSAGE( "SinglePlayer Game Started" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -22,6 +24,8 @@ GameSinglePlayer::~GameSinglePlayer()
 
 	delete m_UICamera;
 	m_UICamera = nullptr;
+
+	LOG_SYSMESSAGE( "SinglePlayer Game Terminated" );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -43,10 +47,10 @@ void GameSinglePlayer::Update( float deltaSeconds )
 		m_player = nullptr;
 	}
 		
-	if( m_player != nullptr )
-	{
-		m_player->Update( deltaSeconds );
-	}
+	//if( m_player != nullptr )
+	//{
+	//	m_player->Update( deltaSeconds );
+	//}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

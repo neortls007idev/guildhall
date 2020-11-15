@@ -19,11 +19,13 @@ public:
 	virtual void	Update( float deltaSeconds ) override;
 	virtual void	BeginFrame() override;
 	virtual void	EndFrame() override;
-			Game*	GetGame();
+//			Game*	GetGame();
 			void	AddPlayers();
 //			void	AssignInputSystem( InputSystem* inputSystem );
 public:
 	
+private:
+	int m_numRemotePlayers = 0;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

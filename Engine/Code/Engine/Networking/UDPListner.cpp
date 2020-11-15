@@ -3,10 +3,12 @@
 #include "Engine/Networking/UDPListner.hpp"
 #include "Engine/Networking/UDPSocket.hpp"
 #include <thread>
+#include "Engine/Networking/NetworkSystem.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 extern	DevConsole* g_theDevConsole;
+extern NetworkSystem* g_theNetworkSys;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	
@@ -38,7 +40,6 @@ void UDPListner::StartSocket( int bindPort , int sendPort , std::string host /*=
 
 	 readerThread = new std::thread( &UDPListner::Writer , this , std::ref(*m_listenSocket), std::ref( m_writeQueue ) );
 	 writerThread = new std::thread( &UDPListner::Reader, this , std::ref(*m_listenSocket), std::ref( m_readQueue ) );
-
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -60,8 +61,13 @@ void UDPListner::Reader( UDPSocket& socket , SynchronizedLockFreeQueue<std::stri
 			auto& buffer = socket.ReceiveBuffer();
 			pMsg = reinterpret_cast< UDPMessageHeader const* > ( &buffer[ 0 ] );
 			std::string receivedMessage = &buffer[ sizeof( UDPMessageHeader ) ];
-			LOG_SYSMESSAGE( "UDP Received Message: %s" , receivedMessage.c_str() );
+			//LOG_SYSMESSAGE( "UDP Received Message: %s" , receivedMessage.c_str() );
 			readQueue.push( receivedMessage );
+
+			if( receivedMessage != "" )
+			{
+				g_theNetworkSys->m_recievedUDPMesageBuffer.emplace_back( receivedMessage );
+			}
 		}
 	}
 }

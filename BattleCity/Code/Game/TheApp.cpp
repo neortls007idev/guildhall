@@ -9,17 +9,21 @@
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Time/Time.hpp"
 #include "Game/Game.hpp"
+#include "Game/GameSinglePlayer.hpp"
+#include "Game/GameMultiPlayer.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/AuthServer.hpp"
 #include "Game/TheApp.hpp"
 #include "Game/PlayerClient.hpp"
 #include "Game/MapDefinition.hpp"
+#include "Game/RemoteServer.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 		TheApp*								g_theApp			= nullptr;
 extern	AudioSystem*						g_theAudioSystem;
 extern	AuthoritativeServer*				g_theAuthServer;
+extern	RemoteServer*						g_theRemoteServer;
 extern	BitmapFont*							g_bitmapFont;
 extern	DevConsole*							g_theDevConsole;	
 extern	InputSystem*						g_theInput;
@@ -124,13 +128,13 @@ void TheApp::Startup()
 	g_theAuthServer->Startup();
 	g_theAuthServer->AddPlayers();
 	
-	if( m_client == nullptr )
+	if( m_localclient == nullptr )
 	{
-		m_client = new PlayerClient();
-		m_client->Startup();
+		m_localclient = new PlayerClient( 0 );
+		m_localclient->Startup();
 	}
 
-	g_theAuthServer->AddPlayerClientToServer( m_client );
+	g_theAuthServer->AddPlayerClientToServer( m_localclient );
 	
 	if ( g_theNetworkSys == nullptr )
 	{
@@ -174,10 +178,15 @@ void TheApp::BeginFrame()
 	{
 		g_theAuthServer->BeginFrame();
 	}
-
-	if( m_client != nullptr )
+	
+	if( g_theRemoteServer != nullptr )
 	{
-		m_client->BeginFrame();
+		g_theRemoteServer->BeginFrame();
+	}
+
+	if( m_localclient != nullptr )
+	{
+		m_localclient->BeginFrame();
 	}
 }
 
@@ -186,19 +195,27 @@ void TheApp::BeginFrame()
 void TheApp::Update( float deltaSeconds )
 {
 	UpdateFromKeyboard();
+	
 	if ( g_theAuthServer != nullptr )
 	{
 		g_theAuthServer->Update( deltaSeconds );
 	}
 	
-	if( m_client != nullptr )
+	if( g_theRemoteServer != nullptr )
 	{
-		m_client->Update( deltaSeconds );
+		g_theRemoteServer->Update( deltaSeconds );
 	}
+
+	if( m_localclient != nullptr )
+	{
+		m_localclient->Update( deltaSeconds );
+	}
+	
 	if ( g_theDevConsole->IsOpen() )
 	{
 		g_theDevConsole->Update( deltaSeconds );
 	}
+	
 	g_theInput->EndFrame();
 }
 
@@ -206,9 +223,9 @@ void TheApp::Update( float deltaSeconds )
 
 void TheApp::Render() const
 {
-	if( m_client != nullptr )
+	if( m_localclient != nullptr )
 	{
-		m_client->Render();
+		m_localclient->Render();
 	}
 	if ( g_theDevConsole->IsOpen() )
 	{
@@ -223,14 +240,21 @@ void TheApp::EndFrame()
 {
 	// all engine things that must end at the end of the frame and not the game
 /*	g_currentManager->EndFrame();*/
+	if( g_theRemoteServer != nullptr )
+	{
+		g_theRemoteServer->EndFrame();
+	}
+		
 	if( g_theAuthServer != nullptr )
 	{
 		g_theAuthServer->EndFrame();
 	}
-	if( m_client != nullptr )
+
+	if( m_localclient != nullptr )
 	{
-		m_client->EndFrame();
+		m_localclient->EndFrame();
 	}
+
 	g_theNetworkSys->EndFrame();
 	g_theAudioSystem->EndFrame();
 	g_theDevConsole->EndFrame();
@@ -254,10 +278,16 @@ void TheApp::AddMultiplayerGameCommandsToConsole()
 
 void TheApp::Shutdown()
 {
-	if( m_client != nullptr )
+	if( m_localclient != nullptr )
 	{
-		m_client->Shutdown();
+		m_localclient->Shutdown();
 	}
+
+	if( g_theRemoteServer != nullptr )
+	{
+		g_theRemoteServer->Shutdown();
+	}
+
 	if( g_theAuthServer != nullptr )
 	{
 		g_theAuthServer->Shutdown();
@@ -310,10 +340,32 @@ STATIC bool TheApp::StartMultiplayerServer( EventArgs& args )
 	LOG_SYSMESSAGE( "Stopping Current Game" );
 	int port = args.GetValue( "port" , 48000 );
 	
-	delete g_theAuthServer;
-	g_theAuthServer = nullptr;
-	delete g_theApp->m_client;
-	g_theApp->m_client = nullptr;
+	if( g_theAuthServer != nullptr )
+	{
+		SAFE_RELEASE_POINTER( g_theAuthServer->m_singlePlayerGame );
+		g_theAuthServer->CreateMultiPlayerGame();
+		g_theNetworkSys->StartTCPServer( args );
+		g_theAuthServer->AddPlayers();
+		g_theWindow->SetTitle( "SD3 : A3 - Networked Multiplayer BATTLE CITY - Server" );
+	}
+	else
+	{
+		g_theAuthServer->CreateMultiPlayerGame();
+		g_theNetworkSys->StartTCPServer( args );
+		g_theAuthServer->AddPlayers();
+		g_theWindow->SetTitle( "SD3 : A3 - Networked Multiplayer BATTLE CITY - Server" );
+	}
+
+	delete g_theApp->m_localclient;
+	g_theApp->m_localclient = nullptr;
+
+	if ( g_theApp->m_localclient == nullptr )
+	{
+		g_theApp->m_localclient = new PlayerClient( 0 );
+		g_theApp->m_localclient->Startup();
+	}
+
+	g_theAuthServer->AddPlayerClientToServer( g_theApp->m_localclient );
 
 	return true;
 }
@@ -325,11 +377,27 @@ STATIC bool TheApp::ConnectToMultiplayerServer( EventArgs& args )
 	LOG_SYSMESSAGE( "Stopping Current Game" );
 	std::string ipAddr = args.GetValue( "ip" , "127.0.0.1" );
 	int port = args.GetValue( "port" , 48000 );
-	
-	delete g_theAuthServer;
-	g_theAuthServer = nullptr;
-	delete g_theApp->m_client;
-	g_theApp->m_client = nullptr;
+
+	if ( g_theAuthServer != nullptr )
+	{
+		SAFE_RELEASE_POINTER( g_theAuthServer->m_singlePlayerGame );
+		SAFE_RELEASE_POINTER( g_theAuthServer );
+
+		if( g_theRemoteServer == nullptr )
+		{
+			g_theRemoteServer = new RemoteServer();
+		}
+		g_theRemoteServer->Startup();
+				
+		if( g_theNetworkSys->ConnectToServer( args ) )
+		{
+			g_theWindow->SetTitle( "SD3 : A3 - Networked Multiplayer BATTLE CITY - Client" );
+			g_theRemoteServer->RequestAddPlayerEntityandUDPConnection();
+		}
+	}
+
+	delete g_theApp->m_localclient;
+	g_theApp->m_localclient = nullptr;
 
 	return true;
 }

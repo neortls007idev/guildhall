@@ -61,7 +61,7 @@ public:
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 public:
-	
+	int m_entityID			   = 0;
 	EntityType m_entityType	   = INVALID_ENTITY;
 	Faction m_faction		   = INVALID_FACTION;
 

@@ -100,6 +100,9 @@
     <ClCompile Include="MapGenStepFromImage.cpp">
       <Filter>Gameplay\Map</Filter>
     </ClCompile>
+    <ClCompile Include="EntityDef.cpp">
+      <Filter>Gameplay\Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.hpp">
@@ -179,6 +182,9 @@
     </ClInclude>
     <ClInclude Include="MapGenStepFromImage.hpp">
       <Filter>Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityDef.hpp">
+      <Filter>Gameplay\Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

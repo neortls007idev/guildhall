@@ -18,6 +18,7 @@ extern RenderContext*	g_theRenderer;
 extern TheApp*			g_theApp;
 extern AudioSystem*		g_theAudioSystem;
 extern DevConsole*		g_theDevConsole;
+extern RandomNumberGenerator* g_RNG;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -31,7 +32,6 @@ Player::Player( Game* CurrentGameInstance , Vec2 position , Vec2 velocity , floa
 		)
 {
 	InitializePlayerMemberVariables();
-
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -49,6 +49,20 @@ void Player::Update( float deltaSeconds )
 		checkKeyboardKeyPressForMovement( deltaSeconds );
 	}
 	Entity::WrapAroundScreen();
+	
+	m_didPlayerMoveLastFrame = m_didPlayerMoveThisFrame;
+	m_didPlayerMoveThisFrame = false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Player::UpdatePlayerColor( Rgba8 playerTint )
+{
+	for ( int index = 0; index < 6; index++ )
+	{
+		m_playerTankVerts[ index ].m_color = playerTint;
+		m_playerTurretVerts[ index ].m_color = playerTint;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -202,6 +216,7 @@ void Player::checkKeyboardKeyPressForMovement( float deltaSeconds )
 
 void Player::TankMovement( float deltaSeconds )
 {
+	m_didPlayerMoveThisFrame = true;
 	m_velocity =  Vec2( 1.5f * CosDegrees( m_orientationDegrees ) , 1.5f * SinDegrees( m_orientationDegrees ) ) ;
 	Entity::Movement( deltaSeconds );
 }

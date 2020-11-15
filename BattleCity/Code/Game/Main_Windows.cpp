@@ -20,7 +20,7 @@ extern InputSystem*			g_theInput;
 
 //-----------------------------------------------------------------------------------------------
 
-const	char*	APP_NAME		= "SD3 : A3 - NETWORKED MULTIPLAYER BATTLE CITY";
+const	char*	APP_NAME		= "SD3 : A3 - BATTLE CITY";
 
 //-----------------------------------------------------------------------------------------------
 // Processes all Windows messages (WM_xxx) for this app that have queued up since last frame.

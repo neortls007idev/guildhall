@@ -3,10 +3,26 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-class RemoteServer : protected Server
+class RemoteServer : public Server
 {
 public:
-	
+	RemoteServer();
+	~RemoteServer();
+
+	virtual void	Startup() override;
+	virtual void	Shutdown() override;
+	virtual void	Update( float deltaSeconds ) override;
+	virtual void	BeginFrame() override;
+	virtual void	EndFrame() override;
+
+//	Game* GetGame();
+	bool RequestAddPlayerEntityandUDPConnection();
+
+public:
+	int m_playerID = 0;
+	std::string m_hostIPaddr = "";
+	int m_udpSendToPort = 48000;
+	int m_udpListenPort = 48001;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
