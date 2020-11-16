@@ -29,6 +29,10 @@ UDPListner::~UDPListner()
 	{
 		writerThread->join();
 	}
+
+	SAFE_RELEASE_POINTER( readerThread );
+	SAFE_RELEASE_POINTER( writerThread );
+	SAFE_RELEASE_POINTER( m_listenSocket );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

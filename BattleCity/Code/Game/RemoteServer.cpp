@@ -41,7 +41,13 @@ void RemoteServer::Startup()
 
 void RemoteServer::Shutdown()
 {
+	EventArgs args;
+	args.SetValue( "bindPort" , ToString( m_udpListenPort ) );
 
+	if ( g_theNetworkSys != nullptr )
+	{
+		g_theNetworkSys->CloseUDPPort( args );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -50,10 +56,10 @@ void RemoteServer::Update( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
 
-	//if ( m_gameType == MULTIPLAYER )
-	//{
-	//	m_multiPlayerGame->Update( deltaSeconds );
-	//}
+	if ( m_gameType == MULTIPLAYER )
+	{
+		m_multiPlayerGame->m_world->m_currentMap->CheckCollisions();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -170,13 +176,17 @@ void RemoteServer::ParseAndUpdateEntities()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-bool RemoteServer::RequestAddPlayerEntityandUDPConnection()
+bool RemoteServer::RequestAddPlayerEntityandUDPConnection( EventArgs args )
 {
-	EventArgs args;
-	args.SetValue( "msg" , "StartUDPServer" );
+	m_hostIPaddr = args.GetValue( "ipaddr" , "127.0.0.1" );
+	EventArgs newArgs;
+
+	std::string message = "StartUDPServer," + m_hostIPaddr;
+	newArgs.SetValue( "msg" , message );
+	
 	if ( g_theNetworkSys != nullptr )
 	{
-		return g_theNetworkSys->SendMessageToServer( args );
+		return g_theNetworkSys->SendMessageToServer( newArgs );
 	}
 
 	return false;

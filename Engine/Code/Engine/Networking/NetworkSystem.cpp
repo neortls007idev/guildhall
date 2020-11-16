@@ -78,6 +78,11 @@ void NetworkSystem::Startup()
 
 void NetworkSystem::Shutdown()
 {
+	if ( m_UDPListner != nullptr )
+	{
+		SAFE_RELEASE_POINTER( m_UDPListner );
+	}
+
 	int iResult = WSACleanup();
 
 	if( iResult == SOCKET_ERROR )

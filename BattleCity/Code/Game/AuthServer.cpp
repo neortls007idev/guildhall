@@ -43,7 +43,13 @@ void AuthoritativeServer::Startup()
 
 void AuthoritativeServer::Shutdown()
 {
+	EventArgs args;
+	args.SetValue( "bindPort" , ToString( m_udpListenPort ) );
 
+	if ( m_gameType == MULTIPLAYER && g_theNetworkSys != nullptr )
+	{
+		g_theNetworkSys->CloseUDPPort( args );
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -73,49 +79,62 @@ void AuthoritativeServer::BeginFrame()
 				break;
 			}
 
-			if ( _stricmp( index.c_str() , "StartUDPServer" ) == 0 )
+			Strings updSocketEventData = SplitStringAtGivenDelimiter( index );
+			if( updSocketEventData.size() == 2 )
 			{
-				RandomNumberGenerator rng;
-				m_uniqueKey = rng.RollRandomIntInRange( INT16_MIN , INT16_MAX - 1 );
-				std::string ipaddr = "127.0.0.1";
-				int udpListenPort = rng.RollRandomIntInRange( 48000 , 49000 );
-				int udpSendToPort = rng.RollRandomIntInRange( 48000 , 49000 );
-
-				while ( udpSendToPort == udpListenPort )
+				if ( _stricmp( updSocketEventData[ 0 ].c_str() , "StartUDPServer" ) == 0 )
 				{
-					udpSendToPort = rng.RollRandomIntInRange( 48000 , 49000 );
-					rng.manuallyIncrementPosition();
-				}
-				m_numRemotePlayers++;
+					RandomNumberGenerator rng;
+					m_uniqueKey = rng.RollRandomIntInRange( INT16_MIN , INT16_MAX - 1 );
+					std::string ipaddr = updSocketEventData[ 1 ].c_str();
+					m_udpListenPort = rng.RollRandomIntInRange( 48000 , 49000 );
+					m_udpSendToPort = rng.RollRandomIntInRange( 48000 , 49000 );
 
-				EventArgs args;
-				std::string message = "UDPServerStarted," + ToString( m_uniqueKey ) + "," + ipaddr.c_str() + "," + ToString( udpListenPort ) + "," + ToString( udpSendToPort ) + "," + ToString( m_numRemotePlayers );
-				LOG_SYSMESSAGE( " UniqueKey = %d" , m_uniqueKey );
-
-				EventArgs UDPArgs;
-
-				UDPArgs.SetValue( "bindPort" , ToString( udpListenPort ) );
-				UDPArgs.SetValue( "sendPort" , ToString( udpSendToPort ) );
-				UDPArgs.SetValue( "host" , ipaddr.c_str() );
-				if ( g_theNetworkSys->OpenUDPPort( UDPArgs ) )
-				{
-					args.SetValue( "msg" , message );
-					AddRemoteNewRemotePlayer();
-
-					if ( g_theApp->m_distantClient == nullptr )
+					while ( m_udpSendToPort == m_udpListenPort )
 					{
-						g_theApp->m_distantClient = new RemoteClient( m_numRemotePlayers );
-						g_theApp->m_distantClient->Startup();
+						m_udpSendToPort = rng.RollRandomIntInRange( 48000 , 49000 );
+						rng.manuallyIncrementPosition();
 					}
+					m_numRemotePlayers++;
 
-					g_theAuthServer->AddPlayerClientToServer( g_theApp->m_distantClient );
+					EventArgs args;
+					std::string message = "UDPServerStarted," + 
+										  ToString( m_uniqueKey ) + "," +
+										  ipaddr.c_str() + "," +
+										  ToString( m_udpListenPort ) + "," +
+										  ToString( m_udpSendToPort ) + "," +
+										  ToString( m_numRemotePlayers );
 
+					LOG_SYSMESSAGE( " UniqueKey = %d" , m_uniqueKey );
+
+					EventArgs UDPArgs;
+
+					UDPArgs.SetValue( "bindPort" , ToString( m_udpListenPort ) );
+					UDPArgs.SetValue( "sendPort" , ToString( m_udpSendToPort ) );
+					UDPArgs.SetValue( "host" , ipaddr.c_str() );
+
+					args.SetValue( "msg" , message );
 
 					if ( g_theNetworkSys->SendMessageToClient( args ) )
 					{
 						EventArgs unusedArgs;
-						//g_theNetworkSys->CloseTCPServer( unusedArgs );
-						m_isRemoteClientConnectionComplete = true;
+
+						if ( g_theNetworkSys->OpenUDPPort( UDPArgs ) )
+						{
+							AddRemoteNewRemotePlayer();
+
+							if ( g_theApp->m_distantClient == nullptr )
+							{
+								g_theApp->m_distantClient = new RemoteClient( m_numRemotePlayers );
+								g_theApp->m_distantClient->Startup();
+							}
+
+							g_theAuthServer->AddPlayerClientToServer( g_theApp->m_distantClient );
+
+							m_isRemoteClientConnectionComplete = true;
+							
+							//g_theNetworkSys->CloseTCPServer( unusedArgs );
+						}
 					}
 				}
 			}

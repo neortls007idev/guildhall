@@ -375,7 +375,7 @@ STATIC bool TheApp::StartMultiplayerServer( EventArgs& args )
 STATIC bool TheApp::ConnectToMultiplayerServer( EventArgs& args )
 {
 	LOG_SYSMESSAGE( "Stopping Current Game" );
-	std::string ipAddr = args.GetValue( "ip" , "127.0.0.1" );
+	std::string ipAddr = args.GetValue( "ipaddr" , "127.0.0.1" );
 	int port = args.GetValue( "port" , 48000 );
 
 	if ( g_theAuthServer != nullptr )
@@ -392,7 +392,7 @@ STATIC bool TheApp::ConnectToMultiplayerServer( EventArgs& args )
 		if( g_theNetworkSys->ConnectToServer( args ) )
 		{
 			g_theWindow->SetTitle( "SD3 : A3 - Networked Multiplayer BATTLE CITY - Client" );
-			g_theRemoteServer->RequestAddPlayerEntityandUDPConnection();
+			g_theRemoteServer->RequestAddPlayerEntityandUDPConnection( args );
 		}
 	}
 

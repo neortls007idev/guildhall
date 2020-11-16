@@ -29,6 +29,8 @@ public:
 private:
 	int m_numRemotePlayers = 0;
 	Timer* m_sendFreq = nullptr;
+	int m_udpSendToPort = 48000;
+	int m_udpListenPort = 48001;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

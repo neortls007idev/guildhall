@@ -689,9 +689,13 @@ bool DevConsole::ResetConsole( EventArgs& commandArgs )
 bool DevConsole::ClearConsoleMessagesOfType( EventArgs& commandArgs , eDevConsoleMessageType messageType )
 {
 	UNUSED( commandArgs );
-	while ( g_theInput->m_characters.size() > 0 )
+
+	if( g_theInput != nullptr )
 	{
-		g_theInput->m_characters.pop();
+		while ( g_theInput->m_characters.size() > 0 )
+		{
+			g_theInput->m_characters.pop();
+		}
 	}
 
 	for ( auto index = m_consoleText.begin(); index < m_consoleText.end(); ++index )

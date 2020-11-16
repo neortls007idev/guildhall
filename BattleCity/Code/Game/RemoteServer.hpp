@@ -17,7 +17,7 @@ public:
 			void	ParseAndUpdateEntities();
 
 //	Game* GetGame();
-	bool RequestAddPlayerEntityandUDPConnection();
+	bool RequestAddPlayerEntityandUDPConnection( EventArgs args );
 
 public:
 	int m_playerID = 0;
