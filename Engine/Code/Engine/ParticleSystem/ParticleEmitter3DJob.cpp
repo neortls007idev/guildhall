@@ -6,7 +6,6 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	
 extern		JobSystem*	g_theJobSystem;
-constexpr	uint		NUM_JOBS_SPLIT = 6;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -32,9 +31,9 @@ void ParticleEmitter3DUpdateParticlesJob::Execute()
 	m_emitter->UpdateParticlesData( m_frameTime );
 
 	size_t numParticles = m_emitter->m_numAliveParticles;
-
-	size_t particlesPerJob = static_cast< size_t >( numParticles / 6 );
-	size_t leftoverParticles = static_cast< size_t >( numParticles % 6 );
+	size_t numWorkerThreads = std::thread::hardware_concurrency() - 1;				// -1 for the main thread;
+	size_t particlesPerJob = static_cast< size_t >( numParticles / numWorkerThreads );
+	size_t leftoverParticles = static_cast< size_t >( numParticles % numWorkerThreads );
 
 	size_t particleEndIndex = particlesPerJob - 1;
 		

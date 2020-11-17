@@ -195,6 +195,8 @@ void Camera::SetOrthoView3D( const float& halfHeight , const float& aspectRatio 
 
 	m_projection = CreateOrthoGraphicProjeciton( Vec3( bottomLeft , nearZ ) , Vec3( topRight , farZ ) );
 	m_outputSize = ( GetOrthoMax() - GetOrthoMin() ).GetXYComponents();
+
+	ConstructCameraViewFrustum();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

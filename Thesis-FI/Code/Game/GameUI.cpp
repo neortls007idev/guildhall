@@ -395,10 +395,41 @@ void Game::ProfilingSettingsGUI()
 	if( ImGui::CollapsingHeader( "Profiling Debugging" ) )
 	{
 		ImGui::Checkbox( "Camera View Frustum Culling" , &m_debugSwitchs[ GAME_CAMERA_VIEW_FRUSTUM_CULLING ] );
+
+		for ( uint lightIndex = 0; lightIndex < TOTAL_LIGHTS; lightIndex++ )
+		{
+			std::string lightName = "Light ";
+			lightName.append( ToString( ( int ) lightIndex + 1 ) );
+
+			if( m_debugSwitchs[ THREADED_VIEW_FRUSTUM_CULLING ] && m_debugSwitchs[ GAME_CAMERA_VIEW_FRUSTUM_CULLING ] )
+			{
+				size_t numCulledModelsCount = 0;
+				for( int modelIndex = 0 ; modelIndex < NUM_GAME_MODELS ; modelIndex++ )
+				{
+					numCulledModelsCount += m_ModelLightDrawableInstances[ lightIndex ][ modelIndex ].size();
+				}
+				
+				lightName += " View Frustum Culling Count = " + ToString( ( int ) numCulledModelsCount );
+				ImGui::TextColored( ImVec4( 0.f , 1.f , 0.f , 1.f ) , lightName.c_str() );
+			}
+			else if ( !m_debugSwitchs[ THREADED_VIEW_FRUSTUM_CULLING ] && m_debugSwitchs[ GAME_CAMERA_VIEW_FRUSTUM_CULLING ] )
+			{
+				lightName += " View Frustum Culling Count = " + ToString( ( int ) m_currentlyDrawingShadowMeshes[ lightIndex ] );
+				ImGui::TextColored( ImVec4( 1.f , 1.f , 0.f , 1.f ) , lightName.c_str() );
+			}
+			else if ( !m_debugSwitchs[ THREADED_VIEW_FRUSTUM_CULLING ] && !m_debugSwitchs[ GAME_CAMERA_VIEW_FRUSTUM_CULLING ] )
+			{
+				lightName += " View Frustum Culling Count = " + ToString( ( int ) m_currentlyDrawingShadowMeshes[ lightIndex ] );
+				ImGui::TextColored( ImVec4( 1.f , 0.f , 0.f , 1.f ) , lightName.c_str() );
+			}
+		}
+		ImGui::Checkbox( "Threaded ViewFrustumCulling"  , &m_debugSwitchs[ THREADED_VIEW_FRUSTUM_CULLING ] );
 		ImGui::Checkbox( "Debug Draw Bounding Spheres" , &m_debugSwitchs[ VIEW_FRUSTUM_DEBUG_DRAW ] );
+		ImGui::Checkbox( "Threaded Particles Spawning"  , &m_debugSwitchs[ THREADED_PARTICLE_SPAWN ] );
+		ImGui::Checkbox( "Threaded Particle System Update"  , &m_debugSwitchs[ THREADED_PARTICLE_UPDATE ] );
 
 		ImGui::InputInt( "Shadow Map Edge Size(input power a of 2)" , &m_shadowMapDimensionCopy );
-		if( ImGui::Button( "Apply New Shadow Map Edge Dimesion" ) )
+		if( ImGui::Button( "Apply New Shadow Map Edge Dimension" ) )
 		{
 			m_shadowMapDimension = m_shadowMapDimensionCopy;
 

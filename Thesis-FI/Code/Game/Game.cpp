@@ -7,6 +7,9 @@
 #include "Engine/DebugUI/ImGUISystem.hpp"
 #include "Engine/Input/VirtualKeyboard.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Math/MatrixUtils.hpp"
+#include "Engine/Memory/JobSystem.hpp"
+#include "Engine/ParticleSystem/Particle3D.hpp"
 #include "Engine/ParticleSystem/ParticleEmitter3D.hpp"
 #include "Engine/ParticleSystem/ParticleSystem3D.hpp"
 #include "Engine/Primitives/GPUMesh.hpp"
@@ -17,13 +20,12 @@
 #include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Time/Time.hpp"
 #include "Game/Game.hpp"
-
-#include "Engine/Math/MatrixUtils.hpp"
 #include "Game/GameCommon.hpp"
+#include "Game/GameFrustumCullingJob.hpp"
+#include "Game/GameParticleEmitterSpawnJob.hpp"
 #include "Game/TheApp.hpp"
 #include "ThirdParty/ImGUI/imgui.h"
 #include "ThirdParty/ImGUI/ImGuiFileDialog.h"
-#include "Engine/ParticleSystem/Particle3D.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -32,6 +34,7 @@ extern TheApp*				g_theApp;
 extern DevConsole*			g_theDevConsole;
 extern ImGUISystem*			g_debugUI;
 extern ParticleSystem3D*	g_theParticleSystem3D;
+extern JobSystem*			g_theJobSystem;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -579,6 +582,7 @@ void Game::InitializeShadowMapTextures()
 
 void Game::Update( float deltaSeconds )
 {
+
 	m_frameRate = 1.f / deltaSeconds;
 	//m_frameRates.push_back( m_frameRate );
 	m_currentFrameInBuffer++;
@@ -596,15 +600,38 @@ void Game::Update( float deltaSeconds )
 	m_currentFrame++;
 		
 	m_rollingAvgFPS /= m_currentFrame;
-		
+	
+	if( m_debugSwitchs[ THREADED_PARTICLE_SPAWN ] )
+	{
+		ThreadedUpdateAllStarEmitters();
+	}
+	else
+	{
+		UpdateAllStarEmitters();
+	}
+
 	if ( m_debugSwitchs[ GAME_CAMERA_VIEW_FRUSTUM_CULLING ] )
 	{
-		m_currentlyDrawingMeshes = 0;
-		UpdateViewFrustumCulling();
+		if( !m_debugSwitchs[ THREADED_VIEW_FRUSTUM_CULLING ] )
+		{
+			m_currentlyDrawingMeshes = 0;
+			UpdateViewFrustumCulling();
+			UpdateLightViewFrustumCulling();
+		}
+		if( m_debugSwitchs[ THREADED_VIEW_FRUSTUM_CULLING ] )
+		{
+			m_currentlyDrawingMeshes = 0;
+			ThreadedUpdateViewFrustumCulling();
+			ThreadedUpdateLightViewFrustumCulling();
+		}
 	}
 	else
 	{
 		m_currentlyDrawingMeshes = m_totalDrawableMeshes;
+		for( int index = 0 ; index < TOTAL_LIGHTS ; index++ )
+		{
+			m_currentlyDrawingShadowMeshes[ index ] = m_totalDrawableMeshes;
+		}
 	}
 	
 	for( size_t instanceIndex = 0 ; instanceIndex < m_ModelInstances[ SPACESHIP ].size(); instanceIndex++ )
@@ -628,7 +655,6 @@ void Game::Update( float deltaSeconds )
 
 	DebugUI();
 
-	UpdateAllStarEmitters();
 
 	if( g_theInput->WasKeyJustPressed('Y') )
 	{
@@ -687,6 +713,38 @@ void Game::UpdateAllStarEmitters()
 																					  m_starEmitters[ index ].m_particleStartColor , m_starEmitters[ index ].m_particleEndColor );
 																					 // WHITE , WHITE );
 		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::ThreadedUpdateAllStarEmitters()
+{
+	for ( int index = 0; index < NUM_STARS_EMITTERS; index++ )
+	{
+		m_starEmitters[ index ].m_emitter->UpdateTargetPos( m_gameCamera.GetPosition() );
+		m_starEmitters[ index ].m_emitter->m_targetViewMat = m_gameCamera.GetViewMatrix();
+
+		int direction = 1;
+		Vec3 emitterPos = Vec3( 0.f , 0.f , -5.f );
+
+		if ( index % 2 == 0 )
+		{
+			direction = -1;
+		}
+
+		emitterPos = m_starEmitters[ index ].m_center + Vec3::MakeFromSpericalCoordinates(
+			direction * 45.f * ( float ) GetCurrentTimeSeconds() , 30.f * SinDegrees( ( float ) GetCurrentTimeSeconds() ) , m_starEmitters[ index ].m_movementRadius );
+
+		m_starEmitters[ index ].m_emitter->UpdatePosition( emitterPos );
+
+		uint numNewSpawns = ( ( uint ) m_starEmitters[ index ].m_emitter->m_totalSpawnableParticles ) - m_starEmitters[ index ].m_emitter->m_numAliveParticles;
+
+		numNewSpawns = numNewSpawns <= m_starEmitters[ index ].m_numParticlesToSpawnPerFrame ? numNewSpawns : m_starEmitters[ index ].m_numParticlesToSpawnPerFrame;
+
+		m_particleSpawnJob = new GameParticleEmitterSpawnJob( 0 , m_starEmitters[ index ].m_emitter , numNewSpawns , m_starEmitters[ index ].m_particleVelocity ,
+										m_starEmitters[ index ].m_particleMinLifeTime , m_starEmitters[ index ].m_particleMaxLifeTime ,
+										m_starEmitters[ index ].m_particleSize , m_starEmitters[ index ].m_particleStartColor , m_starEmitters[ index ].m_particleEndColor );
 	}
 }
 
@@ -772,6 +830,141 @@ void Game::UpdateViewFrustumCulling()
 				m_ModelDrawableInstances[ modelIndex ].emplace_back( m_ModelInstances[ modelIndex ][ instanceIndex ] );
 				m_currentlyDrawingMeshes++;
 			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::UpdateLightViewFrustumCulling()
+{
+	Frustum cameraViewFrustum;
+
+	for ( int lightIndex = 0; lightIndex < TOTAL_LIGHTS; lightIndex++ )
+	{
+		m_currentlyDrawingShadowMeshes[ lightIndex ] = 0;
+
+		if( m_lights.lights[ lightIndex ].lightType == POINT_LIGHT )
+		{
+			continue;
+		}
+		else if ( m_lights.lights[ lightIndex ].lightType == DIRECTIONAL_LIGHT )
+		{
+			m_lightsOrtho3DCamera.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
+			m_lightsOrtho3DCamera.SetPitchYawRollRotation( m_lightsPitchYawRoll[ lightIndex ].x , m_lightsPitchYawRoll[ lightIndex ].y , 0.f );
+			
+			cameraViewFrustum = m_lightsOrtho3DCamera.GetCameraViewFrustum();
+		}
+		else if ( m_lights.lights[ lightIndex ].lightType == SPOT_LIGHT )
+		{
+			m_lightsProjectionCamera.SetProjectionPerspective( m_spotlightConeAngles[ lightIndex ].y , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
+			m_lightsProjectionCamera.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
+			m_lightsProjectionCamera.SetPitchYawRollRotation( m_lightsPitchYawRoll[ lightIndex ].x , m_lightsPitchYawRoll[ lightIndex ].y , 0.f );
+
+			cameraViewFrustum = m_lightsProjectionCamera.GetCameraViewFrustum();
+		}
+
+		for ( int modelIndex = 0; modelIndex < NUM_GAME_MODELS; modelIndex++ )
+		{
+			if ( nullptr == m_gameModels[ modelIndex ] )
+			{
+				continue;
+			}
+
+			m_ModelLightDrawableInstances[ lightIndex ][ modelIndex ].clear();
+			float currentModelRadius = m_gameModels[ modelIndex ]->m_boundingSphereRadius;
+
+			for ( size_t instanceIndex = 0; instanceIndex < m_ModelInstances[ modelIndex ].size(); instanceIndex++ )
+			{
+				if ( nullptr == m_ModelInstances[ modelIndex ][ instanceIndex ] )
+				{
+					continue;
+				}
+
+				Vec3& pos = m_ModelInstances[ modelIndex ][ instanceIndex ]->m_position;
+
+				if ( cameraViewFrustum.IsSphereInsideFrustum( pos , currentModelRadius ) )
+				{
+					m_ModelLightDrawableInstances[ lightIndex ][ modelIndex ].emplace_back( m_ModelInstances[ modelIndex ][ instanceIndex ] );
+					m_currentlyDrawingShadowMeshes[ lightIndex ]++;
+				}
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::ThreadedUpdateViewFrustumCulling()
+{
+	Frustum cameraViewFrustum = m_gameCamera.GetCameraViewFrustum();
+
+	for ( int modelIndex = 0; modelIndex < NUM_GAME_MODELS; modelIndex++ )
+	{
+		if ( nullptr == m_gameModels[ modelIndex ] )
+		{
+			continue;
+		}
+		if( m_ModelInstances[ modelIndex ].size() == 0 )
+		{
+			continue;
+		}
+
+		m_ModelDrawableInstances[ modelIndex ].clear();
+		
+		GameFrustumCullingJob* gameCamFrustumCullingJob = new GameFrustumCullingJob( 0 , cameraViewFrustum , m_ModelDrawableInstances[ modelIndex ] , m_ModelInstances[ modelIndex ] ,
+																					 m_gameModels[ modelIndex ]->m_boundingSphereRadius , m_ModelInstances[ modelIndex ].size() );
+		g_theJobSystem->PostJob( *gameCamFrustumCullingJob );
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::ThreadedUpdateLightViewFrustumCulling()
+{
+	Frustum cameraViewFrustum;
+
+	for ( int lightIndex = 0; lightIndex < TOTAL_LIGHTS; lightIndex++ )
+	{
+		m_currentlyDrawingShadowMeshes[ lightIndex ] = 0;
+
+		if ( m_lights.lights[ lightIndex ].lightType == POINT_LIGHT )
+		{
+			continue;
+		}
+		else if ( m_lights.lights[ lightIndex ].lightType == DIRECTIONAL_LIGHT )
+		{
+			m_lightsOrtho3DCamera.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
+			m_lightsOrtho3DCamera.SetPitchYawRollRotation( m_lightsPitchYawRoll[ lightIndex ].x , m_lightsPitchYawRoll[ lightIndex ].y , 0.f );
+
+			cameraViewFrustum = m_lightsOrtho3DCamera.GetCameraViewFrustum();
+		}
+		else if ( m_lights.lights[ lightIndex ].lightType == SPOT_LIGHT )
+		{
+			m_lightsProjectionCamera.SetProjectionPerspective( m_spotlightConeAngles[ lightIndex ].y , CLIENT_ASPECT , -GAME_CAM_NEAR_Z , -GAME_CAM_FAR_Z );
+			m_lightsProjectionCamera.SetPosition( m_lights.lights[ lightIndex ].worldPosition );
+			m_lightsProjectionCamera.SetPitchYawRollRotation( m_lightsPitchYawRoll[ lightIndex ].x , m_lightsPitchYawRoll[ lightIndex ].y , 0.f );
+
+			cameraViewFrustum = m_lightsProjectionCamera.GetCameraViewFrustum();
+		}
+
+		for ( int modelIndex = 0; modelIndex < NUM_GAME_MODELS; modelIndex++ )
+		{
+			if ( nullptr == m_gameModels[ modelIndex ] )
+			{
+				continue;
+			}
+			if ( m_ModelInstances[ modelIndex ].size() == 0 )
+			{
+				continue;
+			}
+
+			m_ModelLightDrawableInstances[ lightIndex ][ modelIndex ].clear();
+
+			GameFrustumCullingJob* lightViewFrustumCullingJob = new GameFrustumCullingJob( 0 , cameraViewFrustum , m_ModelLightDrawableInstances[ lightIndex ][ modelIndex ] ,
+																							m_ModelInstances[ modelIndex ] , m_gameModels[ modelIndex ]->m_boundingSphereRadius ,
+																							m_ModelInstances[ modelIndex ].size() );
+			g_theJobSystem->PostJob( *lightViewFrustumCullingJob );
 		}
 	}
 }

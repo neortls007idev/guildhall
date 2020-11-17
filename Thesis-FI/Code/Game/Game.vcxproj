@@ -559,19 +559,21 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FrustumCullingJob.cpp" />
+    <ClCompile Include="GameFrustumCullingJob.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCommon.cpp" />
     <ClCompile Include="GameInitialize.cpp" />
     <ClCompile Include="GameUI.cpp" />
     <ClCompile Include="GameUtils.cpp" />
+    <ClCompile Include="GameParticleEmitterSpawnJob.cpp" />
     <ClCompile Include="TheApp.cpp" />
     <ClCompile Include="Main_Windows.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineBuildPreferences.hpp" />
-    <ClInclude Include="FrustumCullingJob.hpp" />
+    <ClInclude Include="GameFrustumCullingJob.hpp" />
     <ClInclude Include="Game.hpp" />
+    <ClInclude Include="GameParticleEmitterSpawnJob.hpp" />
     <ClInclude Include="TheApp.hpp" />
     <ClInclude Include="GameCommon.hpp" />
   </ItemGroup>

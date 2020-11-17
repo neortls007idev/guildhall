@@ -8,9 +8,6 @@
     <Filter Include="Gameplay">
       <UniqueIdentifier>{79fdbf1c-2233-4c46-93fe-35bb7ee72e7f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Gameplay\Entities">
-      <UniqueIdentifier>{3329ea6d-c86e-48d3-8692-1cbaaabb7222}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Data">
       <UniqueIdentifier>{a912b540-ab14-40cf-a033-7b990fd31a2b}</UniqueIdentifier>
     </Filter>
@@ -25,6 +22,9 @@
     </Filter>
     <Filter Include="Data\Models">
       <UniqueIdentifier>{ec484c5a-d37d-4c0b-b493-042fe8526aec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Gameplay\Jobs">
+      <UniqueIdentifier>{56745353-bd7d-43a5-b2b2-094ffca40aa4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -49,8 +49,11 @@
     <ClCompile Include="GameUtils.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
-    <ClCompile Include="FrustumCullingJob.cpp">
-      <Filter>Gameplay</Filter>
+    <ClCompile Include="GameParticleEmitterSpawnJob.cpp">
+      <Filter>Gameplay\Jobs</Filter>
+    </ClCompile>
+    <ClCompile Include="GameFrustumCullingJob.cpp">
+      <Filter>Gameplay\Jobs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -66,8 +69,11 @@
     <ClInclude Include="EngineBuildPreferences.hpp">
       <Filter>Framework</Filter>
     </ClInclude>
-    <ClInclude Include="FrustumCullingJob.hpp">
-      <Filter>Gameplay</Filter>
+    <ClInclude Include="GameParticleEmitterSpawnJob.hpp">
+      <Filter>Gameplay\Jobs</Filter>
+    </ClInclude>
+    <ClInclude Include="GameFrustumCullingJob.hpp">
+      <Filter>Gameplay\Jobs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

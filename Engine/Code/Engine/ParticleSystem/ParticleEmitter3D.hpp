@@ -2,12 +2,12 @@
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Math/Vec2.hpp"
-#include "Engine/Renderer/RendererCommon.hpp"
-#include <vector>
-
 #include "Engine/Primitives/AABB2.hpp"
+#include "Engine/Primitives/Frustum.hpp"
 #include "Engine/Renderer/D3D11Utils.hpp"
-#include "../Primitives/Frustum.hpp"
+#include "Engine/Renderer/RendererCommon.hpp"
+#include <mutex>
+#include <vector>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -79,6 +79,7 @@ public:
 //	bool*							m_isParticleInViewFrusutum;
 	size_t							m_ParticlesInViewFrustum	= 0;
 
+	std::mutex						m_aliveParticlesCounterLock;
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
 	//Vec3							m_targetUp					= Vec3::UNIT_VECTOR_ALONG_J_BASIS;

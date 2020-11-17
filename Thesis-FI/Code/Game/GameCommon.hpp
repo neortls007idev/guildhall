@@ -21,7 +21,7 @@ constexpr float		GAME_CAM_NEAR_Z											= 0.01f;
 constexpr float		GAME_CAM_FAR_Z											= 1000.0f;
 constexpr float		GAME_CAM_FOV											= 60.0f;
 constexpr size_t	FRAME_RATE_BUFFER_SIZE									= 9000;
-constexpr size_t	PARTICLE_EMITTER_LIMIT									= 0;
+constexpr size_t	PARTICLE_EMITTER_LIMIT									= 30000;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -114,9 +114,12 @@ enum eGamePlanetaryObjModels
 
 enum GAME_DEBUG_SWITCHS
 {
-	GAME_CAMERA_VIEW_FRUSTUM_CULLING ,
+	GAME_CAMERA_VIEW_FRUSTUM_CULLING , // rename to view frustum culling since it culls for lights too
+	THREADED_VIEW_FRUSTUM_CULLING ,
 	VIEW_FRUSTUM_DEBUG_DRAW ,
-	
+	THREADED_PARTICLE_UPDATE ,
+	THREADED_PARTICLE_SPAWN ,
+
 	NUM_GAME_DEBUG_SWITCHS
 };
 
@@ -139,11 +142,11 @@ struct GameParticleEmitter
 	float				m_movementRadius				= 5.f;
 	Rgba8				m_particleStartColor;
 	Rgba8				m_particleEndColor;
-	int					m_particleMinLifeTime			= 6000;
-	int					m_particleMaxLifeTime			= 6000;
+	int					m_particleMinLifeTime			= 15;
+	int					m_particleMaxLifeTime			= 120;
 	float				m_particleVelocity				= 0.f;
 	Vec2				m_particleSize					= Vec2::ONE;
-	uint				m_numParticlesToSpawnPerFrame	= 0;
+	uint				m_numParticlesToSpawnPerFrame	= 2500;
 
 	//uint				m_numAliveParticles				= 0;
 };
@@ -157,7 +160,7 @@ enum GameStarEmitters
 	YELLOW_GREEN_STAR,
 	PINK_PURPLE_STAR,
 
-	TEST_STAR,
+//	TEST_STAR,
 
 	NUM_STARS_EMITTERS
 };

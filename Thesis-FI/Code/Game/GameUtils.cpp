@@ -139,7 +139,6 @@ void Game::LoadScene()
 			}
 
 			int modelinstanceCount		= ParseXmlAttribute( *modelInstance , "count" , 0 );
-			m_ModelInstances[ modelIndex ].resize( modelinstanceCount );
 			int  enumValIndex			= ParseXmlAttribute( *modelInstance , "enumValue" , modelIndex );
 
 			modelTransform = modelInstance->FirstChildElement( "Transform" );

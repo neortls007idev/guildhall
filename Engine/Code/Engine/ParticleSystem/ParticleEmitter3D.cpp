@@ -145,7 +145,9 @@ void ParticleEmitter3D::EmplaceBackNewParticle( Particle3D temp )
 			{
 				m_isParticleGarbage[ index ] = false;
 				m_particles[ index ] = temp;
+				m_aliveParticlesCounterLock.lock();
 				m_numAliveParticles++;
+				m_aliveParticlesCounterLock.unlock();
 				m_lastSearchPos = index;
 
 				return;
@@ -158,7 +160,9 @@ void ParticleEmitter3D::EmplaceBackNewParticle( Particle3D temp )
 			{
 				m_isParticleGarbage[ index ] = false;
 				m_particles[ index ] = temp;
+				m_aliveParticlesCounterLock.lock();
 				m_numAliveParticles++;
+				m_aliveParticlesCounterLock.unlock();
 				m_lastSearchPos = index;
 
 				return;

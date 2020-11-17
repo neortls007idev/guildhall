@@ -255,10 +255,10 @@ void Game::InitializeParticleEmitters()
 	m_starEmitters[ PINK_PURPLE_STAR ].m_particleEndColor = NO_ALPHA_PINK;
 	m_starEmitters[ PINK_PURPLE_STAR ].m_center = Vec3( -3.f , 0.f , 0.f );
 
-	m_starEmitters[ TEST_STAR ].m_emitter = g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , m_particleEmitterSheets[ STAR_SS ] , 1 , m_gameCamera.GetPosition() );
-	m_starEmitters[ TEST_STAR ].m_particleStartColor = WHITE;
-	m_starEmitters[ TEST_STAR ].m_particleEndColor = WHITE;
-	m_starEmitters[ TEST_STAR ].m_center = Vec3( 0.f , 0.f , -5.f );
+//	m_starEmitters[ TEST_STAR ].m_emitter = g_theParticleSystem3D->CreateNewParticleEmitter( g_theRenderer , m_particleEmitterSheets[ STAR_SS ] , 1 , m_gameCamera.GetPosition() );
+//	m_starEmitters[ TEST_STAR ].m_particleStartColor = WHITE;
+//	m_starEmitters[ TEST_STAR ].m_particleEndColor = WHITE;
+//	m_starEmitters[ TEST_STAR ].m_center = Vec3( 0.f , 0.f , -5.f );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

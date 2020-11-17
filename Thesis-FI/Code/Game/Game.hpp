@@ -12,6 +12,7 @@ class Shader;
 class Texture;
 class GPUMesh;
 class ParticleEmitter3D;
+class GameParticleEmitterSpawnJob;
 
 typedef std::vector< Transform* > OBJInstances;
 
@@ -19,7 +20,6 @@ typedef std::vector< Transform* > OBJInstances;
 
 class Game
 {
-
 public:
 			Game();
 				void LoadShaders();
@@ -42,9 +42,13 @@ public:
 
 			void Update( float deltaSeconds );
 				void UpdateViewFrustumCulling();
+				void UpdateLightViewFrustumCulling();
+				void ThreadedUpdateViewFrustumCulling();
+				void ThreadedUpdateLightViewFrustumCulling();
 				void UpdateLightPosition( float deltaSeconds );
 
 				void UpdateAllStarEmitters();
+				void ThreadedUpdateAllStarEmitters();
 				void UpdateEmitterOfType( GameStarEmitters emitterType );
 			
 			void Render() const;
@@ -146,6 +150,7 @@ public:
 	OBJInstances						m_ModelInstances[ NUM_GAME_MODELS ];
 	std::vector<bool>					m_isInstanceGarbage[ NUM_GAME_MODELS ];
 	OBJInstances						m_ModelDrawableInstances[ NUM_GAME_MODELS ];
+	OBJInstances						m_ModelLightDrawableInstances[ TOTAL_LIGHTS ][ NUM_GAME_MODELS ];
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	//				SKY-BOX
@@ -154,8 +159,12 @@ public:
 	Texture*							m_cubeMapex											= nullptr;
 	Shader*								m_cubeMapTest										= nullptr;
 	Sampler*							m_cubeSampler										= nullptr;
+	
 	//--------------------------------------------------------------------------------------------------------------------------------------------
-
+		
+	bool								m_debugSwitchs[ NUM_GAME_DEBUG_SWITCHS ];
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+		
 private:
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	//				MATERIAL SHADER DATA
@@ -191,18 +200,17 @@ private:
 	//				UI DEBUG DATA
 	//--------------------------------------------------------------------------------------------------------------------------------------------		
 	bool								m_isMouseUnlocked									= false;
-	bool								m_debugSwitchs[ NUM_GAME_DEBUG_SWITCHS ];
 	bool								m_dirtyUBOs[ NUM_DIRTY_UBOS ];
 	uint								m_totalDrawableMeshes;
 	uint								m_currentlyDrawingMeshes;
-
+	uint								m_currentlyDrawingShadowMeshes[ TOTAL_LIGHTS ];
+	
 	//--------------------------------------------------------------------------------------------------------------------------------------------
-	//				TITLE
+	//				PARTICLE EMITTERS
 	//--------------------------------------------------------------------------------------------------------------------------------------------
-			
 	GameParticleEmitter					m_starEmitters[ NUM_STARS_EMITTERS ];
-	SpriteSheet*						m_particleEmitterSheets[ NUM_GAME_SS ];
-
+	SpriteSheet* m_particleEmitterSheets[ NUM_GAME_SS ];
+	
 	//----------------------------------------------------------------------------------------------------------
 	//				SHADOW
 	//----------------------------------------------------------------------------------------------------------
@@ -237,6 +245,11 @@ private:
 	Texture*							m_tileNormal										= nullptr;
 	Texture*							m_objSciFiShipMeshTex_D								= nullptr;
 	Texture*							m_objSciFiShipMeshTex_N								= nullptr;
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	//		JOBS
+	//--------------------------------------------------------------------------------------------------------------------------------------------
+	GameParticleEmitterSpawnJob*					m_particleSpawnJob									= nullptr;
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	//				GUI TEST CODE
