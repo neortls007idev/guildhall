@@ -47,7 +47,7 @@ public:
 	void Render();
 	void Destroy();
 	void UpdateTargetPos( Vec3 newTargetPos );
-//	void UpdateViewFrustum( Frustum viewFrustum );
+	void UpdateViewFrustum( Frustum viewFrustum );
 	void FrustumCulling();
 	void SortParticlesBasedOnPosition();
 	void Move( float deltaSeconds );
@@ -70,16 +70,17 @@ public:
 	Vec3							m_velocity					= Vec3::ZERO;
 	bool							m_areParticlesBillboarded	= true;
 	size_t							m_lastSearchPos				= 0;
-	uint							m_numAliveParticles			= 0;
+	//uint							m_numAliveParticles			= 0;
+	std::atomic< size_t >			m_numAliveParticles			= 0;
 	std::vector<Vertex_PCU>			m_particleVerts;
 	size_t							m_totalSpawnableParticles	= 0;
 	
 	Particle3D*						m_particles;
 	bool*							m_isParticleGarbage;
-//	bool*							m_isParticleInViewFrusutum;
-	size_t							m_ParticlesInViewFrustum	= 0;
+	bool*							m_isParticleInViewFrusutum;
 
-	std::mutex						m_aliveParticlesCounterLock;
+	std::atomic< size_t >			m_ParticlesInViewFrustum	= 0;
+//	std::mutex						m_aliveParticlesCounterLock;
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 
 	//Vec3							m_targetUp					= Vec3::UNIT_VECTOR_ALONG_J_BASIS;

@@ -668,6 +668,9 @@ void Game::UpdateAllStarEmitters()
 {	
 	for ( int index = 0 ; index < NUM_STARS_EMITTERS ; index++ )
 	{
+		Frustum gameCamViewFrustum = m_gameCamera.GetCameraViewFrustum();
+		m_starEmitters[ index ].m_emitter->UpdateViewFrustum( gameCamViewFrustum );
+
 		m_starEmitters[ index ].m_emitter->UpdateTargetPos( m_gameCamera.GetPosition() );
 		m_starEmitters[ index ].m_emitter->m_targetViewMat = m_gameCamera.GetViewMatrix();		
 
@@ -696,7 +699,7 @@ void Game::UpdateAllStarEmitters()
 
 		m_starEmitters[ index ].m_emitter->UpdatePosition( emitterPos );
 
-		uint numNewSpawns = ( ( uint ) m_starEmitters[ index ].m_emitter->m_totalSpawnableParticles ) - m_starEmitters[ index ].m_emitter->m_numAliveParticles;
+		size_t numNewSpawns = m_starEmitters[ index ].m_emitter->m_totalSpawnableParticles - m_starEmitters[ index ].m_emitter->m_numAliveParticles;
 		
 		numNewSpawns = numNewSpawns <= m_starEmitters[ index ].m_numParticlesToSpawnPerFrame ? numNewSpawns : m_starEmitters[ index ].m_numParticlesToSpawnPerFrame;
 
@@ -722,6 +725,9 @@ void Game::ThreadedUpdateAllStarEmitters()
 {
 	for ( int index = 0; index < NUM_STARS_EMITTERS; index++ )
 	{
+		Frustum gameCamViewFrustum = m_gameCamera.GetCameraViewFrustum();
+		m_starEmitters[ index ].m_emitter->UpdateViewFrustum( gameCamViewFrustum );
+
 		m_starEmitters[ index ].m_emitter->UpdateTargetPos( m_gameCamera.GetPosition() );
 		m_starEmitters[ index ].m_emitter->m_targetViewMat = m_gameCamera.GetViewMatrix();
 
@@ -738,13 +744,15 @@ void Game::ThreadedUpdateAllStarEmitters()
 
 		m_starEmitters[ index ].m_emitter->UpdatePosition( emitterPos );
 
-		uint numNewSpawns = ( ( uint ) m_starEmitters[ index ].m_emitter->m_totalSpawnableParticles ) - m_starEmitters[ index ].m_emitter->m_numAliveParticles;
+		size_t numNewSpawns = m_starEmitters[ index ].m_emitter->m_totalSpawnableParticles - m_starEmitters[ index ].m_emitter->m_numAliveParticles;
 
 		numNewSpawns = numNewSpawns <= m_starEmitters[ index ].m_numParticlesToSpawnPerFrame ? numNewSpawns : m_starEmitters[ index ].m_numParticlesToSpawnPerFrame;
 
 		m_particleSpawnJob = new GameParticleEmitterSpawnJob( 0 , m_starEmitters[ index ].m_emitter , numNewSpawns , m_starEmitters[ index ].m_particleVelocity ,
 										m_starEmitters[ index ].m_particleMinLifeTime , m_starEmitters[ index ].m_particleMaxLifeTime ,
 										m_starEmitters[ index ].m_particleSize , m_starEmitters[ index ].m_particleStartColor , m_starEmitters[ index ].m_particleEndColor );
+		
+		g_theJobSystem->PostJob( *m_particleSpawnJob );
 	}
 }
 
@@ -1075,7 +1083,8 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 	g_D3D11PerfMarker->EndPerformanceMarker();
 
 	g_D3D11PerfMarker->BeginPerformanceMarker( L"Render all OBJ Models" );
-	//RenderAllModelInstances();
+	RenderAllModelInstances();
+
 	//RenderAllInstancesOfType( SPACESHIP );
 	//RenderAllInstancesOfType( LUMINARIS_SHIP );
 
@@ -1381,6 +1390,11 @@ void Game::RenderOrthoShadowMapPass() const
 
 		g_D3D11PerfMarker->BeginPerformanceMarker( L"Render all OBJ Models" );
 
+		for( int modelIndex = 0 ; modelIndex < NUM_GAME_MODELS ; modelIndex++ )
+		{
+			RenderAllModelInstancesOfTypeUsingInstanceArray( m_ModelLightDrawableInstances[ lightIndex ][ modelIndex ] , ( eGameObjModels ) modelIndex );
+		}
+
 		//RenderAllModelInstances();
 
 		g_D3D11PerfMarker->EndPerformanceMarker();
@@ -1481,6 +1495,10 @@ void Game::RenderSpotShadowMapPass() const
 			g_D3D11PerfMarker->BeginPerformanceMarker( L"Render all OBJ Models" );
 
 			//RenderAllModelInstances();
+			for ( int modelIndex = 0; modelIndex < NUM_GAME_MODELS; modelIndex++ )
+			{
+				RenderAllModelInstancesOfTypeUsingInstanceArray( m_ModelLightDrawableInstances[ lightIndex ][ modelIndex ] , ( eGameObjModels ) modelIndex );
+			}
 
 			g_D3D11PerfMarker->EndPerformanceMarker();
 
@@ -1537,6 +1555,53 @@ void Game::RenderAllModelInstances() const
 		g_D3D11PerfMarker->EndPerformanceMarker();
 	}
 	g_D3D11PerfMarker->EndPerformanceMarker();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+/*
+void Game::RenderAllModelInstancesUsingInstanceArray( OBJInstances& instanceArray ) const
+{
+	g_D3D11PerfMarker->BeginPerformanceMarker( L"Rendering All Meshes" );
+	for ( int index = 0; index < NUM_GAME_MODELS; index++ )
+	{
+		g_D3D11PerfMarker->BeginPerformanceMarker( L"Rendering Mesh Instances" );
+		RenderAllModelInstancesOfTypeUsingInstanceArray( instanceArray , ( eGameObjModels ) index );
+		g_D3D11PerfMarker->EndPerformanceMarker();
+	}
+	g_D3D11PerfMarker->EndPerformanceMarker();
+}*/
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Game::RenderAllModelInstancesOfTypeUsingInstanceArray( const OBJInstances& instanceArray , eGameObjModels modelType ) const
+{
+	g_theRenderer->BindTexture( m_gameModelsDiffuse[ modelType ] );
+	g_theRenderer->BindTexture( m_gameModelsNormals[ modelType ] , TEX_NORMAL );
+
+	if ( m_debugSwitchs[ GAME_CAMERA_VIEW_FRUSTUM_CULLING ] )
+	{
+		for ( size_t instanceIndex = 0; instanceIndex < instanceArray.size(); instanceIndex++ )
+		{
+			if ( nullptr == instanceArray[ instanceIndex ] )
+			{
+				continue;
+			}
+			g_theRenderer->SetModelMatrix( instanceArray[ instanceIndex ]->GetAsMatrix() );
+			g_theRenderer->DrawMesh( m_gameModels[ modelType ] );
+		}
+	}
+	else
+	{
+		for ( size_t instanceIndex = 0; instanceIndex < m_ModelInstances[ modelType ].size(); instanceIndex++ )
+		{
+			if ( nullptr == m_ModelInstances[ modelType ][ instanceIndex ] )
+			{
+				continue;
+			}
+			g_theRenderer->SetModelMatrix( m_ModelInstances[ modelType ][ instanceIndex ]->GetAsMatrix() );
+			g_theRenderer->DrawMesh( m_gameModels[ modelType ] );
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

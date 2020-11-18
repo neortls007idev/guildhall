@@ -38,8 +38,13 @@ void GameParticleEmitterSpawnJob::Execute()
 	size_t numWorkerThreads			= std::thread::hardware_concurrency() - 1;				// -1 for the main thread;
 	size_t particlesPerJob			= m_numNewParticles / numWorkerThreads;
 	size_t leftoverParticles		= m_numNewParticles % numWorkerThreads;
-	size_t numParticleSpawnSubJobs	= m_numNewParticles / particlesPerJob;
-
+	size_t numParticleSpawnSubJobs  = 0;
+	
+	if( particlesPerJob > 0 )
+	{
+		numParticleSpawnSubJobs = m_numNewParticles / particlesPerJob;
+	}
+	
 	for ( size_t spawnSubJobCount = 0; spawnSubJobCount < numParticleSpawnSubJobs; spawnSubJobCount++ )
 	{
 		GameParticleEmitterSpawnSubJob* spawnParticleSubJob = new GameParticleEmitterSpawnSubJob( 0 , m_emitter , numParticleSpawnSubJobs , m_particleVelocity ,
