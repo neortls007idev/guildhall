@@ -1198,6 +1198,7 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 
 	if( m_isToneMapShaderActive && !m_isToneMapComputeShaderActive )
 	{
+	g_D3D11PerfMarker->BeginPerformanceMarker( L"Tone Map Post Process via PS" );
 		Texture* toneMapTarget = g_theRenderer->GetOrCreatematchingRenderTarget( colorTarget );
 		Texture* currentView = g_theRenderer->GetOrCreatematchingRenderTarget( backBuffer );
 		g_theRenderer->CopyTexture( currentView , backBuffer );
@@ -1207,6 +1208,7 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
 		g_theRenderer->CopyTexture( backBuffer , toneMapTarget );
 		g_theRenderer->ReleaseRenderTarget( currentView );
 		g_theRenderer->ReleaseRenderTarget( toneMapTarget );
+	g_D3D11PerfMarker->EndPerformanceMarker();
 	}
 
 	m_gameCamera.SetColorTarget( backBuffer );
