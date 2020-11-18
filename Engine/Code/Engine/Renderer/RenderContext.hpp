@@ -114,7 +114,8 @@ struct lightDataT
 	float       dotOuterAngle				= -1.0f;                                       // cone light outer angle (default -1.0f) - angle at which cone lights stop affecting the object completely
 	
 	float       shadowFlag					= 1.0f;                                        // 1.0f Enable Shadows for this light 0.0f Disable Shadows for this light.
-	Vec3        pad00						= Vec3::ZERO;								   // padding to keep 16-byte structs
+	float       shadowBias					= 0.0002f;					                   // Shadow bias for the light
+	Vec2        pad00						= Vec2::ZERO;								   // padding to keep 16-byte structs
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

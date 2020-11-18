@@ -85,6 +85,8 @@ private:
 			bool DestroyGameOBJInstance( eGameObjModels modelType , int instanceCount );
 			void RenderAllInstancesOfType( eGameObjModels modelType ) const;
 			void RenderAllModelInstances() const;
+//			void RenderAllModelInstancesUsingInstanceArray( OBJInstances& instanceArray ) const;
+			void RenderAllModelInstancesOfTypeUsingInstanceArray( const OBJInstances& instanceArray , eGameObjModels modelType ) const;
 			void SaveScene();
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

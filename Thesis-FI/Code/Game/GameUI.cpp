@@ -196,7 +196,8 @@ void Game::LightSettingsGUI()
 					if ( ImGui::TreeNode( "Shadow Parameters" ) )
 					{
 						ImGui::DragFloat( "Enable Shadow" , &m_lights.lights[ lightIndex ].shadowFlag , 1.f , 0.f , 1.f );
-												
+						ImGui::DragFloat( "Shadow Bias" , &m_lights.lights[ lightIndex ].shadowBias , 0.0001f , 0.f , 1.f );
+						
 						ImGui::TreePop();
 						ImGui::Separator();
 					}
@@ -547,8 +548,8 @@ void Game::ParticleEmitterSettingsGUI()
 		{
 			std::string emitterName = "Star ";
 			emitterName.append( ToString( ( int ) index + 1 ) );
-			
-			ImGui::TextColored( ImVec4( 0.f , 1.f , 0.f , 1.f ) , "Num Alive %s Emitter Particles = %u" , emitterName.c_str() , m_starEmitters[ index ].m_emitter->m_numAliveParticles );
+			size_t numAliveParticles = m_starEmitters[ index ].m_emitter->m_numAliveParticles;
+			ImGui::TextColored( ImVec4( 0.f , 1.f , 0.f , 1.f ) , "Num Alive %s Emitter Particles = %u" , emitterName.c_str() , numAliveParticles );
 				
 			if( ImGui::TreeNode( emitterName.c_str() ) )
 			{

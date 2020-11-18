@@ -43,7 +43,7 @@ float2 ComputeLightFactor( light_t light , float3 worldPosition , float3 worldNo
                 specular                = facingDirection * specular;   
                 specular                = SPECULAR_FACTOR * pow( specular , SPECULAR_POWER );
  
-    return float2( diffuseAttenuation * diffuse , specularAttenuation * specular * 0.f );
+    return float2( diffuseAttenuation * diffuse , specularAttenuation * specular /* 0.f*/ );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -179,7 +179,7 @@ fragmentFunctionOutput FragmentFunction( v2f_t input )
         
         float3 lightColor = LIGHTS[ index ].color.xyz;
         lightColor = pow( lightColor , GAMMA.xxx );                                                                 // assumes light color is set by a user - so sRGB space
-        
+        bias = LIGHTS[ index ].shadowBias;                                                                          // Shadow bias of the light source          
 	// Range mapping NDC space to 0 to 1
       
    // Calculate the projected texture coordinates for sampling the shadow map (depth buffer texture) based on the light's viewing position.
