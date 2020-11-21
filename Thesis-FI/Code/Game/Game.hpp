@@ -144,13 +144,16 @@ public:
 	uint								m_hCuts = 32;		// slices
 	uint								m_vCuts = 16;		// stacks
 
+	// this is shared by all maps.
 	GPUMesh*							m_gameModels[ NUM_GAME_MODELS ];
 	Texture*							m_gameModelsDiffuse[ NUM_GAME_MODELS ];
 	Texture*							m_gameModelsNormals[ NUM_GAME_MODELS ];
 	Texture*							m_gamePlanetaryDiffuse[ NUM_GAME_MODELS ];
 	Texture*							m_gamePlanetaryNormals[ NUM_GAME_MODELS ];
+	// this is map unique 
+
 	OBJInstances						m_ModelInstances[ NUM_GAME_MODELS ];
-	std::vector<bool>					m_isInstanceGarbage[ NUM_GAME_MODELS ];
+	std::vector<bool>					m_isInstanceNotGarbage[ NUM_GAME_MODELS ];
 	OBJInstances						m_ModelDrawableInstances[ NUM_GAME_MODELS ];
 	OBJInstances						m_ModelLightDrawableInstances[ TOTAL_LIGHTS ][ NUM_GAME_MODELS ];
 
@@ -158,6 +161,7 @@ public:
 	//				SKY-BOX
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 	GPUMesh*							m_unitCubeMesh										= nullptr;
+	// cubemap tex in the map class.
 	Texture*							m_cubeMapex											= nullptr;
 	Shader*								m_cubeMapTest										= nullptr;
 	Sampler*							m_cubeSampler										= nullptr;

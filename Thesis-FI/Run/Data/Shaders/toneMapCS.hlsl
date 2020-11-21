@@ -40,7 +40,7 @@ RWTexture2D<float4> gOutput : register( u1 );
 // Compute Shader
 //--------------------------------------------------------------------------------------
 
-[numthreads( 4 , 4 , 1 )]
+[numthreads( 32 , 32 , 1 )]
 void ComputeFunction( uint3 DTid : SV_DispatchThreadID )
 {
     float4 imageColor = gInput[ DTid.xy ];

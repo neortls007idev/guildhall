@@ -630,7 +630,7 @@ void RenderContext::BeginCamera( const Camera& camera )
 	BindShader( "" );
 	m_lastBoundVBO = nullptr;
 	BindUniformBuffer( UBO_FRAME_SLOT , m_frameUBO );
-	m_currentCamera->UpdateUBO( this );
+	//m_currentCamera->UpdateUBO( this );
 	BindUniformBuffer( UBO_CAMERA_SLOT , m_currentCamera->UpdateUBO( this ) );
 
 	SetModelMatrix( Mat44::IDENTITY );
@@ -2037,7 +2037,6 @@ void RenderContext::BindIndexBuffer( IndexBuffer* ibo )
 
 void RenderContext::BindUniformBuffer( unsigned int slot , RenderBuffer* ubo )
 {
-
 	ID3D11Buffer* uboHandle = ubo->m_handle; /*ubo->GetHandle();*/
 
 	m_context->VSSetConstantBuffers( slot , 1 , &uboHandle );

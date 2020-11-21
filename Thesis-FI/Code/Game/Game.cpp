@@ -1148,8 +1148,9 @@ g_D3D11PerfMarker->BeginPerformanceMarker( L"Game Render Start" );
  		g_theRenderer->BindMaterialData( ( void* ) &m_toneMapTransform , sizeof( m_toneMapTransform ) );
  		g_theRenderer->BindTexture( currentView , 0 , 0 , SHADER_STAGE_COMPUTE );
  		g_theRenderer->BindUAVTexture( toneMapTarget , 1 );
- 
- 		g_theRenderer->ExecuteComputeShader( m_toneMapComputeShader , 352 , 180 , 1 );
+		float numXthreads = ceilf( ( float ) ( toneMapTarget->GetDimensions().x / 32 ) );
+		float numYthreads = ceilf( ( float ) ( toneMapTarget->GetDimensions().y / 32 ) );
+		g_theRenderer->ExecuteComputeShader( m_toneMapComputeShader , ( uint ) numXthreads , ( uint ) numYthreads , 1 );
  		g_theRenderer->CopyTexture( colorTarget , toneMapTarget );
  		g_theRenderer->ReleaseRenderTarget( currentView );
  		g_theRenderer->ReleaseUAVTarget( toneMapTarget );
