@@ -8,6 +8,7 @@
 #include "Engine/Renderer/RendererCommon.hpp"
 #include <mutex>
 #include <vector>
+#include <atomic>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -53,7 +54,10 @@ public:
 	void Move( float deltaSeconds );
 	void UpdatePosition( Vec3 newPos );
 	void UpdateVelocity( Vec3 newVelocity );
-	
+
+private:
+	Mat44 ParticleTargetPosFacingxyz( Vec3& particlePos );
+
 public:
 	Texture*						m_texture					= nullptr;
 	SpriteSheet*					m_spriteSheet				= nullptr;
@@ -64,22 +68,21 @@ public:
 	
 	Frustum							m_viewFrustum;
 	Vec3							m_targetPos					= Vec3::ZERO;
-	Mat44							m_targetViewMat;
-
+	
 	Vec3							m_position					= Vec3::ZERO;
 	Vec3							m_velocity					= Vec3::ZERO;
 	bool							m_areParticlesBillboarded	= true;
-	size_t							m_lastSearchPos				= 0;
+	std::atomic< size_t >			m_lastSearchPos				= 0;
 	//uint							m_numAliveParticles			= 0;
 	std::atomic< size_t >			m_numAliveParticles			= 0;
-	std::vector<Vertex_PCU>			m_particleVerts;
+	std::atomic< size_t >			m_particlesInViewFrustum	= 0;
 	size_t							m_totalSpawnableParticles	= 0;
+	std::vector<Vertex_PCU>			m_particleVerts;
 	
 	Particle3D*						m_particles;
 	bool*							m_isParticleGarbage;
 	bool*							m_isParticleInViewFrusutum;
 
-	std::atomic< size_t >			m_ParticlesInViewFrustum	= 0;
 //	std::mutex						m_aliveParticlesCounterLock;
 	//--------------------------------------------------------------------------------------------------------------------------------------------
 

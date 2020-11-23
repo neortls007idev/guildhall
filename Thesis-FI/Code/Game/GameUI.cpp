@@ -548,8 +548,12 @@ void Game::ParticleEmitterSettingsGUI()
 		{
 			std::string emitterName = "Star ";
 			emitterName.append( ToString( ( int ) index + 1 ) );
+			size_t frustumCulledParticles = m_starEmitters[ index ].m_emitter->m_particlesInViewFrustum;
 			size_t numAliveParticles = m_starEmitters[ index ].m_emitter->m_numAliveParticles;
-			ImGui::TextColored( ImVec4( 0.f , 1.f , 0.f , 1.f ) , "Num Alive %s Emitter Particles = %u" , emitterName.c_str() , numAliveParticles );
+			
+			ImGui::TextColored( ImVec4( 0.f , 1.f , 0.f , 1.f ) , "Num Particles in View Frustum %s Emitter Particles = %u" , emitterName.c_str() , frustumCulledParticles );
+			ImGui::TextColored( ImVec4( 1.f , 1.f , 0.f , 1.f ) , "Num Alive %s Emitter Particles = %u" , emitterName.c_str() , numAliveParticles );
+			ImGui::TextColored( ImVec4( 1.f , 1.f , 1.f , 1.f ) , "Num Max Allowed %s Emitter Particles = %u" , emitterName.c_str() , PARTICLE_EMITTER_LIMIT );
 				
 			if( ImGui::TreeNode( emitterName.c_str() ) )
 			{

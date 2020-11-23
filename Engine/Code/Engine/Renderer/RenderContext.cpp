@@ -630,7 +630,7 @@ void RenderContext::BeginCamera( const Camera& camera )
 	BindShader( "" );
 	m_lastBoundVBO = nullptr;
 	BindUniformBuffer( UBO_FRAME_SLOT , m_frameUBO );
-	//m_currentCamera->UpdateUBO( this );
+//	m_currentCamera->UpdateUBO( this );
 	BindUniformBuffer( UBO_CAMERA_SLOT , m_currentCamera->UpdateUBO( this ) );
 
 	SetModelMatrix( Mat44::IDENTITY );

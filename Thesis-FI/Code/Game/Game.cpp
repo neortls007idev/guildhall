@@ -672,7 +672,6 @@ void Game::UpdateAllStarEmitters()
 		m_starEmitters[ index ].m_emitter->UpdateViewFrustum( gameCamViewFrustum );
 
 		m_starEmitters[ index ].m_emitter->UpdateTargetPos( m_gameCamera.GetPosition() );
-		m_starEmitters[ index ].m_emitter->m_targetViewMat = m_gameCamera.GetViewMatrix();		
 
 		int direction = 1;
 		Vec3 emitterPos = Vec3( 0.f , 0.f , -5.f );
@@ -704,7 +703,7 @@ void Game::UpdateAllStarEmitters()
 		numNewSpawns = numNewSpawns <= m_starEmitters[ index ].m_numParticlesToSpawnPerFrame ? numNewSpawns : m_starEmitters[ index ].m_numParticlesToSpawnPerFrame;
 
 	
-		for( uint particleSpawned = 0 ; particleSpawned <= numNewSpawns ; particleSpawned++ )
+		for( uint particleSpawned = 0 ; particleSpawned < numNewSpawns ; particleSpawned++ )
 		{			
 			Vec3 position = g_RNG->RollRandomInUnitSphere();
 			Vec3 deviation = g_RNG->RollRandomUnitVec3() * m_starEmitters[ index ].m_particleVelocity;
@@ -717,6 +716,25 @@ void Game::UpdateAllStarEmitters()
 																					 // WHITE , WHITE );
 		}
 	}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//			SINGLE PARTICLE TEST CODE
+//--------------------------------------------------------------------------------------------------------------------------------------------
+		
+//	Frustum gameCamViewFrustum = m_gameCamera.GetCameraViewFrustum();
+//	m_starEmitters[ TEST_STAR ].m_emitter->UpdateViewFrustum( gameCamViewFrustum );
+//
+//	m_starEmitters[ TEST_STAR ].m_emitter->UpdateTargetPos( m_gameCamera.GetPosition() );
+//
+//	Vec3 position = Vec3( 0.f , 2.f , 6.f );
+//	Vec3 deviation = g_RNG->RollRandomUnitVec3() * m_starEmitters[ TEST_STAR ].m_particleVelocity;
+//	//float scale = g_RNG->RollRandomFloatInRange( 0.f , 1.5f );
+//	int maxAge = 100;
+//
+//	m_starEmitters[ TEST_STAR ].m_emitter->SpawnNewRandomParticleFromSpriteSheet( AABB2( -m_starEmitters[ TEST_STAR ].m_particleSize , m_starEmitters[ TEST_STAR ].m_particleSize )
+//		, position , 1.f , deviation , static_cast< uint16_t >( maxAge ) ,
+//		m_starEmitters[ TEST_STAR ].m_particleStartColor , m_starEmitters[ TEST_STAR ].m_particleEndColor );
+//	// WHITE , WHITE );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -729,7 +747,6 @@ void Game::ThreadedUpdateAllStarEmitters()
 		m_starEmitters[ index ].m_emitter->UpdateViewFrustum( gameCamViewFrustum );
 
 		m_starEmitters[ index ].m_emitter->UpdateTargetPos( m_gameCamera.GetPosition() );
-		m_starEmitters[ index ].m_emitter->m_targetViewMat = m_gameCamera.GetViewMatrix();
 
 		int direction = 1;
 		Vec3 emitterPos = Vec3( 0.f , 0.f , -5.f );
@@ -746,7 +763,7 @@ void Game::ThreadedUpdateAllStarEmitters()
 
 		size_t numNewSpawns = m_starEmitters[ index ].m_emitter->m_totalSpawnableParticles - m_starEmitters[ index ].m_emitter->m_numAliveParticles;
 
-		numNewSpawns = numNewSpawns <= m_starEmitters[ index ].m_numParticlesToSpawnPerFrame ? numNewSpawns : m_starEmitters[ index ].m_numParticlesToSpawnPerFrame;
+		numNewSpawns = numNewSpawns < m_starEmitters[ index ].m_numParticlesToSpawnPerFrame ? numNewSpawns : m_starEmitters[ index ].m_numParticlesToSpawnPerFrame;
 
 		m_particleSpawnJob = new GameParticleEmitterSpawnJob( 0 , m_starEmitters[ index ].m_emitter , numNewSpawns , m_starEmitters[ index ].m_particleVelocity ,
 										m_starEmitters[ index ].m_particleMinLifeTime , m_starEmitters[ index ].m_particleMaxLifeTime ,

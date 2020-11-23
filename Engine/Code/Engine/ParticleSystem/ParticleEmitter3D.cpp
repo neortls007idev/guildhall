@@ -6,6 +6,7 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SpriteDefinition.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
+#include "Engine/Math/MathUtils.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -191,6 +192,7 @@ void ParticleEmitter3D::SpawnNewRandomParticleFromSpriteSheet ( AABB2 cosmeticBo
 void ParticleEmitter3D::Update( float deltaSeconds )
 {
 	m_particleVerts.clear();
+	m_particlesInViewFrustum = 0;
 
 	if( m_numAliveParticles == 0 )
 	{
@@ -228,19 +230,15 @@ void ParticleEmitter3D::Update( float deltaSeconds )
 		if ( m_viewFrustum.IsPointInsideFrustum( m_particles[ index ].m_position ) )
 		{
 			m_isParticleInViewFrusutum[ index ] = true;
+			m_particlesInViewFrustum++;
 
-		const SpriteDefinition& currentParticleSprite = m_spriteSheet->GetSpriteDefinition( m_particles[ index ].m_spriteIndex );
-		currentParticleSprite.GetUVs( minUVs , maxUVs );
-		
-		lookAt = LookAtMatrix( particle->m_position , m_targetPos );
-		Vec4 ibasis = -lookAt.GetIBasis4D();
-		lookAt.Ix = ibasis.x;
-		lookAt.Iy = ibasis.y;
-		lookAt.Iz = ibasis.z;
-		lookAt.Iw = ibasis.w;
-
-		Transform3DAndAppendVertsForAABB2( m_particleVerts , particle->m_cosmeticBounds , particle->m_startColor ,
-			minUVs , maxUVs , particle->m_position , m_targetViewMat );
+			const SpriteDefinition& currentParticleSprite = m_spriteSheet->GetSpriteDefinition( m_particles[ index ].m_spriteIndex );
+			currentParticleSprite.GetUVs( minUVs , maxUVs );
+			
+			lookAt = ParticleTargetPosFacingxyz( particle->m_position );
+			
+			Transform3DAndAppendVertsForAABB2( m_particleVerts , particle->m_cosmeticBounds , particle->m_startColor ,
+				minUVs , maxUVs , lookAt );
 		}
 	}
 }
@@ -250,7 +248,8 @@ void ParticleEmitter3D::Update( float deltaSeconds )
 void ParticleEmitter3D::UpdateParticlesData( float deltaSeconds )
 {
 	m_particleVerts.clear();
-	
+	m_particlesInViewFrustum = 0;
+
 	for ( size_t index = 0; ( index < m_totalSpawnableParticles ) && ( m_numAliveParticles > 0 ); index++ )
 	{
 		if ( m_isParticleGarbage[ index ] )
@@ -258,16 +257,18 @@ void ParticleEmitter3D::UpdateParticlesData( float deltaSeconds )
 			continue;
 		}
 		m_particles[ index ].Update( deltaSeconds );
-		
-		if ( m_viewFrustum.IsPointInsideFrustum( m_particles[ index ].m_position ) )
-		{
-			m_isParticleInViewFrusutum[ index ] = true;
-		}
 
 		if ( m_particles[ index ].m_age >= m_particles[ index ].m_maxAge )
 		{
 			m_isParticleGarbage[ index ] = true;
 			m_numAliveParticles--;
+			continue;
+		}
+		
+		if ( m_viewFrustum.IsPointInsideFrustum( m_particles[ index ].m_position ) )
+		{
+			m_isParticleInViewFrusutum[ index ] = true;
+			m_particlesInViewFrustum++;
 		}
 	}
 
@@ -299,15 +300,10 @@ void ParticleEmitter3D::UpdateParticlesVBO( size_t startIndex , size_t endIndex 
 		const SpriteDefinition& currentParticleSprite = m_spriteSheet->GetSpriteDefinition( m_particles[ index ].m_spriteIndex );
 		currentParticleSprite.GetUVs( minUVs , maxUVs );
 		
-		lookAt = LookAtMatrix( particle->m_position , m_targetPos );
-		Vec4 ibasis = -lookAt.GetIBasis4D();
-		lookAt.Ix = ibasis.x;
-		lookAt.Iy = ibasis.y;
-		lookAt.Iz = ibasis.z;
-		lookAt.Iw = ibasis.w;
+		lookAt = ParticleTargetPosFacingxyz( particle->m_position );
 
 		Transform3DAndAppendVertsForAABB2AtIndex( m_particleVerts , index * 6 , particle->m_cosmeticBounds , particle->m_startColor ,
-			minUVs , maxUVs , particle->m_position , lookAt );
+			minUVs , maxUVs , lookAt );
 	}
 }
 
@@ -413,3 +409,22 @@ void ParticleEmitter3D::UpdateVelocity( Vec3 newVelocity )
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+
+Mat44 ParticleEmitter3D::ParticleTargetPosFacingxyz( Vec3& particlePos )
+{
+	Vec3 forward = ( m_targetPos - particlePos ).GetNormalized();
+
+	if ( forward.GetLengthSquared() <= 0.001 )
+	{
+		return Mat44::IDENTITY;
+	}
+
+	Vec3 left = CrossProduct3D( forward , Vec3::UNIT_VECTOR_ALONG_J_BASIS ).GetNormalized();
+	Vec3 up = CrossProduct3D( forward , left );
+
+	Mat44 lookAt;
+
+	lookAt.SetBasisVectors3D( left , up , forward , particlePos );
+
+	return lookAt;
+}
