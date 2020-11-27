@@ -237,11 +237,11 @@ void DevConsole::Render( RenderContext& renderer , const Camera& camera , float 
 	renderer.SetRasterState( FILL_SOLID );
 	renderer.SetModelMatrix( Mat44::IDENTITY );
 
-	AABB2 devConsolePhoenixAnimArea = consoleArea.GetBoxAtTop( 0.75f , 0.f ).GetBoxAtRight( 0.25f , 0.f );
+	AABB2 devConsolePhoenixAnimArea = consoleArea.GetBoxAtTop( 0.75f , 0.f ).GetBoxAtRight( 0.75f , 0.f );
 	devConsolePhoenixAnimArea.AlignWithinAABB2( consoleArea , ALIGN_TOP_RIGHT );
 	RenderPhoenixAnimation( renderer , camera , devConsolePhoenixAnimArea );
 
-	AABB2 devConsoleCatAnimArea = consoleArea.GetBoxAtBottom( 0.75f , 0.f ).GetBoxAtRight( 0.25f , 0.f );
+	AABB2 devConsoleCatAnimArea = consoleArea.GetBoxAtBottom( 0.75f , 0.f ).GetBoxAtRight( 0.75f , 0.f );
 	devConsoleCatAnimArea.AlignWithinAABB2( consoleArea , ALIGN_BOTTOM_RIGHT );
 	RenderCatAnimation( renderer , camera , devConsoleCatAnimArea );
 	

@@ -72,6 +72,13 @@ void ImGUISystem::Update( float deltaSeconds )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void ImGUISystem::UpdateClearMode( unsigned int clearFlags , Rgba8 color )
+{
+	m_debugCamera->SetClearMode( clearFlags , color );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void ImGUISystem::Render() const
 {
 	m_renderContext->BeginCamera( *m_debugCamera );
