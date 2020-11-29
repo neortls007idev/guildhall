@@ -2,7 +2,6 @@
 #include "Game/Server.hpp"
 #include "Game/GameSinglePlayer.hpp"
 #include "Game/GameMultiplayer.hpp"
-#include "Engine/Networking/NetworkSystem.hpp"
 #include "Game/TheApp.hpp"
 #include "PlayerClient.hpp"
 #include "RemoteClient.hpp"
@@ -10,11 +9,12 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Time/Timer.hpp"
+#include "Game/Networking/GameNetworkSystem.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	
 AuthoritativeServer* g_theAuthServer = nullptr;
-extern	NetworkSystem* g_theNetworkSys;
+extern	GameNetworkSystem* g_theGameNetworkSys;
 extern TheApp* g_theApp;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -46,9 +46,9 @@ void AuthoritativeServer::Shutdown()
 	EventArgs args;
 	args.SetValue( "bindPort" , ToString( m_udpListenPort ) );
 
-	if ( m_gameType == MULTIPLAYER && g_theNetworkSys != nullptr )
+	if ( m_gameType == MULTIPLAYER && g_theGameNetworkSys != nullptr )
 	{
-		g_theNetworkSys->CloseUDPPort( args );
+		g_theGameNetworkSys->CloseUDPPort( args );
 	}
 }
 
@@ -72,7 +72,7 @@ void AuthoritativeServer::BeginFrame()
 {
 	if( m_gameType == MULTIPLAYER )
 	{
-		for( auto index : g_theNetworkSys->m_recievedTCPClientMesageBuffer )
+		for( auto index : g_theGameNetworkSys->m_recievedTCPClientMesageBuffer )
 		{
 			if ( m_isRemoteClientConnectionComplete )
 			{
@@ -115,11 +115,11 @@ void AuthoritativeServer::BeginFrame()
 
 					args.SetValue( "msg" , message );
 
-					if ( g_theNetworkSys->SendMessageToClient( args ) )
+					if ( g_theGameNetworkSys->SendMessageToClient( args ) )
 					{
 						EventArgs unusedArgs;
 
-						if ( g_theNetworkSys->OpenUDPPort( UDPArgs ) )
+						if ( g_theGameNetworkSys->OpenUDPPort( UDPArgs ) )
 						{
 							AddRemoteNewRemotePlayer();
 
@@ -148,7 +148,7 @@ void AuthoritativeServer::BeginFrame()
 
 void AuthoritativeServer::EndFrame()
 {
-	ParseReceivedMessages( g_theNetworkSys->m_recievedUDPMesageBuffer );
+	ParseReceivedMessages( g_theGameNetworkSys->m_recievedUDPMesageBuffer );
 
 	if( m_sendFreq->HasElapsed() )
 	{
@@ -226,7 +226,7 @@ void AuthoritativeServer::ParseAndSendEntityData()
 													 ToString( currentList[ entityIndex ]->m_orientationDegrees );
 
 					EntityUpdateArgs.SetValue( "msg" , EntityDataAsString.c_str() );
-					g_theNetworkSys->SendUDPMessage( EntityUpdateArgs );
+					g_theGameNetworkSys->SendUDPMessage( EntityUpdateArgs );
 				}
 			}
 		}

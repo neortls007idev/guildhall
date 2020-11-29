@@ -1,18 +1,18 @@
+#include "Engine/Core/DevConsole.hpp"
+#include "Engine/Core/EngineCommon.hpp"
+#include "Game/GameMultiplayer.hpp"
+#include "Game/Networking/GameNetworkSystem.hpp"
+#include "Game/PlayerClient.hpp"
 #include "Game/RemoteServer.hpp"
 #include "Game/Server.hpp"
-#include "Game/GameMultiplayer.hpp"
-#include "Engine/Networking/NetworkSystem.hpp"
 #include "Game/TheApp.hpp"
-#include "PlayerClient.hpp"
-#include "Engine/Core/EngineCommon.hpp"
-#include "Engine/Core/DevConsole.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-		RemoteServer*	g_theRemoteServer = nullptr;
+		RemoteServer*		g_theRemoteServer = nullptr;
 
-extern	NetworkSystem*	g_theNetworkSys;
-extern	TheApp*			g_theApp;
+extern	GameNetworkSystem*	g_theGameNetworkSys;
+extern	TheApp*				g_theApp;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -44,9 +44,9 @@ void RemoteServer::Shutdown()
 	EventArgs args;
 	args.SetValue( "bindPort" , ToString( m_udpListenPort ) );
 
-	if ( g_theNetworkSys != nullptr )
+	if ( g_theGameNetworkSys != nullptr )
 	{
-		g_theNetworkSys->CloseUDPPort( args );
+		g_theGameNetworkSys->CloseUDPPort( args );
 	}
 }
 
@@ -68,7 +68,7 @@ void RemoteServer::BeginFrame()
 {
 	if ( m_gameType == MULTIPLAYER )
 	{
-		for ( auto index : g_theNetworkSys->m_recievedTCPServerMesageBuffer )
+		for ( auto index : g_theGameNetworkSys->m_recievedTCPServerMesageBuffer )
 		{
 			if( m_isRemoteClientConnectionComplete )
 			{
@@ -104,7 +104,7 @@ void RemoteServer::BeginFrame()
 					UDPArgs.SetValue( "sendPort" , ToString( m_udpSendToPort ) );
 					UDPArgs.SetValue( "host" , m_hostIPaddr.c_str() );
 					
-					if ( g_theNetworkSys->OpenUDPPort( UDPArgs ) )
+					if ( g_theGameNetworkSys->OpenUDPPort( UDPArgs ) )
 					{
 						EventArgs args;
 						//g_theNetworkSys->DisconnectFromServer( args );
@@ -122,7 +122,7 @@ void RemoteServer::BeginFrame()
 
 void RemoteServer::EndFrame()
 {
-	ParseReceivedMessages( g_theNetworkSys->m_recievedUDPMesageBuffer );
+	ParseReceivedMessages( g_theGameNetworkSys->m_recievedUDPMesageBuffer );
 	ParseAndUpdateEntities();
 }
 
@@ -139,7 +139,7 @@ void RemoteServer::ParseAndUpdateEntities()
 			return;
 		}
 
-		for ( auto index : g_theNetworkSys->m_recievedUDPMesageBuffer )
+		for ( auto index : g_theGameNetworkSys->m_recievedUDPMesageBuffer )
 		{
 			if ( index != "" )
 			{
@@ -184,9 +184,9 @@ bool RemoteServer::RequestAddPlayerEntityandUDPConnection( EventArgs args )
 	std::string message = "StartUDPServer," + m_hostIPaddr;
 	newArgs.SetValue( "msg" , message );
 	
-	if ( g_theNetworkSys != nullptr )
+	if ( g_theGameNetworkSys != nullptr )
 	{
-		return g_theNetworkSys->SendMessageToServer( newArgs );
+		return g_theGameNetworkSys->SendMessageToServer( newArgs );
 	}
 
 	return false;

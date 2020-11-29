@@ -6,8 +6,8 @@
 #include "Game/GameSinglePlayer.hpp"
 #include "Game/AuthServer.hpp"
 #include "Game/RemoteServer.hpp"
-#include "Engine/Networking/NetworkSystem.hpp"
-#include "Player.hpp"
+#include "Game/Player.hpp"
+#include "Game/Networking/GameNetworkSystem.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ extern	Window*								g_theWindow;
 extern	BitmapFont*							g_bitmapFont;
 extern	AuthoritativeServer*				g_theAuthServer;
 extern	RemoteServer*						g_theRemoteServer;
-extern	NetworkSystem*						g_theNetworkSys;
+extern	GameNetworkSystem*					g_theGameNetworkSys;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	
@@ -71,7 +71,7 @@ void PlayerClient::Update( float deltaSeconds )
 												 ToString( player->m_orientationDegrees );
 
 				ClientUpdateArgs.SetValue( "msg" , clientDataAsString.c_str() );
-				g_theNetworkSys->SendUDPMessage( ClientUpdateArgs );
+				g_theGameNetworkSys->SendUDPMessage( ClientUpdateArgs );
 			}
 		}
 	}

@@ -1,12 +1,12 @@
 #include "Game/RemoteClient.hpp"
 #include "Game/Game.hpp"
 #include "Game/RemoteServer.hpp"
-#include "Engine/Networking/NetworkSystem.hpp"
+#include "Game/Networking/GameNetworkSystem.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	
 extern	RemoteServer*	g_theRemoteServer;
-extern	NetworkSystem*	g_theNetworkSys;
+extern	GameNetworkSystem*	g_theGameNetworkSys;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
