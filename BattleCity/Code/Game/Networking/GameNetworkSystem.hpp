@@ -3,6 +3,7 @@
 #include <list>
 #include <string>
 #include "GameUDPData.hpp"
+#include "GameNetworkCommon.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -56,8 +57,8 @@ private:
 	bool							m_isListening						= false;
 	int								m_listenPort						= -1;
 	GameTCPServer*					m_TCPServer;
-	GameTCPClient*					m_TCPclient;
-	SOCKET							m_linkSocket;
+	GameTCPClient*					m_TCPclient[ MAX_CLIENTS ];
+	SOCKET							m_linkSocket[ MAX_CLIENTS ];
 	static bool						m_wasMessageJustSentByServer;
 	static bool						m_wasMessageJustSentByClient;
 	GameUDPListner*					m_UDPListner						= nullptr;

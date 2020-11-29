@@ -30,8 +30,11 @@ GameNetworkSystem::GameNetworkSystem() :
 								m_isListening( false )
 								
 {
-	m_linkSocket = INVALID_SOCKET;
-	m_TCPclient = new GameTCPClient( INVALID_SOCKET );
+	for( int index = 0 ; index < MAX_CLIENTS ; index++ )
+	{
+		m_linkSocket[ index ]	= INVALID_SOCKET;
+		m_TCPclient[ index ]	= new GameTCPClient( INVALID_SOCKET );
+	}
 	if ( !areDevConsoleCommandsAdded )
 	{
 		AddNetowrkingCommandsToConsole();
@@ -43,13 +46,16 @@ GameNetworkSystem::GameNetworkSystem() :
 
 GameNetworkSystem::~GameNetworkSystem()
 {
-	m_linkSocket = INVALID_SOCKET;
 	m_isListening = false;
 
-	if ( nullptr != m_TCPclient )
+	for ( int index = 0; index < MAX_CLIENTS; index++ )
 	{
-		delete m_TCPclient;
-		m_TCPclient = nullptr;
+		m_linkSocket[ index ] = INVALID_SOCKET;
+		if ( nullptr != m_TCPclient[ index ] )
+		{
+			delete m_TCPclient[ index ];
+			m_TCPclient[ index ] = nullptr;
+		}
 	}
 
 	if ( nullptr != m_TCPServer )
@@ -99,51 +105,56 @@ void GameNetworkSystem::BeginFrame()
 	{
 		if( ( m_TCPServer != nullptr ) && ( m_TCPServer->m_listenSocket != INVALID_SOCKET ) )
 		{
-			if( m_linkSocket == INVALID_SOCKET )
-			{
-				m_linkSocket = m_TCPServer->Accept();
+			for( int index = 0 ; index < MAX_CLIENTS ; index++ )
+			{				
+				if( m_linkSocket[ index ] == INVALID_SOCKET )
+				{
+					m_linkSocket[ index ] = m_TCPServer->Accept();
 
-				if( m_linkSocket != INVALID_SOCKET )
+					if( m_linkSocket[ index ] != INVALID_SOCKET )
+					{
+						g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client Connected from %s" , GetAddress( m_linkSocket[ index ] ).c_str() );
+					}
+				}
+				if( m_linkSocket[ index ] != INVALID_SOCKET )
 				{
-					g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client Connected from %s" , GetAddress( m_linkSocket ).c_str() );
+					std::array<char , 256> bufferRecieve;
+					std::string recievedClientMessage = m_TCPServer->ReceiveClientMessage( m_linkSocket[ index ] , &bufferRecieve[ 0 ] , ( int ) ( bufferRecieve.size() - 1 ) );
+					if( recievedClientMessage != "" )
+					{
+						m_recievedTCPClientMesageBuffer.emplace_back( recievedClientMessage );
+					}
+					
+					if( m_wasMessageJustSentByServer )
+					{
+						//std::array<char , 256> buffer;
+						m_TCPServer->SendClientMessage( m_linkSocket[ index ] );
+					}
 				}
 			}
-			if( m_linkSocket != INVALID_SOCKET )
-			{
-				std::array<char , 256> bufferRecieve;
-				std::string recievedClientMessage = m_TCPServer->ReceiveClientMessage( m_linkSocket , &bufferRecieve[ 0 ] , ( int ) ( bufferRecieve.size() - 1 ) );
-				if( recievedClientMessage != "" )
-				{
-					m_recievedTCPClientMesageBuffer.emplace_back( recievedClientMessage );
-				}
-				
-				if( m_wasMessageJustSentByServer )
-				{
-					//std::array<char , 256> buffer;
-					m_TCPServer->SendClientMessage( m_linkSocket );
-					m_wasMessageJustSentByServer = false;
-				}
-			}
+			m_wasMessageJustSentByServer = false;
 		}
 	}
-
-	if( m_TCPclient != nullptr )
+	
+	for ( int index = 0; index < MAX_CLIENTS; index++ )
 	{
-		if( m_TCPclient->m_clientSocket != INVALID_SOCKET )
+		if( m_TCPclient[ index ] != nullptr )
 		{
-			std::array<char , 256> bufferRecieve;
-			
-			std::string recievedServerMessage = m_TCPclient->ReceiveServerMessage( m_TCPclient->m_clientSocket , &bufferRecieve[ 0 ] , ( int ) ( bufferRecieve.size() - 1 ) );
-			if ( recievedServerMessage != "" )
+			if( m_TCPclient[ index ]->m_clientSocket != INVALID_SOCKET )
 			{
-				m_recievedTCPServerMesageBuffer.emplace_back( recievedServerMessage );
-			}
+				std::array<char , 256> bufferRecieve;
+				
+				std::string recievedServerMessage = m_TCPclient[ index ]->ReceiveServerMessage( m_TCPclient[ index ]->m_clientSocket , &bufferRecieve[ 0 ] , ( int ) ( bufferRecieve.size() - 1 ) );
+				if ( recievedServerMessage != "" )
+				{
+					m_recievedTCPServerMesageBuffer.emplace_back( recievedServerMessage );
+				}
 
-
-			if( m_wasMessageJustSentByClient )
-			{
-				m_TCPclient->SendServerMessage( m_TCPclient->m_clientSocket );
-				m_wasMessageJustSentByClient = false;
+				if( m_wasMessageJustSentByClient )
+				{
+					m_TCPclient[ index ]->SendServerMessage( m_TCPclient[ index ]->m_clientSocket );
+					m_wasMessageJustSentByClient = false;
+				}
 			}
 		}
 	}
@@ -256,10 +267,14 @@ STATIC bool GameNetworkSystem::CloseTCPServer( EventArgs& args )
 	{
 		g_theGameNetworkSys->SetIsListening( false );
 		g_theGameNetworkSys->m_TCPServer->SetListenPort( -1 );
-		closesocket( g_theGameNetworkSys->m_linkSocket );
+
+		for ( int index = 0; index < MAX_CLIENTS; index++ )
+		{
+			closesocket( g_theGameNetworkSys->m_linkSocket[ index ] );
+			g_theGameNetworkSys->m_linkSocket[ index ] = INVALID_SOCKET;
+		}
+
 		closesocket( g_theGameNetworkSys->m_TCPServer->m_listenSocket );
-		
-		g_theGameNetworkSys->m_linkSocket = INVALID_SOCKET;
 		if ( g_theGameNetworkSys->m_TCPServer != nullptr )
 		{
 			delete g_theGameNetworkSys->m_TCPServer;
@@ -276,12 +291,18 @@ STATIC bool GameNetworkSystem::CloseTCPServer( EventArgs& args )
 
 STATIC bool GameNetworkSystem::SendMessageToClient( EventArgs& args )
 {
-	if( ( nullptr != g_theGameNetworkSys->m_TCPServer ) && ( g_theGameNetworkSys->m_linkSocket != INVALID_SOCKET ) )
+	if( ( nullptr != g_theGameNetworkSys->m_TCPServer ) )
 	{
-		std::string message = args.GetValue( "msg" , "InvalidMessage" );
-		g_theGameNetworkSys->m_TCPServer->SetServerSendMessage( message );
-		m_wasMessageJustSentByServer = true;
+		for ( int index = 0; index < MAX_CLIENTS; index++ )
+		{
+			if( ( g_theGameNetworkSys->m_linkSocket[ index ] != INVALID_SOCKET ) )
+			{
+				std::string message = args.GetValue( "msg" , "InvalidMessage" );
+				g_theGameNetworkSys->m_TCPServer->SetServerSendMessage( message );
+			}
+		}
 
+		m_wasMessageJustSentByServer = true;
 		return true;
 	}
 	return false;
@@ -291,12 +312,17 @@ STATIC bool GameNetworkSystem::SendMessageToClient( EventArgs& args )
 
 bool GameNetworkSystem::SendMessageToServer( EventArgs& args )
 {
-	if( ( nullptr != g_theGameNetworkSys->m_TCPclient ) && ( g_theGameNetworkSys->m_TCPclient->m_clientSocket != INVALID_SOCKET ) )
+	if( ( nullptr != g_theGameNetworkSys->m_TCPclient ) )
 	{
-		std::string message = args.GetValue( "msg" , "InvalidMessage" );
-		g_theGameNetworkSys->m_TCPclient->SetClientSendMessage( message );
+		for ( int index = 0; index < MAX_CLIENTS; index++ )
+		{
+			if( ( g_theGameNetworkSys->m_TCPclient[ index ]->m_clientSocket != INVALID_SOCKET ) )
+			{
+				std::string message = args.GetValue( "msg" , "InvalidMessage" );
+				g_theGameNetworkSys->m_TCPclient[ index ]->SetClientSendMessage( message );
+			}
+		}
 		m_wasMessageJustSentByClient = true;
-
 		return true;
 	}
 	return false;
@@ -311,15 +337,18 @@ STATIC bool GameNetworkSystem::ConnectToServer( EventArgs& args )
 		std::string host = args.GetValue( "ipaddr" , "" );		
 		std::string port = args.GetValue( "port" , "48000" );
 	
-		g_theGameNetworkSys->m_TCPclient->m_clientSocket = g_theGameNetworkSys->m_TCPclient->Connect( host.c_str() ,
-		                                                                                      ( uint16_t )atoi( port.c_str() ) ,
-		                                                                                      Mode::Nonblocking );
-		if( g_theGameNetworkSys->m_TCPclient->m_clientSocket != INVALID_SOCKET )
+		for ( int index = 0; index < MAX_CLIENTS; index++ )
 		{
-			g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Server Connected to %s" ,
-										  g_theGameNetworkSys->GetAddress( g_theGameNetworkSys->m_TCPclient->m_clientSocket ).c_str() );
+			g_theGameNetworkSys->m_TCPclient[ index ]->m_clientSocket = g_theGameNetworkSys->m_TCPclient[ index ]->Connect( host.c_str() ,
+			                                                                                      ( uint16_t )atoi( port.c_str() ) ,
+			                                                                                      Mode::Nonblocking );
+			if( g_theGameNetworkSys->m_TCPclient[ index ]->m_clientSocket != INVALID_SOCKET )
+			{
+				g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Server Connected to %s" ,
+											  g_theGameNetworkSys->GetAddress( g_theGameNetworkSys->m_TCPclient[ index ]->m_clientSocket ).c_str() );
+				break;
+			}
 		}
-		
 		return true;
 	}
 	return false;
@@ -333,11 +362,15 @@ bool GameNetworkSystem::DisconnectFromServer( EventArgs& args )
 
 	if( nullptr != g_theGameNetworkSys )
 	{
-		closesocket( g_theGameNetworkSys->m_linkSocket );
-		closesocket( g_theGameNetworkSys->m_TCPclient->m_clientSocket );
+		for ( int index = 0; index < MAX_CLIENTS; index++ )
+		{
+			closesocket( g_theGameNetworkSys->m_linkSocket[ index ] );
+			closesocket( g_theGameNetworkSys->m_TCPclient[ index ]->m_clientSocket );
 
-		g_theGameNetworkSys->m_TCPclient->m_clientSocket = INVALID_SOCKET;
-		g_theGameNetworkSys->m_linkSocket = INVALID_SOCKET;
+			g_theGameNetworkSys->m_TCPclient[ index ]->m_clientSocket = INVALID_SOCKET;
+			g_theGameNetworkSys->m_linkSocket[ index ] = INVALID_SOCKET;	
+			break;
+		}
 
 		g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "CLIENT DISCONNECTED" );
 	}
