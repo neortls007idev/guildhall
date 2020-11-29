@@ -138,32 +138,36 @@ Game* Server::GetGame()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Server::ParseReceivedMessages( std::vector< std::string > messageBuffer )
+void Server::ParseReceivedMessages( std::vector< GameUDPData > messageBuffer )
 {
 	if ( m_gameType == MULTIPLAYER && m_isRemoteClientConnectionComplete )
 	{
 		for ( auto index : messageBuffer )
 		{
-			if ( index != "" )
+			if ( index.m_packetType != INVAlID_PACKET )
 			{
-				Strings data = SplitStringAtGivenDelimiter( index , '|' );
-				int identifier = atoi( data[ 0 ].c_str() );
-				//LOG_SYSMESSAGE( " UniqueKey = %d" , identifier );
-				if ( identifier != m_uniqueKey )
-				{
-					continue;
-				}
+				Entity* entityData = new Entity( GetGame() , Vec2::ZERO , 0.f );
+				memcpy( &entityData , &index.m_data[ 0 ] , sizeof( Entity ) - sizeof( Game* ) );
+				//Strings enityData = SplitStringAtGivenDelimiter( index , '|' );
+				//int identifier = atoi( enityData[ 0 ].c_str() );
+				////LOG_SYSMESSAGE( " UniqueKey = %d" , identifier );
+				//if ( identifier != m_uniqueKey )
+				//{
+				//	continue;
+				//}
 
 				Game* currentGame = GetGame();
-				Entitylist& entityList = currentGame->m_world->m_currentMap->m_entityListsByType[ atoi( data[ 1 ].c_str() ) ];
-				int entityID = atoi( data[ 2 ].c_str() );
+				Entitylist& entityList = currentGame->m_world->m_currentMap->m_entityListsByType[ entityData->m_entityType ];
+				int entityID = entityData->m_entityID;
 
 				for ( int entityIndex = 0; entityIndex < entityList.size(); entityIndex++ )
 				{
 					if ( entityList[ entityIndex ]->m_entityID == entityID )
 					{
-						entityList[ entityIndex ]->m_position = entityList[ entityIndex ]->m_position.SetFromText( data[ 3 ].c_str() );
-						entityList[ entityIndex ]->m_orientationDegrees = StringConvertToValue( data[ 4 ].c_str() , entityList[ entityIndex ]->m_orientationDegrees );
+						entityList[ entityIndex ] = entityData;
+						
+						//entityList[ entityIndex ]->m_position = entityList[ entityIndex ]->m_position.SetFromText( entityData[ 3 ].c_str() );
+						//entityList[ entityIndex ]->m_orientationDegrees = StringConvertToValue( entityData[ 4 ].c_str() , entityList[ entityIndex ]->m_orientationDegrees );
 					}
 				}
 			}

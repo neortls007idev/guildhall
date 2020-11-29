@@ -378,6 +378,13 @@ bool GameNetworkSystem::SendUDPMessage( EventArgs& args )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void GameNetworkSystem::SendUDPMessage( GameUDPData& updPacket )
+{
+	m_UDPListner->AddMessage( updPacket );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 bool GameNetworkSystem::CloseUDPPort( EventArgs& args )
 {
 	if ( nullptr != g_theGameNetworkSys )
@@ -397,9 +404,9 @@ void GameNetworkSystem::StartUDPListner( int bindPort , int sendPort , std::stri
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void GameNetworkSystem::SendUDPMessage( std::string message )
-{
-	m_UDPListner->AddMessage( message );
-}
+//void GameNetworkSystem::SendUDPMessage( std::string message )
+//{
+//	m_UDPListner->AddMessage( message );
+//}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

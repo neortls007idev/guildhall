@@ -31,6 +31,7 @@ public:
 	std::string GetAddress( SOCKET socket );
 
 	void SendUDPMessage( std::string message );
+	void SendUDPMessage( GameUDPData& updPacket );
 	void StartUDPListner( int bindPort , int sendPort , std::string host /*= "127.0.0.1"*/ );
 	
 	//----------------------------------------------------------------------------------------------------------
@@ -44,13 +45,13 @@ public:
 	static bool DisconnectFromServer( EventArgs& args );
 	static bool OpenUDPPort( EventArgs& args );
 	static bool SendUDPMessage( EventArgs& args );
-	static bool SendUDPMessage( GameUDPData updPacket );
 	static bool CloseUDPPort( EventArgs& args );
 	
 public:
 	std::vector< std::string >		m_recievedTCPClientMesageBuffer;
 	std::vector< std::string >		m_recievedTCPServerMesageBuffer;
-	std::vector< std::string >		m_recievedUDPMesageBuffer;
+//	std::vector< std::string >		m_recievedUDPMesageBuffer;
+	std::vector< GameUDPData >		m_recievedUDPMesageBuffer;
 
 private:
 	bool							m_isListening						= false;

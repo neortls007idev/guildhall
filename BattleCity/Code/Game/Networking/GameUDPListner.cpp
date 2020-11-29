@@ -49,39 +49,82 @@ void GameUDPListner::StartSocket( int bindPort , int sendPort , std::string host
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void GameUDPListner::AddMessage( std::string& message )
+//void GameUDPListner::AddMessage( std::string& message )
+//{
+//	m_writeQueue.push( message );
+//}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void GameUDPListner::AddMessage( GameUDPData& udpPacket )
 {
-	m_writeQueue.push( message );
+	m_writeQueue.push( udpPacket );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void GameUDPListner::Reader( GameUDPSocket& socket , SynchronizedLockFreeQueue<std::string>& readQueue )
+//void GameUDPListner::Reader( GameUDPSocket& socket , SynchronizedLockFreeQueue<std::string>& readQueue )
+//{
+//	while ( socket.IsValid() )
+//	{
+//		UDPMessageHeader const* pMsg = nullptr;
+//		if ( socket.Receive() > 0 )
+//		{
+//			auto& buffer = socket.ReceiveBuffer();
+//			pMsg = reinterpret_cast< UDPMessageHeader const* > ( &buffer[ 0 ] );
+//			std::string receivedMessage = &buffer[ sizeof( UDPMessageHeader ) ];
+//			//LOG_SYSMESSAGE( "UDP Received Message: %s" , receivedMessage.c_str() );
+//			readQueue.push( receivedMessage );
+//
+//			if( receivedMessage != "" )
+//			{
+//				bool wasMessageAddedToBuffer = false;
+//				for( auto index : g_theGameNetworkSys->m_recievedUDPMesageBuffer )
+//				{
+//					if( index == "" )
+//					{
+//						g_theGameNetworkSys->m_recievedUDPMesageBuffer.emplace_back( receivedMessage );
+//						wasMessageAddedToBuffer = true;
+//						break;
+//					}
+//				}
+//				if( !wasMessageAddedToBuffer )
+//				{
+//					g_theGameNetworkSys->m_recievedUDPMesageBuffer.emplace_back( receivedMessage );
+//				}
+//			}
+//		}
+//	}
+//}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void GameUDPListner::Reader( GameUDPSocket& socket , SynchronizedLockFreeQueue<GameUDPData>& readQueue )
 {
 	while ( socket.IsValid() )
 	{
-		UDPMessageHeader const* pMsg = nullptr;
+		//GameUDPData const* pMsg = nullptr;
 		if ( socket.Receive() > 0 )
 		{
 			auto& buffer = socket.ReceiveBuffer();
-			pMsg = reinterpret_cast< UDPMessageHeader const* > ( &buffer[ 0 ] );
-			std::string receivedMessage = &buffer[ sizeof( UDPMessageHeader ) ];
+			//pMsg = reinterpret_cast< GameUDPData const* > ( &buffer[ 0 ] );
+			GameUDPData const* receivedMessage = reinterpret_cast< GameUDPData const* > ( &buffer[ 0 ] );
 			//LOG_SYSMESSAGE( "UDP Received Message: %s" , receivedMessage.c_str() );
-			readQueue.push( receivedMessage );
+			readQueue.push( *receivedMessage );
 
-			if( receivedMessage != "" )
+			if ( receivedMessage != nullptr )
 			{
 				bool wasMessageAddedToBuffer = false;
-				for( auto index : g_theGameNetworkSys->m_recievedUDPMesageBuffer )
+				for ( auto index : g_theGameNetworkSys->m_recievedUDPMesageBuffer )
 				{
-					if( index == "" )
+					if ( index.m_packetType != INVAlID_PACKET )
 					{
 						g_theGameNetworkSys->m_recievedUDPMesageBuffer.emplace_back( receivedMessage );
 						wasMessageAddedToBuffer = true;
 						break;
 					}
 				}
-				if( !wasMessageAddedToBuffer )
+				if ( !wasMessageAddedToBuffer )
 				{
 					g_theGameNetworkSys->m_recievedUDPMesageBuffer.emplace_back( receivedMessage );
 				}
@@ -92,23 +135,42 @@ void GameUDPListner::Reader( GameUDPSocket& socket , SynchronizedLockFreeQueue<s
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 	
-void GameUDPListner::Writer( GameUDPSocket& socket , SynchronizedLockFreeQueue<std::string>& writeQueue )
+//void GameUDPListner::Writer( GameUDPSocket& socket , SynchronizedLockFreeQueue<std::string>& writeQueue )
+//{
+//	UDPMessageHeader header;
+//	while ( socket.IsValid() )
+//	{
+//		std::string message = writeQueue.pop();
+//		header.id = 1;
+//		header.length = ( uint16_t ) strlen( message.c_str() );
+//		header.sequenceNo = 1;
+//		if ( message != "" )
+//		{
+//			auto& buffer = socket.SendBuffer();
+//
+//			*reinterpret_cast< UDPMessageHeader* >( &buffer[ 0 ] ) = header;
+//			memcpy( &( socket.SendBuffer()[ sizeof( UDPMessageHeader ) ] ) , message.c_str() , header.length );
+//			socket.SendBuffer()[ sizeof( UDPMessageHeader ) + header.length ] = NULL;
+//			m_listenSocket->Send( sizeof( UDPMessageHeader ) + ( int ) message.length() + 1 );
+//		}
+//	}
+//}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void GameUDPListner::Writer( GameUDPSocket& socket , SynchronizedLockFreeQueue<GameUDPData>& writeQueue )
 {
-	UDPMessageHeader header;
+	//UDPMessageHeader header;
 	while ( socket.IsValid() )
 	{
-		std::string message = writeQueue.pop();
-		header.id = 1;
-		header.length = ( uint16_t ) strlen( message.c_str() );
-		header.sequenceNo = 1;
-		if ( message != "" )
+		GameUDPData message = writeQueue.pop();
+		if ( message.m_packetType != INVAlID_PACKET )
 		{
 			auto& buffer = socket.SendBuffer();
 
-			*reinterpret_cast< UDPMessageHeader* >( &buffer[ 0 ] ) = header;
-			memcpy( &( socket.SendBuffer()[ sizeof( UDPMessageHeader ) ] ) , message.c_str() , header.length );
-			socket.SendBuffer()[ sizeof( UDPMessageHeader ) + header.length ] = NULL;
-			m_listenSocket->Send( sizeof( UDPMessageHeader ) + ( int ) message.length() + 1 );
+			memcpy( &( socket.SendBuffer()[ sizeof( GameUDPData ) ] ) , &message , sizeof( GameUDPData ) );
+			socket.SendBuffer()[ sizeof( GameUDPData ) + 1 ] = NULL;
+			m_listenSocket->Send( sizeof( GameUDPData ) + 1 );
 		}
 	}
 }

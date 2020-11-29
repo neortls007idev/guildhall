@@ -30,6 +30,20 @@ Entity::Entity( Game* pointerToGameInstance , Vec2 pos , float orientation )
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+Entity::Entity( const Entity& copyData )
+{
+	m_entityID = copyData.m_entityID;
+	// Do not copy the pointers
+	//m_theGame = pointerToGameInstance;
+	m_position = copyData.m_position;
+	m_velocity = copyData.m_velocity;
+	m_orientationDegrees = copyData.m_orientationDegrees;
+	m_entityType = copyData.m_entityType;
+	m_faction = copyData.m_faction;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Entity::Update (float deltaSeconds)
 {
 	Movement(deltaSeconds);

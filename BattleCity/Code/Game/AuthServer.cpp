@@ -218,15 +218,12 @@ void AuthoritativeServer::ParseAndSendEntityData()
 			{
 				if ( currentList[ entityIndex ] )
 				{
-					EventArgs EntityUpdateArgs;
-					std::string EntityDataAsString = ToString( m_uniqueKey ) + "|" +
-													 ToString( Entitytype ) + "|" +
-													 ToString( currentList[ entityIndex ]->m_entityID ) + "|" +
-													 ToString( currentList[ entityIndex ]->m_position ) + "|" +
-													 ToString( currentList[ entityIndex ]->m_orientationDegrees );
-
-					EntityUpdateArgs.SetValue( "msg" , EntityDataAsString.c_str() );
-					g_theGameNetworkSys->SendUDPMessage( EntityUpdateArgs );
+					Entity entityData = *currentList[ entityIndex ];
+					GameUDPData packet;
+					packet.m_frameID = 0;
+					packet.m_packetType = ( UDPDataPacketType ) Entitytype;
+					memcpy( &packet.m_data[ 0 ] , &entityData , sizeof( Entity ) );
+					g_theGameNetworkSys->SendUDPMessage( packet );
 				}
 			}
 		}

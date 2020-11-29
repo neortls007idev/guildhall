@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "GameCommon.hpp"
+#include "Networking/GameUDPData.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -34,7 +35,7 @@ public:
 
 	void	AddRemoteNewRemotePlayer();
 	Game*	GetGame();
-	void	ParseReceivedMessages( std::vector< std::string > messageBuffer );
+	void	ParseReceivedMessages( std::vector< GameUDPData > messageBuffer );
 	
 public:
 	bool						m_isRemoteClientConnectionComplete = false;

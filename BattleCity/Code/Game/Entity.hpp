@@ -46,6 +46,8 @@ public:
 
 	Entity( Game* pointerToGameInstance , Vec2 pos , Vec2 velocity , float orientation , EntityType type , Faction faction );
 	Entity( Game* pointerToGameInstance , Vec2 pos , float orientation );
+	Entity( const Entity& copyData );
+
 	virtual void Update(float deltaSeconds);
 
 	void Movement(float deltaSeconds);

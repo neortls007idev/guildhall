@@ -123,7 +123,7 @@ void RemoteServer::BeginFrame()
 void RemoteServer::EndFrame()
 {
 	ParseReceivedMessages( g_theGameNetworkSys->m_recievedUDPMesageBuffer );
-	ParseAndUpdateEntities();
+	//ParseAndUpdateEntities();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -141,8 +141,9 @@ void RemoteServer::ParseAndUpdateEntities()
 
 		for ( auto index : g_theGameNetworkSys->m_recievedUDPMesageBuffer )
 		{
-			if ( index != "" )
+			if ( index.m_packetType != INVAlID_PACKET )
 			{
+				/*Entity
 				Strings data = SplitStringAtGivenDelimiter( index , '|' );
 				int identifier = atoi( data[ 0 ].c_str() );
 				//LOG_SYSMESSAGE( " UniqueKey = %d" , identifier );
@@ -173,7 +174,7 @@ void RemoteServer::ParseAndUpdateEntities()
 						entityList[ entityIndex ]->m_position = entityList[ entityIndex ]->m_position.SetFromText( data[ 3 ].c_str() );
 						entityList[ entityIndex ]->m_orientationDegrees = StringConvertToValue( data[ 4 ].c_str() , entityList[ entityIndex ]->m_orientationDegrees );
 					}
-				}
+				}*/
 			}
 		}
 	}
