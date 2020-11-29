@@ -31,7 +31,7 @@ constexpr int	MAX_NUMBER_OF_WATER_WORMS								=   30;
 constexpr int   MIN_WORM_LENGTH											=   3;
 constexpr int   MAX_WORM_LENGTH											=   13;
 
-constexpr int	PLAYER_HEALTH_PER_LIVES									=    3;
+constexpr int	PLAYER_HEALTH_PER_LIVES									=    2;
 constexpr int	TOTAL_PLAYER_LIVES										=    5;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

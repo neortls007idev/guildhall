@@ -89,7 +89,14 @@ void Player::Render() const
 	g_theRenderer->DrawVertexArray( 6 , tempTurret );
 	g_theRenderer->BindTexture( nullptr );
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
+	AABB2 healthBar( 0.f , 0.f , 0.8f , 0.2f );
+	Vec2 healthBarPos = Vec2( m_position.x - .4f , m_position.y - .8f );
+	healthBar.Translate( healthBarPos );
+	g_theRenderer->DrawAABB2( healthBar , BLACK );
+	float healthPercent = RangeMapFloatNormalizedOutput( 0.f , ( float ) TOTAL_PLAYER_LIVES * PLAYER_HEALTH_PER_LIVES , ( float ) m_health );
+	healthBar = healthBar.GetBoxAtLeft( 1.f - healthPercent , 0.f );
+	g_theRenderer->DrawAABB2( healthBar , GREEN );
+	//--------------------------------------------------------------------------------------------------------------------------------------------
 
 	//if (g_theGame->m_debugDraw)
 	//{
@@ -135,8 +142,8 @@ void Player::checkKeyboardKeyPressForMovement( float deltaSeconds )
 	{
 		if ( g_theInput->WasKeyJustPressed( KEY_SPACE ) )
 		{
-			// m_theGame->m_world->m_currentMap->SpawnNewEntity( GOOD_BULLET_ENTITY , m_faction , m_position , m_turretOrientation + m_orientationDegrees );
-			// //m_theGame->m_world1->m_currentMap->SpawnNewEntity( EXPLOSION_ENTITY , m_faction , m_position , m_turretOrientation + m_orientationDegrees );
+			 m_theGame->m_world->m_currentMap->SpawnNewEntity( GOOD_BULLET_ENTITY , m_faction , m_position , m_turretOrientation + m_orientationDegrees );
+			 //m_theGame->m_world->m_currentMap->SpawnNewEntity( EXPLOSION_ENTITY , m_faction , m_position , m_turretOrientation + m_orientationDegrees );
 			// //SoundID testSound = g_theAudioSystem->CreateOrGetSound( "Data/Audio/PlayerShoot.wav" );
 			// g_theAudioSystem->PlaySound( m_theGame->m_sounds[ SOUND_PLAYER_SHOOT ] );
 		}

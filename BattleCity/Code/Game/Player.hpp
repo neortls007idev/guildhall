@@ -18,10 +18,10 @@ public:
 	void UpdatePlayerColor( Rgba8 playerTint );
 	void Render() const override;
 	void IsDead() override;
+	void checkKeyboardKeyPressForMovement( float deltaSeconds );
 
 	//void RenderingDeveloperMode();
 
-	void checkKeyboardKeyPressForMovement( float deltaSeconds );
 
 	void TankMovement( float deltaSeconds );
 
@@ -45,9 +45,9 @@ public:
 	float m_turretOrientation;
 	bool m_didPlayerMoveThisFrame = false;
 	bool m_didPlayerMoveLastFrame = false;
+	InputSystem* m_inputSystem = nullptr;
 
 private:
-
 	int m_controllerID = -1;
 	Vec2 m_thrustFraction = Vec2(0.f,0.f);
 	bool m_updatefromjoystick = false;

@@ -1,21 +1,22 @@
-#include "Game/Map.hpp"
-#include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-#include "Engine/Math/RandomNumberGenerator.hpp"
-#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Core/StdExtensions.hpp"
 #include "Engine/Core/VertexUtils.hpp"
-#include "Game/player.hpp"
-#include "Game/GameCommon.hpp"
-#include "Game/Game.hpp"
-#include "Game/TheApp.hpp"
-#include "Game/NpcTank.hpp"
-#include "Game/Bullet.hpp"
+#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Math/RandomNumberGenerator.hpp"
+#include "Engine/Renderer/RenderContext.hpp"
 #include "Game/Boulder.hpp"
-#include "Game/NpcTurret.hpp"
+#include "Game/Bullet.hpp"
 #include "Game/Explosion.hpp"
-#include "Game/TileDefinition.hpp"
+#include "Game/Game.hpp"
+#include "Game/GameCommon.hpp"
+#include "Game/Map.hpp"
 #include "Game/MapDefinition.hpp"
+#include "Game/NpcTank.hpp"
+#include "Game/NpcTurret.hpp"
+#include "Game/player.hpp"
+#include "Game/TheApp.hpp"
+#include "Game/TileDefinition.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // GLOBAL VARIABLES
@@ -139,11 +140,19 @@ void Map::GarbageCollection()
 			{
 				currentList[ entityIndex ]->m_isDead =  true ;
 				//currentList[ entityIndex ]->m_isGarbage = true;
+				for ( int index = 0; index < ( int ) m_allEntities.size(); index++ )
+				{
+					if ( m_allEntities[ index ] == currentList[ entityIndex ] )
+					{
+						m_allEntities[ index ] == nullptr;
+					}
+				}
 				delete currentList[ entityIndex ];
 				currentList[ entityIndex ] = nullptr;
 			}
 		}
 	}
+
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -166,6 +175,7 @@ Entity* Map::SpawnNewEntity( EntityType type , Faction faction , const Vec2& pos
 		break;
 	case NPCBOULDER_ENTITY:
 		newEntity = new Boulder( m_theGame , position , Vec2::ZERO , orientation , type , faction );
+		
 		break;
 	case GOOD_BULLET_ENTITY :
 		newEntity = new Bullet( m_theGame , position , Vec2::ZERO , orientation , type , faction );
@@ -190,6 +200,7 @@ Entity* Map::SpawnNewEntity( EntityType type , Faction faction , const Vec2& pos
 
 void Map::AddEntityToMap( Entity* entity )
 {
+	EmplaceBackAtEmptySpace( m_allEntities , entity );
 	Entitylist& currentList = m_entityListsByType[ entity->m_entityType ];
 	AddEntityToList( currentList, entity );
 }

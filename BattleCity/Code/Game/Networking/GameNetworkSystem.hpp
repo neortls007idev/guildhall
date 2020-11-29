@@ -2,6 +2,7 @@
 #include <atlalloc.h>
 #include <list>
 #include <string>
+#include "GameUDPData.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -43,6 +44,7 @@ public:
 	static bool DisconnectFromServer( EventArgs& args );
 	static bool OpenUDPPort( EventArgs& args );
 	static bool SendUDPMessage( EventArgs& args );
+	static bool SendUDPMessage( GameUDPData updPacket );
 	static bool CloseUDPPort( EventArgs& args );
 	
 public:
@@ -53,12 +55,12 @@ public:
 private:
 	bool							m_isListening						= false;
 	int								m_listenPort						= -1;
-	GameTCPServer*						m_TCPServer;
-	GameTCPClient*						m_TCPclient;
+	GameTCPServer*					m_TCPServer;
+	GameTCPClient*					m_TCPclient;
 	SOCKET							m_linkSocket;
 	static bool						m_wasMessageJustSentByServer;
 	static bool						m_wasMessageJustSentByClient;
-	GameUDPListner*						m_UDPListner						= nullptr;
+	GameUDPListner*					m_UDPListner						= nullptr;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

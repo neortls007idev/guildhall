@@ -216,8 +216,6 @@ void TheApp::Update( float deltaSeconds )
 	{
 		g_theDevConsole->Update( deltaSeconds );
 	}
-	
-	g_theInput->EndFrame();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -260,6 +258,7 @@ void TheApp::EndFrame()
 	g_theAudioSystem->EndFrame();
 	g_theDevConsole->EndFrame();
 	g_theRenderer->EndFrame();
+	g_theInput->EndFrame();
 	Clock::EndFrame();
 }
 

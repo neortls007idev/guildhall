@@ -61,6 +61,7 @@ public:
 	std::vector< Tile >			m_tiles;
 	std::vector<Vertex_PCU>     m_tileVerts;
 	Entitylist					m_entityListsByType[ NUM_ENTITY_TYPES ];
+	Entitylist					m_allEntities;
 private:
 	int							m_thisMapNumber		= 0;
 };

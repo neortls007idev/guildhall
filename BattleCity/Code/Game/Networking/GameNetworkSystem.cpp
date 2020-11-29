@@ -10,8 +10,8 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 		GameNetworkSystem*		g_theGameNetworkSys;
-extern	DevConsole*			g_theDevConsole;
-static	bool				areDevConsoleCommandsAdded = false;
+extern	DevConsole*				g_theDevConsole;
+static	bool					areDevConsoleCommandsAdded = false;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

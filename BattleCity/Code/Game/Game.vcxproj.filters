@@ -124,6 +124,9 @@
     <ClCompile Include="Networking\GameUDPSocket.cpp">
       <Filter>Networking</Filter>
     </ClCompile>
+    <ClCompile Include="Networking\GameUDPData.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.hpp">
@@ -229,6 +232,9 @@
       <Filter>Networking</Filter>
     </ClInclude>
     <ClInclude Include="Networking\GameNetworkCommon.hpp">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\GameUDPData.hpp">
       <Filter>Networking</Filter>
     </ClInclude>
   </ItemGroup>

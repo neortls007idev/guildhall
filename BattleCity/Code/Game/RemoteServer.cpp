@@ -150,8 +150,20 @@ void RemoteServer::ParseAndUpdateEntities()
 				{
 					continue;
 				}
-								
-				Entitylist& entityList = currentGame->m_world->m_currentMap->m_entityListsByType[ atoi( data[ 1 ].c_str() ) ];
+				EntityType entityType = ( EntityType ) atoi( data[ 1 ].c_str() );
+				if( entityType == GOOD_BULLET_ENTITY )
+				{
+					GetGame()->m_world->m_currentMap->SpawnNewEntity( GOOD_BULLET_ENTITY , FACTION_ALLY , Vec2::ZERO , 0.f );
+				}
+				else if ( entityType == EVIL_BULLET_ENTITY )
+				{
+					GetGame()->m_world->m_currentMap->SpawnNewEntity( EVIL_BULLET_ENTITY , FACTION_ENEMY , Vec2::ZERO , 0.f );
+				}
+				else if ( entityType == EXPLOSION_ENTITY )
+				{
+					GetGame()->m_world->m_currentMap->SpawnNewEntity( EVIL_BULLET_ENTITY , FACTION_NEUTRAL , Vec2::ZERO , 0.f );
+				}
+				Entitylist& entityList = currentGame->m_world->m_currentMap->m_entityListsByType[ entityType ];
 				int entityID = atoi( data[ 2 ].c_str() );
 
 				for ( int entityIndex = 0; entityIndex < entityList.size(); entityIndex++ )

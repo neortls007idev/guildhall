@@ -227,6 +227,7 @@
     <ClCompile Include="Networking\GameTCPData.cpp" />
     <ClCompile Include="Networking\GameTCPServer.cpp" />
     <ClCompile Include="Networking\GameTCPSocket.cpp" />
+    <ClCompile Include="Networking\GameUDPData.cpp" />
     <ClCompile Include="Networking\GameUDPListner.cpp" />
     <ClCompile Include="Networking\GameUDPSocket.cpp" />
     <ClCompile Include="NpcTank.cpp" />
@@ -273,6 +274,7 @@
     <ClInclude Include="Networking\GameTCPData.hpp" />
     <ClInclude Include="Networking\GameTCPServer.hpp" />
     <ClInclude Include="Networking\GameTCPSocket.hpp" />
+    <ClInclude Include="Networking\GameUDPData.hpp" />
     <ClInclude Include="Networking\GameUDPListner.hpp" />
     <ClInclude Include="Networking\GameUDPSocket.hpp" />
     <ClInclude Include="Networking\GameNetworkCommon.hpp" />
