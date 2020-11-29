@@ -68,8 +68,10 @@ void PlayerClient::Update( float deltaSeconds )
 												 ToString( PLAYERTANK_ENTITY ) + "|" + 
 												 ToString( player->m_entityID ) + "|" +
 												 ToString( player->m_position ) + "|" +
-												 ToString( player->m_orientationDegrees );
-
+												 ToString( player->m_orientationDegrees ) + "|" +
+												 ToString( player->m_faction ) + "|" +
+												 ToString( player->m_health );
+				
 				ClientUpdateArgs.SetValue( "msg" , clientDataAsString.c_str() );
 				g_theGameNetworkSys->SendUDPMessage( ClientUpdateArgs );
 			}

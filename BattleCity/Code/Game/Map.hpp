@@ -43,10 +43,12 @@ public:
 	~Map();
 
 	void Update( float deltaSeconds );
+	void UpdateEntityListOfType( float deltaSeconds , EntityType entityType );
 	void CheckNoClipping();
 	void Render() const;
 	void GarbageCollection();
 
+	bool IsEntityOfTypeWithIDPresent( EntityType entityType , int entityID );
 	int GetTileIndexforTileCoords( const IntVec2& tileCoords ) const;
 	IntVec2 GetTileCoordsforTileIndex( int tileIndex ) const;
 	Tile* GetTileAtTileCoords( const IntVec2& tileCoords );

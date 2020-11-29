@@ -82,25 +82,40 @@ Map::Map( Game* theGame , MapDefinition* mapDefinition , std::string mapName ) :
 
 void Map::Update( float deltaSeconds )
 {
-	for ( int Entitytype = 0; Entitytype < NUM_ENTITY_TYPES; Entitytype++ )
+	for ( int entityType = 0; entityType < NUM_ENTITY_TYPES; entityType++ )
 	{
-		if( Entitytype == PLAYERTANK_ENTITY )
+		if( entityType == PLAYERTANK_ENTITY )
 		{
 			continue;
 		}
-
-		Entitylist& currentList = m_entityListsByType[ Entitytype ];	
-		for ( int entityIndex = 0; entityIndex < (int)m_entityListsByType[ Entitytype ].size(); entityIndex++ )
-		{
-			if ( currentList[ entityIndex ] )
-			{
-				currentList[ entityIndex ]->Update( deltaSeconds );
-			}
-		}
+		
+		UpdateEntityListOfType( deltaSeconds , ( EntityType ) entityType );
+		//Entitylist& currentList = m_entityListsByType[ Entitytype ];	
+		//for ( int entityIndex = 0; entityIndex < (int)m_entityListsByType[ Entitytype ].size(); entityIndex++ )
+		//{
+		//	if ( currentList[ entityIndex ] )
+		//	{
+		//		currentList[ entityIndex ]->Update( deltaSeconds );
+		//	}
+		//}
 	}
 	CheckNoClipping();
 	CheckCollisions();
 	GarbageCollection();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void Map::UpdateEntityListOfType( float deltaSeconds , EntityType entityType )
+{
+	Entitylist& currentList = m_entityListsByType[ entityType ];
+	for ( int entityIndex = 0; entityIndex < ( int ) m_entityListsByType[ entityType ].size(); entityIndex++ )
+	{
+		if ( currentList[ entityIndex ] )
+		{
+			currentList[ entityIndex ]->Update( deltaSeconds );
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -144,7 +159,7 @@ void Map::GarbageCollection()
 				{
 					if ( m_allEntities[ index ] == currentList[ entityIndex ] )
 					{
-						m_allEntities[ index ] == nullptr;
+						m_allEntities[ index ] = nullptr;
 					}
 				}
 				delete currentList[ entityIndex ];
@@ -154,6 +169,22 @@ void Map::GarbageCollection()
 	}
 
 }
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Map::IsEntityOfTypeWithIDPresent( EntityType entityType , int entityID )
+{
+	Entitylist entityList = m_entityListsByType[ entityType ];
+	for ( int entityIndex = 0; entityIndex < entityList.size(); entityIndex++ )
+	{
+		if ( entityList[ entityIndex ]->m_entityID == entityID )
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 Entity* Map::SpawnNewEntity( EntityType type , Faction faction , const Vec2& position, const float& orientation, const float blastRadius , const float animationDuration )

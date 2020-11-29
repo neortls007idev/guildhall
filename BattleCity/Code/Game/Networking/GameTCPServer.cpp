@@ -13,7 +13,7 @@ extern	DevConsole* g_theDevConsole;
 GameTCPServer::GameTCPServer( int port /*= 48000 */ ) :
 												m_listenPort( port ) ,
 												m_listenSocket( INVALID_SOCKET ) ,
-												m_timeVal { 01,01 }
+												m_timeVal { 00,00 }
 {
 	FD_ZERO( &m_listenSet );
 }

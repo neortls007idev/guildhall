@@ -32,13 +32,19 @@ public:
 	
 	static bool StartMultiplayerServer( EventArgs& args );
 	static bool ConnectToMultiplayerServer( EventArgs& args );
+	bool StartMultiplayerServerCheck();
+	bool ConnectToMultiplayerServerCheck();
+
 	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 private :
 
 	bool					m_isQuitting			= false ;
-	
+	bool					m_hasServerJustStarted;
+	EventArgs				m_serverArgs;
+	bool					m_hasClientJustConnected;
+	EventArgs				m_clientArgs;
 public:
 	PlayerClient*			m_localclient				= nullptr;
 	RemoteClient*			m_distantClient			= nullptr;

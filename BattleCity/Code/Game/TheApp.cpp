@@ -239,6 +239,9 @@ void TheApp::EndFrame()
 {
 	// all engine things that must end at the end of the frame and not the game
 /*	g_currentManager->EndFrame();*/
+	StartMultiplayerServerCheck();
+	ConnectToMultiplayerServerCheck();
+
 	if( g_theRemoteServer != nullptr )
 	{
 		g_theRemoteServer->EndFrame();
@@ -337,6 +340,13 @@ void TheApp::UpdateFromKeyboard()
 
 STATIC bool TheApp::StartMultiplayerServer( EventArgs& args )
 {
+	if( !g_theApp->m_hasServerJustStarted )
+	{
+		g_theApp->m_serverArgs = args;
+		g_theApp->m_hasServerJustStarted = true;
+		return false;
+	}
+
 	LOG_SYSMESSAGE( "Stopping Current Game" );
 	int port = args.GetValue( "port" , 48000 );
 	
@@ -374,6 +384,13 @@ STATIC bool TheApp::StartMultiplayerServer( EventArgs& args )
 	
 STATIC bool TheApp::ConnectToMultiplayerServer( EventArgs& args )
 {
+	if ( !g_theApp->m_hasClientJustConnected )
+	{
+		g_theApp->m_clientArgs = args;
+		g_theApp->m_hasClientJustConnected = true;
+		return false;
+	}
+
 	LOG_SYSMESSAGE( "Stopping Current Game" );
 	std::string ipAddr = args.GetValue( "ipaddr" , "127.0.0.1" );
 	int port = args.GetValue( "port" , 48000 );
@@ -399,6 +416,30 @@ STATIC bool TheApp::ConnectToMultiplayerServer( EventArgs& args )
 	delete g_theApp->m_localclient;
 	g_theApp->m_localclient = nullptr;
 
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool TheApp::StartMultiplayerServerCheck()
+{
+	if( m_hasServerJustStarted )
+	{
+		StartMultiplayerServer( m_serverArgs );
+	}
+	m_hasServerJustStarted = false;
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+bool TheApp::ConnectToMultiplayerServerCheck()
+{
+	if ( m_hasClientJustConnected )
+	{
+		ConnectToMultiplayerServer( m_clientArgs );
+	}
+	m_hasClientJustConnected = false;
 	return true;
 }
 

@@ -144,7 +144,9 @@ void Server::ParseReceivedMessages( std::vector< std::string > messageBuffer )
 	{
 		for ( auto index : messageBuffer )
 		{
-			if ( index != "" )
+			Game* currentGame = GetGame();
+
+			/*if ( index != "" )
 			{
 				Strings data = SplitStringAtGivenDelimiter( index , '|' );
 				int identifier = atoi( data[ 0 ].c_str() );
@@ -164,6 +166,49 @@ void Server::ParseReceivedMessages( std::vector< std::string > messageBuffer )
 					{
 						entityList[ entityIndex ]->m_position = entityList[ entityIndex ]->m_position.SetFromText( data[ 3 ].c_str() );
 						entityList[ entityIndex ]->m_orientationDegrees = StringConvertToValue( data[ 4 ].c_str() , entityList[ entityIndex ]->m_orientationDegrees );
+						entityList[ entityIndex ]->m_faction = ( Faction ) StringConvertToValue( data[ 5 ].c_str() , ( int ) entityList[ entityIndex ]->m_faction );
+						entityList[ entityIndex ]->m_health = StringConvertToValue( data[ 6 ].c_str() , entityList[ entityIndex ]->m_health );
+					}
+				}
+			}*/
+
+			if ( index != "" )
+			{
+				Strings data = SplitStringAtGivenDelimiter( index , '|' );
+				int identifier = atoi( data[ 0 ].c_str() );
+				//LOG_SYSMESSAGE( " UniqueKey = %d" , identifier );
+				if ( identifier != m_uniqueKey )
+				{
+					continue;
+				}
+				EntityType entityType = ( EntityType ) atoi( data[ 1 ].c_str() );
+				int entityID = atoi( data[ 2 ].c_str() );
+				Map* curMap = GetGame()->m_world->m_currentMap;
+				if ( !curMap->IsEntityOfTypeWithIDPresent( entityType , entityID ) )
+				{
+					if ( entityType == GOOD_BULLET_ENTITY )
+					{
+						curMap->SpawnNewEntity( GOOD_BULLET_ENTITY , FACTION_ALLY , Vec2::ZERO , 0.f );
+					}
+					else if ( entityType == EVIL_BULLET_ENTITY )
+					{
+						curMap->SpawnNewEntity( EVIL_BULLET_ENTITY , FACTION_ENEMY , Vec2::ZERO , 0.f );
+					}
+					else if ( entityType == EXPLOSION_ENTITY )
+					{
+						curMap->SpawnNewEntity( EVIL_BULLET_ENTITY , FACTION_NEUTRAL , Vec2::ZERO , 0.f );
+					}
+				}
+				Entitylist& entityList = currentGame->m_world->m_currentMap->m_entityListsByType[ entityType ];
+
+				for ( int entityIndex = 0; entityIndex < entityList.size(); entityIndex++ )
+				{
+					if ( entityList[ entityIndex ]->m_entityID == entityID )
+					{
+						entityList[ entityIndex ]->m_position = entityList[ entityIndex ]->m_position.SetFromText( data[ 3 ].c_str() );
+						entityList[ entityIndex ]->m_orientationDegrees = StringConvertToValue( data[ 4 ].c_str() , entityList[ entityIndex ]->m_orientationDegrees );
+						entityList[ entityIndex ]->m_faction = ( Faction ) StringConvertToValue( data[ 5 ].c_str() , ( int ) entityList[ entityIndex ]->m_faction );
+						entityList[ entityIndex ]->m_health = StringConvertToValue( data[ 6 ].c_str() , entityList[ entityIndex ]->m_health );
 					}
 				}
 			}

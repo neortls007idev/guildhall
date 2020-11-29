@@ -223,8 +223,10 @@ void AuthoritativeServer::ParseAndSendEntityData()
 													 ToString( Entitytype ) + "|" +
 													 ToString( currentList[ entityIndex ]->m_entityID ) + "|" +
 													 ToString( currentList[ entityIndex ]->m_position ) + "|" +
-													 ToString( currentList[ entityIndex ]->m_orientationDegrees );
-
+													 ToString( currentList[ entityIndex ]->m_orientationDegrees ) + "|" + 
+													 ToString( currentList[ entityIndex ]->m_faction ) + "|" + 
+													 ToString( currentList[ entityIndex ]->m_health );
+						
 					EntityUpdateArgs.SetValue( "msg" , EntityDataAsString.c_str() );
 					g_theGameNetworkSys->SendUDPMessage( EntityUpdateArgs );
 				}

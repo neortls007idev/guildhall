@@ -58,7 +58,9 @@ void RemoteServer::Update( float deltaSeconds )
 
 	if ( m_gameType == MULTIPLAYER )
 	{
+		m_multiPlayerGame->m_world->m_currentMap->UpdateEntityListOfType( deltaSeconds , EXPLOSION_ENTITY );
 		m_multiPlayerGame->m_world->m_currentMap->CheckCollisions();
+		m_multiPlayerGame->m_world->m_currentMap->GarbageCollection();
 	}
 }
 
@@ -122,8 +124,8 @@ void RemoteServer::BeginFrame()
 
 void RemoteServer::EndFrame()
 {
-	ParseReceivedMessages( g_theGameNetworkSys->m_recievedUDPMesageBuffer );
 	ParseAndUpdateEntities();
+	ParseReceivedMessages( g_theGameNetworkSys->m_recievedUDPMesageBuffer );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -144,6 +146,10 @@ void RemoteServer::ParseAndUpdateEntities()
 			if ( index != "" )
 			{
 				Strings data = SplitStringAtGivenDelimiter( index , '|' );
+				if ( data.size() != 7 )
+				{
+					continue;
+				}
 				int identifier = atoi( data[ 0 ].c_str() );
 				//LOG_SYSMESSAGE( " UniqueKey = %d" , identifier );
 				if ( identifier != m_uniqueKey )
@@ -151,20 +157,24 @@ void RemoteServer::ParseAndUpdateEntities()
 					continue;
 				}
 				EntityType entityType = ( EntityType ) atoi( data[ 1 ].c_str() );
-				if( entityType == GOOD_BULLET_ENTITY )
+				int entityID = atoi( data[ 2 ].c_str() );
+				Map* curMap = GetGame()->m_world->m_currentMap;
+				if ( !curMap->IsEntityOfTypeWithIDPresent( entityType , entityID ) )
 				{
-					GetGame()->m_world->m_currentMap->SpawnNewEntity( GOOD_BULLET_ENTITY , FACTION_ALLY , Vec2::ZERO , 0.f );
-				}
-				else if ( entityType == EVIL_BULLET_ENTITY )
-				{
-					GetGame()->m_world->m_currentMap->SpawnNewEntity( EVIL_BULLET_ENTITY , FACTION_ENEMY , Vec2::ZERO , 0.f );
-				}
-				else if ( entityType == EXPLOSION_ENTITY )
-				{
-					GetGame()->m_world->m_currentMap->SpawnNewEntity( EVIL_BULLET_ENTITY , FACTION_NEUTRAL , Vec2::ZERO , 0.f );
+					if( entityType == GOOD_BULLET_ENTITY )
+					{
+						curMap->SpawnNewEntity( GOOD_BULLET_ENTITY , FACTION_ALLY , Vec2::ZERO , 0.f );
+					}
+					else if ( entityType == EVIL_BULLET_ENTITY )
+					{
+						curMap->SpawnNewEntity( EVIL_BULLET_ENTITY , FACTION_ENEMY , Vec2::ZERO , 0.f );
+					}
+					else if ( entityType == EXPLOSION_ENTITY )
+					{
+						curMap->SpawnNewEntity( EVIL_BULLET_ENTITY , FACTION_NEUTRAL , Vec2::ZERO , 0.f );
+					}
 				}
 				Entitylist& entityList = currentGame->m_world->m_currentMap->m_entityListsByType[ entityType ];
-				int entityID = atoi( data[ 2 ].c_str() );
 
 				for ( int entityIndex = 0; entityIndex < entityList.size(); entityIndex++ )
 				{
@@ -172,6 +182,8 @@ void RemoteServer::ParseAndUpdateEntities()
 					{
 						entityList[ entityIndex ]->m_position = entityList[ entityIndex ]->m_position.SetFromText( data[ 3 ].c_str() );
 						entityList[ entityIndex ]->m_orientationDegrees = StringConvertToValue( data[ 4 ].c_str() , entityList[ entityIndex ]->m_orientationDegrees );
+						entityList[ entityIndex ]->m_faction = ( Faction ) StringConvertToValue( data[ 5 ].c_str() , ( int ) entityList[ entityIndex ]->m_faction );
+						entityList[ entityIndex ]->m_health = StringConvertToValue( data[ 6 ].c_str() , entityList[ entityIndex ]->m_health );
 					}
 				}
 			}
