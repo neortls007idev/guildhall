@@ -61,7 +61,7 @@ private:
 	SOCKET							m_linkSocket[ MAX_CLIENTS ];
 	static bool						m_wasMessageJustSentByServer;
 	static bool						m_wasMessageJustSentByClient;
-	GameUDPListner*					m_UDPListner						= nullptr;
+	GameUDPListner*					m_UDPListner[ 4 ];
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

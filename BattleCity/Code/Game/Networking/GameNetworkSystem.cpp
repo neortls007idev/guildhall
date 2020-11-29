@@ -34,12 +34,12 @@ GameNetworkSystem::GameNetworkSystem() :
 	{
 		m_linkSocket[ index ]	= INVALID_SOCKET;
 		m_TCPclient[ index ]	= new GameTCPClient( INVALID_SOCKET );
+		m_UDPListner[ index ]	= new GameUDPListner();
 	}
 	if ( !areDevConsoleCommandsAdded )
 	{
 		AddNetowrkingCommandsToConsole();
 	}
-	m_UDPListner = new GameUDPListner();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -84,9 +84,12 @@ void GameNetworkSystem::Startup()
 
 void GameNetworkSystem::Shutdown()
 {
-	if ( m_UDPListner != nullptr )
+	for( int index = 0 ; index < MAX_CLIENTS ; index++ )
 	{
-		SAFE_RELEASE_POINTER( m_UDPListner );
+		if ( m_UDPListner[ index ] != nullptr )
+		{
+			SAFE_RELEASE_POINTER( m_UDPListner[ index ] );
+		}
 	}
 
 	int iResult = WSACleanup();
@@ -415,8 +418,13 @@ bool GameNetworkSystem::CloseUDPPort( EventArgs& args )
 {
 	if ( nullptr != g_theGameNetworkSys )
 	{
-		std::string bindPort = args.GetValue( "bindPort" , "48000" );
-		g_theGameNetworkSys->m_UDPListner->m_listenSocket->Close();
+		for( int index = 0 ; index < MAX_CLIENTS ; index++ )
+		{
+			std::string bindPort = args.GetValue( "bindPort" , "48000" );
+			g_theGameNetworkSys->m_UDPListner[ index ]->m_listenSocket->Close();
+			// TODO close only the correct client
+			break;
+		}
 	}
 	return true;
 }
@@ -425,14 +433,22 @@ bool GameNetworkSystem::CloseUDPPort( EventArgs& args )
 	
 void GameNetworkSystem::StartUDPListner( int bindPort , int sendPort , std::string host /*= "127.0.0.1"*/ )
 {
-	m_UDPListner->StartSocket( bindPort , sendPort , host );
+	for( int index = 0 ; index < MAX_CLIENTS ; index++ )
+	{
+		m_UDPListner[ index ]->StartSocket( bindPort , sendPort , host );
+		break;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void GameNetworkSystem::SendUDPMessage( std::string message )
 {
-	m_UDPListner->AddMessage( message );
+	for ( int index = 0; index < MAX_CLIENTS; index++ )
+	{
+		m_UDPListner[ index ]->AddMessage( message );
+		break;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

@@ -7,6 +7,7 @@
 #include "Engine/Core/DevConsole.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
+static int remotePlayersCount = 0;
 
 Server* g_theServer = nullptr;
 
@@ -113,8 +114,22 @@ bool Server::RemovePlayerClientFromServer( Client* client )
 
 void Server::AddRemoteNewRemotePlayer()
 {
-	Player* secondplayer = m_multiPlayerGame->CreateAndAddPlayerAtpositionAndOrientation( Vec2( 46.5 , 1.5f ) , 135.f );
-	secondplayer->UpdatePlayerColor( MAGENTA );
+	if( remotePlayersCount == 0 )
+	{
+		Player* secondplayer = m_multiPlayerGame->CreateAndAddPlayerAtpositionAndOrientation( Vec2( 46.5f , 1.5f ) , 135.f );
+		secondplayer->UpdatePlayerColor( MAGENTA );
+	}
+	if( remotePlayersCount == 1 )
+	{
+		Player* thirdplayer = m_multiPlayerGame->CreateAndAddPlayerAtpositionAndOrientation( Vec2( 1.5f , 46.5f ) , 225.f );
+		thirdplayer->UpdatePlayerColor( YELLOW );
+	}
+	if ( remotePlayersCount == 2 )
+	{
+		Player* fourthplayer = m_multiPlayerGame->CreateAndAddPlayerAtpositionAndOrientation( Vec2( 46.5f , 46.5f ) , 315.f );
+		fourthplayer->UpdatePlayerColor( YELLOW );
+	}
+	remotePlayersCount++;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
