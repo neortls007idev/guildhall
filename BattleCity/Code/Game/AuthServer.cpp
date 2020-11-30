@@ -158,7 +158,11 @@ void AuthoritativeServer::EndFrame()
 		ParseAndSendEntityData();
 		m_sendFreq->Reset();
 	}
-
+	
+	if( GetGame() != nullptr )
+	{
+		GetGame()->LateUpdate();
+	}
 	//Server::EndFrame();
 }
 

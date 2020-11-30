@@ -29,6 +29,7 @@ public:
 
 	virtual void Startup();
 	virtual void Update( float deltaSeconds );
+	virtual void LateUpdate();
 	void UpdateCamera();
 
 	void UpdateGameplayFromXbox();

@@ -47,6 +47,16 @@ void Game::Update( float deltaSeconds )
 	
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Game::LateUpdate()
+{
+	if ( ( m_world != nullptr ) && ( m_world->m_currentMap != nullptr ) )
+	{
+		m_world->m_currentMap->GarbageCollection();
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 void Game::UpdateGameplayFromXbox()
 {
 	m_controllerID = g_theInput->GetXboxController( m_controllerID ).GetControllerID();

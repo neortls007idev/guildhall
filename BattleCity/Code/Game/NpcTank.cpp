@@ -21,6 +21,7 @@ extern RenderContext*	g_theRenderer;
 extern AudioSystem*		g_theAudioSystem;
 extern TheApp*			g_theApp;
 extern Game*			g_theGame;
+extern BitmapFont*		g_bitmapFont;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -172,10 +173,30 @@ void NpcTank::Render() const
 	AABB2 healthBar( 0.f , 0.f , 0.8f , 0.2f );
 	Vec2 healthBarPos = Vec2( m_position.x - .4f , m_position.y - .8f );
 	healthBar.Translate( healthBarPos );
-	g_theRenderer->DrawAABB2( healthBar , BLACK );
-	float healthPercent = RangeMapFloatNormalizedOutput( 0.f , 3.f , ( float ) m_health );
-	healthBar = healthBar.GetBoxAtLeft( 1.f - healthPercent , 0.f );
-	g_theRenderer->DrawAABB2( healthBar , RED );
+	//g_theRenderer->DrawAABB2( healthBar , BLACK );
+	//float healthPercent = RangeMapFloatNormalizedOutput( 0.f , 3.f , ( float ) m_health );
+	//healthBar = healthBar.GetBoxAtLeft( 1.f - healthPercent , 0.f );
+	//g_theRenderer->DrawAABB2( healthBar , RED );
+
+	std::vector< Vertex_PCU > healthVerts;
+	if ( m_health > 2 )
+	{
+		g_bitmapFont->AddVertsForTextInBox2D( healthVerts , healthBar , .3f , ToString( m_health ) , GREEN , 1.f , ALIGN_CENTERED );
+	}
+	else if ( m_health > 1 )
+	{
+		g_bitmapFont->AddVertsForTextInBox2D( healthVerts , healthBar , .3f , ToString( m_health ) , YELLOW , 1.f , ALIGN_CENTERED );
+	}
+	else
+	{
+		g_bitmapFont->AddVertsForTextInBox2D( healthVerts , healthBar , .3f , ToString( m_health ) , RED , 1.f , ALIGN_CENTERED );
+	}
+	g_theRenderer->BindTexture( g_bitmapFont->GetTexture() );
+	if ( healthVerts.size() > 0 )
+	{
+		g_theRenderer->DrawVertexArray( healthVerts );
+	}
+	g_theRenderer->BindTexture( nullptr );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

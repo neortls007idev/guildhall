@@ -101,7 +101,7 @@ void Map::Update( float deltaSeconds )
 	}
 	CheckNoClipping();
 	CheckCollisions();
-	GarbageCollection();
+	//GarbageCollection();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -132,7 +132,8 @@ void Map::Render() const
 
 		for ( int entityIndex = 0; entityIndex < ( int ) m_entityListsByType[ Entitytype ].size(); entityIndex++ )
 		{
-			if ( currentList[ entityIndex ] )
+			//if ( currentList[ entityIndex ] )
+			if( currentList[ entityIndex ] && ( currentList[ entityIndex ]->m_health > 0 ) )
 			{
 				currentList[ entityIndex ]->Render();
 				//m_entityListsByType[ Entitytype ][ entityIndex ]->Render();

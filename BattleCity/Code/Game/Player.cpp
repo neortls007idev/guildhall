@@ -14,11 +14,12 @@
 //		GLOBAL VARIABLES
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-extern RenderContext*	g_theRenderer;
-extern TheApp*			g_theApp;
-extern AudioSystem*		g_theAudioSystem;
-extern DevConsole*		g_theDevConsole;
-extern RandomNumberGenerator* g_RNG;
+extern RenderContext*			g_theRenderer;
+extern TheApp*					g_theApp;
+extern AudioSystem*				g_theAudioSystem;
+extern DevConsole*				g_theDevConsole;
+extern RandomNumberGenerator*	g_RNG;
+extern BitmapFont*				g_bitmapFont;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -93,12 +94,30 @@ void Player::Render() const
 	AABB2 healthBar( 0.f , 0.f , 0.8f , 0.2f );
 	Vec2 healthBarPos = Vec2( m_position.x - .4f , m_position.y - .8f );
 	healthBar.Translate( healthBarPos );
-	g_theRenderer->DrawAABB2( healthBar , BLACK );
-	float healthPercent = RangeMapFloatNormalizedOutput( 0.f , ( float ) TOTAL_PLAYER_LIVES * PLAYER_HEALTH_PER_LIVES , ( float ) m_health );
-	healthBar = healthBar.GetBoxAtLeft( 1.f - healthPercent , 0.f );
-	g_theRenderer->DrawAABB2( healthBar , GREEN );
+	//g_theRenderer->DrawAABB2( healthBar , BLACK );
+	//float healthPercent = RangeMapFloatNormalizedOutput( 0.f , ( float ) TOTAL_PLAYER_LIVES * PLAYER_HEALTH_PER_LIVES , ( float ) m_health );
+	//healthBar = healthBar.GetBoxAtLeft( 1.f - healthPercent , 0.f );
+	//g_theRenderer->DrawAABB2( healthBar , GREEN );
 	//--------------------------------------------------------------------------------------------------------------------------------------------
-
+	std::vector< Vertex_PCU > healthVerts;
+	if( m_health > 7 )
+	{
+		g_bitmapFont->AddVertsForTextInBox2D( healthVerts , healthBar , .3f , ToString( m_health ) , GREEN , 1.f , ALIGN_CENTERED );
+	}
+	else if( m_health > 3 )
+	{
+		g_bitmapFont->AddVertsForTextInBox2D( healthVerts , healthBar , .3f , ToString( m_health ) , YELLOW , 1.f , ALIGN_CENTERED );
+	}
+	else
+	{
+		g_bitmapFont->AddVertsForTextInBox2D( healthVerts , healthBar , .3f , ToString( m_health ) , RED , 1.f , ALIGN_CENTERED );
+	}
+	g_theRenderer->BindTexture( g_bitmapFont->GetTexture() );
+	if ( healthVerts.size() > 0 )
+	{
+		g_theRenderer->DrawVertexArray( healthVerts );
+	}
+	g_theRenderer->BindTexture( nullptr );
 	//if (g_theGame->m_debugDraw)
 	//{
 	//	g_theRenderer->DrawRing( m_position , m_cosmeticRadius , m_cosmeticRing , 0.02f );

@@ -133,6 +133,10 @@ void RemoteServer::EndFrame()
 	ParseReceivedMessages( g_theGameNetworkSys->m_recievedUDPMesageBuffer , false );
 	g_theGameNetworkSys->m_recieveBufferMutex.unlock();
 	//Server::EndFrame();
+	if( m_multiPlayerGame != nullptr )
+	{
+		m_multiPlayerGame->LateUpdate();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
