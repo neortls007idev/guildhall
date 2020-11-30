@@ -65,12 +65,29 @@ void PlayerClient::Update( float deltaSeconds )
 			{
 				EventArgs ClientUpdateArgs;
 				std::string clientDataAsString = ToString( m_uniqueKey ) + "|" +
+												 ToString( m_frameID ) + "|" +
 												 ToString( PLAYERTANK_ENTITY ) + "|" + 
 												 ToString( player->m_entityID ) + "|" +
 												 ToString( player->m_position ) + "|" +
 												 ToString( player->m_orientationDegrees ) + "|" +
 												 ToString( player->m_faction ) + "|" +
 												 ToString( player->m_health );
+				
+				ClientUpdateArgs.SetValue( "msg" , clientDataAsString.c_str() );
+				g_theGameNetworkSys->SendUDPMessage( ClientUpdateArgs );
+			}
+
+			if( player->m_lastSpawnedBullet != nullptr )
+			{
+				EventArgs ClientUpdateArgs;
+				std::string clientDataAsString = ToString( m_uniqueKey ) + "|" +
+												 ToString( m_frameID ) + "|" +
+												 ToString( GOOD_BULLET_ENTITY ) + "|" + 
+												 ToString( player->m_lastSpawnedBullet->m_entityID ) + "|" +
+												 ToString( player->m_lastSpawnedBullet->m_position ) + "|" +
+												 ToString( player->m_lastSpawnedBullet->m_orientationDegrees ) + "|" +
+												 ToString( player->m_lastSpawnedBullet->m_faction ) + "|" +
+												 ToString( player->m_lastSpawnedBullet->m_health );
 				
 				ClientUpdateArgs.SetValue( "msg" , clientDataAsString.c_str() );
 				g_theGameNetworkSys->SendUDPMessage( ClientUpdateArgs );
@@ -104,11 +121,13 @@ void PlayerClient::EndFrame()
 	{
 		m_game = g_theAuthServer->GetGame();
 		m_uniqueKey = g_theAuthServer->m_uniqueKey;
+		m_frameID = g_theAuthServer->GetFrameID();
 	}
 	else if( m_game == nullptr && g_theRemoteServer != nullptr )
 	{
 		m_game = g_theRemoteServer->GetGame();
 		m_uniqueKey = g_theRemoteServer->m_uniqueKey;
+		m_frameID = g_theRemoteServer->GetFrameID();
 	}
 }
 

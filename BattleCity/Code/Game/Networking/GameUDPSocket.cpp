@@ -76,7 +76,7 @@ int GameUDPSocket::Receive()
 	int result = ::recvfrom( m_socket , &m_receiveBuffer[ 0 ] , static_cast< int > ( m_receiveBuffer.size() ) , 0 , reinterpret_cast< SOCKADDR* >( &fromAddr ) , &fromLen );
 	if ( result == SOCKET_ERROR || result < 0 )
 	{
-		LOG_ERROR( "Recieve on UDP Socket Failed, Error = %d" , WSAGetLastError() );
+		//LOG_ERROR( "Recieve on UDP Socket Failed, Error = %d" , WSAGetLastError() );
 	}
 	return result;
 }

@@ -12,6 +12,20 @@ enum UDPDataPacketType
 	NUM_PACKET_DATA ,
 };
 
+enum PacketDataBreakDown
+{
+	D_UNIQUE_ID,
+	D_FRAME_ID,
+	D_ENTITY_TYPE,
+	D_ENTITY_ID,
+	D_POSITION,
+	D_ORIENTATION_DEG,
+	D_FACTION,
+	D_HEALTH,
+
+	D_NUM_TOTAL
+};
+
 struct GameUDPData
 {
 public:

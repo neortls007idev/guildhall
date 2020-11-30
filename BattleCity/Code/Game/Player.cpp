@@ -38,7 +38,8 @@ Player::Player( Game* CurrentGameInstance , Vec2 position , Vec2 velocity , floa
 
 void Player::Update( float deltaSeconds )
 {
-	UpdateFromJoystick( deltaSeconds );
+	m_lastSpawnedBullet = nullptr;
+	//UpdateFromJoystick( deltaSeconds );
 	//if ( m_isDead )
 	if ( !IsAlive() )
 	{
@@ -110,6 +111,7 @@ void Player::Render() const
 void Player::IsDead()
 {
 	m_isDead = true;
+	m_lastSpawnedBullet = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -142,7 +144,7 @@ void Player::checkKeyboardKeyPressForMovement( float deltaSeconds )
 	{
 		if ( g_theInput->WasKeyJustPressed( KEY_SPACE ) )
 		{
-			 m_theGame->m_world->m_currentMap->SpawnNewEntity( GOOD_BULLET_ENTITY , m_faction , m_position , m_turretOrientation + m_orientationDegrees );
+			 m_lastSpawnedBullet = m_theGame->m_world->m_currentMap->SpawnNewEntity( GOOD_BULLET_ENTITY , m_faction , m_position , m_turretOrientation + m_orientationDegrees );
 			 //m_theGame->m_world->m_currentMap->SpawnNewEntity( EXPLOSION_ENTITY , m_faction , m_position , m_turretOrientation + m_orientationDegrees );
 			// //SoundID testSound = g_theAudioSystem->CreateOrGetSound( "Data/Audio/PlayerShoot.wav" );
 			// g_theAudioSystem->PlaySound( m_theGame->m_sounds[ SOUND_PLAYER_SHOOT ] );
@@ -185,39 +187,6 @@ void Player::checkKeyboardKeyPressForMovement( float deltaSeconds )
 		{
 			TankMovement( deltaSeconds );
 		}
-
-		if ( g_theInput->IsKeyHeldDown( 'J' ) )
-		{
-			RotateTurretLeft( deltaSeconds );
-		}
-		if ( g_theInput->IsKeyHeldDown( 'L' ) )
-		{
-			RotateTurretRight( deltaSeconds );
-		}
-		if ( g_theInput->IsKeyHeldDown( 'I' ) )
-		{
-			RotateTurretUp( deltaSeconds );
-		}
-		if ( g_theInput->IsKeyHeldDown( 'K' ) )
-		{
-			RotateTurretDown( deltaSeconds );
-		}
-		if ( g_theInput->IsKeyHeldDown( 'L' ) && g_theInput->IsKeyHeldDown( 'I' ) )
-		{
-			m_turretOrientation = GetTurnedToward( m_turretOrientation , 45.f , 180.f * deltaSeconds );
-		}
-		if ( g_theInput->IsKeyHeldDown( 'I' ) && g_theInput->IsKeyHeldDown( 'J' ) )
-		{
-			m_turretOrientation = GetTurnedToward( m_turretOrientation , 135.f , 135.f * deltaSeconds );
-		}
-		if ( g_theInput->IsKeyHeldDown( 'K' ) && g_theInput->IsKeyHeldDown( 'J' ) )
-		{
-			m_turretOrientation = GetTurnedToward( m_turretOrientation , 225.f , 180.f * deltaSeconds );
-		}
-		if ( g_theInput->IsKeyHeldDown( 'K' ) && g_theInput->IsKeyHeldDown( 'L' ) )
-		{
-			m_turretOrientation = GetTurnedToward( m_turretOrientation , 315.f , 180.f * deltaSeconds );
-		}
 	}
 }
 
@@ -228,38 +197,6 @@ void Player::TankMovement( float deltaSeconds )
 	m_didPlayerMoveThisFrame = true;
 	m_velocity =  Vec2( 1.5f * CosDegrees( m_orientationDegrees ) , 1.5f * SinDegrees( m_orientationDegrees ) ) ;
 	Entity::Movement( deltaSeconds );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-void Player::XboxButtonPresses( const XboxController& controller , float deltaSeconds )
-{
-	// Check if player is dead; if so, respawn on Start button (only)
-	if ( !m_isDead /*|| !g_theApp->m_isPaused*/ )
-	{
-		const KeyButtonState& aButton = controller.GetButtonState( XBOX_BUTTON_ID_A );
-		if ( aButton.WasJustPressed() && m_health > 0 )
-		{
-			// m_theGame->m_world->m_currentMap->SpawnNewEntity( GOOD_BULLET_ENTITY , m_faction , m_position , m_turretOrientation + m_orientationDegrees );
-			//SoundID testSound = g_theAudioSystem->CreateOrGetSound( "Data/Audio/PlayerShoot.wav" );
-			g_theAudioSystem->PlaySound( m_theGame->m_sounds[ SOUND_PLAYER_SHOOT ] );
-		}
-
-		const AnalogJoystick& leftStick = controller.GetLeftJoystick();
-		float leftStickMagnitude = leftStick.GetMagnitude();
-		if ( leftStickMagnitude > 0.f && m_health > 0 ) // This is already deadzone-corrected; so anything non-zero means “significant movement” (outside the inner dead zone)
-		{
-			m_orientationDegrees = GetTurnedToward( m_orientationDegrees , leftStick.GetAngleDegrees() , 180.f * deltaSeconds );
-			TankMovement( deltaSeconds );
-		}
-
-		const AnalogJoystick& rightStick = controller.GetRightJoystick();
-		float rightStickMagnitude = rightStick.GetMagnitude();
-		if ( rightStickMagnitude > 0.f && m_health > 0 ) // This is already deadzone-corrected; so anything non-zero means “significant movement” (outside the inner dead zone)
-		{
-			m_turretOrientation = GetTurnedToward( m_turretOrientation , rightStick.GetAngleDegrees() - m_orientationDegrees , 180.f * deltaSeconds );
-		}
-	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

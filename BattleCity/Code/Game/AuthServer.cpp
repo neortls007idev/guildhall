@@ -63,6 +63,7 @@ void AuthoritativeServer::Update( float deltaSeconds )
 	else if( m_gameType == MULTIPLAYER )
 	{
 		m_multiPlayerGame->Update( deltaSeconds );
+		m_frameID++;
 	}
 }
 
@@ -155,6 +156,8 @@ void AuthoritativeServer::EndFrame()
 		ParseAndSendEntityData();
 		m_sendFreq->Reset();
 	}
+
+	//Server::EndFrame();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -196,7 +199,6 @@ void AuthoritativeServer::AddPlayers()
 
 void AuthoritativeServer::ParseAndSendEntityData()
 {
-
 	if ( m_gameType == MULTIPLAYER && m_isRemoteClientConnectionComplete )
 	{
 		Game* currentGame = GetGame();
@@ -220,6 +222,7 @@ void AuthoritativeServer::ParseAndSendEntityData()
 				{
 					EventArgs EntityUpdateArgs;
 					std::string EntityDataAsString = ToString( m_uniqueKey ) + "|" +
+													 ToString( m_frameID ) + "|" +
 													 ToString( Entitytype ) + "|" +
 													 ToString( currentList[ entityIndex ]->m_entityID ) + "|" +
 													 ToString( currentList[ entityIndex ]->m_position ) + "|" +

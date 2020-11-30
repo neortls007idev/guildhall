@@ -22,12 +22,9 @@ public:
 
 	//void RenderingDeveloperMode();
 
-
 	void TankMovement( float deltaSeconds );
-
 	void UpdateFromJoystick( float deltaSeconds );
-	void XboxButtonPresses( const XboxController& controller , float deltaSeconds );
-
+	
 	void RotateTankLeft( float deltaSeconds );
 	void RotateTankRight( float deltaSeconds );
 	void RotateTankUp( float deltaSeconds );
@@ -46,6 +43,7 @@ public:
 	bool m_didPlayerMoveThisFrame = false;
 	bool m_didPlayerMoveLastFrame = false;
 	InputSystem* m_inputSystem = nullptr;
+	Entity* m_lastSpawnedBullet = nullptr;
 
 private:
 	int m_controllerID = -1;

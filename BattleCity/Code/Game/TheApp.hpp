@@ -46,7 +46,7 @@ private :
 	bool					m_hasClientJustConnected;
 	EventArgs				m_clientArgs;
 public:
-	PlayerClient*			m_localclient				= nullptr;
+	PlayerClient*			m_localclient			= nullptr;
 	RemoteClient*			m_distantClient			= nullptr;
 };
 

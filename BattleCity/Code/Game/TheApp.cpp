@@ -295,6 +295,7 @@ void TheApp::Shutdown()
 	{
 		g_theAuthServer->Shutdown();
 	}
+	
 	g_theGameNetworkSys->Shutdown();
 	g_theAudioSystem->Shutdown();
 	g_theDevConsole->Shutdown();

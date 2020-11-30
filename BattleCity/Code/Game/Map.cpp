@@ -155,13 +155,13 @@ void Map::GarbageCollection()
 			{
 				currentList[ entityIndex ]->m_isDead =  true ;
 				//currentList[ entityIndex ]->m_isGarbage = true;
-				for ( int index = 0; index < ( int ) m_allEntities.size(); index++ )
-				{
-					if ( m_allEntities[ index ] == currentList[ entityIndex ] )
-					{
-						m_allEntities[ index ] = nullptr;
-					}
-				}
+//				for ( int index = 0; index < ( int ) m_allEntities.size(); index++ )
+//				{
+//					if ( m_allEntities[ index ] == currentList[ entityIndex ] )
+//					{
+//						m_allEntities[ index ] = nullptr;
+//					}
+//				}
 				delete currentList[ entityIndex ];
 				currentList[ entityIndex ] = nullptr;
 			}
@@ -177,6 +177,11 @@ bool Map::IsEntityOfTypeWithIDPresent( EntityType entityType , int entityID )
 	Entitylist entityList = m_entityListsByType[ entityType ];
 	for ( int entityIndex = 0; entityIndex < entityList.size(); entityIndex++ )
 	{
+		if( entityList[ entityIndex ] == nullptr )
+		{
+			continue;
+		}
+
 		if ( entityList[ entityIndex ]->m_entityID == entityID )
 		{
 			return true;
@@ -231,7 +236,7 @@ Entity* Map::SpawnNewEntity( EntityType type , Faction faction , const Vec2& pos
 
 void Map::AddEntityToMap( Entity* entity )
 {
-	EmplaceBackAtEmptySpace( m_allEntities , entity );
+//  EmplaceBackAtEmptySpace( m_allEntities , entity );
 	Entitylist& currentList = m_entityListsByType[ entity->m_entityType ];
 	AddEntityToList( currentList, entity );
 }
@@ -489,7 +494,6 @@ void Map::CheckCollisions()
 					if ( m_entityListsByType[ Entitytype ][ entityIndex ] != nullptr && m_entityListsByType[ Entitytype2 ][ entityIndex1 ] != nullptr && m_entityListsByType[ Entitytype ][ entityIndex ] != m_entityListsByType[ Entitytype2 ][ entityIndex1 ] )
 					{
   						ResolveEntityEntityCollision( *m_entityListsByType[ Entitytype ][ entityIndex ] , *m_entityListsByType[ Entitytype2 ][ entityIndex1 ] );
-
 					}
 				}
 
@@ -585,7 +589,7 @@ bool Map::InLineOfSight( Vec2& endPosition , Vec2& startPosition , float maxDist
 	float distanceBetweenEndAndStart = forwardDirection.GetLength();
 	forwardDirection.Normalize();
 
-	if (distanceBetweenEndAndStart> maxDistance)
+	if (distanceBetweenEndAndStart > maxDistance)
 	{
 		return false;
 	}

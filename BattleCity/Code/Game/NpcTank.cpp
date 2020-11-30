@@ -61,85 +61,87 @@ void NpcTank::Update( float deltaSeconds )
 	}
 	Vec2 displacementBetweenNpcTankAndPlayer =  playerPosition - m_position ;
 	
-	if ( currentMap->m_entityListsByType[ PLAYERTANK_ENTITY ][ 0 ] )
+	for( int index = 0 ; index < currentMap->m_entityListsByType[ PLAYERTANK_ENTITY ].size() ; index++ )
 	{
-		if ( currentMap->InLineOfSight( playerPosition , m_position , m_lineOfSightRadius ) && currentMap->m_entityListsByType[ PLAYERTANK_ENTITY ][ 0 ]->m_health > 0 )
+		if ( currentMap->m_entityListsByType[ PLAYERTANK_ENTITY ][ index ] )
 		{
-			static bool isSoundPlayed = false;
-			if ( !isSoundPlayed )
+			if ( currentMap->InLineOfSight( playerPosition , m_position , m_lineOfSightRadius ) && currentMap->m_entityListsByType[ PLAYERTANK_ENTITY ][ index ]->m_health > 0 )
 			{
-				g_theAudioSystem->PlaySound( m_theGame->m_sounds[ SOUND_ENEMY_SPOTTED ] );
-				isSoundPlayed = true;
-			}
-
-			float goalDegrees = displacementBetweenNpcTankAndPlayer.GetAngleDegrees();
-			m_orientationDegrees = GetTurnedToward( m_orientationDegrees , goalDegrees , 30.f * deltaSeconds );
-			m_lastSeenPosition = playerPosition;
-			m_wasPlayerSeen = true;
-
-			if ( IsPointInSector( playerPosition , m_position , m_orientationDegrees , 45.f , m_lineOfSightRadius ) )
-			{
-				Entity::Movement( deltaSeconds );
-			}
-
-			if ( IsPointInSector( playerPosition , m_position , m_orientationDegrees , 10.f , m_lineOfSightRadius ) )
-			{
-				if ( m_firingCoolDown <= 0.f )
+				static bool isSoundPlayed = false;
+				if ( !isSoundPlayed )
 				{
-					currentMap->SpawnNewEntity( EVIL_BULLET_ENTITY , m_faction , m_position , m_orientationDegrees );
-					//SoundPlaybackID currentNPCTankShootID = g_theAudioSystem->PlaySound( m_theGame->m_sounds[ SOUND_ENEMY_SHOOT ] );
-					//float playbackBalance = CosDegrees( ( m_position - playerPosition ).GetAngleDegrees() );
-					//g_theAudioSystem->SetSoundPlaybackBalance( currentNPCTankShootID , playbackBalance );
-					//float playbackVolume = RangeMapFloat( 0.f , m_lineOfSightRadius , 1.0 , 0.f , ( m_position - playerPosition ).GetClamped( m_lineOfSightRadius ).GetLength() );
-					//g_theAudioSystem->SetSoundPlaybackVolume( currentNPCTankShootID , playbackVolume );
-					m_firingCoolDown = 1.7f;
+					g_theAudioSystem->PlaySound( m_theGame->m_sounds[ SOUND_ENEMY_SPOTTED ] );
+					isSoundPlayed = true;
+				}
+
+				float goalDegrees = displacementBetweenNpcTankAndPlayer.GetAngleDegrees();
+				m_orientationDegrees = GetTurnedToward( m_orientationDegrees , goalDegrees , 30.f * deltaSeconds );
+				m_lastSeenPosition = playerPosition;
+				m_wasPlayerSeen = true;
+
+				if ( IsPointInSector( playerPosition , m_position , m_orientationDegrees , 45.f , m_lineOfSightRadius ) )
+				{
+					Entity::Movement( deltaSeconds );
+				}
+
+				if ( IsPointInSector( playerPosition , m_position , m_orientationDegrees , 10.f , m_lineOfSightRadius ) )
+				{
+					if ( m_firingCoolDown <= 0.f )
+					{
+						//currentMap->SpawnNewEntity( EVIL_BULLET_ENTITY , m_faction , m_position , m_orientationDegrees );
+						//SoundPlaybackID currentNPCTankShootID = g_theAudioSystem->PlaySound( m_theGame->m_sounds[ SOUND_ENEMY_SHOOT ] );
+						//float playbackBalance = CosDegrees( ( m_position - playerPosition ).GetAngleDegrees() );
+						//g_theAudioSystem->SetSoundPlaybackBalance( currentNPCTankShootID , playbackBalance );
+						//float playbackVolume = RangeMapFloat( 0.f , m_lineOfSightRadius , 1.0 , 0.f , ( m_position - playerPosition ).GetClamped( m_lineOfSightRadius ).GetLength() );
+						//g_theAudioSystem->SetSoundPlaybackVolume( currentNPCTankShootID , playbackVolume );
+						m_firingCoolDown = 1.7f;
+					}
 				}
 			}
-		}
-		else if ( m_whiskers[ 0 ].m_impactFraction < 1.f || m_whiskers[ 1 ].m_impactFraction < 1.f || m_whiskers[ 2 ].m_impactFraction < 1.f )
-		{
-			m_newGoalOrientation = m_orientationDegrees + 90.f;
-			m_orientationDegrees = GetTurnedToward( m_orientationDegrees , m_newGoalOrientation , 180.f * deltaSeconds );
-			Entity::Movement( deltaSeconds );
-		}
-		else if ( m_wasPlayerSeen )
-		{
-			m_newGoalOrientation = ( m_lastSeenPosition - m_position ).GetAngleDegrees();
-			m_orientationDegrees = GetTurnedToward( m_orientationDegrees , m_newGoalOrientation , 75.f * deltaSeconds );
-			Entity::Movement( deltaSeconds );
-
-			if ( ( int ) m_position.GetLength() == ( int ) m_lastSeenPosition.GetLength() )
+			else if ( m_whiskers[ 0 ].m_impactFraction < 1.f || m_whiskers[ 1 ].m_impactFraction < 1.f || m_whiskers[ 2 ].m_impactFraction < 1.f )
 			{
-				m_wasPlayerSeen = false;
+				m_newGoalOrientation = m_orientationDegrees + 90.f;
+				m_orientationDegrees = GetTurnedToward( m_orientationDegrees , m_newGoalOrientation , 180.f * deltaSeconds );
+				Entity::Movement( deltaSeconds );
+			}
+			else if ( m_wasPlayerSeen )
+			{
+				m_newGoalOrientation = ( m_lastSeenPosition - m_position ).GetAngleDegrees();
+				m_orientationDegrees = GetTurnedToward( m_orientationDegrees , m_newGoalOrientation , 75.f * deltaSeconds );
+				Entity::Movement( deltaSeconds );
+
+				if ( ( int ) m_position.GetLength() == ( int ) m_lastSeenPosition.GetLength() )
+				{
+					m_wasPlayerSeen = false;
+				}
+			}
+			else
+			{
+				//m_orientationChangeTimer -= deltaSeconds;
+				//m_orientationDegrees = GetTurnedToward( m_orientationDegrees , m_newGoalOrientation , 45.f * deltaSeconds );
+				Entity::Movement( deltaSeconds );
 			}
 		}
-		else
-		{
-			//m_orientationChangeTimer -= deltaSeconds;
-			//m_orientationDegrees = GetTurnedToward( m_orientationDegrees , m_newGoalOrientation , 45.f * deltaSeconds );
-			Entity::Movement( deltaSeconds );
-		}
+	}
 
-
-		if ( ( m_positionBeforeASecond - m_position ).GetLength() <= 0.001f )
+	if ( ( m_positionBeforeASecond - m_position ).GetLength() <= 0.001f )
+	{
+		m_orientationChangeTimer -= deltaSeconds;
+		if ( m_orientationChangeTimer <= 0.f )
 		{
-			m_orientationChangeTimer -= deltaSeconds;
-			if ( m_orientationChangeTimer <= 0.f )
-			{
-				m_newGoalOrientation = g_RNG->RollRandomFloatLessThan( 360.f );
-				m_orientationChangeTimer = 2.f;
-			}
-			m_orientationDegrees = GetTurnedToward( m_orientationDegrees , m_newGoalOrientation , 180.f * deltaSeconds );
-			Entity::Movement( deltaSeconds );
-			m_wasPlayerSeen = false;
+			m_newGoalOrientation = g_RNG->RollRandomFloatLessThan( 360.f );
+			m_orientationChangeTimer = 2.f;
 		}
-		else
-		{
-			//m_orientationChangeTimer -= deltaSeconds;
-			//static float newGoalOrientation = 0.f; 
-			m_orientationDegrees = GetTurnedToward( m_orientationDegrees , m_newGoalOrientation , 180.f * deltaSeconds );
-			Entity::Movement( deltaSeconds );
-		}
+		m_orientationDegrees = GetTurnedToward( m_orientationDegrees , m_newGoalOrientation , 180.f * deltaSeconds );
+		Entity::Movement( deltaSeconds );
+		m_wasPlayerSeen = false;
+	}
+	else
+	{
+		//m_orientationChangeTimer -= deltaSeconds;
+		//static float newGoalOrientation = 0.f; 
+		m_orientationDegrees = GetTurnedToward( m_orientationDegrees , m_newGoalOrientation , 180.f * deltaSeconds );
+		Entity::Movement( deltaSeconds );
 	}
 }
 
@@ -166,6 +168,14 @@ void NpcTank::Render() const
 	TransformVertexArray2D( 6 , tempTank , 1.f , m_orientationDegrees , m_position );
 	g_theRenderer->DrawVertexArray( 6 , tempTank );
 	g_theRenderer->BindTexture( nullptr );
+
+	AABB2 healthBar( 0.f , 0.f , 0.8f , 0.2f );
+	Vec2 healthBarPos = Vec2( m_position.x - .4f , m_position.y - .8f );
+	healthBar.Translate( healthBarPos );
+	g_theRenderer->DrawAABB2( healthBar , BLACK );
+	float healthPercent = RangeMapFloatNormalizedOutput( 0.f , 3.f , ( float ) m_health );
+	healthBar = healthBar.GetBoxAtLeft( 1.f - healthPercent , 0.f );
+	g_theRenderer->DrawAABB2( healthBar , RED );
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

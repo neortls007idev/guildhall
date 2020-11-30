@@ -58,9 +58,12 @@ void RemoteServer::Update( float deltaSeconds )
 
 	if ( m_gameType == MULTIPLAYER )
 	{
+		m_multiPlayerGame->m_world->m_currentMap->UpdateEntityListOfType( deltaSeconds , EVIL_BULLET_ENTITY );
+		m_multiPlayerGame->m_world->m_currentMap->UpdateEntityListOfType( deltaSeconds , GOOD_BULLET_ENTITY );
 		m_multiPlayerGame->m_world->m_currentMap->UpdateEntityListOfType( deltaSeconds , EXPLOSION_ENTITY );
 		m_multiPlayerGame->m_world->m_currentMap->CheckCollisions();
 		m_multiPlayerGame->m_world->m_currentMap->GarbageCollection();
+		m_frameID++;
 	}
 }
 
@@ -124,8 +127,9 @@ void RemoteServer::BeginFrame()
 
 void RemoteServer::EndFrame()
 {
-	ParseAndUpdateEntities();
+	//ParseAndUpdateEntities();
 	ParseReceivedMessages( g_theGameNetworkSys->m_recievedUDPMesageBuffer );
+	//Server::EndFrame();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -178,6 +182,11 @@ void RemoteServer::ParseAndUpdateEntities()
 
 				for ( int entityIndex = 0; entityIndex < entityList.size(); entityIndex++ )
 				{
+					if ( entityList[ entityIndex ] == nullptr )
+					{
+						continue;
+					}
+
 					if ( entityList[ entityIndex ]->m_entityID == entityID )
 					{
 						entityList[ entityIndex ]->m_position = entityList[ entityIndex ]->m_position.SetFromText( data[ 3 ].c_str() );

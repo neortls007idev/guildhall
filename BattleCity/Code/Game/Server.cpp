@@ -5,9 +5,11 @@
 #include "Game/GameMultiPlayer.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/DevConsole.hpp"
+#include "Networking/GameUDPData.hpp"
+#include "Networking/GameNetworkSystem.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-
+extern	GameNetworkSystem* g_theGameNetworkSys;
 Server* g_theServer = nullptr;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -62,7 +64,8 @@ void Server::Update( float deltaSeconds )
 
 void Server::EndFrame()
 {
-
+//	g_theGameNetworkSys->SendACKForRecievedMessages();
+//	g_theGameNetworkSys->RecievedACKForSentMessages();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -142,48 +145,28 @@ void Server::ParseReceivedMessages( std::vector< std::string > messageBuffer )
 {
 	if ( m_gameType == MULTIPLAYER && m_isRemoteClientConnectionComplete )
 	{
-		for ( auto index : messageBuffer )
+		for ( int index = 0; index < messageBuffer.size() ; index++ )
 		{
 			Game* currentGame = GetGame();
 
-			/*if ( index != "" )
+			if ( messageBuffer[ index ] != "" )
 			{
-				Strings data = SplitStringAtGivenDelimiter( index , '|' );
-				int identifier = atoi( data[ 0 ].c_str() );
+				Strings data = SplitStringAtGivenDelimiter( messageBuffer[ index ] , '|' );
+				int identifier = atoi( data[ D_UNIQUE_ID ].c_str() );
 				//LOG_SYSMESSAGE( " UniqueKey = %d" , identifier );
+				//if ( data.size() != D_NUM_TOTAL )
+				//{
+				//	index = "";
+				//	continue;
+				//}
 				if ( identifier != m_uniqueKey )
 				{
 					continue;
 				}
-
-				Game* currentGame = GetGame();
-				Entitylist& entityList = currentGame->m_world->m_currentMap->m_entityListsByType[ atoi( data[ 1 ].c_str() ) ];
-				int entityID = atoi( data[ 2 ].c_str() );
-
-				for ( int entityIndex = 0; entityIndex < entityList.size(); entityIndex++ )
-				{
-					if ( entityList[ entityIndex ]->m_entityID == entityID )
-					{
-						entityList[ entityIndex ]->m_position = entityList[ entityIndex ]->m_position.SetFromText( data[ 3 ].c_str() );
-						entityList[ entityIndex ]->m_orientationDegrees = StringConvertToValue( data[ 4 ].c_str() , entityList[ entityIndex ]->m_orientationDegrees );
-						entityList[ entityIndex ]->m_faction = ( Faction ) StringConvertToValue( data[ 5 ].c_str() , ( int ) entityList[ entityIndex ]->m_faction );
-						entityList[ entityIndex ]->m_health = StringConvertToValue( data[ 6 ].c_str() , entityList[ entityIndex ]->m_health );
-					}
-				}
-			}*/
-
-			if ( index != "" )
-			{
-				Strings data = SplitStringAtGivenDelimiter( index , '|' );
-				int identifier = atoi( data[ 0 ].c_str() );
-				//LOG_SYSMESSAGE( " UniqueKey = %d" , identifier );
-				if ( identifier != m_uniqueKey )
-				{
-					continue;
-				}
-				EntityType entityType = ( EntityType ) atoi( data[ 1 ].c_str() );
-				int entityID = atoi( data[ 2 ].c_str() );
+				EntityType entityType = ( EntityType ) atoi( data[ D_ENTITY_TYPE ].c_str() );
+				int entityID = atoi( data[ D_ENTITY_ID ].c_str() );
 				Map* curMap = GetGame()->m_world->m_currentMap;
+
 				if ( !curMap->IsEntityOfTypeWithIDPresent( entityType , entityID ) )
 				{
 					if ( entityType == GOOD_BULLET_ENTITY )
@@ -203,12 +186,16 @@ void Server::ParseReceivedMessages( std::vector< std::string > messageBuffer )
 
 				for ( int entityIndex = 0; entityIndex < entityList.size(); entityIndex++ )
 				{
+					if( entityList[ entityIndex ] == nullptr )
+					{
+						continue;
+					}
 					if ( entityList[ entityIndex ]->m_entityID == entityID )
 					{
-						entityList[ entityIndex ]->m_position = entityList[ entityIndex ]->m_position.SetFromText( data[ 3 ].c_str() );
-						entityList[ entityIndex ]->m_orientationDegrees = StringConvertToValue( data[ 4 ].c_str() , entityList[ entityIndex ]->m_orientationDegrees );
-						entityList[ entityIndex ]->m_faction = ( Faction ) StringConvertToValue( data[ 5 ].c_str() , ( int ) entityList[ entityIndex ]->m_faction );
-						entityList[ entityIndex ]->m_health = StringConvertToValue( data[ 6 ].c_str() , entityList[ entityIndex ]->m_health );
+						entityList[ entityIndex ]->m_position = entityList[ entityIndex ]->m_position.SetFromText( data[ D_POSITION ].c_str() );
+						entityList[ entityIndex ]->m_orientationDegrees = StringConvertToValue( data[ D_ORIENTATION_DEG ].c_str() , entityList[ entityIndex ]->m_orientationDegrees );
+						entityList[ entityIndex ]->m_faction = ( Faction ) StringConvertToValue( data[ D_FACTION ].c_str() , ( int ) entityList[ entityIndex ]->m_faction );
+						entityList[ entityIndex ]->m_health = StringConvertToValue( data[ D_HEALTH ].c_str() , entityList[ entityIndex ]->m_health );
 					}
 				}
 			}

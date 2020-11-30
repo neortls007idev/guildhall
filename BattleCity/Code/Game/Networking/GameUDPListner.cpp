@@ -5,6 +5,7 @@
 #include "Game/Networking/GameUDPListner.hpp"
 #include "Game/Networking/GameUDPSocket.hpp"
 #include <thread>
+#include "Engine/Core/StdExtensions.hpp"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -52,6 +53,24 @@ void GameUDPListner::StartSocket( int bindPort , int sendPort , std::string host
 void GameUDPListner::AddMessage( std::string& message )
 {
 	m_writeQueue.push( message );
+
+	if ( message != "" )
+	{
+		bool wasMessageAddedToBuffer = false;
+		for ( int index = 0; index < g_theGameNetworkSys->m_sentUDPMesageBuffer.size(); index++ )
+		{
+			if ( g_theGameNetworkSys->m_sentUDPMesageBuffer[ index ] == "" )
+			{
+				g_theGameNetworkSys->m_sentUDPMesageBuffer[ index ] = message;
+				wasMessageAddedToBuffer = true;
+				break;
+			}
+		}
+		if ( !wasMessageAddedToBuffer )
+		{
+			g_theGameNetworkSys->m_sentUDPMesageBuffer.push_back( message );
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -72,18 +91,18 @@ void GameUDPListner::Reader( GameUDPSocket& socket , SynchronizedLockFreeQueue<s
 			if( receivedMessage != "" )
 			{
 				bool wasMessageAddedToBuffer = false;
-				for( auto index : g_theGameNetworkSys->m_recievedUDPMesageBuffer )
+				for( int index = 0; index < g_theGameNetworkSys->m_recievedUDPMesageBuffer.size() ; index++ )
 				{
-					if( index == "" )
+					if( g_theGameNetworkSys->m_recievedUDPMesageBuffer[ index ] == "" )
 					{
-						g_theGameNetworkSys->m_recievedUDPMesageBuffer.emplace_back( receivedMessage );
+						g_theGameNetworkSys->m_recievedUDPMesageBuffer[ index ] = receivedMessage;
 						wasMessageAddedToBuffer = true;
 						break;
 					}
 				}
 				if( !wasMessageAddedToBuffer )
 				{
-					g_theGameNetworkSys->m_recievedUDPMesageBuffer.emplace_back( receivedMessage );
+					g_theGameNetworkSys->m_recievedUDPMesageBuffer.push_back( receivedMessage );
 				}
 			}
 		}

@@ -155,7 +155,89 @@ void GameNetworkSystem::EndFrame()
 {
 	m_recievedTCPClientMesageBuffer.clear();
 	m_recievedTCPServerMesageBuffer.clear();
+	
 	m_recievedUDPMesageBuffer.clear();
+	m_recievedUDPMesageBuffer.resize( 0 );
+	
+	m_sentUDPMesageBuffer.clear();
+	m_sentUDPMesageBuffer.resize( 0 );
+	//SendACKForRecievedMessages();
+	//RecievedACKForSentMessages();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void GameNetworkSystem::SendACKForRecievedMessages()
+{
+	for ( int index = 0; index < m_recievedUDPMesageBuffer.size(); index++ )
+	{
+		if( m_recievedUDPMesageBuffer[ index ] != "" )
+		{
+			std::string curString = m_recievedUDPMesageBuffer[ index ];
+			Strings rMsg = SplitStringAtGivenDelimiter( curString , '|' );
+			if( rMsg.size() == D_NUM_TOTAL )
+			{
+				std::string msg = "ACK|" +
+				  				   rMsg[ D_FRAME_ID ] + "|" +
+								   rMsg[ D_ENTITY_TYPE ] + "|" +
+								   rMsg[ D_ENTITY_ID ];
+				
+				EventArgs ackUpdateArgs;
+				ackUpdateArgs.SetValue( "msg" , msg.c_str() );
+				g_theGameNetworkSys->SendUDPMessage( ackUpdateArgs );
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void GameNetworkSystem::RecievedACKForSentMessages()
+{
+	for ( auto index = 0; index < m_recievedUDPMesageBuffer.size(); index++ )
+	{
+		if ( m_recievedUDPMesageBuffer[ index ] != "" )
+		{
+			std::string curString = m_recievedUDPMesageBuffer[ index ];
+			Strings rMsg = SplitStringAtGivenDelimiter( curString , '|' );
+			if ( rMsg.size() == 4 )
+			{
+				if( rMsg[ 0 ] == "ACK" )
+				{
+					FindAndEraseSentMessageFromBuffer( rMsg[ 1 ] , rMsg[ 2 ] , rMsg[ 3 ] );
+					m_recievedUDPMesageBuffer[ index ] = "";
+				}
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+void GameNetworkSystem::FindAndEraseSentMessageFromBuffer( std::string& frameID , std::string& entityType , std::string& entityID )
+{
+	for ( int index = 0; index < m_sentUDPMesageBuffer.size(); index++ )
+	{
+		if ( m_sentUDPMesageBuffer[ index ] != "" )
+		{
+			std::string curString = m_sentUDPMesageBuffer[ index ];
+			Strings sentMsg = SplitStringAtGivenDelimiter( curString , '|' );
+
+			if ( sentMsg.size() != D_NUM_TOTAL )
+			{
+				m_sentUDPMesageBuffer[ index ] = "";
+				//m_sentUDPMesageBuffer.erase( index.begin() , index.end() );
+				continue;
+			}
+			if ( sentMsg.size() == D_NUM_TOTAL )
+			{
+				if ( ( sentMsg[ D_FRAME_ID ] == frameID ) && ( sentMsg[ D_ENTITY_TYPE ] == entityType ) && ( sentMsg[ D_ENTITY_ID ] == entityID ) )
+				{
+					m_sentUDPMesageBuffer[ index ] = "";
+				}
+			}
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

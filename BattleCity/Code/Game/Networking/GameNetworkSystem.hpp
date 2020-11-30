@@ -3,6 +3,7 @@
 #include <list>
 #include <string>
 #include "GameUDPData.hpp"
+#include <mutex>
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -23,6 +24,9 @@ public:
 
 	void BeginFrame();
 	void EndFrame();
+	void SendACKForRecievedMessages();
+	void RecievedACKForSentMessages();
+	void FindAndEraseSentMessageFromBuffer( std::string& frameID , std::string& entityType , std::string& entityID );
 
 	//----------------------------------------------------------------------------------------------------------
 	bool GetIsListening()																		{ return m_isListening; }
@@ -51,6 +55,7 @@ public:
 	std::vector< std::string >		m_recievedTCPClientMesageBuffer;
 	std::vector< std::string >		m_recievedTCPServerMesageBuffer;
 	std::vector< std::string >		m_recievedUDPMesageBuffer;
+	std::vector< std::string >		m_sentUDPMesageBuffer;
 
 private:
 	bool							m_isListening						= false;
@@ -61,6 +66,8 @@ private:
 	static bool						m_wasMessageJustSentByServer;
 	static bool						m_wasMessageJustSentByClient;
 	GameUDPListner*					m_UDPListner						= nullptr;
+	std::mutex						m_sendBufferMutex;
+	std::mutex						m_recieveBufferMutex;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

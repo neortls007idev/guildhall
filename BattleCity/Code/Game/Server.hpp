@@ -31,14 +31,15 @@ public:
 	
 	void AddPlayerClientToServer( Client* client );
 	bool RemovePlayerClientFromServer( Client* client );
-
 	void	AddRemoteNewRemotePlayer();
 	Game*	GetGame();
+	int		GetFrameID()																		{ return m_frameID;  }
 	void	ParseReceivedMessages( std::vector< std::string > messageBuffer );
 	
 public:
 	bool						m_isRemoteClientConnectionComplete = false;
-	int							m_uniqueKey = 0;
+	int							m_uniqueKey = 0;	
+	int							m_frameID = 0;
 
 	GameSinglePlayer*			m_singlePlayerGame	= nullptr;
 	GameMultiplayer*			m_multiPlayerGame	= nullptr;
