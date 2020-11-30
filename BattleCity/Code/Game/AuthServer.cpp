@@ -112,8 +112,19 @@ void AuthoritativeServer::BeginFrame()
 
 					UDPArgs.SetValue( "bindPort" , ToString( m_udpListenPort ) );
 					UDPArgs.SetValue( "sendPort" , ToString( m_udpSendToPort ) );
-					UDPArgs.SetValue( "host" , /*ipaddr.c_str()*/g_theGameNetworkSys->m_clientAddr.c_str() );
+					
+					std::string address = g_theGameNetworkSys->GetConnectClientAddress();
+					Strings s = SplitStringAtGivenDelimiter( address , ':' );
+					if ( s[ 0 ] == "192.168.56.1" )
+					{
+						address = "127.0.0.1";
+					}
+					else
+					{
+						address = s[ 0 ];
+					}
 
+					UDPArgs.SetValue( "host" , /*ipaddr.c_str()*/address );
 					args.SetValue( "msg" , message );
 
 					if ( g_theGameNetworkSys->SendMessageToClient( args ) )

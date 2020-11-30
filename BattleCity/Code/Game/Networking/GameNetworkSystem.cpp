@@ -105,8 +105,8 @@ void GameNetworkSystem::BeginFrame()
 
 				if( m_linkSocket != INVALID_SOCKET )
 				{
-					m_clientAddr = GetAddress( m_linkSocket ) ;
-					g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client Connected from %s" , m_clientAddr.c_str() );
+					//m_clientAddr = GetAddress( m_linkSocket ) ;
+					g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client Connected from %s" , GetConnectClientAddress( m_linkSocket ).c_str() );
 				}
 			}
 			if( m_linkSocket != INVALID_SOCKET )
@@ -249,7 +249,7 @@ void GameNetworkSystem::FindAndEraseSentMessageFromBuffer( std::string& frameID 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-std::string GameNetworkSystem::GetAddress( SOCKET socket )
+std::string GameNetworkSystem::GetConnectClientAddress( SOCKET socket )
 {
 
 	std::array<char , 128> addressString;
@@ -276,6 +276,30 @@ std::string GameNetworkSystem::GetAddress( SOCKET socket )
 
 	addressString[ outLength ] = NULL;
 	return std::string( &addressString[ 0 ] );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+std::string GameNetworkSystem::GetConnectClientAddress()
+{
+	std::array<char , 128> addressStr;
+	sockaddr clientAddr;
+	int addrSize = sizeof( clientAddr );
+	int iResult = getpeername( m_linkSocket , &clientAddr , &addrSize );
+	if ( iResult == SOCKET_ERROR )
+	{
+		//error
+	}
+	DWORD outlen = ( DWORD ) addressStr.size();
+#pragma warning( push )
+#pragma warning( disable : 4996  )
+	iResult = WSAAddressToStringA( &clientAddr , addrSize , NULL , &addressStr[ 0 ] , &outlen );
+#pragma warning( pop )
+	if ( iResult == SOCKET_ERROR )
+	{
+		//error
+	}
+	return &addressStr[ 0 ];
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -406,7 +430,7 @@ STATIC bool GameNetworkSystem::ConnectToServer( EventArgs& args )
 		if( g_theGameNetworkSys->m_TCPclient->m_clientSocket != INVALID_SOCKET )
 		{
 			g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Server Connected to %s" ,
-										  g_theGameNetworkSys->GetAddress( g_theGameNetworkSys->m_TCPclient->m_clientSocket ).c_str() );
+										  g_theGameNetworkSys->GetConnectClientAddress( g_theGameNetworkSys->m_TCPclient->m_clientSocket ).c_str() );
 		}
 		
 		return true;

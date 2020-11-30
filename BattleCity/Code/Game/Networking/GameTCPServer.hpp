@@ -21,7 +21,8 @@ public:
 	void			SetListenPort( int port )											{ m_listenPort = port; }
 	void			SetServerSendMessage( std::string message )							{ m_sendMessage.m_message = message; }
 	std::string		GetServerSendMessage()												{ return m_sendMessage.m_message; }
-		
+	std::string		GetAddress();
+
 	SOCKET					m_listenSocket;
 private:
 	int						m_listenPort = -1;

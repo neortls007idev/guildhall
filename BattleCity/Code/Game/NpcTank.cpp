@@ -89,7 +89,7 @@ void NpcTank::Update( float deltaSeconds )
 				{
 					if ( m_firingCoolDown <= 0.f )
 					{
-						//currentMap->SpawnNewEntity( EVIL_BULLET_ENTITY , m_faction , m_position , m_orientationDegrees );
+						currentMap->SpawnNewEntity( EVIL_BULLET_ENTITY , m_faction , m_position , m_orientationDegrees );
 						//SoundPlaybackID currentNPCTankShootID = g_theAudioSystem->PlaySound( m_theGame->m_sounds[ SOUND_ENEMY_SHOOT ] );
 						//float playbackBalance = CosDegrees( ( m_position - playerPosition ).GetAngleDegrees() );
 						//g_theAudioSystem->SetSoundPlaybackBalance( currentNPCTankShootID , playbackBalance );

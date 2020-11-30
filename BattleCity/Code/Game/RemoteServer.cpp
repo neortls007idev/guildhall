@@ -88,7 +88,7 @@ void RemoteServer::BeginFrame()
 				{
 					m_uniqueKey = atoi( data[ 1 ].c_str() );
 					LOG_SYSMESSAGE( " UniqueKey = %d" , m_uniqueKey );
-					m_hostIPaddr = data[ 2 ];
+					m_hostIPaddr = data[ 2 ];/*g_theGameNetworkSys->GetAddress( g_theGameNetworkSys->m_linkSocket );*/
 					m_udpSendToPort = atoi( data[ 3 ].c_str() );
 					m_udpListenPort = atoi( data[ 4 ].c_str() );
 					

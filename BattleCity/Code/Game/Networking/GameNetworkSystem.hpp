@@ -32,7 +32,8 @@ public:
 	bool GetIsListening()																		{ return m_isListening; }
 	void SetIsListening( bool listen )															{ m_isListening = listen; }
 
-	std::string GetAddress( SOCKET socket );
+	std::string GetConnectClientAddress( SOCKET socket );
+	std::string GetConnectClientAddress();
 
 	void SendUDPMessage( std::string message );
 	void StartUDPListner( int bindPort , int sendPort , std::string host /*= "127.0.0.1"*/ );
@@ -57,13 +58,15 @@ public:
 	std::vector< std::string >		m_recievedUDPMesageBuffer;
 	std::vector< std::string >		m_sentUDPMesageBuffer;
 	std::mutex						m_recieveBufferMutex;
-	std::string						m_clientAddr;
+	
+//	std::string						m_clientAddr;
+	SOCKET							m_linkSocket;
+	GameTCPServer*					m_TCPServer;
+
 private:
 	bool							m_isListening						= false;
 	int								m_listenPort						= -1;
-	GameTCPServer*					m_TCPServer;
 	GameTCPClient*					m_TCPclient;
-	SOCKET							m_linkSocket;
 	static bool						m_wasMessageJustSentByServer;
 	static bool						m_wasMessageJustSentByClient;
 	GameUDPListner*					m_UDPListner						= nullptr;
