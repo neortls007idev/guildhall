@@ -91,6 +91,7 @@ void GameUDPListner::Reader( GameUDPSocket& socket , SynchronizedLockFreeQueue<s
 			if( receivedMessage != "" )
 			{
 				bool wasMessageAddedToBuffer = false;
+				g_theGameNetworkSys->m_recieveBufferMutex.lock();
 				for( int index = 0; index < g_theGameNetworkSys->m_recievedUDPMesageBuffer.size() ; index++ )
 				{
 					if( g_theGameNetworkSys->m_recievedUDPMesageBuffer[ index ] == "" )
@@ -104,6 +105,7 @@ void GameUDPListner::Reader( GameUDPSocket& socket , SynchronizedLockFreeQueue<s
 				{
 					g_theGameNetworkSys->m_recievedUDPMesageBuffer.push_back( receivedMessage );
 				}
+				g_theGameNetworkSys->m_recieveBufferMutex.unlock();
 			}
 		}
 	}

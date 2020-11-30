@@ -156,8 +156,10 @@ void GameNetworkSystem::EndFrame()
 	m_recievedTCPClientMesageBuffer.clear();
 	m_recievedTCPServerMesageBuffer.clear();
 	
+	g_theGameNetworkSys->m_recieveBufferMutex.lock();
 	m_recievedUDPMesageBuffer.clear();
 	m_recievedUDPMesageBuffer.resize( 0 );
+	g_theGameNetworkSys->m_recieveBufferMutex.unlock();
 	
 	m_sentUDPMesageBuffer.clear();
 	m_sentUDPMesageBuffer.resize( 0 );
@@ -169,6 +171,7 @@ void GameNetworkSystem::EndFrame()
 
 void GameNetworkSystem::SendACKForRecievedMessages()
 {
+	g_theGameNetworkSys->m_recieveBufferMutex.lock();
 	for ( int index = 0; index < m_recievedUDPMesageBuffer.size(); index++ )
 	{
 		if( m_recievedUDPMesageBuffer[ index ] != "" )
@@ -188,12 +191,14 @@ void GameNetworkSystem::SendACKForRecievedMessages()
 			}
 		}
 	}
+	g_theGameNetworkSys->m_recieveBufferMutex.unlock();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 void GameNetworkSystem::RecievedACKForSentMessages()
 {
+	g_theGameNetworkSys->m_recieveBufferMutex.lock();
 	for ( auto index = 0; index < m_recievedUDPMesageBuffer.size(); index++ )
 	{
 		if ( m_recievedUDPMesageBuffer[ index ] != "" )
@@ -210,6 +215,7 @@ void GameNetworkSystem::RecievedACKForSentMessages()
 			}
 		}
 	}
+	g_theGameNetworkSys->m_recieveBufferMutex.unlock();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

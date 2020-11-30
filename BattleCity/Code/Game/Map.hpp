@@ -47,6 +47,7 @@ public:
 	void CheckNoClipping();
 	void Render() const;
 	void GarbageCollection();
+	void IsGarbageUpdate();
 
 	bool IsEntityOfTypeWithIDPresent( EntityType entityType , int entityID );
 	int GetTileIndexforTileCoords( const IntVec2& tileCoords ) const;

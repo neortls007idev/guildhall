@@ -149,7 +149,9 @@ void AuthoritativeServer::BeginFrame()
 
 void AuthoritativeServer::EndFrame()
 {
+	g_theGameNetworkSys->m_recieveBufferMutex.lock();
 	ParseReceivedMessages( g_theGameNetworkSys->m_recievedUDPMesageBuffer , true );
+	g_theGameNetworkSys->m_recieveBufferMutex.unlock();
 
 	if( m_sendFreq->HasElapsed() )
 	{

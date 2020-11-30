@@ -61,6 +61,7 @@ void RemoteServer::Update( float deltaSeconds )
 		m_multiPlayerGame->m_world->m_currentMap->UpdateEntityListOfType( deltaSeconds , EVIL_BULLET_ENTITY );
 		m_multiPlayerGame->m_world->m_currentMap->UpdateEntityListOfType( deltaSeconds , GOOD_BULLET_ENTITY );
 		m_multiPlayerGame->m_world->m_currentMap->UpdateEntityListOfType( deltaSeconds , EXPLOSION_ENTITY );
+		m_multiPlayerGame->m_world->m_currentMap->IsGarbageUpdate();
 		m_multiPlayerGame->m_world->m_currentMap->CheckCollisions();
 		m_multiPlayerGame->m_world->m_currentMap->GarbageCollection();
 		m_frameID++;
@@ -128,7 +129,9 @@ void RemoteServer::BeginFrame()
 void RemoteServer::EndFrame()
 {
 	//ParseAndUpdateEntities();
+	g_theGameNetworkSys->m_recieveBufferMutex.lock();
 	ParseReceivedMessages( g_theGameNetworkSys->m_recievedUDPMesageBuffer , false );
+	g_theGameNetworkSys->m_recieveBufferMutex.unlock();
 	//Server::EndFrame();
 }
 

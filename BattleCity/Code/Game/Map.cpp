@@ -172,6 +172,28 @@ void Map::GarbageCollection()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+void Map::IsGarbageUpdate()
+{
+	for ( int entityType = 0; entityType < NUM_ENTITY_TYPES; entityType++ )
+	{
+		Entitylist entityList = m_entityListsByType[ entityType ];
+		for ( int entityIndex = 0; entityIndex < entityList.size(); entityIndex++ )
+		{
+			if ( entityList[ entityIndex ] == nullptr )
+			{
+				continue;
+			}
+
+			if ( entityList[ entityIndex ]->m_health <= 0 )
+			{
+				entityList[ entityIndex ]->m_isGarbage = true;
+			}
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 bool Map::IsEntityOfTypeWithIDPresent( EntityType entityType , int entityID )
 {
 	Entitylist entityList = m_entityListsByType[ entityType ];

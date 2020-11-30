@@ -56,6 +56,7 @@ public:
 	std::vector< std::string >		m_recievedTCPServerMesageBuffer;
 	std::vector< std::string >		m_recievedUDPMesageBuffer;
 	std::vector< std::string >		m_sentUDPMesageBuffer;
+	std::mutex						m_recieveBufferMutex;
 
 private:
 	bool							m_isListening						= false;
@@ -66,8 +67,6 @@ private:
 	static bool						m_wasMessageJustSentByServer;
 	static bool						m_wasMessageJustSentByClient;
 	GameUDPListner*					m_UDPListner						= nullptr;
-	std::mutex						m_sendBufferMutex;
-	std::mutex						m_recieveBufferMutex;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------------

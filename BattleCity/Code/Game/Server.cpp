@@ -166,10 +166,10 @@ void Server::ParseReceivedMessages( std::vector< std::string > messageBuffer , b
 
 				int frameID = atoi( data[ D_FRAME_ID ].c_str() );
 				
-				if ( isAuthserver && ( frameID < m_frameID ) )
-				{
-					//continue;
-				}
+				//if ( isAuthserver && ( frameID < m_frameID ) )
+				//{
+				//	continue;
+				//}
 
 				EntityType entityType = ( EntityType ) atoi( data[ D_ENTITY_TYPE ].c_str() );
 				int entityID = atoi( data[ D_ENTITY_ID ].c_str() );
@@ -179,15 +179,15 @@ void Server::ParseReceivedMessages( std::vector< std::string > messageBuffer , b
 				{
 					if ( entityType == GOOD_BULLET_ENTITY )
 					{
-						curMap->SpawnNewEntity( GOOD_BULLET_ENTITY , FACTION_ALLY , Vec2::ZERO , 0.f );
+						curMap->SpawnNewEntity( GOOD_BULLET_ENTITY , FACTION_ALLY , Vec2::SetFromText( data[ D_POSITION ].c_str() ) , StringConvertToValue( data[ D_ORIENTATION_DEG ].c_str() , 0.f ) );
 					}
 					else if ( entityType == EVIL_BULLET_ENTITY )
 					{
-						curMap->SpawnNewEntity( EVIL_BULLET_ENTITY , FACTION_ENEMY , Vec2::ZERO , 0.f );
+						curMap->SpawnNewEntity( EVIL_BULLET_ENTITY , FACTION_ENEMY , Vec2::SetFromText( data[ D_POSITION ].c_str() ) , StringConvertToValue( data[ D_ORIENTATION_DEG ].c_str() , 0.f ) );
 					}
 					else if ( entityType == EXPLOSION_ENTITY )
 					{
-						curMap->SpawnNewEntity( EVIL_BULLET_ENTITY , FACTION_NEUTRAL , Vec2::ZERO , 0.f );
+						curMap->SpawnNewEntity( EXPLOSION_ENTITY , FACTION_NEUTRAL , Vec2::SetFromText( data[ D_POSITION ].c_str() ) , StringConvertToValue( data[ D_ORIENTATION_DEG ].c_str() , 0.f ) );
 					}
 				}
 				Entitylist& entityList = currentGame->m_world->m_currentMap->m_entityListsByType[ entityType ];

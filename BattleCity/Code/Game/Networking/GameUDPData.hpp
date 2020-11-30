@@ -22,6 +22,7 @@ enum PacketDataBreakDown
 	D_ORIENTATION_DEG,
 	D_FACTION,
 	D_HEALTH,
+	D_GARBAGE,
 
 	D_NUM_TOTAL
 };
