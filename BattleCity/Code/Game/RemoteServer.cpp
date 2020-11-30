@@ -128,7 +128,7 @@ void RemoteServer::BeginFrame()
 void RemoteServer::EndFrame()
 {
 	//ParseAndUpdateEntities();
-	ParseReceivedMessages( g_theGameNetworkSys->m_recievedUDPMesageBuffer );
+	ParseReceivedMessages( g_theGameNetworkSys->m_recievedUDPMesageBuffer , false );
 	//Server::EndFrame();
 }
 

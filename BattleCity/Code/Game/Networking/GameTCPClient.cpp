@@ -60,8 +60,8 @@ SOCKET GameTCPClient::Connect( std::string const& host , std::uint16_t port , Mo
 		g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Connection Failed, Invalid Socket" );
 	}
 	// Set blocking mode as needed.
-	if( m_mode == Mode::Nonblocking )
-	{
+	//if( m_mode == Mode::Nonblocking )
+	//{
 		u_long winsockmode = 1;
 		iResult = ioctlsocket( socket , FIONBIO , &winsockmode );
 		if( iResult == SOCKET_ERROR )
@@ -69,7 +69,7 @@ SOCKET GameTCPClient::Connect( std::string const& host , std::uint16_t port , Mo
 			g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "IOCTL on server listen socket failed, error = %d" , WSAGetLastError() );
 			closesocket( socket );
 		}
-	}
+	//}
 	return socket;
 }
 

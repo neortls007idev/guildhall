@@ -34,7 +34,7 @@ public:
 	void	AddRemoteNewRemotePlayer();
 	Game*	GetGame();
 	int		GetFrameID()																		{ return m_frameID;  }
-	void	ParseReceivedMessages( std::vector< std::string > messageBuffer );
+	void	ParseReceivedMessages( std::vector< std::string > messageBuffer , bool isAuthserver );
 	
 public:
 	bool						m_isRemoteClientConnectionComplete = false;

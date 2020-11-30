@@ -141,7 +141,7 @@ Game* Server::GetGame()
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-void Server::ParseReceivedMessages( std::vector< std::string > messageBuffer )
+void Server::ParseReceivedMessages( std::vector< std::string > messageBuffer , bool isAuthserver )
 {
 	if ( m_gameType == MULTIPLAYER && m_isRemoteClientConnectionComplete )
 	{
@@ -163,6 +163,14 @@ void Server::ParseReceivedMessages( std::vector< std::string > messageBuffer )
 				{
 					continue;
 				}
+
+				int frameID = atoi( data[ D_FRAME_ID ].c_str() );
+				
+				if ( isAuthserver && ( frameID < m_frameID ) )
+				{
+					//continue;
+				}
+
 				EntityType entityType = ( EntityType ) atoi( data[ D_ENTITY_TYPE ].c_str() );
 				int entityID = atoi( data[ D_ENTITY_ID ].c_str() );
 				Map* curMap = GetGame()->m_world->m_currentMap;

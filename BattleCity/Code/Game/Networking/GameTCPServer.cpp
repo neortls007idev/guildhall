@@ -65,7 +65,7 @@ void GameTCPServer::Bind()
 		g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to ioctlsocket Failed %i" , WSAGetLastError() );
 	}
 
-	iResult = bind( m_listenSocket , pAddressOut->ai_addr , ( int ) pAddressOut->ai_addrlen );
+	iResult = ::bind( m_listenSocket , pAddressOut->ai_addr , ( int ) pAddressOut->ai_addrlen );
 
 	if( iResult == SOCKET_ERROR )
 	{
@@ -77,7 +77,7 @@ void GameTCPServer::Bind()
 
 void GameTCPServer::Listen()
 {
-	int iResult = listen( m_listenSocket , SOMAXCONN );
+	int iResult = ::listen( m_listenSocket , SOMAXCONN );
 	if( iResult == SOCKET_ERROR )
 	{
 		g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to listen Failed %i" , WSAGetLastError() );
@@ -147,7 +147,7 @@ void GameTCPServer::SendClientMessage( SOCKET client )
 		buffer[ index + 4 ] = msg[ index ];
 	}
 		
-	int iResult = send( client , &buffer[ 0 ] , static_cast< int >( GetServerSendMessage().size() + 4 ) , 0 );
+	int iResult = ::send( client , &buffer[ 0 ] , static_cast< int >( GetServerSendMessage().size() + 4 ) , 0 );
 	if( iResult == SOCKET_ERROR )
 	{
 		g_theDevConsole->PrintString( DEVCONSOLE_WARNING , "Sending Data to Client Failed %i" , WSAGetLastError() );
@@ -165,14 +165,14 @@ SOCKET GameTCPServer::Accept()
 	FD_SET( m_listenSocket , &m_listenSet );
 	int iResult = select( 0 , &m_listenSet , NULL , NULL , &m_timeVal );
 
-	if( iResult == INVALID_SOCKET )
+	if( iResult == SOCKET_ERROR )
 	{
 		g_theDevConsole->PrintString( DEVCONSOLE_ERROR , "Call to Select Failed %i" , WSAGetLastError() );
 	}
 
 	if( FD_ISSET( m_listenSocket , &m_listenSet ) )
 	{
-		clientSocket = accept( m_listenSocket , NULL , NULL );
+		clientSocket = ::accept( m_listenSocket , NULL , NULL );
 
 		if( clientSocket == INVALID_SOCKET )
 		{
