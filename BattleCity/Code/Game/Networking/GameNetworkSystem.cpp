@@ -105,7 +105,8 @@ void GameNetworkSystem::BeginFrame()
 
 				if( m_linkSocket != INVALID_SOCKET )
 				{
-					g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client Connected from %s" , GetAddress( m_linkSocket ).c_str() );
+					m_clientAddr = GetAddress( m_linkSocket ) ;
+					g_theDevConsole->PrintString( DEVCONSOLE_SYTEMLOG , "Client Connected from %s" , m_clientAddr.c_str() );
 				}
 			}
 			if( m_linkSocket != INVALID_SOCKET )

@@ -57,7 +57,7 @@ public:
 	std::vector< std::string >		m_recievedUDPMesageBuffer;
 	std::vector< std::string >		m_sentUDPMesageBuffer;
 	std::mutex						m_recieveBufferMutex;
-
+	std::string						m_clientAddr;
 private:
 	bool							m_isListening						= false;
 	int								m_listenPort						= -1;

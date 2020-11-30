@@ -62,7 +62,7 @@ int GameUDPSocket::Send( int length )
 	int result = ::sendto( m_socket , &m_sendBuffer[ 0 ] , static_cast< int >( length ) , 0 , reinterpret_cast< SOCKADDR* >( &m_toAddress ) , sizeof( m_toAddress ) );
 	if ( result == SOCKET_ERROR )
 	{
-		LOG_ERROR( "Send on UDP Socket Failed, Error = %d" , WSAGetLastError() );
+		//LOG_ERROR( "Send on UDP Socket Failed, Error = %d" , WSAGetLastError() );
 	}
 	return result;
 }

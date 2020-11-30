@@ -36,7 +36,7 @@ AuthoritativeServer::~AuthoritativeServer()
 void AuthoritativeServer::Startup()
 {
 	m_sendFreq = new Timer();
-	m_sendFreq->SetSeconds( 0.032 );
+	m_sendFreq->SetSeconds( 0.008 );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ void AuthoritativeServer::BeginFrame()
 
 					UDPArgs.SetValue( "bindPort" , ToString( m_udpListenPort ) );
 					UDPArgs.SetValue( "sendPort" , ToString( m_udpSendToPort ) );
-					UDPArgs.SetValue( "host" , ipaddr.c_str() );
+					UDPArgs.SetValue( "host" , /*ipaddr.c_str()*/g_theGameNetworkSys->m_clientAddr.c_str() );
 
 					args.SetValue( "msg" , message );
 
