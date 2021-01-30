@@ -10,9 +10,9 @@
 #include <windows.h>					// #include this (massive, platform-specific) header in very few places
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-
-extern	DevConsole* g_theDevConsole;
-extern	Window*		g_theWindow;
+		InputSystem*	g_theInput		= nullptr;
+extern	DevConsole*		g_theDevConsole;
+extern	Window*			g_theWindow;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 

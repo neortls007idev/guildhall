@@ -15,8 +15,11 @@
 #include "Game/EngineBuildPreferences.hpp"
 #if !defined( ENGINE_DISABLE_AUDIO )
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+	
+	AudioSystem* g_theAudioSystem = nullptr;
 
-//-----------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------
 // Link in the appropriate FMOD static library (32-bit or 64-bit)
 //
 #if defined( _WIN64 )
@@ -24,7 +27,6 @@
 #else
 #pragma comment( lib, "ThirdParty/fmod/fmod_vc.lib" )
 #endif
-
 
 //-----------------------------------------------------------------------------------------------
 // Initialization code based on example from "FMOD Studio Programmers API for Windows"
